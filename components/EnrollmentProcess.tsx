@@ -163,7 +163,7 @@ d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:info@www.elevateforhumanity.org"
+              href="mailto:info@elevateforhumanity.org"
               className="inline-block px-8 py-4 bg-white text-orange-600 font-bold rounded-full hover:bg-slate-50 transition-all"
             >
               Email Us

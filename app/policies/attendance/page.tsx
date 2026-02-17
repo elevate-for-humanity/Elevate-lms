@@ -270,7 +270,7 @@ export default function AttendancePage() {
               For attendance questions or to report absences:
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
-              <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
+              <li><strong>Email:</strong> info@elevateforhumanity.org</li>
               <li><strong>Phone:</strong> (317) 314-3757</li>
               <li><strong>Office Hours:</strong> Monday-Friday, 8:00 AM - 6:00 PM EST</li>
               <li><strong>Emergency Line:</strong> (317) 314-3757 ext. 911 (after hours)</li>

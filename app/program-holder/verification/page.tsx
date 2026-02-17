@@ -261,7 +261,7 @@ export default async function VerificationPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
-                  href="mailto:elevate4humanityedu@gmail.com"
+                  href="mailto:info@elevateforhumanity.org"
                   className="inline-flex items-center text-brand-blue-900 hover:text-brand-blue-700 font-medium"
                 >
                   <Mail className="h-4 w-4 mr-2" />

@@ -147,10 +147,10 @@ export default function AccessibilityPage() {
             <div className="flex items-center gap-3">
               <Mail className="w-5 h-5 text-brand-blue-600" />
               <a
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="mailto:info@elevateforhumanity.org"
                 className="text-brand-blue-600 hover:underline font-semibold"
               >
-                elevate4humanityedu@gmail.com
+                info@elevateforhumanity.org
               </a>
             </div>
             <div className="flex items-center gap-3">

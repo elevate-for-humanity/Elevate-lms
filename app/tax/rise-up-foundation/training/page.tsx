@@ -302,7 +302,7 @@ export default function TrainingPage() {
             Call support center
           </a>
           <a
-            href="mailto:elevate4humanityedu@gmail.com"
+            href="mailto:info@elevateforhumanity.org"
             className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-green-50 transition"
           >
             Email for Access Code

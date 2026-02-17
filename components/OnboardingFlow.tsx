@@ -247,7 +247,7 @@ export function StudentOnboarding({ onComplete }: { onComplete: () => void }) {
             </div>
             <div className="bg-slate-50 rounded-lg p-4">
               <div className="font-semibold text-black mb-1">📧 Email Support</div>
-              <div className="text-sm text-black">elevate4humanityedu@gmail.com</div>
+              <div className="text-sm text-black">info@elevateforhumanity.org</div>
             </div>
             <div className="bg-slate-50 rounded-lg p-4">
               <div className="font-semibold text-black mb-1">📚 Help Center</div>

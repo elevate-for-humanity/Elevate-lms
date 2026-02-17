@@ -121,10 +121,10 @@ export default function SiteLocatorPage() {
               <br />
               Email:{' '}
               <a
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="mailto:info@elevateforhumanity.org"
                 className="text-brand-green-600 hover:underline"
               >
-                elevate4humanityedu@gmail.com
+                info@elevateforhumanity.org
               </a>
             </p>
           </div>

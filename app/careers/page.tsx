@@ -347,7 +347,7 @@ export default async function CareersPage() {
               { q: 'Are positions full-time or part-time?', a: 'We offer both. Many instructor positions are part-time or contract-based. Administrative roles are typically full-time.' },
               { q: 'Can I work remotely?', a: 'Some administrative positions offer remote or hybrid options. Instructor and student-facing roles are typically on-site.' },
               { q: 'What benefits do you offer?', a: 'Full-time employees receive health insurance, paid time off, and professional development opportunities. Benefits vary by position type.' },
-              { q: 'How do I apply?', a: 'Click on any open position to apply online. You can also send your resume to elevate4humanityedu@gmail.com for general consideration.' },
+              { q: 'How do I apply?', a: 'Click on any open position to apply online. You can also send your resume to info@elevateforhumanity.org for general consideration.' },
             ].map((faq, i) => (
               <details key={i} className="bg-white rounded-xl overflow-hidden shadow-sm group">
                 <summary className="p-5 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">

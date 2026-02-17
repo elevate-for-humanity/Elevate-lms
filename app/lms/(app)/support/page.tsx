@@ -214,13 +214,13 @@ export default async function SupportPage() {
                     <div className="text-sm">Get Help Online</div>
                   </div>
                 </a>
-                <a href="mailto:elevate4humanityedu@gmail.com" className="flex items-center gap-3 text-slate-600 hover:text-brand-blue-600">
+                <a href="mailto:info@elevateforhumanity.org" className="flex items-center gap-3 text-slate-600 hover:text-brand-blue-600">
                   <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
                     <Mail className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="font-medium text-slate-900">Email Support</div>
-                    <div className="text-sm">elevate4humanityedu@gmail.com</div>
+                    <div className="text-sm">info@elevateforhumanity.org</div>
                   </div>
                 </a>
               </div>

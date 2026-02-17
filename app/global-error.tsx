@@ -96,7 +96,7 @@ export default function GlobalError({
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center text-sm">
                 <a 
-                  href="mailto:elevate4humanityedu@gmail.com" 
+                  href="mailto:info@elevateforhumanity.org" 
                   className="text-orange-600 hover:text-orange-700 font-semibold hover:underline"
                 >
                   Email Support

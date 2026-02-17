@@ -19,7 +19,7 @@ export default function OrientationFormClient() {
         const endH = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
         const endDT = `${date.replace(/-/g, '')}T${endH}${time.split(':')[1]}00`;
         const details = `Orientation for ${name} (${email})%0A%0AZoom Link: ${ZOOM_MEETING_URL}`;
-        const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Elevate for Humanity — Orientation')}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)},${encodeURIComponent('elevate4humanityedu@gmail.com')}&location=Zoom`;
+        const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Elevate for Humanity — Orientation')}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)},${encodeURIComponent('info@elevateforhumanity.org')}&location=Zoom`;
 
         window.open(calUrl, '_blank');
       }}

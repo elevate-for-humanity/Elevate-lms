@@ -54,10 +54,10 @@ export default function Error({
         <div className="text-sm text-gray-500">
           <p>If this problem persists, please contact support:</p>
           <a 
-            href="mailto:elevate4humanityedu@gmail.com" 
+            href="mailto:info@elevateforhumanity.org" 
             className="text-brand-blue-600 hover:underline"
           >
-            elevate4humanityedu@gmail.com
+            info@elevateforhumanity.org
           </a>
         </div>
       </div>

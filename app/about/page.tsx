@@ -53,8 +53,8 @@ export default function AboutPage() {
             Elevate for Humanity
           </h1>
           <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
-            A nonprofit workforce development organization providing free career training
-            in Indianapolis, Indiana. Founded in 2019 by Elizabeth Greene.
+            A workforce development and career training institute operated by 2Exclusive LLC-S, 
+            in partnership with Rise Forward Foundation. Founded in 2019 by Elizabeth Greene.
           </p>
         </div>
       </section>

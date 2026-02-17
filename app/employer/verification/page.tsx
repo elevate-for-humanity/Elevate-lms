@@ -60,7 +60,7 @@ export default async function EmployerVerificationPage() {
             </ul>
           </div>
           <p className="text-slate-500 text-sm">
-            Contact elevate4humanityedu@gmail.com to complete verification.
+            Contact info@elevateforhumanity.org to complete verification.
           </p>
         </div>
       </div>

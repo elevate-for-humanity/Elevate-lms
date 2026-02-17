@@ -210,11 +210,11 @@ export default async function SecurityPage() {
               concerns about data protection, please contact us immediately:
             </p>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="mailto:info@elevateforhumanity.org"
               className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:underline"
             >
               <Mail className="w-5 h-5" />
-              elevate4humanityedu@gmail.com
+              info@elevateforhumanity.org
             </a>
           </div>
         </section>

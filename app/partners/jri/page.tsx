@@ -218,11 +218,11 @@ export default function JRIPage() {
 
               <div className="space-y-2">
                 <a
-                  href="mailto:elevate4humanityedu@gmail.com"
+                  href="mailto:info@elevateforhumanity.org"
                   className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700"
                 >
                   <Mail className="w-4 h-4" />
-                  elevate4humanityedu@gmail.com
+                  info@elevateforhumanity.org
                 </a>
               </div>
             </div>

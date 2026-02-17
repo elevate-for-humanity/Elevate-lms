@@ -58,7 +58,7 @@ export default function InquirySuccessPage() {
               Browse FAQ
             </a>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="mailto:info@elevateforhumanity.org"
               className="flex items-center gap-1 text-brand-blue-600 hover:underline text-sm"
             >
               <Mail className="w-3 h-3" />

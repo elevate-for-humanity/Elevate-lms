@@ -415,7 +415,7 @@ export default async function AcademicIntegrityPage() {
               <li>• Speak directly with the course instructor</li>
               <li>• Contact the Dean of Students</li>
               <li>• Submit an anonymous report through the student portal</li>
-              <li>• Email: elevate4humanityedu@gmail.com</li>
+              <li>• Email: info@elevateforhumanity.org</li>
               <li>• Phone: 317-314-3757</li>
             </ul>
             <p className="text-brand-blue-900 text-sm mt-4">
@@ -486,7 +486,7 @@ export default async function AcademicIntegrityPage() {
                 Contact Student Services
               </p>
               <a
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="mailto:info@elevateforhumanity.org"
                 className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
                 Email Support →

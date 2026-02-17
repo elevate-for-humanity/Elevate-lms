@@ -41,7 +41,7 @@ export default function StaffApplicationForm() {
         `Email: ${data.email}\nPhone: ${data.phone}\n` +
         `Experience: ${data.experience || 'N/A'}\nAvailability: ${data.availability || 'N/A'}\n`
       );
-      window.location.href = `mailto:elevate4humanityedu@gmail.com?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:info@elevateforhumanity.org?subject=${subject}&body=${body}`;
       setLoading(false);
     }
   }

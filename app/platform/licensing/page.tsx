@@ -377,7 +377,7 @@ export default function LicensingPage() {
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
           <p className="mt-8 text-sm text-slate-500">
-            Or email directly: <a href="mailto:elevate4humanityedu@gmail.com" className="underline hover:text-white/60">elevate4humanityedu@gmail.com</a>
+            Or email directly: <a href="mailto:info@elevateforhumanity.org" className="underline hover:text-white/60">info@elevateforhumanity.org</a>
           </p>
         </div>
       </section>

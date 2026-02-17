@@ -310,7 +310,7 @@ export default async function ProgramHolderHandbookPage() {
           <p>For questions or support:</p>
           <ul>
             <li>
-              <strong>Email:</strong> elevate4humanityedu@gmail.com
+              <strong>Email:</strong> info@elevateforhumanity.org
             </li>
             <li>
               <strong>Phone:</strong> (317) 314-3757

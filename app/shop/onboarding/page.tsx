@@ -282,7 +282,7 @@ export default async function ShopOnboardingPage() {
             Sponsor of Record
           </h3>
           <p className="text-sm text-brand-blue-900 mb-2">
-            Elevate for Humanity is the program brand operated by 2Exclusive LLC, the USDOL Registered Apprenticeship Sponsor of Record.
+            Elevate for Humanity is the program brand operated by 2Exclusive LLC-S, the USDOL Registered Apprenticeship Sponsor of Record.
           </p>
           <p className="text-sm text-brand-blue-800">
             Partner training sites provide supervised practical training and validate training hours. Partners do not set wages, provide payroll services, or guarantee employment.

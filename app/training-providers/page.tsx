@@ -287,8 +287,8 @@ export default function TrainingProvidersPage() {
           </div>
           <p className="mt-8 text-gray-500">
             Questions? Email us at{' '}
-            <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">
-              elevate4humanityedu@gmail.com
+            <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">
+              info@elevateforhumanity.org
             </a>
           </p>
         </div>

@@ -74,7 +74,7 @@ export default function CompliancePage() {
             </h2>
             <p className="text-slate-700 leading-relaxed">
               Elevate for Humanity is a workforce development and career training institute
-              operated by 2Exclusive LLC, a registered limited liability company in the State of Indiana.
+              operated by 2Exclusive LLC-S, a registered limited liability company in the State of Indiana.
               This document defines how disclosures are presented, how claims are supported,
               and how compliance alignment is maintained across the platform. It exists to
               ensure that users, partners, regulators, and payment processors can verify

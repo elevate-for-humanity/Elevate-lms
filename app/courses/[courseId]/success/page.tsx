@@ -145,7 +145,7 @@ export default async function EnrollmentSuccessPage({
               Call support center
             </a>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="mailto:info@elevateforhumanity.org"
               className="inline-flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-black px-6 py-3 rounded-lg font-bold transition-colors"
             >
               Email Support

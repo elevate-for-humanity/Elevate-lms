@@ -3,10 +3,11 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
-const EFFECTIVE_DATE = 'February 1, 2025';
-const LEGAL_ENTITY = '2Exclusive LLC';
+const EFFECTIVE_DATE = 'February 17, 2026';
+const LEGAL_ENTITY = '2Exclusive LLC-S (d/b/a Elevate for Humanity Career & Technical Institute)';
 const ORG_NAME = 'Elevate for Humanity';
 const ORG_FULL = `${ORG_NAME}, operated by ${LEGAL_ENTITY}`;
+const PARTNER_ENTITY = 'Selfish Inc. (d/b/a Rise Forward Foundation)';
 const ORG_EMAIL = 'privacy@elevateforhumanity.org';
 const ORG_PHONE = '(317) 314-3757';
 const ORG_ADDRESS = 'Indianapolis, IN 46201';
@@ -123,7 +124,7 @@ export default function PrivacyPolicyPage() {
                 <li>Our learning management system (LMS) and student portal</li>
                 <li>Online enrollment, application, and payment forms</li>
                 <li>Career services, job placement, and employer partnership tools</li>
-                <li>SupersonicFastCash tax preparation services</li>
+                <li>Services delivered in partnership with Rise Forward Foundation</li>
                 <li>Communications via email, phone, text, and chat</li>
               </ul>
             </Section>
@@ -137,7 +138,7 @@ export default function PrivacyPolicyPage() {
                 <li>Educational background, employment history, and military service status</li>
                 <li>Program enrollment selections and scheduling preferences</li>
                 <li>Financial information for tuition payments (processed by Stripe; we do not store card numbers)</li>
-                <li>Tax return information (for SupersonicFastCash clients only, stored encrypted)</li>
+                <li>Tax return information (for tax preparation clients only, stored encrypted and governed by a separate addendum)</li>
                 <li>Documents you upload (ID, transcripts, certifications, W-2s)</li>
               </ul>
 
@@ -163,7 +164,7 @@ export default function PrivacyPolicyPage() {
                 <li>Deliver training programs, track progress, and issue certifications</li>
                 <li>Provide career services including resume assistance and job placement</li>
                 <li>Process tuition payments and financial aid</li>
-                <li>Prepare and file tax returns (SupersonicFastCash clients)</li>
+                <li>Prepare and file tax returns (tax preparation clients, governed by separate addendum)</li>
                 <li>Communicate about programs, schedules, and deadlines</li>
                 <li>Comply with WIOA, WRG, JRI, and DOL reporting requirements</li>
                 <li>Report apprenticeship outcomes to the U.S. Department of Labor</li>
@@ -198,8 +199,16 @@ export default function PrivacyPolicyPage() {
                   <p className="text-sm">Supabase (database), Stripe (payments), Netlify (hosting), Sentry (error monitoring) — bound by data processing agreements.</p>
                 </div>
                 <div className="border-t border-slate-200 pt-3">
+                  <p className="font-semibold text-slate-900">Rise Forward Foundation (Supportive Services)</p>
+                  <p className="text-sm">We may share limited information with Selfish Inc. (d/b/a Rise Forward Foundation) to coordinate supportive services, including mental wellness programming (CurvatureBody Sculpting). We share the minimum necessary data and require appropriate safeguards.</p>
+                </div>
+                <div className="border-t border-slate-200 pt-3">
+                  <p className="font-semibold text-slate-900">Training Partners</p>
+                  <p className="text-sm">We may share limited information with training partners (e.g., Choice Medical CNA School) when required to deliver instruction, clinical components, attendance verification, credentialing, or program administration.</p>
+                </div>
+                <div className="border-t border-slate-200 pt-3">
                   <p className="font-semibold text-slate-900">IRS</p>
-                  <p className="text-sm">Tax return data for SupersonicFastCash clients — transmitted via IRS Modernized e-File (MeF) system with end-to-end encryption.</p>
+                  <p className="text-sm">Tax return data for tax preparation clients — transmitted via IRS Modernized e-File (MeF) system with end-to-end encryption. Governed by a separate privacy addendum.</p>
                 </div>
                 <div className="border-t border-slate-200 pt-3">
                   <p className="font-semibold text-slate-900">Legal Authorities</p>

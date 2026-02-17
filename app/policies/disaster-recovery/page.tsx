@@ -191,7 +191,7 @@ export default function DisasterRecoveryPage() {
           For questions about disaster recovery procedures or to report an incident:
         </p>
         <ul className="list-none mb-6 text-black space-y-2 p-0">
-          <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
+          <li><strong>Email:</strong> info@elevateforhumanity.org</li>
           <li><strong>Phone:</strong> (317) 314-3757</li>
         </ul>
 

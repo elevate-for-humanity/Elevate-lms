@@ -41,7 +41,7 @@ export default function EmployerApplicationForm() {
         `Email: ${data.email}\nPhone: ${data.phone}\n` +
         `Industry: ${data.industry || 'N/A'}\nHiring Needs: ${data.hiringNeeds || 'N/A'}\n`
       );
-      window.location.href = `mailto:elevate4humanityedu@gmail.com?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:info@elevateforhumanity.org?subject=${subject}&body=${body}`;
       setLoading(false);
     }
   }

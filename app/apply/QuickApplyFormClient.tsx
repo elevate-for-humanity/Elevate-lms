@@ -261,10 +261,10 @@ Preferred Contact: ${form.preferredContact}`,
               </a>{' '}
               or email{' '}
               <a
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="mailto:info@elevateforhumanity.org"
                 className="font-bold text-brand-orange-600 hover:text-brand-orange-700"
               >
-                elevate4humanityedu@gmail.com
+                info@elevateforhumanity.org
               </a>
             </p>
           </div>

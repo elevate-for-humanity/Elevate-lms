@@ -162,11 +162,11 @@ export default async function ApplicationSuccessPage({
               Get Help Online
             </a>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="mailto:info@elevateforhumanity.org"
               className="flex items-center gap-2 text-brand-blue-600 hover:underline"
             >
               <Mail className="w-5 h-5" />
-              elevate4humanityedu@gmail.com
+              info@elevateforhumanity.org
             </a>
           </div>
         </div>

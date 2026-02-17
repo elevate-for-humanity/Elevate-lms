@@ -360,10 +360,10 @@ export default function BookAppointmentPage() {
                 <div>
                   <div className="font-semibold text-sm">Email</div>
                   <a
-                    href="mailto:elevate4humanityedu@gmail.com"
+                    href="mailto:info@elevateforhumanity.org"
                     className="text-brand-blue-600 hover:underline text-sm"
                   >
-                    elevate4humanityedu@gmail.com
+                    info@elevateforhumanity.org
                   </a>
                 </div>
               </div>

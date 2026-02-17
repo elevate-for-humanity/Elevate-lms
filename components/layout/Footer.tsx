@@ -67,10 +67,11 @@ export function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-6 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-          <div>© {new Date().getFullYear()} Elevate for Humanity. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} 2Exclusive LLC-S (d/b/a Elevate for Humanity Career &amp; Technical Institute). All rights reserved.</div>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-white">Privacy</Link>
             <Link href="/terms" className="hover:text-white">Terms</Link>
+            <Link href="/governance/legal" className="hover:text-white">Legal</Link>
             <Link href="/governance" className="hover:text-white">Governance</Link>
           </div>
         </div>

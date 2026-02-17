@@ -5,7 +5,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Security & Data Protection Statement | Elevate for Humanity',
-  description: 'How Supersonic Fast Cash LLC and its associated platform components protect personal, financial, and operational data.',
+  description: 'How 2Exclusive LLC-S (d/b/a Elevate for Humanity Career & Technical Institute) protects personal, educational, and operational data.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/governance/security',
   },
@@ -49,7 +49,7 @@ export default function SecurityDocumentPage() {
             </div>
           </div>
           <p className="text-slate-300">
-            Supersonic Fast Cash LLC & Platform Ecosystem
+            2Exclusive LLC-S (d/b/a Elevate for Humanity Career &amp; Technical Institute)
           </p>
           <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-400">
             <span>Version: 1.0</span>
@@ -69,10 +69,12 @@ export default function SecurityDocumentPage() {
               1. Purpose
             </h2>
             <p className="text-slate-700 leading-relaxed">
-              This document defines how Supersonic Fast Cash LLC and its associated platform components 
-              protect personal, financial, and operational data. It exists to provide clear, accurate, 
-              and reviewable information to users, partners, regulators, and payment processors regarding 
-              security practices and data handling.
+              This document defines how 2Exclusive LLC-S (d/b/a Elevate for Humanity Career &amp; Technical Institute) 
+              protects personal, educational, and operational data across the workforce training platform. 
+              It provides clear, accurate, and reviewable information to students, partners, regulators, 
+              and funding agencies regarding security practices and data handling.
+              Rise Forward Foundation and training partners (e.g., Choice Medical CNA School) operate 
+              their own systems independently. This document covers only Elevate for Humanity systems.
             </p>
             <p className="text-slate-700 leading-relaxed mt-4">
               This document governs all systems unless a more specific authoritative document explicitly 
@@ -89,13 +91,20 @@ export default function SecurityDocumentPage() {
               This statement applies to all platform components, including:
             </p>
             <ul className="list-disc list-inside text-slate-700 space-y-2 ml-4">
-              <li>Public website and marketing pages</li>
+              <li>Public website and marketing pages (elevateforhumanity.org)</li>
               <li>Learning Management System (LMS)</li>
               <li>Store, checkout, and payment flows</li>
-              <li>Supersonic Fast Cash tax preparation services</li>
-              <li>Refund-based cash advance workflows</li>
-              <li>Administrative and partner portals</li>
+              <li>Student enrollment and credentialing systems</li>
+              <li>WIOA/WRG/JRI funding and compliance workflows</li>
+              <li>Administrative, instructor, and partner portals</li>
             </ul>
+            <p className="text-slate-700 leading-relaxed mt-4">
+              Tax preparation services operated under the SupersonicFastCash brand (a separate DBA of 2Exclusive LLC-S) 
+              are governed by a separate security addendum available at{' '}
+              <Link href="/supersonic-fast-cash/governance" className="text-brand-blue-600 hover:underline">
+                supersonicfastcash security documentation
+              </Link>.
+            </p>
             <p className="text-slate-700 leading-relaxed mt-4">
               It applies to all users, including students, tax filers, instructors, administrators, 
               partners, and internal staff.

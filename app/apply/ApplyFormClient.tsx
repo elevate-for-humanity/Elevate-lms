@@ -452,7 +452,7 @@ export default function ApplyFormClient() {
                 <p className="text-sm text-black">
                   This will open your email client to send to:{' '}
                   <span className="font-semibold">
-                    elevate4humanityedu@gmail.com
+                    info@elevateforhumanity.org
                   </span>
                 </p>
                 <p className="text-xs text-slate-500">

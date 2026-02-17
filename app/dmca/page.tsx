@@ -117,10 +117,10 @@ export default async function DMCAPage() {
               <p className="text-black mb-2">
                 Email:{' '}
                 <a
-                  href="mailto:elevate4humanityedu@gmail.com"
+                  href="mailto:info@elevateforhumanity.org"
                   className="text-brand-blue-600 hover:underline"
                 >
-                  elevate4humanityedu@gmail.com
+                  info@elevateforhumanity.org
                 </a>
               </p>
               <p className="text-black">
@@ -207,10 +207,10 @@ export default async function DMCAPage() {
               <p className="text-black mb-2">
                 Email:{' '}
                 <a
-                  href="mailto:elevate4humanityedu@gmail.com"
+                  href="mailto:info@elevateforhumanity.org"
                   className="text-brand-blue-600 hover:underline"
                 >
-                  elevate4humanityedu@gmail.com
+                  info@elevateforhumanity.org
                 </a>
               </p>
               <p className="text-black">

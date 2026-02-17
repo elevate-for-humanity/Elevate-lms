@@ -166,7 +166,7 @@ export default function BarberChatAssistant() {
       if (data.error) {
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: "I'm not sure about that. For specific questions, please contact us at (317) 314-3757 or email elevate4humanityedu@gmail.com.",
+          content: "I'm not sure about that. For specific questions, please contact us at (317) 314-3757 or email info@elevateforhumanity.org.",
         }]);
       } else {
         setMessages(prev => [...prev, {

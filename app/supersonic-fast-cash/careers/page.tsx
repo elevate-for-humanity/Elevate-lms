@@ -294,7 +294,7 @@ export default async function TaxCareersPage() {
           <div className="mt-8 text-center">
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="mailto:elevate4humanityedu@gmail.com?subject=Employee Referral"
+                href="mailto:info@elevateforhumanity.org?subject=Employee Referral"
                 className="inline-block px-8 py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition"
               >
                 Submit a Referral
@@ -773,10 +773,10 @@ export default async function TaxCareersPage() {
               </a>{' '}
               or email{' '}
               <a
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="mailto:info@elevateforhumanity.org"
                 className="text-green-600 font-bold underline"
               >
-                elevate4humanityedu@gmail.com
+                info@elevateforhumanity.org
               </a>
             </p>
           </div>

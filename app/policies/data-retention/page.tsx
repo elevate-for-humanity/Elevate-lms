@@ -278,7 +278,7 @@ export default function DataRetentionPage() {
               For questions about data retention or to request data access/deletion:
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
-              <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
+              <li><strong>Email:</strong> info@elevateforhumanity.org</li>
               <li><strong>Phone:</strong> (317) 314-3757</li>
               <li><strong>Mail:</strong> Privacy Officer, Elevate for Humanity</li>
               <li className="ml-6">3737 N Meridian St, Suite 200</li>

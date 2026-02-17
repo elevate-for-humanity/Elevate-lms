@@ -241,7 +241,7 @@ const productData = {
   lastUpdated: 'January 20, 2026',
   version: '3.2.1',
   developer: 'Elevate for Humanity',
-  supportEmail: 'elevate4humanityedu@gmail.com',
+  supportEmail: 'info@elevateforhumanity.org',
 };
 
 export default function SamGovProductPage() {

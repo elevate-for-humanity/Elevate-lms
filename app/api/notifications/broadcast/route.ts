@@ -12,7 +12,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 // Configure VAPID
 if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(
-    process.env.VAPID_SUBJECT || 'mailto:elevateforhumanity.edu@gmail.com',
+    process.env.VAPID_SUBJECT || 'mailto:info@elevateforhumanity.org',
     process.env.VAPID_PUBLIC_KEY,
     process.env.VAPID_PRIVATE_KEY
   );

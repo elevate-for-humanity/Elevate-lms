@@ -383,7 +383,7 @@ export default function PlatformOverviewPage() {
           <p><strong>Document ID:</strong> EFH-GOV-001</p>
           <p><strong>Classification:</strong> Internal / Shareable upon request</p>
           <p><strong>Owner:</strong> Executive Leadership, Elevate For Humanity</p>
-          <p><strong>Contact:</strong> elevate4humanityedu@gmail.com</p>
+          <p><strong>Contact:</strong> info@elevateforhumanity.org</p>
           <p className="mt-4">© 2025 Elevate For Humanity. All rights reserved.</p>
         </footer>
       </div>

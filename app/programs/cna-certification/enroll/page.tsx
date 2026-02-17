@@ -88,7 +88,7 @@ export default function CNAEnrollPage() {
         window.location.href = `/lms/payments/checkout?program=cna&amount=${PROGRAM_DETAILS.price}&type=full-payment`;
       }
     } catch (err) {
-      setError('There was an error processing your enrollment. Please try again or contact us at elevate4humanityedu@gmail.com');
+      setError('There was an error processing your enrollment. Please try again or contact us at info@elevateforhumanity.org');
       setIsSubmitting(false);
     }
   };
@@ -500,7 +500,7 @@ export default function CNAEnrollPage() {
             {/* Contact */}
             <div className="text-center text-sm text-gray-600">
               <p>Questions? Contact us:</p>
-              <p className="font-medium">elevate4humanityedu@gmail.com</p>
+              <p className="font-medium">info@elevateforhumanity.org</p>
               <p className="font-medium">(317) 555-0123</p>
             </div>
           </div>

@@ -11,7 +11,7 @@ export default function RapidsAdminPage() {
     ...program,
   }));
 
-  const procurementStatement = `Elevate for Humanity is the program brand operated by 2Exclusive LLC, the USDOL Registered Apprenticeship Sponsor of Record for the Barber program in Indiana. Registration documentation is available upon request for procurement, compliance, or partner onboarding purposes. This program is fee-based and not state-funded. Employment and wages, if applicable, are governed by host sites and applicable labor laws and are not administered through Elevate.`;
+  const procurementStatement = `Elevate for Humanity is the program brand operated by 2Exclusive LLC-S, the USDOL Registered Apprenticeship Sponsor of Record for the Barber program in Indiana. Registration documentation is available upon request for procurement, compliance, or partner onboarding purposes. This program is fee-based and not state-funded. Employment and wages, if applicable, are governed by host sites and applicable labor laws and are not administered through Elevate.`;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

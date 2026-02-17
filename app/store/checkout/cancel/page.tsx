@@ -56,10 +56,10 @@ function CancelContent() {
             <p className="text-sm text-gray-400">
               Having trouble? Contact us at{" "}
               <a
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="mailto:info@elevateforhumanity.org"
                 className="text-emerald-400 hover:underline"
               >
-                elevate4humanityedu@gmail.com
+                info@elevateforhumanity.org
               </a>
             </p>
           </div>

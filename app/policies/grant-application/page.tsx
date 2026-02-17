@@ -273,7 +273,7 @@ export default function GrantApplicationPage() {
               For grant opportunities or assistance:
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
-              <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
+              <li><strong>Email:</strong> info@elevateforhumanity.org</li>
               <li><strong>Phone:</strong> (317) 314-3757</li>
               <li><strong>Office Hours:</strong> Monday-Friday, 9:00 AM - 5:00 PM EST</li>
             </ul>

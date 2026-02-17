@@ -94,8 +94,8 @@ export default function ThankYouPage() {
               <a href="/support" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-brand-blue-600">
                 <Phone className="w-4 h-4" /> Get Help Online
               </a>
-              <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-brand-blue-600">
-                <Mail className="w-4 h-4" /> elevate4humanityedu@gmail.com
+              <a href="mailto:info@elevateforhumanity.org" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-brand-blue-600">
+                <Mail className="w-4 h-4" /> info@elevateforhumanity.org
               </a>
             </div>
           </div>

@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
         },
         {
           role: 'user',
-          content: `Write a comprehensive blog post about: ${topic}\n\nContext from our site:\n${context}\n\nThe post should:\n- Be 800-1200 words\n- Use markdown formatting\n- Include relevant headings (##)\n- Provide actionable information\n- End with a call-to-action\n- Be SEO-friendly\n- Include information about WIOA funding if relevant\n- Mention our contact info: (317) 314-3757, info@www.elevateforhumanity.org`,
+          content: `Write a comprehensive blog post about: ${topic}\n\nContext from our site:\n${context}\n\nThe post should:\n- Be 800-1200 words\n- Use markdown formatting\n- Include relevant headings (##)\n- Provide actionable information\n- End with a call-to-action\n- Be SEO-friendly\n- Include information about WIOA funding if relevant\n- Mention our contact info: (317) 314-3757, info@elevateforhumanity.org`,
         },
       ],
       temperature: 0.7,

@@ -302,7 +302,7 @@ export async function GET(request: NextRequest) {
         programName: a.program_slug || 'Barber Apprenticeship',
         occupationCode: a.occupation_code || '39-5011.00',
         occupationTitle: a.occupation_title || 'Barber',
-        sponsorName: process.env.NEXT_PUBLIC_RAPIDS_SPONSOR_NAME || '2Exclusive LLC',
+        sponsorName: process.env.NEXT_PUBLIC_RAPIDS_SPONSOR_NAME || '2Exclusive LLC-S',
         rapidsId: a.rapids_id || '',
         registrationDate: formatDate(a.registration_date || a.started_at || a.created_at),
         expectedCompletionDate: formatDate(a.expected_completion_date),
@@ -331,7 +331,7 @@ export async function GET(request: NextRequest) {
         exportDate: new Date().toISOString(),
         exportType: type,
         recordCount: rapidsData2.length,
-        sponsorName: process.env.NEXT_PUBLIC_RAPIDS_SPONSOR_NAME || '2Exclusive LLC',
+        sponsorName: process.env.NEXT_PUBLIC_RAPIDS_SPONSOR_NAME || '2Exclusive LLC-S',
         programNumber: process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || '2025-IN-132301',
         apprentices: rapidsData2,
       });

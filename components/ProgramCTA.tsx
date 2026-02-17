@@ -249,8 +249,8 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
             <div className="bg-brand-blue-800 rounded-lg p-6">
               <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">✉️</div>
               <h3 className="font-bold mb-2">Email Us</h3>
-              <a href="mailto:info@www.elevateforhumanity.org" className="text-brand-blue-100 hover:text-white">
-                info@www.elevateforhumanity.org
+              <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-100 hover:text-white">
+                info@elevateforhumanity.org
               </a>
             </div>
             <div className="bg-brand-blue-800 rounded-lg p-6">

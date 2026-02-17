@@ -139,7 +139,7 @@ export default function FederalCompliancePage() {
             </p>
             <div className="bg-white rounded-lg p-4 mt-4">
               <p className="font-semibold text-gray-900">Title IX Coordinator Contact:</p>
-              <p>Email: elevate4humanityedu@gmail.com</p>
+              <p>Email: info@elevateforhumanity.org</p>
               <p>Phone: (317) 314-3757</p>
             </div>
           </div>
@@ -234,7 +234,7 @@ export default function FederalCompliancePage() {
             <div className="bg-white/10 rounded-xl p-6">
               <h3 className="font-bold text-lg mb-3">Internal Reporting</h3>
               <div className="space-y-2 text-gray-300">
-                <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> elevate4humanityedu@gmail.com</p>
+                <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> info@elevateforhumanity.org</p>
                 <p className="flex items-center gap-2"><Phone className="w-4 h-4" /> (317) 314-3757</p>
               </div>
               <Link href="/policies/grievance" className="inline-block mt-4 text-orange-400 hover:text-orange-300">

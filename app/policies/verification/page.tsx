@@ -144,7 +144,7 @@ export default function VerificationPage() {
             <div className="bg-green-50 rounded-xl p-6 border-2 border-green-200 mb-6">
               <h4 className="text-lg font-bold text-black mb-3">Contact Registrar</h4>
               <ul className="list-disc pl-6 text-black space-y-2">
-                <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
+                <li><strong>Email:</strong> info@elevateforhumanity.org</li>
                 <li><strong>Phone:</strong> (317) 314-3757</li>
                 <li><strong>Fax:</strong> (317) 314-3758</li>
                 <li><strong>Response Time:</strong> 1-2 business days</li>
@@ -282,7 +282,7 @@ export default function VerificationPage() {
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
               <li><strong>Online Portal:</strong> www.elevateforhumanity.org/verify</li>
-              <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
+              <li><strong>Email:</strong> info@elevateforhumanity.org</li>
               <li><strong>Phone:</strong> (317) 314-3757</li>
               <li><strong>Fax:</strong> (317) 314-3758</li>
               <li><strong>Mail:</strong> Registrar Office, Elevate for Humanity</li>

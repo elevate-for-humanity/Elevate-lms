@@ -201,10 +201,10 @@ export default function ResponseSLAPage() {
               For inquiries and support:
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
-              <li><strong>General:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>Admissions:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>Student Services:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>IT Support:</strong> elevate4humanityedu@gmail.com</li>
+              <li><strong>General:</strong> info@elevateforhumanity.org</li>
+              <li><strong>Admissions:</strong> info@elevateforhumanity.org</li>
+              <li><strong>Student Services:</strong> info@elevateforhumanity.org</li>
+              <li><strong>IT Support:</strong> info@elevateforhumanity.org</li>
               <li><strong>Phone:</strong> (317) 314-3757</li>
               <li><strong>Emergency:</strong> (317) 314-3757 ext. 911</li>
             </ul>

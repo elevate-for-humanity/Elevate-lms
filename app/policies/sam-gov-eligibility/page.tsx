@@ -368,8 +368,8 @@ export default function SAMGovEligibilityPage() {
           <h3 className="mt-0">Grants Office</h3>
           <p className="mb-2">
             <strong>Email:</strong>{' '}
-            <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:text-brand-blue-800">
-              elevate4humanityedu@gmail.com
+            <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:text-brand-blue-800">
+              info@elevateforhumanity.org
             </a>
           </p>
           <p className="mb-2">
@@ -429,8 +429,8 @@ export default function SAMGovEligibilityPage() {
         <p className="text-lg font-semibold text-green-900 mb-2">Questions About Federal Funding?</p>
         <p className="text-green-800 mb-0">
           Contact our Grants Office at{' '}
-          <a href="mailto:elevate4humanityedu@gmail.com" className="text-green-900 font-semibold hover:underline">
-            elevate4humanityedu@gmail.com
+          <a href="mailto:info@elevateforhumanity.org" className="text-green-900 font-semibold hover:underline">
+            info@elevateforhumanity.org
           </a>{' '}
           or call{' '}
           <a href="/support" className="text-green-900 font-semibold hover:underline">

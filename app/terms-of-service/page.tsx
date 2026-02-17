@@ -36,9 +36,15 @@ export default function TermsOfServicePage() {
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">1. Acceptance of Terms</h2>
             <p className="text-slate-600">
-              Elevate for Humanity is a workforce development and career training institute
-              operated by 2Exclusive LLC (&quot;Company,&quot; &quot;we,&quot; &quot;our,&quot; &quot;us&quot;),
+              Elevate for Humanity is operated by 2Exclusive LLC-S (d/b/a Elevate for Humanity 
+              Career &amp; Technical Institute) (&quot;School,&quot; &quot;we,&quot; &quot;us&quot;), 
               a registered limited liability company in the State of Indiana.
+              We may collaborate with Selfish Inc. (d/b/a Rise Forward Foundation) to provide 
+              supportive services, including mental wellness programming (CurvatureBody Sculpting).
+              Certain training programs may be delivered in collaboration with third-party training 
+              partners such as Choice Medical CNA School.
+              These Terms govern your use of the Elevate for Humanity websites, portals, and 
+              services provided by the School.
               By accessing or using our website, learning management system,
               or any of our services, you agree to be bound by these Terms of Service.
               If you do not agree, do not use our services.
@@ -81,7 +87,7 @@ export default function TermsOfServicePage() {
             <h2 className="text-2xl font-bold text-slate-900 mb-4">5. Intellectual Property</h2>
             <p className="text-slate-600">
               All content, materials, courseware, and platform software are the property
-              of 2Exclusive LLC (operating as Elevate for Humanity) or our licensors.
+              of 2Exclusive LLC-S (d/b/a Elevate for Humanity Career &amp; Technical Institute) or our licensors.
               Unauthorized reproduction or distribution is prohibited.
             </p>
           </section>
@@ -107,8 +113,8 @@ export default function TermsOfServicePage() {
             <h2 className="text-2xl font-bold text-slate-900 mb-4">8. Contact</h2>
             <div className="bg-slate-50 rounded-xl p-6">
               <p className="text-slate-700">
-                <strong>2Exclusive LLC</strong><br />
-                d/b/a Elevate for Humanity<br />
+                <strong>2Exclusive LLC-S</strong><br />
+                d/b/a Elevate for Humanity Career &amp; Technical Institute<br />
                 Email: <a href="mailto:legal@elevateforhumanity.org" className="text-blue-600 hover:underline">legal@elevateforhumanity.org</a><br />
                 Phone: (317) 314-3757
               </p>

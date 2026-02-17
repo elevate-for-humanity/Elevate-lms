@@ -136,11 +136,11 @@ export default async function EnrollSuccessPage() {
               <span>Visit our Help Center →</span>
             </a>
             <a 
-              href="mailto:elevate4humanityedu@gmail.com" 
+              href="mailto:info@elevateforhumanity.org" 
               className="flex items-center gap-3 text-gray-700 hover:text-brand-blue-600"
             >
               <Mail className="w-5 h-5" />
-              <span>elevate4humanityedu@gmail.com</span>
+              <span>info@elevateforhumanity.org</span>
             </a>
           </div>
         </div>

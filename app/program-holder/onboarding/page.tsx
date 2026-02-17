@@ -458,10 +458,10 @@ export default async function ProgramHolderOnboarding() {
               <p className="text-black">
                 Email{' '}
                 <a
-                  href="mailto:elevate4humanityedu@gmail.com"
+                  href="mailto:info@elevateforhumanity.org"
                   className="text-brand-blue-700 font-semibold hover:underline"
                 >
-                  elevate4humanityedu@gmail.com
+                  info@elevateforhumanity.org
                 </a>{' '}
                 or call{' '}
                 <a

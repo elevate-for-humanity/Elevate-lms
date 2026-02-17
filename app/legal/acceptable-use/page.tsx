@@ -117,7 +117,7 @@ export default function AcceptableUsePage() {
 
             <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">6. Reporting Violations</h2>
             <p className="text-gray-700 mb-4">
-              If you become aware of any violation of this policy, please report it to: <a href="mailto:elevate4humanityedu@gmail.com" className="text-green-600 hover:underline">elevate4humanityedu@gmail.com</a>
+              If you become aware of any violation of this policy, please report it to: <a href="mailto:info@elevateforhumanity.org" className="text-green-600 hover:underline">info@elevateforhumanity.org</a>
             </p>
 
             <div className="mt-12 pt-8 border-t border-gray-200">

@@ -146,3 +146,38 @@ export async function recordAgreementAcceptance(
     return { success: false, error: 'Failed to record agreement' };
   }
 }
+
+export async function getCurrentAgreementVersions(): Promise<Record<string, string>> {
+  const client = createClient();
+  const { data } = await client
+    .from('agreement_versions')
+    .select('agreement_type, version')
+    .eq('is_current', true);
+  const versions: Record<string, string> = {};
+  (data || []).forEach((row: any) => {
+    versions[row.agreement_type] = row.version;
+  });
+  return versions;
+}
+
+export async function recordHandbookAcknowledgment({
+  userId,
+  handbookVersion,
+}: {
+  userId: string;
+  handbookVersion: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const client = createClient();
+    const { error } = await client.from('handbook_acknowledgments').insert({
+      user_id: userId,
+      handbook_version: handbookVersion,
+      acknowledged_at: new Date().toISOString(),
+    });
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    logger.error('[Compliance] Failed to record handbook acknowledgment:', error);
+    return { success: false, error: 'Failed to record acknowledgment' };
+  }
+}

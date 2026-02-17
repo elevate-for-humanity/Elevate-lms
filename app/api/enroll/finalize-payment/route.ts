@@ -275,7 +275,7 @@ export async function POST(req: Request) {
           enrollment.course.retail_price_cents?.toString() || '0',
       },
       // Enable payment methods
-      payment_method_types: ['card', 'klarna', 'afterpay_clearpay'],
+      payment_method_types: ['card', 'affirm', 'klarna', 'afterpay_clearpay'],
       // Disable automatic tax for now
       automatic_tax: {
         enabled: true,

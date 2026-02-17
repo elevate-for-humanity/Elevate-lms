@@ -55,7 +55,7 @@ const searchParams = request.nextUrl.searchParams;
     // Create Stripe checkout session for codebase license purchase
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'affirm', 'klarna', 'afterpay_clearpay'],
       customer_email: email,
       metadata: {
         license_slug: licenseSlug,

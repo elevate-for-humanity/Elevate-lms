@@ -47,6 +47,25 @@ export async function POST(request: NextRequest) {
       enrollment_id,
     } = body;
 
+    // CHECK FOR EXISTING ACTIVE ENROLLMENT (prevent double enrollment)
+    const { data: existingEnrollment } = await supabase
+      .from('student_enrollments')
+      .select('id, status, enrollment_state')
+      .eq('student_id', user.id)
+      .eq('program_slug', 'barber-apprenticeship')
+      .in('status', ['enrolled', 'active', 'orientation_complete'])
+      .maybeSingle();
+
+    if (existingEnrollment) {
+      return NextResponse.json({
+        error: 'You already have an active enrollment',
+        code: 'ENROLLMENT_EXISTS',
+        enrollment_id: existingEnrollment.id,
+        status: existingEnrollment.status,
+        redirect: '/apprentice',
+      }, { status: 409 }); // 409 Conflict
+    }
+
     // Validate hours per week (realistic range for apprenticeship)
     if (hours_per_week < 20 || hours_per_week > 50) {
       return NextResponse.json(
@@ -106,7 +125,7 @@ export async function POST(request: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,
       mode: 'subscription',
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'affirm', 'klarna', 'afterpay_clearpay'],
       line_items: [
         // Setup fee (one-time) - collected immediately
         {

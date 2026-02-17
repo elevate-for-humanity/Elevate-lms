@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,
       mode: license.billingType === 'subscription' ? 'subscription' : 'payment',
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'affirm', 'klarna', 'afterpay_clearpay'],
       line_items: [
         {
           price: license.stripePriceId || undefined,

@@ -167,7 +167,7 @@ export async function POST(req: Request) {
         phone: phone || '',
       },
       // Enable all payment methods including BNPL
-      payment_method_types: ['card', 'klarna', 'afterpay_clearpay'],
+      payment_method_types: ['card', 'affirm', 'klarna', 'afterpay_clearpay'],
       // Enable automatic tax if configured
       automatic_tax: {
         enabled: true,

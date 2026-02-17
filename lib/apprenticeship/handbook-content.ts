@@ -419,17 +419,15 @@ This fee is the same regardless of:
 - Personal protective equipment
 
 ## Payment Options
-1. **Pay in Full:** $4,980
-2. **4-Month Plan:** $1,245/month
-3. **6-Month Plan:** $830/month
-4. **12-Month Plan:** $415/month
+1. **Pay in Full:** $4,980 (card or bank transfer)
+2. **Affirm/Klarna/Afterpay:** Split into payments (terms set by lender at checkout)
+3. **Setup Fee + Weekly:** $1,743 setup fee at enrollment, remaining $3,237 paid weekly
 
 ## Payment Terms
-- First payment due at enrollment
-- Subsequent payments due on same day each month
-- 5-day grace period for late payments
-- $25 late fee after grace period
-- Account suspension after 30 days past due
+- Full payment or BNPL selection made at checkout
+- Weekly payment option: Invoices sent every Friday via email
+- Weekly amount calculated based on your hours per week schedule
+- Payment links included in invoice emails
 
 ## Refund Policy
 - Within 3 days of enrollment: Full refund

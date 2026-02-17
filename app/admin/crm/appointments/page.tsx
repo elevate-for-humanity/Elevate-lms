@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 const appointments = [
-  { id: 1, title: 'Enrollment Consultation', contact: 'Marcus Johnson', time: '9:00 AM', duration: '30 min', type: 'video', status: 'confirmed' },
+  { id: 1, title: 'Enrollment Consultation', contact: 'James W.', time: '9:00 AM', duration: '30 min', type: 'video', status: 'confirmed' },
   { id: 2, title: 'WOTC Review Meeting', contact: 'ABC Healthcare', time: '11:00 AM', duration: '1 hour', type: 'in-person', status: 'confirmed' },
   { id: 3, title: 'Training Progress Check', contact: 'Sarah Williams', time: '2:00 PM', duration: '30 min', type: 'phone', status: 'pending' },
   { id: 4, title: 'Partnership Discussion', contact: 'Tech Solutions', time: '4:00 PM', duration: '1 hour', type: 'video', status: 'confirmed' },

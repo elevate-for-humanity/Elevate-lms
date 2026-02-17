@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     'workforce development grants',
     'trade school scholarships',
     'vocational training financial aid',
-    'free CNA training funding',
+    'CNA training payment plans',
     'free CDL training scholarships',
     'adult education grants Indiana',
     'second chance scholarships',

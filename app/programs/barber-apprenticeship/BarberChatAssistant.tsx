@@ -40,12 +40,11 @@ Payment plans are available. Contact us for employer-sponsored funding options.`
   'wioa|wrg|funding|free|financial aid': `This is a **fee-based program** ($4,980 total).
 
 **Payment Options:**
-• Pay in full: $4,980
-• 4-month plan: $1,245/month
-• 6-month plan: $830/month
-• 12-month plan: $415/month
+• Pay in full: $4,980 (card or bank transfer)
+• Affirm/Klarna/Afterpay: Split into payments (terms set by lender)
+• Setup fee + weekly: $1,743 setup fee, then weekly payments until complete
 
-Payment is collected after your enrollment is approved. We offer flexible payment plans to fit your budget.
+Payment is collected after your enrollment is approved.
 
 Ready to get started? Apply at /forms/barber-apprenticeship-inquiry`,
 

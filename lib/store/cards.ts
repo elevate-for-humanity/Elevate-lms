@@ -107,7 +107,7 @@ export const secondaryCards: StoreCard[] = [
     subtitle: 'WIOA-Funded Training',
     description: 'Enroll in WIOA-eligible training programs with job placement support.',
     href: '/programs',
-    image: '/images/programs-hq/barber-hero.jpg',
+    image: '/images/barber-vibrant.jpg',
     icon: 'users',
     tourId: 'store-card-programs',
     tier: 'secondary',

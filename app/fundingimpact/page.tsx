@@ -270,7 +270,7 @@ export default function FundingImpactPage() {
               <div className="relative h-48">
                 <Image
                   src="/images/programs-new/program-11.jpg"
-                  alt="Marcus J. success story"
+                  alt="Graduate J. success story"
                   fill
                   className="object-cover"
                 />
@@ -281,7 +281,7 @@ export default function FundingImpactPage() {
                     MJ
                   </div>
                   <div>
-                    <div className="font-bold text-gray-900">Marcus J.</div>
+                    <div className="font-bold text-gray-900">Graduate J.</div>
                     <div className="text-sm text-gray-500">WIOA Adult Program</div>
                   </div>
                 </div>

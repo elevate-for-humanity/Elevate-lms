@@ -310,9 +310,6 @@ export default function NewSocialCampaignPage() {
                     <option value="cdl">CDL Program</option>
                     <option value="hvac">HVAC Program</option>
                     <option value="welding">Welding Program</option>
-                    <option value="direct-support-professional">
-                      Direct Support Professional (DSP)
-                    </option>
                     <option value="phlebotomy">Phlebotomy</option>
                     <option value="dental-assistant">Dental Assistant</option>
                   </select>

@@ -6,7 +6,7 @@ const teamMembers = [
     name: "Elizabeth Greene",
     title: "Founder & Chief Executive Officer",
     image: "/images/team/elizabeth-greene.jpg",
-    bio: "Elizabeth founded Elevate for Humanity with a mission to connect everyday people to free workforce training. She also owns Textures Institute of Cosmetology, Greene Staffing Solutions, and Greene Property Management—creating a holistic ecosystem for training, employment, and housing.",
+    bio: "Elizabeth founded Elevate for Humanity with a mission to connect everyday people to free workforce training. She also owns Textures Institute of Cosmetology, Greene Staffing Solutions, and Greene Property Management—creating a holistic ecosystem for training, employment, and housing. Elevate for Humanity is a U.S. Department of Labor Registered Apprenticeship Sponsor, Indiana DWD approved INTraining provider, registered government contractor, 501(c)(3) nonprofit, Indiana State Bidder, ITAP certified, Indiana Department of Revenue registered, and ByBlack certified.",
   },
   {
     name: "Jozanna George",

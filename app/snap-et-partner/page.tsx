@@ -211,7 +211,7 @@ export default function SNAPETPartnerPage() {
                   </td>
                   <td className="px-6 py-4">
                     CNA, HVAC, Barber, Esthetics, Tax Prep, CHW, Home Health
-                    Aide, Peer Recovery Coach, Direct Support Professional, CDL
+                    Aide, Peer Recovery Coach, CDL
                   </td>
                   <td className="px-6 py-4 text-center text-green-600 font-bold">
                     <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 inline-block" />

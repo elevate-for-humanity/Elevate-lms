@@ -50,7 +50,7 @@ export default function ShopWeeklyReportPage() {
         avgHoursPerApprentice: 32,
         complianceStatus: 'compliant',
         apprentices: [
-          { id: '1', name: 'Marcus Johnson', hoursThisWeek: 32, hoursApproved: 24, hoursPending: 8, daysWorked: 5, onTrack: true },
+          { id: '1', name: 'James W.', hoursThisWeek: 32, hoursApproved: 24, hoursPending: 8, daysWorked: 5, onTrack: true },
           { id: '2', name: 'Deja Williams', hoursThisWeek: 36, hoursApproved: 28, hoursPending: 8, daysWorked: 5, onTrack: true },
           { id: '3', name: 'Tyrone Davis', hoursThisWeek: 28, hoursApproved: 20, hoursPending: 8, daysWorked: 4, onTrack: false },
         ],

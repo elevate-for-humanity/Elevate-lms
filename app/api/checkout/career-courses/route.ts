@@ -119,7 +119,7 @@ export async function POST(req: Request) {
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'affirm', 'klarna', 'afterpay_clearpay'],
       line_items: lineItems,
       discounts,
       success_url: successUrl || `${process.env.NEXT_PUBLIC_SITE_URL}/career-services/courses/success?session_id={CHECKOUT_SESSION_ID}`,

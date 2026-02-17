@@ -372,9 +372,6 @@ export default function ApplyFormClient() {
                     <option value="nail-technician-apprenticeship">Nail Technician Apprenticeship</option>
                   </optgroup>
                   <optgroup label="Other Programs">
-                    <option value="dsp">
-                      Direct Support Professional (DSP)
-                    </option>
                     <option value="hvac">HVAC Technician</option>
                     <option value="ehst">Emergency Health & Safety Tech</option>
                     <option value="prc">Peer Recovery Coach</option>

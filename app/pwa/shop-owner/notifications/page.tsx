@@ -42,7 +42,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
     id: '1',
     type: 'hours_submitted',
     title: 'Hours Pending Approval',
-    message: 'Marcus Johnson submitted 32 hours for the week ending Jan 24.',
+    message: 'James W. submitted 32 hours for the week ending Jan 24.',
     read: false,
     createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
     actionUrl: '/pwa/shop-owner/approve-hours',

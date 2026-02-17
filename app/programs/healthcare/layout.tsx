@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Healthcare Training Programs | Elevate for Humanity',
-  description: 'Healthcare training programs including CNA certification ($1,200), Direct Support Professional, and more. Funding assistance may be available through WIOA.',
+  description: 'Healthcare training programs including CNA certification ($1,200), Medical Assistant, Phlebotomy, and more. Funding assistance may be available through WIOA for eligible programs.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/programs/healthcare',
   },

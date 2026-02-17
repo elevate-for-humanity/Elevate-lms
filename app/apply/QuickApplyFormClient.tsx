@@ -10,7 +10,7 @@ import { Loader2, ArrowRight, Calendar } from 'lucide-react';
 type ProgramOption =
   | 'barber'
   | 'cna'
-  | 'direct-support-professional'
+
   | 'hvac'
   | 'cdl'
   | 'building-technician'
@@ -370,9 +370,7 @@ Preferred Contact: ${form.preferredContact}`,
           <option value="">Select a program</option>
           <option value="barber">Barber Apprenticeship</option>
           <option value="cna">CNA / Healthcare</option>
-          <option value="direct-support-professional">
-            Direct Support Professional (DSP)
-          </option>
+
           <option value="hvac">HVAC / Building Trades</option>
           <option value="cdl">CDL / Transportation</option>
           <option value="building-technician">Building Technician</option>

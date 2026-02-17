@@ -1,7 +1,9 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Clock, Upload, FileText, Calendar } from 'lucide-react';
+import { Clock, Upload, FileText, Calendar, Loader2 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface Requirement {
   id: string;
@@ -15,11 +17,30 @@ interface Requirement {
 }
 
 interface RequirementsChecklistProps {
-  requirements: Requirement[];
+  requirements?: Requirement[];
   enrollmentId: string;
 }
 
-export function RequirementsChecklist({ requirements, enrollmentId }: RequirementsChecklistProps) {
+export function RequirementsChecklist({ requirements: initialRequirements, enrollmentId }: RequirementsChecklistProps) {
+  const [requirements, setRequirements] = useState<Requirement[]>(initialRequirements || []);
+  const [loading, setLoading] = useState(!initialRequirements?.length);
+
+  useEffect(() => {
+    // Skip fetch if requirements were passed as props
+    if (initialRequirements?.length) return;
+    if (!enrollmentId) { setLoading(false); return; }
+
+    const supabase = createClient();
+    supabase
+      .from('enrollment_requirements')
+      .select('id, requirement_type, title, description, due_date, priority, status, evidence_url')
+      .eq('enrollment_id', enrollmentId)
+      .order('due_date', { ascending: true, nullsFirst: false })
+      .then(({ data }) => {
+        setRequirements(data || []);
+        setLoading(false);
+      });
+  }, [enrollmentId, initialRequirements]);
   const getRequirementIcon = (type: string) => {
     switch (type) {
       case 'document':
@@ -79,6 +100,14 @@ export function RequirementsChecklist({ requirements, enrollmentId }: Requiremen
 
     return 0;
   });
+
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <Loader2 className="w-5 h-5 animate-spin text-gray-400 mx-auto" />
+      </div>
+    );
+  }
 
   if (sortedRequirements.length === 0) {
     return (

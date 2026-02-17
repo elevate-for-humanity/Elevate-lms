@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { EmployerList } from '@/components/admin/EmployerList';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/admin/employers' },
@@ -30,19 +31,7 @@ export default async function EmployersPage() {
             <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Add Employer</button>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="divide-y">
-            {employers && employers.length > 0 ? employers.map((employer: any) => (
-              <div key={employer.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center"><span className="text-brand-blue-600 font-bold text-lg">{(employer.name || 'E')[0]}</span></div>
-                  <div><p className="font-medium">{employer.name}</p><p className="text-sm text-gray-500">{employer.industry} • {employer.location}</p></div>
-                </div>
-                <Link href={`/admin/employers/${employer.id}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">View Details</Link>
-              </div>
-            )) : <div className="p-8 text-center text-gray-500">No employers added yet</div>}
-          </div>
-        </div>
+        <EmployerList />
       </div>
     </div>
   );

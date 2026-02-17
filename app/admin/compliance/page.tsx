@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import WIOAComplianceDashboard from '@/components/admin/WIOAComplianceDashboard';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -191,6 +192,13 @@ export default async function CompliancePage() {
               </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* WIOA Compliance Dashboard */}
+      <section className="py-8 px-6">
+        <div className="max-w-7xl mx-auto">
+          <WIOAComplianceDashboard />
         </div>
       </section>
     </div>

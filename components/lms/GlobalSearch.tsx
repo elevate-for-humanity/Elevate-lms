@@ -35,7 +35,7 @@ function GlobalSearchContent() {
     await supabase.rpc('increment_search_count', { search_query: searchQuery });
   }
 
-  // Load search suggestions from DB
+  // Load search suggestions from DB + search index
   useEffect(() => {
     async function loadSuggestions() {
       if (query.length < 2) {
@@ -43,13 +43,22 @@ function GlobalSearchContent() {
         return;
       }
 
-      const { data } = await supabase
-        .from('search_suggestions')
-        .select('suggestion')
-        .ilike('suggestion', `%${query}%`)
-        .limit(5);
+      // Fetch from both Supabase suggestions and the search API
+      const [dbResult, apiResult] = await Promise.all([
+        supabase
+          .from('search_suggestions')
+          .select('suggestion')
+          .ilike('suggestion', `%${query}%`)
+          .limit(3),
+        fetch(`/api/search?q=${encodeURIComponent(query)}&limit=3&source=index`)
+          .then(r => r.json())
+          .catch(() => ({ results: [] })),
+      ]);
 
-      if (data) setSuggestions(data.map(s => s.suggestion));
+      const dbSuggestions = (dbResult.data || []).map((s: any) => s.suggestion);
+      const indexSuggestions = (apiResult.results || []).map((r: any) => r.title);
+      const merged = [...new Set([...dbSuggestions, ...indexSuggestions])].slice(0, 5);
+      setSuggestions(merged);
     }
     const debounce = setTimeout(loadSuggestions, 300);
     return () => clearTimeout(debounce);

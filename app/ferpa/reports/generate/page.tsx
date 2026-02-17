@@ -38,15 +38,34 @@ export default function GenerateReportPage() {
     includeDetails: true,
   });
 
+  const [reportData, setReportData] = useState<any>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Simulate report generation
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setLoading(false);
-    setGenerated(true);
+
+    try {
+      const res = await fetch('/api/ferpa/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reportType: formData.reportType,
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+          format: formData.format,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setReportData(data);
+        setGenerated(true);
+      }
+    } catch {
+      // Error handled silently
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

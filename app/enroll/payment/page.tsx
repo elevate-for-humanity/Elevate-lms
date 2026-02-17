@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CreditCard, Calendar, Loader2 } from 'lucide-react';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
+import UnifiedPaymentFlow from '@/components/payments/UnifiedPaymentFlow';
 
 // Pricing derived from canonical source
 const PRICING = {
@@ -322,6 +323,16 @@ function EnrollPaymentContent() {
               <span className="text-gray-500">Training access unlocks after approval</span>
             </div>
           </div>
+        </div>
+
+        {/* Unified Payment Flow */}
+        <div className="mt-8">
+          <UnifiedPaymentFlow
+            programId={programId || 'barber-apprenticeship'}
+            programName="Barber Apprenticeship"
+            programSlug="barber-apprenticeship"
+            price={BARBER_PRICING.fullPrice}
+          />
         </div>
 
         {/* Contact */}

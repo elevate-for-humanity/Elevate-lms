@@ -1,148 +1,188 @@
-import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import Link from 'next/link';
-import { ArrowLeft, Calendar, Clock, User, Video, MapPin, Save } from 'lucide-react';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'New Appointment | CRM Admin',
-  description: 'Schedule a new appointment.',
-  robots: { index: false, follow: false },
-};
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ArrowLeft, Calendar, Save, Loader2 } from 'lucide-react';
 
 export default function NewAppointmentPage() {
+  const router = useRouter();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [form, setForm] = useState({
+    title: '',
+    appointment_type: 'consultation',
+    date: '',
+    time: '',
+    duration_minutes: '30',
+    location: '',
+    notes: '',
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.title.trim() || !form.date || !form.time) {
+      setError('Title, date, and time are required');
+      return;
+    }
+    setSaving(true);
+    setError('');
+
+    try {
+      const scheduled_at = new Date(`${form.date}T${form.time}`).toISOString();
+
+      const res = await fetch('/api/admin/crm/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: form.title,
+          appointment_type: form.appointment_type,
+          scheduled_at,
+          duration_minutes: parseInt(form.duration_minutes) || 30,
+          location: form.location || null,
+          notes: form.notes || null,
+        }),
+      });
+
+      if (res.ok) {
+        router.push('/admin/crm/appointments');
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Failed to create appointment');
+      }
+    } catch {
+      setError('Network error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const update = (field: string, value: string) => setForm(prev => ({ ...prev, [field]: value }));
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "New" }]} />
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'CRM', href: '/admin/crm' }, { label: 'New Appointment' }]} />
       </div>
-<div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto">
         <Link href="/admin/crm/appointments" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to Appointments
         </Link>
 
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
-            <Calendar className="w-6 h-6 text-brand-blue-600" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">New Appointment</h1>
-            <p className="text-gray-600">Schedule a meeting or consultation</p>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">New Appointment</h1>
+          <p className="text-gray-600">Schedule a new appointment</p>
         </div>
 
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-6">Appointment Details</h2>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>
+            )}
+
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
                 <input
                   type="text"
+                  value={form.title}
+                  onChange={e => update('title', e.target.value)}
                   placeholder="e.g., Enrollment Consultation"
                   className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                  required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Contact *</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search contacts..."
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                <select
+                  value={form.appointment_type}
+                  onChange={e => update('appointment_type', e.target.value)}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                >
+                  <option value="consultation">Consultation</option>
+                  <option value="interview">Interview</option>
+                  <option value="orientation">Orientation</option>
+                  <option value="follow_up">Follow-up</option>
+                  <option value="assessment">Assessment</option>
+                  <option value="other">Other</option>
+                </select>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Date *</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="date"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                    />
-                  </div>
+                  <input
+                    type="date"
+                    value={form.date}
+                    onChange={e => update('date', e.target.value)}
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                    required
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Time *</label>
-                  <div className="relative">
-                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="time"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                    />
-                  </div>
+                  <input
+                    type="time"
+                    value={form.time}
+                    onChange={e => update('time', e.target.value)}
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                    required
+                  />
                 </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Duration</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
-                    <option>15 minutes</option>
-                    <option>30 minutes</option>
-                    <option>45 minutes</option>
-                    <option>1 hour</option>
-                    <option>1.5 hours</option>
-                    <option>2 hours</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
-                    <option>Video Call</option>
-                    <option>Phone Call</option>
-                    <option>In Person</option>
+                  <select
+                    value={form.duration_minutes}
+                    onChange={e => update('duration_minutes', e.target.value)}
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                  >
+                    <option value="15">15 minutes</option>
+                    <option value="30">30 minutes</option>
+                    <option value="45">45 minutes</option>
+                    <option value="60">1 hour</option>
+                    <option value="90">1.5 hours</option>
+                    <option value="120">2 hours</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Location / Meeting Link</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Enter location or paste meeting link"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                <input
+                  type="text"
+                  value={form.location}
+                  onChange={e => update('location', e.target.value)}
+                  placeholder="Enter location or paste meeting link"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
                 <textarea
-                  rows={3}
+                  rows={4}
+                  value={form.notes}
+                  onChange={e => update('notes', e.target.value)}
                   placeholder="Add any notes or agenda items..."
                   className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 />
               </div>
-
-              <div className="flex items-center gap-3">
-                <input type="checkbox" id="reminder" className="w-4 h-4 text-brand-blue-600 rounded" defaultChecked />
-                <label htmlFor="reminder" className="text-sm text-gray-700">
-                  Send reminder email to contact
-                </label>
-              </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <Link
-              href="/admin/crm/appointments"
-              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-            >
-              Cancel
-            </Link>
+          <div className="flex justify-end">
             <button
               type="submit"
-              className="px-8 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold flex items-center gap-2"
+              disabled={saving}
+              className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2 disabled:opacity-50"
             >
-              <Save className="w-4 h-4" />
-              Schedule Appointment
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Calendar className="w-4 h-4" />}
+              {saving ? 'Scheduling...' : 'Schedule Appointment'}
             </button>
           </div>
         </form>

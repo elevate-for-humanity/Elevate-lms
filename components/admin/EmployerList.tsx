@@ -1,112 +1,126 @@
-import Link from "next/link";
-import { employers } from "@/lms-data/employers";
-import { getProgramsWithTuitionMeta } from "@/lms-data/tuition";
+'use client';
 
-const programsWithTuition = getProgramsWithTuitionMeta();
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
+import { Building2, MapPin, Mail, Phone, Loader2 } from 'lucide-react';
+
+interface Employer {
+  id: string;
+  name: string;
+  industry?: string;
+  location?: string;
+  city?: string;
+  state?: string;
+  contact_name?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  website?: string;
+  status?: string;
+  notes?: string;
+  created_at?: string;
+}
 
 export function EmployerList() {
+  const [employers, setEmployers] = useState<Employer[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from('employers')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50)
+      .then(({ data }) => {
+        setEmployers(data || []);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg border p-8 flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
   if (!employers.length) {
     return (
-      <p className="text-xs text-slate-300">
-        No employers have been added yet. In the future, this can connect to a
-        Supabase table or CRM.
-      </p>
+      <div className="bg-white rounded-lg border p-8 text-center">
+        <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+        <p className="text-gray-500">No employers added yet.</p>
+        <Link
+          href="/admin/employers/onboarding"
+          className="inline-block mt-4 text-sm text-brand-blue-600 hover:text-brand-blue-800 font-medium"
+        >
+          + Add Employer
+        </Link>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-3 text-xs">
-      {employers.map((emp) => {
-        const taggedPrograms = programsWithTuition.filter((p) =>
-          emp.interestedPrograms.includes(p.program.id)
-        );
-
-        return (
-          <article
-            key={emp.id}
-            className="rounded-xl border border-slate-800 bg-slate-900/90 p-3"
-          >
-            <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+    <div className="bg-white rounded-lg shadow-sm border divide-y">
+      {employers.map((emp) => (
+        <div key={emp.id} className="p-4 hover:bg-gray-50 transition">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <span className="text-brand-blue-600 font-bold">
+                  {(emp.name || 'E')[0]}
+                </span>
+              </div>
               <div>
-                <p className="text-[11px] font-semibold text-slate-100">
-                  {emp.name}
-                </p>
-                {emp.city && emp.state && (
-                  <p className="text-[10px] text-slate-400">
-                    {emp.city}, {emp.state}
-                  </p>
+                <p className="font-semibold text-gray-900">{emp.name}</p>
+                {emp.industry && (
+                  <p className="text-sm text-gray-500">{emp.industry}</p>
                 )}
-                {emp.contactName && (
-                  <p className="mt-1 text-[10px] text-slate-300">
-                    Contact: {emp.contactName}
-                    {emp.contactEmail ? ` (${emp.contactEmail})` : ""}
-                  </p>
-                )}
-                {emp.notes && (
-                  <p className="mt-1 text-[10px] text-slate-400">
-                    Notes: {emp.notes}
-                  </p>
-                )}
-                {emp.tags.length > 0 && (
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {emp.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <div className="mt-2 space-y-1">
-                  <p className="text-[10px] font-semibold text-slate-200">
-                    Interested Programs:
-                  </p>
-                  {taggedPrograms.length ? (
-                    <ul className="list-disc space-y-1 pl-4 text-[10px] text-slate-300">
-                      {taggedPrograms.map(({ program, tuition }) => (
-                        <li key={program.id}>
-                          {program.title}
-                          {tuition?.baseTuition && (
-                            <span className="text-slate-400">
-                              {" "}
-                              – {tuition.baseTuition}
-                            </span>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-[10px] text-slate-400">
-                      Not yet mapped to specific programs.
-                    </p>
+                <div className="flex flex-wrap gap-3 mt-1 text-xs text-gray-500">
+                  {(emp.city || emp.state || emp.location) && (
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      {emp.city && emp.state
+                        ? `${emp.city}, ${emp.state}`
+                        : emp.location || ''}
+                    </span>
+                  )}
+                  {emp.contact_email && (
+                    <span className="flex items-center gap-1">
+                      <Mail className="w-3 h-3" />
+                      {emp.contact_email}
+                    </span>
+                  )}
+                  {emp.contact_phone && (
+                    <span className="flex items-center gap-1">
+                      <Phone className="w-3 h-3" />
+                      {emp.contact_phone}
+                    </span>
                   )}
                 </div>
-                <div className="mt-2 flex flex-wrap gap-2 text-[10px] text-slate-400">
-                  {emp.wantsWex && <span>WEX ✔</span>}
-                  {emp.wantsOjt && <span>OJT ✔</span>}
-                  {emp.wantsApprenticeship && <span>Apprenticeship ✔</span>}
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 text-[11px] md:items-end">
-                <Link
-                  href={`/admin/employers/${emp.id}/proposal`}
-                  className="rounded-md bg-orange-400 text-white px-3 py-2 font-semibold text-white hover:bg-orange-500"
-                >
-                  View Proposal Preview
-                </Link>
-                <Link
-                  href="/admin/funding-playbook"
-                  className="rounded-md border border-slate-700 px-3 py-2 font-semibold text-slate-100 hover:bg-slate-800"
-                >
-                  Open Funding Playbook
-                </Link>
+                {emp.status && (
+                  <span className={`inline-block mt-2 text-xs px-2 py-0.5 rounded-full font-medium ${
+                    emp.status === 'active'
+                      ? 'bg-green-100 text-green-700'
+                      : emp.status === 'pending'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {emp.status}
+                  </span>
+                )}
               </div>
             </div>
-          </article>
-        );
-      })}
+            <Link
+              href={`/admin/employers/${emp.id}`}
+              className="text-sm text-brand-blue-600 hover:text-brand-blue-800 font-medium flex-shrink-0"
+            >
+              View Details
+            </Link>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

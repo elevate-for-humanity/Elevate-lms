@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
+import EligibilityPreQualifier from '@/components/enrollment/EligibilityPreQualifier';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/wioa-eligibility' },
@@ -33,6 +34,13 @@ export default function WIOAEligibilityPage() {
               WIOA covers tuition, books, supplies, and certification fees. It&apos;s a grant — you never pay it back.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Quick eligibility pre-qualifier */}
+      <section className="py-14 sm:py-20 bg-gradient-to-b from-white to-slate-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <EligibilityPreQualifier />
         </div>
       </section>
 

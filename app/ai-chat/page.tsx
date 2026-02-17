@@ -5,6 +5,7 @@ import {
   MessageSquare, Bot, Sparkles, Clock, BookOpen, 
   HelpCircle, ArrowRight, Zap, Phone
 } from 'lucide-react';
+import ChatAssistantWrapper from './ChatAssistantWrapper';
 
 export const metadata: Metadata = {
   alternates: {
@@ -228,6 +229,9 @@ export default function AIChatPage() {
           </Link>
         </div>
       </section>
+      {/* Live Chat Assistant */}
+      <ChatAssistantWrapper />
+
       {/* CTA Section */}
       <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">

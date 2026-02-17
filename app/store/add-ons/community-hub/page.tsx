@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import ProductReviews from '@/components/store/ProductReviews';
+import ProductRecommendations from '@/components/store/ProductRecommendations';
 import {
   Users,
   MessageSquare,
@@ -231,6 +233,20 @@ export default function CommunityHubPage() {
               </ul>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Reviews */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <ProductReviews productId="community-hub" />
+        </div>
+      </section>
+
+      {/* Recommendations */}
+      <section className="py-12 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <ProductRecommendations productId="community-hub" />
         </div>
       </section>
 

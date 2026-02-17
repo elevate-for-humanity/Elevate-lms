@@ -4,6 +4,7 @@ import Image from 'next/image';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
+import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -21,6 +22,18 @@ export const metadata: Metadata = {
 
 export default function CNACertificationPage() {
   return (
+    <>
+    <ProgramStructuredData program={{
+      id: 'cna-certification',
+      name: 'CNA Certification Training',
+      slug: 'cna-certification',
+      description: 'Become a Certified Nursing Assistant in 4-6 weeks. State certification exam included. Funding available through WIOA.',
+      duration_weeks: 6,
+      price: 0,
+      image_url: `${SITE_URL}/images/heroes/programs/healthcare/hero-program-cna.jpg`,
+      category: 'Healthcare',
+      outcomes: ['Certified Nursing Assistant (CNA)', 'CPR/BLS Certification'],
+    }} />
     <div className="min-h-screen bg-white">
       <ProgramHeroBanner videoSrc="/videos/cna-hero.mp4" />
       <div className="bg-slate-50 border-b">
@@ -138,5 +151,6 @@ export default function CNACertificationPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

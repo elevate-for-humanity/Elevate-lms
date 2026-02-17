@@ -5,6 +5,7 @@ import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
+import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -22,6 +23,18 @@ export const metadata: Metadata = {
 
 export default function BarberApprenticeshipPage() {
   return (
+    <>
+    <ProgramStructuredData program={{
+      id: 'barber-apprenticeship',
+      name: 'Barber Apprenticeship Program',
+      slug: 'barber-apprenticeship',
+      description: 'Earn while you learn barbering through a DOL-registered apprenticeship. 1,500 hours of supervised training with state licensure preparation.',
+      duration_weeks: 52,
+      price: 0,
+      image_url: `${SITE_URL}/images/programs-hq/barber-training.jpg`,
+      category: 'Beauty & Cosmetology',
+      outcomes: ['Indiana Barber License', 'DOL Apprenticeship Certificate'],
+    }} />
     <div className="min-h-screen bg-white">
       <ProgramHeroBanner videoSrc="/videos/barber-hero-final.mp4" />
       <div className="bg-slate-50 border-b">
@@ -185,5 +198,6 @@ export default function BarberApprenticeshipPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

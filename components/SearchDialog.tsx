@@ -102,7 +102,7 @@ export function SearchDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="hidden md:flex gap-2">
+        <Button variant="outline" size="sm" className="flex gap-2" aria-label="Search programs and pages">
           <Search className="h-4 w-4" />
           <span className="hidden lg:inline">Search...</span>
           <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 lg:flex">

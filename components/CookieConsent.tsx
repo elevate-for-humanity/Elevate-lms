@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
 
 export default function CookieConsent() {
@@ -81,11 +81,51 @@ export default function CookieConsent() {
     handleAccept();
   };
 
+  const bannerRef = useRef<HTMLDivElement>(null);
+  const firstFocusRef = useRef<HTMLButtonElement>(null);
+
+  // Focus trap: keep Tab within the banner while visible
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (!bannerRef.current) return;
+    if (e.key === 'Escape') {
+      handleClose();
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const focusable = bannerRef.current.querySelectorAll<HTMLElement>(
+      'button, a[href], [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isVisible) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Auto-focus the first button when banner appears
+      setTimeout(() => firstFocusRef.current?.focus(), 200);
+    }
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isVisible, handleKeyDown]);
+
   // Don't render anything until mounted (prevents SSR/hydration issues)
   if (!mounted || !showBanner) return null;
 
   return (
     <div
+      ref={bannerRef}
+      role="dialog"
+      aria-modal="false"
+      aria-label="Cookie consent"
+      aria-live="polite"
       className={`fixed bottom-0 left-0 right-0 z-[9999] transition-transform duration-300 ${
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
@@ -102,6 +142,7 @@ export default function CookieConsent() {
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -112,13 +153,13 @@ export default function CookieConsent() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">
+                  <h3 id="cookie-consent-title" className="font-semibold text-gray-900 mb-1">
                     We Value Your Privacy
                   </h3>
                   <p className="text-sm text-gray-700 leading-relaxed">
                     We use cookies to enhance your experience, analyze site
                     traffic, and provide personalized content. By clicking
-                    "Accept All", you consent to our use of cookies.{' '}
+                    &ldquo;Accept&rdquo;, you consent to our use of cookies.{' '}
                     <a
                       href="/privacy-policy"
                       className="text-brand-blue-600 hover:text-brand-blue-700 underline"
@@ -132,22 +173,23 @@ export default function CookieConsent() {
             {/* Actions */}
             <div className="flex items-center gap-3 flex-shrink-0">
               <button
+                ref={firstFocusRef}
                 onClick={handleReject}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:ring-offset-2"
                 aria-label="Reject all cookies"
               >
                 Reject
               </button>
               <button
                 onClick={handleAccept}
-                className="px-5 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded transition-colors"
+                className="px-5 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:ring-offset-2"
                 aria-label="Accept all cookies"
               >
                 Accept
               </button>
               <button
                 onClick={handleClose}
-                className="p-2 text-gray-400 hover:text-gray-900 transition-colors"
+                className="p-2 text-gray-400 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:ring-offset-2 rounded"
                 aria-label="Close cookie consent banner"
               >
                 <X className="w-5 h-5" />

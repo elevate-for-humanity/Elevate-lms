@@ -51,7 +51,7 @@ const AUDIENCES = [
       { value: '2–4', label: 'Weeks to fill roles' },
     ],
     objections: [
-      { q: 'What screening do you do?', a: 'Background checks, drug testing, credential verification, and skills assessment — before referral.' },
+      { q: 'What screening do you do?', a: 'Credential verification and skills assessment for all candidates. Background checks and drug screening where required by the program or employer.' },
       { q: 'What guarantees?', a: 'If a hire doesn\'t work out within 90 days, we replace them at no cost.' },
       { q: 'How fast can you staff?', a: 'Active candidate pool. Most roles filled within 2–4 weeks.' },
     ],

@@ -223,7 +223,7 @@ export default function SearchPage() {
               <p className="text-brand-orange-600 font-bold text-sm mb-2 uppercase tracking-wide">For Employers</p>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Hire Trained Graduates</h2>
               <ul className="text-slate-700 space-y-3 mb-6">
-                <li className="flex items-start gap-2"><span className="text-brand-orange-500 font-bold mt-0.5">•</span> Pre-trained, certified candidates ready day one</li>
+                <li className="flex items-start gap-2"><span className="text-brand-orange-500 font-bold mt-0.5">•</span> Pre-trained, credentialed candidates ready to work</li>
                 <li className="flex items-start gap-2"><span className="text-brand-orange-500 font-bold mt-0.5">•</span> WOTC tax credits — up to $9,600 per hire</li>
                 <li className="flex items-start gap-2"><span className="text-brand-orange-500 font-bold mt-0.5">•</span> OJT reimbursement covers 50-75% of wages</li>
                 <li className="flex items-start gap-2"><span className="text-brand-orange-500 font-bold mt-0.5">•</span> Post jobs and browse candidates online</li>

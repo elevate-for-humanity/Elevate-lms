@@ -9,6 +9,7 @@ import {
   Clock, DollarSign, Award, ArrowRight, 
   Thermometer, Users, BookOpen, Wrench, Phone, Zap, Wind, Shield
 } from 'lucide-react';
+import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -85,6 +86,18 @@ const employers = [
 
 export default function HVACTechnicianPage() {
   return (
+    <>
+    <ProgramStructuredData program={{
+      id: 'hvac-technician',
+      name: 'HVAC Technician Training',
+      slug: 'hvac-technician',
+      description: 'Learn heating, ventilation, and air conditioning installation and repair. EPA 608 certification included. WIOA funding available.',
+      duration_weeks: 16,
+      price: 0,
+      image_url: `${SITE_URL}/images/programs-hq/hvac-technician.jpg`,
+      category: 'Skilled Trades',
+      outcomes: ['EPA 608 Certification', 'HVAC Technician Certificate'],
+    }} />
     <div className="min-h-screen bg-white">
       {/* Avatar Guide */}
       <ProgramHeroBanner videoSrc="/videos/avatars/trades-guide.mp4" />
@@ -310,5 +323,6 @@ export default function HVACTechnicianPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

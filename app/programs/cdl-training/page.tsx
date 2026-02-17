@@ -5,6 +5,7 @@ import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
+import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -22,6 +23,18 @@ export const metadata: Metadata = {
 
 export default function CDLTrainingPage() {
   return (
+    <>
+    <ProgramStructuredData program={{
+      id: 'cdl-training',
+      name: 'CDL Commercial Driving Training',
+      slug: 'cdl-training',
+      description: 'Get your Class A CDL in 4-8 weeks. DOT-compliant training with job placement assistance. WIOA funding available.',
+      duration_weeks: 8,
+      price: 0,
+      image_url: `${SITE_URL}/images/programs-hq/cdl-trucking.jpg`,
+      category: 'Transportation',
+      outcomes: ['Class A Commercial Driver License (CDL)', 'DOT Medical Card'],
+    }} />
     <div className="min-h-screen bg-white">
       <ProgramHeroBanner videoSrc="/videos/cdl-hero.mp4" />
       <div className="bg-slate-50 border-b">
@@ -178,5 +191,6 @@ export default function CDLTrainingPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

@@ -401,7 +401,7 @@ async function sendPaymentFailedEmail(studentId: string, programId: string): Pro
       <p>Hi ${student.full_name || 'Student'},</p>
       <p>We were unable to process your tuition payment for <strong>${program?.title || 'your program'}</strong>.</p>
       <p>Please update your payment method to avoid interruption to your course access.</p>
-      <p><a href="https://www.elevateforhumanity.org/student/billing">Update Payment Method</a></p>
+      <p><a href="https://www.elevateforhumanity.org/account/billing">Update Payment Method</a></p>
       <p>If you have questions, contact us at support@elevateforhumanity.org</p>
     `,
   });

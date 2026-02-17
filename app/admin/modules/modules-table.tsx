@@ -214,7 +214,7 @@ export function ModulesTable({
                       </Link>
                       {module.module_type === 'scorm' && (
                         <Link
-                          href={`/student/programs/${module.program?.slug}/modules/${module.id}`}
+                          href={`/lms/programs/${module.program?.slug}/modules/${module.id}`}
                           target="_blank"
                           className="text-black hover:text-black"
                         >

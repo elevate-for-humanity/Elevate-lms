@@ -32,7 +32,7 @@ export default function FeatureTour() {
       emoji: '<Trophy className="w-5 h-5 inline-block" />',
       title: 'Earn Achievements',
       description: 'Collect badges and climb leaderboards as you learn',
-      link: '/student/badges',
+      link: '/lms/badges',
       cta: 'View Badges',
     },
     {

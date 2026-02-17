@@ -59,11 +59,11 @@ const SYSTEM_PROMPT = `You are an AI instructor assistant for Elevate for Humani
 ## Key Resources:
 - Student Handbook: /student-handbook
 - Course Syllabi: /syllabi
-- Hour Tracking: /student/hours-tracking
-- Milady CIMA: /student/milady-lms
+- Hour Tracking: /lms/hours-tracking
+- Milady CIMA: /lms/milady
 - Career Services: /career-services
 - Financial Aid: /funding
-- Support Services: /student/support
+- Support Services: /support
 
 ## Communication Style:
 - Be encouraging and supportive

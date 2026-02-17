@@ -81,7 +81,7 @@ export async function generateWelcomePacket(data: WelcomePacketData): Promise<{
       title: 'Enrollment Agreement',
       description: 'Review and acknowledge your enrollment terms',
       type: 'form',
-      url: `/student/enrollment-agreement/${data.enrollmentId}`,
+      url: `/lms/enrollment-agreement/${data.enrollmentId}`,
       required: true,
     },
     {
@@ -97,7 +97,7 @@ export async function generateWelcomePacket(data: WelcomePacketData): Promise<{
       title: 'Technology Setup Guide',
       description: 'Set up your student portal and LMS access',
       type: 'document',
-      url: '/student/tech-setup',
+      url: '/lms/orientation',
       required: true,
     },
     {
@@ -188,7 +188,7 @@ export async function sendWelcomePacketEmail(
       <li>And more!</li>
     </ul>
 
-    <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/student/welcome-packet/${packetId}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">View Your Welcome Packet</a></p>
+    <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/lms/welcome-packet/${packetId}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">View Your Welcome Packet</a></p>
 
     <h2>Next Steps</h2>
     <ol>
@@ -429,7 +429,7 @@ export async function sendWelcomePacketReminder(
 
     <p>Please complete these items before your first day to ensure a smooth start to your program.</p>
 
-    <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/student/welcome-packet/${packetId}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Complete Welcome Packet</a></p>
+    <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/lms/welcome-packet/${packetId}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Complete Welcome Packet</a></p>
 
     <p>Need help? Contact us at support@www.elevateforhumanity.org or 317-314-3757.</p>
 

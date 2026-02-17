@@ -136,7 +136,7 @@ export function getTokenUrl(token: string, purpose: TokenPurpose): string {
     case 'host_shop_hours':
       return `${baseUrl}/portal/hours/submit?token=${token}`;
     case 'school_transfer':
-      return `${baseUrl}/portal/student/transfer-hours?token=${token}`;
+      return `${baseUrl}/lms/transfer-hours?token=${token}`;
     case 'ce_submission':
       return `${baseUrl}/portal/ce/submit?token=${token}`;
     default:

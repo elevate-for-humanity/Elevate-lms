@@ -313,7 +313,7 @@ export function getPartnerMilestoneEmail(data: {
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
-      <a href="https://www.elevateforhumanity.org/student/courses" style="display: inline-block; background: #667eea; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Continue Learning</a>
+      <a href="https://www.elevateforhumanity.org/lms/courses" style="display: inline-block; background: #667eea; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Continue Learning</a>
     </div>
 
   </div>
@@ -342,7 +342,7 @@ You're ${data.progress}% complete!
 
 Keep going! You're doing great! Keep up the momentum and you'll reach your goal in no time.
 
-Continue Learning: https://www.elevateforhumanity.org/student/courses
+Continue Learning: https://www.elevateforhumanity.org/lms/courses
 
 ---
 Elevate for Humanity

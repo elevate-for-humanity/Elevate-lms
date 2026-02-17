@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
           <h2>Document Review Update</h2>
           <p>Your document <strong>${document.file_name}</strong> has been ${status}.</p>
           ${status === 'rejected' ? `<p><strong>Reason:</strong> ${rejectionReason}</p>` : ''}
-          <p>Login to view details: <a href="${process.env.NEXT_PUBLIC_SITE_URL}/student/documents">View Documents</a></p>
+          <p>Login to view details: <a href="${process.env.NEXT_PUBLIC_SITE_URL}/lms/documents">View Documents</a></p>
         `,
       });
     }

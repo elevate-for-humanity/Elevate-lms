@@ -131,7 +131,7 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
     return {
       success: true,
       enrollmentId: enrollment.id,
-      courseAccessUrl: `/student/courses/${data.courseId}`,
+      courseAccessUrl: `/lms/courses/${data.courseId}`,
     };
 
   } catch (error) { /* Error handled silently */ 

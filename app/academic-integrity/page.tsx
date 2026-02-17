@@ -460,7 +460,7 @@ export default async function AcademicIntegrityPage() {
                 Get help with assignments and studying
               </p>
               <Link
-                href="/student/support"
+                href="/support"
                 className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
                 Visit Support Center →

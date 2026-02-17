@@ -173,7 +173,7 @@ export async function notifyApprenticeSubmissionReceived(
   applicationId: string
 ): Promise<void> {
   const continueUrl = await buildTokenUrl(
-    '/portal/student/enroll/barber-apprenticeship',
+    '/lms/enroll/barber-apprenticeship',
     {
       purpose: 'continue_enrollment',
       email,
@@ -343,7 +343,7 @@ export async function notifyApprenticeDecision(
   
   if (approved) {
     portalUrl = await buildTokenUrl(
-      '/student/dashboard',
+      '/learner/dashboard',
       {
         purpose: 'continue_enrollment',
         email,

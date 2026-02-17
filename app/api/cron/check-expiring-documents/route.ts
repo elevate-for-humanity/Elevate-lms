@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
               <p>Your document <strong>${doc.file_name}</strong> will expire in <strong>${daysUntilExpiration} day(s)</strong>.</p>
               <p><strong>Expiration Date:</strong> ${expirationDate.toLocaleDateString()}</p>
               <p>Please upload a new version to maintain compliance.</p>
-              <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/student/documents/upload">Upload New Document</a></p>
+              <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/lms/documents/upload">Upload New Document</a></p>
             `,
           });
           notifications.push({ documentId: doc.id, daysUntilExpiration });

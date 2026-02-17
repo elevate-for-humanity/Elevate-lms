@@ -168,12 +168,12 @@ export const footerNavigation = {
  */
 export const dashboardNavigation = {
   student: [
-    { label: 'Dashboard', href: '/student/dashboard-new', icon: 'home' },
-    { label: 'My Lessons', href: '/student/lessons', icon: 'book' },
-    { label: 'Log Hours', href: '/student/hours', icon: 'clock' },
-    { label: 'Documents', href: '/student/documents', icon: 'file' },
-    { label: 'Appointments', href: '/student/appointments', icon: 'calendar' },
-    { label: 'Profile', href: '/student/profile', icon: 'user' },
+    { label: 'Dashboard', href: '/learner/dashboard', icon: 'home' },
+    { label: 'My Lessons', href: '/lms/courses', icon: 'book' },
+    { label: 'Log Hours', href: '/lms/hours', icon: 'clock' },
+    { label: 'Documents', href: '/lms/documents', icon: 'file' },
+    { label: 'Appointments', href: '/lms/appointments', icon: 'calendar' },
+    { label: 'Profile', href: '/lms/profile', icon: 'user' },
   ],
   programHolder: [
     { label: 'Dashboard', href: '/program-holder/dashboard', icon: 'home' },
@@ -207,8 +207,8 @@ export const dashboardNavigation = {
 export const quickActions = {
   student: [
     { label: 'Apply for Program', href: '/apply', icon: 'file-text' },
-    { label: 'Schedule Appointment', href: '/student/appointments/new', icon: 'calendar' },
-    { label: 'Upload Document', href: '/student/documents/upload', icon: 'upload' },
+    { label: 'Schedule Appointment', href: '/lms/appointments/new', icon: 'calendar' },
+    { label: 'Upload Document', href: '/lms/documents/upload', icon: 'upload' },
     { label: 'Get Help', href: '/contact', icon: 'help-circle' },
   ],
   visitor: [

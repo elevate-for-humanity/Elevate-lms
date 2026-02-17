@@ -35,7 +35,7 @@ export async function POST(request: Request) {
         recipient_id: apprenticeship.student_id,
         notification_type: 'checkin_reminder',
         subject: '⏰ Time to Check In - ' + apprenticeship.employer_name,
-        message: `Hi ${apprenticeship.student.full_name},\n\nReminder to check in for your shift at ${apprenticeship.employer_name}.\n\nCheck in now: ${process.env.NEXT_PUBLIC_SITE_URL}/student/apprenticeship-hours`
+        message: `Hi ${apprenticeship.student.full_name},\n\nReminder to check in for your shift at ${apprenticeship.employer_name}.\n\nCheck in now: ${process.env.NEXT_PUBLIC_SITE_URL}/lms/apprenticeship-hours`
       });
       break;
 

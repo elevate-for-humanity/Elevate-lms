@@ -72,7 +72,7 @@ export async function trackScormProgress(data: {
     }
   }
 
-  revalidatePath('/student/courses');
+  revalidatePath('/lms/courses');
   return { success: true, enrollment };
 }
 
@@ -204,7 +204,7 @@ export async function enrollInPartnerCourse(data: {
     });
 
   revalidatePath('/courses/partners');
-  revalidatePath('/student/courses');
+  revalidatePath('/lms/courses');
 
   return {
     success: true,
@@ -273,6 +273,6 @@ export async function syncPartnerProgress(enrollmentId: string, progressData: {
     throw new Error('Failed to update progress');
   }
 
-  revalidatePath('/student/courses');
+  revalidatePath('/lms/courses');
   return { success: true };
 }

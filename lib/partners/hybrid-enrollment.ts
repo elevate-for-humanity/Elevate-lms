@@ -120,7 +120,7 @@ async function enrollViaAPI(
   const launchUrl = await client.getSsoLaunchUrl({
     accountExternalId: account.externalId,
     externalEnrollmentId: enrollment.externalEnrollmentId,
-    returnTo: `${process.env.NEXT_PUBLIC_APP_URL}/student/courses/${request.courseId}/external/${request.moduleId}`,
+    returnTo: `${process.env.NEXT_PUBLIC_APP_URL}/lms/courses/${request.courseId}/external/${request.moduleId}`,
   });
 
   // Save progress in database

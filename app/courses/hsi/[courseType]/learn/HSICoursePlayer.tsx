@@ -52,7 +52,7 @@ export function HSICoursePlayer({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => router.push('/student/courses')}
+              onClick={() => router.push('/lms/courses')}
               className="flex items-center gap-2 text-black hover:text-black transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -172,7 +172,7 @@ export function HSICoursePlayer({
               </div>
             </div>
             <button
-              onClick={() => router.push('/student/courses')}
+              onClick={() => router.push('/lms/courses')}
               className="px-6 py-2 bg-white text-brand-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors"
             >
               Continue Learning

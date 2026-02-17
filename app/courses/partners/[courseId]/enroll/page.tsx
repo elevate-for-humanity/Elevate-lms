@@ -106,7 +106,7 @@ export default function EnrollPage({
       // Check if SCORM package is available
       if (data.hasScorm && data.scormPackage) {
         // Redirect to SCORM player
-        router.push(`/student/scorm/${data.enrollment.id}`);
+        router.push(`/lms/scorm/${data.enrollment.id}`);
       } else {
         // Redirect to partner LMS
         window.location.href = course.enrollment_url;

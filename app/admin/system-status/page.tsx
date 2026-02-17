@@ -281,7 +281,7 @@ export default async function SystemStatusPage() {
     { path: '/store/licenses', name: 'License Products', category: 'Store', dataSource: 'static' },
     { path: '/store/integrations', name: 'Integrations', category: 'Store', dataSource: 'static' },
     { path: '/login', name: 'Login', category: 'Auth', dataSource: 'supabase' },
-    { path: '/student/dashboard', name: 'Student Dashboard', category: 'Student', dataSource: 'supabase' },
+    { path: '/learner/dashboard', name: 'Student Dashboard', category: 'Student', dataSource: 'supabase' },
     { path: '/lms/dashboard', name: 'LMS Dashboard', category: 'Student', dataSource: 'supabase' },
     { path: '/lms/courses', name: 'My Courses', category: 'Student', dataSource: 'supabase' },
     { path: '/admin', name: 'Admin Home', category: 'Admin', dataSource: 'supabase' },

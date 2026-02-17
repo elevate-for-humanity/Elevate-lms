@@ -100,7 +100,7 @@ export async function autoEnrollPartnerCourse(
     const launchUrl = await client.getSsoLaunchUrl({
       accountExternalId: account.externalId,
       externalEnrollmentId: enrollment.externalEnrollmentId,
-      returnTo: `${process.env.NEXT_PUBLIC_APP_URL}/student/dashboard`,
+      returnTo: `${process.env.NEXT_PUBLIC_APP_URL}/learner/dashboard`,
     });
 
     // 7) Save enrollment in Supabase

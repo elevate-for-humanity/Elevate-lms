@@ -222,7 +222,7 @@ export default function NotificationsPage() {
                     ) =>
                       setNotification({ ...notification, url: e.target.value })
                     }
-                    placeholder="/student/courses"
+                    placeholder="/lms/courses"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                   <p className="text-sm text-black mt-1">
@@ -298,7 +298,7 @@ export default function NotificationsPage() {
                       ...notification,
                       title: 'Class Reminder',
                       body: 'Your class starts in 30 minutes',
-                      url: '/student/courses',
+                      url: '/lms/courses',
                     })
                   }
                 />
@@ -310,7 +310,7 @@ export default function NotificationsPage() {
                       ...notification,
                       title: 'Assignment Due',
                       body: 'Assignment due tomorrow at 11:59 PM',
-                      url: '/student/assignments',
+                      url: '/lms/assignments',
                     })
                   }
                 />
@@ -322,7 +322,7 @@ export default function NotificationsPage() {
                       ...notification,
                       title: 'New Message',
                       body: 'You have a new message from your instructor',
-                      url: '/student/messages',
+                      url: '/lms/messages',
                     })
                   }
                 />
@@ -334,7 +334,7 @@ export default function NotificationsPage() {
                       ...notification,
                       title: 'Certificate Ready',
                       body: 'Your certificate is ready to download!',
-                      url: '/student/certificates',
+                      url: '/lms/certificates',
                     })
                   }
                 />

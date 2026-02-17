@@ -204,9 +204,9 @@ export default function HomePage() {
 
       {/* ===== HOW IT WORKS ===== */}
       <InView animation="fade-up">
-      <section className="py-16 sm:py-20">
+      <section className="py-10 sm:py-14">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">How It Works</h2>
             <p className="text-lg text-slate-700">Four steps to your new career</p>
           </div>
@@ -219,13 +219,15 @@ export default function HomePage() {
               { title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates.', href: '/career-services', image: '/images/workforce-3.jpg' },
             ].map((step) => (
               <div key={step.title} className="text-center">
-                <Image
-                  src={step.image}
-                  alt={step.title}
-                  width={400}
-                  height={267}
-                  className="w-full h-auto rounded-lg mb-4"
-                />
+                <div className="relative aspect-[3/2] rounded-lg overflow-hidden mb-4">
+                  <Image
+                    src={step.image}
+                    alt={step.title}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    className="object-cover"
+                  />
+                </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{step.title}</h3>
                 <p className="text-slate-700 text-base mb-4">{step.desc}</p>
                 <Link href={step.href} className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
@@ -240,16 +242,17 @@ export default function HomePage() {
 
       {/* ===== FUNDING ===== */}
       <InView animation="fade-up">
-      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
+      <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
-          <Image
-            src="/images/hero-banner-new.jpg"
-            alt="Students in funded training programs"
-            width={1400}
-            height={788}
-            sizes="(max-width: 768px) 100vw, 960px"
-            className="w-full h-auto rounded-lg mb-10"
-          />
+          <div className="relative aspect-[16/7] rounded-lg overflow-hidden mb-8">
+            <Image
+              src="/images/hero-banner-new.jpg"
+              alt="Students in funded training programs"
+              fill
+              sizes="(max-width: 768px) 100vw, 960px"
+              className="object-cover"
+            />
+          </div>
           <p className="text-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Funding Available</p>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">100% Tuition-Free Programs</h2>
           <p className="text-lg text-slate-700 mb-8">
@@ -263,7 +266,9 @@ export default function HomePage() {
               { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/homepage/government-agencies.jpg', external: true },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
-                <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-auto" />
+                <div className="relative aspect-[3/2]">
+                  <Image src={item.image} alt={item.label} fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
+                </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-lg mb-1">{item.label}</h3>
                   <p className="text-slate-600 text-sm mb-4">{item.desc}</p>
@@ -292,7 +297,7 @@ export default function HomePage() {
 
       {/* ===== PARTNERS ===== */}
       <InView animation="fade">
-      <section className="py-16 sm:py-20 border-t border-slate-100">
+      <section className="py-10 sm:py-14 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-10">Approved Training Provider</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
@@ -319,16 +324,17 @@ export default function HomePage() {
 
       {/* ===== EMPLOYERS ===== */}
       <InView animation="fade-up">
-      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
+      <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
-          <Image
-            src="/images/efh-building-tech-hero.jpg"
-            alt="Employer partners hiring trained graduates"
-            width={1600}
-            height={1067}
-            sizes="(max-width: 768px) 100vw, 960px"
-            className="w-full h-auto rounded-lg mb-10"
-          />
+          <div className="relative aspect-[16/7] rounded-lg overflow-hidden mb-8">
+            <Image
+              src="/images/efh-building-tech-hero.jpg"
+              alt="Employer partners hiring trained graduates"
+              fill
+              sizes="(max-width: 768px) 100vw, 960px"
+              className="object-cover"
+            />
+          </div>
           <p className="text-red-600 font-bold text-sm mb-2 uppercase tracking-wide">For Employers</p>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Hire Our Skilled Graduates</h2>
           <p className="text-lg text-slate-700 mb-8">
@@ -369,7 +375,7 @@ export default function HomePage() {
 
       {/* ===== TESTIMONIALS ===== */}
       <InView animation="fade-up">
-      <section className="py-16 sm:py-20">
+      <section className="py-10 sm:py-14">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">What Our Students Say</h2>
@@ -395,7 +401,7 @@ export default function HomePage() {
 
       {/* ===== CTA ===== */}
       <InView animation="fade-up">
-      <section className="py-20 sm:py-28 bg-red-600 relative overflow-hidden">
+      <section className="py-14 sm:py-20 bg-red-600 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
         <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4">Ready to Change Your Life?</h2>

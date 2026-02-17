@@ -179,7 +179,7 @@ export default async function EnrollSuccessPage() {
             Student Dashboard
           </Link>
           <Link
-            href="/student/billing"
+            href="/account/billing"
             className="flex-1 border border-brand-blue-600 text-brand-blue-600 px-6 py-3 rounded-lg font-semibold text-center hover:bg-brand-blue-50 transition"
           >
             View Payment Plan

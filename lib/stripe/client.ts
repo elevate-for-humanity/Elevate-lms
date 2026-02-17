@@ -7,7 +7,7 @@ let _initialized = false;
 function init(): Stripe | null {
   if (!_initialized) {
     _initialized = true;
-    const key = process.env.STRIPE_SECRET_KEY;
+    const key = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_RESTRICTED_KEY;
     if (key) {
       _stripe = new Stripe(key, {
         apiVersion: '2025-10-29.clover',

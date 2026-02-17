@@ -1,8 +1,14 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { lazy, Suspense } from 'react';
 
 import HomeHeroVideo from './HomeHeroVideo';
 import PageAvatar from '@/components/PageAvatar';
+import { InView } from '@/components/ui/InView';
+
+const ProgramFinderQuiz = lazy(() => import('@/components/quiz/ProgramFinderQuiz'));
 
 const programs = [
   { name: 'Healthcare', href: '/programs/healthcare', image: '/images/hero/hero-healthcare.jpg', desc: 'CNA, Medical Assistant, Phlebotomy' },
@@ -47,6 +53,7 @@ export default function HomePage() {
       </section>
 
       {/* ===== AUDIENCE QUICK LINKS ===== */}
+      <InView animation="fade-up">
       <section className="py-10 sm:py-12 bg-slate-50 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-900 mb-3">
@@ -101,8 +108,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </InView>
 
       {/* ===== 3-CARD VALUE PROPS ===== */}
+      <InView animation="fade-up">
       <section className="py-10 sm:py-14">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -131,8 +140,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </InView>
 
       {/* ===== PROGRAMS ===== */}
+      <InView animation="fade-up">
       <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-10">
@@ -169,8 +180,30 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </InView>
+
+      {/* ===== FIND YOUR PATH QUIZ ===== */}
+      <InView animation="fade-up">
+      <section id="find-your-path" className="py-16 sm:py-20 bg-gradient-to-b from-slate-50 to-white border-t border-slate-100">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <p className="text-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Interactive Guide</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Find your path in 30 seconds
+            </h2>
+            <p className="text-lg text-slate-600 mt-3">
+              Answer three quick questions and we&apos;ll match you with the right program.
+            </p>
+          </div>
+          <Suspense fallback={<div className="h-64 flex items-center justify-center text-slate-400">Loading...</div>}>
+            <ProgramFinderQuiz />
+          </Suspense>
+        </div>
+      </section>
+      </InView>
 
       {/* ===== HOW IT WORKS ===== */}
+      <InView animation="fade-up">
       <section className="py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
@@ -203,8 +236,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </InView>
 
       {/* ===== FUNDING ===== */}
+      <InView animation="fade-up">
       <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <Image
@@ -253,8 +288,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </InView>
 
       {/* ===== PARTNERS ===== */}
+      <InView animation="fade">
       <section className="py-16 sm:py-20 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-10">Approved Training Provider</h2>
@@ -278,8 +315,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </InView>
 
       {/* ===== EMPLOYERS ===== */}
+      <InView animation="fade-up">
       <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <Image
@@ -326,8 +365,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </InView>
 
       {/* ===== TESTIMONIALS ===== */}
+      <InView animation="fade-up">
       <section className="py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
@@ -350,8 +391,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </InView>
 
       {/* ===== CTA ===== */}
+      <InView animation="fade-up">
       <section className="py-20 sm:py-28 bg-red-600 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
         <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
@@ -366,6 +409,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </InView>
     </main>
   );
 }

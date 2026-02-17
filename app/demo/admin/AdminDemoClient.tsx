@@ -59,7 +59,7 @@ export default function AdminDemoClient({ students, programs, metrics, recentAct
   return (
     <div className="space-y-6">
       {toast && (
-        <div className="fixed top-20 right-4 z-50 bg-green-600 text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium animate-fade-in-up">
+        <div className="fixed top-20 right-4 z-50 bg-brand-green-600 text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium animate-fade-in-up">
           {toast}
         </div>
       )}
@@ -86,7 +86,7 @@ export default function AdminDemoClient({ students, programs, metrics, recentAct
             placeholder="Search students..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 pr-4 py-2 border rounded-lg text-sm w-64 focus:ring-2 focus:ring-red-500 outline-none"
+            className="pl-9 pr-4 py-2 border rounded-lg text-sm w-64 focus:ring-2 focus:ring-brand-red-500 outline-none"
           />
         </div>
       </div>
@@ -94,8 +94,8 @@ export default function AdminDemoClient({ students, programs, metrics, recentAct
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 animate-fade-in-up">
         {[
-          { label: 'Enrolled', value: m.enrolled, icon: Users, color: 'text-blue-600 bg-blue-50', link: '/demo/admin/enrollments' },
-          { label: 'Completed', value: m.completed, icon: GraduationCap, color: 'text-green-600 bg-green-50', link: '/demo/admin/outcomes' },
+          { label: 'Enrolled', value: m.enrolled, icon: Users, color: 'text-brand-blue-600 bg-brand-blue-50', link: '/demo/admin/enrollments' },
+          { label: 'Completed', value: m.completed, icon: GraduationCap, color: 'text-brand-green-600 bg-brand-green-50', link: '/demo/admin/outcomes' },
           { label: 'Placed', value: m.placed, icon: TrendingUp, color: 'text-purple-600 bg-purple-50', link: '/demo/admin/outcomes' },
           { label: 'Funding', value: m.funding, icon: DollarSign, color: 'text-amber-600 bg-amber-50', link: '/demo/admin/funding' },
           { label: 'Compliance', value: `${m.compliance}%`, icon: Circle, color: 'text-emerald-600 bg-emerald-50', link: '/demo/admin/compliance' },
@@ -121,14 +121,14 @@ export default function AdminDemoClient({ students, programs, metrics, recentAct
             <h3 className="font-semibold text-gray-900 text-sm flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-gray-400" /> Enrollment Trend
             </h3>
-            <span className="text-xs text-green-600 font-medium">+18% vs last quarter</span>
+            <span className="text-xs text-brand-green-600 font-medium">+18% vs last quarter</span>
           </div>
           <div className="flex items-end gap-1.5 h-32">
             {TREND.map((val, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-1">
                 <div
                   className={`w-full rounded-t transition-all hover:opacity-80 cursor-pointer ${
-                    i === TREND.length - 1 ? 'bg-red-500' : 'bg-blue-200'
+                    i === TREND.length - 1 ? 'bg-brand-red-500' : 'bg-brand-blue-200'
                   }`}
                   style={{ height: `${(val / maxTrend) * 100}%` }}
                   title={`${TREND_LABELS[i]}: ${val} enrollments`}
@@ -153,19 +153,19 @@ export default function AdminDemoClient({ students, programs, metrics, recentAct
               <div key={a.id} className="px-5 py-3 flex items-start justify-between gap-3 hover:bg-gray-50">
                 <div className="flex items-start gap-3 min-w-0">
                   <div className={`mt-0.5 p-1 rounded-full flex-shrink-0 ${
-                    a.type === 'enrollment' ? 'bg-blue-100' :
-                    a.type === 'completion' ? 'bg-green-100' :
-                    a.type === 'alert' ? 'bg-red-100' :
+                    a.type === 'enrollment' ? 'bg-brand-blue-100' :
+                    a.type === 'completion' ? 'bg-brand-green-100' :
+                    a.type === 'alert' ? 'bg-brand-red-100' :
                     a.type === 'placement' ? 'bg-purple-100' :
                     a.type === 'compliance' ? 'bg-amber-100' :
                     'bg-gray-100'
                   }`}>
-                    {a.type === 'enrollment' && <Users className="w-3 h-3 text-blue-600" />}
-                    {a.type === 'completion' && <GraduationCap className="w-3 h-3 text-green-600" />}
-                    {a.type === 'alert' && <AlertTriangle className="w-3 h-3 text-red-600" />}
+                    {a.type === 'enrollment' && <Users className="w-3 h-3 text-brand-blue-600" />}
+                    {a.type === 'completion' && <GraduationCap className="w-3 h-3 text-brand-green-600" />}
+                    {a.type === 'alert' && <AlertTriangle className="w-3 h-3 text-brand-red-600" />}
                     {a.type === 'placement' && <TrendingUp className="w-3 h-3 text-purple-600" />}
                     {a.type === 'compliance' && <Clock className="w-3 h-3 text-amber-600" />}
-                    {a.type === 'funding' && <DollarSign className="w-3 h-3 text-green-600" />}
+                    {a.type === 'funding' && <DollarSign className="w-3 h-3 text-brand-green-600" />}
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm text-gray-900 truncate">{a.text}</p>
@@ -174,12 +174,12 @@ export default function AdminDemoClient({ students, programs, metrics, recentAct
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
                   {a.actionable && a.type === 'enrollment' && (
-                    <button onClick={() => { dismiss(a.id); showToast('Application opened for review'); }} className="text-xs text-blue-600 hover:underline flex items-center gap-0.5">
+                    <button onClick={() => { dismiss(a.id); showToast('Application opened for review'); }} className="text-xs text-brand-blue-600 hover:underline flex items-center gap-0.5">
                       <Eye className="w-3 h-3" /> Review
                     </button>
                   )}
                   {a.actionable && a.type === 'alert' && (
-                    <button onClick={() => { dismiss(a.id); showToast('Intervention flagged — case manager notified'); }} className="text-xs text-red-600 hover:underline flex items-center gap-0.5">
+                    <button onClick={() => { dismiss(a.id); showToast('Intervention flagged — case manager notified'); }} className="text-xs text-brand-red-600 hover:underline flex items-center gap-0.5">
                       <Mail className="w-3 h-3" /> Intervene
                     </button>
                   )}
@@ -197,23 +197,23 @@ export default function AdminDemoClient({ students, programs, metrics, recentAct
 
       {/* At-risk students */}
       {AT_RISK.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-5">
-          <h3 className="font-semibold text-red-900 text-sm mb-3 flex items-center gap-2">
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded-xl p-5">
+          <h3 className="font-semibold text-brand-red-900 text-sm mb-3 flex items-center gap-2">
             <AlertTriangle className="w-4 h-4" /> Students Needing Attention
           </h3>
           <div className="space-y-2">
             {AT_RISK.map((s, i) => (
-              <div key={i} className="flex items-center justify-between bg-white rounded-lg px-4 py-3 border border-red-100">
+              <div key={i} className="flex items-center justify-between bg-white rounded-lg px-4 py-3 border border-brand-red-100">
                 <div>
                   <span className="font-medium text-gray-900 text-sm">{s.name}</span>
                   <span className="text-gray-500 text-xs ml-2">{s.program}</span>
-                  <span className={`ml-2 text-xs font-medium ${s.severity === 'high' ? 'text-red-600' : 'text-amber-600'}`}>{s.issue}</span>
+                  <span className={`ml-2 text-xs font-medium ${s.severity === 'high' ? 'text-brand-red-600' : 'text-amber-600'}`}>{s.issue}</span>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => showToast(`Outreach email sent to ${s.name}`)} className="text-xs bg-white border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition">
                     Send Outreach
                   </button>
-                  <button onClick={() => showToast(`Case opened for ${s.name}`)} className="text-xs bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 transition">
+                  <button onClick={() => showToast(`Case opened for ${s.name}`)} className="text-xs bg-brand-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-brand-red-700 transition">
                     Open Case
                   </button>
                 </div>
@@ -226,16 +226,16 @@ export default function AdminDemoClient({ students, programs, metrics, recentAct
       {/* Quick links */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: 'Review Applications', count: 2, href: '/demo/admin/applications', color: 'text-blue-600' },
+          { label: 'Review Applications', count: 2, href: '/demo/admin/applications', color: 'text-brand-blue-600' },
           { label: 'Compliance Dashboard', count: 1, href: '/demo/admin/compliance', color: 'text-amber-600' },
           { label: 'Generate Reports', count: 0, href: '/demo/admin/reports', color: 'text-purple-600' },
-          { label: 'Manage Partners', count: 0, href: '/demo/admin/partners', color: 'text-green-600' },
+          { label: 'Manage Partners', count: 0, href: '/demo/admin/partners', color: 'text-brand-green-600' },
         ].map(link => (
           <Link key={link.label} href={link.href} className="bg-white rounded-xl border p-4 hover:shadow-md transition group flex items-center justify-between">
             <div>
               <span className={`text-sm font-medium ${link.color}`}>{link.label}</span>
               {link.count > 0 && (
-                <span className="ml-2 bg-red-100 text-red-700 text-xs font-bold px-1.5 py-0.5 rounded-full">{link.count}</span>
+                <span className="ml-2 bg-brand-red-100 text-brand-red-700 text-xs font-bold px-1.5 py-0.5 rounded-full">{link.count}</span>
               )}
             </div>
             <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition" />

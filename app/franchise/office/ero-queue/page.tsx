@@ -224,7 +224,7 @@ export default function EROQueuePage() {
       </div>
 
       {/* Info Card */}
-      <Card className="bg-brand-blue-50 dark:bg-blue-950 border-brand-blue-200">
+      <Card className="bg-brand-blue-50 dark:bg-brand-blue-950 border-brand-blue-200">
         <CardContent className="flex items-start gap-3 py-4">
           <AlertCircle className="h-5 w-5 text-brand-blue-500 mt-0.5" />
           <div>
@@ -333,7 +333,7 @@ export default function EROQueuePage() {
                     
                     <div className="text-right">
                       {ret.return_data?.refund_amount ? (
-                        <Badge variant="default" className="bg-green-500">
+                        <Badge variant="default" className="bg-brand-green-500">
                           Refund: ${ret.return_data.refund_amount.toLocaleString()}
                         </Badge>
                       ) : ret.return_data?.amount_owed ? (

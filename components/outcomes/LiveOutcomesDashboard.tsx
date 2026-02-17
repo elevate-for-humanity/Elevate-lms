@@ -156,7 +156,7 @@ export function LiveOutcomesDashboard({ initialData }: { initialData?: Partial<O
 
   const colorClasses: Record<string, { bg: string; icon: string; text: string }> = {
     blue: { bg: 'bg-brand-blue-50', icon: 'text-brand-blue-600', text: 'text-brand-blue-900' },
-    green: { bg: 'bg-green-50', icon: 'text-green-600', text: 'text-green-900' },
+    green: { bg: 'bg-brand-green-50', icon: 'text-brand-green-600', text: 'text-brand-green-900' },
     purple: { bg: 'bg-purple-50', icon: 'text-purple-600', text: 'text-purple-900' },
     emerald: { bg: 'bg-emerald-50', icon: 'text-emerald-600', text: 'text-emerald-900' },
     amber: { bg: 'bg-amber-50', icon: 'text-amber-600', text: 'text-amber-900' },
@@ -218,25 +218,25 @@ export function LiveOutcomesDashboard({ initialData }: { initialData?: Partial<O
           <h3 className="text-lg font-bold text-slate-900 mb-4 text-center">Verified By</h3>
           <div className="flex flex-wrap justify-center gap-6 sm:gap-12 text-slate-600">
             <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-brand-green-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
               <span className="text-sm font-medium">Indiana DWD</span>
             </div>
             <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-brand-green-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
               <span className="text-sm font-medium">EmployIndy</span>
             </div>
             <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-brand-green-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
               <span className="text-sm font-medium">WIOA Compliant</span>
             </div>
             <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-brand-green-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
               <span className="text-sm font-medium">ETPL Listed</span>

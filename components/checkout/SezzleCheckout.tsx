@@ -192,7 +192,7 @@ export default function SezzleCheckout({
 
   if (!publicKey) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+      <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700 text-sm">
         Sezzle is not configured. Please contact support.
       </div>
     );

@@ -147,8 +147,8 @@ export default async function HelpPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-6">
             <a href="/support" className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <Phone className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center">
+                <Phone className="w-6 h-6 text-brand-green-600" />
               </div>
               <div>
                 <div className="font-semibold text-gray-900">Contact Us</div>

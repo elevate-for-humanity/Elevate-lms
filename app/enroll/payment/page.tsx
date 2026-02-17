@@ -189,7 +189,7 @@ function EnrollPaymentContent() {
                   <div className="flex items-center gap-2">
                     <CreditCard className="w-5 h-5 text-gray-600" />
                     <span className="font-semibold text-gray-900">{PRICING.full.label}</span>
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                    <span className="text-xs bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded-full">
                       {PRICING.full.savings}
                     </span>
                   </div>
@@ -274,8 +274,8 @@ function EnrollPaymentContent() {
 
         {/* Error message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-red-800 text-sm">{error}</p>
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6">
+            <p className="text-brand-red-800 text-sm">{error}</p>
           </div>
         )}
 
@@ -307,7 +307,7 @@ function EnrollPaymentContent() {
           <h3 className="font-semibold text-gray-900 mb-4">What happens after payment?</h3>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">•</span>
+              <span className="w-6 h-6 rounded-full bg-brand-green-100 text-brand-green-600 flex items-center justify-center text-sm font-bold">•</span>
               <span className="text-gray-700">Enrollment confirmed</span>
             </div>
             <div className="flex items-center gap-3">

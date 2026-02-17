@@ -183,9 +183,9 @@ export default function LicenseAgreementPage() {
                 By purchasing a license or using the Elevate For Humanity platform as a licensee, you acknowledge that you have read, understood, and agree to be bound by this Software License Agreement.
               </p>
               <div className="mt-6 flex gap-4">
-                <Link href="/legal/eula" className="text-green-600 hover:underline">EULA</Link>
-                <Link href="/legal/acceptable-use" className="text-green-600 hover:underline">Acceptable Use Policy</Link>
-                <Link href="/legal/disclosures" className="text-green-600 hover:underline">Disclosures</Link>
+                <Link href="/legal/eula" className="text-brand-green-600 hover:underline">EULA</Link>
+                <Link href="/legal/acceptable-use" className="text-brand-green-600 hover:underline">Acceptable Use Policy</Link>
+                <Link href="/legal/disclosures" className="text-brand-green-600 hover:underline">Disclosures</Link>
               </div>
             </div>
           </div>

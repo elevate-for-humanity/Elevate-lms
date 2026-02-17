@@ -85,9 +85,9 @@ export default async function ActivityLogPage() {
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'User Management': return 'bg-brand-blue-100 text-brand-blue-700';
-      case 'Enrollment': return 'bg-green-100 text-green-700';
+      case 'Enrollment': return 'bg-brand-green-100 text-brand-green-700';
       case 'Course Management': return 'bg-brand-blue-100 text-brand-blue-700';
-      case 'WIOA': return 'bg-orange-100 text-orange-700';
+      case 'WIOA': return 'bg-brand-orange-100 text-brand-orange-700';
       case 'Certificates': return 'bg-pink-100 text-pink-700';
       default: return 'bg-gray-100 text-gray-700';
     }

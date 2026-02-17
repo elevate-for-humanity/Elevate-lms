@@ -44,7 +44,7 @@ export default function UniversalMarketingPage({
             </div>
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-orange-600 hover:bg-orange-50 transition-all shadow-lg hover:scale-105 whitespace-nowrap"
+              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-brand-orange-600 hover:bg-brand-orange-50 transition-all shadow-lg hover:scale-105 whitespace-nowrap"
             >
               Apply Now →
             </Link>
@@ -78,7 +78,7 @@ export default function UniversalMarketingPage({
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/apply"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 text-white font-semibold rounded hover:bg-orange-600 transition-colors shadow-lg"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-500 text-white font-semibold rounded hover:bg-brand-orange-600 transition-colors shadow-lg"
                 >
                   Apply Now
                   <ArrowRight size={20} className="ml-2" />
@@ -196,13 +196,13 @@ export default function UniversalMarketingPage({
                 <h2 className="text-4xl md:text-5xl font-bold mb-6">
                   {cta.title}
                 </h2>
-                <p className="text-xl mb-8 text-orange-50">
+                <p className="text-xl mb-8 text-brand-orange-50">
                   {cta.description}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
                     href={cta.primaryButton.href}
-                    className="inline-flex items-center justify-center px-8 py-4 bg-white text-orange-600 font-bold rounded-lg hover:bg-orange-50 transition-colors shadow-lg"
+                    className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-lg hover:bg-brand-orange-50 transition-colors shadow-lg"
                   >
                     {cta.primaryButton.text}
                     <ArrowRight size={20} className="ml-2" />
@@ -210,7 +210,7 @@ export default function UniversalMarketingPage({
                   {cta.secondaryButton && (
                     <Link
                       href={cta.secondaryButton.href}
-                      className="inline-flex items-center justify-center px-8 py-4 bg-orange-700 text-white font-semibold rounded-lg hover:bg-orange-800 transition-colors shadow-lg"
+                      className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-700 text-white font-semibold rounded-lg hover:bg-brand-orange-800 transition-colors shadow-lg"
                     >
                       {cta.secondaryButton.text}
                     </Link>

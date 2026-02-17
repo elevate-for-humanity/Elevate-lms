@@ -24,7 +24,7 @@ export default function RSVPButton({ eventId, eventTitle }: RSVPButtonProps) {
     return (
       <button
         disabled
-        className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-lg font-medium"
+        className="inline-flex items-center gap-2 bg-brand-green-100 text-brand-green-700 px-4 py-2 rounded-lg font-medium"
       >
         <Check className="w-4 h-4" />
         RSVP Confirmed

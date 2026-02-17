@@ -116,11 +116,11 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-black">Completed</p>
-              <p className="text-3xl font-bold text-green-600 mt-2">
+              <p className="text-3xl font-bold text-brand-green-600 mt-2">
                 {stats?.completedReferrals || 0}
               </p>
             </div>
-            <Check className="w-12 h-12 text-green-600 opacity-20" />
+            <Check className="w-12 h-12 text-brand-green-600 opacity-20" />
           </div>
         </div>
 
@@ -210,8 +210,8 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
           </div>
 
           <div className="text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Users className="w-8 h-8 text-green-600" />
+            <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Users className="w-8 h-8 text-brand-green-600" />
             </div>
             <h4 className="font-semibold text-black mb-2">2. They Sign Up</h4>
             <p className="text-sm text-black">
@@ -220,7 +220,7 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
           </div>
 
           <div className="text-center">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Gift className="w-8 h-8 text-brand-orange-600" />
             </div>
             <h4 className="font-semibold text-black mb-2">3. Earn Rewards</h4>
@@ -236,14 +236,14 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-xl font-bold text-black mb-6">Earnings Breakdown</h3>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-brand-green-50 rounded-lg">
               <div>
                 <p className="text-sm text-black">Paid Earnings</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-2xl font-bold text-brand-green-600">
                   ${stats.paidEarnings?.toFixed(2) || '0.00'}
                 </p>
               </div>
-              <Check className="w-8 h-8 text-green-600" />
+              <Check className="w-8 h-8 text-brand-green-600" />
             </div>
 
             <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg">
@@ -304,7 +304,7 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         referral.status === 'completed'
-                          ? 'bg-green-100 text-green-800'
+                          ? 'bg-brand-green-100 text-brand-green-800'
                           : referral.status === 'pending'
                           ? 'bg-yellow-100 text-yellow-800'
                           : 'bg-gray-100 text-black'

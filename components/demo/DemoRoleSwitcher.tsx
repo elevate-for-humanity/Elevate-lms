@@ -96,7 +96,7 @@ export function DemoRoleSwitcher({ currentRole, isDemoTenant = true }: DemoRoleS
                         onClick={() => handleCopyEmail(user.email)}
                         className={`flex-shrink-0 p-2 rounded-lg transition ${
                           isCopied 
-                            ? 'bg-green-100 text-green-600' 
+                            ? 'bg-brand-green-100 text-brand-green-600' 
                             : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                         }`}
                         title={isCopied ? 'Copied!' : 'Copy email'}

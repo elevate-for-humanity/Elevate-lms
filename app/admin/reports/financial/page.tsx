@@ -52,8 +52,8 @@ export default async function FinancialReportPage() {
     draft: 'bg-gray-100 text-gray-600',
     submitted: 'bg-brand-blue-100 text-brand-blue-700',
     pending_review: 'bg-yellow-100 text-yellow-700',
-    approved: 'bg-green-100 text-green-700',
-    denied: 'bg-red-100 text-red-700',
+    approved: 'bg-brand-green-100 text-brand-green-700',
+    denied: 'bg-brand-red-100 text-brand-red-700',
   };
 
   return (
@@ -74,12 +74,12 @@ export default async function FinancialReportPage() {
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <DollarSign className="w-5 h-5 text-green-600" />
+              <div className="p-2 bg-brand-green-100 rounded-lg">
+                <DollarSign className="w-5 h-5 text-brand-green-600" />
               </div>
               <span className="text-sm text-gray-600">WOTC Credits</span>
             </div>
-            <p className="text-3xl font-bold text-green-600">${totalWOTCCredits.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-brand-green-600">${totalWOTCCredits.toLocaleString()}</p>
           </div>
           
           <div className="bg-white rounded-xl shadow-sm p-6">
@@ -104,12 +104,12 @@ export default async function FinancialReportPage() {
           
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Clock className="w-5 h-5 text-orange-600" />
+              <div className="p-2 bg-brand-orange-100 rounded-lg">
+                <Clock className="w-5 h-5 text-brand-orange-600" />
               </div>
               <span className="text-sm text-gray-600">Pending Apps</span>
             </div>
-            <p className="text-3xl font-bold text-orange-600">{pendingWOTC.length + pendingGrants.length}</p>
+            <p className="text-3xl font-bold text-brand-orange-600">{pendingWOTC.length + pendingGrants.length}</p>
           </div>
         </div>
 
@@ -137,7 +137,7 @@ export default async function FinancialReportPage() {
                         {app.status.replace('_', ' ')}
                       </span>
                       {app.tax_credit_amount && (
-                        <p className="text-sm font-medium text-green-600 mt-1">
+                        <p className="text-sm font-medium text-brand-green-600 mt-1">
                           ${parseFloat(app.tax_credit_amount).toLocaleString()}
                         </p>
                       )}
@@ -172,14 +172,14 @@ export default async function FinancialReportPage() {
                     </div>
                     <div className="text-right">
                       <span className={`px-2 py-1 text-xs rounded-full ${
-                        app.status === 'approved' ? 'bg-green-100 text-green-700' :
-                        app.status === 'denied' ? 'bg-red-100 text-red-700' :
+                        app.status === 'approved' ? 'bg-brand-green-100 text-brand-green-700' :
+                        app.status === 'denied' ? 'bg-brand-red-100 text-brand-red-700' :
                         'bg-yellow-100 text-yellow-700'
                       }`}>
                         {app.status.replace('_', ' ')}
                       </span>
                       {app.amount_awarded && (
-                        <p className="text-sm font-medium text-green-600 mt-1">
+                        <p className="text-sm font-medium text-brand-green-600 mt-1">
                           ${parseFloat(app.amount_awarded).toLocaleString()}
                         </p>
                       )}
@@ -208,7 +208,7 @@ export default async function FinancialReportPage() {
                   <h3 className="font-medium text-gray-900 mb-1">{grant.title}</h3>
                   <p className="text-sm text-gray-500 mb-2">{grant.funder}</p>
                   <div className="flex items-center justify-between">
-                    <span className="text-green-600 font-medium">
+                    <span className="text-brand-green-600 font-medium">
                       ${(grant.amount_min / 1000).toFixed(0)}K - ${(grant.amount_max / 1000).toFixed(0)}K
                     </span>
                     {grant.deadline && (

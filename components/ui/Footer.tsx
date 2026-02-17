@@ -97,7 +97,7 @@ export const Footer: React.FC = () => {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-slate-300 text-sm font-medium hover:text-orange-400 transition-colors"
+                    className="text-slate-300 text-sm font-medium hover:text-brand-orange-400 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -114,7 +114,7 @@ export const Footer: React.FC = () => {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-slate-300 text-sm font-medium hover:text-orange-400 transition-colors"
+                    className="text-slate-300 text-sm font-medium hover:text-brand-orange-400 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -131,7 +131,7 @@ export const Footer: React.FC = () => {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-slate-300 text-sm font-medium hover:text-orange-400 transition-colors"
+                    className="text-slate-300 text-sm font-medium hover:text-brand-orange-400 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -148,7 +148,7 @@ export const Footer: React.FC = () => {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-slate-300 text-sm font-medium hover:text-orange-400 transition-colors"
+                    className="text-slate-300 text-sm font-medium hover:text-brand-orange-400 transition-colors"
                   >
                     {link.name}
                   </Link>

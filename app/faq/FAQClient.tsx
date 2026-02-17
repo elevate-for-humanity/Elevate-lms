@@ -182,10 +182,10 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white pt-24 pb-16 lg:pt-32">
+      <div className="bg-gradient-to-r from-brand-orange-500 to-brand-orange-600 text-white pt-24 pb-16 lg:pt-32">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h1>
-          <p className="text-xl text-orange-100 max-w-2xl mb-8">
+          <p className="text-xl text-brand-orange-100 max-w-2xl mb-8">
             Find answers to common questions about our programs and services.
           </p>
           <div className="relative max-w-xl">
@@ -195,7 +195,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
               placeholder="Search questions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-300"
+              className="w-full pl-12 pr-4 py-3 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-orange-300"
             />
           </div>
         </div>
@@ -212,7 +212,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                 <button
                   onClick={() => setSelectedCategory(null)}
                   className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                    !selectedCategory ? 'bg-orange-100 text-orange-700 font-medium' : 'text-gray-600 hover:bg-gray-100'
+                    !selectedCategory ? 'bg-brand-orange-100 text-brand-orange-700 font-medium' : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
                   All Questions
@@ -222,7 +222,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.name)}
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                      selectedCategory === cat.name ? 'bg-orange-100 text-orange-700 font-medium' : 'text-gray-600 hover:bg-gray-100'
+                      selectedCategory === cat.name ? 'bg-brand-orange-100 text-brand-orange-700 font-medium' : 'text-gray-600 hover:bg-gray-100'
                     }`}
                   >
                     {cat.name}
@@ -246,7 +246,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                         setOpenFaqId(faq.id);
                         document.getElementById(`faq-${faq.id}`)?.scrollIntoView({ behavior: 'smooth' });
                       }}
-                      className="w-full text-left text-sm text-gray-600 hover:text-orange-600 line-clamp-2"
+                      className="w-full text-left text-sm text-gray-600 hover:text-brand-orange-600 line-clamp-2"
                     >
                       {faq.question}
                     </button>
@@ -256,9 +256,9 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
             )}
 
             {/* Popular Questions */}
-            <div className="bg-orange-50 rounded-xl p-4">
+            <div className="bg-brand-orange-50 rounded-xl p-4">
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-orange-500" />
+                <TrendingUp className="w-4 h-4 text-brand-orange-500" />
                 Popular Questions
               </h3>
               <div className="space-y-2">
@@ -269,7 +269,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                       setOpenFaqId(faq.id);
                       document.getElementById(`faq-${faq.id}`)?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="w-full text-left text-sm text-gray-600 hover:text-orange-600 line-clamp-2"
+                    className="w-full text-left text-sm text-gray-600 hover:text-brand-orange-600 line-clamp-2"
                   >
                     {faq.question}
                   </button>
@@ -297,7 +297,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                     key={faq.id}
                     id={`faq-${faq.id}`}
                     className={`bg-white rounded-xl shadow-sm border overflow-hidden transition-all duration-300 ${
-                      isOpen ? 'ring-2 ring-orange-200' : ''
+                      isOpen ? 'ring-2 ring-brand-orange-200' : ''
                     }`}
                   >
                     <button
@@ -308,13 +308,13 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                       className="w-full flex items-center justify-between p-6 text-left"
                     >
                       <div className="flex items-start gap-4 flex-1">
-                        <HelpCircle className="w-6 h-6 text-orange-500 flex-shrink-0 mt-0.5" />
+                        <HelpCircle className="w-6 h-6 text-brand-orange-500 flex-shrink-0 mt-0.5" />
                         <div className="flex-1">
                           <span className="font-medium text-gray-900 block">
                             {highlightText(faq.question)}
                           </span>
                           {isPopular && (
-                            <span className="inline-flex items-center gap-1 mt-1 text-xs text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">
+                            <span className="inline-flex items-center gap-1 mt-1 text-xs text-brand-orange-600 bg-brand-orange-100 px-2 py-0.5 rounded-full">
                               <TrendingUp className="w-3 h-3" />
                               Popular
                             </span>
@@ -342,7 +342,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                                     trackView(related.id);
                                     document.getElementById(`faq-${related.id}`)?.scrollIntoView({ behavior: 'smooth' });
                                   }}
-                                  className="block text-sm text-orange-600 hover:text-orange-700 hover:underline"
+                                  className="block text-sm text-brand-orange-600 hover:text-brand-orange-700 hover:underline"
                                 >
                                   → {related.question}
                                 </button>
@@ -361,7 +361,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                                 onClick={() => handleVote(faq.id, true)}
                                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                                   helpfulVotes[faq.id] === 'yes'
-                                    ? 'bg-green-100 text-green-700'
+                                    ? 'bg-brand-green-100 text-brand-green-700'
                                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                 }`}
                               >
@@ -372,7 +372,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                                 onClick={() => handleVote(faq.id, false)}
                                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                                   helpfulVotes[faq.id] === 'no'
-                                    ? 'bg-red-100 text-red-700'
+                                    ? 'bg-brand-red-100 text-brand-red-700'
                                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                 }`}
                               >
@@ -405,7 +405,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                                     onClick={() => copyLink(faq.id)}
                                     className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                                   >
-                                    {copiedLink ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                                    {copiedLink ? <Check className="w-4 h-4 text-brand-green-500" /> : <Copy className="w-4 h-4" />}
                                     {copiedLink ? 'Copied!' : 'Copy Link'}
                                   </button>
                                   <button
@@ -451,7 +451,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                     setSearchQuery('');
                     setSelectedCategory(null);
                   }}
-                  className="text-orange-600 hover:text-orange-700 font-medium"
+                  className="text-brand-orange-600 hover:text-brand-orange-700 font-medium"
                 >
                   Clear filters
                 </button>
@@ -459,11 +459,11 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
             )}
 
             {/* Contact CTA */}
-            <div className="mt-12 bg-orange-50 rounded-xl p-8 text-center">
-              <MessageSquare className="w-12 h-12 text-orange-500 mx-auto mb-4" />
+            <div className="mt-12 bg-brand-orange-50 rounded-xl p-8 text-center">
+              <MessageSquare className="w-12 h-12 text-brand-orange-500 mx-auto mb-4" />
               <h2 className="text-xl font-bold mb-2">Still have questions?</h2>
               <p className="text-gray-600 mb-4">Our team is here to help you find the answers you need.</p>
-              <Link href="/contact" className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
+              <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-orange-600 transition-colors">
                 Contact Us
               </Link>
             </div>

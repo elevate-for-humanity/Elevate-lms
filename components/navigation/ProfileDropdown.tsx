@@ -202,7 +202,7 @@ export function ProfileDropdown({ className }: Props) {
     <div className={`relative ${className || ''}`} ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:ring-offset-2"
+        className="relative w-10 h-10 rounded-full bg-gradient-to-br from-brand-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:ring-offset-2"
         aria-label="Profile menu"
         aria-expanded={isOpen}
       >
@@ -220,7 +220,7 @@ export function ProfileDropdown({ className }: Props) {
         
         {/* Notification badge */}
         {notifications.unread > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-brand-red-500 text-white text-xs rounded-full flex items-center justify-center">
             {notifications.unread > 9 ? '9+' : notifications.unread}
           </span>
         )}
@@ -229,9 +229,9 @@ export function ProfileDropdown({ className }: Props) {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50">
           {/* User Info Header */}
-          <div className="px-4 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+          <div className="px-4 py-4 bg-gradient-to-r from-brand-blue-50 to-indigo-50 border-b">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold">
                 {profile.avatar_url ? (
                   <Image
                     src={profile.avatar_url}
@@ -268,7 +268,7 @@ export function ProfileDropdown({ className }: Props) {
               <div className="font-semibold text-gray-900">
                 Notifications
                 {notifications.unread > 0 && (
-                  <span className="ml-1 text-xs text-red-500">({notifications.unread})</span>
+                  <span className="ml-1 text-xs text-brand-red-500">({notifications.unread})</span>
                 )}
               </div>
             </Link>
@@ -321,7 +321,7 @@ export function ProfileDropdown({ className }: Props) {
                 <Bell className="h-4 w-4 text-gray-400" />
                 Notifications
                 {notifications.unread > 0 && (
-                  <span className="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full">
+                  <span className="bg-brand-red-100 text-brand-red-600 text-xs px-2 py-0.5 rounded-full">
                     {notifications.unread}
                   </span>
                 )}
@@ -385,7 +385,7 @@ export function ProfileDropdown({ className }: Props) {
             <button
               onClick={handleSignOut}
               disabled={signingOut}
-              className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 w-full disabled:opacity-50"
+              className="flex items-center gap-3 px-4 py-2.5 text-sm text-brand-red-600 hover:bg-brand-red-50 w-full disabled:opacity-50"
             >
               {signingOut ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

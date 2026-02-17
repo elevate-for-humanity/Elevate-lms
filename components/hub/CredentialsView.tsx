@@ -93,9 +93,9 @@ export default function CredentialsView({ userId }: { userId?: string }) {
   }
 
   const statusConfig = {
-    active: { label: 'Active', color: 'text-green-700', bg: 'bg-green-100', icon: CheckCircle },
+    active: { label: 'Active', color: 'text-brand-green-700', bg: 'bg-brand-green-100', icon: CheckCircle },
     pending: { label: 'Pending', color: 'text-amber-700', bg: 'bg-amber-100', icon: Clock },
-    expired: { label: 'Expired', color: 'text-red-700', bg: 'bg-red-100', icon: Clock },
+    expired: { label: 'Expired', color: 'text-brand-red-700', bg: 'bg-brand-red-100', icon: Clock },
   };
 
   return (

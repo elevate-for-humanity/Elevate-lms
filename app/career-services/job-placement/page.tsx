@@ -86,7 +86,7 @@ export default function JobPlacementPage() {
           </div>
         </div>
 
-        <div className="bg-orange-50 rounded-2xl p-8 md:p-12">
+        <div className="bg-brand-orange-50 rounded-2xl p-8 md:p-12">
           <h2 className="text-3xl font-bold text-black mb-8 text-center">How Job Placement Works</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-6">
@@ -200,8 +200,8 @@ export default function JobPlacementPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <Briefcase className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+                <Briefcase className="w-6 h-6 text-brand-green-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">Business Services</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
@@ -226,8 +226,8 @@ export default function JobPlacementPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <TrendingUp className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center mb-4">
+                <TrendingUp className="w-6 h-6 text-brand-orange-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">Manufacturing</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
@@ -239,8 +239,8 @@ export default function JobPlacementPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
-                <Award className="w-6 h-6 text-red-600" />
+              <div className="w-12 h-12 bg-brand-red-100 rounded-lg flex items-center justify-center mb-4">
+                <Award className="w-6 h-6 text-brand-red-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">Nonprofit</h3>
               <ul className="space-y-2 text-gray-600 text-sm">

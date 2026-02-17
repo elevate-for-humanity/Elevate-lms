@@ -64,7 +64,7 @@ export default function CopyrightPage() {
             </ul>
 
             <h3 className="text-xl font-bold text-black mt-6 mb-3">Prohibited Uses</h3>
-            <div className="bg-red-50 rounded-lg p-6 border-2 border-red-200 mb-6">
+            <div className="bg-brand-red-50 rounded-lg p-6 border-2 border-brand-red-200 mb-6">
               <p className="text-black mb-4">
                 You may NOT:
               </p>
@@ -151,7 +151,7 @@ export default function CopyrightPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Fair Use in Education</h2>
             
-            <div className="bg-green-50 rounded-xl p-6 border-2 border-green-200 mb-6">
+            <div className="bg-brand-green-50 rounded-xl p-6 border-2 border-brand-green-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Educational Fair Use</h3>
               <p className="text-black mb-4">
                 Fair use allows limited use of copyrighted materials for educational purposes without permission. 

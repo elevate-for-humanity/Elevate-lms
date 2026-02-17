@@ -168,7 +168,7 @@ export default async function QuizPage({ params }: Props) {
               )}
             </div>
             {hasPassed && (
-              <div className="flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full">
+              <div className="flex items-center gap-2 bg-brand-green-100 text-brand-green-800 px-4 py-2 rounded-full">
                 <Trophy className="w-5 h-5" />
                 <span className="font-semibold">Passed</span>
               </div>
@@ -217,14 +217,14 @@ export default async function QuizPage({ params }: Props) {
           {quiz.max_attempts && (
             <div className={`rounded-xl p-4 mb-6 ${
               attemptsRemaining === 0 
-                ? 'bg-red-50 border border-red-200' 
+                ? 'bg-brand-red-50 border border-brand-red-200' 
                 : 'bg-brand-blue-50 border border-brand-blue-200'
             }`}>
               <div className="flex items-center gap-2">
                 <AlertCircle className={`w-5 h-5 ${
-                  attemptsRemaining === 0 ? 'text-red-600' : 'text-brand-blue-600'
+                  attemptsRemaining === 0 ? 'text-brand-red-600' : 'text-brand-blue-600'
                 }`} />
-                <span className={attemptsRemaining === 0 ? 'text-red-800' : 'text-brand-blue-800'}>
+                <span className={attemptsRemaining === 0 ? 'text-brand-red-800' : 'text-brand-blue-800'}>
                   {attemptsRemaining === 0 
                     ? 'You have used all available attempts for this quiz.'
                     : `You have ${attemptsRemaining} attempt${attemptsRemaining !== 1 ? 's' : ''} remaining.`
@@ -267,11 +267,11 @@ export default async function QuizPage({ params }: Props) {
                   >
                     <div className="flex items-center gap-4">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        passed ? 'bg-green-100' : 'bg-red-100'
+                        passed ? 'bg-brand-green-100' : 'bg-brand-red-100'
                       }`}>
                         {passed 
                           ? <span className="text-slate-400 flex-shrink-0">•</span>
-                          : <XCircle className="w-5 h-5 text-red-600" />
+                          : <XCircle className="w-5 h-5 text-brand-red-600" />
                         }
                       </div>
                       <div>
@@ -291,7 +291,7 @@ export default async function QuizPage({ params }: Props) {
                     </div>
                     <div className="text-right">
                       <p className={`text-2xl font-bold ${
-                        passed ? 'text-green-600' : 'text-red-600'
+                        passed ? 'text-brand-green-600' : 'text-brand-red-600'
                       }`}>
                         {attempt.score}%
                       </p>

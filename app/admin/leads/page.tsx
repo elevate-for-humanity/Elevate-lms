@@ -15,12 +15,12 @@ export const metadata: Metadata = {
 const statusColors: Record<string, string> = {
   new: 'bg-brand-blue-100 text-brand-blue-800',
   contacted: 'bg-yellow-100 text-yellow-800',
-  qualified: 'bg-green-100 text-green-800',
+  qualified: 'bg-brand-green-100 text-brand-green-800',
   appointment_set: 'bg-brand-blue-100 text-brand-blue-800',
   application_started: 'bg-indigo-100 text-indigo-800',
   enrolled: 'bg-emerald-100 text-emerald-800',
   not_interested: 'bg-gray-100 text-gray-800',
-  unqualified: 'bg-red-100 text-red-800',
+  unqualified: 'bg-brand-red-100 text-brand-red-800',
 };
 
 const statusLabels: Record<string, string> = {
@@ -127,8 +127,8 @@ export default async function AdminLeadsPage() {
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Phone className="w-6 h-6 text-green-600" />
+              <div className="p-2 bg-brand-green-100 rounded-lg">
+                <Phone className="w-6 h-6 text-brand-green-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{contactedToday || 0}</p>
@@ -193,7 +193,7 @@ export default async function AdminLeadsPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           {error ? (
             <div className="p-8 text-center">
-              <div className="text-red-600 mb-4">Database table not found</div>
+              <div className="text-brand-red-600 mb-4">Database table not found</div>
               <p className="text-gray-600 mb-4">
                 Run the migration in Supabase Dashboard SQL Editor:
               </p>

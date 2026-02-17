@@ -145,9 +145,9 @@ export default function QuizManagerClient({ course, initialQuizzes, courseId }: 
 
       {/* Error Display */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
           {error}
-          <button onClick={() => setError(null)} className="ml-4 text-red-500 hover:text-red-700">Dismiss</button>
+          <button onClick={() => setError(null)} className="ml-4 text-brand-red-500 hover:text-brand-red-700">Dismiss</button>
         </div>
       )}
 
@@ -162,7 +162,7 @@ export default function QuizManagerClient({ course, initialQuizzes, courseId }: 
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                   </svg>
                 </div>
-                <button onClick={() => handleDelete(quiz.id)} className="text-red-500 hover:text-red-700">
+                <button onClick={() => handleDelete(quiz.id)} className="text-brand-red-500 hover:text-brand-red-700">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </button>
               </div>

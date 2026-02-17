@@ -196,8 +196,8 @@ export default function LessonPage() {
       return (
         <div className="flex items-center justify-center h-screen bg-slate-50">
           <div className="text-center max-w-md">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="w-6 h-6 text-red-600" />
+            <div className="w-12 h-12 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="w-6 h-6 text-brand-red-600" />
             </div>
             <h2 className="text-xl font-bold text-slate-900 mb-2">Lesson Not Found</h2>
             <p className="text-slate-600 mb-6">
@@ -205,7 +205,7 @@ export default function LessonPage() {
             </p>
             <Link
               href={`/lms/courses/${courseId}`}
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-brand-blue-700"
             >
               Back to Course
             </Link>
@@ -233,7 +233,7 @@ export default function LessonPage() {
         {/* Skeleton content */}
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div className="w-10 h-10 border-4 border-brand-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-slate-600">Loading lesson...</p>
           </div>
         </div>
@@ -310,7 +310,7 @@ export default function LessonPage() {
                 href={`/lms/courses/${courseId}/lessons/${l.id}`}
                 className={`flex items-center gap-3 p-3 rounded-lg mb-2 transition ${
                   l.id === lessonId
-                    ? 'bg-blue-50 border-l-4 border-brand-blue-600'
+                    ? 'bg-brand-blue-50 border-l-4 border-brand-blue-600'
                     : 'hover:bg-slate-50'
                 }`}
               >
@@ -319,7 +319,7 @@ export default function LessonPage() {
                     lessonDone
                       ? 'bg-brand-green-100 text-brand-green-600'
                       : l.id === lessonId
-                        ? 'bg-blue-100 text-brand-blue-600'
+                        ? 'bg-brand-blue-100 text-brand-blue-600'
                         : 'bg-slate-100 text-black'
                   }`}
                 >
@@ -331,7 +331,7 @@ export default function LessonPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div
-                    className={`font-semibold text-sm truncate ${l.id === lessonId ? 'text-blue-900' : 'text-black'}`}
+                    className={`font-semibold text-sm truncate ${l.id === lessonId ? 'text-brand-blue-900' : 'text-black'}`}
                   >
                     {l.title}
                   </div>
@@ -423,8 +423,8 @@ export default function LessonPage() {
               onClick={markComplete}
               className={`px-6 py-3 rounded-lg font-semibold transition ${
                 isCompleted
-                  ? 'bg-brand-green-100 text-green-700 border-2 border-brand-green-600'
-                  : 'bg-brand-green-600 hover:bg-green-700 text-white'
+                  ? 'bg-brand-green-100 text-brand-green-700 border-2 border-brand-green-600'
+                  : 'bg-brand-green-600 hover:bg-brand-green-700 text-white'
               }`}
             >
               {isCompleted ? '• Completed' : 'Mark as Complete'}
@@ -488,7 +488,7 @@ export default function LessonPage() {
                     className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                         <FileText className="w-5 h-5 text-brand-blue-600" />
                       </div>
                       <div>
@@ -515,7 +515,7 @@ export default function LessonPage() {
               <div>
                 <textarea
                   placeholder="Take notes while you learn..."
-                  className="w-full h-64 p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-64 p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
                 <button className="mt-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-2 rounded-lg font-semibold" aria-label="Action button">
                   Save Notes
@@ -526,21 +526,21 @@ export default function LessonPage() {
 
           {/* Course Completion Banner */}
           {courseCompleted && (
-            <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
+            <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-6 mb-8">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-green-900">Course Completed!</h3>
-                  <p className="text-green-700 text-sm">
+                  <h3 className="text-lg font-bold text-brand-green-900">Course Completed!</h3>
+                  <p className="text-brand-green-700 text-sm">
                     Congratulations! You have completed all lessons in this course.
                   </p>
                 </div>
                 {certificate && (
                   <Link
                     href={`/certificates/${certificate.id}`}
-                    className="bg-green-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-green-700 transition text-sm"
+                    className="bg-brand-green-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-brand-green-700 transition text-sm"
                   >
                     View Certificate
                   </Link>

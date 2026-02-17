@@ -116,9 +116,9 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
   if (!placements || placements.length === 0) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-8">
-        <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
+        <div className="bg-brand-orange-50 border border-brand-orange-200 rounded-xl p-6">
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-6 h-6 text-orange-600 mt-0.5" />
+            <AlertCircle className="w-6 h-6 text-brand-orange-600 mt-0.5" />
             <div>
               <h2 className="text-lg font-bold text-black">
                 No Active Apprentices
@@ -278,8 +278,8 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
           <div
             className={`rounded-lg p-4 flex items-start gap-3 ${
               message.type === 'success'
-                ? 'bg-green-50 border border-green-200'
-                : 'bg-red-50 border border-red-200'
+                ? 'bg-brand-green-50 border border-brand-green-200'
+                : 'bg-brand-red-50 border border-brand-red-200'
             }`}
           >
             {message.type === 'success' ? (
@@ -289,7 +289,7 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
             )}
             <div
               className={`text-sm ${
-                message.type === 'success' ? 'text-green-800' : 'text-red-800'
+                message.type === 'success' ? 'text-brand-green-800' : 'text-brand-red-800'
               }`}
             >
               {message.text}

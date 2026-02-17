@@ -110,7 +110,7 @@ export default async function BarriersPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-500">Active</h3>
-              <span className="text-orange-600 bg-orange-100 p-2 rounded-lg">
+              <span className="text-brand-orange-600 bg-brand-orange-100 p-2 rounded-lg">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -123,7 +123,7 @@ export default async function BarriersPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-500">Resolved</h3>
-              <span className="text-green-600 bg-green-100 p-2 rounded-lg">
+              <span className="text-brand-green-600 bg-brand-green-100 p-2 rounded-lg">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -167,9 +167,9 @@ export default async function BarriersPage() {
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     barrier.status === 'resolved' 
-                      ? 'bg-green-100 text-green-800' 
+                      ? 'bg-brand-green-100 text-brand-green-800' 
                       : barrier.status === 'active'
-                      ? 'bg-orange-100 text-orange-800'
+                      ? 'bg-brand-orange-100 text-brand-orange-800'
                       : 'bg-gray-100 text-gray-800'
                   }`}>
                     {barrier.status || 'pending'}

@@ -42,8 +42,8 @@ const statusConfig: Record<EnrollmentStatus, {
   },
   enrolled: { 
     label: 'Enrolled', 
-    color: 'text-green-700', 
-    bgColor: 'bg-green-100',
+    color: 'text-brand-green-700', 
+    bgColor: 'bg-brand-green-100',
     icon: CheckCircle 
   },
   in_progress: { 
@@ -182,7 +182,7 @@ export default function EnrollmentState({ userId }: { userId?: string }) {
         <p className="text-slate-600 mb-4">Start your journey by enrolling in a program</p>
         <Link 
           href="/programs"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700"
         >
           Browse Programs
           <ArrowRight className="w-4 h-4" />
@@ -224,7 +224,7 @@ export default function EnrollmentState({ userId }: { userId?: string }) {
               </div>
               <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-green-500 rounded-full transition-all duration-500"
+                  className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
                   style={{ width: `${enrollment.progress_percent}%` }}
                 />
               </div>
@@ -237,10 +237,10 @@ export default function EnrollmentState({ userId }: { userId?: string }) {
                 href={enrollment.next_action_url}
                 className="flex items-center justify-between group"
               >
-                <span className="font-medium text-slate-900 group-hover:text-green-600 transition">
+                <span className="font-medium text-slate-900 group-hover:text-brand-green-600 transition">
                   {enrollment.next_action}
                 </span>
-                <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-green-600 group-hover:translate-x-1 transition" />
+                <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-brand-green-600 group-hover:translate-x-1 transition" />
               </Link>
             </div>
           </div>

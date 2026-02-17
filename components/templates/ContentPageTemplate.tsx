@@ -25,7 +25,7 @@ export default function ContentPageTemplate({
       </div>
 
       {/* Simple header - no image */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12">
+      <div className="bg-gradient-to-r from-brand-blue-600 to-purple-600 text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">{title}</h1>
           {description && (

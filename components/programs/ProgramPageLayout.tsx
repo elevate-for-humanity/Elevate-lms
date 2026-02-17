@@ -37,10 +37,10 @@ const colorClasses = {
     ctaText: 'text-brand-blue-600',
   },
   orange: {
-    badge: 'bg-orange-500',
-    cta: 'bg-orange-500',
-    ctaHover: 'hover:bg-orange-600',
-    ctaText: 'text-orange-600',
+    badge: 'bg-brand-orange-500',
+    cta: 'bg-brand-orange-500',
+    ctaHover: 'hover:bg-brand-orange-600',
+    ctaText: 'text-brand-orange-600',
   },
   purple: {
     badge: 'bg-purple-600',
@@ -49,16 +49,16 @@ const colorClasses = {
     ctaText: 'text-purple-600',
   },
   green: {
-    badge: 'bg-green-600',
-    cta: 'bg-green-600',
-    ctaHover: 'hover:bg-green-700',
-    ctaText: 'text-green-600',
+    badge: 'bg-brand-green-600',
+    cta: 'bg-brand-green-600',
+    ctaHover: 'hover:bg-brand-green-700',
+    ctaText: 'text-brand-green-600',
   },
   red: {
-    badge: 'bg-red-600',
-    cta: 'bg-red-600',
-    ctaHover: 'hover:bg-red-700',
-    ctaText: 'text-red-600',
+    badge: 'bg-brand-red-600',
+    cta: 'bg-brand-red-600',
+    ctaHover: 'hover:bg-brand-red-700',
+    ctaText: 'text-brand-red-600',
   },
 };
 

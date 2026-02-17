@@ -64,8 +64,8 @@ export default async function CareerMessagesPage() {
               return (
                 <div key={msg.id} className="p-4 hover:bg-gray-50">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                      <Briefcase className="w-5 h-5 text-green-600" />
+                    <div className="w-10 h-10 bg-brand-green-100 rounded-full flex items-center justify-center">
+                      <Briefcase className="w-5 h-5 text-brand-green-600" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">

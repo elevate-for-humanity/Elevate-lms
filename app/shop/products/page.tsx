@@ -147,7 +147,7 @@ export default async function ProductsPage() {
                     </div>
                   )}
                   {product.original_price && (
-                    <span className="absolute top-2 left-2 px-2 py-1 bg-red-500 text-white text-xs font-medium rounded">
+                    <span className="absolute top-2 left-2 px-2 py-1 bg-brand-red-500 text-white text-xs font-medium rounded">
                       Sale
                     </span>
                   )}

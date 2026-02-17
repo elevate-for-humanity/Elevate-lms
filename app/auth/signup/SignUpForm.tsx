@@ -166,8 +166,8 @@ export default function SignUpForm() {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg" role="alert" aria-live="assertive">
-            <p className="text-sm text-red-800">{error}</p>
+          <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg" role="alert" aria-live="assertive">
+            <p className="text-sm text-brand-red-800">{error}</p>
           </div>
         )}
 
@@ -187,7 +187,7 @@ export default function SignUpForm() {
                 value={formData.firstName}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition"
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 outline-none transition"
                 placeholder="First name"
               />
             </div>
@@ -205,7 +205,7 @@ export default function SignUpForm() {
                 value={formData.lastName}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition"
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 outline-none transition"
                 placeholder="Doe"
               />
             </div>
@@ -225,7 +225,7 @@ export default function SignUpForm() {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 outline-none transition"
               placeholder="your.email@gmail.com"
             />
           </div>
@@ -245,7 +245,7 @@ export default function SignUpForm() {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition pr-12"
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 outline-none transition pr-12"
                 placeholder="••••••••"
               />
               <button
@@ -309,7 +309,7 @@ export default function SignUpForm() {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 outline-none transition"
               placeholder="••••••••"
             />
           </div>
@@ -331,7 +331,7 @@ export default function SignUpForm() {
                   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                 >
               ) => setAgreedToTerms(e.target.checked)}
-              className="w-4 h-4 mt-1 text-brand-orange-600 border-slate-300 rounded focus:ring-orange-500"
+              className="w-4 h-4 mt-1 text-brand-orange-600 border-slate-300 rounded focus:ring-brand-orange-500"
             />
             <label htmlFor="terms" className="ml-3 text-sm text-black">
               I agree to the{' '}
@@ -354,7 +354,7 @@ export default function SignUpForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 bg-brand-orange-600 text-white font-semibold rounded-lg hover:bg-brand-orange-700 focus:ring-4 focus:ring-orange-200 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="w-full py-3 px-4 bg-brand-orange-600 text-white font-semibold rounded-lg hover:bg-brand-orange-700 focus:ring-4 focus:ring-brand-orange-200 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             {loading ? 'Creating account...' : 'Create Account'}
           </button>

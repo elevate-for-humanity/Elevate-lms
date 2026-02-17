@@ -28,11 +28,11 @@ export default async function CardPage() {
         </div>
       </div>
 
-      <section className="bg-green-600 text-white py-20">
+      <section className="bg-brand-green-600 text-white py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <CreditCard className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Elevate Card</h1>
-          <p className="text-xl text-green-100 mb-8">Receive your refunds and stipends faster with the Elevate prepaid card</p>
+          <p className="text-xl text-brand-green-100 mb-8">Receive your refunds and stipends faster with the Elevate prepaid card</p>
         </div>
       </section>
 
@@ -46,7 +46,7 @@ export default async function CardPage() {
               { icon: Circle, title: 'No Fees', desc: 'No monthly fees or minimum balance requirements' },
             ].map((feature, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border flex items-start gap-4">
-                <feature.icon className="w-8 h-8 text-green-600 flex-shrink-0" />
+                <feature.icon className="w-8 h-8 text-brand-green-600 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">{feature.title}</h3>
                   <p className="text-gray-600">{feature.desc}</p>
@@ -61,7 +61,7 @@ export default async function CardPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Get Your Card</h2>
           <p className="text-gray-600 mb-8">Contact your program coordinator to request an Elevate Card.</p>
-          <a href="/contact" className="inline-flex items-center gap-2 bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700">
+          <a href="/contact" className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-green-700">
             Contact Us
           </a>
         </div>

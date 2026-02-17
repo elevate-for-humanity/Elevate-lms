@@ -51,7 +51,7 @@ export default function ApplyPage() {
             <div className="p-6 text-center">
               <h3 className="text-2xl font-bold text-black mb-2">Start Application</h3>
               <p className="text-black mb-4">Ready to enroll? Complete your application online now.</p>
-              <span className="inline-flex items-center px-8 py-4 bg-green-600 text-white text-lg font-bold rounded-full">Apply Now <ArrowRight className="w-5 h-5 ml-2" /></span>
+              <span className="inline-flex items-center px-8 py-4 bg-brand-green-600 text-white text-lg font-bold rounded-full">Apply Now <ArrowRight className="w-5 h-5 ml-2" /></span>
             </div>
           </Link>
         </div>

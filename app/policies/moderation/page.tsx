@@ -48,7 +48,7 @@ export default function ModerationPage() {
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Moderation Standards</h2>
             
             <h3 className="text-xl font-bold text-black mt-6 mb-3">Prohibited Content</h3>
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <p className="text-black mb-4">
                 Content will be removed if it contains:
               </p>
@@ -133,7 +133,7 @@ export default function ModerationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     2
                   </div>
                   <div>
@@ -157,7 +157,7 @@ export default function ModerationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     4
                   </div>
                   <div>
@@ -169,7 +169,7 @@ export default function ModerationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     5
                   </div>
                   <div>
@@ -184,7 +184,7 @@ export default function ModerationPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Enforcement Actions</h2>
             
-            <div className="bg-green-50 border-l-4 border-green-400 p-6 mb-6">
+            <div className="bg-brand-green-50 border-l-4 border-brand-green-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Content-Level Actions</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li><strong>Content Removal:</strong> Deleted from platform</li>

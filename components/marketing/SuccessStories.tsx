@@ -26,7 +26,7 @@ export function SuccessStories() {
     <section className="bg-slate-950">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
         <header className="max-w-2xl">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-300">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-orange-300">
             Success stories
           </h2>
           <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-50">

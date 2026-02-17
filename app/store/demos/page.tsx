@@ -74,7 +74,7 @@ export default function StoreDemosPage() {
             Each demo uses sample data from a fictional training organization. Nothing you do here affects any real system.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/demo/admin" className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 transition">
+            <Link href="/demo/admin" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition">
               <Play className="w-5 h-5" /> Open Admin Demo
             </Link>
             <Link href="/store/trial" className="inline-flex items-center gap-2 border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-50 transition">
@@ -95,7 +95,7 @@ export default function StoreDemosPage() {
                   <Image src={demo.image} alt={demo.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" quality={90} />
                   <Link href={demo.href} className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors">
                     <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
-                      <Play className="w-7 h-7 text-red-600 ml-1" />
+                      <Play className="w-7 h-7 text-brand-red-600 ml-1" />
                     </div>
                   </Link>
                 </div>
@@ -103,7 +103,7 @@ export default function StoreDemosPage() {
                 {/* Content */}
                 <div className="w-full md:w-1/2">
                   <div className="flex items-center gap-3 mb-2">
-                    <demo.icon className="w-6 h-6 text-red-600" />
+                    <demo.icon className="w-6 h-6 text-brand-red-600" />
                     <h2 className="text-2xl font-bold text-slate-900">{demo.title}</h2>
                   </div>
                   <p className="text-slate-700 mb-5">{demo.description}</p>
@@ -115,7 +115,7 @@ export default function StoreDemosPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href={demo.href} className="inline-flex items-center gap-2 bg-red-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-red-700 transition-colors">
+                  <Link href={demo.href} className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-red-700 transition-colors">
                     Open Live Demo <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -133,7 +133,7 @@ export default function StoreDemosPage() {
             Start a 14-day trial and get your own branded instance with your real programs and students. No credit card required.
           </p>
           <div className="flex flex-col items-center gap-3">
-            <Link href="/store/trial" className="inline-flex items-center gap-2 bg-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-700 transition">
+            <Link href="/store/trial" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition">
               Start Free Trial <ArrowRight className="w-5 h-5" />
             </Link>
             <div className="flex gap-4 text-sm text-slate-500">

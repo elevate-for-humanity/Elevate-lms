@@ -233,16 +233,16 @@ export default function PartnersPage() {
       <section className="bg-gray-50">
         <div className="mx-auto max-w-6xl px-6 py-14">
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <Award className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
+              <Award className="w-6 h-6 text-brand-green-600" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold">Credential & Certification Partners</h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {credentialPartners.map((partner) => (
-              <div key={partner.name} className="rounded-lg border-2 border-gray-200 bg-white p-6 hover:border-green-500 transition-colors">
-                <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full mb-3">
+              <div key={partner.name} className="rounded-lg border-2 border-gray-200 bg-white p-6 hover:border-brand-green-500 transition-colors">
+                <span className="inline-block px-3 py-1 bg-brand-green-100 text-brand-green-700 text-xs font-semibold rounded-full mb-3">
                   {partner.type}
                 </span>
                 <h3 className="text-lg font-bold text-black mb-2">{partner.name}</h3>
@@ -257,16 +257,16 @@ export default function PartnersPage() {
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-6 py-14">
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Briefcase className="w-6 h-6 text-orange-600" />
+            <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+              <Briefcase className="w-6 h-6 text-brand-orange-600" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold">Industry & Employer Partners</h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             {industryPartners.map((partner) => (
-              <div key={partner.name} className="rounded-lg border-2 border-gray-200 bg-white p-6 hover:border-orange-500 transition-colors">
-                <span className="inline-block px-3 py-1 bg-orange-100 text-orange-700 text-xs font-semibold rounded-full mb-3">
+              <div key={partner.name} className="rounded-lg border-2 border-gray-200 bg-white p-6 hover:border-brand-orange-500 transition-colors">
+                <span className="inline-block px-3 py-1 bg-brand-orange-100 text-brand-orange-700 text-xs font-semibold rounded-full mb-3">
                   {partner.type}
                 </span>
                 <h3 className="text-lg font-bold text-black mb-2">{partner.name}</h3>

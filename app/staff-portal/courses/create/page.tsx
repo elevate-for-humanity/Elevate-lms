@@ -287,7 +287,7 @@ export default function CreateCoursePage() {
                     <button
                       type="button"
                       onClick={() => removeOutcome(index)}
-                      className="p-3 text-gray-400 hover:text-red-500"
+                      className="p-3 text-gray-400 hover:text-brand-red-500"
                     >
                       <X className="w-5 h-5" />
                     </button>

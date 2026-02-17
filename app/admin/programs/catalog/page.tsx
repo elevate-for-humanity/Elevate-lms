@@ -96,8 +96,8 @@ export default async function ProgramCatalogPage() {
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <Clock className="w-6 h-6 text-brand-green-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Total Clock Hours</p>
@@ -120,8 +120,8 @@ export default async function ProgramCatalogPage() {
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-brand-orange-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Last Updated</p>
@@ -168,8 +168,8 @@ export default async function ProgramCatalogPage() {
           {/* Summary Catalog */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <FileText className="w-7 h-7 text-green-600" />
+              <div className="w-14 h-14 bg-brand-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <FileText className="w-7 h-7 text-brand-green-600" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900">Summary Catalog</h3>
@@ -180,7 +180,7 @@ export default async function ProgramCatalogPage() {
                 <div className="flex items-center gap-3">
                   <Link
                     href="/api/admin/catalog/summary?format=pdf"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 text-sm font-medium"
                   >
                     <Download className="w-4 h-4" />
                     Download PDF
@@ -205,7 +205,7 @@ export default async function ProgramCatalogPage() {
             {/* Healthcare */}
             <div className="p-6">
               <h3 className="text-md font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="w-3 h-3 bg-red-500 rounded-full"></span>
+                <span className="w-3 h-3 bg-brand-red-500 rounded-full"></span>
                 Healthcare ({categories.healthcare.length} programs)
               </h3>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -224,7 +224,7 @@ export default async function ProgramCatalogPage() {
             {/* Skilled Trades */}
             <div className="p-6">
               <h3 className="text-md font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="w-3 h-3 bg-orange-500 rounded-full"></span>
+                <span className="w-3 h-3 bg-brand-orange-500 rounded-full"></span>
                 Skilled Trades ({categories.trades.length} programs)
               </h3>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -145,20 +145,20 @@ export default function PaymentPlanCheckout({
   // If fully paid, show enrollment ready
   if (isFullyPaid) {
     return (
-      <div className="bg-white rounded-xl border-2 border-green-500 overflow-hidden">
-        <div className="bg-green-500 text-white p-4 text-center">
+      <div className="bg-white rounded-xl border-2 border-brand-green-500 overflow-hidden">
+        <div className="bg-brand-green-500 text-white p-4 text-center">
           <h3 className="font-bold text-xl">✓ Payment Complete</h3>
         </div>
         <div className="p-6 text-center">
           <p className="text-lg text-slate-700 mb-4">
             Your payment of {formatCurrency(totalAmount)} has been received.
           </p>
-          <p className="text-green-600 font-semibold mb-6">
+          <p className="text-brand-green-600 font-semibold mb-6">
             You are ready to enroll in {programName}!
           </p>
           <button
             onClick={() => onCheckout({ paymentType: 'full', amount: 0, downPayment: 0, weeklyPayment: 0, numberOfWeeks: 0, useBnpl: false })}
-            className="bg-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition-colors"
+            className="bg-brand-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-green-700 transition-colors"
           >
             Complete Enrollment
           </button>
@@ -193,8 +193,8 @@ export default function PaymentPlanCheckout({
               <p className="font-bold text-slate-900">{formatCurrency(totalAmount)}</p>
             </div>
             <div>
-              <p className="text-green-700">Credits Applied</p>
-              <p className="font-bold text-green-600">-{formatCurrency(totalCredits)}</p>
+              <p className="text-brand-green-700">Credits Applied</p>
+              <p className="font-bold text-brand-green-600">-{formatCurrency(totalCredits)}</p>
               {approvedAmount > 0 && paidAmount > 0 && (
                 <p className="text-xs text-slate-500">
                   (Approved: {formatCurrency(approvedAmount)} + Paid: {formatCurrency(paidAmount)})
@@ -202,8 +202,8 @@ export default function PaymentPlanCheckout({
               )}
             </div>
             <div>
-              <p className="text-red-700">Remaining Balance</p>
-              <p className="font-bold text-red-600 text-xl">{formatCurrency(remainingBalance)}</p>
+              <p className="text-brand-red-700">Remaining Balance</p>
+              <p className="font-bold text-brand-red-600 text-xl">{formatCurrency(remainingBalance)}</p>
             </div>
           </div>
           <p className="text-xs text-amber-700 mt-2">
@@ -225,13 +225,13 @@ export default function PaymentPlanCheckout({
               onClick={() => setPaymentType('full')}
               className={`p-4 rounded-lg border-2 text-center transition-all ${
                 paymentType === 'full'
-                  ? 'border-green-500 bg-green-50'
+                  ? 'border-brand-green-500 bg-brand-green-50'
                   : 'border-slate-200 hover:border-slate-300'
               }`}
             >
               <p className="font-bold text-slate-900">Pay in Full</p>
-              <p className="text-lg font-bold text-green-600">{formatCurrency(remainingBalance)}</p>
-              <p className="text-xs text-green-600">Enroll immediately</p>
+              <p className="text-lg font-bold text-brand-green-600">{formatCurrency(remainingBalance)}</p>
+              <p className="text-xs text-brand-green-600">Enroll immediately</p>
             </button>
 
             <button
@@ -239,7 +239,7 @@ export default function PaymentPlanCheckout({
               onClick={() => setPaymentType('plan')}
               className={`p-4 rounded-lg border-2 text-center transition-all ${
                 paymentType === 'plan'
-                  ? 'border-blue-500 bg-blue-50'
+                  ? 'border-brand-blue-500 bg-brand-blue-50'
                   : 'border-slate-200 hover:border-slate-300'
               }`}
             >
@@ -270,7 +270,7 @@ export default function PaymentPlanCheckout({
                     onClick={() => setDownPayment(preset.amount)}
                     className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
                       downPayment === preset.amount
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-brand-blue-600 text-white'
                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                   >
@@ -287,7 +287,7 @@ export default function PaymentPlanCheckout({
                 step={25}
                 value={downPayment}
                 onChange={(e) => setDownPayment(Number(e.target.value))}
-                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-blue-600"
               />
 
               {/* Custom Input */}
@@ -306,25 +306,25 @@ export default function PaymentPlanCheckout({
                         setDownPayment(val);
                       }
                     }}
-                    className="w-full pl-8 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-8 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
               </div>
             </div>
 
             {/* Payment Summary */}
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <div className="bg-brand-blue-50 rounded-lg p-4 border border-brand-blue-200">
               <h4 className="font-bold text-slate-900 mb-3">Your Payment Plan</h4>
               <div className="space-y-2">
                 {totalCredits > 0 && (
-                  <div className="flex justify-between text-sm pb-2 border-b border-blue-200">
-                    <span className="text-green-700">✓ Already Credited</span>
-                    <span className="font-semibold text-green-600">{formatCurrency(totalCredits)}</span>
+                  <div className="flex justify-between text-sm pb-2 border-b border-brand-blue-200">
+                    <span className="text-brand-green-700">✓ Already Credited</span>
+                    <span className="font-semibold text-brand-green-600">{formatCurrency(totalCredits)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
                   <span className="text-slate-600">Down Payment (Today)</span>
-                  <span className="text-xl font-bold text-blue-600">{formatCurrency(downPayment)}</span>
+                  <span className="text-xl font-bold text-brand-blue-600">{formatCurrency(downPayment)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-600">Balance After Down Payment</span>
@@ -345,14 +345,14 @@ export default function PaymentPlanCheckout({
               </div>
 
               {/* Enrollment Status */}
-              <div className={`mt-4 p-3 rounded-lg ${plan.balanceAfterDown > 0 ? 'bg-amber-100' : 'bg-green-100'}`}>
+              <div className={`mt-4 p-3 rounded-lg ${plan.balanceAfterDown > 0 ? 'bg-amber-100' : 'bg-brand-green-100'}`}>
                 {plan.balanceAfterDown > 0 ? (
                   <p className="text-sm text-amber-800">
                     ⚠️ <strong>Enrollment pending:</strong> You can start after paying down payment. 
                     Weekly payments required to continue.
                   </p>
                 ) : (
-                  <p className="text-sm text-green-800">
+                  <p className="text-sm text-brand-green-800">
                     ✓ <strong>Full enrollment:</strong> Pay {formatCurrency(downPayment)} to enroll immediately!
                   </p>
                 )}
@@ -366,7 +366,7 @@ export default function PaymentPlanCheckout({
                   type="checkbox"
                   checked={useBnpl}
                   onChange={(e) => setUseBnpl(e.target.checked)}
-                  className="mt-1 w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                  className="mt-1 w-5 h-5 text-brand-blue-600 border-slate-300 rounded focus:ring-brand-blue-500"
                 />
                 <div>
                   <p className="font-medium text-slate-900">Split down payment with Buy Now Pay Later</p>
@@ -382,7 +382,7 @@ export default function PaymentPlanCheckout({
                     type="button"
                     onClick={() => setSelectedBnpl('stripe')}
                     className={`w-full p-3 rounded-lg border-2 text-left ${
-                      selectedBnpl === 'stripe' ? 'border-blue-500 bg-blue-50' : 'border-slate-200'
+                      selectedBnpl === 'stripe' ? 'border-brand-blue-500 bg-brand-blue-50' : 'border-slate-200'
                     }`}
                   >
                     <p className="font-medium">Affirm / Klarna / Afterpay</p>
@@ -417,7 +417,7 @@ export default function PaymentPlanCheckout({
             <button
               type="button"
               onClick={() => setShowSchedule(!showSchedule)}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
               {showSchedule ? '▼ Hide' : '▶ View'} Payment Schedule
             </button>
@@ -436,8 +436,8 @@ export default function PaymentPlanCheckout({
                   <tbody>
                     {plan.schedule.map((item, idx) => (
                       <tr key={idx} className={`border-b border-slate-100 ${
-                        item.type === 'credit' ? 'bg-green-50' : 
-                        item.type === 'down_payment' ? 'bg-blue-50 font-semibold' : ''
+                        item.type === 'credit' ? 'bg-brand-green-50' : 
+                        item.type === 'down_payment' ? 'bg-brand-blue-50 font-semibold' : ''
                       }`}>
                         <td className="py-2">
                           {item.type === 'credit' ? '✓ Credit Applied' :
@@ -449,7 +449,7 @@ export default function PaymentPlanCheckout({
                         </td>
                         <td className="py-2 text-right">
                           {item.type === 'credit' ? (
-                            <span className="text-green-600">-{formatCurrency(item.amount)}</span>
+                            <span className="text-brand-green-600">-{formatCurrency(item.amount)}</span>
                           ) : (
                             formatCurrency(item.amount)
                           )}
@@ -472,7 +472,7 @@ export default function PaymentPlanCheckout({
         <button
           onClick={handleCheckout}
           disabled={isLoading}
-          className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
+          className="w-full bg-brand-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-700 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Processing...' : 
            paymentType === 'full' ? `Pay ${formatCurrency(remainingBalance)} - Enroll Now` :

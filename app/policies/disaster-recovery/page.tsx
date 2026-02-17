@@ -19,7 +19,7 @@ export default function DisasterRecoveryPage() {
         <article className="bg-white rounded-xl shadow-sm p-8 md:p-12 mt-6">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <Shield className="w-8 h-8 text-orange-600" />
+              <Shield className="w-8 h-8 text-brand-orange-600" />
               <h1 className="text-4xl font-bold text-black">Disaster Recovery Policy</h1>
         </div>
         <p className="text-sm text-gray-600">Last Updated: January 24, 2026</p>
@@ -161,17 +161,17 @@ export default function DisasterRecoveryPage() {
           without impacting production systems.
         </p>
 
-        <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-6">
+        <div className="bg-brand-green-50 border-2 border-brand-green-200 rounded-lg p-6 mb-6">
           <div className="flex items-center gap-3 mb-3">
             <span className="text-slate-400 flex-shrink-0">•</span>
-            <h3 className="text-lg font-bold text-green-800 m-0">Latest DR Test: Passed</h3>
+            <h3 className="text-lg font-bold text-brand-green-800 m-0">Latest DR Test: Passed</h3>
           </div>
           <p className="text-black mb-3">
             Our most recent disaster recovery drill was completed successfully on January 24, 2026.
           </p>
           <Link 
             href="/policies/disaster-recovery-test" 
-            className="inline-flex items-center gap-2 text-green-700 font-semibold hover:underline"
+            className="inline-flex items-center gap-2 text-brand-green-700 font-semibold hover:underline"
           >
             View Full Test Report →
           </Link>

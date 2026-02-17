@@ -54,17 +54,17 @@ export default async function MembersPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-orange-600 text-white py-20">
+      <section className="relative bg-brand-orange-600 text-white py-20">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 mb-4">
-              <Users className="w-6 h-6 text-orange-200" />
-              <span className="text-orange-100 font-medium">Member Directory</span>
+              <Users className="w-6 h-6 text-brand-orange-200" />
+              <span className="text-brand-orange-100 font-medium">Member Directory</span>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold mb-6">
               Connect With<br />{(count || 0).toLocaleString()} Members
             </h1>
-            <p className="text-xl text-orange-100 mb-8">
+            <p className="text-xl text-brand-orange-100 mb-8">
               Find mentors, study partners, and industry professionals who can help you on your journey.
             </p>
             
@@ -75,10 +75,10 @@ export default async function MembersPage() {
                 <input
                   type="text"
                   placeholder="Search members by name or role..."
-                  className="w-full pl-12 pr-4 py-4 rounded-full text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-300"
+                  className="w-full pl-12 pr-4 py-4 rounded-full text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-orange-300"
                 />
               </div>
-              <button className="px-6 py-4 bg-orange-800 text-white font-semibold rounded-full hover:bg-orange-900 transition-colors flex items-center gap-2">
+              <button className="px-6 py-4 bg-brand-orange-800 text-white font-semibold rounded-full hover:bg-brand-orange-900 transition-colors flex items-center gap-2">
                 <Filter className="w-5 h-5" />
                 Filters
               </button>
@@ -91,7 +91,7 @@ export default async function MembersPage() {
       <section className="py-8 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-4">
-            <button className="px-6 py-2 rounded-full font-medium bg-orange-600 text-white">
+            <button className="px-6 py-2 rounded-full font-medium bg-brand-orange-600 text-white">
               All Members ({(count || 0).toLocaleString()})
             </button>
             {Object.entries(categoryMap).slice(0, 4).map(([role, roleCount]) => (
@@ -151,7 +151,7 @@ export default async function MembersPage() {
               <p className="text-gray-600 mb-6">Be the first to join the community!</p>
               <Link 
                 href="/apply" 
-                className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700"
               >
                 Apply Now
                 <ArrowRight className="w-4 h-4" />
@@ -162,15 +162,15 @@ export default async function MembersPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-orange-600">
+      <section className="py-16 bg-brand-orange-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Join?</h2>
-          <p className="text-orange-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-brand-orange-100 mb-8 max-w-2xl mx-auto">
             Start your journey and connect with others working toward career success.
           </p>
           <Link
             href="/programs"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-orange-600 font-semibold rounded-full hover:bg-orange-50 transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-orange-600 font-semibold rounded-full hover:bg-brand-orange-50 transition-colors"
           >
             Browse Programs
             <ArrowRight className="w-5 h-5" />

@@ -72,9 +72,9 @@ export default function AddStudentPage() {
           </div>
 
           {submitted && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
+            <div className="mb-6 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg flex items-center gap-3">
               <span className="text-slate-400 flex-shrink-0">•</span>
-              <span className="text-green-800">Student added successfully!</span>
+              <span className="text-brand-green-800">Student added successfully!</span>
             </div>
           )}
 

@@ -341,7 +341,7 @@ export default function MediaStudioPage() {
                     </button>
                     <button
                       onClick={() => handleDeleteClick(file.name)}
-                      className="text-xs py-2 px-2 bg-red-50 text-brand-orange-600 rounded hover:bg-red-100"
+                      className="text-xs py-2 px-2 bg-brand-red-50 text-brand-orange-600 rounded hover:bg-brand-red-100"
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>
@@ -384,7 +384,7 @@ export default function MediaStudioPage() {
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => handleDeleteClick(file.name)}
-                        className="text-brand-orange-600 hover:text-red-700"
+                        className="text-brand-orange-600 hover:text-brand-red-700"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

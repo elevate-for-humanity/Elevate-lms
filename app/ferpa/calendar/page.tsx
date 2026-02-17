@@ -32,9 +32,9 @@ interface CalendarEvent {
 const EVENT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
   training: { label: 'Training', color: 'bg-brand-blue-100 text-brand-blue-700' },
   audit: { label: 'Audit', color: 'bg-brand-blue-100 text-brand-blue-700' },
-  deadline: { label: 'Deadline', color: 'bg-red-100 text-red-700' },
-  review: { label: 'Review', color: 'bg-orange-100 text-orange-700' },
-  notification: { label: 'Notification', color: 'bg-green-100 text-green-700' },
+  deadline: { label: 'Deadline', color: 'bg-brand-red-100 text-brand-red-700' },
+  review: { label: 'Review', color: 'bg-brand-orange-100 text-brand-orange-700' },
+  notification: { label: 'Notification', color: 'bg-brand-green-100 text-brand-green-700' },
   other: { label: 'Other', color: 'bg-gray-100 text-gray-700' },
 };
 
@@ -151,17 +151,17 @@ export default async function FerpaCalendarPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Overdue Items */}
         {overdueEvents && overdueEvents.length > 0 && (
-          <div className="mb-8 bg-red-50 border border-red-200 rounded-xl p-6">
+          <div className="mb-8 bg-brand-red-50 border border-brand-red-200 rounded-xl p-6">
             <div className="flex items-center gap-2 mb-4">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-              <h2 className="text-lg font-semibold text-red-800">Overdue Items</h2>
+              <AlertCircle className="w-5 h-5 text-brand-red-600" />
+              <h2 className="text-lg font-semibold text-brand-red-800">Overdue Items</h2>
             </div>
             <div className="space-y-3">
               {(overdueEvents as CalendarEvent[]).map((event) => (
-                <div key={event.id} className="flex items-center justify-between bg-white rounded-lg p-3 border border-red-200">
+                <div key={event.id} className="flex items-center justify-between bg-white rounded-lg p-3 border border-brand-red-200">
                   <div>
                     <p className="font-medium text-gray-900">{event.title}</p>
-                    <p className="text-sm text-red-600">Due: {formatDate(event.start_date)}</p>
+                    <p className="text-sm text-brand-red-600">Due: {formatDate(event.start_date)}</p>
                   </div>
                   <button className="text-sm text-brand-blue-600 hover:text-brand-blue-700">Mark Complete</button>
                 </div>

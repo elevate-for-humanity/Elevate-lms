@@ -153,7 +153,7 @@ export default async function TaxFilingAdminPage() {
           </Link>
           <Link
             href="/admin/tax-filing/preparers"
-            className="px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-green-700 transition"
+            className="px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 transition"
           >
             Manage Preparers ({stats.totalPreparers})
           </Link>
@@ -243,13 +243,13 @@ export default async function TaxFilingAdminPage() {
                       <span
                         className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           app.status === 'completed'
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-green-100 text-brand-green-800'
                             : app.status === 'filed'
                               ? 'bg-brand-blue-100 text-brand-blue-800'
                               : app.status === 'in_progress'
                                 ? 'bg-yellow-100 text-yellow-800'
                                 : app.status === 'pending'
-                                  ? 'bg-orange-100 text-orange-800'
+                                  ? 'bg-brand-orange-100 text-brand-orange-800'
                                   : 'bg-slate-100 text-black'
                         }`}
                       >
@@ -270,7 +270,7 @@ export default async function TaxFilingAdminPage() {
                         View
                       </Link>
                       {app.status === 'pending' && (
-                        <button className="text-brand-green-600 hover:text-green-900" aria-label="Action button">
+                        <button className="text-brand-green-600 hover:text-brand-green-900" aria-label="Action button">
                           Assign
                         </button>
                       )}

@@ -305,7 +305,7 @@ export default function AutomatedEnrollmentWorkflow({
     switch (status) {
       case 'completed': return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'in_progress': return <Loader2 className="w-5 h-5 text-brand-blue-500 animate-spin" />;
-      case 'failed': return <AlertCircle className="w-5 h-5 text-red-500" />;
+      case 'failed': return <AlertCircle className="w-5 h-5 text-brand-red-500" />;
       case 'skipped': return <Circle className="w-5 h-5 text-gray-400" />;
       default: return <Circle className="w-5 h-5 text-gray-300" />;
     }
@@ -313,9 +313,9 @@ export default function AutomatedEnrollmentWorkflow({
 
   const getStatusBg = (status: WorkflowStep['status']) => {
     switch (status) {
-      case 'completed': return 'bg-green-50 border-green-200';
+      case 'completed': return 'bg-brand-green-50 border-brand-green-200';
       case 'in_progress': return 'bg-brand-blue-50 border-brand-blue-200';
-      case 'failed': return 'bg-red-50 border-red-200';
+      case 'failed': return 'bg-brand-red-50 border-brand-red-200';
       default: return 'bg-gray-50 border-gray-200';
     }
   };
@@ -340,7 +340,7 @@ export default function AutomatedEnrollmentWorkflow({
   return (
     <div className="space-y-6">
       {enrollment && (
-        <Card className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-brand-blue-200">
+        <Card className="p-4 bg-gradient-to-r from-brand-blue-50 to-indigo-50 border-brand-blue-200">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-semibold text-gray-900">
@@ -352,7 +352,7 @@ export default function AutomatedEnrollmentWorkflow({
             </div>
             <div className="text-right">
               <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                enrollment.status === 'active' ? 'bg-green-100 text-green-800' :
+                enrollment.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' :
                 enrollment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                 'bg-gray-100 text-gray-800'
               }`}>
@@ -405,7 +405,7 @@ export default function AutomatedEnrollmentWorkflow({
                   )}
                   
                   {step.error_message && (
-                    <p className="text-xs text-red-600 mt-1">{step.error_message}</p>
+                    <p className="text-xs text-brand-red-600 mt-1">{step.error_message}</p>
                   )}
                 </div>
 
@@ -436,15 +436,15 @@ export default function AutomatedEnrollmentWorkflow({
                 <p className="text-xs text-gray-500">Today</p>
               </div>
             </div>
-            <p className={`text-xs mt-2 ${percentChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <p className={`text-xs mt-2 ${percentChange >= 0 ? 'text-brand-green-600' : 'text-brand-red-600'}`}>
               {percentChange >= 0 ? '↑' : '↓'} {Math.abs(percentChange)}% vs yesterday
             </p>
           </Card>
 
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Clock className="w-5 h-5 text-orange-600" />
+              <div className="p-2 bg-brand-orange-100 rounded-lg">
+                <Clock className="w-5 h-5 text-brand-orange-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.avgProcessingTimeMinutes}m</p>
@@ -456,8 +456,8 @@ export default function AutomatedEnrollmentWorkflow({
 
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <TrendingUp className="w-5 h-5 text-green-600" />
+              <div className="p-2 bg-brand-green-100 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-brand-green-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.successRate}%</p>
@@ -477,14 +477,14 @@ export default function AutomatedEnrollmentWorkflow({
                 <p className="text-xs text-gray-500">Pending</p>
               </div>
             </div>
-            <p className="text-xs mt-2 text-red-500">{stats.failedCount} failed</p>
+            <p className="text-xs mt-2 text-brand-red-500">{stats.failedCount} failed</p>
           </Card>
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-600">{error}</p>
+        <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg">
+          <p className="text-sm text-brand-red-600">{error}</p>
         </div>
       )}
     </div>

@@ -52,11 +52,11 @@ export default async function ScormPage() {
             return (
               <div key={pkg.id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isCompleted ? 'bg-green-100' : 'bg-brand-blue-100'}`}>
-                    <svg className={`w-5 h-5 ${isCompleted ? 'text-green-600' : 'text-brand-blue-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isCompleted ? 'bg-brand-green-100' : 'bg-brand-blue-100'}`}>
+                    <svg className={`w-5 h-5 ${isCompleted ? 'text-brand-green-600' : 'text-brand-blue-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                   </div>
                   <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">SCORM {pkg.scorm_version || '1.2'}</span>
-                  {isCompleted && <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded font-medium">Completed</span>}
+                  {isCompleted && <span className="text-xs text-brand-green-700 bg-brand-green-100 px-2 py-1 rounded font-medium">Completed</span>}
                 </div>
                 <h3 className="font-semibold text-slate-900 mb-1">{pkg.title}</h3>
                 <p className="text-sm text-slate-500 mb-3 line-clamp-2">{pkg.description || 'Interactive SCORM module'}</p>

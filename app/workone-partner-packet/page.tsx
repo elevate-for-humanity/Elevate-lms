@@ -56,7 +56,7 @@ export default function WorkOnePartnerPacketPage() {
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
-              <span className="px-4 py-2 bg-green-500/20 border border-green-400/30 rounded-full text-sm font-bold text-green-300">Registered Apprenticeship Sponsor</span>
+              <span className="px-4 py-2 bg-brand-green-500/20 border border-brand-green-400/30 rounded-full text-sm font-bold text-brand-green-300">Registered Apprenticeship Sponsor</span>
               <span className="px-4 py-2 bg-brand-blue-500/20 border border-brand-blue-400/30 rounded-full text-sm font-bold text-brand-blue-300">ETPL Approved</span>
               <span className="px-4 py-2 bg-brand-blue-500/20 border border-brand-blue-400/30 rounded-full text-sm font-bold text-brand-blue-300">WIOA | WRG Eligible</span>
             </div>
@@ -332,10 +332,10 @@ export default function WorkOnePartnerPacketPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <DollarSign className="w-5 h-5 text-green-600" />
+                <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                  <DollarSign className="w-5 h-5 text-brand-green-600" />
                 </div>
-                <span className="text-green-600 font-semibold">Section 4</span>
+                <span className="text-brand-green-600 font-semibold">Section 4</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Funding & Billing</h2>
               <p className="text-lg text-gray-600 mb-4">

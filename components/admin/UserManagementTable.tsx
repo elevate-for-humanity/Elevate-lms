@@ -218,8 +218,8 @@ export default function UserManagementTable({ users: initialUsers }: Props) {
                       onClick={() => handleStatusToggle(user.id, user.status)}
                       className={`px-3 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         user.status === 'active'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
+                          ? 'bg-brand-green-100 text-brand-green-800'
+                          : 'bg-brand-red-100 text-brand-red-800'
                       }`}
                     >
                       {user.status || 'active'}
@@ -246,7 +246,7 @@ export default function UserManagementTable({ users: initialUsers }: Props) {
                           // Handle delete
                         }
                       }}
-                      className="text-brand-orange-600 hover:text-red-900"
+                      className="text-brand-orange-600 hover:text-brand-red-900"
                     >
                       Delete
                     </button>

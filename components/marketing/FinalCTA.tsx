@@ -8,7 +8,7 @@ export function FinalCTA() {
         <div className="rounded-3xl bg-slate-950/95 px-6 py-10 ring-1 ring-emerald-500/40 sm:px-10">
           <div className="grid gap-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:items-center">
             <div>
-              <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-300">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-orange-300">
                 Ready to see what&apos;s possible?
               </h2>
               <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-50">
@@ -31,7 +31,7 @@ export function FinalCTA() {
                 </Link>
                 <Link
                   href="/employers"
-                  className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-600 px-6 py-3 text-sm font-semibold text-slate-50 hover:border-red-300 hover:bg-slate-900"
+                  className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-600 px-6 py-3 text-sm font-semibold text-slate-50 hover:border-brand-red-300 hover:bg-slate-900"
                 >
                   I&apos;m an employer or partner
                 </Link>

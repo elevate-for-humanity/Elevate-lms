@@ -60,7 +60,7 @@ export default function AttendancePage() {
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Types of Absences</h2>
             
             <h3 className="text-xl font-bold text-black mt-6 mb-3">Excused Absences</h3>
-            <div className="bg-green-50 rounded-lg p-6 border-2 border-green-200 mb-6">
+            <div className="bg-brand-green-50 rounded-lg p-6 border-2 border-brand-green-200 mb-6">
               <p className="text-black mb-4">
                 Absences may be excused for:
               </p>
@@ -80,7 +80,7 @@ export default function AttendancePage() {
             </div>
 
             <h3 className="text-xl font-bold text-black mt-6 mb-3">Unexcused Absences</h3>
-            <div className="bg-red-50 rounded-lg p-6 border-2 border-red-200 mb-6">
+            <div className="bg-brand-red-50 rounded-lg p-6 border-2 border-brand-red-200 mb-6">
               <p className="text-black mb-4">
                 Absences are unexcused when:
               </p>
@@ -127,7 +127,7 @@ export default function AttendancePage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     2
                   </div>
                   <div>
@@ -157,7 +157,7 @@ export default function AttendancePage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     4
                   </div>
                   <div>
@@ -182,7 +182,7 @@ export default function AttendancePage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Probation Level (16-20% absences)</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Written warning placed in student file</li>
@@ -193,7 +193,7 @@ export default function AttendancePage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Dismissal Level (Over 20% absences)</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Automatic course failure</li>

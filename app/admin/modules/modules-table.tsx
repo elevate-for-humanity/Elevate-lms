@@ -60,7 +60,7 @@ export function ModulesTable({
       case 'scorm':
         return 'bg-brand-blue-100 text-brand-blue-800';
       case 'lesson':
-        return 'bg-brand-green-100 text-green-800';
+        return 'bg-brand-green-100 text-brand-green-800';
       case 'assessment':
         return 'bg-brand-blue-100 text-brand-blue-800';
       case 'external':

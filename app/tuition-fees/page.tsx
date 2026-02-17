@@ -63,7 +63,7 @@ export default async function TuitionFeesPage() {
             <li>• All tuition amounts are fixed and not subject to change during your enrollment period</li>
             <li>• Third-party exam fees are paid directly to the certifying body and are subject to change</li>
             <li>• Funding eligibility (WIOA/WRG) is determined by your local workforce agency, not by Elevate for Humanity</li>
-            <li>• See our <Link href="/refund-policy" className="text-orange-600 hover:underline">Refund Policy</Link> for cancellation terms</li>
+            <li>• See our <Link href="/refund-policy" className="text-brand-orange-600 hover:underline">Refund Policy</Link> for cancellation terms</li>
           </ul>
         </div>
 
@@ -188,9 +188,9 @@ export default async function TuitionFeesPage() {
             Questions about tuition or payment options? Contact us at Get Help Online or info@elevateforhumanity.org
           </p>
           <div className="flex justify-center gap-6 text-sm">
-            <Link href="/disclosures" className="text-orange-600 hover:underline">Student Disclosures</Link>
-            <Link href="/refund-policy" className="text-orange-600 hover:underline">Refund Policy</Link>
-            <Link href="/enrollment-agreement" className="text-orange-600 hover:underline">Enrollment Agreement</Link>
+            <Link href="/disclosures" className="text-brand-orange-600 hover:underline">Student Disclosures</Link>
+            <Link href="/refund-policy" className="text-brand-orange-600 hover:underline">Refund Policy</Link>
+            <Link href="/enrollment-agreement" className="text-brand-orange-600 hover:underline">Enrollment Agreement</Link>
           </div>
         </div>
       {/* CTA Section */}

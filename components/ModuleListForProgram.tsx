@@ -174,7 +174,7 @@ export function ModuleListForProgram({
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+      <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700 text-sm">
         {error}
       </div>
     );
@@ -252,7 +252,7 @@ export function ModuleListForProgram({
                       </span>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
                         module.is_published 
-                          ? 'bg-green-100 text-green-700' 
+                          ? 'bg-brand-green-100 text-brand-green-700' 
                           : 'bg-slate-200 text-slate-600'
                       }`}>
                         {module.is_published ? 'Published' : 'Draft'}
@@ -284,7 +284,7 @@ export function ModuleListForProgram({
                         disabled={isSaving}
                         className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                           module.is_published
-                            ? 'bg-green-600 text-white hover:bg-green-700'
+                            ? 'bg-brand-green-600 text-white hover:bg-brand-green-700'
                             : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
                         } disabled:opacity-50`}
                       >

@@ -168,11 +168,11 @@ export const POST = withRateLimit(
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ applicationId: application.id, program }),
           }).catch((err) => {
-            console.error('[apply] Routing automation trigger failed (non-fatal):', err);
+            logger.error('[apply] Routing automation trigger failed (non-fatal):', err);
           });
         } catch (triggerError) {
           // Never block user flow - log and continue
-          console.error('[apply] Routing automation trigger error (non-fatal):', triggerError);
+          logger.error('[apply] Routing automation trigger error (non-fatal):', triggerError);
         }
       }
 

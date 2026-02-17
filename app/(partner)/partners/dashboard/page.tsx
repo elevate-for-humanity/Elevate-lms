@@ -43,8 +43,8 @@ export default async function PartnerDashboardPage() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10">
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <Users className="w-5 h-5 text-brand-blue-600" />
               </div>
               <span className="text-sm text-gray-500">Active Students</span>
             </div>
@@ -53,8 +53,8 @@ export default async function PartnerDashboardPage() {
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <BookOpen className="w-5 h-5 text-green-600" />
+              <div className="p-2 bg-brand-green-100 rounded-lg">
+                <BookOpen className="w-5 h-5 text-brand-green-600" />
               </div>
               <span className="text-sm text-gray-500">Total Enrollments</span>
             </div>
@@ -73,8 +73,8 @@ export default async function PartnerDashboardPage() {
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <TrendingUp className="w-5 h-5 text-orange-600" />
+              <div className="p-2 bg-brand-orange-100 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-brand-orange-600" />
               </div>
               <span className="text-sm text-gray-500">Completion Rate</span>
             </div>
@@ -110,14 +110,14 @@ export default async function PartnerDashboardPage() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
+                <h3 className="font-semibold text-gray-900 group-hover:text-brand-blue-600">
                   View Students
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
                   See individual student progress and course enrollment
                 </p>
               </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
+              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-brand-blue-600" />
             </div>
           </Link>
 
@@ -127,14 +127,14 @@ export default async function PartnerDashboardPage() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
+                <h3 className="font-semibold text-gray-900 group-hover:text-brand-blue-600">
                   Attendance
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
                   Track student attendance and hours
                 </p>
               </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
+              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-brand-blue-600" />
             </div>
           </Link>
 
@@ -144,14 +144,14 @@ export default async function PartnerDashboardPage() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
+                <h3 className="font-semibold text-gray-900 group-hover:text-brand-blue-600">
                   Export Data
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
                   Download completion report as CSV
                 </p>
               </div>
-              <Download className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
+              <Download className="w-5 h-5 text-gray-400 group-hover:text-brand-blue-600" />
             </div>
           </a>
         </div>

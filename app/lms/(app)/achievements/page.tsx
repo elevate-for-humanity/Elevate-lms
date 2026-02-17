@@ -217,10 +217,10 @@ export default async function AchievementsPage() {
 
   const colorMap: Record<string, { bg: string; text: string }> = {
     blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600' },
-    orange: { bg: 'bg-orange-100', text: 'text-orange-600' },
+    orange: { bg: 'bg-brand-orange-100', text: 'text-brand-orange-600' },
     yellow: { bg: 'bg-yellow-100', text: 'text-yellow-600' },
     blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600' },
-    green: { bg: 'bg-green-100', text: 'text-green-600' },
+    green: { bg: 'bg-brand-green-100', text: 'text-brand-green-600' },
     amber: { bg: 'bg-amber-100', text: 'text-amber-600' },
     indigo: { bg: 'bg-indigo-100', text: 'text-indigo-600' },
     pink: { bg: 'bg-pink-100', text: 'text-pink-600' },
@@ -269,8 +269,8 @@ export default async function AchievementsPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <Target className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <Target className="w-5 h-5 text-brand-green-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.quizzesCompleted}</div>
@@ -327,14 +327,14 @@ export default async function AchievementsPage() {
                 return (
                   <div
                     key={milestone.id}
-                    className="bg-white rounded-xl border-2 border-green-200 p-6 text-center"
+                    className="bg-white rounded-xl border-2 border-brand-green-200 p-6 text-center"
                   >
                     <div className={`w-14 h-14 ${colors.bg} rounded-full flex items-center justify-center mx-auto mb-3`}>
                       <IconComponent className={`w-7 h-7 ${colors.text}`} />
                     </div>
                     <h3 className="font-bold text-slate-900 mb-1">{milestone.title}</h3>
                     <p className="text-sm text-slate-600 mb-2">{milestone.description}</p>
-                    <div className="flex items-center justify-center gap-1 text-green-600 font-semibold">
+                    <div className="flex items-center justify-center gap-1 text-brand-green-600 font-semibold">
                       <Star className="w-4 h-4" />
                       +{milestone.points} pts
                     </div>

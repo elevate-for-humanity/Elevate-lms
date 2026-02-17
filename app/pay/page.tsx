@@ -47,10 +47,10 @@ export default function PayPage() {
         {/* Payment Options */}
         <div className="space-y-6">
           {/* Pay in Full */}
-          <div className="bg-white rounded-xl p-6 border-2 border-green-200">
+          <div className="bg-white rounded-xl p-6 border-2 border-brand-green-200">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-brand-green-600" />
               </div>
               <div className="flex-1">
                 <h3 className="text-xl font-bold text-black mb-2">Pay in Full</h3>
@@ -101,7 +101,7 @@ export default function PayPage() {
                   We also accept Cash App, PayPal, Venmo, and other digital wallets.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">Cash App</span>
+                  <span className="px-3 py-1 bg-brand-green-100 text-brand-green-700 rounded-full text-sm">Cash App</span>
                   <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 rounded-full text-sm">PayPal</span>
                   <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 rounded-full text-sm">Venmo</span>
                   <span className="px-3 py-1 bg-slate-100 rounded-full text-sm">Link</span>
@@ -138,12 +138,12 @@ export default function PayPage() {
         <div className="mt-8 text-center">
           <Link
             href="/programs"
-            className="inline-block px-8 py-4 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 text-lg"
+            className="inline-block px-8 py-4 bg-brand-orange-600 text-white font-bold rounded-lg hover:bg-brand-orange-700 text-lg"
           >
             View Programs & Enroll
           </Link>
           <p className="mt-4 text-slate-600">
-            Questions? Call <a href="/support" className="text-orange-600 font-bold">support center</a>
+            Questions? Call <a href="/support" className="text-brand-orange-600 font-bold">support center</a>
           </p>
         </div>
       </section>

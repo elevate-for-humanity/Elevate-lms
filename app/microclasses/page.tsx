@@ -125,7 +125,7 @@ export default function MicroclassesPage() {
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <span className="text-slate-400 flex-shrink-0">•</span>
-                      <span className="text-green-600 font-medium">{course.price}</span>
+                      <span className="text-brand-green-600 font-medium">{course.price}</span>
                     </div>
                   </div>
 

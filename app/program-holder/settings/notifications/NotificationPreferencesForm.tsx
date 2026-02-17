@@ -67,7 +67,7 @@ export default function NotificationPreferencesForm({
           <p className="text-sm text-black mb-2">
             Always enabled. You'll see notifications in your dashboard.
           </p>
-          <div className="flex items-center gap-2 text-sm text-green-600">
+          <div className="flex items-center gap-2 text-sm text-brand-green-600">
             <Check className="w-4 h-4" />
             <span>Enabled (cannot be disabled)</span>
           </div>
@@ -167,7 +167,7 @@ export default function NotificationPreferencesForm({
               </label>
 
               {preferences.sms_opt_out && (
-                <div className="flex items-center gap-2 text-sm text-red-600">
+                <div className="flex items-center gap-2 text-sm text-brand-red-600">
                   <X className="w-4 h-4" />
                   <span>You have opted out of SMS notifications</span>
                 </div>

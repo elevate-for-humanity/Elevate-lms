@@ -214,7 +214,7 @@ export default function TransparencyPage() {
           </p>
           <Link
             href="/supersonic-fast-cash/start"
-            className="inline-flex items-center justify-center px-8 py-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
+            className="inline-flex items-center justify-center px-8 py-4 bg-brand-red-600 text-white font-semibold rounded-lg hover:bg-brand-red-700 transition-colors"
           >
             Start Tax Preparation
             <ArrowRight className="ml-2 w-5 h-5" />

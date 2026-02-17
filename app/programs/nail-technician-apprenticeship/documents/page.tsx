@@ -90,7 +90,7 @@ export default function NailTechDocumentsPage() {
 
       <div className="max-w-2xl mx-auto px-6 py-8">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
-          <div className="bg-red-600 px-6 py-3">
+          <div className="bg-brand-red-600 px-6 py-3">
             <h2 className="text-lg font-bold text-white">Required</h2>
           </div>
           <div className="p-6">
@@ -109,7 +109,7 @@ export default function NailTechDocumentsPage() {
                   <span className="flex-1 text-sm text-slate-700 truncate">{governmentId.name}</span>
                   {governmentId.status === 'uploading' && <span className="text-sm text-pink-600">Uploading...</span>}
                   {governmentId.status === 'complete' && (
-                    <button onClick={() => setGovernmentId(null)} className="text-slate-400 hover:text-red-500">
+                    <button onClick={() => setGovernmentId(null)} className="text-slate-400 hover:text-brand-red-500">
                       <X className="w-4 h-4" />
                     </button>
                   )}
@@ -134,7 +134,7 @@ export default function NailTechDocumentsPage() {
         </button>
 
         {!canSubmit && (
-          <p className="text-center text-red-600 text-sm mt-4 flex items-center justify-center gap-2">
+          <p className="text-center text-brand-red-600 text-sm mt-4 flex items-center justify-center gap-2">
             <AlertCircle className="w-4 h-4" />
             Please upload your government-issued ID to continue.
           </p>

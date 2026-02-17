@@ -100,7 +100,7 @@ export default function ImportSitePage() {
       <header className="border-b border-white/10">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-white">
-            <Globe className="w-6 h-6 text-green-400" />
+            <Globe className="w-6 h-6 text-brand-green-400" />
             <span className="font-bold text-lg">Import Your Website</span>
           </div>
           <Link href="/generate" className="text-slate-400 hover:text-white text-sm">
@@ -129,7 +129,7 @@ export default function ImportSitePage() {
                   Your Website URL
                 </label>
                 <div className="flex gap-2">
-                  <div className="flex-1 flex items-center bg-white/10 rounded-lg overflow-hidden border border-white/20 focus-within:border-green-500">
+                  <div className="flex-1 flex items-center bg-white/10 rounded-lg overflow-hidden border border-white/20 focus-within:border-brand-green-500">
                     <span className="pl-4 text-slate-400">https://</span>
                     <input
                       type="text"
@@ -146,11 +146,11 @@ export default function ImportSitePage() {
               </div>
 
               {error && (
-                <div className="flex items-start gap-3 p-4 bg-red-500/20 border border-red-500/50 rounded-lg">
-                  <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 p-4 bg-brand-red-500/20 border border-brand-red-500/50 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-red-200 font-medium">Import Failed</p>
-                    <p className="text-red-300 text-sm">{error}</p>
+                    <p className="text-brand-red-200 font-medium">Import Failed</p>
+                    <p className="text-brand-red-300 text-sm">{error}</p>
                   </div>
                 </div>
               )}
@@ -158,7 +158,7 @@ export default function ImportSitePage() {
               <button
                 onClick={handleImport}
                 disabled={!url || url.length < 10}
-                className="w-full py-4 bg-green-600 hover:bg-green-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-colors"
+                className="w-full py-4 bg-brand-green-600 hover:bg-brand-green-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-colors"
               >
                 <Globe className="w-5 h-5" />
                 Analyze & Import
@@ -185,8 +185,8 @@ export default function ImportSitePage() {
             {/* How it works */}
             <div className="grid md:grid-cols-3 gap-6 mt-12">
               <div className="text-center">
-                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Globe className="w-6 h-6 text-green-400" />
+                <div className="w-12 h-12 bg-brand-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Globe className="w-6 h-6 text-brand-green-400" />
                 </div>
                 <h3 className="text-white font-bold mb-1">1. Enter URL</h3>
                 <p className="text-slate-400 text-sm">Paste your current website address</p>
@@ -212,8 +212,8 @@ export default function ImportSitePage() {
         {/* Step 2: Analyzing */}
         {step === 'analyzing' && (
           <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-green-500/20 rounded-full mb-6">
-              <Loader2 className="w-10 h-10 text-green-400 animate-spin" />
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-500/20 rounded-full mb-6">
+              <Loader2 className="w-10 h-10 text-brand-green-400 animate-spin" />
             </div>
             <h2 className="text-3xl font-black text-white mb-4">
               Analyzing Your Website...
@@ -246,7 +246,7 @@ export default function ImportSitePage() {
         {step === 'review' && extracted && config && (
           <div className="space-y-8">
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 rounded-full text-sm font-medium mb-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-500/20 text-brand-green-400 rounded-full text-sm font-medium mb-4">
                 <Circle className="w-4 h-4" />
                 Import Successful!
               </div>
@@ -261,7 +261,7 @@ export default function ImportSitePage() {
             {/* Extracted Summary */}
             <div className="bg-white/5 backdrop-blur rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-4">
-                <Globe className="w-5 h-5 text-green-400" />
+                <Globe className="w-5 h-5 text-brand-green-400" />
                 <span className="text-white font-medium">{url}</span>
                 <a href={url} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white">
                   <ExternalLink className="w-4 h-4" />
@@ -285,7 +285,7 @@ export default function ImportSitePage() {
                   <p className="text-slate-400 text-sm">Colors</p>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4 text-center">
-                  <Navigation className="w-6 h-6 text-green-400 mx-auto mb-2" />
+                  <Navigation className="w-6 h-6 text-brand-green-400 mx-auto mb-2" />
                   <p className="text-2xl font-bold text-white">{config.navigation.length}</p>
                   <p className="text-slate-400 text-sm">Nav Items</p>
                 </div>
@@ -397,7 +397,7 @@ export default function ImportSitePage() {
                 <div className="space-y-2">
                   {config.programs.map((program, idx) => (
                     <div key={idx} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
-                      <Circle className="w-5 h-5 text-green-400" />
+                      <Circle className="w-5 h-5 text-brand-green-400" />
                       <div>
                         <p className="text-white font-medium">{program.name}</p>
                         <p className="text-slate-400 text-sm">{program.description.slice(0, 80)}...</p>
@@ -421,7 +421,7 @@ export default function ImportSitePage() {
                   localStorage.setItem('sitePreviewConfig', JSON.stringify(config));
                   window.location.href = `/preview/${config.meta.previewId}`;
                 }}
-                className="flex-1 py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 py-4 bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-colors"
               >
                 Preview My Site
                 <ArrowRight className="w-5 h-5" />

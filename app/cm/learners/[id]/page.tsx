@@ -135,7 +135,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
               <p className="text-slate-600">{learner.email}</p>
               <div className="flex items-center gap-2 mt-1">
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  learner.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                  learner.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-gray-100 text-gray-800'
                 }`}>
                   {learner.status || 'Active'}
                 </span>
@@ -176,8 +176,8 @@ export default async function CMLearnerDetailPage({ params }: Props) {
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <Target className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+              <Target className="w-5 h-5 text-brand-green-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-slate-900">{completedGoals}</p>
@@ -226,7 +226,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
                   <div key={goal.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        goal.status === 'completed' ? 'bg-green-100' : 'bg-yellow-100'
+                        goal.status === 'completed' ? 'bg-brand-green-100' : 'bg-yellow-100'
                       }`}>
                         {goal.status === 'completed' ? (
                           <span className="text-slate-400 flex-shrink-0">•</span>
@@ -242,7 +242,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
                       </div>
                     </div>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      goal.status === 'completed' ? 'bg-green-100 text-green-800' :
+                      goal.status === 'completed' ? 'bg-brand-green-100 text-brand-green-800' :
                       goal.status === 'in_progress' ? 'bg-brand-blue-100 text-brand-blue-800' :
                       'bg-gray-100 text-gray-800'
                     }`}>
@@ -314,7 +314,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
                     <div className="text-right">
                       <p className="font-medium text-slate-900">{enrollment.progress || 0}%</p>
                       <span className={`text-xs ${
-                        enrollment.status === 'completed' ? 'text-green-600' :
+                        enrollment.status === 'completed' ? 'text-brand-green-600' :
                         enrollment.status === 'active' ? 'text-brand-blue-600' : 'text-slate-500'
                       }`}>
                         {enrollment.status}

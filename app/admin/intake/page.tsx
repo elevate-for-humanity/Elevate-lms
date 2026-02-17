@@ -29,11 +29,11 @@ const STATUS_COLORS = {
   identity_pending: 'bg-yellow-100 text-yellow-700',
   workforce_screening: 'bg-brand-blue-100 text-brand-blue-700',
   employer_screening: 'bg-brand-blue-100 text-brand-blue-700',
-  financial_readiness: 'bg-orange-100 text-orange-700',
+  financial_readiness: 'bg-brand-orange-100 text-brand-orange-700',
   program_readiness: 'bg-cyan-100 text-cyan-700',
   pending_signature: 'bg-amber-100 text-amber-700',
-  completed: 'bg-green-100 text-green-700',
-  rejected: 'bg-red-100 text-red-700',
+  completed: 'bg-brand-green-100 text-brand-green-700',
+  rejected: 'bg-brand-red-100 text-brand-red-700',
 };
 
 
@@ -136,9 +136,9 @@ export default function AdminIntakePage() {
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Funding Pathways (In Order)</h3>
                   <div className="space-y-3">
-                    <div className="bg-green-50 p-4 rounded-lg">
-                      <p className="font-medium text-green-800">1. Workforce-Funded</p>
-                      <p className="text-sm text-green-700 mt-1">
+                    <div className="bg-brand-green-50 p-4 rounded-lg">
+                      <p className="font-medium text-brand-green-800">1. Workforce-Funded</p>
+                      <p className="text-sm text-brand-green-700 mt-1">
                         "Many students qualify for workforce funding that covers all or most of the program cost. 
                         Let me ask a few questions to see if you might be eligible."
                       </p>
@@ -163,9 +163,9 @@ export default function AdminIntakePage() {
 
                 {/* Prohibited Language */}
                 <div>
-                  <h3 className="font-semibold text-red-800 mb-2">Prohibited Language</h3>
-                  <div className="bg-red-50 p-4 rounded-lg">
-                    <ul className="text-sm text-red-700 space-y-1">
+                  <h3 className="font-semibold text-brand-red-800 mb-2">Prohibited Language</h3>
+                  <div className="bg-brand-red-50 p-4 rounded-lg">
+                    <ul className="text-sm text-brand-red-700 space-y-1">
                       <li>❌ "We'll figure it out later"</li>
                       <li>❌ "Don't worry about the details"</li>
                       <li>❌ "We can probably make something work"</li>
@@ -451,7 +451,7 @@ function IntakeDetailModal({
               <div key={step.id} className="flex items-center">
                 <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
                   step.completed 
-                    ? 'bg-green-100 text-green-600' 
+                    ? 'bg-brand-green-100 text-brand-green-600' 
                     : activeStep === step.id 
                     ? 'bg-brand-blue-100 text-brand-blue-600'
                     : 'bg-gray-100 text-gray-400'
@@ -464,7 +464,7 @@ function IntakeDetailModal({
                 </div>
                 {index < steps.length - 1 && (
                   <div className={`w-12 h-0.5 mx-2 ${
-                    step.completed ? 'bg-green-200' : 'bg-gray-200'
+                    step.completed ? 'bg-brand-green-200' : 'bg-gray-200'
                   }`} />
                 )}
               </div>
@@ -488,11 +488,11 @@ function IntakeDetailModal({
               disabled={saving || intake.funding_pathway === 'workforce_funded'}
               className={`p-4 rounded-lg border-2 text-left transition ${
                 intake.funding_pathway === 'workforce_funded'
-                  ? 'border-green-500 bg-green-50'
-                  : 'border-gray-200 hover:border-green-300'
+                  ? 'border-brand-green-500 bg-brand-green-50'
+                  : 'border-gray-200 hover:border-brand-green-300'
               }`}
             >
-              <Building2 className="w-6 h-6 text-green-600 mb-2" />
+              <Building2 className="w-6 h-6 text-brand-green-600 mb-2" />
               <p className="font-medium text-gray-900">Workforce-Funded</p>
               <p className="text-xs text-gray-500 mt-1">WIOA, VR, JRI, etc.</p>
             </button>
@@ -544,7 +544,7 @@ function IntakeDetailModal({
             <button
               onClick={logDeviation}
               disabled={!deviationNote.trim()}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
+              className="px-4 py-2 bg-brand-red-600 text-white rounded-lg text-sm font-medium hover:bg-brand-red-700 disabled:opacity-50"
             >
               Log Deviation
             </button>

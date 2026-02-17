@@ -202,7 +202,7 @@ export default function PromoCodesAdminPage() {
           </div>
           <div className="bg-white rounded-xl p-4 border">
             <p className="text-sm text-gray-600">Active</p>
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-bold text-brand-green-600">
               {promoCodes.filter(p => p.is_active).length}
             </p>
           </div>
@@ -394,7 +394,7 @@ export default function PromoCodesAdminPage() {
                             </>
                           ) : (
                             <>
-                              <DollarSign className="w-4 h-4 text-green-600" />
+                              <DollarSign className="w-4 h-4 text-brand-green-600" />
                               ${promo.discount_value} off
                             </>
                           )}
@@ -409,7 +409,7 @@ export default function PromoCodesAdminPage() {
                       </td>
                       <td className="px-6 py-4">
                         {promo.valid_until ? (
-                          <span className={`flex items-center gap-1 text-sm ${isExpired ? 'text-red-600' : 'text-gray-600'}`}>
+                          <span className={`flex items-center gap-1 text-sm ${isExpired ? 'text-brand-red-600' : 'text-gray-600'}`}>
                             <Calendar className="w-4 h-4" />
                             {new Date(promo.valid_until).toLocaleDateString()}
                           </span>
@@ -419,11 +419,11 @@ export default function PromoCodesAdminPage() {
                       </td>
                       <td className="px-6 py-4">
                         {isExpired ? (
-                          <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">Expired</span>
+                          <span className="px-2 py-1 bg-brand-red-100 text-brand-red-700 text-xs rounded-full">Expired</span>
                         ) : isMaxedOut ? (
                           <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">Maxed Out</span>
                         ) : promo.is_active ? (
-                          <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Active</span>
+                          <span className="px-2 py-1 bg-brand-green-100 text-brand-green-700 text-xs rounded-full">Active</span>
                         ) : (
                           <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">Inactive</span>
                         )}
@@ -435,7 +435,7 @@ export default function PromoCodesAdminPage() {
                             className={`px-3 py-1 text-sm rounded ${
                               promo.is_active 
                                 ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' 
-                                : 'bg-green-100 text-green-700 hover:bg-green-200'
+                                : 'bg-brand-green-100 text-brand-green-700 hover:bg-brand-green-200'
                             }`}
                           >
                             {promo.is_active ? 'Deactivate' : 'Activate'}
@@ -448,7 +448,7 @@ export default function PromoCodesAdminPage() {
                           </button>
                           <button
                             onClick={() => handleDelete(promo.id)}
-                            className="p-2 text-gray-400 hover:text-red-600"
+                            className="p-2 text-gray-400 hover:text-brand-red-600"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

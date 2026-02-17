@@ -56,9 +56,9 @@ function StatCard({ label, value, icon: Icon, color }: {
 
 function ComplianceStatusBadge({ status }: { status: ApprenticeReport['complianceStatus'] }) {
   const config = {
-    compliant: { bg: 'bg-green-500/20', text: 'text-green-400', label: 'Compliant' },
+    compliant: { bg: 'bg-brand-green-500/20', text: 'text-brand-green-400', label: 'Compliant' },
     warning: { bg: 'bg-amber-500/20', text: 'text-amber-400', label: 'Warning' },
-    'non-compliant': { bg: 'bg-red-500/20', text: 'text-red-400', label: 'Non-Compliant' },
+    'non-compliant': { bg: 'bg-brand-red-500/20', text: 'text-brand-red-400', label: 'Non-Compliant' },
   };
   const { bg, text, label } = config[status];
   
@@ -132,7 +132,7 @@ export default function ShopOwnerReportsPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
         <div className="text-center max-w-md">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
           <p className="text-slate-400 mb-6">{error}</p>
           <Link
@@ -192,7 +192,7 @@ export default function ShopOwnerReportsPage() {
           label="Apprentices" 
           value={summary.totalApprentices} 
           icon={Users}
-          color="bg-green-500"
+          color="bg-brand-green-500"
         />
         <StatCard 
           label="Compliant" 
@@ -303,7 +303,7 @@ export default function ShopOwnerReportsPage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400">Weekly Minimum (30 hrs)</span>
-                        <span className={apprentice.weeklyHours >= 30 ? 'text-green-400' : 'text-amber-400'}>
+                        <span className={apprentice.weeklyHours >= 30 ? 'text-brand-green-400' : 'text-amber-400'}>
                           {apprentice.weeklyHours >= 30 ? '• Met' : '⚠ Below'}
                         </span>
                       </div>
@@ -320,9 +320,9 @@ export default function ShopOwnerReportsPage() {
                         </div>
                       )}
                       {apprentice.complianceStatus === 'non-compliant' && (
-                        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 flex items-start gap-3">
-                          <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                          <p className="text-red-200 text-sm">
+                        <div className="bg-brand-red-500/10 border border-brand-red-500/30 rounded-lg p-3 flex items-start gap-3">
+                          <AlertTriangle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
+                          <p className="text-brand-red-200 text-sm">
                             Significantly below minimum hours. Immediate attention required.
                           </p>
                         </div>
@@ -394,8 +394,8 @@ export default function ShopOwnerReportsPage() {
             onClick={() => handleExport('hours')}
             className="w-full flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700"
           >
-            <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-              <FileText className="w-5 h-5 text-green-400" />
+            <div className="w-10 h-10 bg-brand-green-500/20 rounded-lg flex items-center justify-center">
+              <FileText className="w-5 h-5 text-brand-green-400" />
             </div>
             <div className="flex-1 text-left">
               <p className="text-white font-medium">Monthly Hours Report</p>

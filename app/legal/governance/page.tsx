@@ -24,7 +24,7 @@ const documents = [
     description: 'Data handling, encryption, access controls, incident response, and user responsibilities.',
     href: '/legal/governance/security',
     icon: Shield,
-    color: 'bg-orange-100 text-orange-700',
+    color: 'bg-brand-orange-100 text-brand-orange-700',
     owner: 'Data Protection Officer',
   },
   {
@@ -42,7 +42,7 @@ const documents = [
     description: 'Course creation, instructor requirements, certification policies, and quality assurance.',
     href: '/legal/governance/lms-standards',
     icon: BookOpen,
-    color: 'bg-green-100 text-green-700',
+    color: 'bg-brand-green-100 text-brand-green-700',
     owner: 'Director of Education',
   },
   {
@@ -60,7 +60,7 @@ const documents = [
     description: 'Supersonic Fast Cash services, IRS compliance, refund advances, and data security.',
     href: '/legal/governance/tax-operations',
     icon: Calculator,
-    color: 'bg-red-100 text-red-700',
+    color: 'bg-brand-red-100 text-brand-red-700',
     owner: 'Tax Operations Manager',
   },
   {

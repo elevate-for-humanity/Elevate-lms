@@ -105,7 +105,7 @@ export default function CoursePartnersPage() {
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-bold text-gray-900">{partner.name}</h3>
-                      <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                      <span className="px-3 py-1 bg-brand-green-100 text-brand-green-700 text-xs font-medium rounded-full">
                         {partner.status}
                       </span>
                     </div>
@@ -144,7 +144,7 @@ export default function CoursePartnersPage() {
                     <Edit className="w-4 h-4 text-gray-500" />
                   </button>
                   <button className="p-2 hover:bg-gray-200 rounded-lg transition">
-                    <Trash2 className="w-4 h-4 text-red-500" />
+                    <Trash2 className="w-4 h-4 text-brand-red-500" />
                   </button>
                 </div>
               </div>

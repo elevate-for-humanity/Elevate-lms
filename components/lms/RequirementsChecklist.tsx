@@ -129,12 +129,12 @@ export function RequirementsChecklist({ requirements: initialRequirements, enrol
         let iconColor = 'text-black';
 
         if (isCompleted) {
-          borderColor = 'border-green-300';
-          bgColor = 'bg-green-50';
-          iconColor = 'text-green-600';
+          borderColor = 'border-brand-green-300';
+          bgColor = 'bg-brand-green-50';
+          iconColor = 'text-brand-green-600';
         } else if (isOverdue) {
-          borderColor = 'border-red-500';
-          bgColor = 'bg-red-50';
+          borderColor = 'border-brand-red-500';
+          bgColor = 'bg-brand-red-50';
           iconColor = 'text-brand-orange-600';
         } else if (req.priority === 'urgent' || req.priority === 'high') {
           borderColor = 'border-yellow-500';
@@ -187,7 +187,7 @@ export function RequirementsChecklist({ requirements: initialRequirements, enrol
                 </Link>
               )}
               {isCompleted && req.status === 'verified' && (
-                <p className="text-sm text-green-600">
+                <p className="text-sm text-brand-green-600">
                   Verified and approved
                 </p>
               )}

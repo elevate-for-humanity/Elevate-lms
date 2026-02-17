@@ -150,21 +150,21 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
         {steps.map((step, idx) => (
           <div key={step.id} className="flex items-center">
             <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
-              currentStep > step.id ? 'bg-green-500 text-white' :
-              currentStep === step.id ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-500'
+              currentStep > step.id ? 'bg-brand-green-500 text-white' :
+              currentStep === step.id ? 'bg-brand-orange-500 text-white' : 'bg-gray-200 text-gray-500'
             }`}>
               {currentStep > step.id ? <span className="text-slate-400 flex-shrink-0">•</span> : <step.icon className="w-5 h-5" />}
             </div>
             <span className={`ml-2 text-sm hidden sm:block ${currentStep === step.id ? 'font-medium text-gray-900' : 'text-gray-500'}`}>
               {step.name}
             </span>
-            {idx < steps.length - 1 && <div className={`w-12 h-1 mx-2 ${currentStep > step.id ? 'bg-green-500' : 'bg-gray-200'}`} />}
+            {idx < steps.length - 1 && <div className={`w-12 h-1 mx-2 ${currentStep > step.id ? 'bg-brand-green-500' : 'bg-gray-200'}`} />}
           </div>
         ))}
       </div>
 
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-4 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
           {error}
         </div>
       )}
@@ -177,52 +177,52 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
                 <input type="text" value={formData.firstName} onChange={e => updateField('firstName', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" required />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" required />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
                 <input type="text" value={formData.lastName} onChange={e => updateField('lastName', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" required />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" required />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
                 <input type="email" value={formData.email} onChange={e => updateField('email', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" required />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" required />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                 <input type="tel" value={formData.phone} onChange={e => updateField('phone', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
                 <input type="date" value={formData.dateOfBirth} onChange={e => updateField('dateOfBirth', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">County</label>
                 <input type="text" value={formData.county} onChange={e => updateField('county', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                 <input type="text" value={formData.address} onChange={e => updateField('address', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
                 <input type="text" value={formData.city} onChange={e => updateField('city', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
                 <input type="text" value={formData.state} onChange={e => updateField('state', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
                 <input type="text" value={formData.zipCode} onChange={e => updateField('zipCode', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
               </div>
             </div>
           </div>
@@ -237,10 +237,10 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
               <div className="space-y-3">
                 {programs.map(program => (
                   <label key={program.id} className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 ${
-                    formData.programId === program.id ? 'border-orange-500 bg-orange-50' : ''
+                    formData.programId === program.id ? 'border-brand-orange-500 bg-brand-orange-50' : ''
                   }`}>
                     <input type="radio" name="program" value={program.id} checked={formData.programId === program.id}
-                      onChange={e => updateField('programId', e.target.value)} className="w-4 h-4 text-orange-500" />
+                      onChange={e => updateField('programId', e.target.value)} className="w-4 h-4 text-brand-orange-500" />
                     <div className="flex-1">
                       <p className="font-medium">{program.name}</p>
                       <p className="text-sm text-gray-500">
@@ -261,10 +261,10 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
             <div className="space-y-3">
               {fundingTypes.map(type => (
                 <label key={type.value} className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 ${
-                  formData.fundingType === type.value ? 'border-orange-500 bg-orange-50' : ''
+                  formData.fundingType === type.value ? 'border-brand-orange-500 bg-brand-orange-50' : ''
                 }`}>
                   <input type="radio" name="funding" value={type.value} checked={formData.fundingType === type.value}
-                    onChange={e => updateField('fundingType', e.target.value)} className="w-4 h-4 text-orange-500" />
+                    onChange={e => updateField('fundingType', e.target.value)} className="w-4 h-4 text-brand-orange-500" />
                   <span>{type.label}</span>
                 </label>
               ))}
@@ -298,22 +298,22 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Case Manager Name</label>
                 <input type="text" value={formData.caseManagerName} onChange={e => updateField('caseManagerName', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Case Manager Email</label>
                 <input type="email" value={formData.caseManagerEmail} onChange={e => updateField('caseManagerEmail', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Case Manager Phone</label>
                 <input type="tel" value={formData.caseManagerPhone} onChange={e => updateField('caseManagerPhone', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                 <textarea rows={3} value={formData.notes} onChange={e => updateField('notes', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
               </div>
             </div>
           </div>
@@ -376,12 +376,12 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
           {currentStep < 6 ? (
             <button onClick={() => setCurrentStep(s => s + 1)}
               disabled={currentStep === 1 && (!formData.firstName || !formData.lastName || !formData.email)}
-              className="flex items-center gap-2 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50">
+              className="flex items-center gap-2 px-6 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600 disabled:opacity-50">
               Next <ChevronRight className="w-4 h-4" />
             </button>
           ) : (
             <button onClick={handleSubmit} disabled={isSubmitting}
-              className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50">
+              className="px-6 py-2 bg-brand-green-500 text-white rounded-lg hover:bg-brand-green-600 disabled:opacity-50">
               {isSubmitting ? 'Enrolling...' : 'Complete Enrollment'}
             </button>
           )}

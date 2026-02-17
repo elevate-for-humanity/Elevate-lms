@@ -49,14 +49,14 @@ export default async function LeaderboardPage() {
 
         {/* User's Rank Card */}
         {userRank >= 0 && (
-          <div className="bg-green-500 rounded-2xl p-6 mb-8 text-white">
+          <div className="bg-brand-green-500 rounded-2xl p-6 mb-8 text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-green-100 text-sm">Your Rank</p>
+                <p className="text-brand-green-100 text-sm">Your Rank</p>
                 <p className="text-4xl font-bold">#{userRank + 1}</p>
               </div>
               <div className="text-right">
-                <p className="text-green-100 text-sm">Your Points</p>
+                <p className="text-brand-green-100 text-sm">Your Points</p>
                 <p className="text-4xl font-bold">{userProfile?.points || 0}</p>
               </div>
             </div>
@@ -95,11 +95,11 @@ export default async function LeaderboardPage() {
 
             {/* 3rd Place */}
             <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-orange-500 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-2">
+              <div className="w-20 h-20 rounded-full bg-brand-orange-500 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-2">
                 {topLearners[2]?.full_name?.charAt(0) || '3'}
               </div>
-              <div className="bg-orange-100 rounded-t-lg px-6 py-6">
-                <Star className="w-6 h-6 text-orange-500 mx-auto mb-2" />
+              <div className="bg-brand-orange-100 rounded-t-lg px-6 py-6">
+                <Star className="w-6 h-6 text-brand-orange-500 mx-auto mb-2" />
                 <p className="font-bold text-slate-900 truncate max-w-[100px]">{topLearners[2]?.full_name || 'Learner'}</p>
                 <p className="text-sm text-slate-600">{topLearners[2]?.points || 0} pts</p>
               </div>
@@ -116,7 +116,7 @@ export default async function LeaderboardPage() {
             {topLearners?.slice(3).map((learner: any, index: number) => (
               <div 
                 key={learner.id} 
-                className={`flex items-center gap-4 p-4 ${learner.id === user.id ? 'bg-green-50' : 'hover:bg-slate-50'}`}
+                className={`flex items-center gap-4 p-4 ${learner.id === user.id ? 'bg-brand-green-50' : 'hover:bg-slate-50'}`}
               >
                 <div className="w-8 text-center font-bold text-slate-500">
                   {index + 4}

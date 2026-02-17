@@ -116,7 +116,7 @@ export function CertificationReviewPanel({
         <div className="flex items-center gap-4">
           {/* Status Icon */}
           {submission.status === 'approved' && <span className="text-slate-400 flex-shrink-0">•</span>}
-          {submission.status === 'rejected' && <XCircle className="w-5 h-5 text-red-600" />}
+          {submission.status === 'rejected' && <XCircle className="w-5 h-5 text-brand-red-600" />}
           {submission.status === 'pending_review' && <Clock className="w-5 h-5 text-amber-600" />}
 
           {/* Info */}
@@ -222,7 +222,7 @@ export function CertificationReviewPanel({
               <button
                 onClick={() => handleApprove(submission)}
                 disabled={processing === submission.id}
-                className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 bg-brand-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 {processing === submission.id ? 'Processing...' : 'Approve'}
@@ -230,7 +230,7 @@ export function CertificationReviewPanel({
               <button
                 onClick={() => handleReject(submission)}
                 disabled={processing === submission.id}
-                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 bg-brand-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <XCircle className="w-4 h-4" />
                 {processing === submission.id ? 'Processing...' : 'Reject'}

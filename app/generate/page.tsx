@@ -232,7 +232,7 @@ export default function GenerateSitePage() {
               </div>
 
               {error && (
-                <div className="p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200">
+                <div className="p-4 bg-brand-red-500/20 border border-brand-red-500/50 rounded-lg text-brand-red-200">
                   {error}
                 </div>
               )}
@@ -281,7 +281,7 @@ export default function GenerateSitePage() {
         {step === 'preview' && siteConfig && (
           <div className="space-y-8">
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 rounded-full text-sm font-medium mb-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-500/20 text-brand-green-400 rounded-full text-sm font-medium mb-4">
                 <Sparkles className="w-4 h-4" />
                 Site Generated!
               </div>
@@ -360,7 +360,7 @@ export default function GenerateSitePage() {
                 
                 <a
                   href={`/store/checkout?plan=professional_monthly&preview=${siteConfig.meta.previewId}`}
-                  className="p-6 bg-brand-blue-600 hover:bg-brand-blue-700 rounded-xl text-center transition-colors ring-2 ring-blue-400"
+                  className="p-6 bg-brand-blue-600 hover:bg-brand-blue-700 rounded-xl text-center transition-colors ring-2 ring-brand-blue-400"
                 >
                   <p className="text-white font-bold text-lg">Professional</p>
                   <p className="text-3xl font-black text-white my-2">$299<span className="text-lg">/mo</span></p>

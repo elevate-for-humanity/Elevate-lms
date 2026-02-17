@@ -280,7 +280,7 @@ export default function FranchiseAdminDashboard() {
                 <Clock className="h-3 w-3 mr-1" />
                 {stats?.pendingReturns || 0}
               </Badge>
-              <Badge variant="default" className="text-xs bg-green-500">
+              <Badge variant="default" className="text-xs bg-brand-green-500">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 {stats?.acceptedReturns || 0}
               </Badge>
@@ -298,7 +298,7 @@ export default function FranchiseAdminDashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-brand-green-600">
               ${stats?.totalFranchiseFees?.toLocaleString() || '0'}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -362,7 +362,7 @@ export default function FranchiseAdminDashboard() {
                         </div>
                         <div className="text-center">
                           <p className="text-sm text-muted-foreground">Fees</p>
-                          <p className="font-medium text-green-600">
+                          <p className="font-medium text-brand-green-600">
                             ${office.franchise_fees.toLocaleString()}
                           </p>
                         </div>
@@ -401,7 +401,7 @@ export default function FranchiseAdminDashboard() {
                     >
                       <div className={`p-2 rounded-full ${
                         activity.type === 'return' ? 'bg-brand-blue-100 text-brand-blue-600' :
-                        activity.type === 'office' ? 'bg-green-100 text-green-600' :
+                        activity.type === 'office' ? 'bg-brand-green-100 text-brand-green-600' :
                         'bg-brand-blue-100 text-brand-blue-600'
                       }`}>
                         {activity.type === 'return' ? <FileText className="h-4 w-4" /> :

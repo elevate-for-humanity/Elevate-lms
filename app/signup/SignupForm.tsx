@@ -150,8 +150,8 @@ function SignupFormContent() {
       <h2 className="text-2xl font-bold text-center mb-6">Create Account</h2>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg" role="alert" aria-live="assertive" id="signup-error">
-          <p className="text-red-800 text-sm">{error}</p>
+        <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg" role="alert" aria-live="assertive" id="signup-error">
+          <p className="text-brand-red-800 text-sm">{error}</p>
         </div>
       )}
 

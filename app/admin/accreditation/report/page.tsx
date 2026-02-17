@@ -64,7 +64,7 @@ export default function AccreditationReportPage() {
             <p className="font-semibold text-gray-900">Overall Compliance</p>
           </div>
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <Calendar className="w-8 h-8 text-green-600 mb-3" />
+            <Calendar className="w-8 h-8 text-brand-green-600 mb-3" />
             <p className="text-sm text-gray-500">Last Audit</p>
             <p className="text-xl font-bold text-gray-900">{reportData.lastAudit}</p>
           </div>
@@ -84,7 +84,7 @@ export default function AccreditationReportPage() {
                 <div className="flex-1">
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div
-                      className={`h-3 rounded-full ${cat.status === 'compliant' ? 'bg-green-500' : 'bg-yellow-500'}`}
+                      className={`h-3 rounded-full ${cat.status === 'compliant' ? 'bg-brand-green-500' : 'bg-yellow-500'}`}
                       style={{ width: `${cat.score}%` }}
                     />
                   </div>

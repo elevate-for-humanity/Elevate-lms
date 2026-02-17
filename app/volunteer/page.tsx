@@ -61,7 +61,7 @@ export default async function VolunteerPage() {
         <div className="relative z-10 max-w-6xl mx-auto px-4 text-center text-white">
           <Heart className="w-16 h-16 mx-auto mb-4 opacity-90" />
           <h1 className="text-4xl font-bold mb-4">Volunteer With Us</h1>
-          <p className="text-xl text-orange-100 max-w-2xl mx-auto">
+          <p className="text-xl text-brand-orange-100 max-w-2xl mx-auto">
             Join our community of volunteers making a difference. Your time and skills can help transform lives.
           </p>
         </div>
@@ -74,8 +74,8 @@ export default async function VolunteerPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {benefits.map((benefit, index) => (
               <div key={index} className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Heart className="w-4 h-4 text-orange-600" />
+                <div className="w-8 h-8 bg-brand-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Heart className="w-4 h-4 text-brand-orange-600" />
                 </div>
                 <span className="text-gray-700">{benefit}</span>
               </div>
@@ -96,7 +96,7 @@ export default async function VolunteerPage() {
                     <p className="text-sm text-gray-500">{opp.category || 'General'}</p>
                   </div>
                   {opp.spots_available && (
-                    <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                    <span className="px-2 py-1 bg-brand-green-100 text-brand-green-700 text-xs rounded-full">
                       {opp.spots_available} spots
                     </span>
                   )}
@@ -124,7 +124,7 @@ export default async function VolunteerPage() {
                 </div>
                 <Link
                   href={`/volunteer/apply?opportunity=${opp.id}`}
-                  className="inline-flex items-center gap-2 text-orange-600 font-medium hover:underline"
+                  className="inline-flex items-center gap-2 text-brand-orange-600 font-medium hover:underline"
                 >
                   Apply Now <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -138,7 +138,7 @@ export default async function VolunteerPage() {
             <p className="text-gray-600 mb-6">Check back soon for new volunteer opportunities, or contact us to learn more.</p>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600"
             >
               Contact Us
             </Link>
@@ -177,7 +177,7 @@ export default async function VolunteerPage() {
           </p>
           <Link
             href="/volunteer/apply"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600"
           >
             Apply to Volunteer <ArrowRight className="w-4 h-4" />
           </Link>

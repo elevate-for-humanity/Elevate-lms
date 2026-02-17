@@ -40,7 +40,7 @@ export default function SupersonicFastCashPage() {
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Get Your Tax Refund <span className="block text-transparent bg-clip-text bg-slate-700 animate-pulse"> TODAY! </span></h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Up to <span className="text-red-400">$7,500</span> in Just{' '} <span className="text-red-400">15 Minutes</span></p>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Up to <span className="text-brand-red-400">$7,500</span> in Just{' '} <span className="text-brand-red-400">15 Minutes</span></p>
           </div>
         </div>
       </section>
@@ -141,7 +141,7 @@ export default function SupersonicFastCashPage() {
                 <Image src="/images/business/program-tax-preparation.jpg" alt="Refund Advance" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-green-600 transition-colors">
                   Refund Advance
                 </h3>
                 <p className="text-gray-600 text-sm">
@@ -175,7 +175,7 @@ export default function SupersonicFastCashPage() {
                 <Image src="/images/heroes/about-team.jpg" alt="Audit Protection" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-red-600 transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-red-600 transition-colors">
                   Audit Protection
                 </h3>
                 <p className="text-gray-600 text-sm">
@@ -192,7 +192,7 @@ export default function SupersonicFastCashPage() {
                 <Image src="/images/business/tax-prep-certification-optimized.jpg" alt="Tax Preparer Training" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-orange-600 transition-colors">
                   Become a Tax Pro
                 </h3>
                 <p className="text-gray-600 text-sm">
@@ -218,7 +218,7 @@ export default function SupersonicFastCashPage() {
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <MapPin className="w-8 h-8 text-red-400 flex-shrink-0" />
+                  <MapPin className="w-8 h-8 text-brand-red-400 flex-shrink-0" />
                   <div>
                     <h3 className="font-bold text-lg">Main Office</h3>
                     <p className="text-brand-blue-200">8888 Keystone Crossing, Suite 1300</p>
@@ -227,7 +227,7 @@ export default function SupersonicFastCashPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <Clock className="w-8 h-8 text-red-400 flex-shrink-0" />
+                  <Clock className="w-8 h-8 text-brand-red-400 flex-shrink-0" />
                   <div>
                     <h3 className="font-bold text-lg">Hours</h3>
                     <p className="text-brand-blue-200">Mon-Fri: 9am - 8pm</p>
@@ -236,7 +236,7 @@ export default function SupersonicFastCashPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <Phone className="w-8 h-8 text-red-400 flex-shrink-0" />
+                  <Phone className="w-8 h-8 text-brand-red-400 flex-shrink-0" />
                   <div>
                     <h3 className="font-bold text-lg">Contact Us</h3>
                     <p className="text-brand-blue-200">Get Help Online</p>
@@ -297,7 +297,7 @@ export default function SupersonicFastCashPage() {
               href="/supersonic-fast-cash/tax-tools"
               className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
             >
-              <FileText className="w-8 h-8 text-green-600" />
+              <FileText className="w-8 h-8 text-brand-green-600" />
               <span className="font-semibold text-gray-900">Tax Tools</span>
             </Link>
             <Link
@@ -318,7 +318,7 @@ export default function SupersonicFastCashPage() {
               href="/supersonic-fast-cash/careers"
               className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
             >
-              <Users className="w-8 h-8 text-red-600" />
+              <Users className="w-8 h-8 text-brand-red-600" />
               <span className="font-semibold text-gray-900">Join Our Team</span>
             </Link>
           </div>
@@ -331,19 +331,19 @@ export default function SupersonicFastCashPage() {
           <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
             Ready to Get Your Money?
           </h2>
-          <p className="text-xl text-red-100 mb-10">
+          <p className="text-xl text-brand-red-100 mb-10">
             Apply now and get up to $7,500 today. No appointment needed.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/apply"
-              className="inline-flex items-center justify-center gap-2 bg-white text-red-600 px-10 py-5 rounded-xl font-black text-xl hover:bg-gray-100 transition-colors shadow-lg"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-red-600 px-10 py-5 rounded-xl font-black text-xl hover:bg-gray-100 transition-colors shadow-lg"
             >
               💵 Apply Now - Get Cash Today
               <ArrowRight className="w-6 h-6" />
             </Link>
           </div>
-          <p className="mt-6 text-red-200 text-sm">
+          <p className="mt-6 text-brand-red-200 text-sm">
             Or contact us at <a href="/support" className="underline font-bold text-white">Get Help Online</a>
           </p>
         </div>

@@ -169,7 +169,7 @@ export default function HeroAvatarGuide({
   if (isDismissed) return null;
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-white border-b border-brand-blue-100">
+    <div className="bg-gradient-to-r from-brand-blue-50 to-white border-b border-brand-blue-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col lg:flex-row gap-6 items-start">
           {/* Avatar Video - Large */}

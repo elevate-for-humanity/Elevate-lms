@@ -19,7 +19,7 @@ export function ScormLaunchPanel({ scormPackageId }: Props) {
   const pkg = getScormPackageById(scormPackageId);
   if (!pkg) {
     return (
-      <p className="text-[10px] text-red-400">
+      <p className="text-[10px] text-brand-red-400">
         SCORM package not found. Update lms-data/scorm/packages.ts with the
         correct id and launchUrl.
       </p>
@@ -53,12 +53,12 @@ export function ScormLaunchPanel({ scormPackageId }: Props) {
       <button
         type="button"
         onClick={handleLaunch}
-        className="mt-2 rounded-md bg-orange-400 px-4 py-2 text-[10px] font-semibold text-white hover:bg-orange-500"
+        className="mt-2 rounded-md bg-brand-orange-400 px-4 py-2 text-[10px] font-semibold text-white hover:bg-brand-orange-500"
       >
         Launch SCORM Content
       </button>
       {launched && (
-        <p className="mt-1 text-[10px] text-green-400">
+        <p className="mt-1 text-[10px] text-brand-green-400">
           SCORM content opened in a new tab/window.
         </p>
       )}

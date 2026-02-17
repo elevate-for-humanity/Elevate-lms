@@ -118,7 +118,7 @@ export default function FAQPage() {
         ))}
       </section>
 
-      <section className="mt-8 rounded-2xl bg-green-50 border-l-4 border-brand-green-600 p-6">
+      <section className="mt-8 rounded-2xl bg-brand-green-50 border-l-4 border-brand-green-600 p-6">
         <h2 className="text-xl font-bold mb-3">Still Have Questions?</h2>
         <p className="text-black mb-6">
           Can't find the answer you're looking for? Give us a call and we'll be
@@ -127,13 +127,13 @@ export default function FAQPage() {
         <div className="flex flex-wrap gap-4">
           <a
             href="/support"
-            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
+            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-brand-green-700 transition"
           >
             Call support center
           </a>
           <a
             href="mailto:info@elevateforhumanity.org"
-            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-green-50 transition"
+            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-brand-green-50 transition"
           >
             Email Us
           </a>

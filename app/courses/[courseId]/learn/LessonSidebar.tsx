@@ -101,7 +101,7 @@ export default function LessonSidebar({
                     w-full text-left p-3 rounded-lg mb-2 transition-all
                     ${
                       isActive
-                        ? 'bg-orange-50 border-2 border-orange-500'
+                        ? 'bg-brand-orange-50 border-2 border-brand-orange-500'
                         : 'hover:bg-slate-50 border-2 border-transparent'
                     }
                   `}
@@ -110,7 +110,7 @@ export default function LessonSidebar({
                     {/* Lesson Number / Status */}
                     <div className="flex-shrink-0 mt-0.5">
                       {isCompleted ? (
-                        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 bg-brand-green-500 rounded-full flex items-center justify-center">
                           <span className="text-slate-400 flex-shrink-0">•</span>
                         </div>
                       ) : (
@@ -134,7 +134,7 @@ export default function LessonSidebar({
                       <h3
                         className={`
                         text-sm font-medium mb-1 line-clamp-2
-                        ${isActive ? 'text-orange-900' : 'text-black'}
+                        ${isActive ? 'text-brand-orange-900' : 'text-black'}
                       `}
                       >
                         {lesson.title}

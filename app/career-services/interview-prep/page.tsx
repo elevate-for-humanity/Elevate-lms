@@ -91,7 +91,7 @@ export default function InterviewPrepPage() {
           </p>
           <Link
             href="/career-services/contact"
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center"
+            className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center"
           >
             Schedule Mock Interview <ArrowRight className="ml-2 w-5 h-5" />
           </Link>

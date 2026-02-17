@@ -247,8 +247,8 @@ export default function NotificationsPage() {
                 <div
                   className={`mt-6 p-4 rounded-lg ${
                     result.success
-                      ? 'bg-green-50 border border-green-200'
-                      : 'bg-red-50 border border-red-200'
+                      ? 'bg-brand-green-50 border border-brand-green-200'
+                      : 'bg-brand-red-50 border border-brand-red-200'
                   }`}
                 >
                   <div className="flex items-start space-x-3">
@@ -259,7 +259,7 @@ export default function NotificationsPage() {
                     )}
                     <div className="flex-1">
                       <h3
-                        className={`font-semibold ${result.success ? 'text-green-900' : 'text-red-900'}`}
+                        className={`font-semibold ${result.success ? 'text-brand-green-900' : 'text-brand-red-900'}`}
                       >
                         {result.success
                           ? 'Notification Sent!'
@@ -267,7 +267,7 @@ export default function NotificationsPage() {
                       </h3>
                       {result.summary && (
                         <p
-                          className={`text-sm mt-1 ${result.success ? 'text-green-700' : 'text-red-700'}`}
+                          className={`text-sm mt-1 ${result.success ? 'text-brand-green-700' : 'text-brand-red-700'}`}
                         >
                           Sent to {result.summary.sent} of{' '}
                           {result.summary.total} users
@@ -276,7 +276,7 @@ export default function NotificationsPage() {
                         </p>
                       )}
                       {result.error && (
-                        <p className="text-sm text-red-700 mt-1">
+                        <p className="text-sm text-brand-red-700 mt-1">
                           {result.error}
                         </p>
                       )}

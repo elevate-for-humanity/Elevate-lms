@@ -431,7 +431,7 @@ export function CopilotDeployment() {
                 </div>
                 <div className="w-full bg-brand-border rounded-full h-2">
                   <div
-                    className="bg-green-500 h-2 rounded-full"
+                    className="bg-brand-green-500 h-2 rounded-full"
                     style={{ width: `${feature.effectiveness}%` }}
                   />
                 </div>
@@ -486,7 +486,7 @@ export function CopilotDeployment() {
             </div>
             <div className="space-y-6">
               {selectedGuide.steps.map((step, index) => (
-                <div key={index} className="border-l-4 border-orange-500 pl-4">
+                <div key={index} className="border-l-4 border-brand-orange-500 pl-4">
                   <div className="flex items-center mb-2">
                     <div className="w-8 h-8 bg-brand-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
                       {step.stepNumber}
@@ -503,8 +503,8 @@ export function CopilotDeployment() {
                     <div className="text-brand-info">{step.action}</div>
                   </div>
                   {step.tips.length > 0 && (
-                    <div className="bg-green-50 border border-green-200 rounded p-3">
-                      <div className="font-medium text-green-900 mb-1">
+                    <div className="bg-brand-green-50 border border-brand-green-200 rounded p-3">
+                      <div className="font-medium text-brand-green-900 mb-1">
                         💡 Tips:
                       </div>
                       <ul className="text-brand-success text-sm space-y-1">
@@ -522,15 +522,15 @@ export function CopilotDeployment() {
       )}
       {/* Success Message */}
       {deploymentStatus === 'deployed' && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-green-900 mb-2">
+        <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-brand-green-900 mb-2">
             🎉 Copilot Successfully Deployed!
           </h3>
           <p className="text-brand-success mb-4">
             All AI-powered features are now active and ready to assist your
             staff with:
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-green-700">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-brand-green-700">
             <div>
               <div className="font-medium">✅ Data Entry & Processing</div>
               <div>Smart copy/paste with automatic formatting</div>

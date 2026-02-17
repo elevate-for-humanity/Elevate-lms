@@ -111,13 +111,13 @@ export default function DemosPage() {
       <section className="py-4 bg-gray-100 border-b">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/videos" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
+            <Link href="/videos" className="px-4 py-2 bg-brand-orange-100 text-brand-orange-800 rounded-full text-sm font-medium hover:bg-brand-orange-200 transition-colors">
               Training Videos
             </Link>
             <Link href="/webinars" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               Webinars
             </Link>
-            <Link href="/success-stories" className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
+            <Link href="/success-stories" className="px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium hover:bg-brand-green-200 transition-colors">
               Success Stories
             </Link>
             <Link href="/store" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
@@ -252,8 +252,8 @@ export default function DemosPage() {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-brand-green-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Admin Tools</h3>
               <p className="text-gray-600 text-sm">

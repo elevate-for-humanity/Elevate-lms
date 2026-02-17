@@ -196,7 +196,7 @@ export default async function ProgressPage() {
           
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
@@ -220,8 +220,8 @@ export default async function ProgressPage() {
           
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-5 h-5 text-orange-600" />
+              <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                <Clock className="w-5 h-5 text-brand-orange-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.totalHours}</div>
@@ -232,8 +232,8 @@ export default async function ProgressPage() {
           
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-brand-red-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{overallProgress}%</div>
@@ -297,7 +297,7 @@ export default async function ProgressPage() {
                               </h3>
                               <span className={`px-2 py-1 rounded text-xs font-medium ${
                                 enrollment.status === 'completed'
-                                  ? 'bg-green-100 text-green-700'
+                                  ? 'bg-brand-green-100 text-brand-green-700'
                                   : 'bg-brand-blue-100 text-brand-blue-700'
                               }`}>
                                 {enrollment.status === 'completed' ? 'Completed' : 'In Progress'}
@@ -311,7 +311,7 @@ export default async function ProgressPage() {
                                 <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                                   <div 
                                     className={`h-full rounded-full ${
-                                      progress === 100 ? 'bg-green-500' : 'bg-brand-blue-500'
+                                      progress === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'
                                     }`}
                                     style={{ width: `${progress}%` }}
                                   />
@@ -356,8 +356,8 @@ export default async function ProgressPage() {
                 <div className="space-y-4">
                   {recentActivity.slice(0, 5).map((activity, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Play className="w-4 h-4 text-green-600" />
+                      <div className="w-8 h-8 bg-brand-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Play className="w-4 h-4 text-brand-green-600" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-slate-900 truncate">
@@ -378,17 +378,17 @@ export default async function ProgressPage() {
             </div>
 
             {/* Learning Streak */}
-            <div className="bg-orange-500 rounded-2xl p-6 text-white">
+            <div className="bg-brand-orange-500 rounded-2xl p-6 text-white">
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
                   <Award className="w-8 h-8" />
                 </div>
                 <div>
                   <div className="text-4xl font-black">{stats.streak}</div>
-                  <div className="text-orange-100">Day Streak</div>
+                  <div className="text-brand-orange-100">Day Streak</div>
                 </div>
               </div>
-              <p className="text-sm text-orange-100">
+              <p className="text-sm text-brand-orange-100">
                 {stats.streak > 0 
                   ? "Keep it up! You're on a roll!" 
                   : "Start learning today to build your streak!"}

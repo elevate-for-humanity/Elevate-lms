@@ -292,7 +292,7 @@ function LegalAgreementsContent() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-4" />
+          <Loader2 className="w-8 h-8 text-brand-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-slate-600">Loading agreements...</p>
         </div>
       </div>
@@ -303,7 +303,7 @@ function LegalAgreementsContent() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <Check className="w-12 h-12 text-green-600 mx-auto mb-4" />
+          <Check className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-slate-900 mb-2">All Agreements Signed</h1>
           <p className="text-slate-600 mb-4">Redirecting...</p>
         </div>
@@ -338,9 +338,9 @@ function LegalAgreementsContent() {
                 key={index}
                 className={`flex-1 h-2 rounded-full ${
                   index < currentIndex
-                    ? 'bg-green-500'
+                    ? 'bg-brand-green-500'
                     : index === currentIndex
-                    ? 'bg-blue-500'
+                    ? 'bg-brand-blue-500'
                     : 'bg-slate-200'
                 }`}
               />
@@ -350,9 +350,9 @@ function LegalAgreementsContent() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-red-700">{error}</p>
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
+            <p className="text-brand-red-700">{error}</p>
           </div>
         )}
 
@@ -361,8 +361,8 @@ function LegalAgreementsContent() {
           {/* Agreement Header */}
           <div className="bg-slate-50 border-b border-slate-200 p-6">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <FileText className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <FileText className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-slate-900">
@@ -381,7 +381,7 @@ function LegalAgreementsContent() {
             <Link
               href={currentAgreement.documentUrl}
               target="_blank"
-              className="inline-flex items-center gap-2 text-blue-600 hover:underline"
+              className="inline-flex items-center gap-2 text-brand-blue-600 hover:underline"
             >
               View Full Agreement Document
               <ChevronRight className="w-4 h-4" />
@@ -393,13 +393,13 @@ function LegalAgreementsContent() {
             {/* Signer Name */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                Full Legal Name <span className="text-red-500">*</span>
+                Full Legal Name <span className="text-brand-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={signerName}
                 onChange={(e) => setSignerName(e.target.value)}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 placeholder="Enter your full legal name"
               />
             </div>
@@ -415,12 +415,12 @@ function LegalAgreementsContent() {
                   onClick={() => setSignatureMethod('checkbox')}
                   className={`p-3 border-2 rounded-lg text-center transition-colors ${
                     signatureMethod === 'checkbox'
-                      ? 'border-blue-600 bg-blue-50'
+                      ? 'border-brand-blue-600 bg-brand-blue-50'
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   <CheckSquare className={`w-5 h-5 mx-auto mb-1 ${
-                    signatureMethod === 'checkbox' ? 'text-blue-600' : 'text-slate-400'
+                    signatureMethod === 'checkbox' ? 'text-brand-blue-600' : 'text-slate-400'
                   }`} />
                   <span className="text-sm">Checkbox</span>
                 </button>
@@ -429,12 +429,12 @@ function LegalAgreementsContent() {
                   onClick={() => setSignatureMethod('typed')}
                   className={`p-3 border-2 rounded-lg text-center transition-colors ${
                     signatureMethod === 'typed'
-                      ? 'border-blue-600 bg-blue-50'
+                      ? 'border-brand-blue-600 bg-brand-blue-50'
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   <Type className={`w-5 h-5 mx-auto mb-1 ${
-                    signatureMethod === 'typed' ? 'text-blue-600' : 'text-slate-400'
+                    signatureMethod === 'typed' ? 'text-brand-blue-600' : 'text-slate-400'
                   }`} />
                   <span className="text-sm">Type</span>
                 </button>
@@ -443,12 +443,12 @@ function LegalAgreementsContent() {
                   onClick={() => setSignatureMethod('drawn')}
                   className={`p-3 border-2 rounded-lg text-center transition-colors ${
                     signatureMethod === 'drawn'
-                      ? 'border-blue-600 bg-blue-50'
+                      ? 'border-brand-blue-600 bg-brand-blue-50'
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   <Pen className={`w-5 h-5 mx-auto mb-1 ${
-                    signatureMethod === 'drawn' ? 'text-blue-600' : 'text-slate-400'
+                    signatureMethod === 'drawn' ? 'text-brand-blue-600' : 'text-slate-400'
                   }`} />
                   <span className="text-sm">Draw</span>
                 </button>
@@ -459,13 +459,13 @@ function LegalAgreementsContent() {
             {signatureMethod === 'typed' && (
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Type Your Signature <span className="text-red-500">*</span>
+                  Type Your Signature <span className="text-brand-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={typedSignature}
                   onChange={(e) => setTypedSignature(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-xl"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 text-xl"
                   style={{ fontFamily: "'Brush Script MT', cursive" }}
                   placeholder="Type your full name"
                 />
@@ -476,7 +476,7 @@ function LegalAgreementsContent() {
             {signatureMethod === 'drawn' && (
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Draw Your Signature <span className="text-red-500">*</span>
+                  Draw Your Signature <span className="text-brand-red-500">*</span>
                 </label>
                 <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-white">
                   <canvas
@@ -490,7 +490,7 @@ function LegalAgreementsContent() {
                     signaturePad?.clear();
                     setDrawnSignature(null);
                   }}
-                  className="text-sm text-blue-600 hover:underline mt-2"
+                  className="text-sm text-brand-blue-600 hover:underline mt-2"
                 >
                   Clear
                 </button>
@@ -503,7 +503,7 @@ function LegalAgreementsContent() {
                 type="checkbox"
                 checked={acknowledged}
                 onChange={(e) => setAcknowledged(e.target.checked)}
-                className="mt-1 w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                className="mt-1 w-5 h-5 text-brand-blue-600 border-slate-300 rounded focus:ring-brand-blue-500"
               />
               <span className="text-sm text-slate-700">
                 I have read and agree to the terms of this agreement. I understand this
@@ -517,7 +517,7 @@ function LegalAgreementsContent() {
               disabled={!isFormValid() || submitting}
               className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
                 isFormValid() && !submitting
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
                   : 'bg-slate-300 text-slate-500 cursor-not-allowed'
               }`}
             >
@@ -548,7 +548,7 @@ export default function LegalAgreementsPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-4" />
+          <Loader2 className="w-8 h-8 text-brand-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-slate-600">Loading...</p>
         </div>
       </div>

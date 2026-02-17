@@ -78,7 +78,7 @@ export function ScormPlayer({
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
-            <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
+            <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-brand-orange-500 border-t-transparent" />
             <p className="text-sm text-black">Loading SCORM content...</p>
           </div>
         </div>
@@ -86,8 +86,8 @@ export function ScormPlayer({
 
       {error && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
-            <p className="text-sm font-medium text-red-900">{error}</p>
+          <div className="rounded-xl border border-brand-red-200 bg-brand-red-50 p-6 text-center">
+            <p className="text-sm font-medium text-brand-red-900">{error}</p>
           </div>
         </div>
       )}

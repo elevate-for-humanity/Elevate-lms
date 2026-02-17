@@ -104,22 +104,22 @@ export default function RefundAdvancePage() {
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
               Get Up to $7,500
-              <span className="block text-green-300">Today</span>
+              <span className="block text-brand-green-300">Today</span>
             </h1>
-            <p className="text-xl text-green-100 mb-8">
+            <p className="text-xl text-brand-green-100 mb-8">
               Don&apos;t wait weeks for your refund. Get a 0% interest advance on your tax refund and walk out with cash in your pocket.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/supersonic-fast-cash/apply"
-                className="inline-flex items-center justify-center gap-2 bg-white text-green-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-50 transition-colors"
+                className="inline-flex items-center justify-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-green-50 transition-colors"
               >
                 Apply Now
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
                 href="/supersonic-fast-cash/locations"
-                className="inline-flex items-center justify-center gap-2 bg-green-500/30 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-500/40 transition-colors border border-white/30"
+                className="inline-flex items-center justify-center gap-2 bg-brand-green-500/30 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-green-500/40 transition-colors border border-white/30"
               >
                 Find a Location
               </Link>
@@ -134,8 +134,8 @@ export default function RefundAdvancePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((benefit, idx) => (
               <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm text-center">
-                <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <benefit.icon className="w-7 h-7 text-green-600" />
+                <div className="w-14 h-14 bg-brand-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <benefit.icon className="w-7 h-7 text-brand-green-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{benefit.title}</h3>
                 <p className="text-gray-600">{benefit.description}</p>
@@ -160,7 +160,7 @@ export default function RefundAdvancePage() {
           <div className="grid md:grid-cols-4 gap-8">
             {howItWorks.map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center font-black text-2xl mx-auto mb-4">
+                <div className="w-16 h-16 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-black text-2xl mx-auto mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
@@ -189,11 +189,11 @@ export default function RefundAdvancePage() {
               <div className="text-gray-600 mb-4">Minimum Advance</div>
               <div className="text-sm text-gray-500">Expected refund: $1,000+</div>
             </div>
-            <div className="bg-white rounded-2xl p-8 shadow-lg text-center border-2 border-green-500 relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-white px-4 py-1 rounded-full text-sm font-bold">
+            <div className="bg-white rounded-2xl p-8 shadow-lg text-center border-2 border-brand-green-500 relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-green-500 text-white px-4 py-1 rounded-full text-sm font-bold">
                 Most Popular
               </div>
-              <div className="text-4xl font-black text-green-600 mb-2">$3,500</div>
+              <div className="text-4xl font-black text-brand-green-600 mb-2">$3,500</div>
               <div className="text-gray-600 mb-4">Average Advance</div>
               <div className="text-sm text-gray-500">Expected refund: $5,000+</div>
             </div>
@@ -232,12 +232,12 @@ export default function RefundAdvancePage() {
           <h2 className="text-3xl md:text-4xl font-black text-white mb-6">
             Ready to Get Your Money?
           </h2>
-          <p className="text-xl text-green-100 mb-8">
+          <p className="text-xl text-brand-green-100 mb-8">
             Apply now and walk out with up to $7,500 today.
           </p>
           <Link
             href="/supersonic-fast-cash/apply"
-            className="inline-flex items-center justify-center gap-2 bg-white text-green-700 px-10 py-5 rounded-xl font-bold text-xl hover:bg-green-50 transition-colors shadow-lg"
+            className="inline-flex items-center justify-center gap-2 bg-white text-brand-green-700 px-10 py-5 rounded-xl font-bold text-xl hover:bg-brand-green-50 transition-colors shadow-lg"
           >
             💵 Apply Now
             <ArrowRight className="w-6 h-6" />

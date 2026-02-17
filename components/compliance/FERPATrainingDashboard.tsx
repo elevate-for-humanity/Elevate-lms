@@ -170,17 +170,17 @@ export default function FERPATrainingDashboard({
 
           <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-green-100 rounded-lg">
+              <div className="p-3 bg-brand-green-100 rounded-lg">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
             </div>
-            <div className="text-3xl font-bold text-green-600">{completedCount}</div>
+            <div className="text-3xl font-bold text-brand-green-600">{completedCount}</div>
             <div className="text-sm text-black mt-1">Completed</div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-red-100 rounded-lg">
+              <div className="p-3 bg-brand-red-100 rounded-lg">
                 <AlertCircle className="w-6 h-6 text-brand-orange-600" />
               </div>
             </div>
@@ -190,11 +190,11 @@ export default function FERPATrainingDashboard({
 
           <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-orange-100 rounded-lg">
-                <Clock className="w-6 h-6 text-orange-600" />
+              <div className="p-3 bg-brand-orange-100 rounded-lg">
+                <Clock className="w-6 h-6 text-brand-orange-600" />
               </div>
             </div>
-            <div className="text-3xl font-bold text-orange-600">{pendingCount}</div>
+            <div className="text-3xl font-bold text-brand-orange-600">{pendingCount}</div>
             <div className="text-sm text-black mt-1">Pending</div>
           </div>
 
@@ -236,7 +236,7 @@ export default function FERPATrainingDashboard({
                 onClick={() => setFilter('completed')}
                 className={`px-4 py-2 rounded-lg font-medium transition ${
                   filter === 'completed'
-                    ? 'bg-green-600 text-white'
+                    ? 'bg-brand-green-600 text-white'
                     : 'bg-slate-100 text-black hover:bg-slate-200'
                 }`}
               >
@@ -256,7 +256,7 @@ export default function FERPATrainingDashboard({
                 onClick={() => setFilter('pending')}
                 className={`px-4 py-2 rounded-lg font-medium transition ${
                   filter === 'pending'
-                    ? 'bg-orange-600 text-white'
+                    ? 'bg-brand-orange-600 text-white'
                     : 'bg-slate-100 text-black hover:bg-slate-200'
                 }`}
               >
@@ -319,7 +319,7 @@ export default function FERPATrainingDashboard({
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`text-sm font-medium ${
-                            record.quiz_score >= 90 ? 'text-green-600' :
+                            record.quiz_score >= 90 ? 'text-brand-green-600' :
                             record.quiz_score >= 80 ? 'text-brand-blue-600' :
                             'text-brand-orange-600'
                           }`}>
@@ -334,11 +334,11 @@ export default function FERPATrainingDashboard({
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {isExpired ? (
-                            <span className="px-2 py-2 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                            <span className="px-2 py-2 text-xs font-medium rounded-full bg-brand-red-100 text-brand-red-800">
                               Expired
                             </span>
                           ) : (
-                            <span className="px-2 py-2 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                            <span className="px-2 py-2 text-xs font-medium rounded-full bg-brand-green-100 text-brand-green-800">
                               Current
                             </span>
                           )}
@@ -355,7 +355,7 @@ export default function FERPATrainingDashboard({
                             {isExpired && (
                               <button
                                 onClick={() => sendReminder(record.user_id, record.profiles.email)}
-                                className="text-orange-600 hover:text-orange-800"
+                                className="text-brand-orange-600 hover:text-brand-orange-800"
                                 title="Send Reminder"
                               >
                                 <Mail className="w-4 h-4" />
@@ -428,7 +428,7 @@ export default function FERPATrainingDashboard({
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`text-sm font-medium ${
                             daysPending > 30 ? 'text-brand-orange-600' :
-                            daysPending > 14 ? 'text-orange-600' :
+                            daysPending > 14 ? 'text-brand-orange-600' :
                             'text-black'
                           }`}>
                             {daysPending} days

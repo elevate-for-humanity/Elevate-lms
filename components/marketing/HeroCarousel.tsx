@@ -95,12 +95,12 @@ export function HeroCarousel() {
               transition={{ duration: 0.5, ease: "easeOut" }}
               className="space-y-6"
             >
-              <p className="inline-flex items-center rounded-full bg-orange-500/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-orange-300 ring-1 ring-orange-500/40">
+              <p className="inline-flex items-center rounded-full bg-brand-orange-500/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-brand-orange-300 ring-1 ring-brand-orange-500/40">
                 {activeSlide.label}
               </p>
               <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
                 {activeSlide.title}
-                <span className="block text-orange-300">
+                <span className="block text-brand-orange-300">
                   {activeSlide.highlight}
                 </span>
               </h1>
@@ -113,19 +113,19 @@ export function HeroCarousel() {
                 <div className="flex flex-wrap items-center gap-4">
                   <Link
                     href={activeSlide.primaryCtaHref}
-                    className="inline-flex flex-1 items-center justify-center rounded-full bg-orange-400 px-6 py-3 text-sm font-semibold text-zinc-950 shadow-lg shadow-orange-500/30 transition hover:-translate-y-0.5 hover:bg-orange-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+                    className="inline-flex flex-1 items-center justify-center rounded-full bg-brand-orange-400 px-6 py-3 text-sm font-semibold text-zinc-950 shadow-lg shadow-brand-orange-500/30 transition hover:-translate-y-0.5 hover:bg-brand-orange-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
                   >
                     {activeSlide.primaryCtaLabel}
                   </Link>
                   <Link
                     href={activeSlide.secondaryCtaHref}
-                    className="inline-flex flex-1 items-center justify-center rounded-full border border-zinc-500/60 px-6 py-3 text-sm font-semibold text-zinc-50 transition hover:-translate-y-0.5 hover:border-orange-300 hover:bg-zinc-900"
+                    className="inline-flex flex-1 items-center justify-center rounded-full border border-zinc-500/60 px-6 py-3 text-sm font-semibold text-zinc-50 transition hover:-translate-y-0.5 hover:border-brand-orange-300 hover:bg-zinc-900"
                   >
                     {activeSlide.secondaryCtaLabel}
                   </Link>
                 </div>
                 <div className="inline-flex items-center gap-2 rounded-full bg-zinc-900/80 px-3 py-2 text-xs text-zinc-200 ring-1 ring-zinc-700">
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-orange-400 text-[10px] font-bold text-zinc-950">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-orange-400 text-[10px] font-bold text-zinc-950">
                     ★
                   </span>
                   <span>
@@ -142,7 +142,7 @@ export function HeroCarousel() {
             <button
               type="button"
               onClick={prev}
-              className="rounded-full border border-zinc-700 px-2 py-2 hover:border-orange-300 hover:text-orange-200"
+              className="rounded-full border border-zinc-700 px-2 py-2 hover:border-brand-orange-300 hover:text-brand-orange-200"
             >
               ⟵
             </button>
@@ -154,7 +154,7 @@ export function HeroCarousel() {
                   onClick={() => goTo(i)}
                   className={`h-2.5 w-2.5 rounded-full transition ${
                     i === index
-                      ? "bg-orange-400"
+                      ? "bg-brand-orange-400"
                       : "bg-zinc-700 hover:bg-zinc-500"
                   }`}
                   aria-label={`Go to slide ${i + 1}`}
@@ -164,7 +164,7 @@ export function HeroCarousel() {
             <button
               type="button"
               onClick={next}
-              className="rounded-full border border-zinc-700 px-2 py-2 hover:border-orange-300 hover:text-orange-200"
+              className="rounded-full border border-zinc-700 px-2 py-2 hover:border-brand-orange-300 hover:text-brand-orange-200"
             >
               ⟶
             </button>

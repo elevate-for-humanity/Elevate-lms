@@ -41,11 +41,11 @@ const TYPE_ICONS = {
 };
 
 const TYPE_COLORS = {
-  video: 'bg-red-100 text-red-700',
+  video: 'bg-brand-red-100 text-brand-red-700',
   document: 'bg-brand-blue-100 text-brand-blue-700',
-  course: 'bg-green-100 text-green-700',
+  course: 'bg-brand-green-100 text-brand-green-700',
   quiz: 'bg-purple-100 text-purple-700',
-  module: 'bg-orange-100 text-orange-700',
+  module: 'bg-brand-orange-100 text-brand-orange-700',
   resource: 'bg-gray-100 text-gray-700',
 };
 

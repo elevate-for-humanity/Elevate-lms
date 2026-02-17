@@ -108,19 +108,19 @@ export function IDVerificationForm() {
 
   if (success) {
     return (
-      <div className="max-w-2xl mx-auto p-8 bg-green-50 border-2 border-green-600 rounded-lg">
+      <div className="max-w-2xl mx-auto p-8 bg-brand-green-50 border-2 border-brand-green-600 rounded-lg">
         <div className="flex items-center gap-4 mb-4">
           <span className="text-slate-400 flex-shrink-0">•</span>
           <div>
-            <h2 className="text-2xl font-bold text-green-900">
+            <h2 className="text-2xl font-bold text-brand-green-900">
               Verification Submitted!
             </h2>
-            <p className="text-green-700">
+            <p className="text-brand-green-700">
               Your identity verification is being reviewed.
             </p>
           </div>
         </div>
-        <p className="text-green-800">
+        <p className="text-brand-green-800">
           You'll receive an email notification once your verification is
           approved. This typically takes 1-2 business days.
         </p>
@@ -131,11 +131,11 @@ export function IDVerificationForm() {
   return (
     <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-8">
       {error && (
-        <div className="p-4 bg-red-50 border-2 border-red-600 rounded-lg flex items-start gap-3">
-          <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+        <div className="p-4 bg-brand-red-50 border-2 border-brand-red-600 rounded-lg flex items-start gap-3">
+          <AlertCircle className="w-6 h-6 text-brand-red-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="font-bold text-red-900">Error</h3>
-            <p className="text-red-800">{error}</p>
+            <h3 className="font-bold text-brand-red-900">Error</h3>
+            <p className="text-brand-red-800">{error}</p>
           </div>
         </div>
       )}
@@ -380,7 +380,7 @@ export function IDVerificationForm() {
                 <span className="text-black"> or drag and drop</span>
               </label>
               {files.idFront && (
-                <p className="mt-2 text-sm text-green-600 font-semibold">
+                <p className="mt-2 text-sm text-brand-green-600 font-semibold">
                   • {files.idFront.name}
                 </p>
               )}
@@ -408,7 +408,7 @@ export function IDVerificationForm() {
                 <span className="text-black"> or drag and drop</span>
               </label>
               {files.idBack && (
-                <p className="mt-2 text-sm text-green-600 font-semibold">
+                <p className="mt-2 text-sm text-brand-green-600 font-semibold">
                   • {files.idBack.name}
                 </p>
               )}
@@ -438,7 +438,7 @@ export function IDVerificationForm() {
                 <span className="text-black"> or upload photo</span>
               </label>
               {files.selfie && (
-                <p className="mt-2 text-sm text-green-600 font-semibold">
+                <p className="mt-2 text-sm text-brand-green-600 font-semibold">
                   • {files.selfie.name}
                 </p>
               )}

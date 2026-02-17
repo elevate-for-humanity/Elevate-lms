@@ -203,10 +203,10 @@ export default function OfficeDashboard() {
 
       {/* Alert for pending signatures */}
       {pendingSignatures > 0 && (
-        <Card className="border-orange-500 bg-orange-50 dark:bg-orange-950">
+        <Card className="border-brand-orange-500 bg-brand-orange-50 dark:bg-brand-orange-950">
           <CardContent className="flex items-center justify-between py-4">
             <div className="flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-orange-500" />
+              <AlertCircle className="h-5 w-5 text-brand-orange-500" />
               <span className="font-medium">
                 {pendingSignatures} return{pendingSignatures > 1 ? 's' : ''} awaiting your ERO signature
               </span>
@@ -254,7 +254,7 @@ export default function OfficeDashboard() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-brand-green-600">
               ${stats?.netRevenue?.toLocaleString() || '0'}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -415,13 +415,13 @@ export default function OfficeDashboard() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Franchise Fees</span>
-                    <span className="font-medium text-red-600">
+                    <span className="font-medium text-brand-red-600">
                       -${stats?.franchiseFees?.toLocaleString() || '0'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Preparer Commissions</span>
-                    <span className="font-medium text-red-600">
+                    <span className="font-medium text-brand-red-600">
                       -${stats?.totalCommissions?.toLocaleString() || '0'}
                     </span>
                   </div>
@@ -434,7 +434,7 @@ export default function OfficeDashboard() {
                 <CardTitle className="text-lg">Net Revenue</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold text-green-600">
+                <p className="text-3xl font-bold text-brand-green-600">
                   ${stats?.netRevenue?.toLocaleString() || '0'}
                 </p>
                 <p className="text-sm text-muted-foreground">Your office profit</p>

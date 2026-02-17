@@ -91,7 +91,7 @@ export default function VideoDownloadButton({
     return (
       <button
         onClick={handleDelete}
-        className={`${sizeClasses[size]} rounded-lg bg-green-100 text-green-600 hover:bg-green-200 active:scale-95 transition-all relative`}
+        className={`${sizeClasses[size]} rounded-lg bg-brand-green-100 text-brand-green-600 hover:bg-brand-green-200 active:scale-95 transition-all relative`}
         title="Delete offline video"
       >
         <Check size={iconSizes[size]} />

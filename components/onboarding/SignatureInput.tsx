@@ -252,7 +252,7 @@ export function SignatureInput({
       {signatureType === 'TYPED' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Type Your Full Name {required && <span className="text-red-500">*</span>}
+            Type Your Full Name {required && <span className="text-brand-red-500">*</span>}
           </label>
           <input
             type="text"
@@ -261,7 +261,7 @@ export function SignatureInput({
             placeholder="Type your full name exactly as shown"
             className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 text-xl ${
               typedSignature && !isValid 
-                ? 'border-red-300 bg-red-50' 
+                ? 'border-brand-red-300 bg-brand-red-50' 
                 : 'border-slate-300'
             }`}
             style={{ fontFamily: "'Brush Script MT', 'Segoe Script', cursive" }}
@@ -271,7 +271,7 @@ export function SignatureInput({
               Must match: <strong className="text-gray-900">{userName}</strong>
             </p>
             {typedSignature && (
-              <span className={`text-sm flex items-center gap-1 ${isValid ? 'text-green-600' : 'text-red-600'}`}>
+              <span className={`text-sm flex items-center gap-1 ${isValid ? 'text-brand-green-600' : 'text-brand-red-600'}`}>
                 {isValid ? (
                   <>
                     <Check className="w-4 h-4" /> Valid
@@ -292,7 +292,7 @@ export function SignatureInput({
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="block text-sm font-medium text-gray-700">
-              Draw Your Signature {required && <span className="text-red-500">*</span>}
+              Draw Your Signature {required && <span className="text-brand-red-500">*</span>}
             </label>
             <button
               type="button"
@@ -324,7 +324,7 @@ export function SignatureInput({
 
       {/* Status Messages */}
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        <div className="flex items-center gap-2 p-3 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700 text-sm">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           {error}
         </div>
@@ -338,7 +338,7 @@ export function SignatureInput({
       )}
 
       {saved && (
-        <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+        <div className="flex items-center gap-2 p-3 bg-brand-green-50 border border-brand-green-200 rounded-lg text-brand-green-700 text-sm">
           <Check className="w-4 h-4" />
           Signature saved successfully
         </div>

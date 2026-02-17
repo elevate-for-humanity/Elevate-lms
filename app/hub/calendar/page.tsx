@@ -34,8 +34,8 @@ export default async function CalendarPage() {
     switch (type) {
       case 'study': return 'bg-brand-blue-500';
       case 'workshop': return 'bg-brand-blue-500';
-      case 'webinar': return 'bg-green-500';
-      case 'networking': return 'bg-orange-500';
+      case 'webinar': return 'bg-brand-green-500';
+      case 'networking': return 'bg-brand-orange-500';
       default: return 'bg-slate-500';
     }
   };
@@ -49,7 +49,7 @@ export default async function CalendarPage() {
             <h1 className="text-3xl font-bold text-slate-900">Calendar</h1>
             <p className="text-slate-600 mt-1">Upcoming events and sessions</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700">
+          <button className="flex items-center gap-2 px-4 py-2 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700">
             <Plus className="w-4 h-4" />
             Create Event
           </button>
@@ -66,11 +66,11 @@ export default async function CalendarPage() {
             <span className="text-sm text-slate-600">Workshops</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            <div className="w-3 h-3 rounded-full bg-brand-green-500"></div>
             <span className="text-sm text-slate-600">Webinars</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+            <div className="w-3 h-3 rounded-full bg-brand-orange-500"></div>
             <span className="text-sm text-slate-600">Networking</span>
           </div>
         </div>

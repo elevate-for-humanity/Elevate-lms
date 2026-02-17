@@ -39,9 +39,9 @@ export default function ResponseSLAPage() {
                 <p className="text-black">General questions and non-urgent matters</p>
               </div>
 
-              <div className="bg-green-50 rounded-lg p-6 border-2 border-green-200">
+              <div className="bg-brand-green-50 rounded-lg p-6 border-2 border-brand-green-200">
                 <h3 className="text-xl font-bold text-black mb-3">Phone Calls</h3>
-                <p className="text-3xl font-black text-green-600 mb-2">Same Day</p>
+                <p className="text-3xl font-black text-brand-green-600 mb-2">Same Day</p>
                 <p className="text-black">During business hours (8 AM - 6 PM EST)</p>
               </div>
 
@@ -51,9 +51,9 @@ export default function ResponseSLAPage() {
                 <p className="text-black">Initial review and response</p>
               </div>
 
-              <div className="bg-orange-50 rounded-lg p-6 border-2 border-orange-200">
+              <div className="bg-brand-orange-50 rounded-lg p-6 border-2 border-brand-orange-200">
                 <h3 className="text-xl font-bold text-black mb-3">Urgent Matters</h3>
-                <p className="text-3xl font-black text-orange-600 mb-2">4 Hours</p>
+                <p className="text-3xl font-black text-brand-orange-600 mb-2">4 Hours</p>
                 <p className="text-black">Safety, security, or critical issues</p>
               </div>
             </div>
@@ -102,7 +102,7 @@ export default function ResponseSLAPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Priority Levels</h2>
             
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Critical (4 hours)</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Safety or security threats</li>
@@ -113,7 +113,7 @@ export default function ResponseSLAPage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">High (Same Day)</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Enrollment deadline approaching</li>
@@ -133,7 +133,7 @@ export default function ResponseSLAPage() {
               </ul>
             </div>
 
-            <div className="bg-green-50 border-l-4 border-green-400 p-6 mb-6">
+            <div className="bg-brand-green-50 border-l-4 border-brand-green-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Low (3-5 business days)</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>General feedback</li>

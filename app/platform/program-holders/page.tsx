@@ -106,7 +106,7 @@ export default async function ProgramHolderLicensePage() {
               <h3 className="text-xl font-bold mb-3">Federal Approvals</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <div className="font-semibold">
                       DOL Registered Apprenticeship Sponsor
@@ -125,7 +125,7 @@ export default async function ProgramHolderLicensePage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <div className="font-semibold">
                       WIOA Eligible Training Provider
@@ -145,14 +145,14 @@ export default async function ProgramHolderLicensePage() {
               </h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <div className="font-semibold">ETPL Listed Provider</div>
                     <div className="text-black">Provider ID: 10000949</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <div className="font-semibold">Indiana DWD Approved</div>
                     <div className="text-black">
@@ -161,7 +161,7 @@ export default async function ProgramHolderLicensePage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <div className="font-semibold">
                       Workforce Ready Grant (WRG) Approved
@@ -179,19 +179,19 @@ export default async function ProgramHolderLicensePage() {
               <h3 className="text-xl font-bold mb-3">Official Partnerships</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <div className="font-semibold">
                     Justice Reinvestment Initiative (JRI) Partner
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <div className="font-semibold">
                     WorkOne Centers Approved Provider
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <div className="font-semibold">SNAP E&T Partner</div>
                 </div>
               </div>
@@ -288,7 +288,7 @@ export default async function ProgramHolderLicensePage() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center font-bold text-green-600">
+              <div className="flex-shrink-0 w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center font-bold text-brand-green-600">
                 5
               </div>
               <div>
@@ -382,12 +382,12 @@ export default async function ProgramHolderLicensePage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-green-50 rounded-xl p-6 border-2 border-green-200">
-              <h3 className="text-lg font-bold text-green-900 mb-4 flex items-center gap-2">
+            <div className="bg-brand-green-50 rounded-xl p-6 border-2 border-brand-green-200">
+              <h3 className="text-lg font-bold text-brand-green-900 mb-4 flex items-center gap-2">
                 <Check className="w-5 h-5" />
                 Must Have
               </h3>
-              <ul className="space-y-2 text-sm text-green-800">
+              <ul className="space-y-2 text-sm text-brand-green-800">
                 <li>
                   <span className="text-slate-400 flex-shrink-0">•</span> Located in
                   Indiana (for now - expanding soon)
@@ -415,12 +415,12 @@ export default async function ProgramHolderLicensePage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 rounded-xl p-6 border-2 border-red-200">
-              <h3 className="text-lg font-bold text-red-900 mb-4 flex items-center gap-2">
+            <div className="bg-brand-red-50 rounded-xl p-6 border-2 border-brand-red-200">
+              <h3 className="text-lg font-bold text-brand-red-900 mb-4 flex items-center gap-2">
                 <AlertCircle className="w-5 h-5" />
                 Auto-Reject
               </h3>
-              <ul className="space-y-2 text-sm text-red-800">
+              <ul className="space-y-2 text-sm text-brand-red-800">
                 <li>
                   <XCircle className="w-5 h-5 inline-block" /> Previous
                   compliance violations

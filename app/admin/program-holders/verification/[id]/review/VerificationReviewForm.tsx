@@ -194,7 +194,7 @@ export default function VerificationReviewForm({
                 </div>
                 <div>
                   <p className="text-sm text-black">Status</p>
-                  <span className="px-3 py-2 bg-orange-100 text-orange-800 text-sm font-medium rounded-full">
+                  <span className="px-3 py-2 bg-brand-orange-100 text-brand-orange-800 text-sm font-medium rounded-full">
                     {holder.verification_status}
                   </span>
                 </div>
@@ -310,8 +310,8 @@ export default function VerificationReviewForm({
                         <span
                           className={`px-3 py-2 text-sm font-medium rounded-full ${
                             record.status === 'verified'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
+                              ? 'bg-brand-green-100 text-brand-green-800'
+                              : 'bg-brand-red-100 text-brand-red-800'
                           }`}
                         >
                           {record.status}
@@ -349,7 +349,7 @@ export default function VerificationReviewForm({
               </h2>
 
               {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+                <div className="mb-4 p-3 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-800 text-sm">
                   {error}
                 </div>
               )}
@@ -361,8 +361,8 @@ export default function VerificationReviewForm({
                     onClick={() => setDecision('approve')}
                     className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition ${
                       decision === 'approve'
-                        ? 'bg-green-600 text-white'
-                        : 'bg-green-50 text-green-700 hover:bg-green-100'
+                        ? 'bg-brand-green-600 text-white'
+                        : 'bg-brand-green-50 text-brand-green-700 hover:bg-brand-green-100'
                     }`}
                   >
                     <span className="text-slate-400 flex-shrink-0">•</span>
@@ -373,8 +373,8 @@ export default function VerificationReviewForm({
                     onClick={() => setDecision('reject')}
                     className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition ${
                       decision === 'reject'
-                        ? 'bg-red-600 text-white'
-                        : 'bg-red-50 text-red-700 hover:bg-red-100'
+                        ? 'bg-brand-red-600 text-white'
+                        : 'bg-brand-red-50 text-brand-red-700 hover:bg-brand-red-100'
                     }`}
                   >
                     <XCircle className="w-5 h-5" />

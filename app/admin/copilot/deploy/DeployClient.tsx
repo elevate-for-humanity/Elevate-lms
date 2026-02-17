@@ -171,7 +171,7 @@ export default function DeployClient() {
     <div className="space-y-6">
       {/* Message Banner */}
       {message && (
-        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
+        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-brand-green-50 text-brand-green-800 border border-brand-green-200' : 'bg-brand-red-50 text-brand-red-800 border border-brand-red-200'}`}>
           {message.text}
         </div>
       )}
@@ -196,7 +196,7 @@ export default function DeployClient() {
                     {deployment && (
                       <span className={`px-2 py-1 rounded-full text-xs ${
                         deployment.status === 'active' 
-                          ? 'bg-green-100 text-green-700' 
+                          ? 'bg-brand-green-100 text-brand-green-700' 
                           : deployment.status === 'deploying'
                           ? 'bg-yellow-100 text-yellow-700'
                           : 'bg-gray-100 text-gray-600'
@@ -224,14 +224,14 @@ export default function DeployClient() {
                       className={`px-4 py-2 rounded-lg font-medium ${
                         deployment.status === 'active'
                           ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                          : 'bg-green-100 text-green-700 hover:bg-green-200'
+                          : 'bg-brand-green-100 text-brand-green-700 hover:bg-brand-green-200'
                       }`}
                     >
                       {deployment.status === 'active' ? 'Stop' : 'Start'}
                     </button>
                     <button 
                       onClick={() => handleRemove(deployment.id)}
-                      className="px-4 py-2 rounded-lg font-medium bg-red-100 text-red-700 hover:bg-red-200"
+                      className="px-4 py-2 rounded-lg font-medium bg-brand-red-100 text-brand-red-700 hover:bg-brand-red-200"
                     >
                       Remove
                     </button>
@@ -319,10 +319,10 @@ export default function DeployClient() {
                     <td className="py-2 px-3 capitalize">{d.copilot_type.replace('_', ' ')}</td>
                     <td className="py-2 px-3">
                       <span className={`px-2 py-1 rounded-full text-xs ${
-                        d.status === 'active' ? 'bg-green-100 text-green-700' :
+                        d.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' :
                         d.status === 'stopped' ? 'bg-gray-100 text-gray-600' :
                         d.status === 'deploying' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-red-100 text-red-700'
+                        'bg-brand-red-100 text-brand-red-700'
                       }`}>
                         {d.status}
                       </span>

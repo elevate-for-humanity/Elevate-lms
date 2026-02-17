@@ -248,7 +248,7 @@ export default function InstrumentedVideoPlayer({
     return (
       <div className={`relative bg-gray-900 rounded-lg overflow-hidden ${className}`}>
         <div className="aspect-video flex flex-col items-center justify-center text-white p-8">
-          <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+          <AlertCircle className="w-16 h-16 text-brand-red-500 mb-4" />
           <h3 className="text-xl font-semibold mb-2">Video Unavailable</h3>
           <p className="text-gray-400 text-center mb-4">{errorMessage}</p>
           <button

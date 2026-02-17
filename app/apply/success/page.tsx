@@ -120,7 +120,7 @@ export default async function ApplicationSuccessPage({
       <div className="max-w-2xl w-full">
         {/* Success Icon */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-100 rounded-full mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -128,9 +128,9 @@ export default async function ApplicationSuccessPage({
           </h1>
           <p className="text-lg text-gray-600">{currentRole.message}</p>
           {referenceNumber && (
-            <div className="mt-4 inline-block bg-green-50 border border-green-200 rounded-lg px-4 py-2">
-              <span className="text-sm text-green-700">Confirmation ID: </span>
-              <span className="font-mono font-bold text-green-900">{referenceNumber}</span>
+            <div className="mt-4 inline-block bg-brand-green-50 border border-brand-green-200 rounded-lg px-4 py-2">
+              <span className="text-sm text-brand-green-700">Confirmation ID: </span>
+              <span className="font-mono font-bold text-brand-green-900">{referenceNumber}</span>
             </div>
           )}
         </div>

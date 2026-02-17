@@ -83,7 +83,7 @@ export default async function VerifyPage({
             <Link href="/" className="text-xl font-bold text-gray-900">
               Elevate for Humanity
             </Link>
-            <Link href="/certificates" className="text-sm text-orange-600 hover:text-orange-700">
+            <Link href="/certificates" className="text-sm text-brand-orange-600 hover:text-brand-orange-700">
               View All Certificates
             </Link>
           </div>
@@ -93,8 +93,8 @@ export default async function VerifyPage({
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Title */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Award className="w-8 h-8 text-orange-600" />
+          <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Award className="w-8 h-8 text-brand-orange-600" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Certificate Verification</h1>
           <p className="text-gray-600">
@@ -115,13 +115,13 @@ export default async function VerifyPage({
                   name="id"
                   defaultValue={certificateId || ''}
                   placeholder="Enter certificate ID or verification code"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
                 />
               </div>
             </div>
             <button
               type="submit"
-              className="px-6 py-3 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition"
+              className="px-6 py-3 bg-brand-orange-600 text-white font-medium rounded-lg hover:bg-brand-orange-700 transition"
             >
               Verify
             </button>
@@ -134,12 +134,12 @@ export default async function VerifyPage({
             {certificate ? (
               <>
                 {/* Valid Certificate */}
-                <div className="bg-green-50 border-b border-green-200 p-6">
+                <div className="bg-brand-green-50 border-b border-brand-green-200 p-6">
                   <div className="flex items-center gap-3">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                     <div>
-                      <h2 className="text-xl font-bold text-green-800">Certificate Verified</h2>
-                      <p className="text-green-700">This certificate is authentic and valid.</p>
+                      <h2 className="text-xl font-bold text-brand-green-800">Certificate Verified</h2>
+                      <p className="text-brand-green-700">This certificate is authentic and valid.</p>
                     </div>
                   </div>
                 </div>
@@ -210,12 +210,12 @@ export default async function VerifyPage({
             ) : (
               <>
                 {/* Invalid Certificate */}
-                <div className="bg-red-50 border-b border-red-200 p-6">
+                <div className="bg-brand-red-50 border-b border-brand-red-200 p-6">
                   <div className="flex items-center gap-3">
-                    <XCircle className="w-8 h-8 text-red-600" />
+                    <XCircle className="w-8 h-8 text-brand-red-600" />
                     <div>
-                      <h2 className="text-xl font-bold text-red-800">Certificate Not Found</h2>
-                      <p className="text-red-700">
+                      <h2 className="text-xl font-bold text-brand-red-800">Certificate Not Found</h2>
+                      <p className="text-brand-red-700">
                         We could not find a certificate with the provided ID or code.
                       </p>
                     </div>
@@ -229,7 +229,7 @@ export default async function VerifyPage({
                   </p>
                   <Link
                     href="/contact"
-                    className="text-orange-600 hover:text-orange-700 font-medium"
+                    className="text-brand-orange-600 hover:text-brand-orange-700 font-medium"
                   >
                     Contact Support →
                   </Link>

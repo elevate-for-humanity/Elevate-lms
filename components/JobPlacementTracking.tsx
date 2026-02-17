@@ -195,7 +195,7 @@ export function JobPlacementTracking({ programId, showPipeline = true }: Props) 
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'placed': return 'bg-green-100 text-green-700';
+      case 'placed': return 'bg-brand-green-100 text-brand-green-700';
       case 'offer_pending': return 'bg-yellow-100 text-yellow-700';
       case 'interviewing': return 'bg-brand-blue-100 text-brand-blue-700';
       default: return 'bg-gray-100 text-gray-700';
@@ -242,29 +242,29 @@ export function JobPlacementTracking({ programId, showPipeline = true }: Props) 
                 <h3 className="text-sm text-gray-500">Total Placements</h3>
               </div>
               <p className="text-3xl font-bold text-gray-900">{metrics.totalPlacements}</p>
-              <p className="text-sm text-green-600 mt-1">↑ 12% from last quarter</p>
+              <p className="text-sm text-brand-green-600 mt-1">↑ 12% from last quarter</p>
             </Card>
 
             <Card className="p-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <TrendingUp className="w-5 h-5 text-green-600" />
+                <div className="p-2 bg-brand-green-100 rounded-lg">
+                  <TrendingUp className="w-5 h-5 text-brand-green-600" />
                 </div>
                 <h3 className="text-sm text-gray-500">Placement Rate</h3>
               </div>
-              <p className="text-3xl font-bold text-green-600">{metrics.placementRate}%</p>
+              <p className="text-3xl font-bold text-brand-green-600">{metrics.placementRate}%</p>
               <p className="text-sm text-gray-500 mt-1">Within 90 days</p>
             </Card>
 
             <Card className="p-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <DollarSign className="w-5 h-5 text-orange-600" />
+                <div className="p-2 bg-brand-orange-100 rounded-lg">
+                  <DollarSign className="w-5 h-5 text-brand-orange-600" />
                 </div>
                 <h3 className="text-sm text-gray-500">Avg Starting Salary</h3>
               </div>
-              <p className="text-3xl font-bold text-orange-600">${(metrics.avgSalary / 1000).toFixed(0)}k</p>
-              <p className="text-sm text-green-600 mt-1">↑ 8% from last year</p>
+              <p className="text-3xl font-bold text-brand-orange-600">${(metrics.avgSalary / 1000).toFixed(0)}k</p>
+              <p className="text-sm text-brand-green-600 mt-1">↑ 8% from last year</p>
             </Card>
 
             <Card className="p-6">
@@ -275,7 +275,7 @@ export function JobPlacementTracking({ programId, showPipeline = true }: Props) 
                 <h3 className="text-sm text-gray-500">Avg Time to Placement</h3>
               </div>
               <p className="text-3xl font-bold text-purple-600">{metrics.avgTimeToPlacement} days</p>
-              <p className="text-sm text-green-600 mt-1">↓ 15% improvement</p>
+              <p className="text-sm text-brand-green-600 mt-1">↓ 15% improvement</p>
             </Card>
           </div>
 
@@ -365,7 +365,7 @@ export function JobPlacementTracking({ programId, showPipeline = true }: Props) 
                       </div>
                       <div>
                         <p className="text-gray-500">Salary</p>
-                        <p className="font-semibold text-green-600">
+                        <p className="font-semibold text-brand-green-600">
                           ${placement.salary.toLocaleString()}/year
                         </p>
                       </div>

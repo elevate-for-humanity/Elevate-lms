@@ -40,8 +40,8 @@ export default async function EnrollmentSuccessPage({
     <div className="min-h-screen bg-slate-700 py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Success Message */}
-        <div className="bg-white rounded-2xl border-2 border-green-500 p-8 shadow-xl text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
+        <div className="bg-white rounded-2xl border-2 border-brand-green-500 p-8 shadow-xl text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-100 rounded-full mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           
@@ -56,7 +56,7 @@ export default async function EnrollmentSuccessPage({
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Link
               href={`/courses/${params.courseId}/learn`}
-              className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl text-lg font-bold transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-xl text-lg font-bold transition-colors"
             >
               <Play className="h-5 w-5" />
               Start Learning Now

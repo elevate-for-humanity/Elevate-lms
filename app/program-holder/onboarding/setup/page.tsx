@@ -68,7 +68,7 @@ export default function ProgramHolderSetup() {
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                     step >= s
-                      ? 'bg-green-600 text-white'
+                      ? 'bg-brand-green-600 text-white'
                       : 'bg-gray-300 text-black'
                   }`}
                 >
@@ -77,7 +77,7 @@ export default function ProgramHolderSetup() {
                 {s < 5 && (
                   <div
                     className={`h-1 w-16 ${
-                      step > s ? 'bg-green-600' : 'bg-gray-300'
+                      step > s ? 'bg-brand-green-600' : 'bg-gray-300'
                     }`}
                   />
                 )}
@@ -137,7 +137,7 @@ export default function ProgramHolderSetup() {
               </div>
               <button
                 onClick={() => setStep(2)}
-                className="w-full bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700"
+                className="w-full bg-brand-green-600 text-white py-4 rounded-lg font-bold hover:bg-brand-green-700"
               >
                 Continue
               </button>
@@ -231,7 +231,7 @@ export default function ProgramHolderSetup() {
                 </button>
                 <button
                   onClick={() => setStep(3)}
-                  className="flex-1 bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700"
+                  className="flex-1 bg-brand-green-600 text-white py-4 rounded-lg font-bold hover:bg-brand-green-700"
                 >
                   Continue
                 </button>
@@ -267,7 +267,7 @@ export default function ProgramHolderSetup() {
                   Choose File
                 </label>
                 {formData.syllabusFile && (
-                  <div className="mt-4 flex items-center justify-center gap-2 text-green-600">
+                  <div className="mt-4 flex items-center justify-center gap-2 text-brand-green-600">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>{formData.syllabusFile.name}</span>
                   </div>
@@ -320,7 +320,7 @@ export default function ProgramHolderSetup() {
                 </button>
                 <button
                   onClick={() => setStep(4)}
-                  className="flex-1 bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700"
+                  className="flex-1 bg-brand-green-600 text-white py-4 rounded-lg font-bold hover:bg-brand-green-700"
                 >
                   Continue
                 </button>
@@ -450,7 +450,7 @@ export default function ProgramHolderSetup() {
                     Choose File
                   </label>
                   {formData.bankDocument && (
-                    <div className="mt-3 flex items-center justify-center gap-2 text-green-600">
+                    <div className="mt-3 flex items-center justify-center gap-2 text-brand-green-600">
                       <span className="text-slate-400 flex-shrink-0">•</span>
                       <span>{formData.bankDocument.name}</span>
                     </div>
@@ -475,7 +475,7 @@ export default function ProgramHolderSetup() {
                 </button>
                 <button
                   onClick={() => setStep(5)}
-                  className="flex-1 bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700"
+                  className="flex-1 bg-brand-green-600 text-white py-4 rounded-lg font-bold hover:bg-brand-green-700"
                 >
                   Continue
                 </button>
@@ -500,7 +500,7 @@ export default function ProgramHolderSetup() {
                 </div>
                 <div>
                   <p className="text-sm text-black">Certificate Will Read</p>
-                  <p className="font-semibold text-green-600">
+                  <p className="font-semibold text-brand-green-600">
                     {formData.programName} - Sponsored by Elevate for Humanity
                   </p>
                 </div>
@@ -520,11 +520,11 @@ export default function ProgramHolderSetup() {
                 </div>
               </div>
 
-              <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-                <h3 className="font-bold text-green-900 mb-3">
+              <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6">
+                <h3 className="font-bold text-brand-green-900 mb-3">
                   What Happens Next?
                 </h3>
-                <ol className="text-sm text-green-800 space-y-2">
+                <ol className="text-sm text-brand-green-800 space-y-2">
                   <li>1. Our team reviews your program details and syllabus</li>
                   <li>2. We match your program to compatible course modules</li>
                   <li>
@@ -551,7 +551,7 @@ export default function ProgramHolderSetup() {
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="flex-1 bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700"
+                  className="flex-1 bg-brand-green-600 text-white py-4 rounded-lg font-bold hover:bg-brand-green-700"
                 >
                   Submit Program
                 </button>

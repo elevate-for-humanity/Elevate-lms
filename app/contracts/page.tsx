@@ -34,8 +34,8 @@ export default function ContractsPage() {
               Grant-safe, audit-ready templates for workforce partnerships,
               employer agreements, and platform licensing.
             </p>
-            <div className="bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-xl p-4">
-              <p className="text-sm text-green-400 font-bold">
+            <div className="bg-brand-green-500/20 backdrop-blur-sm border border-brand-green-400/30 rounded-xl p-4">
+              <p className="text-sm text-brand-green-400 font-bold">
                 • WIOA/WRG-Safe | • Audit-Ready | • DWD-Approved Language
               </p>
             </div>
@@ -76,7 +76,7 @@ export default function ContractsPage() {
                   </ul>
                 </div>
 
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-4">
                   <p className="text-xs text-black">
                     <strong className="text-black">Grant-Safe:</strong> All
                     fees are platform licensing and administrative fees only and
@@ -95,10 +95,10 @@ export default function ContractsPage() {
             </div>
 
             {/* Workforce Partnership MOU */}
-            <div className="bg-white rounded-3xl shadow-lg border-2 border-green-200 p-8">
+            <div className="bg-white rounded-3xl shadow-lg border-2 border-brand-green-200 p-8">
               <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Users className="w-6 h-6 text-green-600" />
+                <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Users className="w-6 h-6 text-brand-green-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-black mb-2">
@@ -111,7 +111,7 @@ export default function ContractsPage() {
               </div>
 
               <div className="space-y-4 mb-6">
-                <div className="bg-green-50 rounded-xl p-4">
+                <div className="bg-brand-green-50 rounded-xl p-4">
                   <h4 className="font-bold text-black mb-2">Covers:</h4>
                   <ul className="text-sm text-black space-y-1">
                     <li>• Purpose (referrals & enrollment)</li>
@@ -123,7 +123,7 @@ export default function ContractsPage() {
                   </ul>
                 </div>
 
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-4">
                   <p className="text-xs text-black">
                     <strong className="text-black">
                       WorkOne-Friendly:
@@ -136,7 +136,7 @@ export default function ContractsPage() {
 
               <Link
                 href="/contracts/workforce-mou"
-                className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-bold transition w-full justify-center"
+                className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-6 py-3 rounded-xl font-bold transition w-full justify-center"
               >
                 <Download className="w-5 h-5" />
                 View Template
@@ -144,10 +144,10 @@ export default function ContractsPage() {
             </div>
 
             {/* Employer Participation Agreement */}
-            <div className="bg-white rounded-3xl shadow-lg border-2 border-orange-200 p-8">
+            <div className="bg-white rounded-3xl shadow-lg border-2 border-brand-orange-200 p-8">
               <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Briefcase className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 bg-brand-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Briefcase className="w-6 h-6 text-brand-orange-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-black mb-2">
@@ -160,7 +160,7 @@ export default function ContractsPage() {
               </div>
 
               <div className="space-y-4 mb-6">
-                <div className="bg-orange-50 rounded-xl p-4">
+                <div className="bg-brand-orange-50 rounded-xl p-4">
                   <h4 className="font-bold text-black mb-2">Covers:</h4>
                   <ul className="text-sm text-black space-y-1">
                     <li>• Employer responsibilities (hire, train, pay)</li>
@@ -172,7 +172,7 @@ export default function ContractsPage() {
                   </ul>
                 </div>
 
-                <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                <div className="bg-brand-orange-50 border border-brand-orange-200 rounded-xl p-4">
                   <p className="text-xs text-black">
                     <strong className="text-black">Clear Terms:</strong>{' '}
                     Funding eligibility is determined by workforce agencies and
@@ -183,7 +183,7 @@ export default function ContractsPage() {
 
               <Link
                 href="/contracts/employer-agreement"
-                className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-xl font-bold transition w-full justify-center"
+                className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-6 py-3 rounded-xl font-bold transition w-full justify-center"
               >
                 <Download className="w-5 h-5" />
                 View Template
@@ -293,7 +293,7 @@ export default function ContractsPage() {
       <section className="py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <div className="inline-block px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-bold mb-4">
+            <div className="inline-block px-4 py-2 bg-brand-green-100 text-brand-green-700 rounded-full text-sm font-bold mb-4">
               Use This Verbatim
             </div>
             <h2 className="text-4xl font-bold text-black mb-4">
@@ -304,8 +304,8 @@ export default function ContractsPage() {
             </p>
           </div>
 
-          <div className="bg-zinc-900   rounded-3xl p-8 md:p-12 border-2 border-green-200">
-            <div className="bg-white rounded-2xl p-6 md:p-8 border border-green-200">
+          <div className="bg-zinc-900   rounded-3xl p-8 md:p-12 border-2 border-brand-green-200">
+            <div className="bg-white rounded-2xl p-6 md:p-8 border border-brand-green-200">
               <p className="text-lg text-black leading-relaxed italic">
                 "All fees charged under this agreement are for software access,
                 administrative infrastructure, and compliance support. No grant

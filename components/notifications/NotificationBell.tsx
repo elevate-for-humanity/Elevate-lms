@@ -115,7 +115,7 @@ export function NotificationBell() {
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-brand-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -164,7 +164,7 @@ export function NotificationBell() {
                       {!notification.read && (
                         <button
                           onClick={() => markAsRead(notification.id)}
-                          className="p-1 text-gray-400 hover:text-green-600 rounded"
+                          className="p-1 text-gray-400 hover:text-brand-green-600 rounded"
                           aria-label="Mark as read"
                         >
                           <Check className="w-4 h-4" />
@@ -172,7 +172,7 @@ export function NotificationBell() {
                       )}
                       <button
                         onClick={() => dismissNotification(notification.id)}
-                        className="p-1 text-gray-400 hover:text-red-600 rounded"
+                        className="p-1 text-gray-400 hover:text-brand-red-600 rounded"
                         aria-label="Dismiss"
                       >
                         <X className="w-4 h-4" />

@@ -243,7 +243,7 @@ export default function CertificatesPage() {
             </div>
 
             <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
-              <FileCheck className="h-12 w-12 text-green-600 mb-4" />
+              <FileCheck className="h-12 w-12 text-brand-green-600 mb-4" />
               <h3 className="text-lg font-bold text-black mb-2">IRS</h3>
               <p className="text-sm text-black mb-3">
                 Internal Revenue Service - Tax Preparer Credentials
@@ -275,7 +275,7 @@ export default function CertificatesPage() {
             </div>
 
             <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
-              <Shield className="h-12 w-12 text-orange-600 mb-4" />
+              <Shield className="h-12 w-12 text-brand-orange-600 mb-4" />
               <h3 className="text-lg font-bold text-black mb-2">DOT</h3>
               <p className="text-sm text-black mb-3">
                 Department of Transportation - CDL Verification
@@ -291,7 +291,7 @@ export default function CertificatesPage() {
             </div>
 
             <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
-              <Award className="h-12 w-12 text-red-600 mb-4" />
+              <Award className="h-12 w-12 text-brand-red-600 mb-4" />
               <h3 className="text-lg font-bold text-black mb-2">HHS</h3>
               <p className="text-sm text-black mb-3">
                 Health & Human Services - Healthcare Credentials
@@ -382,7 +382,7 @@ export default function CertificatesPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <h3 className="text-xl font-bold text-black mb-3">
@@ -420,7 +420,7 @@ export default function CertificatesPage() {
           </p>
           <Link
             href="/apply"
-            className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl text-lg font-bold transition-colors"
+            className="inline-flex items-center gap-2 bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-xl text-lg font-bold transition-colors"
           >
             Apply Now - It's Free
           </Link>

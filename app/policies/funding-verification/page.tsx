@@ -132,7 +132,7 @@ export default function FundingVerificationPage() {
               <a href="/support" className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
                 <Phone className="w-4 h-4" /> Get Help Online
               </a>
-              <Link href="/check-eligibility" className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">
+              <Link href="/check-eligibility" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 transition">
                 Register at Indiana Career Connect <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

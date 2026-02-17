@@ -90,13 +90,13 @@ export default async function Page() {
               and breath alcohol specimen collection.
             </p>
             <div className="flex flex-wrap gap-3 mt-4">
-              <span className="flex items-center gap-2 text-green-600 text-sm font-medium">
+              <span className="flex items-center gap-2 text-brand-green-600 text-sm font-medium">
                 <CheckCircle className="w-4 h-4" /> DOT Certified
               </span>
-              <span className="flex items-center gap-2 text-green-600 text-sm font-medium">
+              <span className="flex items-center gap-2 text-brand-green-600 text-sm font-medium">
                 <CheckCircle className="w-4 h-4" /> Job Placement
               </span>
-              <span className="flex items-center gap-2 text-green-600 text-sm font-medium">
+              <span className="flex items-center gap-2 text-brand-green-600 text-sm font-medium">
                 <CheckCircle className="w-4 h-4" /> Fast Certification
               </span>
             </div>
@@ -109,31 +109,31 @@ export default async function Page() {
               />
             </div>
           </div>
-          <div className="bg-blue-50 p-8 rounded-lg">
+          <div className="bg-brand-blue-50 p-8 rounded-lg">
             <h3 className="text-2xl font-bold text-black mb-4">
               Quick Facts
             </h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">Duration:</span>
+                <span className="text-brand-blue-600 font-bold">Duration:</span>
                 <span className="text-black">2-3 weeks</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">Cost:</span>
+                <span className="text-brand-blue-600 font-bold">Cost:</span>
                 <span className="text-black">Contact for pricing</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">Format:</span>
+                <span className="text-brand-blue-600 font-bold">Format:</span>
                 <span className="text-black">
                   Hybrid (online + hands-on)
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">Starting Pay:</span>
+                <span className="text-brand-blue-600 font-bold">Starting Pay:</span>
                 <span className="text-black">$16-$22/hour</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">Certification:</span>
+                <span className="text-brand-blue-600 font-bold">Certification:</span>
                 <span className="text-black">DOT-approved</span>
               </li>
             </ul>
@@ -273,13 +273,13 @@ export default async function Page() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="px-8 py-4 bg-white text-blue-600 hover:bg-gray-100 font-bold rounded-lg transition-all text-center"
+              className="px-8 py-4 bg-white text-brand-blue-600 hover:bg-gray-100 font-bold rounded-lg transition-all text-center"
             >
               Apply Now
             </Link>
             <Link
               href="/contact"
-              className="px-8 py-4 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg transition-all text-center border-2 border-white"
+              className="px-8 py-4 bg-brand-blue-700 hover:bg-brand-blue-800 text-white font-bold rounded-lg transition-all text-center border-2 border-white"
             >
               Contact Us
             </Link>

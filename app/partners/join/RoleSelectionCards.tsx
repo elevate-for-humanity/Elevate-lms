@@ -160,7 +160,7 @@ export default function RoleSelectionCards({
   return (
     <div className="space-y-6">
       {error && (
-        <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="flex items-start gap-3 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
           <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
@@ -188,12 +188,12 @@ export default function RoleSelectionCards({
             </div>
 
             {/* Pay Model */}
-            <div className="p-6 bg-green-50 border-b border-slate-200">
+            <div className="p-6 bg-brand-green-50 border-b border-slate-200">
               <div className="flex items-center gap-2 mb-2">
                 <DollarSign className="w-5 h-5 text-brand-green-600" />
                 <span className="font-semibold text-black">Pay Model</span>
               </div>
-              <p className="text-2xl font-bold text-green-700">
+              <p className="text-2xl font-bold text-brand-green-700">
                 {roleData.pay_model_type === 'PERCENTAGE'
                   ? `${roleData.min_rate}–${roleData.max_rate}%`
                   : `$${roleData.min_rate}–$${roleData.max_rate}`}

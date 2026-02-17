@@ -349,9 +349,9 @@ export default async function PayrollPage() {
             {services.map((service, index) => (
               <div
                 key={index}
-                className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-orange-600 transition"
+                className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-brand-orange-600 transition"
               >
-                <service.icon className="w-12 h-12 text-orange-600 mb-4" />
+                <service.icon className="w-12 h-12 text-brand-orange-600 mb-4" />
                 <h3 className="text-xl font-bold text-black mb-2">
                   {service.title}
                 </h3>
@@ -382,7 +382,7 @@ export default async function PayrollPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {benefits.map((benefit, index) => (
               <div key={index} className="text-center">
-                <benefit.icon className="w-16 h-16 text-orange-600 mx-auto mb-4" />
+                <benefit.icon className="w-16 h-16 text-brand-orange-600 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-black mb-3">
                   {benefit.title}
                 </h3>
@@ -408,12 +408,12 @@ export default async function PayrollPage() {
                 key={index}
                 className={`bg-white rounded-2xl p-8 ${
                   plan.popular
-                    ? 'border-4 border-orange-600 shadow-xl'
+                    ? 'border-4 border-brand-orange-600 shadow-xl'
                     : 'border-2 border-gray-200'
                 }`}
               >
                 {plan.popular && (
-                  <div className="bg-orange-600 text-white text-sm font-bold px-4 py-2 rounded-full inline-block mb-4">
+                  <div className="bg-brand-orange-600 text-white text-sm font-bold px-4 py-2 rounded-full inline-block mb-4">
                     MOST POPULAR
                   </div>
                 )}
@@ -441,7 +441,7 @@ export default async function PayrollPage() {
                   href="/supersonic-fast-cash/contact"
                   className={`block text-center px-6 py-3 rounded-xl font-bold transition ${
                     plan.popular
-                      ? 'bg-orange-600 text-white hover:bg-orange-700'
+                      ? 'bg-brand-orange-600 text-white hover:bg-brand-orange-700'
                       : 'bg-gray-100 text-black hover:bg-gray-200'
                   }`}
                 >
@@ -464,7 +464,7 @@ export default async function PayrollPage() {
             {process.map((step, index) => (
               <div key={index} className="relative">
                 <div className="bg-white rounded-2xl p-6 border-2 border-gray-200">
-                  <div className="w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
+                  <div className="w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4">
                     {step.step}
                   </div>
                   <h3 className="text-lg font-bold text-black mb-2">
@@ -496,7 +496,7 @@ export default async function PayrollPage() {
                 key={index}
                 className="bg-white border-2 border-gray-200 rounded-2xl p-6"
               >
-                <Shield className="w-12 h-12 text-orange-600 mb-4" />
+                <Shield className="w-12 h-12 text-brand-orange-600 mb-4" />
                 <h3 className="text-xl font-bold text-black mb-4">
                   {category.title}
                 </h3>
@@ -533,15 +533,15 @@ export default async function PayrollPage() {
                 className="bg-white border-2 border-gray-200 rounded-xl p-6"
               >
                 <div className="flex items-start gap-4">
-                  <AlertCircle className="w-8 h-8 text-red-600 flex-shrink-0" />
+                  <AlertCircle className="w-8 h-8 text-brand-red-600 flex-shrink-0" />
                   <div>
                     <h3 className="text-lg font-bold text-black mb-2">
                       {item.mistake}
                     </h3>
-                    <p className="text-red-600 text-sm mb-3">
+                    <p className="text-brand-red-600 text-sm mb-3">
                       <strong>Risk:</strong> {item.consequence}
                     </p>
-                    <p className="text-green-600 text-sm">
+                    <p className="text-brand-green-600 text-sm">
                       <strong>Our Solution:</strong> {item.solution}
                     </p>
                   </div>
@@ -586,14 +586,14 @@ export default async function PayrollPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/contact"
-              className="inline-flex items-center justify-center gap-2 bg-white text-orange-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-orange-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition"
             >
               Get Free Quote
               <Calendar className="w-5 h-5" />
             </Link>
             <Link
               href="/supersonic-fast-cash"
-              className="inline-flex items-center justify-center gap-2 bg-orange-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-orange-800 transition border-2 border-white"
+              className="inline-flex items-center justify-center gap-2 bg-brand-orange-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-orange-800 transition border-2 border-white"
             >
               All Services
               <ArrowRight className="w-5 h-5" />
@@ -607,17 +607,17 @@ export default async function PayrollPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
-              <Phone className="w-8 h-8 text-orange-600 mx-auto mb-3" />
+              <Phone className="w-8 h-8 text-brand-orange-600 mx-auto mb-3" />
               <h3 className="font-bold text-black mb-2">Contact Us</h3>
               <p className="text-gray-600">(317) 653-5046</p>
             </div>
             <div>
-              <Mail className="w-8 h-8 text-orange-600 mx-auto mb-3" />
+              <Mail className="w-8 h-8 text-brand-orange-600 mx-auto mb-3" />
               <h3 className="font-bold text-black mb-2">Email Us</h3>
               <p className="text-gray-600">payroll@supersonicfastcash.com</p>
             </div>
             <div>
-              <Clock className="w-8 h-8 text-orange-600 mx-auto mb-3" />
+              <Clock className="w-8 h-8 text-brand-orange-600 mx-auto mb-3" />
               <h3 className="font-bold text-black mb-2">Business Hours</h3>
               <p className="text-gray-600">Mon-Fri: 9AM-6PM EST</p>
             </div>

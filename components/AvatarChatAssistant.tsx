@@ -177,7 +177,7 @@ export default function AvatarChatAssistant({
       >
         <div className="relative">
           <MessageCircle className="w-6 h-6" />
-          <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+          <span className="absolute -top-1 -right-1 w-3 h-3 bg-brand-green-500 rounded-full animate-pulse" />
         </div>
         <span className="font-medium hidden sm:inline">Chat with {avatarName}</span>
       </button>
@@ -191,7 +191,7 @@ export default function AvatarChatAssistant({
       }`}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-brand-blue-600 to-brand-blue-700 text-white p-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           {/* Mini avatar video */}
           <div className="w-10 h-10 rounded-full overflow-hidden bg-brand-blue-800 flex-shrink-0">

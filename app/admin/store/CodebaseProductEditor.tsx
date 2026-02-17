@@ -42,7 +42,7 @@ export default function CodebaseProductEditor() {
 
       <button
         onClick={publish}
-        className="px-4 py-2 bg-brand-green-600 hover:bg-green-700 rounded text-white"
+        className="px-4 py-2 bg-brand-green-600 hover:bg-brand-green-700 rounded text-white"
       >
         Publish Product
       </button>

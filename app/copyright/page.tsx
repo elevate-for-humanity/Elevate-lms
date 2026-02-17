@@ -180,7 +180,7 @@ export default async function CopyrightPage() {
           </ul>
         </div>
 
-        <div className="bg-orange-50 border-l-4 border-orange-500 p-6 mb-8">
+        <div className="bg-brand-orange-50 border-l-4 border-brand-orange-500 p-6 mb-8">
           <h3 className="text-xl font-bold text-black mb-3">
             Tax Services - Special Authorization Notice
           </h3>

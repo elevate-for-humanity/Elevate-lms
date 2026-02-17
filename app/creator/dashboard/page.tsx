@@ -62,10 +62,10 @@ export default function CreatorDashboardPage() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Palette className="w-8 h-8 text-orange-600" />
+              <Palette className="w-8 h-8 text-brand-orange-600" />
               <h1 className="text-2xl font-bold text-gray-900">Creator Studio</h1>
             </div>
-            <Link href="/creator/courses/new" className="flex items-center gap-2 bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700">
+            <Link href="/creator/courses/new" className="flex items-center gap-2 bg-brand-orange-600 text-white px-4 py-2 rounded-lg hover:bg-brand-orange-700">
               <Plus className="w-5 h-5" /> Create Course
             </Link>
           </div>
@@ -76,8 +76,8 @@ export default function CreatorDashboardPage() {
           {stats.map((stat, index) => (
             <div key={index} className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <stat.icon className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                  <stat.icon className="w-6 h-6 text-brand-orange-600" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
@@ -90,7 +90,7 @@ export default function CreatorDashboardPage() {
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">My Courses</h2>
-            <Link href="/creator/courses" className="text-orange-600 hover:underline text-sm">View All</Link>
+            <Link href="/creator/courses" className="text-brand-orange-600 hover:underline text-sm">View All</Link>
           </div>
           <table className="w-full">
             <thead>
@@ -111,14 +111,14 @@ export default function CreatorDashboardPage() {
                   <td className="py-4 text-center text-gray-600">{course.rating || '-'}</td>
                   <td className="py-4 text-right text-gray-900">${course.revenue.toLocaleString()}</td>
                   <td className="py-4 text-center">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${course.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${course.status === 'published' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-gray-100 text-gray-700'}`}>
                       {course.status}
                     </span>
                   </td>
                   <td className="py-4">
                     <div className="flex items-center justify-center gap-2">
                       <button className="p-2 text-gray-600 hover:text-brand-blue-600"><Eye className="w-4 h-4" /></button>
-                      <button className="p-2 text-gray-600 hover:text-orange-600"><Edit className="w-4 h-4" /></button>
+                      <button className="p-2 text-gray-600 hover:text-brand-orange-600"><Edit className="w-4 h-4" /></button>
                       <button className="p-2 text-gray-600 hover:text-brand-blue-600"><BarChart3 className="w-4 h-4" /></button>
                     </div>
                   </td>

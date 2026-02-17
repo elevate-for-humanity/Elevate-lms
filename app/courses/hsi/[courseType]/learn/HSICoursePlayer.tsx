@@ -110,7 +110,7 @@ export function HSICoursePlayer({
                   </p>
                   <button
                     onClick={handleCompletion}
-                    className="px-4 py-2 bg-brand-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                    className="px-4 py-2 bg-brand-green-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-green-700 transition-colors"
                   >
                     • Mark as Complete
                   </button>
@@ -146,7 +146,7 @@ export function HSICoursePlayer({
                 <div className="pt-4">
                   <button
                     onClick={handleCompletion}
-                    className="px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                    className="px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 transition-colors"
                   >
                     • I've Completed the Course
                   </button>
@@ -165,7 +165,7 @@ export function HSICoursePlayer({
               <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-semibold">Course Complete!</div>
-                <div className="text-sm text-green-100">
+                <div className="text-sm text-brand-green-100">
                   Your certificate is being generated and will be emailed to you
                   shortly
                 </div>
@@ -173,7 +173,7 @@ export function HSICoursePlayer({
             </div>
             <button
               onClick={() => router.push('/lms/courses')}
-              className="px-6 py-2 bg-white text-brand-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors"
+              className="px-6 py-2 bg-white text-brand-green-600 font-semibold rounded-lg hover:bg-brand-green-50 transition-colors"
             >
               Continue Learning
             </button>

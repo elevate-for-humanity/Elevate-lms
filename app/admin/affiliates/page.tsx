@@ -74,7 +74,7 @@ export default async function AffiliatesPage() {
         </div>
         <Link
           href="/admin/affiliates/new"
-          className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center gap-2"
+          className="px-4 py-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition flex items-center gap-2"
         >
           <UserPlus className="w-5 h-5" />
           Add Affiliate
@@ -86,8 +86,8 @@ export default async function AffiliatesPage() {
         {stats.map((stat) => (
           <div key={stat.label} className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center justify-between">
-              <stat.icon className="w-8 h-8 text-orange-600" />
-              <span className="text-green-600 text-sm font-medium">{stat.change}</span>
+              <stat.icon className="w-8 h-8 text-brand-orange-600" />
+              <span className="text-brand-green-600 text-sm font-medium">{stat.change}</span>
             </div>
             <p className="text-2xl font-bold mt-4">{stat.value}</p>
             <p className="text-gray-600 text-sm">{stat.label}</p>
@@ -103,7 +103,7 @@ export default async function AffiliatesPage() {
             <input
               type="text"
               placeholder="Search affiliates..."
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
             />
           </div>
           <button className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50">
@@ -139,7 +139,7 @@ export default async function AffiliatesPage() {
                 <td className="px-6 py-4">
                   <span className={`px-2 py-2 rounded-full text-xs font-medium ${
                     affiliate.status === 'active' 
-                      ? 'bg-green-100 text-green-800' 
+                      ? 'bg-brand-green-100 text-brand-green-800' 
                       : 'bg-yellow-100 text-yellow-800'
                   }`}>
                     {affiliate.status}

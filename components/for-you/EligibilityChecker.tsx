@@ -75,7 +75,7 @@ export function EligibilityChecker() {
               >
                 {question.text}
                 {question.required && (
-                  <span className="text-red-600 ml-1">*</span>
+                  <span className="text-brand-red-600 ml-1">*</span>
                 )}
               </label>
               <div className="flex gap-3">
@@ -84,8 +84,8 @@ export function EligibilityChecker() {
                   onClick={() => handleCheck(question.id, true)}
                   className={`px-6 py-2 rounded-lg font-semibold transition ${
                     answers[question.id] === true
-                      ? 'bg-green-600 text-white'
-                      : 'bg-white text-black border border-slate-300 hover:border-green-600'
+                      ? 'bg-brand-green-600 text-white'
+                      : 'bg-white text-black border border-slate-300 hover:border-brand-green-600'
                   }`}
                 >
                   Yes
@@ -95,8 +95,8 @@ export function EligibilityChecker() {
                   onClick={() => handleCheck(question.id, false)}
                   className={`px-6 py-2 rounded-lg font-semibold transition ${
                     answers[question.id] === false
-                      ? 'bg-red-600 text-white'
-                      : 'bg-white text-black border border-slate-300 hover:border-red-600'
+                      ? 'bg-brand-red-600 text-white'
+                      : 'bg-white text-black border border-slate-300 hover:border-brand-red-600'
                   }`}
                 >
                   No
@@ -119,7 +119,7 @@ export function EligibilityChecker() {
           <div
             className={`mt-8 p-6 rounded-lg border-2 ${
               fullyEligible
-                ? 'bg-green-50 border-green-600'
+                ? 'bg-brand-green-50 border-brand-green-600'
                 : 'bg-yellow-50 border-yellow-600'
             }`}
           >
@@ -127,19 +127,19 @@ export function EligibilityChecker() {
               <>
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-slate-400 flex-shrink-0">•</span>
-                  <h4 className="text-2xl font-bold text-green-900">
+                  <h4 className="text-2xl font-bold text-brand-green-900">
                     You Qualify!
                   </h4>
                 </div>
-                <p className="text-green-900 mb-6">
+                <p className="text-brand-green-900 mb-6">
                   Based on your responses, you appear eligible for free training
                   programs through workforce funding.
                 </p>
-                <div className="bg-white rounded-lg p-6 border border-green-200">
-                  <h5 className="font-bold text-green-900 mb-3">
+                <div className="bg-white rounded-lg p-6 border border-brand-green-200">
+                  <h5 className="font-bold text-brand-green-900 mb-3">
                     What Happens Next:
                   </h5>
-                  <ol className="space-y-2 text-green-900">
+                  <ol className="space-y-2 text-brand-green-900">
                     <li className="flex items-start gap-2">
                       <span className="font-bold">1.</span>
                       <span>Click "Apply Now" below (takes 2 minutes)</span>

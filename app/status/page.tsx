@@ -28,13 +28,13 @@ function StatusIcon({ status }: { status: string }) {
   if (status === 'degraded') {
     return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
   }
-  return <AlertTriangle className="w-5 h-5 text-red-500" />;
+  return <AlertTriangle className="w-5 h-5 text-brand-red-500" />;
 }
 
 function StatusBadge({ status }: { status: string }) {
   if (status === 'operational') {
     return (
-      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-green-100 text-brand-green-800">
         Operational
       </span>
     );
@@ -47,7 +47,7 @@ function StatusBadge({ status }: { status: string }) {
     );
   }
   return (
-    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-red-100 text-brand-red-800">
       Outage
     </span>
   );
@@ -66,7 +66,7 @@ export default function StatusPage() {
         <Breadcrumbs items={[{ label: "Status" }]} />
       </div>
 {/* Header */}
-      <div className={`${allOperational ? 'bg-green-600' : 'bg-yellow-600'} text-white py-12`}>
+      <div className={`${allOperational ? 'bg-brand-green-600' : 'bg-yellow-600'} text-white py-12`}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             {allOperational ? (
@@ -78,7 +78,7 @@ export default function StatusPage() {
           <h1 className="text-3xl font-bold mb-2">
             {allOperational ? 'All Systems Operational' : 'Some Systems Experiencing Issues'}
           </h1>
-          <p className="text-green-100">
+          <p className="text-brand-green-100">
             Last updated: {lastUpdated}
           </p>
         </div>

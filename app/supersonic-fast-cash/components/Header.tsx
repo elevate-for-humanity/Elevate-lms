@@ -46,7 +46,7 @@ export function SupersonicHeader() {
             <Link href="/supersonic-fast-cash" className="flex items-center">
               <div className="text-xl font-bold">
                 <span className="text-brand-blue-900">Supersonic</span>
-                <span className="text-red-600"> Fast Cash</span>
+                <span className="text-brand-red-600"> Fast Cash</span>
                 <span className="text-brand-blue-900 text-sm font-normal ml-1">LLC</span>
               </div>
             </Link>
@@ -64,7 +64,7 @@ export function SupersonicHeader() {
               ))}
               <Link
                 href="/supersonic-fast-cash/start"
-                className="px-5 py-2.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors text-sm"
+                className="px-5 py-2.5 bg-brand-red-600 text-white font-semibold rounded-lg hover:bg-brand-red-700 transition-colors text-sm"
               >
                 Start Tax Prep
               </Link>
@@ -97,7 +97,7 @@ export function SupersonicHeader() {
               ))}
               <Link
                 href="/supersonic-fast-cash/start"
-                className="block w-full text-center px-5 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors mt-4"
+                className="block w-full text-center px-5 py-3 bg-brand-red-600 text-white font-semibold rounded-lg hover:bg-brand-red-700 transition-colors mt-4"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Start Tax Prep
@@ -111,7 +111,7 @@ export function SupersonicHeader() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 z-50">
         <Link
           href="/supersonic-fast-cash/start"
-          className="block w-full text-center px-5 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
+          className="block w-full text-center px-5 py-3 bg-brand-red-600 text-white font-semibold rounded-lg hover:bg-brand-red-700 transition-colors"
         >
           Start Tax Preparation
         </Link>

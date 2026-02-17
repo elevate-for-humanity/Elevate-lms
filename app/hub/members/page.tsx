@@ -41,7 +41,7 @@ export default async function MembersPage() {
               <input
                 type="text"
                 placeholder="Search members..."
-                className="pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green-500"
               />
             </div>
             <button className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50">
@@ -75,7 +75,7 @@ export default async function MembersPage() {
                   <button className="p-2 text-slate-500 hover:text-brand-blue-600 hover:bg-brand-blue-50 rounded-lg transition">
                     <MessageSquare className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-slate-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition">
+                  <button className="p-2 text-slate-500 hover:text-brand-green-600 hover:bg-brand-green-50 rounded-lg transition">
                     <UserPlus className="w-4 h-4" />
                   </button>
                 </div>

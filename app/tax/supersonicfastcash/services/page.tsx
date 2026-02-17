@@ -121,7 +121,7 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border-2 border-green-200 bg-white p-6 hover:shadow-lg transition">
+        <div className="rounded-2xl border-2 border-brand-green-200 bg-white p-6 hover:shadow-lg transition">
           <div className="w-12 h-12 rounded-full bg-brand-green-100 flex items-center justify-center mb-4">
             <DollarSign className="w-6 h-6 text-brand-green-600" />
           </div>
@@ -185,8 +185,8 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border-2 border-orange-200 bg-white p-6 hover:shadow-lg transition">
-          <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mb-4">
+        <div className="rounded-2xl border-2 border-brand-orange-200 bg-white p-6 hover:shadow-lg transition">
+          <div className="w-12 h-12 rounded-full bg-brand-orange-100 flex items-center justify-center mb-4">
             <Calculator className="w-6 h-6 text-brand-orange-600" />
           </div>
           <h2 className="text-xl font-bold text-black mb-2">
@@ -218,8 +218,8 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border-2 border-red-200 bg-white p-6 hover:shadow-lg transition">
-          <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+        <div className="rounded-2xl border-2 border-brand-red-200 bg-white p-6 hover:shadow-lg transition">
+          <div className="w-12 h-12 rounded-full bg-brand-red-100 flex items-center justify-center mb-4">
             <FileText className="w-6 h-6 text-brand-orange-600" />
           </div>
           <h2 className="text-xl font-bold text-black mb-2">

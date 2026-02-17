@@ -61,7 +61,7 @@ export default function CreatorApprovalActions({
       <button
         onClick={handleApprove}
         disabled={loading}
-        className="bg-brand-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50 text-sm"
+        className="bg-brand-green-600 text-white px-4 py-2 rounded hover:bg-brand-green-700 disabled:opacity-50 text-sm"
       >
         Approve
       </button>

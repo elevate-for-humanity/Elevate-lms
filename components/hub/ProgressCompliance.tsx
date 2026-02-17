@@ -118,9 +118,9 @@ export default function ProgressCompliance({ userId }: { userId?: string }) {
   }
 
   const statusConfig = {
-    compliant: { label: 'On Track', color: 'text-green-700', bg: 'bg-green-100', icon: CheckCircle },
+    compliant: { label: 'On Track', color: 'text-brand-green-700', bg: 'bg-brand-green-100', icon: CheckCircle },
     at_risk: { label: 'At Risk', color: 'text-amber-700', bg: 'bg-amber-100', icon: AlertTriangle },
-    non_compliant: { label: 'Behind', color: 'text-red-700', bg: 'bg-red-100', icon: AlertTriangle },
+    non_compliant: { label: 'Behind', color: 'text-brand-red-700', bg: 'bg-brand-red-100', icon: AlertTriangle },
   };
 
   const status = statusConfig[data.complianceStatus];
@@ -161,7 +161,7 @@ export default function ProgressCompliance({ userId }: { userId?: string }) {
         </div>
         <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
           <div 
-            className="h-full bg-green-500 rounded-full transition-all duration-500"
+            className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
             style={{ width: `${modulesPercent}%` }}
           />
         </div>

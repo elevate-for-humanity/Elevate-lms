@@ -22,7 +22,7 @@ export default function SideHeroBanner() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/apply"
-                className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-500 text-white font-bold rounded-lg hover:bg-brand-orange-600 transition-all shadow-lg hover:shadow-xl hover:scale-105"
               >
                 Start Your Application
                 <ArrowRight size={20} className="ml-2" />

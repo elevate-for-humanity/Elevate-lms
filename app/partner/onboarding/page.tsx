@@ -190,11 +190,11 @@ export default function PartnerOnboardingPage() {
           {[1, 2, 3, 4, 5].map((s) => (
             <div key={s} className="flex items-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                s < step ? 'bg-green-500 text-white' : s === step ? 'bg-brand-blue-600 text-white' : 'bg-slate-700 text-slate-400'
+                s < step ? 'bg-brand-green-500 text-white' : s === step ? 'bg-brand-blue-600 text-white' : 'bg-slate-700 text-slate-400'
               }`}>
                 {s < step ? <span className="text-slate-400 flex-shrink-0">•</span> : s}
               </div>
-              {s < 5 && <div className={`w-8 h-1 ${s < step ? 'bg-green-500' : 'bg-slate-700'}`} />}
+              {s < 5 && <div className={`w-8 h-1 ${s < step ? 'bg-brand-green-500' : 'bg-slate-700'}`} />}
             </div>
           ))}
         </div>
@@ -206,7 +206,7 @@ export default function PartnerOnboardingPage() {
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700">
+            <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-center gap-3 text-brand-red-700">
               <AlertCircle className="w-5 h-5" />
               {error}
             </div>
@@ -340,14 +340,14 @@ export default function PartnerOnboardingPage() {
                 {requiredDocs.map(docType => {
                   const uploaded = uploadedFiles.find(f => f.docType === docType);
                   return (
-                    <div key={docType} className={`p-4 border-2 rounded-lg ${uploaded ? 'border-green-500 bg-green-50' : 'border-slate-200'}`}>
+                    <div key={docType} className={`p-4 border-2 rounded-lg ${uploaded ? 'border-brand-green-500 bg-brand-green-50' : 'border-slate-200'}`}>
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="font-medium text-slate-900">{DOCUMENT_TYPE_LABELS[docType]}</p>
-                          {uploaded && <p className="text-sm text-green-600">{uploaded.name}</p>}
+                          {uploaded && <p className="text-sm text-brand-green-600">{uploaded.name}</p>}
                         </div>
                         {uploaded ? (
-                          <button onClick={() => removeFile(docType)} className="text-red-500 hover:text-red-700">
+                          <button onClick={() => removeFile(docType)} className="text-brand-red-500 hover:text-brand-red-700">
                             <X className="w-5 h-5" />
                           </button>
                         ) : (
@@ -387,10 +387,10 @@ export default function PartnerOnboardingPage() {
                     ))}
                   </div>
                 </div>
-                <div><p className="text-sm text-slate-500">Documents Uploaded</p><p className="font-medium text-green-600">{uploadedFiles.length} of {requiredDocs.length}</p></div>
+                <div><p className="text-sm text-slate-500">Documents Uploaded</p><p className="font-medium text-brand-green-600">{uploadedFiles.length} of {requiredDocs.length}</p></div>
               </div>
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <p className="text-green-800 text-sm"><strong>No admin approval required.</strong> Your account will be activated automatically once documents are verified (typically within 24-48 hours).</p>
+              <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4">
+                <p className="text-brand-green-800 text-sm"><strong>No admin approval required.</strong> Your account will be activated automatically once documents are verified (typically within 24-48 hours).</p>
               </div>
               <label className="flex items-start gap-3 p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-brand-blue-300">
                 <input type="checkbox" checked={formData.agreedToTerms} onChange={(e) => updateField('agreedToTerms', e.target.checked)}
@@ -423,7 +423,7 @@ export default function PartnerOnboardingPage() {
               </button>
             ) : (
               <button onClick={handleSubmit} disabled={isSubmitting || !formData.agreedToTerms}
-                className="flex items-center gap-2 px-8 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50">
+                className="flex items-center gap-2 px-8 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 disabled:opacity-50">
                 {isSubmitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</> : <>Submit Application <span className="text-slate-400 flex-shrink-0">•</span></>}
               </button>
             )}

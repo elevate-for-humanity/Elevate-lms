@@ -201,8 +201,8 @@ export default async function LocationsPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Phone className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Phone className="w-6 h-6 text-brand-green-600" />
               </div>
               <h3 className="font-bold text-black mb-2">
                 Phone Consultation

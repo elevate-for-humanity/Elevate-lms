@@ -193,7 +193,7 @@ export default function BillingPage() {
             </p>
             <Link
               href="/pricing"
-              className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-600"
+              className="inline-flex items-center gap-2 bg-brand-orange-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-orange-600"
             >
               View Plans
             </Link>
@@ -298,7 +298,7 @@ export default function BillingPage() {
             <ul className="space-y-1">
               {plan.features.map((feature, idx) => (
                 <li key={idx} className="flex items-center gap-2 text-sm text-gray-600">
-                  <Check className="w-4 h-4 text-green-600" />
+                  <Check className="w-4 h-4 text-brand-green-600" />
                   {feature}
                 </li>
               ))}

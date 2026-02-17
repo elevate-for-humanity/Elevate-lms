@@ -134,7 +134,7 @@ export default function SearchPage() {
                       </span>
                     ))}
                   </div>
-                  <p className="text-sm text-green-700 font-medium">{prog.funding}</p>
+                  <p className="text-sm text-brand-green-700 font-medium">{prog.funding}</p>
                 </div>
               </Link>
             ))}
@@ -184,20 +184,20 @@ export default function SearchPage() {
               />
             </div>
             <div>
-              <p className="text-green-700 font-bold text-sm mb-2 uppercase tracking-wide">Funding Available</p>
+              <p className="text-brand-green-700 font-bold text-sm mb-2 uppercase tracking-wide">Funding Available</p>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Many Programs Are Free</h2>
               <p className="text-slate-700 mb-3">
                 WIOA, Workforce Ready Grant, and Job-Ready Incentive funding covers tuition, supplies, and certification fees for qualifying students.
               </p>
               <ul className="text-slate-700 space-y-2 mb-6">
-                <li className="flex items-start gap-2"><span className="text-green-600 font-bold mt-0.5">1.</span> Register at indianacareerconnect.com</li>
-                <li className="flex items-start gap-2"><span className="text-green-600 font-bold mt-0.5">2.</span> Schedule a WorkOne appointment</li>
-                <li className="flex items-start gap-2"><span className="text-green-600 font-bold mt-0.5">3.</span> Get approved and start training</li>
+                <li className="flex items-start gap-2"><span className="text-brand-green-600 font-bold mt-0.5">1.</span> Register at indianacareerconnect.com</li>
+                <li className="flex items-start gap-2"><span className="text-brand-green-600 font-bold mt-0.5">2.</span> Schedule a WorkOne appointment</li>
+                <li className="flex items-start gap-2"><span className="text-brand-green-600 font-bold mt-0.5">3.</span> Get approved and start training</li>
               </ul>
               <div className="flex flex-wrap gap-3">
                 <Link
                   href="/funding"
-                  className="inline-block bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition"
+                  className="inline-block bg-brand-green-600 hover:bg-brand-green-700 text-white px-6 py-3 rounded-lg font-semibold transition"
                 >
                   Learn About Funding
                 </Link>
@@ -205,7 +205,7 @@ export default function SearchPage() {
                   href="https://www.indianacareerconnect.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block border-2 border-green-600 text-green-700 px-6 py-3 rounded-lg font-semibold hover:bg-green-50 transition"
+                  className="inline-block border-2 border-brand-green-600 text-brand-green-700 px-6 py-3 rounded-lg font-semibold hover:bg-brand-green-50 transition"
                 >
                   Register at ICC →
                 </a>
@@ -220,17 +220,17 @@ export default function SearchPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="order-2 md:order-1">
-              <p className="text-orange-600 font-bold text-sm mb-2 uppercase tracking-wide">For Employers</p>
+              <p className="text-brand-orange-600 font-bold text-sm mb-2 uppercase tracking-wide">For Employers</p>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Hire Trained Graduates</h2>
               <ul className="text-slate-700 space-y-3 mb-6">
-                <li className="flex items-start gap-2"><span className="text-orange-500 font-bold mt-0.5">•</span> Pre-trained, certified candidates ready day one</li>
-                <li className="flex items-start gap-2"><span className="text-orange-500 font-bold mt-0.5">•</span> WOTC tax credits — up to $9,600 per hire</li>
-                <li className="flex items-start gap-2"><span className="text-orange-500 font-bold mt-0.5">•</span> OJT reimbursement covers 50-75% of wages</li>
-                <li className="flex items-start gap-2"><span className="text-orange-500 font-bold mt-0.5">•</span> Post jobs and browse candidates online</li>
+                <li className="flex items-start gap-2"><span className="text-brand-orange-500 font-bold mt-0.5">•</span> Pre-trained, certified candidates ready day one</li>
+                <li className="flex items-start gap-2"><span className="text-brand-orange-500 font-bold mt-0.5">•</span> WOTC tax credits — up to $9,600 per hire</li>
+                <li className="flex items-start gap-2"><span className="text-brand-orange-500 font-bold mt-0.5">•</span> OJT reimbursement covers 50-75% of wages</li>
+                <li className="flex items-start gap-2"><span className="text-brand-orange-500 font-bold mt-0.5">•</span> Post jobs and browse candidates online</li>
               </ul>
               <Link
                 href="/employer"
-                className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg"
+                className="inline-block bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg"
               >
                 Employer Portal →
               </Link>

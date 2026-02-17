@@ -97,7 +97,7 @@ export function ApprenticeshipShopFields({
   return (
     <div className="space-y-6">
       {/* Multi-Region Notice */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-5 text-white">
+      <div className="bg-gradient-to-r from-purple-600 to-brand-blue-600 rounded-xl p-5 text-white">
         <div className="flex items-start gap-3">
           <Globe className="w-6 h-6 flex-shrink-0 mt-0.5" />
           <div>
@@ -114,13 +114,13 @@ export function ApprenticeshipShopFields({
       {/* Training Region */}
       <div>
         <label className="block text-sm font-semibold text-slate-700 mb-2">
-          Training Region <span className="text-red-500">*</span>
+          Training Region <span className="text-brand-red-500">*</span>
         </label>
         <select
           value={formData.trainingRegion}
           onChange={(e) => onChange({ trainingRegion: e.target.value, trainingRegionOther: '' })}
           className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
-            errors.trainingRegion ? 'border-red-500' : 'border-slate-300'
+            errors.trainingRegion ? 'border-brand-red-500' : 'border-slate-300'
           }`}
           required
         >
@@ -132,7 +132,7 @@ export function ApprenticeshipShopFields({
           ))}
         </select>
         {errors.trainingRegion && (
-          <p className="mt-1 text-sm text-red-600">{errors.trainingRegion}</p>
+          <p className="mt-1 text-sm text-brand-red-600">{errors.trainingRegion}</p>
         )}
       </div>
 
@@ -140,7 +140,7 @@ export function ApprenticeshipShopFields({
       {showOtherRegion && (
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-2">
-            Specify State/Region <span className="text-red-500">*</span>
+            Specify State/Region <span className="text-brand-red-500">*</span>
           </label>
           <input
             type="text"
@@ -148,12 +148,12 @@ export function ApprenticeshipShopFields({
             onChange={(e) => onChange({ trainingRegionOther: e.target.value })}
             placeholder="e.g., Ohio, Michigan, Kentucky"
             className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
-              errors.trainingRegionOther ? 'border-red-500' : 'border-slate-300'
+              errors.trainingRegionOther ? 'border-brand-red-500' : 'border-slate-300'
             }`}
             required={showOtherRegion}
           />
           {errors.trainingRegionOther && (
-            <p className="mt-1 text-sm text-red-600">{errors.trainingRegionOther}</p>
+            <p className="mt-1 text-sm text-brand-red-600">{errors.trainingRegionOther}</p>
           )}
         </div>
       )}
@@ -161,13 +161,13 @@ export function ApprenticeshipShopFields({
       {/* Program Track */}
       <div>
         <label className="block text-sm font-semibold text-slate-700 mb-2">
-          Program Track <span className="text-red-500">*</span>
+          Program Track <span className="text-brand-red-500">*</span>
         </label>
         <select
           value={formData.programTrack}
           onChange={(e) => onChange({ programTrack: e.target.value, supervisorLicenseType: '' })}
           className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
-            errors.programTrack ? 'border-red-500' : 'border-slate-300'
+            errors.programTrack ? 'border-brand-red-500' : 'border-slate-300'
           }`}
           required
         >
@@ -179,7 +179,7 @@ export function ApprenticeshipShopFields({
           ))}
         </select>
         {errors.programTrack && (
-          <p className="mt-1 text-sm text-red-600">{errors.programTrack}</p>
+          <p className="mt-1 text-sm text-brand-red-600">{errors.programTrack}</p>
         )}
       </div>
 
@@ -206,7 +206,7 @@ export function ApprenticeshipShopFields({
       {/* Shop Name */}
       <div>
         <label className="block text-sm font-semibold text-slate-700 mb-2">
-          Shop Name <span className="text-red-500">*</span>
+          Shop Name <span className="text-brand-red-500">*</span>
         </label>
         <input
           type="text"
@@ -214,19 +214,19 @@ export function ApprenticeshipShopFields({
           onChange={(e) => onChange({ shopName: e.target.value })}
           placeholder="Enter shop/salon name"
           className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
-            errors.shopName ? 'border-red-500' : 'border-slate-300'
+            errors.shopName ? 'border-brand-red-500' : 'border-slate-300'
           }`}
           required
         />
         {errors.shopName && (
-          <p className="mt-1 text-sm text-red-600">{errors.shopName}</p>
+          <p className="mt-1 text-sm text-brand-red-600">{errors.shopName}</p>
         )}
       </div>
 
       {/* Shop Address */}
       <div>
         <label className="block text-sm font-semibold text-slate-700 mb-2">
-          Shop Address <span className="text-red-500">*</span>
+          Shop Address <span className="text-brand-red-500">*</span>
         </label>
         <div className="relative">
           <MapPin className="absolute left-3 top-3.5 w-5 h-5 text-slate-400" />
@@ -236,20 +236,20 @@ export function ApprenticeshipShopFields({
             onChange={(e) => onChange({ shopAddress: e.target.value })}
             placeholder="Full street address, city, state, ZIP"
             className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
-              errors.shopAddress ? 'border-red-500' : 'border-slate-300'
+              errors.shopAddress ? 'border-brand-red-500' : 'border-slate-300'
             }`}
             required
           />
         </div>
         {errors.shopAddress && (
-          <p className="mt-1 text-sm text-red-600">{errors.shopAddress}</p>
+          <p className="mt-1 text-sm text-brand-red-600">{errors.shopAddress}</p>
         )}
       </div>
 
       {/* Shop Phone */}
       <div>
         <label className="block text-sm font-semibold text-slate-700 mb-2">
-          Shop Phone <span className="text-red-500">*</span>
+          Shop Phone <span className="text-brand-red-500">*</span>
         </label>
         <div className="relative">
           <Phone className="absolute left-3 top-3.5 w-5 h-5 text-slate-400" />
@@ -259,20 +259,20 @@ export function ApprenticeshipShopFields({
             onChange={(e) => onChange({ shopPhone: e.target.value })}
             placeholder="(317) 314-3757"
             className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
-              errors.shopPhone ? 'border-red-500' : 'border-slate-300'
+              errors.shopPhone ? 'border-brand-red-500' : 'border-slate-300'
             }`}
             required
           />
         </div>
         {errors.shopPhone && (
-          <p className="mt-1 text-sm text-red-600">{errors.shopPhone}</p>
+          <p className="mt-1 text-sm text-brand-red-600">{errors.shopPhone}</p>
         )}
       </div>
 
       {/* Owner/Manager Name */}
       <div>
         <label className="block text-sm font-semibold text-slate-700 mb-2">
-          Owner/Manager Name <span className="text-red-500">*</span>
+          Owner/Manager Name <span className="text-brand-red-500">*</span>
         </label>
         <div className="relative">
           <User className="absolute left-3 top-3.5 w-5 h-5 text-slate-400" />
@@ -282,20 +282,20 @@ export function ApprenticeshipShopFields({
             onChange={(e) => onChange({ ownerManagerName: e.target.value })}
             placeholder="Shop owner or manager name"
             className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
-              errors.ownerManagerName ? 'border-red-500' : 'border-slate-300'
+              errors.ownerManagerName ? 'border-brand-red-500' : 'border-slate-300'
             }`}
             required
           />
         </div>
         {errors.ownerManagerName && (
-          <p className="mt-1 text-sm text-red-600">{errors.ownerManagerName}</p>
+          <p className="mt-1 text-sm text-brand-red-600">{errors.ownerManagerName}</p>
         )}
       </div>
 
       {/* Supervisor Name */}
       <div>
         <label className="block text-sm font-semibold text-slate-700 mb-2">
-          Supervisor Name <span className="text-red-500">*</span>
+          Supervisor Name <span className="text-brand-red-500">*</span>
         </label>
         <div className="relative">
           <User className="absolute left-3 top-3.5 w-5 h-5 text-slate-400" />
@@ -305,20 +305,20 @@ export function ApprenticeshipShopFields({
             onChange={(e) => onChange({ supervisorName: e.target.value })}
             placeholder="Licensed professional who will supervise you"
             className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
-              errors.supervisorName ? 'border-red-500' : 'border-slate-300'
+              errors.supervisorName ? 'border-brand-red-500' : 'border-slate-300'
             }`}
             required
           />
         </div>
         {errors.supervisorName && (
-          <p className="mt-1 text-sm text-red-600">{errors.supervisorName}</p>
+          <p className="mt-1 text-sm text-brand-red-600">{errors.supervisorName}</p>
         )}
       </div>
 
       {/* Supervisor License Type */}
       <div>
         <label className="block text-sm font-semibold text-slate-700 mb-2">
-          Supervisor License Type <span className="text-red-500">*</span>
+          Supervisor License Type <span className="text-brand-red-500">*</span>
         </label>
         <div className="relative">
           <Award className="absolute left-3 top-3.5 w-5 h-5 text-slate-400" />
@@ -326,7 +326,7 @@ export function ApprenticeshipShopFields({
             value={formData.supervisorLicenseType}
             onChange={(e) => onChange({ supervisorLicenseType: e.target.value })}
             className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
-              errors.supervisorLicenseType ? 'border-red-500' : 'border-slate-300'
+              errors.supervisorLicenseType ? 'border-brand-red-500' : 'border-slate-300'
             }`}
             required
             disabled={!formData.programTrack}
@@ -342,7 +342,7 @@ export function ApprenticeshipShopFields({
           </select>
         </div>
         {errors.supervisorLicenseType && (
-          <p className="mt-1 text-sm text-red-600">{errors.supervisorLicenseType}</p>
+          <p className="mt-1 text-sm text-brand-red-600">{errors.supervisorLicenseType}</p>
         )}
       </div>
 
@@ -356,9 +356,9 @@ export function ApprenticeshipShopFields({
         {/* Region Acknowledgment */}
         <label className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
           formData.regionAcknowledgment 
-            ? 'bg-green-50 border-green-300' 
+            ? 'bg-brand-green-50 border-brand-green-300' 
             : errors.regionAcknowledgment 
-              ? 'bg-red-50 border-red-300' 
+              ? 'bg-brand-red-50 border-brand-red-300' 
               : 'bg-slate-50 border-slate-200 hover:border-purple-300'
         }`}>
           <input
@@ -374,15 +374,15 @@ export function ApprenticeshipShopFields({
           </span>
         </label>
         {errors.regionAcknowledgment && (
-          <p className="text-sm text-red-600">{errors.regionAcknowledgment}</p>
+          <p className="text-sm text-brand-red-600">{errors.regionAcknowledgment}</p>
         )}
 
         {/* Shop Acknowledgment */}
         <label className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
           formData.shopAcknowledgment 
-            ? 'bg-green-50 border-green-300' 
+            ? 'bg-brand-green-50 border-brand-green-300' 
             : errors.shopAcknowledgment 
-              ? 'bg-red-50 border-red-300' 
+              ? 'bg-brand-red-50 border-brand-red-300' 
               : 'bg-slate-50 border-slate-200 hover:border-purple-300'
         }`}>
           <input
@@ -398,7 +398,7 @@ export function ApprenticeshipShopFields({
           </span>
         </label>
         {errors.shopAcknowledgment && (
-          <p className="text-sm text-red-600">{errors.shopAcknowledgment}</p>
+          <p className="text-sm text-brand-red-600">{errors.shopAcknowledgment}</p>
         )}
       </div>
     </div>

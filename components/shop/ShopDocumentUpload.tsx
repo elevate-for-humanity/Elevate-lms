@@ -170,8 +170,8 @@ export function ShopDocumentUpload({
                 <div
                   className={`rounded-lg p-4 flex items-start gap-3 ${
                     message.type === 'success'
-                      ? 'bg-green-50 border border-green-200'
-                      : 'bg-red-50 border border-red-200'
+                      ? 'bg-brand-green-50 border border-brand-green-200'
+                      : 'bg-brand-red-50 border border-brand-red-200'
                   }`}
                 >
                   {message.type === 'success' ? (
@@ -181,7 +181,7 @@ export function ShopDocumentUpload({
                   )}
                   <div
                     className={`text-sm ${
-                      message.type === 'success' ? 'text-green-800' : 'text-red-800'
+                      message.type === 'success' ? 'text-brand-green-800' : 'text-brand-red-800'
                     }`}
                   >
                     {message.text}

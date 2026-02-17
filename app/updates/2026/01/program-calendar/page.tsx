@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function ProgramCalendar() {
   return (
     <article className="max-w-3xl mx-auto px-6 py-12">
-      <Link href="/updates" className="text-orange-600 hover:text-orange-700 mb-4 inline-block">
+      <Link href="/updates" className="text-brand-orange-600 hover:text-brand-orange-700 mb-4 inline-block">
         ← Back to Updates
       </Link>
       
@@ -67,7 +67,7 @@ export default function ProgramCalendar() {
         </p>
         <Link 
           href="/apply" 
-          className="inline-block bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors"
+          className="inline-block bg-brand-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-orange-700 transition-colors"
         >
           Start Your Application
         </Link>

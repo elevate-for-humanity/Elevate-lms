@@ -77,8 +77,8 @@ export default function HoursTracker() {
 
   if (error) {
     return (
-      <div className="bg-red-50 rounded-xl p-6 border border-red-200">
-        <div className="flex items-center gap-3 text-red-700">
+      <div className="bg-brand-red-50 rounded-xl p-6 border border-brand-red-200">
+        <div className="flex items-center gap-3 text-brand-red-700">
           <AlertCircle className="w-5 h-5" />
           <p>Unable to load hours data. Please try again later.</p>
         </div>
@@ -120,12 +120,12 @@ export default function HoursTracker() {
 
             {/* Summary Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 border-b border-gray-100">
-              <div className="bg-green-50 rounded-lg p-4">
-                <div className="flex items-center gap-2 text-green-700 mb-1">
+              <div className="bg-brand-green-50 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-brand-green-700 mb-1">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-sm font-medium">Verified Hours</span>
                 </div>
-                <p className="text-3xl font-bold text-green-800">
+                <p className="text-3xl font-bold text-brand-green-800">
                   {enrollment.verified_total.toFixed(1)}
                 </p>
               </div>
@@ -162,7 +162,7 @@ export default function HoursTracker() {
                 </div>
                 <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-green-500 rounded-full transition-all"
+                    className="h-full bg-brand-green-500 rounded-full transition-all"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -204,7 +204,7 @@ export default function HoursTracker() {
                           </td>
                           <td className="py-3">
                             {entry.verified ? (
-                              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-brand-green-100 text-brand-green-700">
                                 <span className="text-slate-400 flex-shrink-0">•</span>
                                 Verified
                               </span>

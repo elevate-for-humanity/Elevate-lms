@@ -79,13 +79,13 @@ export default async function TuitionPage() {
           <div className="space-y-8 sm:space-y-12">
             
             {/* Pathway 1: Workforce-Funded */}
-            <div className="bg-green-50 border border-green-200 rounded-xl p-6 sm:p-8">
+            <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-6 sm:p-8">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Users className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                  <Users className="w-5 h-5 sm:w-6 sm:h-6 text-brand-green-600" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-green-600">Funding Pathway 1</p>
+                  <p className="text-xs sm:text-sm font-medium text-brand-green-600">Funding Pathway 1</p>
                   <h2 className="text-lg sm:text-xl font-bold text-slate-900">Workforce-Funded Training</h2>
                 </div>
               </div>
@@ -98,29 +98,29 @@ export default async function TuitionPage() {
                 <p className="font-medium text-slate-900 mb-2">This may include:</p>
                 <ul className="space-y-1 text-sm text-slate-600">
                   <li className="flex items-center gap-2">
-                    <Circle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0" />
                     Workforce Innovation and Opportunity Act (WIOA) funding
                   </li>
                   <li className="flex items-center gap-2">
-                    <Circle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0" />
                     State and local workforce grants
                   </li>
                   <li className="flex items-center gap-2">
-                    <Circle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0" />
                     Vocational Rehabilitation (VR)
                   </li>
                   <li className="flex items-center gap-2">
-                    <Circle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0" />
                     Justice-involved and re-entry programs
                   </li>
                   <li className="flex items-center gap-2">
-                    <Circle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0" />
                     Other approved workforce agencies
                   </li>
                 </ul>
               </div>
               
-              <p className="text-sm text-green-800 font-medium">
+              <p className="text-sm text-brand-green-800 font-medium">
                 If you qualify, tuition, books, and required materials may be fully covered.
               </p>
             </div>
@@ -285,7 +285,7 @@ export default async function TuitionPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/apply"
-              className="inline-flex items-center justify-center gap-2 bg-orange-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-orange-700 transition"
+              className="inline-flex items-center justify-center gap-2 bg-brand-orange-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-brand-orange-700 transition"
             >
               Apply Now
             </Link>

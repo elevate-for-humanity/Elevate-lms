@@ -94,7 +94,7 @@ export function BlockchainCredentialVerification() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Blockchain Credential Verification</h1>
-          <p className="text-red-100">Secure, tamper-proof credential verification</p>
+          <p className="text-brand-red-100">Secure, tamper-proof credential verification</p>
         </div>
       </div>
 
@@ -110,15 +110,15 @@ export function BlockchainCredentialVerification() {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">•</span>
+                  <span className="text-brand-green-600">•</span>
                   <span>Immutable records</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">•</span>
+                  <span className="text-brand-green-600">•</span>
                   <span>Instant verification</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">•</span>
+                  <span className="text-brand-green-600">•</span>
                   <span>Globally accessible</span>
                 </div>
               </div>
@@ -133,7 +133,7 @@ export function BlockchainCredentialVerification() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`py-4 px-2 border-b-2 font-medium ${
-                  activeTab === tab ? 'border-red-600 text-brand-orange-600' : 'border-transparent text-gray-500'
+                  activeTab === tab ? 'border-brand-red-600 text-brand-orange-600' : 'border-transparent text-gray-500'
                 }`}
               >
                 {tab === 'verify' ? 'Verify Credential' : 'My Credentials'}
@@ -168,35 +168,35 @@ export function BlockchainCredentialVerification() {
               </div>
 
               {verificationResult && (
-                <div className="mt-8 p-6 bg-green-50 border-2 border-green-500 rounded-lg">
+                <div className="mt-8 p-6 bg-brand-green-50 border-2 border-brand-green-500 rounded-lg">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="text-4xl text-2xl md:text-3xl lg:text-4xl">•</div>
                     <div>
-                      <h3 className="text-xl font-bold text-green-900">Credential Verified</h3>
-                      <p className="text-sm text-green-700">This credential is authentic and valid</p>
+                      <h3 className="text-xl font-bold text-brand-green-900">Credential Verified</h3>
+                      <p className="text-sm text-brand-green-700">This credential is authentic and valid</p>
                     </div>
                   </div>
 
                   <div className="space-y-3 text-sm">
-                    <div className="flex justify-between py-2 border-b border-green-200">
-                      <span className="text-green-700 font-medium">Type:</span>
-                      <span className="text-green-900 capitalize">{verificationResult.type}</span>
+                    <div className="flex justify-between py-2 border-b border-brand-green-200">
+                      <span className="text-brand-green-700 font-medium">Type:</span>
+                      <span className="text-brand-green-900 capitalize">{verificationResult.type}</span>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-green-200">
-                      <span className="text-green-700 font-medium">Title:</span>
-                      <span className="text-green-900">{verificationResult.title}</span>
+                    <div className="flex justify-between py-2 border-b border-brand-green-200">
+                      <span className="text-brand-green-700 font-medium">Title:</span>
+                      <span className="text-brand-green-900">{verificationResult.title}</span>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-green-200">
-                      <span className="text-green-700 font-medium">Issuer:</span>
-                      <span className="text-green-900">{verificationResult.issuer}</span>
+                    <div className="flex justify-between py-2 border-b border-brand-green-200">
+                      <span className="text-brand-green-700 font-medium">Issuer:</span>
+                      <span className="text-brand-green-900">{verificationResult.issuer}</span>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-green-200">
-                      <span className="text-green-700 font-medium">Issue Date:</span>
-                      <span className="text-green-900">{verificationResult.issueDate}</span>
+                    <div className="flex justify-between py-2 border-b border-brand-green-200">
+                      <span className="text-brand-green-700 font-medium">Issue Date:</span>
+                      <span className="text-brand-green-900">{verificationResult.issueDate}</span>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-green-200">
-                      <span className="text-green-700 font-medium">Status:</span>
-                      <span className="text-green-900 capitalize">{verificationResult.status}</span>
+                    <div className="flex justify-between py-2 border-b border-brand-green-200">
+                      <span className="text-brand-green-700 font-medium">Status:</span>
+                      <span className="text-brand-green-900 capitalize">{verificationResult.status}</span>
                     </div>
                   </div>
 
@@ -209,10 +209,10 @@ export function BlockchainCredentialVerification() {
 
                   {verificationResult.metadata.skills && (
                     <div className="mt-4">
-                      <p className="text-sm font-semibold text-green-900 mb-2">Skills Verified:</p>
+                      <p className="text-sm font-semibold text-brand-green-900 mb-2">Skills Verified:</p>
                       <div className="flex flex-wrap gap-2">
                         {verificationResult.metadata.skills.map((skill) => (
-                          <span key={skill} className="px-3 py-2 bg-green-200 text-green-800 text-xs rounded">
+                          <span key={skill} className="px-3 py-2 bg-brand-green-200 text-brand-green-800 text-xs rounded">
                             {skill}
                           </span>
                         ))}
@@ -238,7 +238,7 @@ export function BlockchainCredentialVerification() {
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 w-8 h-8 bg-brand-orange-500 text-white rounded-full flex items-center justify-center font-bold">
                     2
                   </div>
                   <div>
@@ -280,9 +280,9 @@ export function BlockchainCredentialVerification() {
                        credential.type === 'badge' ? '🏆' : '🎓'}
                     </div>
                     <span className={`px-3 py-2 rounded text-xs font-medium ${
-                      credential.status === 'verified' ? 'bg-green-100 text-green-700' :
+                      credential.status === 'verified' ? 'bg-brand-green-100 text-brand-green-700' :
                       credential.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
+                      'bg-brand-red-100 text-brand-red-700'
                     }`}>
                       {credential.status}
                     </span>
@@ -297,7 +297,7 @@ export function BlockchainCredentialVerification() {
                       <p className="text-xs font-semibold text-black mb-2">Skills:</p>
                       <div className="flex flex-wrap gap-1">
                         {credential.metadata.skills.slice(0, 3).map((skill) => (
-                          <span key={skill} className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded">
+                          <span key={skill} className="px-2 py-0.5 bg-brand-orange-100 text-brand-orange-700 text-xs rounded">
                             {skill}
                           </span>
                         ))}

@@ -80,8 +80,8 @@ export default function VerifyEmailPage() {
         </div>
 
         {resent && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-            <p className="text-green-800 text-sm flex items-center">
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4 mb-4">
+            <p className="text-brand-green-800 text-sm flex items-center">
               <span className="text-slate-400 flex-shrink-0">•</span>
               Verification email sent! Check your inbox.
             </p>
@@ -89,8 +89,8 @@ export default function VerifyEmailPage() {
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-            <p className="text-red-800 text-sm flex items-center">
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-4">
+            <p className="text-brand-red-800 text-sm flex items-center">
               <AlertCircle className="w-5 h-5 mr-2" />
               {error}
             </p>

@@ -22,7 +22,7 @@ interface Notification {
 
 const NOTIFICATION_ICONS: Record<NotificationType, React.ReactNode> = {
   hours_approved: <span className="text-slate-400 flex-shrink-0">•</span>,
-  hours_rejected: <AlertCircle className="w-5 h-5 text-red-400" />,
+  hours_rejected: <AlertCircle className="w-5 h-5 text-brand-red-400" />,
   milestone: <Award className="w-5 h-5 text-amber-400" />,
   reminder: <Clock className="w-5 h-5 text-brand-blue-400" />,
   training: <BookOpen className="w-5 h-5 text-brand-blue-400" />,
@@ -30,8 +30,8 @@ const NOTIFICATION_ICONS: Record<NotificationType, React.ReactNode> = {
 };
 
 const NOTIFICATION_COLORS: Record<NotificationType, string> = {
-  hours_approved: 'bg-green-500/20',
-  hours_rejected: 'bg-red-500/20',
+  hours_approved: 'bg-brand-green-500/20',
+  hours_rejected: 'bg-brand-red-500/20',
   milestone: 'bg-amber-500/20',
   reminder: 'bg-brand-blue-500/20',
   training: 'bg-brand-blue-500/20',
@@ -221,7 +221,7 @@ export default function NotificationsPage() {
                   )}
                   <button
                     onClick={() => deleteNotification(notification.id)}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 text-slate-400 hover:text-red-400 hover:bg-slate-700 text-sm"
+                    className="flex-1 flex items-center justify-center gap-2 py-3 text-slate-400 hover:text-brand-red-400 hover:bg-slate-700 text-sm"
                   >
                     <Trash2 className="w-4 h-4" />
                     Delete

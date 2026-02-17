@@ -20,7 +20,7 @@ export default function PartnerOnboardingSuccessPage() {
       <div className="py-12 px-4 flex items-center justify-center">
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           
@@ -57,8 +57,8 @@ export default function PartnerOnboardingSuccessPage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <ArrowRight className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-brand-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <ArrowRight className="w-5 h-5 text-brand-green-600" />
               </div>
               <div>
                 <p className="font-medium text-slate-900">Next Steps</p>

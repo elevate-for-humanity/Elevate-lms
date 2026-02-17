@@ -172,7 +172,7 @@ export default function AppHubPage() {
           </p>
           <Link
             href="/programs"
-            className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
+            className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
           >
             Browse Programs
           </Link>

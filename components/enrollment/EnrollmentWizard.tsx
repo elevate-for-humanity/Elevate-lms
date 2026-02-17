@@ -214,7 +214,7 @@ export default function EnrollmentWizard({
           ) : (
             <button
               onClick={handleSubmit}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg"
+              className="px-6 py-2 bg-brand-green-600 text-white rounded-lg"
             >
               Complete Enrollment
             </button>

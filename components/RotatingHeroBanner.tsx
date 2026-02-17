@@ -93,7 +93,7 @@ export default function RotatingHeroBanner() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
           <div className="max-w-3xl">
             {/* Animated Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-green-500 px-6 py-3 text-sm font-bold text-white mb-6 animate-pulse shadow-lg">
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand-green-500 px-6 py-3 text-sm font-bold text-white mb-6 animate-pulse shadow-lg">
               <span className="text-lg">💯</span>
               <span>100% FREE TRAINING - GOVERNMENT PAYS EVERYTHING</span>
             </div>
@@ -104,7 +104,7 @@ export default function RotatingHeroBanner() {
             </h1>
 
             {/* Subtitle */}
-            <p className="text-2xl md:text-3xl text-orange-400 font-bold mb-4">
+            <p className="text-2xl md:text-3xl text-brand-orange-400 font-bold mb-4">
               {slide.subtitle}
             </p>
 
@@ -117,7 +117,7 @@ export default function RotatingHeroBanner() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/apply"
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-orange-500 rounded-full hover:bg-orange-600 transition-all hover:scale-105 shadow-2xl"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-brand-orange-500 rounded-full hover:bg-brand-orange-600 transition-all hover:scale-105 shadow-2xl"
               >
                 {slide.cta1}
               </Link>
@@ -156,7 +156,7 @@ export default function RotatingHeroBanner() {
             onClick={() => goToSlide(index)}
             className={`h-3 rounded-full transition-all ${
               index === currentSlide
-                ? "w-12 bg-orange-500"
+                ? "w-12 bg-brand-orange-500"
                 : "w-3 bg-white/50 hover:bg-white/70"
             }`}
             aria-label={`Go to slide ${index + 1}`}

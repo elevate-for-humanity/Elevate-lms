@@ -151,7 +151,7 @@ export default function HVACProgramPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-slate-900 text-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-brand-blue-900 via-brand-blue-800 to-slate-900 text-white overflow-hidden">
         <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
         
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32">
@@ -165,10 +165,10 @@ export default function HVACProgramPage() {
               
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mt-6 mb-6 leading-tight">
                 Become a Certified
-                <span className="text-blue-400"> HVAC Technician</span>
+                <span className="text-brand-blue-400"> HVAC Technician</span>
               </h1>
               
-              <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+              <p className="text-xl text-brand-blue-100 mb-8 leading-relaxed">
                 Launch your career in one of America's fastest-growing trades. 
                 Learn to install, maintain, and repair heating and cooling systems. 
                 <strong className="text-white"> 100% free with WIOA funding.</strong>
@@ -176,11 +176,11 @@ export default function HVACProgramPage() {
 
               <div className="flex flex-wrap gap-4 mb-10">
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <Clock className="w-4 h-4 text-blue-400" />
+                  <Clock className="w-4 h-4 text-brand-blue-400" />
                   12-16 Weeks
                 </span>
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <DollarSign className="w-4 h-4 text-green-400" />
+                  <DollarSign className="w-4 h-4 text-brand-green-400" />
                   $0 Tuition (WIOA)
                 </span>
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
@@ -192,7 +192,7 @@ export default function HVACProgramPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/wioa-eligibility"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-blue-500 hover:bg-blue-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-blue-500/30"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-500 hover:bg-brand-blue-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-brand-blue-500/30"
                 >
                   Check Your Eligibility
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -222,7 +222,7 @@ export default function HVACProgramPage() {
                 transition={{ delay: index * 0.1 }}
                 className="text-center"
               >
-                <stat.icon className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                <stat.icon className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
                 <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
                 <div className="text-sm text-gray-500">{stat.label}</div>
               </motion.div>
@@ -235,7 +235,7 @@ export default function HVACProgramPage() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-block bg-blue-100 text-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
+            <span className="inline-block bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Why Choose HVAC?
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -286,8 +286,8 @@ export default function HVACProgramPage() {
                 transition={{ delay: index * 0.1 }}
                 className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                  <item.icon className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
+                  <item.icon className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
                 <p className="text-gray-600">{item.description}</p>
@@ -301,7 +301,7 @@ export default function HVACProgramPage() {
       <section id="curriculum" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-block bg-green-100 text-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
+            <span className="inline-block bg-brand-green-100 text-brand-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               What You'll Learn
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -323,7 +323,7 @@ export default function HVACProgramPage() {
               >
                 <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                   <div className="flex-shrink-0">
-                    <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white">
+                    <div className="w-20 h-20 bg-brand-blue-600 rounded-2xl flex items-center justify-center text-white">
                       <span className="text-sm font-bold">{module.week}</span>
                     </div>
                   </div>
@@ -332,14 +332,14 @@ export default function HVACProgramPage() {
                     <div className="grid md:grid-cols-2 gap-4 mb-4">
                       {module.topics.map((topic, i) => (
                         <div key={i} className="flex items-center gap-2">
-                          <Circle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                          <Circle className="w-5 h-5 text-brand-green-500 flex-shrink-0" />
                           <span className="text-gray-700">{topic}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="bg-blue-50 rounded-lg p-4 mt-4">
-                      <span className="text-sm font-semibold text-blue-700">Hands-On Project:</span>
-                      <span className="text-sm text-blue-600 ml-2">{module.project}</span>
+                    <div className="bg-brand-blue-50 rounded-lg p-4 mt-4">
+                      <span className="text-sm font-semibold text-brand-blue-700">Hands-On Project:</span>
+                      <span className="text-sm text-brand-blue-600 ml-2">{module.project}</span>
                     </div>
                   </div>
                 </div>
@@ -350,16 +350,16 @@ export default function HVACProgramPage() {
       </section>
 
       {/* Certifications */}
-      <section className="py-20 bg-gradient-to-br from-blue-900 to-slate-900 text-white">
+      <section className="py-20 bg-gradient-to-br from-brand-blue-900 to-slate-900 text-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-block bg-white/10 text-blue-300 text-sm font-semibold px-4 py-1 rounded-full mb-4">
+            <span className="inline-block bg-white/10 text-brand-blue-300 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Industry Credentials
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
               Certifications You'll Earn
             </h2>
-            <p className="text-lg text-blue-200 max-w-2xl mx-auto">
+            <p className="text-lg text-brand-blue-200 max-w-2xl mx-auto">
               Graduate with the credentials employers require - all included in your training.
             </p>
           </div>
@@ -389,11 +389,11 @@ export default function HVACProgramPage() {
                 transition={{ delay: index * 0.1 }}
                 className="bg-white/10 backdrop-blur rounded-2xl p-8 text-center"
               >
-                <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-brand-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <cert.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">{cert.title}</h3>
-                <p className="text-blue-200">{cert.description}</p>
+                <p className="text-brand-blue-200">{cert.description}</p>
               </motion.div>
             ))}
           </div>
@@ -425,24 +425,24 @@ export default function HVACProgramPage() {
                 className="bg-slate-50 rounded-2xl p-8"
               >
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Users className="w-8 h-8 text-blue-600" />
+                  <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                    <Users className="w-8 h-8 text-brand-blue-600" />
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900">{story.name}</h3>
                     <p className="text-sm text-gray-500">{story.role}</p>
-                    <p className="text-sm text-blue-600">{story.company}</p>
+                    <p className="text-sm text-brand-blue-600">{story.company}</p>
                   </div>
                 </div>
                 <p className="text-gray-600 italic mb-6">"{story.quote}"</p>
                 <div className="flex justify-between text-sm">
                   <div>
                     <span className="text-gray-500">Salary:</span>
-                    <span className="font-semibold text-green-600 ml-1">{story.salary}</span>
+                    <span className="font-semibold text-brand-green-600 ml-1">{story.salary}</span>
                   </div>
                   <div>
                     <span className="text-gray-500">Hired in:</span>
-                    <span className="font-semibold text-blue-600 ml-1">{story.timeToJob}</span>
+                    <span className="font-semibold text-brand-blue-600 ml-1">{story.timeToJob}</span>
                   </div>
                 </div>
               </motion.div>
@@ -498,31 +498,31 @@ export default function HVACProgramPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-br from-blue-600 to-blue-800 text-white">
+      <section className="py-20 bg-gradient-to-br from-brand-blue-600 to-brand-blue-800 text-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
             Ready to Start Your HVAC Career?
           </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-brand-blue-100 mb-8 max-w-2xl mx-auto">
             Take the first step today. Check your eligibility for free WIOA-funded training and join our next class.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/wioa-eligibility"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-600 font-semibold rounded-full hover:bg-brand-blue-50 transition-all transform hover:scale-105 shadow-lg"
             >
               Check Eligibility Now
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center px-8 py-4 bg-blue-700 hover:bg-blue-600 text-white font-semibold rounded-full transition-all"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-700 hover:bg-brand-blue-600 text-white font-semibold rounded-full transition-all"
             >
               <Phone className="w-5 h-5 mr-2" />
               Talk to an Advisor
             </Link>
           </div>
-          <p className="mt-8 text-blue-200 text-sm">
+          <p className="mt-8 text-brand-blue-200 text-sm">
             Classes starting soon • Limited seats available • No cost with WIOA funding
           </p>
         </div>

@@ -217,8 +217,8 @@ export default function BarbershopPartnerPage() {
 
             <div className="bg-white p-8 rounded-xl shadow-sm">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-6 h-6 text-green-600" />
+                <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                  <Building2 className="w-6 h-6 text-brand-green-600" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gray-900">Worksite (Your Shop)</h3>
@@ -263,14 +263,14 @@ export default function BarbershopPartnerPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div className="bg-gray-50 p-6 rounded-xl border-2 border-gray-200">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <DollarSign className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+                <DollarSign className="w-5 h-5 text-brand-green-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Hourly Wage</h3>
               <p className="text-sm text-gray-600 mb-3">
                 Pay a set hourly rate for all hours worked. Most common for early-stage apprentices.
               </p>
-              <span className="text-xs text-green-700 font-medium">Recommended for beginners</span>
+              <span className="text-xs text-brand-green-700 font-medium">Recommended for beginners</span>
             </div>
 
             <div className="bg-gray-50 p-6 rounded-xl border-2 border-gray-200">
@@ -296,14 +296,14 @@ export default function BarbershopPartnerPage() {
             </div>
 
             <div className="bg-gray-50 p-6 rounded-xl border-2 border-gray-200">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <FileText className="w-5 h-5 text-orange-600" />
+              <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center mb-4">
+                <FileText className="w-5 h-5 text-brand-orange-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Funding Support</h3>
               <p className="text-sm text-gray-600 mb-3">
                 OJT subsidies may offset wages if apprentice qualifies through workforce programs.
               </p>
-              <span className="text-xs text-orange-700 font-medium">Subject to availability</span>
+              <span className="text-xs text-brand-orange-700 font-medium">Subject to availability</span>
             </div>
           </div>
 
@@ -333,7 +333,7 @@ export default function BarbershopPartnerPage() {
       <section className="py-12 bg-gray-900 text-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
-            <XCircle className="w-7 h-7 text-red-400" />
+            <XCircle className="w-7 h-7 text-brand-red-400" />
             What This Program Does NOT Provide
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -346,7 +346,7 @@ export default function BarbershopPartnerPage() {
               'Legal or tax advice',
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3">
-                <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                <XCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0" />
                 <span className="text-gray-300">{item}</span>
               </div>
             ))}

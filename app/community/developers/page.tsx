@@ -112,7 +112,7 @@ export default async function DevelopersPage() {
               <div className="bg-white rounded-xl border p-6">
                 <h3 className="font-bold mb-4">Quick Start Guide</h3>
                 <div className="bg-slate-900 rounded-lg p-4 mb-4">
-                  <pre className="text-green-400 text-sm overflow-x-auto">
+                  <pre className="text-brand-green-400 text-sm overflow-x-auto">
 {`# Install the Elevate SDK
 npm install @elevate/sdk
 
@@ -196,8 +196,8 @@ const client = new ElevateClient({
             <section className="bg-white rounded-xl border p-6">
               <h3 className="font-bold text-lg mb-4">API Status</h3>
               <div className="flex items-center gap-2 mb-2">
-                <span className="w-3 h-3 bg-green-500 rounded-full"></span>
-                <span className="text-green-700 font-medium">All Systems Operational</span>
+                <span className="w-3 h-3 bg-brand-green-500 rounded-full"></span>
+                <span className="text-brand-green-700 font-medium">All Systems Operational</span>
               </div>
               <a 
                 href="https://status.elevateforhumanity.org" 

@@ -86,7 +86,7 @@ export function CourseContentAccordion({
                           <span>{lesson.duration_minutes} min</span>
                         )}
                         {lesson.completed && (
-                          <span className="rounded-full bg-red-50 px-2 py-0.5 text-[9px] font-semibold text-red-700">
+                          <span className="rounded-full bg-brand-red-50 px-2 py-0.5 text-[9px] font-semibold text-brand-red-700">
                             Done
                           </span>
                         )}

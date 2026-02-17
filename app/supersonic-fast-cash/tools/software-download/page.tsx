@@ -135,15 +135,15 @@ export default function SupersonicFastCashDownloadPage() {
 
             <div className="space-y-3 text-sm">
               <div className="flex items-center gap-2">
-                <Circle className="w-4 h-4 text-green-300" />
+                <Circle className="w-4 h-4 text-brand-green-300" />
                 <span>Account credentials managed by IT department</span>
               </div>
               <div className="flex items-center gap-2">
-                <Circle className="w-4 h-4 text-green-300" />
+                <Circle className="w-4 h-4 text-brand-green-300" />
                 <span>Secure access for certified tax preparers</span>
               </div>
               <div className="flex items-center gap-2">
-                <Circle className="w-4 h-4 text-green-300" />
+                <Circle className="w-4 h-4 text-brand-green-300" />
                 <span>Training required before software access</span>
               </div>
             </div>
@@ -165,7 +165,7 @@ export default function SupersonicFastCashDownloadPage() {
           {sfcProducts.map((product, index) => (
             <div
               key={index}
-              className="bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-100 hover:border-green-500 transition"
+              className="bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-100 hover:border-brand-green-500 transition"
             >
               <div className="flex items-start justify-between mb-6">
                 <div>
@@ -181,7 +181,7 @@ export default function SupersonicFastCashDownloadPage() {
                   href={product.downloadUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition"
+                  className="flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-xl font-semibold hover:bg-brand-green-700 transition"
                 >
                   <Download className="w-5 h-5" />
                   Download
@@ -194,7 +194,7 @@ export default function SupersonicFastCashDownloadPage() {
                   <ul className="space-y-2">
                     {product.features.map((feature, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm">
-                        <Circle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                        <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                         <span>{feature}</span>
                       </li>
                     ))}
@@ -306,12 +306,12 @@ export default function SupersonicFastCashDownloadPage() {
             rel="noopener noreferrer"
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition"
           >
-            <Key className="w-10 h-10 text-green-600 mb-4" />
+            <Key className="w-10 h-10 text-brand-green-600 mb-4" />
             <h3 className="font-bold text-lg mb-2">Training Videos</h3>
             <p className="text-sm text-black mb-4">
               Learn how to use SupersonicFastCash Tax effectively
             </p>
-            <span className="text-green-600 font-semibold flex items-center gap-1">
+            <span className="text-brand-green-600 font-semibold flex items-center gap-1">
               Watch Videos <ExternalLink className="w-4 h-4" />
             </span>
           </a>

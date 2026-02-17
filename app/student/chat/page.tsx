@@ -128,7 +128,7 @@ export default function StudentChatPage() {
                   <input
                     type="text"
                     placeholder="Search conversations..."
-                    className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 text-sm"
                   />
                 </div>
               </div>
@@ -138,7 +138,7 @@ export default function StudentChatPage() {
                     key={convo.id}
                     onClick={() => setSelectedConversation(convo.id)}
                     className={`w-full px-4 py-3 flex items-start gap-3 hover:bg-gray-50 text-left ${
-                      selectedConversation === convo.id ? 'bg-blue-50' : ''
+                      selectedConversation === convo.id ? 'bg-brand-blue-50' : ''
                     }`}
                   >
                     <div className="relative">
@@ -146,7 +146,7 @@ export default function StudentChatPage() {
                         <User className="w-5 h-5 text-gray-500" />
                       </div>
                       {convo.online && (
-                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
+                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-brand-green-500 border-2 border-white rounded-full" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -158,7 +158,7 @@ export default function StudentChatPage() {
                       <p className="text-sm text-gray-600 truncate mt-1">{convo.lastMessage}</p>
                     </div>
                     {convo.unread > 0 && (
-                      <span className="w-5 h-5 bg-blue-600 text-white text-xs rounded-full flex items-center justify-center">
+                      <span className="w-5 h-5 bg-brand-blue-600 text-white text-xs rounded-full flex items-center justify-center">
                         {convo.unread}
                       </span>
                     )}
@@ -178,7 +178,7 @@ export default function StudentChatPage() {
                         <User className="w-5 h-5 text-gray-500" />
                       </div>
                       {selectedConvo.online && (
-                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
+                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-brand-green-500 border-2 border-white rounded-full" />
                       )}
                     </div>
                     <div>
@@ -211,13 +211,13 @@ export default function StudentChatPage() {
                       <div
                         className={`max-w-md px-4 py-2 rounded-2xl ${
                           message.sender === 'me'
-                            ? 'bg-blue-600 text-white'
+                            ? 'bg-brand-blue-600 text-white'
                             : 'bg-gray-100 text-gray-900'
                         }`}
                       >
                         <p>{message.text}</p>
                         <p className={`text-xs mt-1 ${
-                          message.sender === 'me' ? 'text-blue-200' : 'text-gray-500'
+                          message.sender === 'me' ? 'text-brand-blue-200' : 'text-gray-500'
                         }`}>
                           {message.timestamp}
                         </p>
@@ -238,14 +238,14 @@ export default function StudentChatPage() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                       placeholder="Type a message..."
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-brand-blue-500"
                     />
                     <button className="p-2 text-gray-500 hover:text-gray-700">
                       <Smile className="w-5 h-5" />
                     </button>
                     <button
                       onClick={handleSend}
-                      className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"
+                      className="p-2 bg-brand-blue-600 text-white rounded-full hover:bg-brand-blue-700"
                     >
                       <Send className="w-5 h-5" />
                     </button>

@@ -84,7 +84,7 @@ export default function SourceUseLicensePage() {
             {/* What You Get */}
             <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm">
               <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                <Check className="w-6 h-6 text-green-500" />
+                <Check className="w-6 h-6 text-brand-green-500" />
                 What You Get
               </h2>
               <ul className="space-y-4">
@@ -97,7 +97,7 @@ export default function SourceUseLicensePage() {
                   'Internal organizational use',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-slate-700">
-                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <Check className="w-5 h-5 text-brand-green-500 flex-shrink-0 mt-0.5" />
                     {item}
                   </li>
                 ))}
@@ -343,7 +343,7 @@ export default function SourceUseLicensePage() {
                 <ul className="space-y-2">
                   {col.items.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-slate-700 text-sm">
-                      <Shield className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <Shield className="w-4 h-4 text-brand-blue-400 flex-shrink-0 mt-0.5" />
                       {item}
                     </li>
                   ))}

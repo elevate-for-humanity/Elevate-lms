@@ -20,7 +20,7 @@ export default function Error({
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center px-4 max-w-2xl">
         <div className="mb-8">
-          <AlertCircle className="h-20 w-20 text-red-500 mx-auto mb-6" />
+          <AlertCircle className="h-20 w-20 text-brand-red-500 mx-auto mb-6" />
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
             Something Went Wrong
           </h1>
@@ -28,8 +28,8 @@ export default function Error({
             We encountered an unexpected error. Our team has been notified.
           </p>
           {error.message && process.env.NODE_ENV === 'development' && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-red-800 font-mono">{error.message}</p>
+            <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6">
+              <p className="text-sm text-brand-red-800 font-mono">{error.message}</p>
             </div>
           )}
         </div>

@@ -23,14 +23,14 @@ export function Leaderboard({ entries, timeframe = 'week' }: LeaderboardProps) {
   const getRankIcon = (rank: number) => {
     if (rank === 1) return <Trophy className="text-yellow-500" size={24} />;
     if (rank === 2) return <Medal className="text-gray-400" size={24} />;
-    if (rank === 3) return <Medal className="text-orange-600" size={24} />;
+    if (rank === 3) return <Medal className="text-brand-orange-600" size={24} />;
     return null;
   };
 
   const getRankBadge = (rank: number) => {
     if (rank === 1) return 'bg-yellow-100 text-yellow-800 border-yellow-300';
     if (rank === 2) return 'bg-gray-100 text-black border-gray-300';
-    if (rank === 3) return 'bg-orange-100 text-orange-800 border-orange-300';
+    if (rank === 3) return 'bg-brand-orange-100 text-brand-orange-800 border-brand-orange-300';
     return 'bg-gray-50 text-black border-gray-200';
   };
 
@@ -49,7 +49,7 @@ export function Leaderboard({ entries, timeframe = 'week' }: LeaderboardProps) {
               key={entry.rank}
               className={`flex items-center gap-4 p-4 rounded-lg border-2 ${
                 entry.isCurrentUser
-                  ? 'border-red-600 bg-red-50'
+                  ? 'border-brand-red-600 bg-brand-red-50'
                   : 'border-gray-200 hover:bg-gray-50'
               } transition`}
             >

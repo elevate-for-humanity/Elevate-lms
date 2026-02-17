@@ -93,12 +93,12 @@ export default function ModerationDashboard() {
   const getReasonBadge = (reason: string) => {
     const colors: Record<string, string> = {
       spam: 'bg-yellow-100 text-yellow-800',
-      harassment: 'bg-red-100 text-red-800',
-      inappropriate: 'bg-orange-100 text-orange-800',
+      harassment: 'bg-brand-red-100 text-brand-red-800',
+      inappropriate: 'bg-brand-orange-100 text-brand-orange-800',
       copyright: 'bg-purple-100 text-purple-800',
       misinformation: 'bg-brand-blue-100 text-brand-blue-800',
-      hate_speech: 'bg-red-100 text-red-800',
-      violence: 'bg-red-100 text-red-800',
+      hate_speech: 'bg-brand-red-100 text-brand-red-800',
+      violence: 'bg-brand-red-100 text-brand-red-800',
       other: 'bg-gray-100 text-black',
     };
 
@@ -174,7 +174,7 @@ export default function ModerationDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-black">Approved</p>
-                <p className="text-2xl font-bold text-green-600">{stats.approvedReports}</p>
+                <p className="text-2xl font-bold text-brand-green-600">{stats.approvedReports}</p>
               </div>
               <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
@@ -280,14 +280,14 @@ export default function ModerationDashboard() {
                       </button>
                       <button
                         onClick={() => handleReview(report.id, 'approve')}
-                        className="text-green-600 hover:text-green-800"
+                        className="text-brand-green-600 hover:text-brand-green-800"
                         title="Approve"
                       >
                         <span className="text-slate-400 flex-shrink-0">•</span>
                       </button>
                       <button
                         onClick={() => handleReview(report.id, 'remove')}
-                        className="text-brand-orange-600 hover:text-red-800"
+                        className="text-brand-orange-600 hover:text-brand-red-800"
                         title="Remove"
                       >
                         <Trash2 className="w-5 h-5" />
@@ -352,7 +352,7 @@ export default function ModerationDashboard() {
               </button>
               <button
                 onClick={() => handleReview(selectedReport.id, 'approve', 'Content approved after review')}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                className="flex-1 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700"
               >
                 Approve
               </button>

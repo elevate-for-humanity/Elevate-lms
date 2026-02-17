@@ -47,9 +47,9 @@ export default function RefundApplyPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-green-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-brand-green-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Application Received!</h1>
@@ -58,11 +58,11 @@ export default function RefundApplyPage() {
           </p>
           <div className="bg-white rounded-xl border p-6 mb-6">
             <p className="text-sm text-gray-500 mb-2">Need immediate assistance?</p>
-            <a href="/support" className="text-2xl font-bold text-orange-600 hover:text-orange-700">
+            <a href="/support" className="text-2xl font-bold text-brand-orange-600 hover:text-brand-orange-700">
               Visit Support Center
             </a>
           </div>
-          <Link href="/supersonic-fast-cash" className="text-orange-600 hover:text-orange-700 font-medium">
+          <Link href="/supersonic-fast-cash" className="text-brand-orange-600 hover:text-brand-orange-700 font-medium">
             ← Back to Supersonic Fast Cash
           </Link>
         </div>
@@ -78,14 +78,14 @@ export default function RefundApplyPage() {
 {/* Hero */}
       <section className="bg-slate-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
-          <Link href="/supersonic-fast-cash" className="inline-flex items-center gap-2 text-orange-100 hover:text-white mb-4">
+          <Link href="/supersonic-fast-cash" className="inline-flex items-center gap-2 text-brand-orange-100 hover:text-white mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Get Your Tax Refund Today
           </h1>
-          <p className="text-xl text-orange-100">
+          <p className="text-xl text-brand-orange-100">
             Fill out this quick form and get up to $7,500 in as little as 15 minutes.
           </p>
         </div>
@@ -96,11 +96,11 @@ export default function RefundApplyPage() {
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div className="flex items-center justify-center gap-2">
-              <DollarSign className="w-5 h-5 text-green-600" />
+              <DollarSign className="w-5 h-5 text-brand-green-600" />
               <span className="text-sm font-medium">Up to $7,500</span>
             </div>
             <div className="flex items-center justify-center gap-2">
-              <Clock className="w-5 h-5 text-orange-600" />
+              <Clock className="w-5 h-5 text-brand-orange-600" />
               <span className="text-sm font-medium">15 Min Approval</span>
             </div>
             <div className="flex items-center justify-center gap-2">
@@ -130,7 +130,7 @@ export default function RefundApplyPage() {
                   required
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
                 />
               </div>
               <div>
@@ -140,7 +140,7 @@ export default function RefundApplyPage() {
                   required
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
                 />
               </div>
             </div>
@@ -154,7 +154,7 @@ export default function RefundApplyPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
                 />
               </div>
               <div>
@@ -164,7 +164,7 @@ export default function RefundApplyPage() {
                   required
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
                   placeholder="(555) 555-5555"
                 />
               </div>
@@ -179,7 +179,7 @@ export default function RefundApplyPage() {
                 required
                 value={formData.filingStatus}
                 onChange={(e) => setFormData({ ...formData, filingStatus: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
               >
                 <option value="">Select filing status</option>
                 <option value="single">Single</option>
@@ -197,7 +197,7 @@ export default function RefundApplyPage() {
                 required
                 value={formData.employmentType}
                 onChange={(e) => setFormData({ ...formData, employmentType: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
               >
                 <option value="">Select employment type</option>
                 <option value="w2-employee">W-2 Employee</option>
@@ -215,7 +215,7 @@ export default function RefundApplyPage() {
                 required
                 value={formData.estimatedIncome}
                 onChange={(e) => setFormData({ ...formData, estimatedIncome: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
               >
                 <option value="">Select income range</option>
                 <option value="under-15k">Under $15,000</option>
@@ -236,7 +236,7 @@ export default function RefundApplyPage() {
                     type="checkbox"
                     checked={formData.hasW2}
                     onChange={(e) => setFormData({ ...formData, hasW2: e.target.checked })}
-                    className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                    className="w-4 h-4 text-brand-orange-600 border-gray-300 rounded focus:ring-brand-orange-500"
                   />
                   <span className="text-gray-700">W-2 from employer(s)</span>
                 </label>
@@ -245,7 +245,7 @@ export default function RefundApplyPage() {
                     type="checkbox"
                     checked={formData.has1099}
                     onChange={(e) => setFormData({ ...formData, has1099: e.target.checked })}
-                    className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                    className="w-4 h-4 text-brand-orange-600 border-gray-300 rounded focus:ring-brand-orange-500"
                   />
                   <span className="text-gray-700">1099 forms (if self-employed)</span>
                 </label>
@@ -259,7 +259,7 @@ export default function RefundApplyPage() {
                   type="checkbox"
                   checked={formData.hasDependents}
                   onChange={(e) => setFormData({ ...formData, hasDependents: e.target.checked })}
-                  className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                  className="w-4 h-4 text-brand-orange-600 border-gray-300 rounded focus:ring-brand-orange-500"
                 />
                 <span className="text-gray-700 font-medium">I have dependents (children, etc.)</span>
               </label>
@@ -267,7 +267,7 @@ export default function RefundApplyPage() {
                 <select
                   value={formData.dependentCount}
                   onChange={(e) => setFormData({ ...formData, dependentCount: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
                 >
                   <option value="">How many dependents?</option>
                   <option value="1">1</option>
@@ -292,7 +292,7 @@ export default function RefundApplyPage() {
                     value="phone"
                     checked={formData.preferredContact === 'phone'}
                     onChange={(e) => setFormData({ ...formData, preferredContact: e.target.value })}
-                    className="w-4 h-4 text-orange-600 border-gray-300 focus:ring-orange-500"
+                    className="w-4 h-4 text-brand-orange-600 border-gray-300 focus:ring-brand-orange-500"
                   />
                   <span className="text-gray-700">Phone</span>
                 </label>
@@ -303,7 +303,7 @@ export default function RefundApplyPage() {
                     value="text"
                     checked={formData.preferredContact === 'text'}
                     onChange={(e) => setFormData({ ...formData, preferredContact: e.target.value })}
-                    className="w-4 h-4 text-orange-600 border-gray-300 focus:ring-orange-500"
+                    className="w-4 h-4 text-brand-orange-600 border-gray-300 focus:ring-brand-orange-500"
                   />
                   <span className="text-gray-700">Text</span>
                 </label>
@@ -314,7 +314,7 @@ export default function RefundApplyPage() {
                     value="email"
                     checked={formData.preferredContact === 'email'}
                     onChange={(e) => setFormData({ ...formData, preferredContact: e.target.value })}
-                    className="w-4 h-4 text-orange-600 border-gray-300 focus:ring-orange-500"
+                    className="w-4 h-4 text-brand-orange-600 border-gray-300 focus:ring-brand-orange-500"
                   />
                   <span className="text-gray-700">Email</span>
                 </label>
@@ -327,7 +327,7 @@ export default function RefundApplyPage() {
               <select
                 value={formData.preferredTime}
                 onChange={(e) => setFormData({ ...formData, preferredTime: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
               >
                 <option value="">Any time</option>
                 <option value="morning">Morning (9am - 12pm)</option>
@@ -340,7 +340,7 @@ export default function RefundApplyPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white py-4 rounded-lg font-bold text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white py-4 rounded-lg font-bold text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Submitting...' : 'Get My Refund Now →'}
             </button>
@@ -351,9 +351,9 @@ export default function RefundApplyPage() {
           </form>
 
           {/* Call CTA */}
-          <div className="mt-8 bg-orange-50 rounded-xl p-6 text-center">
+          <div className="mt-8 bg-brand-orange-50 rounded-xl p-6 text-center">
             <p className="text-gray-600 mb-2">Prefer to talk to someone now?</p>
-            <a href="/support" className="inline-flex items-center gap-2 text-2xl font-bold text-orange-600 hover:text-orange-700">
+            <a href="/support" className="inline-flex items-center gap-2 text-2xl font-bold text-brand-orange-600 hover:text-brand-orange-700">
               <Phone className="w-6 h-6" />
               Visit Support Center
             </a>

@@ -81,7 +81,7 @@ export default function EnrollmentForm({ courseId, courseName, price, userEmail,
           </div>
           <div className="text-right">
             {isFree ? (
-              <span className="text-xl font-bold text-green-600">FREE</span>
+              <span className="text-xl font-bold text-brand-green-600">FREE</span>
             ) : (
               <span className="text-xl font-bold text-slate-900">${price}</span>
             )}
@@ -108,7 +108,7 @@ export default function EnrollmentForm({ courseId, courseName, price, userEmail,
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm">
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 text-brand-red-700 text-sm">
           {error}
         </div>
       )}

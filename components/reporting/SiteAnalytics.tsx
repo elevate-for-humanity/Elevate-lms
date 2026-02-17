@@ -247,7 +247,7 @@ export default function SiteAnalytics() {
                   <div className="flex items-center gap-2">
                     <span className="font-bold">{site.completionRate.toFixed(1)}%</span>
                     {site.completionRate >= 70 ? (
-                      <TrendingUp className="h-4 w-4 text-green-600" />
+                      <TrendingUp className="h-4 w-4 text-brand-green-600" />
                     ) : (
                       <TrendingDown className="h-4 w-4 text-brand-orange-600" />
                     )}
@@ -259,7 +259,7 @@ export default function SiteAnalytics() {
                   <div className="flex items-center gap-2">
                     <span className="font-bold">{site.placementRate.toFixed(1)}%</span>
                     {site.placementRate >= 60 ? (
-                      <TrendingUp className="h-4 w-4 text-green-600" />
+                      <TrendingUp className="h-4 w-4 text-brand-green-600" />
                     ) : (
                       <TrendingDown className="h-4 w-4 text-brand-orange-600" />
                     )}

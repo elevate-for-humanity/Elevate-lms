@@ -252,9 +252,9 @@ export default async function PlatformLicensingPage() {
 
           <div className="grid lg:grid-cols-2 gap-8 mb-16">
             {/* License Type 1: Program Holder Network */}
-            <div className="bg-zinc-900   rounded-2xl shadow-2xl p-8 text-white relative border-4 border-orange-400">
+            <div className="bg-zinc-900   rounded-2xl shadow-2xl p-8 text-white relative border-4 border-brand-orange-400">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
+                <div className="bg-brand-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
                   <Star className="w-4 h-4" />
                   MOST POPULAR
                 </div>
@@ -303,19 +303,19 @@ export default async function PlatformLicensingPage() {
 
               <div className="space-y-3 mb-6 text-sm">
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-300 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-300 flex-shrink-0 mt-0.5" />
                   <span>Bring your programs under our umbrella</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-300 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-300 flex-shrink-0 mt-0.5" />
                   <span>Skip 4-8 years of approval waiting</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-300 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-300 flex-shrink-0 mt-0.5" />
                   <span>We handle compliance oversight</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-300 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-300 flex-shrink-0 mt-0.5" />
                   <span>Launch in 30 days (Indiana only for now)</span>
                 </div>
               </div>
@@ -375,28 +375,28 @@ export default async function PlatformLicensingPage() {
 
               <div className="space-y-3 mb-6 text-sm text-black">
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>White-label platform</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Full LMS & mobile app</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Student management</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Instant access (no approval needed)</span>
                 </div>
               </div>
 
-              <div className="bg-green-50 rounded-lg p-4 mb-6 text-sm">
-                <div className="font-bold text-green-900 mb-1">
+              <div className="bg-brand-green-50 rounded-lg p-4 mb-6 text-sm">
+                <div className="font-bold text-brand-green-900 mb-1">
                   <span className="text-slate-400 flex-shrink-0">•</span> Best For:
                 </div>
-                <div className="text-green-800">
+                <div className="text-brand-green-800">
                   Organizations with existing credentials or willing to get
                   their own.
                 </div>
@@ -445,19 +445,19 @@ export default async function PlatformLicensingPage() {
 
               <div className="space-y-3 mb-6 text-sm text-black">
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Apprenticeship management</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>OJT tracking</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>MOU workflows</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Instant access</span>
                 </div>
               </div>
@@ -482,8 +482,8 @@ export default async function PlatformLicensingPage() {
             {/* License Type 4: À La Carte */}
             <div className="bg-white rounded-2xl shadow-lg border-2 border-slate-200 p-8 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-16 h-16 bg-orange-100 rounded-xl flex items-center justify-center">
-                  <Package className="w-8 h-8 text-orange-600" />
+                <div className="w-16 h-16 bg-brand-orange-100 rounded-xl flex items-center justify-center">
+                  <Package className="w-8 h-8 text-brand-orange-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-black">
@@ -500,11 +500,11 @@ export default async function PlatformLicensingPage() {
                 <div className="text-black">Pay only for what you need</div>
               </div>
 
-              <div className="bg-orange-50 rounded-xl p-4 mb-6">
-                <div className="font-bold text-orange-900 mb-2">
+              <div className="bg-brand-orange-50 rounded-xl p-4 mb-6">
+                <div className="font-bold text-brand-orange-900 mb-2">
                   Pick & Choose:
                 </div>
-                <div className="space-y-1 text-sm text-orange-800">
+                <div className="space-y-1 text-sm text-brand-orange-800">
                   <div>• Core Platform: $2K/mo</div>
                   <div>• + WIOA Module: +$1.5K/mo</div>
                   <div>• + RAPIDS Module: +$1K/mo</div>
@@ -515,19 +515,19 @@ export default async function PlatformLicensingPage() {
 
               <div className="space-y-3 mb-6 text-sm text-black">
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Maximum flexibility</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Scale as you grow</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Add modules anytime</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Per-student option available</span>
                 </div>
               </div>
@@ -543,7 +543,7 @@ export default async function PlatformLicensingPage() {
 
               <Link
                 href="/pricing/build"
-                className="block w-full bg-orange-600 hover:bg-orange-700 text-white text-center px-6 py-4 rounded-lg font-bold transition text-lg"
+                className="block w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white text-center px-6 py-4 rounded-lg font-bold transition text-lg"
               >
                 Build Package →
               </Link>
@@ -588,19 +588,19 @@ export default async function PlatformLicensingPage() {
 
               <div className="space-y-2 mb-6 text-sm">
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>White-label platform</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Student management</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>LMS & mobile app</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Basic reporting</span>
                 </div>
               </div>
@@ -621,9 +621,9 @@ export default async function PlatformLicensingPage() {
             </div>
 
             {/* Tier 2: Government Approved - MOST POPULAR */}
-            <div className="bg-zinc-900   rounded-2xl shadow-2xl border-4 border-orange-400 p-6 relative transform lg:scale-105">
+            <div className="bg-zinc-900   rounded-2xl shadow-2xl border-4 border-brand-orange-400 p-6 relative transform lg:scale-105">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
+                <div className="bg-brand-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
                   <Star className="w-4 h-4" />
                   MOST POPULAR
                 </div>
@@ -652,19 +652,19 @@ export default async function PlatformLicensingPage() {
 
               <div className="space-y-2 mb-6 text-sm text-white">
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-300 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-300 flex-shrink-0 mt-0.5" />
                   <span>Everything in Basic</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-300 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-300 flex-shrink-0 mt-0.5" />
                   <span>ETPL Provider ID: 10000949</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-300 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-300 flex-shrink-0 mt-0.5" />
                   <span>WIOA compliance</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-300 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-300 flex-shrink-0 mt-0.5" />
                   <span>State reporting</span>
                 </div>
               </div>
@@ -709,19 +709,19 @@ export default async function PlatformLicensingPage() {
 
               <div className="space-y-2 mb-6 text-sm">
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Everything in Gov Approved</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>DOL RAPIDS: 2025-IN-132301</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Apprenticeship management</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Multi-state operations</span>
                 </div>
               </div>
@@ -744,8 +744,8 @@ export default async function PlatformLicensingPage() {
             {/* Tier 4: Enterprise */}
             <div className="bg-white rounded-2xl shadow-lg border-2 border-slate-200 p-6 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                  <Globe className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 bg-brand-orange-100 rounded-xl flex items-center justify-center">
+                  <Globe className="w-6 h-6 text-brand-orange-600" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-black">
@@ -766,24 +766,24 @@ export default async function PlatformLicensingPage() {
 
               <div className="space-y-2 mb-6 text-sm">
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Everything in Federal</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Multi-tenant architecture</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Custom development</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Dedicated success team</span>
                 </div>
               </div>
 
-              <div className="bg-orange-50 rounded-lg p-3 mb-4 text-xs">
+              <div className="bg-brand-orange-50 rounded-lg p-3 mb-4 text-xs">
                 <div className="font-semibold mb-1">$705K-$1.1M Value</div>
                 <div className="text-black">
                   All credentials + custom dev
@@ -792,7 +792,7 @@ export default async function PlatformLicensingPage() {
 
               <Link
                 href="/contact?tier=enterprise"
-                className="block w-full bg-orange-600 hover:bg-orange-700 text-white text-center px-4 py-3 rounded-lg font-bold transition"
+                className="block w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white text-center px-4 py-3 rounded-lg font-bold transition"
               >
                 Contact Sales
               </Link>

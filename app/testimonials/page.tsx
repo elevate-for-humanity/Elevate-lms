@@ -69,7 +69,7 @@ export default function TestimonialsPage() {
       <section className="relative min-h-[400px] flex items-center overflow-hidden bg-slate-700">
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 w-full">
           <div className="max-w-2xl">
-            <span className="inline-block px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-full mb-6">
+            <span className="inline-block px-4 py-2 bg-brand-green-500 text-white text-sm font-semibold rounded-full mb-6">
               Real People, Real Results
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6">
@@ -126,9 +126,9 @@ export default function TestimonialsPage() {
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 rounded-xl p-8 text-center">
-            <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <p className="text-red-700">{error}</p>
+          <div className="bg-brand-red-50 rounded-xl p-8 text-center">
+            <AlertCircle className="w-12 h-12 text-brand-red-400 mx-auto mb-4" />
+            <p className="text-brand-red-700">{error}</p>
           </div>
         )}
 
@@ -194,7 +194,7 @@ export default function TestimonialsPage() {
 
                     {story.salary_before && story.salary_after && (
                       <div className="flex items-center gap-2 text-sm">
-                        <TrendingUp className="w-4 h-4 text-green-500" />
+                        <TrendingUp className="w-4 h-4 text-brand-green-500" />
                         <span className="text-gray-600">
                           ${story.salary_before.toLocaleString()} → ${story.salary_after.toLocaleString()}
                         </span>
@@ -210,21 +210,21 @@ export default function TestimonialsPage() {
         {/* CTA */}
         <section className="bg-slate-700 rounded-2xl p-8 text-white text-center">
           <h2 className="text-2xl font-bold mb-4">Your Success Story Starts Here</h2>
-          <p className="text-orange-100 mb-6 max-w-xl mx-auto">
+          <p className="text-brand-orange-100 mb-6 max-w-xl mx-auto">
             Join the graduates who have transformed their lives through 
             career training. Your story could be next.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-orange-600 font-semibold rounded-lg hover:bg-gray-100 transition"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-brand-orange-600 font-semibold rounded-lg hover:bg-gray-100 transition"
             >
               Apply Now
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/programs"
-              className="px-6 py-3 bg-orange-400 text-white font-semibold rounded-lg hover:bg-orange-300 transition"
+              className="px-6 py-3 bg-brand-orange-400 text-white font-semibold rounded-lg hover:bg-brand-orange-300 transition"
             >
               View Programs
             </Link>

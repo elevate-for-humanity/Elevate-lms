@@ -21,7 +21,7 @@ const features = [
     icon: DollarSign,
     title: 'Funding Verification',
     desc: 'Check your eligibility for WIOA, WRG, and JRI funding online. See which programs are covered before you apply.',
-    color: 'bg-green-50 text-green-600',
+    color: 'bg-brand-green-50 text-brand-green-600',
   },
   {
     icon: Monitor,
@@ -33,13 +33,13 @@ const features = [
     icon: Briefcase,
     title: 'Career Services Portal',
     desc: 'Build your resume, practice interviews, search job listings, and connect with employer partners — all self-service.',
-    color: 'bg-orange-50 text-orange-600',
+    color: 'bg-brand-orange-50 text-brand-orange-600',
   },
   {
     icon: Users,
     title: 'Employer Connections',
     desc: 'Employers post jobs and browse certified graduates. Students get matched with employers hiring in their field.',
-    color: 'bg-red-50 text-red-600',
+    color: 'bg-brand-red-50 text-brand-red-600',
   },
   {
     icon: Shield,

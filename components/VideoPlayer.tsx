@@ -76,14 +76,14 @@ export function VideoPlayer({ src, title, onProgress, onComplete }: VideoPlayerP
         <div className="flex items-center gap-4">
           <button
             onClick={togglePlay}
-            className="text-white hover:text-red-500 transition"
+            className="text-white hover:text-brand-red-500 transition"
           >
             {isPlaying ? <Pause size={24} /> : <Play size={24} />}
           </button>
 
           <button
             onClick={toggleMute}
-            className="text-white hover:text-red-500 transition"
+            className="text-white hover:text-brand-red-500 transition"
           >
             {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
           </button>
@@ -101,11 +101,11 @@ export function VideoPlayer({ src, title, onProgress, onComplete }: VideoPlayerP
             {videoRef.current && formatTime(videoRef.current.currentTime)} / {formatTime(duration)}
           </span>
 
-          <button className="text-white hover:text-red-500 transition">
+          <button className="text-white hover:text-brand-red-500 transition">
             <Settings size={20} />
           </button>
 
-          <button className="text-white hover:text-red-500 transition">
+          <button className="text-white hover:text-brand-red-500 transition">
             <Maximize size={20} />
           </button>
         </div>

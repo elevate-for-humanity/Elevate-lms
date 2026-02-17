@@ -100,7 +100,7 @@ export function SMSNotificationSystem() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">SMS Notifications</h1>
-          <p className="text-red-100">Send instant text messages to students</p>
+          <p className="text-brand-red-100">Send instant text messages to students</p>
         </div>
       </div>
 
@@ -184,7 +184,7 @@ export function SMSNotificationSystem() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-black">Delivery Rate:</span>
-                  <span className="font-semibold text-green-600">98.5%</span>
+                  <span className="font-semibold text-brand-green-600">98.5%</span>
                 </div>
               </div>
             </Card>

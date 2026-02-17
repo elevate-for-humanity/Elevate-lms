@@ -1,3 +1,9 @@
+/**
+ * @deprecated Use canonical enrollment routes:
+ *   - /api/enroll (student enrollment)
+ *   - /api/enrollment/submit (comprehensive wizard)
+ *   - /api/enrollments/create-enforced (admin/partner)
+ */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;

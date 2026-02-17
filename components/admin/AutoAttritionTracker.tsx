@@ -486,7 +486,7 @@ export function AutoAttritionTracker() {
                 metrics.overall.trend === 'improving'
                   ? 'bg-brand-surface text-brand-success'
                   : metrics.overall.trend === 'declining'
-                    ? 'bg-brand-surface text-red-800'
+                    ? 'bg-brand-surface text-brand-red-800'
                     : 'bg-brand-surface-dark text-brand-text'
               }`}
             >
@@ -516,7 +516,7 @@ export function AutoAttritionTracker() {
               <p className="text-sm font-medium text-brand-text-muted">
                 At-Risk Students
               </p>
-              <p className="text-3xl font-bold text-orange-600">
+              <p className="text-3xl font-bold text-brand-orange-600">
                 {atRiskStudents.length}
               </p>
             </div>
@@ -569,7 +569,7 @@ export function AutoAttritionTracker() {
                     <div className="flex items-center">
                       <div className="w-16 bg-brand-border rounded-full h-2 mr-2">
                         <div
-                          className="bg-green-500 h-2 rounded-full"
+                          className="bg-brand-green-500 h-2 rounded-full"
                           style={{ width: `${program.retentionRate}%` }}
                         />
                       </div>
@@ -638,7 +638,7 @@ export function AutoAttritionTracker() {
                   {student.riskFactors.map((factor, index) => (
                     <span
                       key={index}
-                      className="text-xs bg-brand-surface text-red-700 px-2 py-2 rounded"
+                      className="text-xs bg-brand-surface text-brand-red-700 px-2 py-2 rounded"
                     >
                       {factor}
                     </span>
@@ -706,11 +706,11 @@ export function AutoAttritionTracker() {
               <div className="text-sm text-brand-text mb-3">
                 <strong>Affected Students:</strong> {factor.affectedStudents}
               </div>
-              <div className="bg-green-50 border border-green-200 rounded p-3">
+              <div className="bg-brand-green-50 border border-brand-green-200 rounded p-3">
                 <div className="text-sm font-medium text-brand-success mb-1">
                   🤖 Au
                 </div>
-                <div className="text-sm text-green-700">
+                <div className="text-sm text-brand-green-700">
                   {factor.autoIntervention}
                 </div>
               </div>

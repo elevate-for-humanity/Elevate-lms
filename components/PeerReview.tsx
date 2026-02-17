@@ -134,14 +134,14 @@ export function PeerReview({ assignmentId, studentName }: PeerReviewProps) {
                   <Star
                     key={star}
                     size={20}
-                    className={star <= averageRating ? 'fill-orange-500 text-orange-500' : 'text-gray-300'}
+                    className={star <= averageRating ? 'fill-brand-orange-500 text-brand-orange-500' : 'text-gray-300'}
                   />
                 ))}
               </div>
               <div className="text-sm text-black">{reviews.length} peer reviews</div>
             </div>
             <div className="text-center">
-              <Award className="text-orange-600 mx-auto mb-2" size={48} />
+              <Award className="text-brand-orange-600 mx-auto mb-2" size={48} />
               <div className="text-sm font-semibold">Peer Review Badge</div>
             </div>
           </div>
@@ -165,7 +165,7 @@ export function PeerReview({ assignmentId, studentName }: PeerReviewProps) {
                 >
                   <Star
                     size={32}
-                    className={star <= newReview.rating ? 'fill-orange-500 text-orange-500' : 'text-gray-300'}
+                    className={star <= newReview.rating ? 'fill-brand-orange-500 text-brand-orange-500' : 'text-gray-300'}
                   />
                 </button>
               ))}
@@ -178,7 +178,7 @@ export function PeerReview({ assignmentId, studentName }: PeerReviewProps) {
               value={newReview.comment}
               onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setNewReview({ ...newReview, comment: e.target.value })}
               placeholder="Provide constructive feedback..."
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500"
               rows={4}
             />
             <div className="text-xs text-gray-500 mt-2">
@@ -221,7 +221,7 @@ export function PeerReview({ assignmentId, studentName }: PeerReviewProps) {
                         <Star
                           key={star}
                           size={16}
-                          className={star <= review.rating ? 'fill-orange-500 text-orange-500' : 'text-gray-300'}
+                          className={star <= review.rating ? 'fill-brand-orange-500 text-brand-orange-500' : 'text-gray-300'}
                         />
                       ))}
                     </div>

@@ -29,7 +29,7 @@ export function ImageSection({
       >
         <div className="flex-1 space-y-2 text-[11px] md:text-[12px]">
           {eyebrow && (
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-orange-400">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-brand-orange-400">
               {eyebrow}
             </p>
           )}

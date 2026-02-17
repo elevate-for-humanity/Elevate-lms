@@ -114,7 +114,7 @@ export function InstructorBio({
                 {specialties.map((specialty, idx) => (
                   <span
                     key={idx}
-                    className="px-3 py-2 bg-red-50 text-red-700 text-xs font-medium rounded-full"
+                    className="px-3 py-2 bg-brand-red-50 text-brand-red-700 text-xs font-medium rounded-full"
                   >
                     {specialty}
                   </span>

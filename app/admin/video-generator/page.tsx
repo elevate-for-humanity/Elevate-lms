@@ -121,12 +121,12 @@ export default function VideoGeneratorPage() {
                 <div className="text-3xl font-bold text-gray-900">{status.total}</div>
                 <div className="text-sm text-gray-500">Total Lessons</div>
               </div>
-              <div className="bg-green-50 rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold text-green-600">{status.withVideos}</div>
+              <div className="bg-brand-green-50 rounded-lg p-4 text-center">
+                <div className="text-3xl font-bold text-brand-green-600">{status.withVideos}</div>
                 <div className="text-sm text-gray-500">With Videos</div>
               </div>
-              <div className="bg-orange-50 rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold text-orange-600">{status.withoutVideos}</div>
+              <div className="bg-brand-orange-50 rounded-lg p-4 text-center">
+                <div className="text-3xl font-bold text-brand-orange-600">{status.withoutVideos}</div>
                 <div className="text-sm text-gray-500">Need Videos</div>
               </div>
               <div className="bg-brand-blue-50 rounded-lg p-4 text-center">
@@ -181,7 +181,7 @@ export default function VideoGeneratorPage() {
             <button
               onClick={generateAll}
               disabled={generating || (status?.withoutVideos === 0)}
-              className="flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 bg-brand-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-brand-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {generating ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -203,7 +203,7 @@ export default function VideoGeneratorPage() {
 
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            <div className="bg-brand-red-50 border border-brand-red-200 text-brand-red-700 px-4 py-3 rounded-lg mb-6">
               {error}
             </div>
           )}
@@ -220,7 +220,7 @@ export default function VideoGeneratorPage() {
                     {result.success ? (
                       <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
-                      <XCircle className="w-5 h-5 text-red-500" />
+                      <XCircle className="w-5 h-5 text-brand-red-500" />
                     )}
                     <span className="font-mono text-sm text-gray-600">
                       {result.lessonId.substring(0, 8)}...
@@ -235,7 +235,7 @@ export default function VideoGeneratorPage() {
                         View Video
                       </a>
                     ) : (
-                      <span className="text-red-600 text-sm">{result.error}</span>
+                      <span className="text-brand-red-600 text-sm">{result.error}</span>
                     )}
                   </div>
                 ))}

@@ -47,11 +47,11 @@ export default async function TimeOffPage() {
   const statusBadge = (status: string) => {
     switch (status) {
       case 'approved':
-        return <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded flex items-center gap-1"><CheckCircle className="w-3 h-3" />Approved</span>;
+        return <span className="bg-brand-green-100 text-brand-green-700 text-xs font-medium px-2 py-1 rounded flex items-center gap-1"><CheckCircle className="w-3 h-3" />Approved</span>;
       case 'pending':
         return <span className="bg-yellow-100 text-yellow-700 text-xs font-medium px-2 py-1 rounded flex items-center gap-1"><AlertCircle className="w-3 h-3" />Pending</span>;
       case 'denied':
-        return <span className="bg-red-100 text-red-700 text-xs font-medium px-2 py-1 rounded flex items-center gap-1"><XCircle className="w-3 h-3" />Denied</span>;
+        return <span className="bg-brand-red-100 text-brand-red-700 text-xs font-medium px-2 py-1 rounded flex items-center gap-1"><XCircle className="w-3 h-3" />Denied</span>;
       default:
         return <span className="bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded">{status}</span>;
     }

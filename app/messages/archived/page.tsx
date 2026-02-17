@@ -54,7 +54,7 @@ export default function ArchivedMessagesPage() {
                     <button className="p-2 text-gray-400 hover:text-brand-blue-600 transition" title="Restore">
                       <RotateCcw className="w-5 h-5" />
                     </button>
-                    <button className="p-2 text-gray-400 hover:text-red-600 transition" title="Delete">
+                    <button className="p-2 text-gray-400 hover:text-brand-red-600 transition" title="Delete">
                       <Trash2 className="w-5 h-5" />
                     </button>
                   </div>

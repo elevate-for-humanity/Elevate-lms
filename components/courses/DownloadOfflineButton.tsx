@@ -52,7 +52,7 @@ export function DownloadOfflineButton({ courseId, lessonUrls = [] }: DownloadOff
           <div className="flex items-center gap-2">
             <button
               onClick={handleRemove}
-              className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm hover:bg-red-200 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-red-100 text-brand-red-700 rounded-lg text-sm hover:bg-brand-red-200 transition-colors"
             >
               <Trash2 className="w-4 h-4" />
               <span>Confirm Remove</span>
@@ -67,7 +67,7 @@ export function DownloadOfflineButton({ courseId, lessonUrls = [] }: DownloadOff
         ) : (
           <button
             onClick={() => setShowConfirm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm hover:bg-green-200 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-brand-green-100 text-brand-green-700 rounded-lg text-sm hover:bg-brand-green-200 transition-colors"
           >
             <Check className="w-4 h-4" />
             <span>{t('offline.availableOffline')}</span>
@@ -87,7 +87,7 @@ export function DownloadOfflineButton({ courseId, lessonUrls = [] }: DownloadOff
         <span>{t('offline.downloadForOffline')}</span>
       </button>
       {error && (
-        <p className="mt-1 text-xs text-red-600">{error}</p>
+        <p className="mt-1 text-xs text-brand-red-600">{error}</p>
       )}
     </div>
   );

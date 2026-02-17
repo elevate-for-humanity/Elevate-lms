@@ -171,7 +171,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
                       {p.name.split(' ')[0]}
                     </div>
                     {!p.muted && (
-                      <div className="absolute top-1 right-1 bg-green-500 w-2 h-2 rounded-full" />
+                      <div className="absolute top-1 right-1 bg-brand-green-500 w-2 h-2 rounded-full" />
                     )}
                   </div>
                 ))}
@@ -213,7 +213,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
                   onClick={() => setActivePanel(panel)}
                   className={`flex-1 py-3 text-sm font-medium capitalize ${
                     activePanel === panel
-                      ? 'text-white border-b-2 border-red-600'
+                      ? 'text-white border-b-2 border-brand-red-600'
                       : 'text-gray-400 hover:text-white'
                   }`}
                 >
@@ -242,7 +242,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
                       <input
                         type="text"
                         placeholder="Type a message..."
-                        className="flex-1 px-3 py-2 bg-gray-700 text-white rounded border-none focus:ring-2 focus:ring-red-600"
+                        className="flex-1 px-3 py-2 bg-gray-700 text-white rounded border-none focus:ring-2 focus:ring-brand-red-600"
                       />
                       <button className="px-4 py-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white rounded">
                         Send

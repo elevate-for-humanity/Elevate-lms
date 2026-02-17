@@ -31,7 +31,7 @@ export default async function PayrollPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">This Period</h3><p className="text-3xl font-bold text-green-600 mt-2">Not configured</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">This Period</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">Not configured</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">YTD Total</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">Not configured</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Staff Accounts</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">{staffCount || 0}</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Next Run</h3><p className="text-xl font-bold text-gray-900 mt-2">Not scheduled</p></div>

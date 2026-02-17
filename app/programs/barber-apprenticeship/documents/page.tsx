@@ -169,7 +169,7 @@ export default function BarberDocumentsPage() {
       <div className="max-w-2xl mx-auto px-6 py-8">
         {/* Required Documents */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
-          <div className="bg-red-600 px-6 py-3">
+          <div className="bg-brand-red-600 px-6 py-3">
             <h2 className="text-lg font-bold text-white">Required</h2>
           </div>
           <div className="p-6">
@@ -197,7 +197,7 @@ export default function BarberDocumentsPage() {
                     {governmentId.status === 'complete' && (
                       <button
                         onClick={() => setGovernmentId(null)}
-                        className="text-slate-400 hover:text-red-500"
+                        className="text-slate-400 hover:text-brand-red-500"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -259,7 +259,7 @@ export default function BarberDocumentsPage() {
         </button>
 
         {!canSubmit && (
-          <p className="text-center text-red-600 text-sm mt-4 flex items-center justify-center gap-2">
+          <p className="text-center text-brand-red-600 text-sm mt-4 flex items-center justify-center gap-2">
             <AlertCircle className="w-4 h-4" />
             Please upload your government-issued ID to continue.
           </p>

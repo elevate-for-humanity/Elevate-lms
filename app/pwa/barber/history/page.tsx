@@ -66,14 +66,14 @@ export default function BarberHistoryPage() {
     switch (status) {
       case 'approved':
         return (
-          <span className="flex items-center gap-1 text-green-400 text-xs">
+          <span className="flex items-center gap-1 text-brand-green-400 text-xs">
             <span className="text-slate-400 flex-shrink-0">•</span>
             Approved
           </span>
         );
       case 'rejected':
         return (
-          <span className="flex items-center gap-1 text-red-400 text-xs">
+          <span className="flex items-center gap-1 text-brand-red-400 text-xs">
             <XCircle className="w-3 h-3" />
             Rejected
           </span>
@@ -106,7 +106,7 @@ export default function BarberHistoryPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
         <div className="text-center max-w-md">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
           <p className="text-slate-400 mb-6">{error}</p>
           <Link
@@ -142,7 +142,7 @@ export default function BarberHistoryPage() {
           </div>
           <div className="bg-slate-700/50 rounded-xl p-3">
             <p className="text-slate-400 text-xs">Approved</p>
-            <p className="text-xl font-bold text-green-400">{approvedHours} hrs</p>
+            <p className="text-xl font-bold text-brand-green-400">{approvedHours} hrs</p>
           </div>
         </div>
       </header>

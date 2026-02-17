@@ -146,11 +146,11 @@ export function StudentOnboarding({ onComplete }: { onComplete: () => void }) {
       description: 'Let\'s get you started with your learning journey',
       content: (
         <div className="space-y-4">
-          <div className="bg-red-50 rounded-lg p-6 text-center">
+          <div className="bg-brand-red-50 rounded-lg p-6 text-center">
             <h4 className="text-lg font-semibold text-emerald-900 mb-2">
               🎓 Welcome to Your Learning Platform
             </h4>
-            <p className="text-red-700">
+            <p className="text-brand-red-700">
               Access free career training, earn certificates, and connect with employers.
             </p>
           </div>
@@ -219,13 +219,13 @@ export function StudentOnboarding({ onComplete }: { onComplete: () => void }) {
               <div className="font-semibold text-purple-900">Skilled Trades</div>
               <div className="text-sm text-purple-700">HVAC, Building Maintenance</div>
             </div>
-            <div className="bg-orange-50 rounded-lg p-4">
-              <div className="font-semibold text-orange-900">Transportation</div>
-              <div className="text-sm text-orange-700">CDL Training</div>
+            <div className="bg-brand-orange-50 rounded-lg p-4">
+              <div className="font-semibold text-brand-orange-900">Transportation</div>
+              <div className="text-sm text-brand-orange-700">CDL Training</div>
             </div>
-            <div className="bg-green-50 rounded-lg p-4">
-              <div className="font-semibold text-green-900">Personal Services</div>
-              <div className="text-sm text-green-700">Barber Apprenticeship</div>
+            <div className="bg-brand-green-50 rounded-lg p-4">
+              <div className="font-semibold text-brand-green-900">Personal Services</div>
+              <div className="text-sm text-brand-green-700">Barber Apprenticeship</div>
             </div>
           </div>
         </div>

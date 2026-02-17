@@ -48,7 +48,7 @@ export function ForumList({ threads, categoryId }: ForumListProps) {
             onClick={() => setSortBy("recent")}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               sortBy === "recent"
-                ? "bg-orange-500 text-white"
+                ? "bg-brand-orange-500 text-white"
                 : "bg-slate-800 text-slate-300 hover:bg-slate-700"
             }`}
           >
@@ -58,7 +58,7 @@ export function ForumList({ threads, categoryId }: ForumListProps) {
             onClick={() => setSortBy("popular")}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               sortBy === "popular"
-                ? "bg-orange-500 text-white"
+                ? "bg-brand-orange-500 text-white"
                 : "bg-slate-800 text-slate-300 hover:bg-slate-700"
             }`}
           >
@@ -78,9 +78,9 @@ export function ForumList({ threads, categoryId }: ForumListProps) {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   {thread.is_pinned && (
-                    <Pin className="w-4 h-4 text-orange-400" />
+                    <Pin className="w-4 h-4 text-brand-orange-400" />
                   )}
-                  <h3 className="text-lg font-semibold text-white hover:text-orange-400 transition-colors">
+                  <h3 className="text-lg font-semibold text-white hover:text-brand-orange-400 transition-colors">
                     {thread.title}
                   </h3>
                 </div>

@@ -126,14 +126,14 @@ export default function AdminProgramHolderDocuments() {
   const getStatusBadge = (doc: Document) => {
     if (doc.approved) {
       return (
-        <span className="inline-flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800">
+        <span className="inline-flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium bg-brand-green-100 text-brand-green-800">
           <span className="text-slate-400 flex-shrink-0">•</span>
           Approved
         </span>
       );
     } else if (doc.approved_by) {
       return (
-        <span className="inline-flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium bg-red-100 text-red-800">
+        <span className="inline-flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium bg-brand-red-100 text-brand-red-800">
           <XCircle size={16} />
           Rejected
         </span>
@@ -312,7 +312,7 @@ export default function AdminProgramHolderDocuments() {
                         <button
                           onClick={() => handleApprove(doc.id, true)}
                           disabled={processing}
-                          className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center gap-2"
+                          className="px-4 py-2 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center gap-2"
                         >
                           <span className="text-slate-400 flex-shrink-0">•</span>
                           Approve
@@ -320,7 +320,7 @@ export default function AdminProgramHolderDocuments() {
                         <button
                           onClick={() => handleApprove(doc.id, false)}
                           disabled={processing}
-                          className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center gap-2"
+                          className="px-4 py-2 bg-brand-red-600 text-white rounded-lg font-medium hover:bg-brand-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center gap-2"
                         >
                           <XCircle size={16} />
                           Reject

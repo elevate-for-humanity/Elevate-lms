@@ -59,7 +59,7 @@ const SUPPORT_CATEGORIES = [
     title: 'Course Questions',
     description: 'Questions about course content, assignments, or grades',
     icon: BookOpen,
-    color: 'bg-green-100 text-green-600',
+    color: 'bg-brand-green-100 text-brand-green-600',
   },
   {
     title: 'Account & Billing',
@@ -71,7 +71,7 @@ const SUPPORT_CATEGORIES = [
     title: 'Career Services',
     description: 'Job placement, resume help, or career guidance',
     icon: CheckCircle,
-    color: 'bg-orange-100 text-orange-600',
+    color: 'bg-brand-orange-100 text-brand-orange-600',
   },
 ];
 
@@ -266,7 +266,7 @@ export default async function SupportPage() {
                         <span className="font-medium text-slate-900 truncate">{ticket.subject}</span>
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
                           ticket.status === 'open' ? 'bg-yellow-100 text-yellow-700' :
-                          ticket.status === 'resolved' ? 'bg-green-100 text-green-700' :
+                          ticket.status === 'resolved' ? 'bg-brand-green-100 text-brand-green-700' :
                           'bg-slate-100 text-slate-700'
                         }`}>
                           {ticket.status}

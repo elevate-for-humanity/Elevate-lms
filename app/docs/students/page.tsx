@@ -38,10 +38,10 @@ export default function StudentDocsPage() {
             </Link>
           ))}
         </div>
-        <div className="mt-8 p-6 bg-green-50 rounded-xl">
+        <div className="mt-8 p-6 bg-brand-green-50 rounded-xl">
           <h3 className="font-semibold text-gray-900 mb-2">Ready to Start Learning?</h3>
           <p className="text-gray-600 text-sm mb-4">Browse our programs and enroll today.</p>
-          <Link href="/programs" className="text-green-600 hover:underline font-medium">View Programs →</Link>
+          <Link href="/programs" className="text-brand-green-600 hover:underline font-medium">View Programs →</Link>
         </div>
       </div>
     </div>

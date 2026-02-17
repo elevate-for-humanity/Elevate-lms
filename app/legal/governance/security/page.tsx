@@ -35,12 +35,12 @@ export default function SecurityStatementPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-8 flex items-center justify-between">
+        <div className="bg-brand-orange-50 border border-brand-orange-200 rounded-lg p-4 mb-8 flex items-center justify-between">
           <div>
-            <p className="font-medium text-orange-900">Official Security Document</p>
-            <p className="text-sm text-orange-700">Authoritative reference for all security and data protection practices.</p>
+            <p className="font-medium text-brand-orange-900">Official Security Document</p>
+            <p className="text-sm text-brand-orange-700">Authoritative reference for all security and data protection practices.</p>
           </div>
-          <a href="/docs/Security_and_Data_Protection_Statement.pdf" download className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+          <a href="/docs/Security_and_Data_Protection_Statement.pdf" download className="flex items-center gap-2 px-4 py-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700">
             <Download className="w-4 h-4" /> PDF
           </a>
         </div>
@@ -48,21 +48,21 @@ export default function SecurityStatementPage() {
         <nav className="bg-gray-50 rounded-lg p-6 mb-10">
           <h2 className="font-semibold mb-4">Contents</h2>
           <ol className="space-y-2 text-sm">
-            <li><a href="#purpose" className="text-orange-600 hover:underline">1. Security Purpose & Principles</a></li>
-            <li><a href="#data-collected" className="text-orange-600 hover:underline">2. Data Collected</a></li>
-            <li><a href="#storage" className="text-orange-600 hover:underline">3. Data Storage & Encryption</a></li>
-            <li><a href="#access" className="text-orange-600 hover:underline">4. Access Controls</a></li>
-            <li><a href="#retention" className="text-orange-600 hover:underline">5. Data Retention & Deletion</a></li>
-            <li><a href="#incident" className="text-orange-600 hover:underline">6. Incident Response</a></li>
-            <li><a href="#user-responsibilities" className="text-orange-600 hover:underline">7. User Responsibilities</a></li>
-            <li><a href="#contact" className="text-orange-600 hover:underline">8. Contact & Reporting</a></li>
-            <li><a href="#versioning" className="text-orange-600 hover:underline">9. Versioning & Review</a></li>
+            <li><a href="#purpose" className="text-brand-orange-600 hover:underline">1. Security Purpose & Principles</a></li>
+            <li><a href="#data-collected" className="text-brand-orange-600 hover:underline">2. Data Collected</a></li>
+            <li><a href="#storage" className="text-brand-orange-600 hover:underline">3. Data Storage & Encryption</a></li>
+            <li><a href="#access" className="text-brand-orange-600 hover:underline">4. Access Controls</a></li>
+            <li><a href="#retention" className="text-brand-orange-600 hover:underline">5. Data Retention & Deletion</a></li>
+            <li><a href="#incident" className="text-brand-orange-600 hover:underline">6. Incident Response</a></li>
+            <li><a href="#user-responsibilities" className="text-brand-orange-600 hover:underline">7. User Responsibilities</a></li>
+            <li><a href="#contact" className="text-brand-orange-600 hover:underline">8. Contact & Reporting</a></li>
+            <li><a href="#versioning" className="text-brand-orange-600 hover:underline">9. Versioning & Review</a></li>
           </ol>
         </nav>
 
         <section id="purpose" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Shield className="w-6 h-6 text-orange-600" />
+            <Shield className="w-6 h-6 text-brand-orange-600" />
             1. Security Purpose & Principles
           </h2>
           <h3 className="text-lg font-semibold mt-6 mb-3">1.1 Purpose</h3>
@@ -80,7 +80,7 @@ export default function SecurityStatementPage() {
 
         <section id="data-collected" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Eye className="w-6 h-6 text-orange-600" />
+            <Eye className="w-6 h-6 text-brand-orange-600" />
             2. Data Collected
           </h2>
           <h3 className="text-lg font-semibold mt-6 mb-3">2.1 By Platform Component</h3>
@@ -124,7 +124,7 @@ export default function SecurityStatementPage() {
 
         <section id="storage" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Server className="w-6 h-6 text-orange-600" />
+            <Server className="w-6 h-6 text-brand-orange-600" />
             3. Data Storage & Encryption
           </h2>
           <h3 className="text-lg font-semibold mt-6 mb-3">3.1 Infrastructure</h3>
@@ -146,7 +146,7 @@ export default function SecurityStatementPage() {
 
         <section id="access" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Lock className="w-6 h-6 text-orange-600" />
+            <Lock className="w-6 h-6 text-brand-orange-600" />
             4. Access Controls
           </h2>
           <h3 className="text-lg font-semibold mt-6 mb-3">4.1 Authentication</h3>
@@ -171,7 +171,7 @@ export default function SecurityStatementPage() {
 
         <section id="retention" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <FileText className="w-6 h-6 text-orange-600" />
+            <FileText className="w-6 h-6 text-brand-orange-600" />
             5. Data Retention & Deletion
           </h2>
           <table className="w-full border-collapse border">
@@ -197,7 +197,7 @@ export default function SecurityStatementPage() {
 
         <section id="incident" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <AlertTriangle className="w-6 h-6 text-orange-600" />
+            <AlertTriangle className="w-6 h-6 text-brand-orange-600" />
             6. Incident Response
           </h2>
           <h3 className="text-lg font-semibold mt-6 mb-3">6.1 Response Process</h3>
@@ -216,7 +216,7 @@ export default function SecurityStatementPage() {
 
         <section id="user-responsibilities" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Users className="w-6 h-6 text-orange-600" />
+            <Users className="w-6 h-6 text-brand-orange-600" />
             7. User Responsibilities
           </h2>
           <ul className="list-disc pl-6 space-y-2 text-gray-700">

@@ -37,7 +37,7 @@ interface StudyTopic {
 const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
   theory: { bg: 'bg-brand-blue-500/20', text: 'text-brand-blue-400' },
   practical: { bg: 'bg-purple-500/20', text: 'text-purple-400' },
-  sanitation: { bg: 'bg-green-500/20', text: 'text-green-400' },
+  sanitation: { bg: 'bg-brand-green-500/20', text: 'text-brand-green-400' },
   laws: { bg: 'bg-amber-500/20', text: 'text-amber-400' },
 };
 
@@ -113,15 +113,15 @@ export default function StateBoardPrepPage() {
         </div>
 
         {/* Eligibility banner */}
-        <div className={`rounded-xl p-3 ${isEligible ? 'bg-green-500/20' : 'bg-amber-500/20'}`}>
+        <div className={`rounded-xl p-3 ${isEligible ? 'bg-brand-green-500/20' : 'bg-amber-500/20'}`}>
           <div className="flex items-center gap-3">
             {isEligible ? (
-              <Award className="w-6 h-6 text-green-400" />
+              <Award className="w-6 h-6 text-brand-green-400" />
             ) : (
               <AlertCircle className="w-6 h-6 text-amber-400" />
             )}
             <div>
-              <p className={`font-medium ${isEligible ? 'text-green-300' : 'text-amber-300'}`}>
+              <p className={`font-medium ${isEligible ? 'text-brand-green-300' : 'text-amber-300'}`}>
                 {isEligible ? 'Eligible for State Board Exam' : `${Math.round(totalHours).toLocaleString()} / 1,500 hours`}
               </p>
               <p className="text-xs text-white/60">
@@ -218,7 +218,7 @@ export default function StateBoardPrepPage() {
               const passed = best?.passed;
               return (
                 <div key={test.id} className={`bg-slate-800 rounded-xl p-4 border ${
-                  passed ? 'border-green-500/30' : 'border-slate-700'
+                  passed ? 'border-brand-green-500/30' : 'border-slate-700'
                 }`}>
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
@@ -241,17 +241,17 @@ export default function StateBoardPrepPage() {
                       </div>
                       {best && (
                         <div className="mt-2">
-                          <span className={`text-sm font-medium ${passed ? 'text-green-400' : 'text-amber-400'}`}>
+                          <span className={`text-sm font-medium ${passed ? 'text-brand-green-400' : 'text-amber-400'}`}>
                             Best: {best.score}% {passed ? '✓ Passed' : '— Not passed'}
                           </span>
                         </div>
                       )}
                     </div>
                     <button className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      passed ? 'bg-green-500/20' : 'bg-brand-blue-600'
+                      passed ? 'bg-brand-green-500/20' : 'bg-brand-blue-600'
                     }`}>
                       {passed ? (
-                        <TrendingUp className="w-5 h-5 text-green-400" />
+                        <TrendingUp className="w-5 h-5 text-brand-green-400" />
                       ) : (
                         <Play className="w-5 h-5 text-white" />
                       )}

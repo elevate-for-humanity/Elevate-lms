@@ -50,7 +50,7 @@ export default function MobileLessonCard({
         locked
           ? 'bg-gray-50 border-gray-200 cursor-not-allowed'
           : completed
-            ? 'bg-green-50 border-green-200 active:scale-98'
+            ? 'bg-brand-green-50 border-brand-green-200 active:scale-98'
             : 'bg-white border-gray-200 active:scale-98 hover:border-brand-blue-300'
       }`}
     >
@@ -77,7 +77,7 @@ export default function MobileLessonCard({
       </div>
       {/* Status Badge */}
       {completed && (
-        <div className="flex-shrink-0 px-2 py-2 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+        <div className="flex-shrink-0 px-2 py-2 bg-brand-green-100 text-brand-green-700 text-xs font-medium rounded-full">
           Completed
         </div>
       )}

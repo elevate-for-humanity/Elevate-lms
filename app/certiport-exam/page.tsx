@@ -127,7 +127,7 @@ function CertiportExamContent() {
       <div className="min-h-screen bg-slate-50 py-12 px-4">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <h1 className="text-2xl font-bold mb-2">Your Exam Voucher</h1>
@@ -138,11 +138,11 @@ function CertiportExamContent() {
               <p className="text-3xl font-mono font-bold tracking-wider">{existingRequest.voucherCode}</p>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left mb-6">
-              <h3 className="font-semibold text-blue-900 flex items-center gap-2 mb-2">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-4 text-left mb-6">
+              <h3 className="font-semibold text-brand-blue-900 flex items-center gap-2 mb-2">
                 <MapPin className="w-4 h-4" /> Testing Center
               </h3>
-              <p className="text-blue-800 text-sm">
+              <p className="text-brand-blue-800 text-sm">
                 Elevate for Humanity Career & Technical Institute<br />
                 7009 E 56th St, Suite F<br />
                 Indianapolis, IN 46226
@@ -171,8 +171,8 @@ function CertiportExamContent() {
       <div className="min-h-screen bg-slate-50 py-12 px-4">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Clock className="w-8 h-8 text-blue-600" />
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Clock className="w-8 h-8 text-brand-blue-600" />
             </div>
             <h1 className="text-2xl font-bold mb-2">Exam Request Submitted</h1>
             <p className="text-slate-600 mb-4">
@@ -193,7 +193,7 @@ function CertiportExamContent() {
     <div className="min-h-screen bg-slate-50 py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-brand-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Award className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-slate-900">Certification Exam</h1>
@@ -211,22 +211,22 @@ function CertiportExamContent() {
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-center">
-            <p className="text-red-800">{error}</p>
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-xl p-4 mb-6 text-center">
+            <p className="text-brand-red-800">{error}</p>
           </div>
         )}
 
         {/* Funding badge */}
         <div className="mb-6">
           {fundingStatus === 'funded' ? (
-            <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
-              <Shield className="w-5 h-5 text-green-600" />
-              <span className="text-green-800 font-medium">Funded Program — No exam fee</span>
+            <div className="flex items-center gap-2 bg-brand-green-50 border border-brand-green-200 rounded-lg px-4 py-3">
+              <Shield className="w-5 h-5 text-brand-green-600" />
+              <span className="text-brand-green-800 font-medium">Funded Program — No exam fee</span>
             </div>
           ) : fundingStatus === 'self_pay' ? (
-            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
-              <Shield className="w-5 h-5 text-blue-600" />
-              <span className="text-blue-800 font-medium">Self-Pay — $150 exam fee (paid to Elevate)</span>
+            <div className="flex items-center gap-2 bg-brand-blue-50 border border-brand-blue-200 rounded-lg px-4 py-3">
+              <Shield className="w-5 h-5 text-brand-blue-600" />
+              <span className="text-brand-blue-800 font-medium">Self-Pay — $150 exam fee (paid to Elevate)</span>
             </div>
           ) : null}
         </div>
@@ -244,7 +244,7 @@ function CertiportExamContent() {
                     key={exam.code}
                     className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition ${
                       selectedExam === exam.code
-                        ? 'bg-blue-50 border-2 border-blue-500'
+                        ? 'bg-brand-blue-50 border-2 border-brand-blue-500'
                         : 'hover:bg-slate-50 border-2 border-transparent'
                     }`}
                   >
@@ -254,7 +254,7 @@ function CertiportExamContent() {
                       value={exam.code}
                       checked={selectedExam === exam.code}
                       onChange={() => setSelectedExam(exam.code)}
-                      className="w-4 h-4 text-blue-600"
+                      className="w-4 h-4 text-brand-blue-600"
                     />
                     <div className="flex-1">
                       <p className="font-medium text-slate-900">{exam.name}</p>
@@ -271,7 +271,7 @@ function CertiportExamContent() {
         <button
           onClick={handleSubmit}
           disabled={!selectedExam || submitting || courseStatus === 'incomplete'}
-          className="w-full py-4 bg-blue-600 text-white font-bold text-lg rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition flex items-center justify-center gap-2"
+          className="w-full py-4 bg-brand-blue-600 text-white font-bold text-lg rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-blue-700 transition flex items-center justify-center gap-2"
         >
           {submitting ? (
             'Processing...'

@@ -103,7 +103,7 @@ export default function ProgressPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Academic Standing Categories</h2>
             
-            <div className="bg-green-50 border-l-4 border-green-400 p-6 mb-6">
+            <div className="bg-brand-green-50 border-l-4 border-brand-green-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Good Standing</h3>
               <p className="text-black mb-2">
                 Student meets all three SAP standards:
@@ -134,7 +134,7 @@ export default function ProgressPage() {
               </p>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Academic Probation</h3>
               <p className="text-black mb-2">
                 Student on warning fails to meet SAP standards again:
@@ -151,7 +151,7 @@ export default function ProgressPage() {
               </p>
             </div>
 
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Academic Dismissal</h3>
               <p className="text-black mb-2">
                 Student on probation fails to meet SAP standards or academic plan:

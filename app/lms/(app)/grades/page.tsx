@@ -205,11 +205,11 @@ export default async function GradesPage() {
   });
 
   const getGradeColor = (grade: number) => {
-    if (grade >= 90) return 'text-green-600 bg-green-100';
+    if (grade >= 90) return 'text-brand-green-600 bg-brand-green-100';
     if (grade >= 80) return 'text-brand-blue-600 bg-brand-blue-100';
     if (grade >= 70) return 'text-yellow-600 bg-yellow-100';
-    if (grade >= 60) return 'text-orange-600 bg-orange-100';
-    return 'text-red-600 bg-red-100';
+    if (grade >= 60) return 'text-brand-orange-600 bg-brand-orange-100';
+    return 'text-brand-red-600 bg-brand-red-100';
   };
 
   const getLetterGrade = (grade: number) => {
@@ -270,8 +270,8 @@ export default async function GradesPage() {
 
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <FileText className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <FileText className="w-5 h-5 text-brand-green-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">
@@ -298,8 +298,8 @@ export default async function GradesPage() {
 
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-orange-600" />
+              <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-brand-orange-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">
@@ -415,15 +415,15 @@ export default async function GradesPage() {
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <h2 className="text-xl font-bold text-slate-900 mb-4">Grade Summary</h2>
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="p-4 bg-green-50 rounded-xl">
+                <div className="p-4 bg-brand-green-50 rounded-xl">
                   <div className="flex items-center gap-3 mb-2">
-                    <FileText className="w-5 h-5 text-green-600" />
-                    <span className="font-semibold text-green-900">Assignment Average</span>
+                    <FileText className="w-5 h-5 text-brand-green-600" />
+                    <span className="font-semibold text-brand-green-900">Assignment Average</span>
                   </div>
-                  <div className="text-3xl font-bold text-green-600">
+                  <div className="text-3xl font-bold text-brand-green-600">
                     {stats.avgAssignmentGrade}%
                   </div>
-                  <p className="text-sm text-green-700 mt-1">
+                  <p className="text-sm text-brand-green-700 mt-1">
                     Based on {stats.totalAssignments} graded assignments
                   </p>
                 </div>

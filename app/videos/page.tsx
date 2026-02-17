@@ -57,7 +57,7 @@ export default async function VideosPage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
             Training Videos
           </h1>
-          <p className="text-xl text-orange-100 max-w-3xl mx-auto">
+          <p className="text-xl text-brand-orange-100 max-w-3xl mx-auto">
             Watch videos about our free career training programs. Learn what we
             offer and how to get started.
           </p>
@@ -94,7 +94,7 @@ export default async function VideosPage() {
                         />
                         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition flex items-center justify-center">
                           <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition">
-                            <Play className="w-8 h-8 text-orange-600 ml-1" />
+                            <Play className="w-8 h-8 text-brand-orange-600 ml-1" />
                           </div>
                         </div>
                       </div>
@@ -128,7 +128,7 @@ export default async function VideosPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg transition"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold rounded-lg transition"
             >
               Apply Now
             </Link>

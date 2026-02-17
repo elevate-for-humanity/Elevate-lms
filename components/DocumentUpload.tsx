@@ -164,7 +164,7 @@ export default function DocumentUpload({
           isDragging
             ? 'border-brand-blue-500 bg-brand-blue-50'
             : error
-            ? 'border-red-300 bg-red-50'
+            ? 'border-brand-red-300 bg-brand-red-50'
             : 'border-gray-300 bg-gray-50 hover:border-brand-blue-400 hover:bg-gray-50'
         }`}
       >
@@ -219,16 +219,16 @@ export default function DocumentUpload({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3"
+            className="mt-4 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-start gap-3"
           >
             <AlertCircle className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-semibold text-red-900">Upload Error</h4>
-              <p className="text-sm text-red-700">{error}</p>
+              <h4 className="font-semibold text-brand-red-900">Upload Error</h4>
+              <p className="text-sm text-brand-red-700">{error}</p>
             </div>
             <button
               onClick={() => setError(null)}
-              className="ml-auto text-brand-orange-600 hover:text-red-800"
+              className="ml-auto text-brand-orange-600 hover:text-brand-red-800"
             >
               <X className="w-5 h-5" />
             </button>
@@ -265,12 +265,12 @@ export default function DocumentUpload({
                   <div className="flex items-center gap-4">
                     {/* File Icon */}
                     <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      file.status === 'success' ? 'bg-green-100' :
-                      file.status === 'error' ? 'bg-red-100' :
+                      file.status === 'success' ? 'bg-brand-green-100' :
+                      file.status === 'error' ? 'bg-brand-red-100' :
                       'bg-brand-blue-100'
                     }`}>
                       {file.status === 'success' ? (
-                        <Check className="w-6 h-6 text-green-600" />
+                        <Check className="w-6 h-6 text-brand-green-600" />
                       ) : file.status === 'error' ? (
                         <AlertCircle className="w-6 h-6 text-brand-orange-600" />
                       ) : (
@@ -310,7 +310,7 @@ export default function DocumentUpload({
                       )}
 
                       {file.status === 'success' && (
-                        <div className="flex items-center gap-2 text-sm text-green-600">
+                        <div className="flex items-center gap-2 text-sm text-brand-green-600">
                           <Check className="w-4 h-4" />
                           <span>Upload complete</span>
                         </div>
@@ -338,7 +338,7 @@ export default function DocumentUpload({
                           <a
                             href={file.url}
                             download={file.name}
-                            className="p-2 text-black hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                            className="p-2 text-black hover:text-brand-green-600 hover:bg-brand-green-50 rounded-lg transition-colors"
                             title="Download"
                           >
                             <Download className="w-5 h-5" />
@@ -347,7 +347,7 @@ export default function DocumentUpload({
                       )}
                       <button
                         onClick={() => removeFile(file.id)}
-                        className="p-2 text-black hover:text-brand-orange-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-black hover:text-brand-orange-600 hover:bg-brand-red-50 rounded-lg transition-colors"
                         title="Remove"
                       >
                         <Trash2 className="w-5 h-5" />
@@ -373,14 +373,14 @@ export default function DocumentUpload({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3"
+          className="mt-6 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg flex items-center gap-3"
         >
-          <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+          <div className="w-10 h-10 bg-brand-green-600 rounded-full flex items-center justify-center">
             <Check className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h4 className="font-semibold text-green-900">All files uploaded successfully!</h4>
-            <p className="text-sm text-green-700">
+            <h4 className="font-semibold text-brand-green-900">All files uploaded successfully!</h4>
+            <p className="text-sm text-brand-green-700">
               {successCount} file{successCount > 1 ? 's' : ''} ready for submission
             </p>
           </div>

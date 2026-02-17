@@ -187,7 +187,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
                       {review.author}
                     </span>
                     {review.verified && (
-                      <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded">
+                      <span className="px-2 py-0.5 bg-brand-green-100 text-brand-green-700 text-xs font-semibold rounded">
                         Verified Purchase
                       </span>
                     )}

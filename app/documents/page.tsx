@@ -16,9 +16,9 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 const getFileIcon = (type: string) => {
-  if (type?.includes('pdf')) return 'text-red-500';
+  if (type?.includes('pdf')) return 'text-brand-red-500';
   if (type?.includes('doc')) return 'text-brand-blue-500';
-  if (type?.includes('sheet') || type?.includes('excel')) return 'text-green-500';
+  if (type?.includes('sheet') || type?.includes('excel')) return 'text-brand-green-500';
   if (type?.includes('image')) return 'text-brand-blue-500';
   return 'text-gray-500';
 };
@@ -65,7 +65,7 @@ export default async function DocumentsPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-          <Link href="/" className="hover:text-orange-600">Home</Link>
+          <Link href="/" className="hover:text-brand-orange-600">Home</Link>
           <ChevronRight className="w-4 h-4" />
           <span className="text-gray-900">Documents</span>
         </nav>
@@ -75,7 +75,7 @@ export default async function DocumentsPage() {
             <h1 className="text-3xl font-bold text-gray-900">Document Library</h1>
             <p className="text-gray-600">Access forms, guides, and resources</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+          <button className="flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
             <Upload className="w-4 h-4" /> Upload Document
           </button>
         </div>
@@ -84,7 +84,7 @@ export default async function DocumentsPage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input type="text" placeholder="Search documents..."
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
           </div>
           <div className="flex gap-2 overflow-x-auto">
             {categories.slice(0, 6).map(cat => (

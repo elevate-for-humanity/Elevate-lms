@@ -183,7 +183,7 @@ export default async function OnboardingPage() {
                 </li>
               </ul>
               <div className="text-center">
-                <span className="inline-flex items-center text-orange-700 font-semibold">
+                <span className="inline-flex items-center text-brand-orange-700 font-semibold">
                   Partner With Us <ArrowRight className="ml-2" size={20} />
                 </span>
               </div>

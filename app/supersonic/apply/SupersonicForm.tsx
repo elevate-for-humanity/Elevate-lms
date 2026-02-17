@@ -99,17 +99,17 @@ export default function SupersonicForm({ userId, existingProfile }: Props) {
         {[1, 2, 3].map(s => (
           <div key={s} className="flex items-center">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              step >= s ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-500'
+              step >= s ? 'bg-brand-orange-500 text-white' : 'bg-gray-200 text-gray-500'
             }`}>
               {step > s ? <span className="text-slate-400 flex-shrink-0">•</span> : s}
             </div>
-            {s < 3 && <div className={`w-16 h-1 ${step > s ? 'bg-orange-500' : 'bg-gray-200'}`} />}
+            {s < 3 && <div className={`w-16 h-1 ${step > s ? 'bg-brand-orange-500' : 'bg-gray-200'}`} />}
           </div>
         ))}
       </div>
 
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-4 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
           {error}
         </div>
       )}
@@ -240,10 +240,10 @@ export default function SupersonicForm({ userId, existingProfile }: Props) {
                 </select>
               </div>
             </div>
-            <div className="bg-green-50 rounded-lg p-4">
-              <p className="font-medium text-green-900 mb-2">Estimated Refund Advance</p>
-              <p className="text-3xl font-bold text-green-600">${estimateRefund().toLocaleString()}</p>
-              <p className="text-sm text-green-700 mt-1">Available within 24 hours of approval</p>
+            <div className="bg-brand-green-50 rounded-lg p-4">
+              <p className="font-medium text-brand-green-900 mb-2">Estimated Refund Advance</p>
+              <p className="text-3xl font-bold text-brand-green-600">${estimateRefund().toLocaleString()}</p>
+              <p className="text-sm text-brand-green-700 mt-1">Available within 24 hours of approval</p>
             </div>
           </div>
         )}
@@ -258,12 +258,12 @@ export default function SupersonicForm({ userId, existingProfile }: Props) {
           {step < 3 ? (
             <button onClick={() => setStep(s => s + 1)}
               disabled={step === 1 && (!formData.firstName || !formData.lastName || !formData.email || !formData.income || !formData.filingStatus)}
-              className="flex items-center gap-2 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50">
+              className="flex items-center gap-2 px-6 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600 disabled:opacity-50">
               Continue <ChevronRight className="w-4 h-4" />
             </button>
           ) : (
             <button onClick={handleSubmit} disabled={isSubmitting || !formData.bankAccount || !formData.routingNumber}
-              className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50">
+              className="px-6 py-2 bg-brand-green-500 text-white rounded-lg hover:bg-brand-green-600 disabled:opacity-50">
               {isSubmitting ? 'Submitting...' : 'Submit Application'}
             </button>
           )}

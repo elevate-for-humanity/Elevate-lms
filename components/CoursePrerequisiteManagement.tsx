@@ -68,7 +68,7 @@ export function CoursePrerequisiteManagement() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Course Prerequisites</h1>
-          <p className="text-red-100">Manage learning path dependencies</p>
+          <p className="text-brand-red-100">Manage learning path dependencies</p>
         </div>
       </div>
 
@@ -90,7 +90,7 @@ export function CoursePrerequisiteManagement() {
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-xl font-bold">{course.course_name}</h3>
                     <span className={`px-3 py-2 rounded text-xs font-medium ${
-                      course.status === 'completed' ? 'bg-green-100 text-green-700' :
+                      course.status === 'completed' ? 'bg-brand-green-100 text-brand-green-700' :
                       course.status === 'available' ? 'bg-brand-blue-100 text-brand-blue-700' :
                       'bg-gray-100 text-black'
                     }`}>
@@ -103,7 +103,7 @@ export function CoursePrerequisiteManagement() {
                       <p className="text-sm font-semibold text-black mb-1">Prerequisites:</p>
                       <div className="flex flex-wrap gap-2">
                         {getPrerequisiteTitles(course.prerequisites).map((title) => (
-                          <span key={title} className="px-2 py-2 bg-orange-100 text-orange-700 text-xs rounded">
+                          <span key={title} className="px-2 py-2 bg-brand-orange-100 text-brand-orange-700 text-xs rounded">
                             {title}
                           </span>
                         ))}
@@ -127,7 +127,7 @@ export function CoursePrerequisiteManagement() {
 
                 <div>
                   {course.status === 'completed' && (
-                    <div className="text-green-600 text-3xl">•</div>
+                    <div className="text-brand-green-600 text-3xl">•</div>
                   )}
                   {course.status === 'available' && (
                     <Button size="sm">Start Course</Button>

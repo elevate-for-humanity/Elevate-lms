@@ -346,9 +346,9 @@ export default function InteractiveVideoPlayer({
                     className={`w-full p-4 text-left rounded-lg border-2 transition-colors ${
                       showQuizResult
                         ? index === currentQuiz.correctAnswer
-                          ? 'border-green-500 bg-green-50'
+                          ? 'border-brand-green-500 bg-brand-green-50'
                           : index === quizAnswer
-                            ? 'border-red-500 bg-red-50'
+                            ? 'border-brand-red-500 bg-brand-red-50'
                             : 'border-gray-200'
                         : quizAnswer === index
                           ? 'border-brand-blue-500 bg-brand-blue-50'
@@ -377,8 +377,8 @@ export default function InteractiveVideoPlayer({
                 <div
                   className={`p-4 rounded-lg mb-4 ${
                     quizAnswer === currentQuiz.correctAnswer
-                      ? 'bg-green-50 text-green-900'
-                      : 'bg-red-50 text-red-900'
+                      ? 'bg-brand-green-50 text-brand-green-900'
+                      : 'bg-brand-red-50 text-brand-red-900'
                   }`}
                 >
                   <p className="font-semibold mb-2">

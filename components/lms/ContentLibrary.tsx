@@ -363,7 +363,7 @@ export default function ContentLibrary() {
                           e.stopPropagation();
                           handleDelete(item.id);
                         }}
-                        className="flex items-center justify-center px-2 py-2 text-sm border rounded hover:bg-red-50 text-brand-orange-600"
+                        className="flex items-center justify-center px-2 py-2 text-sm border rounded hover:bg-brand-red-50 text-brand-orange-600"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -441,7 +441,7 @@ export default function ContentLibrary() {
                           </button>
                           <button
                             onClick={() => handleDelete(item.id)}
-                            className="p-1 hover:bg-red-100 rounded text-brand-orange-600"
+                            className="p-1 hover:bg-brand-red-100 rounded text-brand-orange-600"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

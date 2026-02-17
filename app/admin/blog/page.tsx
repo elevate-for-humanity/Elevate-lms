@@ -55,12 +55,12 @@ export default async function BlogAdminPage() {
             <p className="text-sm text-black">{pendingCount} posts awaiting approval</p>
           </div>
 
-          <div className="border-l-4 border-green-500 pl-4">
+          <div className="border-l-4 border-brand-green-500 pl-4">
             <h3 className="font-semibold">Published</h3>
             <p className="text-sm text-black">{publishedCount} live blog posts</p>
           </div>
 
-          <div className="border-l-4 border-red-500 pl-4">
+          <div className="border-l-4 border-brand-red-500 pl-4">
             <h3 className="font-semibold">Archived</h3>
             <p className="text-sm text-black">{archivedCount} removed from public view</p>
           </div>

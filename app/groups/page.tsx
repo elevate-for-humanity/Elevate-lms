@@ -60,9 +60,9 @@ export default async function GroupsPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500" />
-            <p className="text-red-700">Unable to load study groups. Please try again later.</p>
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6 flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-brand-red-500" />
+            <p className="text-brand-red-700">Unable to load study groups. Please try again later.</p>
           </div>
         )}
 
@@ -84,7 +84,7 @@ export default async function GroupsPage() {
                     <h3 className="font-bold text-gray-900">{group.name}</h3>
                     <p className="text-gray-500 text-sm">{group.category}</p>
                   </div>
-                  {group.is_active && <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Active</span>}
+                  {group.is_active && <span className="px-2 py-1 bg-brand-green-100 text-brand-green-700 text-xs rounded-full">Active</span>}
                 </div>
                 <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
                   <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {group.member_count} members</span>

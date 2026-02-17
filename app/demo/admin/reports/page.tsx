@@ -26,8 +26,8 @@ export default function DemoReportsPage() {
             </div>
             <div className="flex items-center gap-3">
               <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                r.status === 'Submitted' ? 'bg-green-100 text-green-800' :
-                r.status === 'Overdue' ? 'bg-red-100 text-red-800' :
+                r.status === 'Submitted' ? 'bg-brand-green-100 text-brand-green-800' :
+                r.status === 'Overdue' ? 'bg-brand-red-100 text-brand-red-800' :
                 r.status === 'Ready' ? 'bg-brand-blue-100 text-brand-blue-800' :
                 'bg-gray-100 text-gray-600'
               }`}>{r.status}</span>

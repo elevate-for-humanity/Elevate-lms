@@ -84,7 +84,7 @@ export function ProgramPageVisual({ program }: Props) {
               <span className="text-white font-medium">{program.duration}</span>
             </div>
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
-              <DollarSign className="w-5 h-5 text-green-400" />
+              <DollarSign className="w-5 h-5 text-brand-green-400" />
               <span className="text-white font-medium">{program.salary} Avg Salary</span>
             </div>
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
@@ -92,9 +92,9 @@ export function ProgramPageVisual({ program }: Props) {
               <span className="text-white font-medium">{program.demand} Demand</span>
             </div>
             {program.fundingType === 'funded' && (
-              <div className="flex items-center gap-2 bg-green-500/20 backdrop-blur px-4 py-2 rounded-full border border-green-400/50">
+              <div className="flex items-center gap-2 bg-brand-green-500/20 backdrop-blur px-4 py-2 rounded-full border border-brand-green-400/50">
                 <span className="text-slate-400 flex-shrink-0">•</span>
-                <span className="text-green-300 font-medium">Free for Eligible</span>
+                <span className="text-brand-green-300 font-medium">Free for Eligible</span>
               </div>
             )}
           </div>
@@ -179,7 +179,7 @@ export function ProgramPageVisual({ program }: Props) {
                   <Briefcase className="w-6 h-6 text-brand-blue-400" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">{career.title}</h3>
-                <p className="text-green-400 font-semibold">{career.salary}</p>
+                <p className="text-brand-green-400 font-semibold">{career.salary}</p>
               </div>
             ))}
           </div>
@@ -201,7 +201,7 @@ export function ProgramPageVisual({ program }: Props) {
                 key={index}
                 className="flex items-center gap-3 bg-slate-50 rounded-xl p-4"
               >
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-brand-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <span className="text-slate-700 font-medium">{req}</span>

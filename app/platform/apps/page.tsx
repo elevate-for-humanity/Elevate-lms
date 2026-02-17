@@ -145,7 +145,7 @@ export default async function PlatformAppsPage() {
                     <h3 className="text-lg font-semibold text-black mb-2">
                       {app.name}
                     </h3>
-                    <div className="inline-flex items-center px-2 py-2 bg-brand-green-100 text-green-800 text-xs font-semibold rounded">
+                    <div className="inline-flex items-center px-2 py-2 bg-brand-green-100 text-brand-green-800 text-xs font-semibold rounded">
                       <Check className="w-3 h-3 mr-1" />
                       Core App
                     </div>

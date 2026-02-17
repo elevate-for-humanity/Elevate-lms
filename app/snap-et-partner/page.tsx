@@ -92,29 +92,29 @@ export default function SNAPETPartnerPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <Image src="/images/icons/award.png" alt="Icon" width={32} height={32} className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mb-4">
+                <Image src="/images/icons/award.png" alt="Icon" width={32} height={32} className="w-8 h-8 text-brand-green-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">Already Approved</h3>
               <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>ETPL programs (WIOA eligible)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>DOL Registered Apprenticeship Sponsor</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>DWD INTraining Location ID: 10004621</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>WRG approved programs</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>JRI partner (justice-involved)</span>
                 </li>
               </ul>
@@ -213,7 +213,7 @@ export default function SNAPETPartnerPage() {
                     CNA, HVAC, Barber, Esthetics, Tax Prep, CHW, Home Health
                     Aide, Peer Recovery Coach, CDL
                   </td>
-                  <td className="px-6 py-4 text-center text-green-600 font-bold">
+                  <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
                     <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 inline-block" />
                   </td>
                 </tr>
@@ -223,7 +223,7 @@ export default function SNAPETPartnerPage() {
                     DOL Registered Apprenticeships (Barber, HVAC, Building
                     Maintenance), On-the-Job Training, Work-Based Learning
                   </td>
-                  <td className="px-6 py-4 text-center text-green-600 font-bold">
+                  <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
                     <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 inline-block" />
                   </td>
                 </tr>
@@ -233,7 +233,7 @@ export default function SNAPETPartnerPage() {
                     Business Startup, Workforce Readiness, Soft Skills Training,
                     Resume Writing, Interview Prep
                   </td>
-                  <td className="px-6 py-4 text-center text-green-600 font-bold">
+                  <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
                     <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 inline-block" />
                   </td>
                 </tr>
@@ -245,7 +245,7 @@ export default function SNAPETPartnerPage() {
                     Career Coaching, Case Management, Job Placement Services,
                     Employer Connections
                   </td>
-                  <td className="px-6 py-4 text-center text-green-600 font-bold">
+                  <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
                     <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 inline-block" />
                   </td>
                 </tr>
@@ -255,7 +255,7 @@ export default function SNAPETPartnerPage() {
                     Transportation Reimbursement, Childcare Assistance,
                     Emergency Support Services
                   </td>
-                  <td className="px-6 py-4 text-center text-green-600 font-bold">
+                  <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
                     <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 inline-block" />
                   </td>
                 </tr>
@@ -272,7 +272,7 @@ export default function SNAPETPartnerPage() {
             <h2 className="text-4xl font-bold mb-4">
               What We Provide as a SNAP E&T Partner
             </h2>
-            <p className="text-xl text-green-100">
+            <p className="text-xl text-brand-green-100">
               Complete execution layer for SNAP → Training → Job pathway
             </p>
           </div>
@@ -363,7 +363,7 @@ export default function SNAPETPartnerPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">500+</div>
+              <div className="text-4xl font-bold text-brand-green-600 mb-2">500+</div>
               <p className="font-bold mb-2">Students Trained</p>
               <p className="text-sm text-black">
                 Proven track record of outcomes
@@ -379,7 +379,7 @@ export default function SNAPETPartnerPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <div className="text-4xl font-bold text-orange-600 mb-2">
+              <div className="text-4xl font-bold text-brand-orange-600 mb-2">
                 100%
               </div>
               <p className="font-bold mb-2">Compliance Ready</p>

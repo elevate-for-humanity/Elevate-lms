@@ -170,7 +170,7 @@ export default function ComplianceAuditPage() {
                     </span>
                     <span className={`text-xs px-2 py-1 rounded-full ${
                       audit.status === 'completed' 
-                        ? 'bg-green-100 text-green-700'
+                        ? 'bg-brand-green-100 text-brand-green-700'
                         : audit.status === 'pending_signoff'
                         ? 'bg-amber-100 text-amber-700'
                         : 'bg-gray-100 text-gray-600'
@@ -199,14 +199,14 @@ export default function ComplianceAuditPage() {
 
                 {/* Auto-Flagged Issues */}
                 {selectedAudit.auto_flagged_issues?.length > 0 && (
-                  <div className="p-6 bg-red-50 border-b border-red-100">
-                    <h3 className="font-semibold text-red-800 flex items-center gap-2 mb-3">
+                  <div className="p-6 bg-brand-red-50 border-b border-brand-red-100">
+                    <h3 className="font-semibold text-brand-red-800 flex items-center gap-2 mb-3">
                       <AlertTriangle className="w-5 h-5" />
                       Auto-Flagged Issues ({selectedAudit.auto_flagged_issues.length})
                     </h3>
                     <ul className="space-y-2">
                       {selectedAudit.auto_flagged_issues.map((issue: any, index: number) => (
-                        <li key={index} className="flex items-start gap-2 text-sm text-red-700">
+                        <li key={index} className="flex items-start gap-2 text-sm text-brand-red-700">
                           <XCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                           {issue.description}
                         </li>
@@ -246,11 +246,11 @@ export default function ComplianceAuditPage() {
                 <div className="p-6 border-t border-gray-100">
                   <h3 className="font-semibold text-gray-900 mb-4">Funding Distribution</h3>
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="p-4 bg-green-50 rounded-lg">
-                      <p className="text-2xl font-bold text-green-700">
+                    <div className="p-4 bg-brand-green-50 rounded-lg">
+                      <p className="text-2xl font-bold text-brand-green-700">
                         {selectedAudit.workforce_funded_count}
                       </p>
-                      <p className="text-sm text-green-600">Workforce-Funded</p>
+                      <p className="text-sm text-brand-green-600">Workforce-Funded</p>
                     </div>
                     <div className="p-4 bg-brand-blue-50 rounded-lg">
                       <p className="text-2xl font-bold text-brand-blue-700">
@@ -280,11 +280,11 @@ export default function ComplianceAuditPage() {
                       <p className="text-xs text-gray-500">Missed Payment</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-xl font-bold text-orange-600">{selectedAudit.accounts_paused}</p>
+                      <p className="text-xl font-bold text-brand-orange-600">{selectedAudit.accounts_paused}</p>
                       <p className="text-xs text-gray-500">Paused</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-xl font-bold text-red-600">{selectedAudit.accounts_beyond_90_days}</p>
+                      <p className="text-xl font-bold text-brand-red-600">{selectedAudit.accounts_beyond_90_days}</p>
                       <p className="text-xs text-gray-500">Beyond 90 Days</p>
                     </div>
                   </div>
@@ -340,8 +340,8 @@ function MetricCard({
 }) {
   const colors = {
     gray: 'bg-gray-50 text-gray-600',
-    green: 'bg-green-50 text-green-600',
-    red: 'bg-red-50 text-red-600',
+    green: 'bg-brand-green-50 text-brand-green-600',
+    red: 'bg-brand-red-50 text-brand-red-600',
   };
 
   return (
@@ -366,7 +366,7 @@ function SignoffCard({
 }) {
   return (
     <div className={`p-4 rounded-lg border-2 ${
-      signed ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'
+      signed ? 'border-brand-green-200 bg-brand-green-50' : 'border-gray-200 bg-white'
     }`}>
       <div className="flex items-center gap-2 mb-2">
         {signed ? (
@@ -378,7 +378,7 @@ function SignoffCard({
       </div>
       
       {signed ? (
-        <p className="text-xs text-green-600">
+        <p className="text-xs text-brand-green-600">
           Signed {new Date(signedAt!).toLocaleDateString()}
         </p>
       ) : (

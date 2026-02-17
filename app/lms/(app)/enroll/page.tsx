@@ -164,7 +164,7 @@ export default async function EnrollPage({ searchParams }: Props) {
                       <div className="flex items-center justify-between">
                         <div>
                           {isFree ? (
-                            <span className="text-lg font-bold text-green-600">FREE</span>
+                            <span className="text-lg font-bold text-brand-green-600">FREE</span>
                           ) : (
                             <span className="text-lg font-bold text-slate-900">${course.price}</span>
                           )}
@@ -235,7 +235,7 @@ export default async function EnrollPage({ searchParams }: Props) {
                       <div className="flex items-center justify-between">
                         <div>
                           {price === 0 ? (
-                            <span className="text-lg font-bold text-green-600">FREE</span>
+                            <span className="text-lg font-bold text-brand-green-600">FREE</span>
                           ) : (
                             <span className="text-lg font-bold text-slate-900">${price}</span>
                           )}

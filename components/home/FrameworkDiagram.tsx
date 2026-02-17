@@ -18,8 +18,8 @@ export default function FrameworkDiagram() {
           {/* Step 1: Apply */}
           <div className="relative">
             <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow">
-              <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-20 h-20 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10 text-brand-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
@@ -30,7 +30,7 @@ export default function FrameworkDiagram() {
             </div>
             {/* Arrow */}
             <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-              <svg className="w-8 h-8 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-8 h-8 text-brand-orange-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
             </div>
@@ -60,8 +60,8 @@ export default function FrameworkDiagram() {
           {/* Step 3: Certify */}
           <div className="relative">
             <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10 text-brand-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                 </svg>
               </div>
@@ -72,7 +72,7 @@ export default function FrameworkDiagram() {
             </div>
             {/* Arrow */}
             <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-              <svg className="w-8 h-8 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-8 h-8 text-brand-green-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
             </div>
@@ -97,7 +97,7 @@ export default function FrameworkDiagram() {
         {/* Supporting Stats */}
         <div className="mt-16 grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           <div className="text-center">
-            <div className="text-4xl font-bold text-orange-600 mb-2">100%</div>
+            <div className="text-4xl font-bold text-brand-orange-600 mb-2">100%</div>
             <div className="text-black">Free Training Available</div>
           </div>
           <div className="text-center">
@@ -105,7 +105,7 @@ export default function FrameworkDiagram() {
             <div className="text-black">Weeks to Complete</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-bold text-green-600 mb-2">85%+</div>
+            <div className="text-4xl font-bold text-brand-green-600 mb-2">85%+</div>
             <div className="text-black">Job Placement Rate</div>
           </div>
         </div>

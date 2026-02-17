@@ -240,14 +240,14 @@ export default function BarberPartnerPage() {
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700">
+          <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-center gap-3 text-brand-red-700">
             <AlertCircle className="w-5 h-5" />
             {error}
           </div>
         )}
         
         {success && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3 text-green-700">
+          <div className="mb-6 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg flex items-center gap-3 text-brand-green-700">
             <span className="text-slate-400 flex-shrink-0">•</span>
             {success}
           </div>
@@ -333,7 +333,7 @@ export default function BarberPartnerPage() {
                       <td className="px-6 py-4 text-sm text-slate-500 max-w-xs truncate">{entry.notes || '-'}</td>
                       <td className="px-6 py-4">
                         <span className={`text-xs px-2 py-1 rounded-full ${
-                          entry.status === 'verified' ? 'bg-green-100 text-green-700' :
+                          entry.status === 'verified' ? 'bg-brand-green-100 text-brand-green-700' :
                           entry.status === 'submitted' ? 'bg-brand-blue-100 text-brand-blue-700' :
                           'bg-slate-100 text-slate-600'
                         }`}>

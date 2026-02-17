@@ -197,9 +197,9 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
 
       {/* Error Display */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
           {error}
-          <button onClick={() => setError(null)} className="ml-4 text-red-500 hover:text-red-700">Dismiss</button>
+          <button onClick={() => setError(null)} className="ml-4 text-brand-red-500 hover:text-brand-red-700">Dismiss</button>
         </div>
       )}
 
@@ -211,7 +211,7 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <p className="text-sm text-gray-500">Active</p>
-          <p className="text-2xl font-bold text-green-600">{currentStats.active}</p>
+          <p className="text-2xl font-bold text-brand-green-600">{currentStats.active}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <p className="text-sm text-gray-500">Students</p>
@@ -219,11 +219,11 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <p className="text-sm text-gray-500">Instructors</p>
-          <p className="text-2xl font-bold text-orange-600">{currentStats.instructors}</p>
+          <p className="text-2xl font-bold text-brand-orange-600">{currentStats.instructors}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <p className="text-sm text-gray-500">Admins</p>
-          <p className="text-2xl font-bold text-red-600">{currentStats.admins}</p>
+          <p className="text-2xl font-bold text-brand-red-600">{currentStats.admins}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <p className="text-sm text-gray-500">Employers</p>
@@ -287,17 +287,17 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
                   <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      user.role === 'admin' || user.role === 'super_admin' ? 'bg-red-100 text-red-700' :
+                      user.role === 'admin' || user.role === 'super_admin' ? 'bg-brand-red-100 text-brand-red-700' :
                       user.role === 'instructor' ? 'bg-brand-blue-100 text-brand-blue-700' :
-                      user.role === 'employer' ? 'bg-orange-100 text-orange-700' :
-                      'bg-green-100 text-green-700'
+                      user.role === 'employer' ? 'bg-brand-orange-100 text-brand-orange-700' :
+                      'bg-brand-green-100 text-brand-green-700'
                     }`}>
                       {user.role || 'student'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      user.is_active !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                      user.is_active !== false ? 'bg-brand-green-100 text-brand-green-700' : 'bg-gray-100 text-gray-600'
                     }`}>
                       {user.is_active !== false ? 'Active' : 'Inactive'}
                     </span>
@@ -309,11 +309,11 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
                     <div className="flex justify-end gap-2">
                       <button onClick={() => openEditModal(user)} className="px-3 py-1 text-sm border rounded hover:bg-gray-50">Edit</button>
                       {user.is_active !== false ? (
-                        <button onClick={() => handleDeactivate(user.id)} className="px-3 py-1 text-sm text-orange-600 border border-orange-200 rounded hover:bg-orange-50">Deactivate</button>
+                        <button onClick={() => handleDeactivate(user.id)} className="px-3 py-1 text-sm text-brand-orange-600 border border-brand-orange-200 rounded hover:bg-brand-orange-50">Deactivate</button>
                       ) : (
-                        <button onClick={() => handleActivate(user.id)} className="px-3 py-1 text-sm text-green-600 border border-green-200 rounded hover:bg-green-50">Activate</button>
+                        <button onClick={() => handleActivate(user.id)} className="px-3 py-1 text-sm text-brand-green-600 border border-brand-green-200 rounded hover:bg-brand-green-50">Activate</button>
                       )}
-                      <button onClick={() => handleDelete(user.id)} className="px-3 py-1 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50">Delete</button>
+                      <button onClick={() => handleDelete(user.id)} className="px-3 py-1 text-sm text-brand-red-600 border border-brand-red-200 rounded hover:bg-brand-red-50">Delete</button>
                     </div>
                   </td>
                 </tr>

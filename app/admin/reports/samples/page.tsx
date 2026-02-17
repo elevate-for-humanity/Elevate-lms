@@ -188,7 +188,7 @@ export default function SampleReportsPage() {
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Status</dt>
                     <dd>
-                      <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">
+                      <span className="inline-flex items-center gap-1 bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded text-xs font-medium">
                         <span className="text-slate-400 flex-shrink-0">•</span>
                         {SAMPLE_ENROLLMENT.status}
                       </span>
@@ -207,7 +207,7 @@ export default function SampleReportsPage() {
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Amount</dt>
-                    <dd className="font-medium text-green-600">${SAMPLE_ENROLLMENT.funding.amount.toLocaleString()}</dd>
+                    <dd className="font-medium text-brand-green-600">${SAMPLE_ENROLLMENT.funding.amount.toLocaleString()}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Provider</dt>
@@ -307,7 +307,7 @@ export default function SampleReportsPage() {
 
         {/* Sample Funding Report */}
         <section className="bg-white rounded-xl border shadow-sm overflow-hidden">
-          <div className="bg-green-600 text-white px-6 py-4 flex items-center justify-between">
+          <div className="bg-brand-green-600 text-white px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <DollarSign className="w-6 h-6" />
               <h2 className="text-xl font-bold">Sample Funding Source Report</h2>
@@ -334,17 +334,17 @@ export default function SampleReportsPage() {
                 <div className="text-3xl font-bold text-brand-blue-600">{SAMPLE_FUNDING_REPORT.summary.total_enrollments}</div>
                 <div className="text-sm text-brand-blue-700">Total Enrollments</div>
               </div>
-              <div className="bg-green-50 rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold text-green-600">${(SAMPLE_FUNDING_REPORT.summary.total_funding / 1000).toFixed(0)}K</div>
-                <div className="text-sm text-green-700">Total Funding</div>
+              <div className="bg-brand-green-50 rounded-lg p-4 text-center">
+                <div className="text-3xl font-bold text-brand-green-600">${(SAMPLE_FUNDING_REPORT.summary.total_funding / 1000).toFixed(0)}K</div>
+                <div className="text-sm text-brand-green-700">Total Funding</div>
               </div>
               <div className="bg-brand-blue-50 rounded-lg p-4 text-center">
                 <div className="text-3xl font-bold text-brand-blue-600">{SAMPLE_FUNDING_REPORT.summary.completions}</div>
                 <div className="text-sm text-brand-blue-700">Completions</div>
               </div>
-              <div className="bg-orange-50 rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold text-orange-600">{SAMPLE_FUNDING_REPORT.summary.placements}</div>
-                <div className="text-sm text-orange-700">Job Placements</div>
+              <div className="bg-brand-orange-50 rounded-lg p-4 text-center">
+                <div className="text-3xl font-bold text-brand-orange-600">{SAMPLE_FUNDING_REPORT.summary.placements}</div>
+                <div className="text-sm text-brand-orange-700">Job Placements</div>
               </div>
             </div>
 
@@ -367,7 +367,7 @@ export default function SampleReportsPage() {
                       <tr key={row.source} className="border-t">
                         <td className="px-4 py-3 font-medium">{row.source}</td>
                         <td className="px-4 py-3 text-right">{row.enrollments}</td>
-                        <td className="px-4 py-3 text-right text-green-600">${row.amount.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right text-brand-green-600">${row.amount.toLocaleString()}</td>
                         <td className="px-4 py-3 text-right">{row.completions}</td>
                         <td className="px-4 py-3 text-right">{row.placements}</td>
                       </tr>
@@ -377,7 +377,7 @@ export default function SampleReportsPage() {
                     <tr className="border-t-2 bg-gray-50 font-semibold">
                       <td className="px-4 py-3">Total</td>
                       <td className="px-4 py-3 text-right">{SAMPLE_FUNDING_REPORT.summary.total_enrollments}</td>
-                      <td className="px-4 py-3 text-right text-green-600">${SAMPLE_FUNDING_REPORT.summary.total_funding.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-right text-brand-green-600">${SAMPLE_FUNDING_REPORT.summary.total_funding.toLocaleString()}</td>
                       <td className="px-4 py-3 text-right">{SAMPLE_FUNDING_REPORT.summary.completions}</td>
                       <td className="px-4 py-3 text-right">{SAMPLE_FUNDING_REPORT.summary.placements}</td>
                     </tr>
@@ -406,7 +406,7 @@ export default function SampleReportsPage() {
                         <td className="px-4 py-3 text-right">{row.enrollments}</td>
                         <td className="px-4 py-3 text-right">{row.completions}</td>
                         <td className="px-4 py-3 text-right">
-                          <span className="inline-flex items-center bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">
+                          <span className="inline-flex items-center bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded text-xs font-medium">
                             {row.placement_rate}%
                           </span>
                         </td>

@@ -124,14 +124,14 @@ export default async function PartnerAttendancePage() {
                   <td className="px-6 py-4 text-gray-600">{new Date(session.date).toLocaleDateString()}</td>
                   <td className="px-6 py-4 text-gray-600">{session.time}</td>
                   <td className="px-6 py-4 text-center">
-                    <span className="text-green-600 font-medium">{session.present}</span>
+                    <span className="text-brand-green-600 font-medium">{session.present}</span>
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <span className="text-red-600 font-medium">{session.absent}</span>
+                    <span className="text-brand-red-600 font-medium">{session.absent}</span>
                   </td>
                   <td className="px-6 py-4 text-center">
                     <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      (session.present / session.total * 100) >= 80 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                      (session.present / session.total * 100) >= 80 ? 'bg-brand-green-100 text-brand-green-700' : 'bg-yellow-100 text-yellow-700'
                     }`}>
                       {Math.round(session.present / session.total * 100)}%
                     </span>

@@ -63,7 +63,7 @@ export default async function CoursesPage() {
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Launch Your New Career <span className="block text-green-400">In Weeks, Not Years</span></h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Launch Your New Career <span className="block text-brand-green-400">In Weeks, Not Years</span></h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">Industry-recognized certifications in healthcare, skilled trades, technology, and more. Free for eligible Indiana residents through WIOA funding.</p>
           </div>
         </div>
@@ -80,8 +80,8 @@ export default async function CoursesPage() {
               { icon: BookOpen, title: 'Flexible Learning', desc: 'Online, in-person, and hybrid options' },
             ].map((item) => (
               <div key={item.title} className="text-center">
-                <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <item.icon className="w-7 h-7 text-green-600" />
+                <div className="w-14 h-14 bg-brand-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <item.icon className="w-7 h-7 text-brand-green-600" />
                 </div>
                 <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
                 <p className="text-sm text-slate-600">{item.desc}</p>
@@ -124,7 +124,7 @@ export default async function CoursesPage() {
                 </div>
                 <div className="p-6">
                   <p className="text-slate-600 mb-4">{category.description}</p>
-                  <div className="flex items-center gap-2 text-green-600 font-semibold">
+                  <div className="flex items-center gap-2 text-brand-green-600 font-semibold">
                     View Programs <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
@@ -161,10 +161,10 @@ export default async function CoursesPage() {
                     />
                   </div>
                   <div className="p-6">
-                    <span className="text-xs font-bold text-green-400 uppercase tracking-wide">
+                    <span className="text-xs font-bold text-brand-green-400 uppercase tracking-wide">
                       {course.category}
                     </span>
-                    <h3 className="text-lg font-bold text-white mt-2 mb-2 group-hover:text-green-400 transition-colors">
+                    <h3 className="text-lg font-bold text-white mt-2 mb-2 group-hover:text-brand-green-400 transition-colors">
                       {course.title}
                     </h3>
                     {course.duration && (
@@ -181,7 +181,7 @@ export default async function CoursesPage() {
             <div className="text-center mt-12">
               <Link
                 href="/programs"
-                className="inline-flex items-center gap-2 bg-green-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-green-700 transition-all"
+                className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-green-700 transition-all"
               >
                 View All Programs <ArrowRight className="w-5 h-5" />
               </Link>
@@ -216,7 +216,7 @@ export default async function CoursesPage() {
                   <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 text-xs font-bold rounded-full">
                     {course.category}
                   </span>
-                  <span className="text-green-600 font-bold">{course.price}</span>
+                  <span className="text-brand-green-600 font-bold">{course.price}</span>
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">{course.title}</h3>
                 <p className="text-slate-600 text-sm mb-4">{course.description}</p>
@@ -269,24 +269,24 @@ export default async function CoursesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-green-600">
+      <section className="py-20 bg-brand-green-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
             Ready to Start Your New Career?
           </h2>
-          <p className="text-xl text-green-100 mb-8">
+          <p className="text-xl text-brand-green-100 mb-8">
             Apply today and find out if you qualify for free WIOA-funded training.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/apply"
-              className="inline-flex items-center gap-2 bg-white text-green-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-50 transition-all"
+              className="inline-flex items-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-green-50 transition-all"
             >
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/wioa-eligibility"
-              className="inline-flex items-center gap-2 bg-green-700 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-800 transition-all"
+              className="inline-flex items-center gap-2 bg-brand-green-700 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-green-800 transition-all"
             >
               Register at Indiana Career Connect
             </Link>

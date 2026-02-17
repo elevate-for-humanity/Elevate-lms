@@ -81,7 +81,7 @@ export default async function EnrollProgramPage({ params }: Props) {
                       <span className="text-slate-400 flex-shrink-0">•</span>
                       <div>
                         <p className="text-sm text-gray-500">Cost</p>
-                        <p className="font-medium text-green-600">Free with WIOA</p>
+                        <p className="font-medium text-brand-green-600">Free with WIOA</p>
                       </div>
                     </div>
                   </div>

@@ -157,9 +157,9 @@ export default async function ProgramHolderAnalyticsPage() {
       </div>
       <div className="max-w-7xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-          <Link href="/" className="hover:text-orange-600">Home</Link>
+          <Link href="/" className="hover:text-brand-orange-600">Home</Link>
           <ChevronRight className="w-4 h-4" />
-          <Link href="/program-holder" className="hover:text-orange-600">Program Holder</Link>
+          <Link href="/program-holder" className="hover:text-brand-orange-600">Program Holder</Link>
           <ChevronRight className="w-4 h-4" />
           <span className="text-gray-900">Analytics</span>
         </nav>
@@ -186,10 +186,10 @@ export default async function ProgramHolderAnalyticsPage() {
           {metrics.map(metric => (
             <div key={metric.label} className="bg-white rounded-xl border p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <metric.icon className="w-5 h-5 text-orange-600" />
+                <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                  <metric.icon className="w-5 h-5 text-brand-orange-600" />
                 </div>
-                <span className={`flex items-center gap-1 text-sm ${metric.up ? 'text-green-600' : 'text-red-600'}`}>
+                <span className={`flex items-center gap-1 text-sm ${metric.up ? 'text-brand-green-600' : 'text-brand-red-600'}`}>
                   {metric.up ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
                   {metric.change}
                 </span>
@@ -259,7 +259,7 @@ export default async function ProgramHolderAnalyticsPage() {
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
                         <div className="w-24 bg-gray-200 rounded-full h-2">
-                          <div className="bg-green-500 h-2 rounded-full" 
+                          <div className="bg-brand-green-500 h-2 rounded-full" 
                             style={{ width: `${program.completionRate}%` }} />
                         </div>
                         <span className="text-sm">{program.completionRate}%</span>

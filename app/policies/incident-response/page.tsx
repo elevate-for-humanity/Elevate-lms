@@ -33,12 +33,12 @@ export default function IncidentResponsePage() {
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Severity Levels</h2>
             
             <div className="space-y-4 mb-8">
-              <div className="bg-red-50 border-l-4 border-red-500 p-4">
+              <div className="bg-brand-red-50 border-l-4 border-brand-red-500 p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="w-5 h-5 text-red-600" />
-                  <h3 className="font-bold text-red-900 m-0">SEV-1: Critical</h3>
+                  <AlertTriangle className="w-5 h-5 text-brand-red-600" />
+                  <h3 className="font-bold text-brand-red-900 m-0">SEV-1: Critical</h3>
                 </div>
-                <p className="text-red-800 m-0">
+                <p className="text-brand-red-800 m-0">
                   Full platform outage or data security risk affecting all users.
                 </p>
               </div>

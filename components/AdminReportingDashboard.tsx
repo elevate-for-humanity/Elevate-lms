@@ -222,8 +222,8 @@ export function AdminReportingDashboard() {
       change: `+${metrics.enrollmentChange}%`,
       trend: 'up',
       icon: TrendingUp,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
+      color: 'text-brand-green-600',
+      bgColor: 'bg-brand-green-100',
     },
     {
       title: 'Completion Rate',
@@ -240,8 +240,8 @@ export function AdminReportingDashboard() {
       change: `+${metrics.revenueChange}%`,
       trend: 'up',
       icon: DollarSign,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-100',
+      color: 'text-brand-orange-600',
+      bgColor: 'bg-brand-orange-100',
     },
   ];
 
@@ -294,7 +294,7 @@ export function AdminReportingDashboard() {
                   <div className={`p-3 rounded-lg ${metric.bgColor}`}>
                     <Icon className={metric.color} size={24} />
                   </div>
-                  <span className="text-sm font-semibold text-green-600">
+                  <span className="text-sm font-semibold text-brand-green-600">
                     {metric.change}
                   </span>
                 </div>
@@ -342,7 +342,7 @@ export function AdminReportingDashboard() {
           <CardContent>
             <div className="space-y-3">
               {programPerformance.slice(0, 5).map((program, index) => {
-                const colors = ['bg-brand-blue-600', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500', 'bg-orange-500'];
+                const colors = ['bg-brand-blue-600', 'bg-brand-green-500', 'bg-yellow-500', 'bg-purple-500', 'bg-brand-orange-500'];
                 const totalRevenue = programPerformance.reduce((sum, p) => sum + p.revenue, 0);
                 const percentage = ((program.revenue / totalRevenue) * 100).toFixed(1);
                 return (
@@ -394,7 +394,7 @@ export function AdminReportingDashboard() {
                     <td className="py-3 px-4 font-medium">{program.name}</td>
                     <td className="py-3 px-4 text-right">{program.students}</td>
                     <td className="py-3 px-4 text-right">
-                      <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-sm font-semibold">
+                      <span className="px-2 py-1 bg-brand-green-100 text-brand-green-800 rounded text-sm font-semibold">
                         {program.completion}%
                       </span>
                     </td>
@@ -425,8 +425,8 @@ export function AdminReportingDashboard() {
               <div key={activity.id} className="flex items-center gap-4 p-3 border rounded-lg hover:bg-gray-50 transition">
                 <div className={`w-2 h-2 rounded-full ${
                   activity.type === 'enrollment' ? 'bg-brand-blue-600' :
-                  activity.type === 'completion' ? 'bg-green-600' :
-                  'bg-orange-600'
+                  activity.type === 'completion' ? 'bg-brand-green-600' :
+                  'bg-brand-orange-600'
                 }`} />
                 <div className="flex-1">
                   <div className="font-medium">

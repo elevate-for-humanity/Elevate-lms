@@ -94,7 +94,7 @@ export default async function ApprenticeSkillsPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'bg-green-100 text-green-700';
+        return 'bg-brand-green-100 text-brand-green-700';
       case 'in-progress':
         return 'bg-brand-blue-100 text-brand-blue-700';
       default:
@@ -126,7 +126,7 @@ export default async function ApprenticeSkillsPage() {
           </div>
           <div className="bg-gray-200 rounded-full h-4 mb-2">
             <div 
-              className="bg-green-500 h-4 rounded-full transition-all" 
+              className="bg-brand-green-500 h-4 rounded-full transition-all" 
               style={{ width: `${progressPercent}%` }}
             />
           </div>

@@ -59,13 +59,13 @@ export default async function PublicAssistancePage() {
         </div>
       </div>
 
-      <section className="bg-green-600 text-white py-16">
+      <section className="bg-brand-green-600 text-white py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <DollarSign className="w-16 h-16 mx-auto mb-4" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Public Assistance Recipients
           </h1>
-          <p className="text-xl text-green-100">
+          <p className="text-xl text-brand-green-100">
             If you receive public assistance, you automatically qualify for WIOA funding
           </p>
         </div>
@@ -85,8 +85,8 @@ export default async function PublicAssistancePage() {
           </p>
           <div className="grid md:grid-cols-2 gap-4">
             {qualifyingPrograms.map((program, index) => (
-              <div key={index} className="bg-green-50 rounded-lg p-4">
-                <div className="font-bold text-green-700">{program.name}</div>
+              <div key={index} className="bg-brand-green-50 rounded-lg p-4">
+                <div className="font-bold text-brand-green-700">{program.name}</div>
                 <div className="text-sm text-gray-600">{program.full}</div>
               </div>
             ))}
@@ -151,21 +151,21 @@ export default async function PublicAssistancePage() {
         )}
 
         {/* CTA */}
-        <div className="bg-green-600 rounded-lg p-8 text-center text-white">
+        <div className="bg-brand-green-600 rounded-lg p-8 text-center text-white">
           <h3 className="text-2xl font-bold mb-4">Ready to Start Your Career?</h3>
-          <p className="text-green-100 mb-6">
+          <p className="text-brand-green-100 mb-6">
             Apply today - your public assistance status qualifies you for free training.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="bg-white text-green-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="bg-white text-brand-green-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-brand-green-700 transition"
             >
               <Phone className="w-5 h-5" />
               Get Help Online

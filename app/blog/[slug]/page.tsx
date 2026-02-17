@@ -136,7 +136,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
             <ArrowLeft className="w-4 h-4" />
             Back to Blog
           </Link>
-          <span className="inline-block px-3 py-2 bg-orange-500 text-white text-sm font-bold rounded-full mb-4">
+          <span className="inline-block px-3 py-2 bg-brand-orange-500 text-white text-sm font-bold rounded-full mb-4">
             {post.category}
           </span>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">

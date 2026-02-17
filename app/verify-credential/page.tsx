@@ -103,14 +103,14 @@ export default function VerifyCredentialPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="mt-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
+              <div className="mt-6 p-4 bg-brand-red-50 border-l-4 border-brand-red-500 rounded">
                 <div className="flex items-start gap-3">
-                  <XCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
+                  <XCircle className="w-6 h-6 text-brand-red-500 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-semibold text-red-900">
+                    <h3 className="font-semibold text-brand-red-900">
                       Verification Failed
                     </h3>
-                    <p className="text-red-700">{error}</p>
+                    <p className="text-brand-red-700">{error}</p>
                   </div>
                 </div>
               </div>
@@ -118,11 +118,11 @@ export default function VerifyCredentialPage() {
 
             {/* Success Result */}
             {result && result.valid && (
-              <div className="mt-6 p-6 bg-green-50 border-2 border-green-500 rounded-lg">
+              <div className="mt-6 p-6 bg-brand-green-50 border-2 border-brand-green-500 rounded-lg">
                 <div className="flex items-start gap-4">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-green-900 mb-4">
+                    <h3 className="text-2xl font-bold text-brand-green-900 mb-4">
                       • Valid Credential
                     </h3>
 
@@ -182,7 +182,7 @@ export default function VerifyCredentialPage() {
                         </div>
                       )}
 
-                      <div className="pt-4 border-t border-green-200">
+                      <div className="pt-4 border-t border-brand-green-200">
                         <div className="text-sm text-black">
                           This credential has been verified as authentic and is
                           currently valid.
@@ -196,11 +196,11 @@ export default function VerifyCredentialPage() {
 
             {/* Invalid/Revoked/Expired Result */}
             {result && !result.valid && (
-              <div className="mt-6 p-6 bg-red-50 border-2 border-red-500 rounded-lg">
+              <div className="mt-6 p-6 bg-brand-red-50 border-2 border-brand-red-500 rounded-lg">
                 <div className="flex items-start gap-4">
-                  <AlertTriangle className="w-8 h-8 text-red-600 flex-shrink-0" />
+                  <AlertTriangle className="w-8 h-8 text-brand-red-600 flex-shrink-0" />
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-red-900 mb-4">
+                    <h3 className="text-2xl font-bold text-brand-red-900 mb-4">
                       ✗ Invalid Credential
                     </h3>
 
@@ -209,7 +209,7 @@ export default function VerifyCredentialPage() {
                         <div className="text-sm font-semibold text-black">
                           Status
                         </div>
-                        <div className="text-lg text-red-900 font-semibold uppercase">
+                        <div className="text-lg text-brand-red-900 font-semibold uppercase">
                           {result.status}
                         </div>
                       </div>
@@ -225,7 +225,7 @@ export default function VerifyCredentialPage() {
                         </div>
                       )}
 
-                      <div className="pt-4 border-t border-red-200">
+                      <div className="pt-4 border-t border-brand-red-200">
                         <div className="text-sm text-black">
                           This credential is not currently valid. Please contact
                           the issuing organization for more information.

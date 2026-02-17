@@ -56,8 +56,8 @@ export default async function GeneralDiscussionsPage() {
       <div className="max-w-4xl mx-auto px-4">
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-            <MessageCircle className="w-6 h-6 text-green-600" />
+          <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
+            <MessageCircle className="w-6 h-6 text-brand-green-600" />
           </div>
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-gray-900">General Discussions</h1>
@@ -65,7 +65,7 @@ export default async function GeneralDiscussionsPage() {
           </div>
           {user && (
             <Link href="/community/discussions/new?category=general"
-              className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+              className="flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
               <Plus className="w-4 h-4" /> New Discussion
             </Link>
           )}
@@ -86,7 +86,7 @@ export default async function GeneralDiscussionsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      {discussion.is_pinned && <Pin className="w-4 h-4 text-orange-500" />}
+                      {discussion.is_pinned && <Pin className="w-4 h-4 text-brand-orange-500" />}
                       <h3 className="font-medium text-gray-900 truncate">{discussion.title}</h3>
                     </div>
                     <p className="text-sm text-gray-500 mt-1">
@@ -117,7 +117,7 @@ export default async function GeneralDiscussionsPage() {
               <p className="text-sm text-gray-500 mb-4">Start a conversation with the community</p>
               {user && (
                 <Link href="/community/discussions/new?category=general"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
                   <Plus className="w-4 h-4" /> Start Discussion
                 </Link>
               )}

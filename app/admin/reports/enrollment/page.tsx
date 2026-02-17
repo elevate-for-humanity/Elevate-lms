@@ -48,8 +48,8 @@ export default async function EnrollmentReportPage() {
   const statusColors: Record<string, string> = {
     enrolled: 'bg-brand-blue-100 text-brand-blue-700',
     in_progress: 'bg-yellow-100 text-yellow-700',
-    completed: 'bg-green-100 text-green-700',
-    dropped: 'bg-red-100 text-red-700',
+    completed: 'bg-brand-green-100 text-brand-green-700',
+    dropped: 'bg-brand-red-100 text-brand-red-700',
   };
 
   return (
@@ -80,8 +80,8 @@ export default async function EnrollmentReportPage() {
           
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <TrendingUp className="w-5 h-5 text-green-600" />
+              <div className="p-2 bg-brand-green-100 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-brand-green-600" />
               </div>
               <span className="text-sm text-gray-600">New This Month</span>
             </div>

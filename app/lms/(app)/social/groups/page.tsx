@@ -202,18 +202,18 @@ export default async function GroupsPage() {
               >
                 <div className="flex items-start gap-4">
                   <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    group.color === 'red' ? 'bg-red-100' :
-                    group.color === 'orange' ? 'bg-orange-100' :
-                    group.color === 'blue' ? 'bg-blue-100' :
+                    group.color === 'red' ? 'bg-brand-red-100' :
+                    group.color === 'orange' ? 'bg-brand-orange-100' :
+                    group.color === 'blue' ? 'bg-brand-blue-100' :
                     group.color === 'purple' ? 'bg-purple-100' :
-                    group.color === 'green' ? 'bg-green-100' : 'bg-indigo-100'
+                    group.color === 'green' ? 'bg-brand-green-100' : 'bg-indigo-100'
                   }`}>
                     <group.icon className={`w-7 h-7 ${
-                      group.color === 'red' ? 'text-red-600' :
-                      group.color === 'orange' ? 'text-orange-600' :
-                      group.color === 'blue' ? 'text-blue-600' :
+                      group.color === 'red' ? 'text-brand-red-600' :
+                      group.color === 'orange' ? 'text-brand-orange-600' :
+                      group.color === 'blue' ? 'text-brand-blue-600' :
                       group.color === 'purple' ? 'text-purple-600' :
-                      group.color === 'green' ? 'text-green-600' : 'text-indigo-600'
+                      group.color === 'green' ? 'text-brand-green-600' : 'text-indigo-600'
                     }`} />
                   </div>
                   <div className="flex-1">

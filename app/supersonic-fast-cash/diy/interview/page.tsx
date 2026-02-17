@@ -44,7 +44,7 @@ export default async function DIYInterviewPage() {
               <span className="text-sm text-black">Step 1 of 5</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
-              <div className="bg-orange-600 h-2 rounded-full" style={{width: '20%'}}></div>
+              <div className="bg-brand-orange-600 h-2 rounded-full" style={{width: '20%'}}></div>
             </div>
           </div>
 
@@ -58,7 +58,7 @@ export default async function DIYInterviewPage() {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                     required
                   />
                 </div>
@@ -68,7 +68,7 @@ export default async function DIYInterviewPage() {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                     required
                   />
                 </div>
@@ -79,7 +79,7 @@ export default async function DIYInterviewPage() {
                   <input
                     type="text"
                     placeholder="XXX-XX-XXXX"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                     required
                   />
                 </div>
@@ -89,7 +89,7 @@ export default async function DIYInterviewPage() {
                   </label>
                   <input
                     type="date"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                     required
                   />
                 </div>
@@ -127,7 +127,7 @@ export default async function DIYInterviewPage() {
               </Link>
               <button
                 type="submit"
-                className="px-8 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold transition-colors"
+                className="px-8 py-3 bg-brand-orange-600 hover:bg-brand-orange-700 text-white rounded-lg font-semibold transition-colors"
               >
                 Continue
               </button>

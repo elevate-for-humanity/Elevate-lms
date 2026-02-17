@@ -120,7 +120,7 @@ export default function ContactClient() {
 
                   {/* Content */}
                   <div className="absolute bottom-0 left-0 right-0 p-6 bg-zinc-900">
-                    <h3 className="text-lg md:text-lg font-bold text-white mb-2 group-hover:text-orange-300 transition">
+                    <h3 className="text-lg md:text-lg font-bold text-white mb-2 group-hover:text-brand-orange-300 transition">
                       {option.title}
                     </h3>
                     <p className="text-white/90 text-sm leading-relaxed">
@@ -143,7 +143,7 @@ export default function ContactClient() {
       {/* Quick Contact Section */}
       <section className="py-20 bg-zinc-900   relative overflow-hidden">
         {/* Decorative shapes */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-orange-200 rounded-full opacity-20 blur-3xl" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-brand-orange-200 rounded-full opacity-20 blur-3xl" />
 
         <div className="max-w-5xl mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">

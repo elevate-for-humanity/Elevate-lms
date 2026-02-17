@@ -90,9 +90,9 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
     .limit(5);
 
   const statusColors: Record<string, string> = {
-    active: 'bg-green-100 text-green-800',
+    active: 'bg-brand-green-100 text-brand-green-800',
     inactive: 'bg-gray-100 text-gray-800',
-    error: 'bg-red-100 text-red-800',
+    error: 'bg-brand-red-100 text-brand-red-800',
     pending: 'bg-yellow-100 text-yellow-800',
   };
 
@@ -165,8 +165,8 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+              <Users className="w-5 h-5 text-brand-green-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-slate-900">{enrollmentCount || 0}</p>
@@ -231,7 +231,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        course.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        course.active ? 'bg-brand-green-100 text-brand-green-800' : 'bg-gray-100 text-gray-800'
                       }`}>
                         {course.active ? 'Active' : 'Inactive'}
                       </span>
@@ -266,13 +266,13 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        log.status === 'success' ? 'bg-green-100' :
-                        log.status === 'error' ? 'bg-red-100' : 'bg-yellow-100'
+                        log.status === 'success' ? 'bg-brand-green-100' :
+                        log.status === 'error' ? 'bg-brand-red-100' : 'bg-yellow-100'
                       }`}>
                         {log.status === 'success' ? (
                           <span className="text-slate-400 flex-shrink-0">•</span>
                         ) : log.status === 'error' ? (
-                          <XCircle className="w-4 h-4 text-red-600" />
+                          <XCircle className="w-4 h-4 text-brand-red-600" />
                         ) : (
                           <RefreshCw className="w-4 h-4 text-yellow-600" />
                         )}
@@ -289,7 +289,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
                         {log.records_synced || 0} records
                       </p>
                       {log.error_message && (
-                        <p className="text-xs text-red-600 truncate max-w-[200px]">
+                        <p className="text-xs text-brand-red-600 truncate max-w-[200px]">
                           {log.error_message}
                         </p>
                       )}
@@ -367,12 +367,12 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
           </div>
 
           {/* Danger Zone */}
-          <div className="bg-white rounded-xl border border-red-200 p-6">
-            <h2 className="text-lg font-semibold text-red-900 mb-4">Danger Zone</h2>
+          <div className="bg-white rounded-xl border border-brand-red-200 p-6">
+            <h2 className="text-lg font-semibold text-brand-red-900 mb-4">Danger Zone</h2>
             <p className="text-sm text-slate-600 mb-4">
               Removing this integration will disconnect all courses and enrollments.
             </p>
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+            <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700">
               <Trash2 className="w-4 h-4" />
               Remove Integration
             </button>

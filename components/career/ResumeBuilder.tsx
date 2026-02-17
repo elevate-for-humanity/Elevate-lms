@@ -133,7 +133,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-          <FileText className="w-6 h-6 text-orange-400" />
+          <FileText className="w-6 h-6 text-brand-orange-400" />
           Resume Builder
         </h2>
         <div className="flex gap-2">
@@ -162,7 +162,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                 personal_info: { ...resumeData.personal_info, full_name: e.target.value },
               })
             }
-            className="bg-slate-900 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="bg-slate-900 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
           />
           <input
             type="email"
@@ -174,7 +174,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                 personal_info: { ...resumeData.personal_info, email: e.target.value },
               })
             }
-            className="bg-slate-900 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="bg-slate-900 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
           />
           <input
             type="tel"
@@ -186,7 +186,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                 personal_info: { ...resumeData.personal_info, phone: e.target.value },
               })
             }
-            className="bg-slate-900 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="bg-slate-900 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
           />
           <input
             type="text"
@@ -198,7 +198,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                 personal_info: { ...resumeData.personal_info, location: e.target.value },
               })
             }
-            className="bg-slate-900 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="bg-slate-900 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
           />
         </div>
       </div>
@@ -210,7 +210,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
           placeholder="Write a brief summary of your professional background and career goals..."
           value={resumeData.summary}
           onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setResumeData({ ...resumeData, summary: e.target.value })}
-          className="w-full bg-slate-900 text-white rounded-lg p-3 min-h-[120px] focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full bg-slate-900 text-white rounded-lg p-3 min-h-[120px] focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
         />
       </div>
 
@@ -220,7 +220,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
           <h3 className="text-lg font-semibold text-white">Work Experience</h3>
           <button
             onClick={addWorkExperience}
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-brand-orange-500 text-white rounded-lg font-medium hover:bg-brand-orange-600 transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Add Experience
@@ -234,7 +234,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                 <h4 className="text-white font-semibold">Experience {index + 1}</h4>
                 <button
                   onClick={() => removeWorkExperience(index)}
-                  className="text-red-400 hover:text-red-300"
+                  className="text-brand-red-400 hover:text-brand-red-300"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -249,7 +249,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                     updated[index].title = e.target.value;
                     setResumeData({ ...resumeData, work_experience: updated });
                   }}
-                  className="bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 />
                 <input
                   type="text"
@@ -260,7 +260,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                     updated[index].company = e.target.value;
                     setResumeData({ ...resumeData, work_experience: updated });
                   }}
-                  className="bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 />
                 <input
                   type="text"
@@ -271,7 +271,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                     updated[index].location = e.target.value;
                     setResumeData({ ...resumeData, work_experience: updated });
                   }}
-                  className="bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 />
                 <div className="flex gap-2">
                   <input
@@ -283,7 +283,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                       updated[index].start_date = e.target.value;
                       setResumeData({ ...resumeData, work_experience: updated });
                     }}
-                    className="flex-1 bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="flex-1 bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                   />
                   <input
                     type="month"
@@ -295,7 +295,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                       updated[index].end_date = e.target.value;
                       setResumeData({ ...resumeData, work_experience: updated });
                     }}
-                    className="flex-1 bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50"
+                    className="flex-1 bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-brand-orange-500 disabled:opacity-50"
                   />
                 </div>
                 <label className="flex items-center gap-2 text-white col-span-2">
@@ -319,7 +319,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                     updated[index].description = e.target.value;
                     setResumeData({ ...resumeData, work_experience: updated });
                   }}
-                  className="col-span-2 bg-slate-800 text-white rounded-lg p-2 min-h-[80px] focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="col-span-2 bg-slate-800 text-white rounded-lg p-2 min-h-[80px] focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 />
               </div>
             </div>
@@ -332,7 +332,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="px-6 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 disabled:opacity-50 transition-colors"
+          className="px-6 py-3 bg-brand-orange-500 text-white rounded-lg font-semibold hover:bg-brand-orange-600 disabled:opacity-50 transition-colors"
         >
           {isSaving ? "Saving..." : "Save Resume"}
         </button>

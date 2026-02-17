@@ -44,7 +44,7 @@ export default function IntakePage() {
     return (
       <div className="min-h-screen bg-white">
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl font-bold text-slate-900 mb-4">Application Received</h1>
@@ -70,7 +70,7 @@ export default function IntakePage() {
             </p>
           )}
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
-            <Link href="/programs" className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-center">
+            <Link href="/programs" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-center">
               Browse Programs
             </Link>
             <Link href="/" className="bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold px-6 py-3 rounded-lg transition-colors text-center">
@@ -101,7 +101,7 @@ export default function IntakePage() {
       <section className="py-12">
         <div className="max-w-2xl mx-auto px-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6" role="alert">
+            <div className="bg-brand-red-50 border border-brand-red-200 text-brand-red-800 px-4 py-3 rounded-lg mb-6" role="alert">
               {error}
             </div>
           )}
@@ -113,26 +113,26 @@ export default function IntakePage() {
               <div className="space-y-4">
                 <div>
                   <label htmlFor="full_name" className="block text-sm font-semibold text-slate-700 mb-1">Full Name *</label>
-                  <input id="full_name" name="full_name" required className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" />
+                  <input id="full_name" name="full_name" required className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500" />
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-1">Email</label>
-                    <input id="email" name="email" type="email" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" />
+                    <input id="email" name="email" type="email" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500" />
                   </div>
                   <div>
                     <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 mb-1">Phone</label>
-                    <input id="phone" name="phone" type="tel" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" />
+                    <input id="phone" name="phone" type="tel" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500" />
                   </div>
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="city" className="block text-sm font-semibold text-slate-700 mb-1">City</label>
-                    <input id="city" name="city" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" />
+                    <input id="city" name="city" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500" />
                   </div>
                   <div>
                     <label htmlFor="state" className="block text-sm font-semibold text-slate-700 mb-1">State</label>
-                    <input id="state" name="state" defaultValue="IN" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" />
+                    <input id="state" name="state" defaultValue="IN" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500" />
                   </div>
                 </div>
               </div>
@@ -144,7 +144,7 @@ export default function IntakePage() {
               <div className="space-y-4">
                 <div>
                   <label htmlFor="program_interest" className="block text-sm font-semibold text-slate-700 mb-1">Which program are you interested in?</label>
-                  <select id="program_interest" name="program_interest" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                  <select id="program_interest" name="program_interest" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500">
                     <option value="barbering">Barber Apprenticeship</option>
                     <option value="cna">CNA Certification</option>
                     <option value="cdl">CDL Training</option>
@@ -159,7 +159,7 @@ export default function IntakePage() {
                 </div>
                 <div>
                   <label htmlFor="preferred_location" className="block text-sm font-semibold text-slate-700 mb-1">Preferred Training Location</label>
-                  <input id="preferred_location" name="preferred_location" placeholder="e.g. Indianapolis, Kokomo" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" />
+                  <input id="preferred_location" name="preferred_location" placeholder="e.g. Indianapolis, Kokomo" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500" />
                 </div>
               </div>
             </div>
@@ -170,7 +170,7 @@ export default function IntakePage() {
               <div className="space-y-4">
                 <div>
                   <label htmlFor="employment_status" className="block text-sm font-semibold text-slate-700 mb-1">Current Employment Status</label>
-                  <select id="employment_status" name="employment_status" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                  <select id="employment_status" name="employment_status" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500">
                     <option value="">Select...</option>
                     <option value="unemployed">Unemployed</option>
                     <option value="part-time">Part-Time</option>
@@ -180,21 +180,21 @@ export default function IntakePage() {
                 </div>
                 <div>
                   <label htmlFor="funding_needed" className="block text-sm font-semibold text-slate-700 mb-1">Do you need funding assistance?</label>
-                  <select id="funding_needed" name="funding_needed" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                  <select id="funding_needed" name="funding_needed" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500">
                     <option value="true">Yes, I need funding assistance</option>
                     <option value="false">No, I can self-pay</option>
                   </select>
                 </div>
                 <div>
                   <label htmlFor="probation_or_reentry" className="block text-sm font-semibold text-slate-700 mb-1">Are you connected to probation, reentry, or community corrections?</label>
-                  <select id="probation_or_reentry" name="probation_or_reentry" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                  <select id="probation_or_reentry" name="probation_or_reentry" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500">
                     <option value="false">No</option>
                     <option value="true">Yes</option>
                   </select>
                 </div>
                 <div>
                   <label htmlFor="workforce_connection" className="block text-sm font-semibold text-slate-700 mb-1">Are you connected to any workforce services?</label>
-                  <select id="workforce_connection" name="workforce_connection" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                  <select id="workforce_connection" name="workforce_connection" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500">
                     <option value="">None / Not sure</option>
                     <option value="workone">WorkOne Indiana</option>
                     <option value="employer-indy">Employer Indy</option>
@@ -212,7 +212,7 @@ export default function IntakePage() {
               <div className="space-y-4">
                 <div>
                   <label htmlFor="referral_source" className="block text-sm font-semibold text-slate-700 mb-1">How did you hear about us?</label>
-                  <select id="referral_source" name="referral_source" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                  <select id="referral_source" name="referral_source" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500">
                     <option value="">Select...</option>
                     <option value="website">Website</option>
                     <option value="social-media">Social Media</option>
@@ -225,7 +225,7 @@ export default function IntakePage() {
                 </div>
                 <div>
                   <label htmlFor="notes" className="block text-sm font-semibold text-slate-700 mb-1">Tell us about your goals (optional)</label>
-                  <textarea id="notes" name="notes" rows={4} className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" />
+                  <textarea id="notes" name="notes" rows={4} className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500" />
                 </div>
               </div>
             </div>
@@ -235,13 +235,13 @@ export default function IntakePage() {
               By submitting this form, you authorize Elevate for Humanity, Inc. to review your
               eligibility for workforce-funded training programs. Funding eligibility is determined
               by our workforce partners and is not guaranteed. Your information will be kept
-              confidential in accordance with our <Link href="/privacy-policy" className="text-red-600 underline">privacy policy</Link>.
+              confidential in accordance with our <Link href="/privacy-policy" className="text-brand-red-600 underline">privacy policy</Link>.
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-red-600 hover:bg-red-700 disabled:bg-slate-400 text-white text-lg font-bold p-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-brand-red-600 hover:bg-brand-red-700 disabled:bg-slate-400 text-white text-lg font-bold p-4 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               {loading ? 'Submitting...' : (
                 <>Check Eligibility & Apply <ArrowRight className="w-5 h-5" /></>

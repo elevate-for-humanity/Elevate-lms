@@ -24,7 +24,7 @@ export function ProgramCard({
   return (
     <Link
       href={link}
-      className="group bg-white rounded-xl overflow-hidden shadow-md border border-slate-200 hover:border-orange-500 hover:shadow-xl transition-all hover:-translate-y-1"
+      className="group bg-white rounded-xl overflow-hidden shadow-md border border-slate-200 hover:border-brand-orange-500 hover:shadow-xl transition-all hover:-translate-y-1"
     >
       {/* Image */}
       <div className="relative aspect-video overflow-hidden">
@@ -36,7 +36,7 @@ export function ProgramCard({
           quality={100}
         />
         {badge && (
-          <div className="absolute top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+          <div className="absolute top-4 right-4 bg-brand-green-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
             {badge}
           </div>
         )}
@@ -44,7 +44,7 @@ export function ProgramCard({
 
       {/* Content */}
       <div className="p-6">
-        <h3 className="text-xl font-bold text-black mb-3 group-hover:text-orange-500 transition-colors">
+        <h3 className="text-xl font-bold text-black mb-3 group-hover:text-brand-orange-500 transition-colors">
           {title}
         </h3>
         <p className="text-black mb-4 line-clamp-2">{description}</p>
@@ -56,13 +56,13 @@ export function ProgramCard({
             <span className="font-semibold">{duration}</span>
           </div>
           <div className="flex items-center gap-2 text-black">
-            <DollarSign size={16} className="text-green-600" />
+            <DollarSign size={16} className="text-brand-green-600" />
             <span className="font-semibold">{salary}</span>
           </div>
         </div>
 
         {/* CTA */}
-        <div className="flex items-center gap-2 text-orange-500 font-semibold group-hover:gap-3 transition-all">
+        <div className="flex items-center gap-2 text-brand-orange-500 font-semibold group-hover:gap-3 transition-all">
           <span>View Program</span>
           <ArrowRight size={18} />
         </div>

@@ -143,16 +143,16 @@ export default function WIOACompliancePage() {
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <span className="inline-block bg-green-600 text-white text-sm font-bold px-4 py-1 rounded-full mb-4">Compliance Tools</span>
+            <span className="inline-block bg-brand-green-600 text-white text-sm font-bold px-4 py-1 rounded-full mb-4">Compliance Tools</span>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">WIOA Compliance Made Simple</h1>
             <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">
               Complete toolkit for Workforce Innovation and Opportunity Act compliance. Automated tracking, reporting, and PIRL exports for workforce development programs.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="#pricing" className="inline-flex items-center gap-2 bg-white text-green-700 px-6 py-3 rounded-lg font-bold hover:bg-green-50 transition">
+              <Link href="#pricing" className="inline-flex items-center gap-2 bg-white text-brand-green-700 px-6 py-3 rounded-lg font-bold hover:bg-brand-green-50 transition">
                 View Pricing <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link href="/store/demo" className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-500 transition border border-green-500">
+              <Link href="/store/demo" className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-green-500 transition border border-brand-green-500">
                 Request Demo
               </Link>
             </div>
@@ -161,13 +161,13 @@ export default function WIOACompliancePage() {
       </section>
 
       {/* WIOA Metrics */}
-      <section className="py-12 bg-green-50">
+      <section className="py-12 bg-brand-green-50">
         <div className="max-w-4xl mx-auto px-4">
           <h3 className="text-lg font-bold text-slate-900 mb-4 text-center">WIOA Primary Indicators</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {metrics.map((metric) => (
-              <div key={metric.label} className="bg-white rounded-lg p-4 border border-green-200 text-center">
-                <metric.icon className="w-5 h-5 text-green-600 mb-2 mx-auto" />
+              <div key={metric.label} className="bg-white rounded-lg p-4 border border-brand-green-200 text-center">
+                <metric.icon className="w-5 h-5 text-brand-green-600 mb-2 mx-auto" />
                 <p className="text-sm text-slate-600">{metric.label}</p>
                 <p className="text-xl font-bold text-slate-900">{metric.target}</p>
               </div>
@@ -186,7 +186,7 @@ export default function WIOACompliancePage() {
 
           <div className="grid md:grid-cols-2 gap-8">
             {features.map((feature) => (
-              <div key={feature.title} className="bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-green-500 hover:shadow-xl transition-all group">
+              <div key={feature.title} className="bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-brand-green-500 hover:shadow-xl transition-all group">
                 <div className="relative h-48">
                   <Image
                     src={feature.image}
@@ -225,9 +225,9 @@ export default function WIOACompliancePage() {
               { step: '4', title: 'Report', desc: 'Generate PIRL exports and quarterly reports', image: '/images/technology/hero-program-it-support.jpg' },
             ].map((item) => (
               <div key={item.step} className="text-center">
-                <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-green-600">
+                <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-brand-green-600">
                   <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
-                  <div className="absolute inset-0 bg-green-600/60 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-brand-green-600/60 flex items-center justify-center">
                     <span className="text-2xl font-black text-slate-900">{item.step}</span>
                   </div>
                 </div>
@@ -247,9 +247,9 @@ export default function WIOACompliancePage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {pricing.map((plan) => (
-              <div key={plan.name} className={`bg-white rounded-2xl overflow-hidden border-2 ${plan.popular ? 'border-green-500 shadow-xl' : 'border-gray-200'} relative`}>
+              <div key={plan.name} className={`bg-white rounded-2xl overflow-hidden border-2 ${plan.popular ? 'border-brand-green-500 shadow-xl' : 'border-gray-200'} relative`}>
                 {plan.popular && (
-                  <div className="absolute top-0 left-0 right-0 bg-green-600 text-white text-center py-2 text-sm font-bold">
+                  <div className="absolute top-0 left-0 right-0 bg-brand-green-600 text-white text-center py-2 text-sm font-bold">
                     Most Popular
                   </div>
                 )}
@@ -272,7 +272,7 @@ export default function WIOACompliancePage() {
                     href={plan.name === 'WIOA Enterprise' ? '/contact' : '/store/checkout'}
                     className={`block text-center py-3 rounded-lg font-bold transition ${
                       plan.popular
-                        ? 'bg-green-600 text-white hover:bg-green-700'
+                        ? 'bg-brand-green-600 text-white hover:bg-brand-green-700'
                         : 'bg-gray-100 text-black hover:bg-gray-200'
                     }`}
                   >
@@ -286,7 +286,7 @@ export default function WIOACompliancePage() {
       </section>
 
       {/* Download Resources */}
-      <section className="py-16 bg-green-50">
+      <section className="py-16 bg-brand-green-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg">
             <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -296,7 +296,7 @@ export default function WIOACompliancePage() {
                   Download our free WIOA compliance checklist and eligibility guide to get started.
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <button className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition">
+                  <button className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-green-700 transition">
                     <Download className="w-5 h-5" />
                     Download Checklist
                   </button>
@@ -320,14 +320,14 @@ export default function WIOACompliancePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-green-700 text-white">
+      <section className="py-16 bg-brand-green-700 text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">Ready for WIOA Compliance?</h2>
-          <p className="text-green-100 mb-8">
+          <p className="text-brand-green-100 mb-8">
             Schedule a demo to see how our WIOA toolkit can streamline your compliance workflow.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/store/demo" className="inline-flex items-center justify-center gap-2 bg-white text-green-700 px-8 py-4 rounded-lg font-bold hover:bg-green-50 transition">
+            <Link href="/store/demo" className="inline-flex items-center justify-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-lg font-bold hover:bg-brand-green-50 transition">
               Schedule Demo
             </Link>
             <Link href="/contact" className="inline-flex items-center justify-center gap-2 border-2 border-white px-8 py-4 rounded-lg font-bold hover:bg-white/10 transition">

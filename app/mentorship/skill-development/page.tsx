@@ -40,7 +40,7 @@ export default function SkillDevelopmentPage() {
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <Wrench className="w-16 h-16 mx-auto mb-4 text-white/80" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Skill Development</h1>
-          <p className="text-xl text-green-100">Build the skills you need to succeed</p>
+          <p className="text-xl text-brand-green-100">Build the skills you need to succeed</p>
         </div>
       </section>
 
@@ -73,17 +73,17 @@ export default function SkillDevelopmentPage() {
           </p>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <Target className="w-10 h-10 text-green-600 mx-auto mb-3" />
+              <Target className="w-10 h-10 text-brand-green-600 mx-auto mb-3" />
               <h3 className="font-bold text-gray-900">Goal Setting</h3>
               <p className="text-sm text-gray-600">Define clear, achievable objectives</p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <BookOpen className="w-10 h-10 text-green-600 mx-auto mb-3" />
+              <BookOpen className="w-10 h-10 text-brand-green-600 mx-auto mb-3" />
               <h3 className="font-bold text-gray-900">Guided Practice</h3>
               <p className="text-sm text-gray-600">Learn by doing with expert feedback</p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <Award className="w-10 h-10 text-green-600 mx-auto mb-3" />
+              <Award className="w-10 h-10 text-brand-green-600 mx-auto mb-3" />
               <h3 className="font-bold text-gray-900">Track Progress</h3>
               <p className="text-sm text-gray-600">Measure and celebrate your growth</p>
             </div>
@@ -91,11 +91,11 @@ export default function SkillDevelopmentPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-green-700 text-white">
+      <section className="py-16 bg-brand-green-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Start Building Your Skills</h2>
-          <p className="text-xl text-green-100 mb-8">Get matched with a mentor who can help you grow.</p>
-          <Link href="/apply" className="bg-white hover:bg-gray-100 text-green-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <p className="text-xl text-brand-green-100 mb-8">Get matched with a mentor who can help you grow.</p>
+          <Link href="/apply" className="bg-white hover:bg-gray-100 text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply for Mentorship <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

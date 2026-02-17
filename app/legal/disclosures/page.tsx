@@ -23,9 +23,9 @@ export default function DisclosuresPage() {
               These disclosures clarify what the Elevate For Humanity platform is and is not. Please read carefully before using the platform or purchasing a license.
             </p>
 
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
-              <h2 className="text-xl font-bold text-red-800 mb-3">No Guarantees</h2>
-              <p className="text-red-700">
+            <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-6 mb-8">
+              <h2 className="text-xl font-bold text-brand-red-800 mb-3">No Guarantees</h2>
+              <p className="text-brand-red-700">
                 <strong>We do not guarantee any outcomes.</strong> This includes but is not limited to: job placement, income levels, certification pass rates, funding approval, enrollment numbers, revenue, or business success. Your results depend entirely on how you implement and use the platform.
               </p>
             </div>
@@ -153,9 +153,9 @@ export default function DisclosuresPage() {
                 <li>You understand this is a software license, not a partnership or service agreement</li>
               </ul>
               <div className="mt-6 flex gap-4">
-                <Link href="/legal/eula" className="text-green-600 hover:underline">EULA</Link>
-                <Link href="/terms-of-service" className="text-green-600 hover:underline">Terms of Service</Link>
-                <Link href="/legal/acceptable-use" className="text-green-600 hover:underline">Acceptable Use Policy</Link>
+                <Link href="/legal/eula" className="text-brand-green-600 hover:underline">EULA</Link>
+                <Link href="/terms-of-service" className="text-brand-green-600 hover:underline">Terms of Service</Link>
+                <Link href="/legal/acceptable-use" className="text-brand-green-600 hover:underline">Acceptable Use Policy</Link>
               </div>
             </div>
           </div>

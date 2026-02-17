@@ -207,9 +207,9 @@ export default function LegalOnboardingPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-            <p className="text-red-700">{error}</p>
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-brand-red-500 flex-shrink-0 mt-0.5" />
+            <p className="text-brand-red-700">{error}</p>
           </div>
         )}
 
@@ -219,16 +219,16 @@ export default function LegalOnboardingPage() {
             <div 
               key={agreement.type}
               className={`bg-white rounded-xl p-6 shadow-sm border ${
-                agreement.signed ? 'border-green-200' : 'border-slate-200'
+                agreement.signed ? 'border-brand-green-200' : 'border-slate-200'
               }`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    agreement.signed ? 'bg-green-100' : 'bg-slate-100'
+                    agreement.signed ? 'bg-brand-green-100' : 'bg-slate-100'
                   }`}>
                     {agreement.signed ? (
-                      <Circle className="w-5 h-5 text-green-600" />
+                      <Circle className="w-5 h-5 text-brand-green-600" />
                     ) : (
                       <FileText className="w-5 h-5 text-slate-400" />
                     )}
@@ -257,7 +257,7 @@ export default function LegalOnboardingPage() {
                 )}
                 
                 {agreement.signed && (
-                  <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                  <span className="px-3 py-1 bg-brand-green-100 text-brand-green-700 text-sm font-medium rounded-full">
                     Signed
                   </span>
                 )}
@@ -285,7 +285,7 @@ export default function LegalOnboardingPage() {
           <button
             onClick={completeOnboarding}
             disabled={signing}
-            className="w-full py-4 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full py-4 bg-brand-green-600 text-white font-bold rounded-xl hover:bg-brand-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {signing ? 'Completing...' : 'Continue to Dashboard'}
           </button>

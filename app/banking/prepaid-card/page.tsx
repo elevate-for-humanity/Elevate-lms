@@ -130,28 +130,28 @@ export default function PrepaidCardPage() {
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Everything You Need</h3>
               <ul className="space-y-4">
                 <li className="flex items-start">
-                  <Circle className="w-6 h-6 text-green-600 mr-3 flex-shrink-0 mt-1" />
+                  <Circle className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1" />
                   <div>
                     <p className="font-semibold text-gray-900">Shop Online & In-Store</p>
                     <p className="text-gray-600">Use your card anywhere Visa is accepted worldwide</p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <Circle className="w-6 h-6 text-green-600 mr-3 flex-shrink-0 mt-1" />
+                  <Circle className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1" />
                   <div>
                     <p className="font-semibold text-gray-900">Pay Bills</p>
                     <p className="text-gray-600">Set up automatic payments for utilities, rent, and more</p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <Circle className="w-6 h-6 text-green-600 mr-3 flex-shrink-0 mt-1" />
+                  <Circle className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1" />
                   <div>
                     <p className="font-semibold text-gray-900">Get Cash</p>
                     <p className="text-gray-600">Withdraw cash at any ATM displaying the Visa logo</p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <Circle className="w-6 h-6 text-green-600 mr-3 flex-shrink-0 mt-1" />
+                  <Circle className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1" />
                   <div>
                     <p className="font-semibold text-gray-900">Mobile App</p>
                     <p className="text-gray-600">Check balance, view transactions, and manage your card</p>
@@ -224,11 +224,11 @@ export default function PrepaidCardPage() {
               <tbody className="divide-y divide-gray-200">
                 <tr>
                   <td className="px-6 py-4">Monthly Maintenance Fee</td>
-                  <td className="px-6 py-4 text-right font-bold text-green-600">$0</td>
+                  <td className="px-6 py-4 text-right font-bold text-brand-green-600">$0</td>
                 </tr>
                 <tr className="bg-gray-50">
                   <td className="px-6 py-4">In-Network ATM Withdrawal</td>
-                  <td className="px-6 py-4 text-right font-bold text-green-600">$0</td>
+                  <td className="px-6 py-4 text-right font-bold text-brand-green-600">$0</td>
                 </tr>
                 <tr>
                   <td className="px-6 py-4">Out-of-Network ATM Withdrawal</td>
@@ -236,15 +236,15 @@ export default function PrepaidCardPage() {
                 </tr>
                 <tr className="bg-gray-50">
                   <td className="px-6 py-4">Purchase Transactions</td>
-                  <td className="px-6 py-4 text-right font-bold text-green-600">$0</td>
+                  <td className="px-6 py-4 text-right font-bold text-brand-green-600">$0</td>
                 </tr>
                 <tr>
                   <td className="px-6 py-4">Balance Inquiry (ATM)</td>
-                  <td className="px-6 py-4 text-right font-bold text-green-600">$0</td>
+                  <td className="px-6 py-4 text-right font-bold text-brand-green-600">$0</td>
                 </tr>
                 <tr className="bg-gray-50">
                   <td className="px-6 py-4">Overdraft Fee</td>
-                  <td className="px-6 py-4 text-right font-bold text-green-600">$0 (No overdraft)</td>
+                  <td className="px-6 py-4 text-right font-bold text-brand-green-600">$0 (No overdraft)</td>
                 </tr>
                 <tr>
                   <td className="px-6 py-4">Card Replacement</td>

@@ -179,7 +179,7 @@ export default function PlumbingProgramPage() {
       <section id="curriculum" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-block bg-green-100 text-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">Training Program</span>
+            <span className="inline-block bg-brand-green-100 text-brand-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">Training Program</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">16-Week Plumbing Curriculum</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">Comprehensive hands-on training in water supply, drainage, fixtures, and gas piping.</p>
           </div>

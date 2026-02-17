@@ -80,7 +80,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
         </div>
 
         {/* Additional Benefits Bar */}
-        <div className="mt-12 bg-orange-50 rounded-lg p-8">
+        <div className="mt-12 bg-brand-orange-50 rounded-lg p-8">
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">

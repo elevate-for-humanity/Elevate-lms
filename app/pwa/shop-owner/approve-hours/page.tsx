@@ -114,7 +114,7 @@ export default function ApproveHoursPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
         <div className="text-center max-w-md">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
           <p className="text-slate-400 mb-6">{error}</p>
           <Link
@@ -178,7 +178,7 @@ export default function ApproveHoursPage() {
                 <button
                   onClick={() => handleApprove(entry.id)}
                   disabled={processing === entry.id}
-                  className="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-xl font-medium hover:bg-green-700 disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 bg-brand-green-600 text-white py-3 rounded-xl font-medium hover:bg-brand-green-700 disabled:opacity-50"
                 >
                   {processing === entry.id ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -192,7 +192,7 @@ export default function ApproveHoursPage() {
                 <button
                   onClick={() => handleReject(entry.id)}
                   disabled={processing === entry.id}
-                  className="flex-1 flex items-center justify-center gap-2 bg-red-600/20 border border-red-500/30 text-red-400 py-3 rounded-xl font-medium hover:bg-red-600/30 disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 bg-brand-red-600/20 border border-brand-red-500/30 text-brand-red-400 py-3 rounded-xl font-medium hover:bg-brand-red-600/30 disabled:opacity-50"
                 >
                   <XCircle className="w-5 h-5" />
                   Reject

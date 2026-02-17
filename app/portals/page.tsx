@@ -91,9 +91,9 @@ const portals = [
 
 const colorClasses: Record<string, { bg: string; text: string; border: string; light: string }> = {
   blue: { bg: 'bg-brand-blue-600', text: 'text-brand-blue-600', border: 'border-brand-blue-200', light: 'bg-brand-blue-50' },
-  green: { bg: 'bg-green-600', text: 'text-green-600', border: 'border-green-200', light: 'bg-green-50' },
+  green: { bg: 'bg-brand-green-600', text: 'text-brand-green-600', border: 'border-brand-green-200', light: 'bg-brand-green-50' },
   blue: { bg: 'bg-brand-blue-600', text: 'text-brand-blue-600', border: 'border-brand-blue-200', light: 'bg-brand-blue-50' },
-  orange: { bg: 'bg-orange-600', text: 'text-orange-600', border: 'border-orange-200', light: 'bg-orange-50' },
+  orange: { bg: 'bg-brand-orange-600', text: 'text-brand-orange-600', border: 'border-brand-orange-200', light: 'bg-brand-orange-50' },
   teal: { bg: 'bg-teal-600', text: 'text-teal-600', border: 'border-teal-200', light: 'bg-teal-50' },
   indigo: { bg: 'bg-indigo-600', text: 'text-indigo-600', border: 'border-indigo-200', light: 'bg-indigo-50' },
 };
@@ -116,7 +116,7 @@ export default function PortalsPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-6 text-sm">
             <div className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-green-400" />
+              <Shield className="w-5 h-5 text-brand-green-400" />
               <span>Secure Access</span>
             </div>
             <div className="flex items-center gap-2">
@@ -216,7 +216,7 @@ export default function PortalsPage() {
               href="/login?redirect=/employer-portal/dashboard"
               className="flex items-center justify-center gap-3 px-6 py-4 bg-slate-800 rounded-xl hover:bg-slate-700 transition-colors"
             >
-              <Building2 className="w-6 h-6 text-green-400" />
+              <Building2 className="w-6 h-6 text-brand-green-400" />
               <span className="font-semibold">Employer Sign In</span>
             </Link>
             <Link

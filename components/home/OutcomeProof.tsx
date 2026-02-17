@@ -47,7 +47,7 @@ export default function OutcomeProof() {
       <div className="max-w-7xl mx-auto px-6">
         <ScrollReveal>
           <div className="text-center mb-16">
-            <p className="text-sm font-semibold text-blue-400 uppercase tracking-wider mb-3">
+            <p className="text-sm font-semibold text-brand-blue-400 uppercase tracking-wider mb-3">
               Measured Outcomes
             </p>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4">
@@ -66,7 +66,7 @@ export default function OutcomeProof() {
               const Icon = stat.icon;
               return (
                 <div key={i} className="text-center p-6 rounded-2xl bg-white/5 border border-white/10">
-                  <Icon className="w-8 h-8 text-blue-400 mx-auto mb-3" />
+                  <Icon className="w-8 h-8 text-brand-blue-400 mx-auto mb-3" />
                   <p className="text-4xl font-extrabold">
                     <AnimatedCounter end={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
                   </p>
@@ -84,7 +84,7 @@ export default function OutcomeProof() {
               <div className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/[0.08] transition-colors h-full flex flex-col">
                 {/* Trajectory arrow */}
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-sm font-medium">
+                  <div className="px-3 py-1.5 bg-brand-red-500/20 text-brand-red-400 rounded-lg text-sm font-medium">
                     {outcome.beforeWage}
                   </div>
                   <TrendingUp className="w-5 h-5 text-emerald-400" />
@@ -100,7 +100,7 @@ export default function OutcomeProof() {
                 <div className="border-t border-white/10 pt-4">
                   <p className="font-semibold text-white">{outcome.name}</p>
                   <p className="text-sm text-slate-400">{outcome.program} &middot; {outcome.duration}</p>
-                  <p className="text-xs text-blue-400 mt-1">{outcome.credential}</p>
+                  <p className="text-xs text-brand-blue-400 mt-1">{outcome.credential}</p>
                 </div>
               </div>
             </ScrollReveal>

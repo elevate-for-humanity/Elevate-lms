@@ -41,7 +41,7 @@ export default function FooterPageTemplate({
 
         <div className="relative container mx-auto px-4 py-16">
           <div className="max-w-4xl">
-            <p className="text-sm font-bold uppercase tracking-wide text-orange-400 mb-4">
+            <p className="text-sm font-bold uppercase tracking-wide text-brand-orange-400 mb-4">
               Legal Information
             </p>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-2xl">
@@ -89,13 +89,13 @@ export default function FooterPageTemplate({
                 <div className="flex flex-wrap gap-4">
                   <Link
                     href="/contact"
-                    className="px-6 py-3 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition"
+                    className="px-6 py-3 bg-brand-orange-600 text-white font-bold rounded-full hover:bg-brand-orange-700 transition"
                   >
                     Contact Us
                   </Link>
                   <a
                     href="/support"
-                    className="px-6 py-3 border-2 border-orange-600 text-orange-600 font-bold rounded-full hover:bg-orange-50 transition"
+                    className="px-6 py-3 border-2 border-brand-orange-600 text-brand-orange-600 font-bold rounded-full hover:bg-brand-orange-50 transition"
                   >
                     Call 317-314-3757
                   </a>

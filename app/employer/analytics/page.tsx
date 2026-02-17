@@ -26,10 +26,10 @@ export default async function EmployerAnalyticsPage() {
           <p className="text-gray-600 mt-2">Track your hiring performance and metrics</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Hires</h3><p className="text-3xl font-bold text-green-600 mt-2">47</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Hires</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">47</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Open Positions</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">8</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Applications</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">156</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Avg. Time to Hire</h3><p className="text-3xl font-bold text-orange-600 mt-2">18d</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Avg. Time to Hire</h3><p className="text-3xl font-bold text-brand-orange-600 mt-2">18d</p></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h2 className="text-lg font-semibold mb-4">Hiring Trends</h2><HiringTrendsChart /></div>

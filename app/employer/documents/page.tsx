@@ -60,7 +60,7 @@ export default async function EmployerDocumentsPage() {
       case 'pending':
         return <Clock className="w-5 h-5 text-yellow-600" />;
       case 'rejected':
-        return <XCircle className="w-5 h-5 text-red-600" />;
+        return <XCircle className="w-5 h-5 text-brand-red-600" />;
       default:
         return <FileText className="w-5 h-5 text-slate-400" />;
     }
@@ -68,9 +68,9 @@ export default async function EmployerDocumentsPage() {
 
   const getStatusBadge = (status: string) => {
     const styles = {
-      approved: 'bg-green-100 text-green-800 border-green-300',
+      approved: 'bg-brand-green-100 text-brand-green-800 border-brand-green-300',
       pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-      rejected: 'bg-red-100 text-red-800 border-red-300',
+      rejected: 'bg-brand-red-100 text-brand-red-800 border-brand-red-300',
     };
     return (
       styles[status as keyof typeof styles] ||
@@ -136,7 +136,7 @@ export default async function EmployerDocumentsPage() {
                         <h3 className="font-semibold text-black">
                           {req.description}
                           {req.is_required && (
-                            <span className="text-red-600 ml-1">*</span>
+                            <span className="text-brand-red-600 ml-1">*</span>
                           )}
                         </h3>
                         <p className="text-sm text-black">
@@ -184,7 +184,7 @@ export default async function EmployerDocumentsPage() {
                         {new Date(doc.created_at).toLocaleDateString()}
                       </p>
                       {doc.status === 'rejected' && doc.rejection_reason && (
-                        <p className="text-sm text-red-600 mt-1">
+                        <p className="text-sm text-brand-red-600 mt-1">
                           <strong>Reason:</strong> {doc.rejection_reason}
                         </p>
                       )}

@@ -232,7 +232,7 @@ export default function EnterpriseReviewPage() {
           </button>
 
           {status === 'error' && (
-            <p className="text-red-400 text-center">Something went wrong. Please try again.</p>
+            <p className="text-brand-red-400 text-center">Something went wrong. Please try again.</p>
           )}
         </form>
       </div>

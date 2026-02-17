@@ -118,12 +118,12 @@ export default async function AdminFerpaPage() {
             <div key={index} className="bg-white rounded-xl p-6 shadow-sm border">
               <div className="flex items-center justify-between mb-4">
                 <stat.icon className={`w-8 h-8 ${
-                  stat.color === 'green' ? 'text-green-600' :
+                  stat.color === 'green' ? 'text-brand-green-600' :
                   stat.color === 'yellow' ? 'text-yellow-600' :
                   stat.color === 'blue' ? 'text-brand-blue-600' : 'text-gray-600'
                 }`} />
                 <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                  stat.color === 'green' ? 'bg-green-100 text-green-700' :
+                  stat.color === 'green' ? 'bg-brand-green-100 text-brand-green-700' :
                   stat.color === 'yellow' ? 'bg-yellow-100 text-yellow-700' :
                   stat.color === 'blue' ? 'bg-brand-blue-100 text-brand-blue-700' : 'bg-gray-100 text-gray-700'
                 }`}>
@@ -160,14 +160,14 @@ export default async function AdminFerpaPage() {
                   href="/admin/ferpa/directory-info"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <Users className="w-5 h-5 text-green-600" />
+                  <Users className="w-5 h-5 text-brand-green-600" />
                   <span className="text-gray-700">Directory Information</span>
                 </Link>
                 <Link
                   href="/admin/ferpa/reports"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <Download className="w-5 h-5 text-orange-600" />
+                  <Download className="w-5 h-5 text-brand-orange-600" />
                   <span className="text-gray-700">Generate Reports</span>
                 </Link>
               </div>
@@ -228,7 +228,7 @@ export default async function AdminFerpaPage() {
                       </div>
                       <div className="text-right">
                         <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                          activity.status === 'complete' ? 'bg-green-100 text-green-700' :
+                          activity.status === 'complete' ? 'bg-brand-green-100 text-brand-green-700' :
                           activity.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                           'bg-brand-blue-100 text-brand-blue-700'
                         }`}>

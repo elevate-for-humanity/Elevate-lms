@@ -135,7 +135,7 @@ export default function JRIPage() {
         
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-6">
+            <div className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-6">
               <Shield className="w-4 h-4" />
               Indiana Justice Reinvestment Initiative
             </div>
@@ -151,7 +151,7 @@ export default function JRIPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/apply?funding=jri"
-                className="inline-flex items-center justify-center bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition text-lg"
+                className="inline-flex items-center justify-center bg-brand-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-green-700 transition text-lg"
               >
                 Apply for JRI Program
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -176,7 +176,7 @@ export default function JRIPage() {
               const IconComponent = stat.icon;
               return (
                 <div key={index} className="text-center">
-                  <IconComponent className="w-8 h-8 text-green-500 mx-auto mb-2" />
+                  <IconComponent className="w-8 h-8 text-brand-green-500 mx-auto mb-2" />
                   <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
                   <div className="text-gray-400 text-sm">{stat.label}</div>
                 </div>
@@ -205,8 +205,8 @@ export default function JRIPage() {
               const IconComponent = benefit.icon;
               return (
                 <div key={index} className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                    <IconComponent className="w-6 h-6 text-green-600" />
+                  <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+                    <IconComponent className="w-6 h-6 text-brand-green-600" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{benefit.title}</h3>
                   <p className="text-gray-600">{benefit.description}</p>
@@ -254,7 +254,7 @@ export default function JRIPage() {
               <div className="space-y-4">
                 <Link
                   href="/apply?funding=jri"
-                  className="block w-full bg-green-600 text-white text-center px-6 py-4 rounded-lg font-semibold hover:bg-green-700 transition"
+                  className="block w-full bg-brand-green-600 text-white text-center px-6 py-4 rounded-lg font-semibold hover:bg-brand-green-700 transition"
                 >
                   Start Your Application
                 </Link>
@@ -286,8 +286,8 @@ export default function JRIPage() {
             {availablePrograms.map((program, index) => (
               <div key={index} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition">
                 <div className="flex items-center gap-2 mb-3">
-                  <BookOpen className="w-5 h-5 text-green-600" />
-                  <span className="text-xs text-green-600 font-semibold uppercase">JRI Approved</span>
+                  <BookOpen className="w-5 h-5 text-brand-green-600" />
+                  <span className="text-xs text-brand-green-600 font-semibold uppercase">JRI Approved</span>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{program.name}</h3>
                 <p className="text-gray-600 text-sm mb-4">{program.description}</p>
@@ -296,7 +296,7 @@ export default function JRIPage() {
                     <Clock className="w-3 h-3" />
                     {program.duration}
                   </span>
-                  <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                  <span className="inline-flex items-center gap-1 text-xs bg-brand-green-100 text-brand-green-700 px-2 py-1 rounded">
                     <DollarSign className="w-3 h-3" />
                     {program.salary}
                   </span>
@@ -308,7 +308,7 @@ export default function JRIPage() {
           <div className="text-center mt-10">
             <Link
               href="/programs"
-              className="inline-flex items-center gap-2 text-green-600 font-semibold hover:underline"
+              className="inline-flex items-center gap-2 text-brand-green-600 font-semibold hover:underline"
             >
               View All Programs <ArrowRight className="w-4 h-4" />
             </Link>
@@ -346,30 +346,30 @@ export default function JRIPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-green-600">
+      <section className="py-16 bg-brand-green-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Start Your New Chapter?
           </h2>
-          <p className="text-xl text-green-100 mb-8">
+          <p className="text-xl text-brand-green-100 mb-8">
             Your past does not define your future. Take the first step today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply?funding=jri"
-              className="inline-flex items-center justify-center bg-white text-green-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-green-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
             >
               Apply Now — It&apos;s Free
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition"
+              className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-green-700 transition"
             >
               <Phone className="mr-2 w-5 h-5" />
               Get Help Online
             </a>
           </div>
-          <p className="text-green-200 text-sm mt-6">
+          <p className="text-brand-green-200 text-sm mt-6">
             <MapPin className="w-4 h-4 inline mr-1" />
             Serving Indianapolis and surrounding Indiana counties
           </p>

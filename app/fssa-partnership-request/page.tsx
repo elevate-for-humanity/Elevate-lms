@@ -74,7 +74,7 @@ export default function FSSAPartnershipRequestPage() {
       <div className="min-h-screen bg-zinc-900   py-12 px-4">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <h1 className="text-3xl font-bold text-black mb-4">
@@ -173,8 +173,8 @@ export default function FSSAPartnershipRequestPage() {
             </p>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-md">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-              <Building className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+              <Building className="w-6 h-6 text-brand-green-600" />
             </div>
             <h3 className="font-bold text-black mb-2">DOL Registered</h3>
             <p className="text-sm text-black">
@@ -182,8 +182,8 @@ export default function FSSAPartnershipRequestPage() {
             </p>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-md">
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-              <TrendingUp className="w-6 h-6 text-orange-600" />
+            <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center mb-4">
+              <TrendingUp className="w-6 h-6 text-brand-orange-600" />
             </div>
             <h3 className="font-bold text-black mb-2">80-Hour Tracking</h3>
             <p className="text-sm text-black">
@@ -342,7 +342,7 @@ export default function FSSAPartnershipRequestPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+              <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 text-brand-red-700">
                 {error}
               </div>
             )}

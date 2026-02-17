@@ -101,8 +101,8 @@ export default function SezzleVirtualCard({
     <div className="max-w-md mx-auto">
       {/* Success Header */}
       <div className="text-center mb-6">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Check className="w-8 h-8 text-green-600" />
+        <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Check className="w-8 h-8 text-brand-green-600" />
         </div>
         <h2 className="text-2xl font-bold text-gray-900">Your Virtual Card is Ready!</h2>
         <p className="text-gray-600 mt-2">
@@ -139,7 +139,7 @@ export default function SezzleVirtualCard({
               className="p-1 hover:bg-white/10 rounded"
             >
               {copiedField === 'pan' ? (
-                <Check className="w-4 h-4 text-green-400" />
+                <Check className="w-4 h-4 text-brand-green-400" />
               ) : (
                 <Copy className="w-4 h-4" />
               )}
@@ -164,7 +164,7 @@ export default function SezzleVirtualCard({
                 className="p-1 hover:bg-white/10 rounded"
               >
                 {copiedField === 'expiry' ? (
-                  <Check className="w-4 h-4 text-green-400" />
+                  <Check className="w-4 h-4 text-brand-green-400" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
@@ -188,7 +188,7 @@ export default function SezzleVirtualCard({
                 className="p-1 hover:bg-white/10 rounded"
               >
                 {copiedField === 'cvv' ? (
-                  <Check className="w-4 h-4 text-green-400" />
+                  <Check className="w-4 h-4 text-brand-green-400" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
@@ -228,7 +228,7 @@ export default function SezzleVirtualCard({
       {onUseCard && (
         <button
           onClick={onUseCard}
-          className="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium"
+          className="w-full py-3 bg-brand-green-600 hover:bg-brand-green-700 text-white rounded-lg font-medium"
         >
           Continue to Payment
         </button>

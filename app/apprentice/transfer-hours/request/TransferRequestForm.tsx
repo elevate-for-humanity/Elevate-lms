@@ -184,16 +184,16 @@ export default function TransferRequestForm({
 
   if (success) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
+      <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-8 text-center">
         <span className="text-slate-400 flex-shrink-0">•</span>
-        <h2 className="text-2xl font-bold text-green-900 mb-2">
+        <h2 className="text-2xl font-bold text-brand-green-900 mb-2">
           Request Submitted!
         </h2>
-        <p className="text-green-700 mb-4">
+        <p className="text-brand-green-700 mb-4">
           Your transfer request has been submitted for review. You will be
           notified once it has been processed.
         </p>
-        <p className="text-green-600 text-sm">Redirecting...</p>
+        <p className="text-brand-green-600 text-sm">Redirecting...</p>
       </div>
     );
   }
@@ -201,15 +201,15 @@ export default function TransferRequestForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+        <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-red-800">{error}</p>
+            <p className="text-brand-red-800">{error}</p>
           </div>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-red-600 hover:text-red-800"
+            className="text-brand-red-600 hover:text-brand-red-800"
           >
             <X className="w-5 h-5" />
           </button>
@@ -330,13 +330,13 @@ export default function TransferRequestForm({
               <div
                 key={docType.type}
                 className={`border rounded-lg p-4 ${
-                  uploaded ? 'border-green-200 bg-green-50' : 'border-gray-200'
+                  uploaded ? 'border-brand-green-200 bg-brand-green-50' : 'border-gray-200'
                 }`}
               >
                 <div className="flex items-start gap-4">
                   <div
                     className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      uploaded ? 'bg-green-100' : 'bg-gray-100'
+                      uploaded ? 'bg-brand-green-100' : 'bg-gray-100'
                     }`}
                   >
                     {uploaded ? (
@@ -356,7 +356,7 @@ export default function TransferRequestForm({
 
                     {uploaded ? (
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-green-700 font-medium">
+                        <span className="text-sm text-brand-green-700 font-medium">
                           {uploaded.file_name}
                         </span>
                         <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">

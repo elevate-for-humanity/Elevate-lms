@@ -39,7 +39,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
       <div className="min-h-screen bg-gray-50 py-16">
         <div className="max-w-2xl mx-auto px-4 text-center">
           <div className="bg-white rounded-2xl shadow-lg p-12">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Application Submitted!</h1>
@@ -186,7 +186,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
               <label htmlFor="resume-upload" className="cursor-pointer">
                 <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                 {resume ? (
-                  <p className="text-green-600 font-medium">{resume.name}</p>
+                  <p className="text-brand-green-600 font-medium">{resume.name}</p>
                 ) : (
                   <>
                     <p className="text-gray-600 font-medium">Click to upload your resume</p>

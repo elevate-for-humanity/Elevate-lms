@@ -60,11 +60,11 @@ export default function SupportForm() {
       <h2 className="text-xl font-bold mb-6">Submit a Support Request</h2>
       
       {status === 'error' && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+        <div className="mb-4 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-brand-red-500 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-red-800 font-medium">Error</p>
-            <p className="text-red-600 text-sm">{errorMessage}</p>
+            <p className="text-brand-red-800 font-medium">Error</p>
+            <p className="text-brand-red-600 text-sm">{errorMessage}</p>
           </div>
         </div>
       )}

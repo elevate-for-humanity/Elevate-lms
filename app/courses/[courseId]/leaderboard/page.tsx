@@ -353,7 +353,7 @@ export default function CourseLeaderboardPage() {
               {/* 3rd Place */}
               <div className="text-center pt-12">
                 <div className="relative inline-block mb-4">
-                  <div className="w-20 h-20 bg-orange-400 rounded-full flex items-center justify-center mx-auto">
+                  <div className="w-20 h-20 bg-brand-orange-400 rounded-full flex items-center justify-center mx-auto">
                     {leaderboard[2]?.profiles?.avatar_url ? (
                       <Image
                         src={leaderboard[2].profiles.avatar_url}

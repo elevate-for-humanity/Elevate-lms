@@ -72,7 +72,7 @@ export default function FinancialAidPage() {
         />
         <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 w-full">
           <div className="max-w-2xl bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
-            <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
+            <div className="inline-flex items-center gap-2 bg-brand-green-100 text-brand-green-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
               <DollarSign className="w-4 h-4" />
               Most Students Pay $0
             </div>
@@ -86,7 +86,7 @@ export default function FinancialAidPage() {
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/apply"
-                className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-green-700 transition-colors"
               >
                 Check Your Eligibility
                 <ArrowRight className="w-4 h-4" />
@@ -107,7 +107,7 @@ export default function FinancialAidPage() {
       <section className="py-8 bg-gray-50 border-b">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/wioa-eligibility" className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
+            <Link href="/wioa-eligibility" className="px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium hover:bg-brand-green-200 transition-colors">
               WIOA Eligibility
             </Link>
             <Link href="/funding" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
@@ -116,7 +116,7 @@ export default function FinancialAidPage() {
             <Link href="/programs/jri" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               JRI Programs
             </Link>
-            <Link href="/how-it-works" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
+            <Link href="/how-it-works" className="px-4 py-2 bg-brand-orange-100 text-brand-orange-800 rounded-full text-sm font-medium hover:bg-brand-orange-200 transition-colors">
               How It Works
             </Link>
             <Link href="/faq" className="px-4 py-2 bg-gray-200 text-gray-800 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">
@@ -127,23 +127,23 @@ export default function FinancialAidPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-12 bg-green-50 border-b">
+      <section className="py-12 bg-brand-green-50 border-b">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">Multiple</div>
+              <div className="text-3xl md:text-4xl font-bold text-brand-green-600 mb-2">Multiple</div>
               <div className="text-gray-600">Funding Options</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">Funded</div>
+              <div className="text-3xl md:text-4xl font-bold text-brand-green-600 mb-2">Funded</div>
               <div className="text-gray-600">For Qualifying Students</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">2-3 Days</div>
+              <div className="text-3xl md:text-4xl font-bold text-brand-green-600 mb-2">2-3 Days</div>
               <div className="text-gray-600">Approval Time</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">No Loans</div>
+              <div className="text-3xl md:text-4xl font-bold text-brand-green-600 mb-2">No Loans</div>
               <div className="text-gray-600">Required</div>
             </div>
           </div>
@@ -161,14 +161,14 @@ export default function FinancialAidPage() {
             {fundingOptions.map((option) => (
               <div key={option.title} className="bg-white border rounded-xl p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <option.icon className="w-6 h-6 text-green-600" />
+                  <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <option.icon className="w-6 h-6 text-brand-green-600" />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold mb-2">{option.title}</h3>
                     <p className="text-gray-600 mb-4">{option.description}</p>
-                    <div className="bg-green-50 rounded-lg p-4 mb-4">
-                      <div className="text-sm font-medium text-green-800 mb-2">Coverage: {option.coverage}</div>
+                    <div className="bg-brand-green-50 rounded-lg p-4 mb-4">
+                      <div className="text-sm font-medium text-brand-green-800 mb-2">Coverage: {option.coverage}</div>
                     </div>
                     <div>
                       <div className="text-sm font-medium text-gray-700 mb-2">Eligibility:</div>
@@ -213,7 +213,7 @@ export default function FinancialAidPage() {
           <div className="grid md:grid-cols-4 gap-8">
             {steps.map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                <div className="w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
                   {item.step}
                 </div>
                 <h3 className="font-semibold mb-2">{item.title}</h3>
@@ -225,15 +225,15 @@ export default function FinancialAidPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-green-600 text-white">
+      <section className="py-16 lg:py-24 bg-brand-green-600 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your New Career?</h2>
-          <p className="text-xl text-green-100 mb-8">
+          <p className="text-xl text-brand-green-100 mb-8">
             Apply today and find out if you qualify for free training. No obligation, no credit check.
           </p>
           <Link
             href="/apply"
-            className="inline-flex items-center gap-2 bg-white text-green-600 px-8 py-4 rounded-lg font-semibold hover:bg-green-50 transition-colors"
+            className="inline-flex items-center gap-2 bg-white text-brand-green-600 px-8 py-4 rounded-lg font-semibold hover:bg-brand-green-50 transition-colors"
           >
             Apply Now - It's Free
             <ArrowRight className="w-4 h-4" />

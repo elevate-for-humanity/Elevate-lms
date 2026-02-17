@@ -117,13 +117,13 @@ export default async function PaymentPage() {
             </div>
 
             {/* Barber Program Payment */}
-            <div className="mt-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-lg p-8 text-white">
+            <div className="mt-12 bg-gradient-to-r from-brand-orange-500 to-brand-orange-600 rounded-lg shadow-lg p-8 text-white">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div>
                   <h2 className="text-2xl font-bold mb-2">
                     Barber Apprenticeship Program
                   </h2>
-                  <p className="text-orange-100 mb-4">
+                  <p className="text-brand-orange-100 mb-4">
                     Start your career as a licensed barber. USDOL registered apprenticeship with flexible payment options.
                   </p>
                   <ul className="space-y-2 text-sm">
@@ -144,7 +144,7 @@ export default async function PaymentPage() {
                 <div className="flex flex-col gap-3">
                   <Link
                     href="/enroll/barber-apprenticeship"
-                    className="bg-white text-orange-600 hover:bg-orange-50 px-8 py-4 rounded-lg font-bold text-center transition-colors"
+                    className="bg-white text-brand-orange-600 hover:bg-brand-orange-50 px-8 py-4 rounded-lg font-bold text-center transition-colors"
                   >
                     Enroll & Pay with Stripe
                   </Link>

@@ -163,11 +163,11 @@ export default function LicenseCheckoutPage() {
                 <p className="text-sm text-slate-500">Billed monthly. Cancel anytime.</p>
               </div>
 
-              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-800 font-medium">
+              <div className="mt-4 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg">
+                <p className="text-sm text-brand-green-800 font-medium">
                   14-day free trial included
                 </p>
-                <p className="text-xs text-green-700 mt-1">
+                <p className="text-xs text-brand-green-700 mt-1">
                   You won't be charged until your trial ends.
                 </p>
               </div>
@@ -175,7 +175,7 @@ export default function LicenseCheckoutPage() {
               <div className="mt-4">
                 <Link
                   href="/license/pricing"
-                  className="text-sm text-blue-600 hover:underline"
+                  className="text-sm text-brand-blue-600 hover:underline"
                 >
                   ← Change plan
                 </Link>
@@ -189,7 +189,7 @@ export default function LicenseCheckoutPage() {
               <h1 className="text-2xl font-bold text-slate-900 mb-6">Complete Your Purchase</h1>
 
               {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
                   {error}
                 </div>
               )}
@@ -209,7 +209,7 @@ export default function LicenseCheckoutPage() {
                         required
                         value={formData.organizationName}
                         onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                         placeholder="Your Organization"
                       />
                     </div>
@@ -222,7 +222,7 @@ export default function LicenseCheckoutPage() {
                         required
                         value={formData.organizationType}
                         onChange={(e) => setFormData({ ...formData, organizationType: e.target.value })}
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       >
                         <option value="">Select type...</option>
                         {organizationTypes.map((type) => (
@@ -249,7 +249,7 @@ export default function LicenseCheckoutPage() {
                         required
                         value={formData.contactName}
                         onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                         placeholder="Full name"
                       />
                     </div>
@@ -263,7 +263,7 @@ export default function LicenseCheckoutPage() {
                         required
                         value={formData.contactEmail}
                         onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                         placeholder="you@organization.org"
                       />
                     </div>
@@ -276,7 +276,7 @@ export default function LicenseCheckoutPage() {
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                         placeholder="(555) 555-5555"
                       />
                     </div>
@@ -293,10 +293,10 @@ export default function LicenseCheckoutPage() {
                         type="checkbox"
                         checked={agreements.tos}
                         onChange={(e) => setAgreements({ ...agreements, tos: e.target.checked })}
-                        className="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                        className="mt-1 w-4 h-4 text-brand-blue-600 border-slate-300 rounded focus:ring-brand-blue-500"
                       />
                       <span className="text-sm text-slate-700">
-                        I agree to the <Link href="/terms-of-service" className="text-blue-600 hover:underline" target="_blank">Terms of Service</Link>
+                        I agree to the <Link href="/terms-of-service" className="text-brand-blue-600 hover:underline" target="_blank">Terms of Service</Link>
                       </span>
                     </label>
 
@@ -305,10 +305,10 @@ export default function LicenseCheckoutPage() {
                         type="checkbox"
                         checked={agreements.eula}
                         onChange={(e) => setAgreements({ ...agreements, eula: e.target.checked })}
-                        className="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                        className="mt-1 w-4 h-4 text-brand-blue-600 border-slate-300 rounded focus:ring-brand-blue-500"
                       />
                       <span className="text-sm text-slate-700">
-                        I agree to the <Link href="/eula" className="text-blue-600 hover:underline" target="_blank">End User License Agreement</Link>
+                        I agree to the <Link href="/eula" className="text-brand-blue-600 hover:underline" target="_blank">End User License Agreement</Link>
                       </span>
                     </label>
 
@@ -317,10 +317,10 @@ export default function LicenseCheckoutPage() {
                         type="checkbox"
                         checked={agreements.aup}
                         onChange={(e) => setAgreements({ ...agreements, aup: e.target.checked })}
-                        className="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                        className="mt-1 w-4 h-4 text-brand-blue-600 border-slate-300 rounded focus:ring-brand-blue-500"
                       />
                       <span className="text-sm text-slate-700">
-                        I agree to the <Link href="/acceptable-use-policy" className="text-blue-600 hover:underline" target="_blank">Acceptable Use Policy</Link>
+                        I agree to the <Link href="/acceptable-use-policy" className="text-brand-blue-600 hover:underline" target="_blank">Acceptable Use Policy</Link>
                       </span>
                     </label>
 
@@ -329,10 +329,10 @@ export default function LicenseCheckoutPage() {
                         type="checkbox"
                         checked={agreements.disclosures}
                         onChange={(e) => setAgreements({ ...agreements, disclosures: e.target.checked })}
-                        className="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                        className="mt-1 w-4 h-4 text-brand-blue-600 border-slate-300 rounded focus:ring-brand-blue-500"
                       />
                       <span className="text-sm text-slate-700">
-                        I acknowledge the <Link href="/disclosures" className="text-blue-600 hover:underline" target="_blank">Platform Disclosures</Link>
+                        I acknowledge the <Link href="/disclosures" className="text-brand-blue-600 hover:underline" target="_blank">Platform Disclosures</Link>
                       </span>
                     </label>
 
@@ -341,10 +341,10 @@ export default function LicenseCheckoutPage() {
                         type="checkbox"
                         checked={agreements.license}
                         onChange={(e) => setAgreements({ ...agreements, license: e.target.checked })}
-                        className="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                        className="mt-1 w-4 h-4 text-brand-blue-600 border-slate-300 rounded focus:ring-brand-blue-500"
                       />
                       <span className="text-sm text-slate-700">
-                        I agree to the <Link href="/license-agreement" className="text-blue-600 hover:underline" target="_blank">License Agreement</Link>
+                        I agree to the <Link href="/license-agreement" className="text-brand-blue-600 hover:underline" target="_blank">License Agreement</Link>
                       </span>
                     </label>
                   </div>
@@ -354,7 +354,7 @@ export default function LicenseCheckoutPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting || !allAgreementsAccepted}
-                  className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
+                  className="w-full bg-brand-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-700 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Redirecting to Stripe...' : `Continue to Payment - ${plan.priceDisplay}/mo`}
                 </button>

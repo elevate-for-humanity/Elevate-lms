@@ -281,13 +281,13 @@ export default function OnboardingDocumentsPage() {
 
         {/* Error Display */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-red-800 font-medium">Error</p>
-              <p className="text-red-700 text-sm">{error}</p>
+              <p className="text-brand-red-800 font-medium">Error</p>
+              <p className="text-brand-red-700 text-sm">{error}</p>
             </div>
-            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">
+            <button onClick={() => setError(null)} className="text-brand-red-400 hover:text-brand-red-600">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -303,17 +303,17 @@ export default function OnboardingDocumentsPage() {
               <div
                 key={doc.id}
                 className={`bg-white rounded-xl shadow-sm p-6 border-2 transition-colors ${
-                  uploaded ? 'border-green-500' : 'border-transparent'
+                  uploaded ? 'border-brand-green-500' : 'border-transparent'
                 }`}
               >
                 <div className="flex items-start gap-4">
                   <div
                     className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      uploaded ? 'bg-green-100' : 'bg-slate-100'
+                      uploaded ? 'bg-brand-green-100' : 'bg-slate-100'
                     }`}
                   >
                     {uploaded ? (
-                      <Check className="w-6 h-6 text-green-600" />
+                      <Check className="w-6 h-6 text-brand-green-600" />
                     ) : (
                       <FileText className="w-6 h-6 text-slate-400" />
                     )}
@@ -323,7 +323,7 @@ export default function OnboardingDocumentsPage() {
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-semibold text-slate-900">{doc.name}</h3>
                       {doc.required && (
-                        <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+                        <span className="text-xs bg-brand-red-100 text-brand-red-700 px-2 py-0.5 rounded-full">
                           Required
                         </span>
                       )}
@@ -341,7 +341,7 @@ export default function OnboardingDocumentsPage() {
                         </div>
                         <button
                           onClick={() => handleRemoveFile(doc.id)}
-                          className="text-red-600 hover:text-red-800 text-sm"
+                          className="text-brand-red-600 hover:text-brand-red-800 text-sm"
                         >
                           Remove
                         </button>

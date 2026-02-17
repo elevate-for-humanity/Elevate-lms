@@ -167,7 +167,7 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
             onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setQuery(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="Search courses, programs, skills..."
-            className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+            className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500"
           />
         </div>
         <Button
@@ -212,7 +212,7 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
                         type="checkbox"
                         checked={filters.category?.includes(category)}
                         onChange={() => toggleFilter('category', category)}
-                        className="w-4 h-4 text-brand-orange-600 rounded focus:ring-red-500"
+                        className="w-4 h-4 text-brand-orange-600 rounded focus:ring-brand-red-500"
                       />
                       <span className="text-sm">{category}</span>
                     </label>
@@ -230,7 +230,7 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
                         type="checkbox"
                         checked={filters.duration?.includes(duration)}
                         onChange={() => toggleFilter('duration', duration)}
-                        className="w-4 h-4 text-brand-orange-600 rounded focus:ring-red-500"
+                        className="w-4 h-4 text-brand-orange-600 rounded focus:ring-brand-red-500"
                       />
                       <span className="text-sm">{duration}</span>
                     </label>
@@ -248,7 +248,7 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
                         type="checkbox"
                         checked={filters.level?.includes(level)}
                         onChange={() => toggleFilter('level', level)}
-                        className="w-4 h-4 text-brand-orange-600 rounded focus:ring-red-500"
+                        className="w-4 h-4 text-brand-orange-600 rounded focus:ring-brand-red-500"
                       />
                       <span className="text-sm">{level}</span>
                     </label>
@@ -266,7 +266,7 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
                         type="checkbox"
                         checked={filters.price?.includes(range)}
                         onChange={() => toggleFilter('price', range)}
-                        className="w-4 h-4 text-brand-orange-600 rounded focus:ring-red-500"
+                        className="w-4 h-4 text-brand-orange-600 rounded focus:ring-brand-red-500"
                       />
                       <span className="text-sm">{range}</span>
                     </label>
@@ -288,12 +288,12 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
             return filterValues.map((value) => (
               <div
                 key={`${key}-${value}`}
-                className="flex items-center gap-2 px-3 py-2 bg-red-100 text-red-800 rounded-full text-sm"
+                className="flex items-center gap-2 px-3 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-sm"
               >
                 <span>{value}</span>
                 <button
                   onClick={() => toggleFilter(key as keyof SearchFilters, value.toString())}
-                  className="hover:text-red-900"
+                  className="hover:text-brand-red-900"
                 >
                   <X size={14} />
                 </button>
@@ -342,11 +342,11 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
-                      <span className="text-orange-500">★</span>
+                      <span className="text-brand-orange-500">★</span>
                       <span className="font-semibold">{result.rating}</span>
                       <span className="text-sm text-black">({result.students})</span>
                     </div>
-                    <div className="font-bold text-green-600">
+                    <div className="font-bold text-brand-green-600">
                       {result.price === 0 ? 'FREE' : `$${result.price}`}
                     </div>
                   </div>

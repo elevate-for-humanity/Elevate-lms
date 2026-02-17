@@ -184,7 +184,7 @@ export function ShoppingCart() {
 
                         <button
                           onClick={() => removeItem(item.id)}
-                          className="p-2 text-brand-orange-600 hover:bg-red-50 rounded transition"
+                          className="p-2 text-brand-orange-600 hover:bg-brand-red-50 rounded transition"
                         >
                           <X size={20} />
                         </button>
@@ -213,7 +213,7 @@ export function ShoppingCart() {
                 </div>
 
                 {discount > 0 && (
-                  <div className="flex justify-between text-green-600">
+                  <div className="flex justify-between text-brand-green-600">
                     <span>Discount ({(discount * 100).toFixed(0)}%)</span>
                     <span>-${(discountAmount / 100).toFixed(2)}</span>
                   </div>
@@ -241,18 +241,18 @@ export function ShoppingCart() {
                     value={promoCode}
                     onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setPromoCode(e.target.value)}
                     placeholder="Enter code"
-                    className="flex-1 px-3 py-2 border rounded focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    className="flex-1 px-3 py-2 border rounded focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500"
                   />
                   <Button
                     onClick={applyPromoCode}
                     variant="outline"
-                    className="border-red-600 text-brand-orange-600 hover:bg-red-50"
+                    className="border-brand-red-600 text-brand-orange-600 hover:bg-brand-red-50"
                   >
                     Apply
                   </Button>
                 </div>
                 {discount > 0 && (
-                  <div className="mt-2 text-sm text-green-600">
+                  <div className="mt-2 text-sm text-brand-green-600">
                     • Promo code applied!
                   </div>
                 )}

@@ -232,7 +232,7 @@ export default async function CareersPage() {
                             {position.department.name}
                           </span>
                         )}
-                        <span className="bg-brand-green-100 text-green-700 px-3 py-2 rounded-full">
+                        <span className="bg-brand-green-100 text-brand-green-700 px-3 py-2 rounded-full">
                           Remote
                         </span>
                         <span className="bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded-full">

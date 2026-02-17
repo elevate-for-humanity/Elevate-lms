@@ -71,7 +71,7 @@ export default async function BankingPage() {
           </p>
           <Link
             href="#products"
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-block"
+            className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-block"
           >
             View Products
           </Link>
@@ -145,9 +145,9 @@ export default async function BankingPage() {
             </div>
 
             {/* Direct Deposit */}
-            <div className="bg-white border-2 border-green-200 rounded-lg p-8 hover:shadow-xl transition-all">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-8 h-8 text-green-600" />
+            <div className="bg-white border-2 border-brand-green-200 rounded-lg p-8 hover:shadow-xl transition-all">
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-8 h-8 text-brand-green-600" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4 text-center">
                 Direct Deposit
@@ -175,7 +175,7 @@ export default async function BankingPage() {
               </ul>
               <Link
                 href="/banking/direct-deposit"
-                className="block w-full bg-green-600 hover:bg-green-700 text-white text-center px-6 py-3 rounded-lg font-bold transition-all"
+                className="block w-full bg-brand-green-600 hover:bg-brand-green-700 text-white text-center px-6 py-3 rounded-lg font-bold transition-all"
               >
                 Learn More
               </Link>
@@ -308,7 +308,7 @@ export default async function BankingPage() {
                 </p>
               </div>
               <div>
-                <Clock className="w-12 h-12 text-orange-600 mx-auto mb-2" />
+                <Clock className="w-12 h-12 text-brand-orange-600 mx-auto mb-2" />
                 <p className="font-semibold">Fast Service</p>
                 <p className="text-sm text-black">Quick processing times</p>
               </div>
@@ -388,7 +388,7 @@ export default async function BankingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all"
+              className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all"
             >
               File Your Taxes
             </Link>

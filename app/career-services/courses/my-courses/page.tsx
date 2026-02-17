@@ -118,7 +118,7 @@ export default async function MyCoursesPage() {
                         <Clock className="w-4 h-4" />
                         {purchase.course?.duration_hours} hours
                       </span>
-                      <span className="flex items-center gap-1 text-green-600">
+                      <span className="flex items-center gap-1 text-brand-green-600">
                         <span className="text-slate-400 flex-shrink-0">•</span>
                         Purchased
                       </span>

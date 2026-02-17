@@ -258,14 +258,14 @@ export default async function ResourcesPage() {
               const colorClasses: Record<string, string> = {
                 blue: 'bg-brand-blue-50 border-brand-blue-200',
                 blue: 'bg-brand-blue-50 border-brand-blue-200',
-                green: 'bg-green-50 border-green-200',
-                red: 'bg-red-50 border-red-200',
+                green: 'bg-brand-green-50 border-brand-green-200',
+                red: 'bg-brand-red-50 border-brand-red-200',
               };
               const iconColors: Record<string, string> = {
                 blue: 'text-brand-blue-600',
                 blue: 'text-brand-blue-600',
-                green: 'text-green-600',
-                red: 'text-red-600',
+                green: 'text-brand-green-600',
+                red: 'text-brand-red-600',
               };
 
               return (
@@ -319,8 +319,8 @@ export default async function ResourcesPage() {
                 className="flex items-center justify-between p-4 hover:bg-gray-50"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-red-600" />
+                  <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-brand-red-600" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">{resource.title}</p>

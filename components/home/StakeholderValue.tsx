@@ -15,9 +15,9 @@ const STAKEHOLDERS = [
     ],
     cta: 'Check Eligibility',
     href: '/wioa-eligibility',
-    gradient: 'from-blue-500 to-blue-700',
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
+    gradient: 'from-brand-blue-500 to-brand-blue-700',
+    bg: 'bg-brand-blue-50',
+    border: 'border-brand-blue-200',
   },
   {
     icon: Building2,

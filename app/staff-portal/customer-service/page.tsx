@@ -92,7 +92,7 @@ export default async function CustomerServicePage() {
             <p className="text-black text-sm">Total Active Tickets</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <AlertCircle className="h-11 w-11 text-red-600 mb-2" />
+            <AlertCircle className="h-11 w-11 text-brand-red-600 mb-2" />
             <p className="text-3xl font-bold text-black">{openCount}</p>
             <p className="text-black text-sm">Open Tickets</p>
           </div>
@@ -135,9 +135,9 @@ export default async function CustomerServicePage() {
                       <span
                         className={`px-2 py-2 text-xs font-medium rounded ${
                           ticket.priority === 'urgent'
-                            ? 'bg-red-100 text-red-700'
+                            ? 'bg-brand-red-100 text-brand-red-700'
                             : ticket.priority === 'high'
-                              ? 'bg-orange-100 text-orange-700'
+                              ? 'bg-brand-orange-100 text-brand-orange-700'
                               : ticket.priority === 'medium'
                                 ? 'bg-yellow-100 text-yellow-700'
                                 : 'bg-slate-100 text-black'
@@ -150,7 +150,7 @@ export default async function CustomerServicePage() {
                       <span
                         className={`text-sm ${
                           ticket.status === 'open'
-                            ? 'text-red-600'
+                            ? 'text-brand-red-600'
                             : 'text-yellow-600'
                         }`}
                       >
@@ -182,7 +182,7 @@ export default async function CustomerServicePage() {
                     </h3>
                     {protocol.dos && protocol.dos.length > 0 && (
                       <div className="mb-2">
-                        <p className="text-sm font-medium text-green-700">
+                        <p className="text-sm font-medium text-brand-green-700">
                           Do:
                         </p>
                         <ul className="text-sm text-black list-disc list-inside">
@@ -194,7 +194,7 @@ export default async function CustomerServicePage() {
                     )}
                     {protocol.donts && protocol.donts.length > 0 && (
                       <div>
-                        <p className="text-sm font-medium text-red-700">
+                        <p className="text-sm font-medium text-brand-red-700">
                           Don't:
                         </p>
                         <ul className="text-sm text-black list-disc list-inside">

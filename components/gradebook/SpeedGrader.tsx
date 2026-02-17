@@ -136,7 +136,7 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
             <button
               onClick={handleNext}
               disabled={currentIndex === submissions.length - 1}
-              className="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-medium text-white bg-brand-orange-600 rounded hover:bg-brand-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {currentIndex === submissions.length - 1 ? 'Finish' : 'Next →'}
             </button>
@@ -206,7 +206,7 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
                   max={assignment.points}
                   min={0}
                   step={0.5}
-                  className="flex-1 px-3 py-2 border border-slate-300 rounded focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="flex-1 px-3 py-2 border border-slate-300 rounded focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
                 />
                 <span className="text-sm text-black">/ {assignment.points}</span>
               </div>
@@ -235,7 +235,7 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
                             onClick={() => handleRubricScore(criterion.id, level.id, level.points)}
                             className={`w-full text-left px-3 py-2 rounded text-sm border ${
                               rubricScores.find(s => s.criterionId === criterion.id)?.levelId === level.id
-                                ? 'bg-orange-50 border-orange-500 text-orange-900'
+                                ? 'bg-brand-orange-50 border-brand-orange-500 text-brand-orange-900'
                                 : 'bg-white border-slate-200 text-black hover:bg-slate-50'
                             }`}
                           >
@@ -263,7 +263,7 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
                 onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setFeedback(e.target.value)}
                 rows={6}
                 placeholder="Provide feedback to the student..."
-                className="w-full px-3 py-2 border border-slate-300 rounded focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                className="w-full px-3 py-2 border border-slate-300 rounded focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 text-sm"
               />
             </div>
 
@@ -295,7 +295,7 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
             <button
               onClick={saveGrade}
               disabled={saving}
-              className="w-full px-4 py-2 bg-orange-600 text-white font-medium rounded hover:bg-orange-700 disabled:opacity-50"
+              className="w-full px-4 py-2 bg-brand-orange-600 text-white font-medium rounded hover:bg-brand-orange-700 disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save Grade'}
             </button>

@@ -66,10 +66,10 @@ function ProgressBar({ current, target, color = 'bg-brand-blue-500' }: {
 
 function TrendIndicator({ trend }: { trend: 'up' | 'down' | 'stable' }) {
   if (trend === 'up') {
-    return <span className="text-green-400 text-xs">↑ Improving</span>;
+    return <span className="text-brand-green-400 text-xs">↑ Improving</span>;
   }
   if (trend === 'down') {
-    return <span className="text-red-400 text-xs">↓ Declining</span>;
+    return <span className="text-brand-red-400 text-xs">↓ Declining</span>;
   }
   return <span className="text-slate-400 text-xs">→ Stable</span>;
 }
@@ -128,7 +128,7 @@ export default function ShopOwnerProgressPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
         <div className="text-center max-w-md">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
           <p className="text-slate-400 mb-6">{error}</p>
           <Link
@@ -282,7 +282,7 @@ export default function ShopOwnerProgressPage() {
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Zap className="w-4 h-4 text-green-400" />
+                          <Zap className="w-4 h-4 text-brand-green-400" />
                           <span className="text-slate-400 text-xs">
                             {apprentice.weeklyAvg} hrs/week avg
                           </span>

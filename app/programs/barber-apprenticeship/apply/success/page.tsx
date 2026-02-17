@@ -13,7 +13,7 @@ export default function ApplicationSuccessPage() {
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
           {/* Success Icon */}
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
 
@@ -37,7 +37,7 @@ export default function ApplicationSuccessPage() {
                 'If you need a host shop, we will discuss placement options',
               ].map((text, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <div className="w-5 h-5 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium mt-0.5">
+                  <div className="w-5 h-5 bg-brand-orange-100 text-brand-orange-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium mt-0.5">
                     {i + 1}
                   </div>
                   <p className="text-sm text-gray-600">{text}</p>
@@ -72,7 +72,7 @@ export default function ApplicationSuccessPage() {
         <div className="text-center mt-6">
           <Link
             href="/programs/barber-apprenticeship"
-            className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium"
+            className="inline-flex items-center gap-2 text-brand-orange-600 hover:text-brand-orange-700 font-medium"
           >
             Back to Program Details
             <ArrowRight className="w-4 h-4" />

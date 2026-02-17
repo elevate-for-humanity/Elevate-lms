@@ -151,7 +151,7 @@ export default async function VideoWatchPage({
           {/* Video Info */}
           <div className="mt-8 bg-white rounded-lg p-8 shadow-sm">
             <div className="mb-4">
-              <span className="inline-block px-3 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-semibold">
+              <span className="inline-block px-3 py-2 bg-brand-orange-100 text-brand-orange-800 rounded-full text-sm font-semibold">
                 {video.category}
               </span>
             </div>
@@ -166,7 +166,7 @@ export default async function VideoWatchPage({
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/apply"
-                className="inline-flex items-center justify-center px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg transition"
+                className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold rounded-lg transition"
               >
                 Apply Now
               </Link>

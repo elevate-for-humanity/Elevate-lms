@@ -106,7 +106,7 @@ export default function PoliciesIndexPage() {
       {policies.map((category) => (
         <div key={category.category} className="bg-white rounded-xl shadow-sm p-8">
           <h2 className="text-xl font-bold text-black mb-6 flex items-center gap-2">
-            <Shield className="w-5 h-5 text-orange-600" />
+            <Shield className="w-5 h-5 text-brand-orange-600" />
             {category.category}
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -116,9 +116,9 @@ export default function PoliciesIndexPage() {
                 <Link
                   key={policy.href}
                   href={policy.href}
-                  className="flex items-start gap-4 p-4 rounded-lg border border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-colors"
+                  className="flex items-start gap-4 p-4 rounded-lg border border-gray-200 hover:border-brand-orange-300 hover:bg-brand-orange-50 transition-colors"
                 >
-                  <Icon className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <Icon className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-semibold text-black">{policy.name}</h3>
                     <p className="text-sm text-gray-600">{policy.description}</p>
@@ -134,7 +134,7 @@ export default function PoliciesIndexPage() {
       <div className="bg-brand-blue-50 rounded-xl p-6 text-center">
         <p className="text-gray-700">
           Questions about our policies? Contact us at{' '}
-          <a href="mailto:info@elevateforhumanity.org" className="text-orange-600 hover:underline font-medium">
+          <a href="mailto:info@elevateforhumanity.org" className="text-brand-orange-600 hover:underline font-medium">
             info@elevateforhumanity.org
           </a>
         </p>

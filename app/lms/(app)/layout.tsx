@@ -67,7 +67,7 @@ function LmsAppLayoutInner({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-slate-50">
       <IdleTimeoutGuard />
       <LMSNavigation user={user} profile={profile} />
-      <main>{children}</main>
+      <main id="main-content" role="main" aria-label="LMS content" tabIndex={-1}>{children}</main>
       {/* Logo stamp for brand recognition */}
       <LogoStamp />
       {/* AI Instructor Widget - Available on all LMS pages */}

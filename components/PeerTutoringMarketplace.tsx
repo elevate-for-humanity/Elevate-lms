@@ -67,7 +67,7 @@ export function PeerTutoringMarketplace() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Peer Tutoring Marketplace</h1>
-          <p className="text-red-100">Connect with expert student tutors</p>
+          <p className="text-brand-red-100">Connect with expert student tutors</p>
         </div>
       </div>
 
@@ -109,7 +109,7 @@ export function PeerTutoringMarketplace() {
                 <p className="text-sm font-semibold text-black mb-2">Subjects:</p>
                 <div className="flex flex-wrap gap-2">
                   {tutor.subjects.map((subject) => (
-                    <span key={subject} className="px-2 py-2 bg-orange-100 text-orange-700 text-xs rounded">
+                    <span key={subject} className="px-2 py-2 bg-brand-orange-100 text-brand-orange-700 text-xs rounded">
                       {subject}
                     </span>
                   ))}

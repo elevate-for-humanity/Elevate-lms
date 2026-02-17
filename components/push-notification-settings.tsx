@@ -110,7 +110,7 @@ export function PushNotificationSettings() {
         <div className="flex items-start gap-3">
           <svg
             className={`w-6 h-6 flex-shrink-0 mt-0.5 ${
-              isSubscribed ? 'text-green-600' : 'text-gray-400'
+              isSubscribed ? 'text-brand-green-600' : 'text-gray-400'
             }`}
             fill="none"
             stroke="currentColor"
@@ -135,9 +135,9 @@ export function PushNotificationSettings() {
               <span
                 className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                   permission === 'granted'
-                    ? 'bg-green-100 text-green-800'
+                    ? 'bg-brand-green-100 text-brand-green-800'
                     : permission === 'denied'
-                    ? 'bg-red-100 text-red-800'
+                    ? 'bg-brand-red-100 text-brand-red-800'
                     : 'bg-gray-100 text-black'
                 }`}
               >

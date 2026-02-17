@@ -44,7 +44,7 @@ export function FAQClient({ categories }: FAQClientProps) {
   return (
     <>
       {/* Search Section */}
-      <section className="bg-gradient-to-br from-blue-600 to-blue-700 text-white py-20">
+      <section className="bg-gradient-to-br from-brand-blue-600 to-brand-blue-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-black mb-6">

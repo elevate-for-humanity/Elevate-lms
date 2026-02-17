@@ -13,7 +13,7 @@ export default function MarketplaceLanding() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-600 text-white py-20">
+      <section className="bg-gradient-to-r from-brand-blue-600 to-brand-blue-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <ShoppingBag className="w-20 h-20 mx-auto mb-6" />
           <h1 className="text-5xl font-bold mb-6">Marketplace</h1>
@@ -57,19 +57,19 @@ export default function MarketplaceLanding() {
               href="/store"
             />
             <FeatureCard
-              icon={<CreditCard className="w-12 h-12 text-green-600" />}
+              icon={<CreditCard className="w-12 h-12 text-brand-green-600" />}
               title="Secure Payments"
               description="Safe and secure payment processing with buyer protection"
               href="/checkout"
             />
             <FeatureCard
-              icon={<TrendingUp className="w-12 h-12 text-orange-600" />}
+              icon={<TrendingUp className="w-12 h-12 text-brand-orange-600" />}
               title="Banking Services"
               description="Business banking and financial services for sellers"
               href="/banking"
             />
             <FeatureCard
-              icon={<Shield className="w-12 h-12 text-red-600" />}
+              icon={<Shield className="w-12 h-12 text-brand-red-600" />}
               title="Buyer Protection"
               description="100% money-back guarantee on all purchases"
               href="/marketplace/protection"
@@ -112,7 +112,7 @@ export default function MarketplaceLanding() {
               description="List products in minutes, start selling immediately"
             />
             <BenefitCard
-              icon={<Shield className="w-8 h-8 text-green-500" />}
+              icon={<Shield className="w-8 h-8 text-brand-green-500" />}
               title="Secure Transactions"
               description="Bank-level security for all payments and data"
             />
@@ -131,7 +131,7 @@ export default function MarketplaceLanding() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-600 text-white">
+      <section className="py-16 bg-gradient-to-r from-brand-blue-600 to-brand-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <StatCard number="10,000+" label="Active Users" />

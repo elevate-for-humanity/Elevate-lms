@@ -328,7 +328,7 @@ export default function ReportsDashboard({
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           enrollment.status === 'active'
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-green-100 text-brand-green-800'
                             : enrollment.status === 'completed'
                               ? 'bg-brand-blue-100 text-brand-blue-800'
                               : 'bg-yellow-100 text-yellow-800'

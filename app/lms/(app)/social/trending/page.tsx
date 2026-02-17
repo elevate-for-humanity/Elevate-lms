@@ -109,7 +109,7 @@ export default async function TrendingPage() {
       </div>
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white">
+      <div className="bg-gradient-to-r from-amber-500 to-brand-orange-600 text-white">
         <div className="max-w-6xl mx-auto px-4 py-12">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -132,7 +132,7 @@ export default async function TrendingPage() {
             {/* Trending Hashtags */}
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Flame className="w-5 h-5 text-orange-500" />
+                <Flame className="w-5 h-5 text-brand-orange-500" />
                 Trending Hashtags
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
@@ -140,18 +140,18 @@ export default async function TrendingPage() {
                   <Link
                     key={i}
                     href={`/lms/social?tag=${topic.tag}`}
-                    className="flex items-center justify-between p-4 rounded-lg border hover:border-orange-300 hover:bg-orange-50 transition-colors"
+                    className="flex items-center justify-between p-4 rounded-lg border hover:border-brand-orange-300 hover:bg-brand-orange-50 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <Hash className="w-5 h-5 text-orange-600" />
+                      <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                        <Hash className="w-5 h-5 text-brand-orange-600" />
                       </div>
                       <div>
                         <div className="font-medium text-gray-900">#{topic.tag}</div>
                         <div className="text-sm text-gray-500">{topic.posts} posts</div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 text-green-600 text-sm font-medium">
+                    <div className="flex items-center gap-1 text-brand-green-600 text-sm font-medium">
                       <ArrowUp className="w-4 h-4" />
                       {topic.trend}
                     </div>
@@ -173,12 +173,12 @@ export default async function TrendingPage() {
                   <div key={post.id} className="p-6 hover:bg-gray-50">
                     <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                       <div className={`w-6 h-6 rounded flex items-center justify-center ${
-                        post.groupColor === 'red' ? 'bg-red-100' :
-                        post.groupColor === 'orange' ? 'bg-orange-100' : 'bg-blue-100'
+                        post.groupColor === 'red' ? 'bg-brand-red-100' :
+                        post.groupColor === 'orange' ? 'bg-brand-orange-100' : 'bg-brand-blue-100'
                       }`}>
                         <post.groupIcon className={`w-4 h-4 ${
-                          post.groupColor === 'red' ? 'text-red-600' :
-                          post.groupColor === 'orange' ? 'text-orange-600' : 'text-blue-600'
+                          post.groupColor === 'red' ? 'text-brand-red-600' :
+                          post.groupColor === 'orange' ? 'text-brand-orange-600' : 'text-brand-blue-600'
                         }`} />
                       </div>
                       <span>{post.group}</span>
@@ -187,20 +187,20 @@ export default async function TrendingPage() {
                       <span>•</span>
                       <span>{post.time}</span>
                     </div>
-                    <h3 className="font-semibold text-gray-900 text-lg hover:text-orange-600 cursor-pointer">
+                    <h3 className="font-semibold text-gray-900 text-lg hover:text-brand-orange-600 cursor-pointer">
                       {post.title}
                     </h3>
                     <p className="text-gray-600 mt-2">{post.preview}</p>
                     <div className="flex items-center gap-6 mt-4">
-                      <button className="flex items-center gap-2 text-gray-500 hover:text-orange-600">
+                      <button className="flex items-center gap-2 text-gray-500 hover:text-brand-orange-600">
                         <ThumbsUp className="w-5 h-5" />
                         <span className="font-medium">{post.likes}</span>
                       </button>
-                      <button className="flex items-center gap-2 text-gray-500 hover:text-orange-600">
+                      <button className="flex items-center gap-2 text-gray-500 hover:text-brand-orange-600">
                         <MessageCircle className="w-5 h-5" />
                         <span>{post.comments}</span>
                       </button>
-                      <button className="flex items-center gap-2 text-gray-500 hover:text-orange-600">
+                      <button className="flex items-center gap-2 text-gray-500 hover:text-brand-orange-600">
                         <Share2 className="w-5 h-5" />
                         <span>{post.shares}</span>
                       </button>
@@ -209,7 +209,7 @@ export default async function TrendingPage() {
                 ))}
               </div>
               <div className="p-4 border-t text-center">
-                <button className="text-orange-600 hover:text-orange-700 font-medium">
+                <button className="text-brand-orange-600 hover:text-brand-orange-700 font-medium">
                   View More Trending Posts
                 </button>
               </div>
@@ -227,7 +227,7 @@ export default async function TrendingPage() {
               <div className="space-y-4">
                 {topContributors.map((contributor, i) => (
                   <div key={i} className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
+                    <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-brand-orange-500 rounded-full flex items-center justify-center text-white font-bold">
                       {i + 1}
                     </div>
                     <div className="flex-1">
@@ -241,7 +241,7 @@ export default async function TrendingPage() {
               </div>
               <Link
                 href="/lms/leaderboard"
-                className="block text-center text-orange-600 hover:text-orange-700 text-sm font-medium mt-4 pt-4 border-t"
+                className="block text-center text-brand-orange-600 hover:text-brand-orange-700 text-sm font-medium mt-4 pt-4 border-t"
               >
                 View Full Leaderboard
               </Link>
@@ -250,13 +250,13 @@ export default async function TrendingPage() {
             {/* Popular Groups */}
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Users className="w-5 h-5 text-blue-500" />
+                <Users className="w-5 h-5 text-brand-blue-500" />
                 Active Groups
               </h3>
               <div className="space-y-3">
                 <Link href="/lms/social/groups/healthcare" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50">
-                  <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                    <Heart className="w-5 h-5 text-red-600" />
+                  <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
+                    <Heart className="w-5 h-5 text-brand-red-600" />
                   </div>
                   <div>
                     <div className="font-medium text-gray-900 text-sm">Healthcare Professionals</div>
@@ -264,8 +264,8 @@ export default async function TrendingPage() {
                   </div>
                 </Link>
                 <Link href="/lms/social/groups/trades" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50">
-                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <Briefcase className="w-5 h-5 text-orange-600" />
+                  <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                    <Briefcase className="w-5 h-5 text-brand-orange-600" />
                   </div>
                   <div>
                     <div className="font-medium text-gray-900 text-sm">Skilled Trades Network</div>
@@ -273,8 +273,8 @@ export default async function TrendingPage() {
                   </div>
                 </Link>
                 <Link href="/lms/social/groups/career" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <div>
                     <div className="font-medium text-gray-900 text-sm">Career Changers</div>
@@ -284,7 +284,7 @@ export default async function TrendingPage() {
               </div>
               <Link
                 href="/lms/social/groups"
-                className="block text-center text-orange-600 hover:text-orange-700 text-sm font-medium mt-4 pt-4 border-t"
+                className="block text-center text-brand-orange-600 hover:text-brand-orange-700 text-sm font-medium mt-4 pt-4 border-t"
               >
                 Browse All Groups
               </Link>

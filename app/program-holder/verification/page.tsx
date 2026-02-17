@@ -148,14 +148,14 @@ export default async function VerificationPage() {
           <div className="max-w-4xl mx-auto">
             {/* Status Banner */}
             {isVerified ? (
-              <div className="bg-green-50 border-l-4 border-green-500 p-6 mb-8">
+              <div className="bg-brand-green-50 border-l-4 border-brand-green-500 p-6 mb-8">
                 <div className="flex items-start">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                   <div>
-                    <h3 className="text-lg font-semibold text-green-900 mb-1">
+                    <h3 className="text-lg font-semibold text-brand-green-900 mb-1">
                       Verification Complete
                     </h3>
-                    <p className="text-green-800">
+                    <p className="text-brand-green-800">
                       Your program holder account has been verified and
                       approved.
                     </p>
@@ -200,7 +200,7 @@ export default async function VerificationPage() {
                     key={req.id}
                     className={`flex items-start p-4 rounded-lg border-2 ${
                       req.completed
-                        ? 'bg-green-50 border-green-200'
+                        ? 'bg-brand-green-50 border-brand-green-200'
                         : 'bg-slate-50 border-slate-200'
                     }`}
                   >
@@ -215,7 +215,7 @@ export default async function VerificationPage() {
                           {req.label}
                         </h3>
                         {req.required && (
-                          <span className="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded">
+                          <span className="text-xs bg-brand-red-100 text-brand-red-800 px-2 py-0.5 rounded">
                             Required
                           </span>
                         )}
@@ -224,7 +224,7 @@ export default async function VerificationPage() {
                         {req.description}
                       </p>
                       {req.completed && (
-                        <p className="text-sm text-green-700 font-medium mt-2">
+                        <p className="text-sm text-brand-green-700 font-medium mt-2">
                           • Document approved
                         </p>
                       )}

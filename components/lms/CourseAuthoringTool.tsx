@@ -101,7 +101,7 @@ function SortableModule(data: any) {
         </button>
         <button
           onClick={() => onDelete(module.id)}
-          className="p-2 text-brand-orange-600 hover:bg-red-50 rounded"
+          className="p-2 text-brand-orange-600 hover:bg-brand-red-50 rounded"
         >
           <Trash2 className="w-4 h-4" />
         </button>
@@ -148,7 +148,7 @@ function SortableLesson(data: any) {
         </button>
         <button
           onClick={() => onDelete(lesson.id)}
-          className="p-1 text-brand-orange-600 hover:bg-red-50 rounded"
+          className="p-1 text-brand-orange-600 hover:bg-brand-red-50 rounded"
         >
           <Trash2 className="w-3 h-3" />
         </button>

@@ -210,14 +210,14 @@ export default async function StudentDashboardOrchestrated() {
             quality={100}
           />
         </div>
-        <div className="p-8 md:p-12 bg-green-900 rounded-b-2xl">
+        <div className="p-8 md:p-12 bg-brand-green-900 rounded-b-2xl">
           <div className="flex items-center gap-3 mb-4">
             <GraduationCap className="w-10 h-10 text-white" />
             <div>
               <h1 className="text-3xl md:text-4xl font-black text-white">
                 Welcome to Your Student Portal
               </h1>
-              <p className="text-lg text-green-100">
+              <p className="text-lg text-brand-green-100">
                 {profile?.full_name || user.email?.split('@')[0]}, you&apos;re in. Start your first lesson, track progress, upload required items, see deadlines and announcements, and complete quizzes and assessments.
               </p>
             </div>
@@ -251,11 +251,11 @@ export default async function StudentDashboardOrchestrated() {
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">•</span>
+              <span className="w-5 h-5 rounded-full bg-brand-green-500 text-white flex items-center justify-center text-xs">•</span>
               <span className="text-amber-900">Applied</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">•</span>
+              <span className="w-5 h-5 rounded-full bg-brand-green-500 text-white flex items-center justify-center text-xs">•</span>
               <span className="text-amber-900">Payment Received</span>
             </div>
             <div className="flex items-center gap-2">

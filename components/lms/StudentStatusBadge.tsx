@@ -21,9 +21,9 @@ export function StudentStatusBadge({
         return {
           icon: <span className="text-slate-400 flex-shrink-0">•</span>,
           text: 'On Track',
-          color: 'text-green-600',
-          bgColor: 'bg-green-600',
-          lightBg: 'bg-green-100'
+          color: 'text-brand-green-600',
+          bgColor: 'bg-brand-green-600',
+          lightBg: 'bg-brand-green-100'
         };
       case 'needs_action':
         return {
@@ -39,7 +39,7 @@ export function StudentStatusBadge({
           text: 'At Risk',
           color: 'text-brand-orange-600',
           bgColor: 'bg-brand-orange-600',
-          lightBg: 'bg-red-100'
+          lightBg: 'bg-brand-red-100'
         };
       default:
         return {

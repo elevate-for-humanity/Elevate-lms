@@ -168,7 +168,7 @@ export default function ReturnDetailPage() {
         <CardContent className="py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${returnData.created_at ? 'bg-green-500 text-white' : 'bg-muted'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${returnData.created_at ? 'bg-brand-green-500 text-white' : 'bg-muted'}`}>
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
@@ -180,7 +180,7 @@ export default function ReturnDetailPage() {
             </div>
             <div className="flex-1 h-1 bg-muted mx-4" />
             <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${returnData.ero_signed_at ? 'bg-green-500 text-white' : 'bg-muted'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${returnData.ero_signed_at ? 'bg-brand-green-500 text-white' : 'bg-muted'}`}>
                 {returnData.ero_signed_at ? <span className="text-slate-400 flex-shrink-0">•</span> : <Clock className="h-4 w-4" />}
               </div>
               <div>
@@ -192,7 +192,7 @@ export default function ReturnDetailPage() {
             </div>
             <div className="flex-1 h-1 bg-muted mx-4" />
             <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${returnData.submitted_at ? 'bg-green-500 text-white' : 'bg-muted'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${returnData.submitted_at ? 'bg-brand-green-500 text-white' : 'bg-muted'}`}>
                 {returnData.submitted_at ? <span className="text-slate-400 flex-shrink-0">•</span> : <Clock className="h-4 w-4" />}
               </div>
               <div>
@@ -205,8 +205,8 @@ export default function ReturnDetailPage() {
             <div className="flex-1 h-1 bg-muted mx-4" />
             <div className="flex items-center gap-2">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                returnData.status === 'accepted' ? 'bg-green-500 text-white' : 
-                returnData.status === 'rejected' ? 'bg-red-500 text-white' : 'bg-muted'
+                returnData.status === 'accepted' ? 'bg-brand-green-500 text-white' : 
+                returnData.status === 'rejected' ? 'bg-brand-red-500 text-white' : 'bg-muted'
               }`}>
                 {returnData.status === 'accepted' ? <span className="text-slate-400 flex-shrink-0">•</span> : 
                  returnData.status === 'rejected' ? <AlertCircle className="h-4 w-4" /> : 
@@ -320,16 +320,16 @@ export default function ReturnDetailPage() {
                   </div>
                 </div>
                 {returnData.return_data?.refund_amount ? (
-                  <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg">
+                  <div className="bg-brand-green-50 dark:bg-brand-green-950 p-4 rounded-lg">
                     <p className="text-sm text-muted-foreground">Refund Amount</p>
-                    <p className="text-2xl font-bold text-green-600">
+                    <p className="text-2xl font-bold text-brand-green-600">
                       ${returnData.return_data.refund_amount.toLocaleString()}
                     </p>
                   </div>
                 ) : returnData.return_data?.amount_owed ? (
-                  <div className="bg-red-50 dark:bg-red-950 p-4 rounded-lg">
+                  <div className="bg-brand-red-50 dark:bg-brand-red-950 p-4 rounded-lg">
                     <p className="text-sm text-muted-foreground">Amount Owed</p>
-                    <p className="text-2xl font-bold text-red-600">
+                    <p className="text-2xl font-bold text-brand-red-600">
                       ${returnData.return_data.amount_owed.toLocaleString()}
                     </p>
                   </div>
@@ -356,17 +356,17 @@ export default function ReturnDetailPage() {
                 <div className="space-y-2 pl-4">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Franchise Fee</span>
-                    <span className="text-red-600">-${returnData.franchise_fee?.toLocaleString()}</span>
+                    <span className="text-brand-red-600">-${returnData.franchise_fee?.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Preparer Commission</span>
-                    <span className="text-red-600">-${returnData.preparer_commission?.toLocaleString()}</span>
+                    <span className="text-brand-red-600">-${returnData.preparer_commission?.toLocaleString()}</span>
                   </div>
                 </div>
                 <hr />
-                <div className="flex justify-between items-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
+                <div className="flex justify-between items-center p-4 bg-brand-green-50 dark:bg-brand-green-950 rounded-lg">
                   <span className="font-medium">Office Revenue</span>
-                  <span className="text-xl font-bold text-green-600">${returnData.office_revenue?.toLocaleString()}</span>
+                  <span className="text-xl font-bold text-brand-green-600">${returnData.office_revenue?.toLocaleString()}</span>
                 </div>
               </div>
             </CardContent>
@@ -377,7 +377,7 @@ export default function ReturnDetailPage() {
           <TabsContent value="errors">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-red-600">
+                <CardTitle className="flex items-center gap-2 text-brand-red-600">
                   <AlertCircle className="h-5 w-5" />
                   IRS Errors
                 </CardTitle>
@@ -386,13 +386,13 @@ export default function ReturnDetailPage() {
                 <div className="space-y-4">
                   {Array.isArray(returnData.irs_errors) ? (
                     returnData.irs_errors.map((error: any, index: number) => (
-                      <div key={index} className="p-4 bg-red-50 dark:bg-red-950 rounded-lg">
+                      <div key={index} className="p-4 bg-brand-red-50 dark:bg-brand-red-950 rounded-lg">
                         <p className="font-medium">{error.code || 'Error'}</p>
                         <p className="text-sm text-muted-foreground">{'An error occurred'}</p>
                       </div>
                     ))
                   ) : (
-                    <div className="p-4 bg-red-50 dark:bg-red-950 rounded-lg">
+                    <div className="p-4 bg-brand-red-50 dark:bg-brand-red-950 rounded-lg">
                       <pre className="text-sm">{JSON.stringify(returnData.irs_errors, null, 2)}</pre>
                     </div>
                   )}

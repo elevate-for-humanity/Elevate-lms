@@ -123,7 +123,7 @@ export default async function LeaderboardPage() {
 
               {/* 3rd Place */}
               <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-orange-500 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 border-4 border-amber-500">
+                <div className="w-20 h-20 rounded-full bg-brand-orange-500 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 border-4 border-amber-500">
                   {getInitial(topLearners![2]?.full_name)}
                 </div>
                 <p className="font-bold text-gray-900">{topLearners![2]?.full_name || 'Learner'}</p>
@@ -150,7 +150,7 @@ export default async function LeaderboardPage() {
                   className={`flex items-center gap-4 p-4 ${
                     index !== topLearners.length - 1 ? 'border-b border-gray-100' : ''
                   } ${index < 3 ? 'bg-yellow-50/50' : ''} ${
-                    user && learner.id === user.id ? 'bg-green-50' : ''
+                    user && learner.id === user.id ? 'bg-brand-green-50' : ''
                   }`}
                 >
                   <div className="w-10 flex justify-center">
@@ -177,7 +177,7 @@ export default async function LeaderboardPage() {
               <p className="text-gray-600 mb-6">Be the first to earn points and claim the top spot!</p>
               <Link 
                 href="/programs" 
-                className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700"
               >
                 Start Learning
                 <ArrowRight className="w-4 h-4" />
@@ -196,7 +196,7 @@ export default async function LeaderboardPage() {
           </p>
           <Link
             href="/programs"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-orange-600 font-semibold rounded-full hover:bg-orange-50 transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-orange-600 font-semibold rounded-full hover:bg-brand-orange-50 transition-colors"
           >
             Browse Programs
             <ArrowRight className="w-5 h-5" />

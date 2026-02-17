@@ -78,24 +78,24 @@ export function PointsDisplay({
             <Trophy className="w-6 h-6" />
             <span className="text-2xl font-bold">{totalPoints.toLocaleString()}</span>
           </div>
-          <p className="text-orange-100 text-sm">Total Points</p>
+          <p className="text-brand-orange-100 text-sm">Total Points</p>
         </div>
         <div className="text-right">
           <div className="flex items-center gap-2 justify-end mb-1">
             <Star className="w-5 h-5" />
             <span className="text-xl font-bold">Level {level}</span>
           </div>
-          <p className="text-orange-100 text-sm">{levelName}</p>
+          <p className="text-brand-orange-100 text-sm">{levelName}</p>
         </div>
       </div>
 
       {/* Progress Bar */}
       <div className="mb-4">
         <div className="flex items-center justify-between text-sm mb-2">
-          <span className="text-orange-100">Progress to Level {level + 1}</span>
+          <span className="text-brand-orange-100">Progress to Level {level + 1}</span>
           <span className="font-semibold">{pointsToNextLevel} points to go</span>
         </div>
-        <div className="w-full bg-orange-700 rounded-full h-3">
+        <div className="w-full bg-brand-orange-700 rounded-full h-3">
           <div
             className="bg-white rounded-full h-3 transition-all duration-500"
             style={{ width: `${progressPercentage}%` }}
@@ -105,7 +105,7 @@ export function PointsDisplay({
 
       {/* Recent Activity */}
       {recentTransactions.length > 0 && (
-        <div className="border-t border-orange-400 pt-4">
+        <div className="border-t border-brand-orange-400 pt-4">
           <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
             <TrendingUp className="w-4 h-4" />
             Recent Activity
@@ -113,7 +113,7 @@ export function PointsDisplay({
           <div className="space-y-2">
             {recentTransactions.slice(0, 3).map((transaction, index) => (
               <div key={index} className="flex items-center justify-between text-sm">
-                <span className="text-orange-100">{transaction.description}</span>
+                <span className="text-brand-orange-100">{transaction.description}</span>
                 <span className="font-semibold">+{transaction.points}</span>
               </div>
             ))}

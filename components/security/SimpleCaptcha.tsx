@@ -86,20 +86,20 @@ export function SimpleCaptcha({ onVerify, className = '', formId }: SimpleCaptch
           onChange={handleChange}
           onKeyPress={(e) => e.key === 'Enter' && handleVerify()}
           placeholder="?"
-          className="w-20 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+          className="w-20 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
           disabled={isVerified}
         />
         {!isVerified && (
           <button
             type="button"
             onClick={handleVerify}
-            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-medium"
+            className="px-4 py-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition font-medium"
           >
             Verify
           </button>
         )}
         {isVerified && (
-          <div className="flex items-center gap-2 text-green-600">
+          <div className="flex items-center gap-2 text-brand-green-600">
             <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="font-medium">Verified</span>
           </div>

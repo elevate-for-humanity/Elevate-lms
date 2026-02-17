@@ -80,45 +80,45 @@ export default async function TaxInformationPage() {
               </ul>
             </div>
 
-            <div className="bg-green-50 rounded-lg p-8 border border-green-200">
+            <div className="bg-brand-green-50 rounded-lg p-8 border border-brand-green-200">
               <h3 className="text-2xl font-bold text-black mb-4">Avoid Common Mistakes</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Double-check Social Security numbers</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Report all income, including side gigs</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>File on time to avoid penalties</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                   <span>Choose the right filing status</span>
                 </li>
               </ul>
             </div>
 
-            <div className="bg-orange-50 rounded-lg p-8 border border-orange-200">
+            <div className="bg-brand-orange-50 rounded-lg p-8 border border-brand-orange-200">
               <h3 className="text-2xl font-bold text-black mb-4">Tax Credits to Claim</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
                   <span>Earned Income Tax Credit (EITC)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
                   <span>Child Tax Credit</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
                   <span>Education credits (American Opportunity, Lifetime Learning)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
                   <span>Retirement savings contributions credit</span>
                 </li>
               </ul>
@@ -153,7 +153,7 @@ export default async function TaxInformationPage() {
       <section id="tax-rates" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-12">
-            <TrendingUp className="w-12 h-12 text-green-600" />
+            <TrendingUp className="w-12 h-12 text-brand-green-600" />
             <h2 className="text-4xl font-black text-black">2024 Tax Rates</h2>
           </div>
 
@@ -218,13 +218,13 @@ export default async function TaxInformationPage() {
       <section id="retention" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-12">
-            <FolderOpen className="w-12 h-12 text-orange-600" />
+            <FolderOpen className="w-12 h-12 text-brand-orange-600" />
             <h2 className="text-4xl font-black text-black">Document Retention Guide</h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-red-50 rounded-2xl p-8 border-2 border-red-200">
-              <h3 className="text-2xl font-black text-red-600 mb-4">Keep 3 Years</h3>
+            <div className="bg-brand-red-50 rounded-2xl p-8 border-2 border-brand-red-200">
+              <h3 className="text-2xl font-black text-brand-red-600 mb-4">Keep 3 Years</h3>
               <ul className="space-y-2 text-black">
                 <li>• Employment tax records</li>
                 <li>• Income documents (W-2, 1099)</li>
@@ -234,8 +234,8 @@ export default async function TaxInformationPage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 rounded-2xl p-8 border-2 border-orange-200">
-              <h3 className="text-2xl font-black text-orange-600 mb-4">Keep 7 Years</h3>
+            <div className="bg-brand-orange-50 rounded-2xl p-8 border-2 border-brand-orange-200">
+              <h3 className="text-2xl font-black text-brand-orange-600 mb-4">Keep 7 Years</h3>
               <ul className="space-y-2 text-black">
                 <li>• Tax returns and supporting docs</li>
                 <li>• Business expense records</li>
@@ -245,8 +245,8 @@ export default async function TaxInformationPage() {
               </ul>
             </div>
 
-            <div className="bg-green-50 rounded-2xl p-8 border-2 border-green-200">
-              <h3 className="text-2xl font-black text-green-600 mb-4">Keep Permanently</h3>
+            <div className="bg-brand-green-50 rounded-2xl p-8 border-2 border-brand-green-200">
+              <h3 className="text-2xl font-black text-brand-green-600 mb-4">Keep Permanently</h3>
               <ul className="space-y-2 text-black">
                 <li>• Tax returns (copies)</li>
                 <li>• Property deeds</li>

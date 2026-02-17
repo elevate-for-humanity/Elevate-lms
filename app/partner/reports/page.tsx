@@ -120,7 +120,7 @@ export default async function PartnerReportsPage() {
             <p className="text-gray-600 text-sm">Total Referrals</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
-            <TrendingUp className="w-8 h-8 text-green-500 mb-2" />
+            <TrendingUp className="w-8 h-8 text-brand-green-500 mb-2" />
             <p className="text-2xl font-bold">{thisQuarterEnrollments || 0}</p>
             <p className="text-gray-600 text-sm">This Quarter</p>
           </div>
@@ -130,7 +130,7 @@ export default async function PartnerReportsPage() {
             <p className="text-gray-600 text-sm">Completions</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
-            <DollarSign className="w-8 h-8 text-orange-500 mb-2" />
+            <DollarSign className="w-8 h-8 text-brand-orange-500 mb-2" />
             <p className="text-2xl font-bold">${estimatedPayout.toLocaleString()}</p>
             <p className="text-gray-600 text-sm">Est. Payout ({payoutShare}%)</p>
           </div>
@@ -145,7 +145,7 @@ export default async function PartnerReportsPage() {
                 <div key={q.name} className="flex items-center gap-4">
                   <span className="w-8 text-sm font-medium text-gray-500">{q.name}</span>
                   <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                    <div className="bg-orange-500 h-full rounded-full" 
+                    <div className="bg-brand-orange-500 h-full rounded-full" 
                       style={{ width: `${Math.min(100, (idx + 1) * 20)}%` }} />
                   </div>
                   <span className="text-sm text-gray-600 w-16 text-right">

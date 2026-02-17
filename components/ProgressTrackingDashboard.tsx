@@ -87,7 +87,7 @@ export function ProgressTrackingDashboard() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Progress Dashboard</h1>
-          <p className="text-red-100">Track your learning journey in real-time</p>
+          <p className="text-brand-red-100">Track your learning journey in real-time</p>
         </div>
       </div>
 
@@ -119,13 +119,13 @@ export function ProgressTrackingDashboard() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Study Hours</h3>
-            <p className="text-3xl font-bold text-orange-500">{overallProgress.studyHours}h</p>
-            <p className="text-sm text-green-600 mt-2">↑ 15% from last week</p>
+            <p className="text-3xl font-bold text-brand-orange-500">{overallProgress.studyHours}h</p>
+            <p className="text-sm text-brand-green-600 mt-2">↑ 15% from last week</p>
           </Card>
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Current Streak</h3>
-            <p className="text-3xl font-bold text-green-600">{overallProgress.streak} days</p>
+            <p className="text-3xl font-bold text-brand-green-600">{overallProgress.streak} days</p>
             <p className="text-sm text-black mt-2">🔥 Keep it going!</p>
           </Card>
 
@@ -138,12 +138,12 @@ export function ProgressTrackingDashboard() {
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Average Score</h3>
             <p className="text-3xl font-bold text-purple-600">{overallProgress.averageScore}%</p>
-            <p className="text-sm text-green-600 mt-2">Above target</p>
+            <p className="text-sm text-brand-green-600 mt-2">Above target</p>
           </Card>
 
           <Card className="p-6   ">
             <h3 className="text-sm text-black mb-2">Next Goal</h3>
-            <p className="text-lg font-bold text-red-700">Complete React Module</p>
+            <p className="text-lg font-bold text-brand-red-700">Complete React Module</p>
             <p className="text-sm text-black mt-2">3 lessons remaining</p>
           </Card>
         </div>
@@ -175,7 +175,7 @@ export function ProgressTrackingDashboard() {
               {milestones.map((milestone, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    milestone.completed ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
+                    milestone.completed ? 'bg-brand-green-500 text-white' : 'bg-gray-300 text-black'
                   }`}>
                     {milestone.completed ? '•' : index + 1}
                   </div>
@@ -207,7 +207,7 @@ export function ProgressTrackingDashboard() {
                   <div className="text-right">
                     <div className="text-2xl font-bold text-brand-orange-600">{course.progress}%</div>
                     <span className={`inline-block mt-1 px-2 py-2 rounded text-xs font-medium ${
-                      course.status === 'on-track' ? 'bg-green-100 text-green-700' :
+                      course.status === 'on-track' ? 'bg-brand-green-100 text-brand-green-700' :
                       course.status === 'behind' ? 'bg-yellow-100 text-yellow-700' :
                       'bg-brand-blue-100 text-brand-blue-700'
                     }`}>

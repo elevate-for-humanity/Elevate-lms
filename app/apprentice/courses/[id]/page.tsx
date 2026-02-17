@@ -164,7 +164,7 @@ export default async function ApprenticeCourseDetailPage({
             </div>
             <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
               <div
-                className="h-full bg-green-500 transition-all"
+                className="h-full bg-brand-green-500 transition-all"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -200,7 +200,7 @@ export default async function ApprenticeCourseDetailPage({
                 key={module.id}
                 className={`bg-white rounded-xl border-2 transition ${
                   module.completed
-                    ? 'border-green-200 bg-green-50'
+                    ? 'border-brand-green-200 bg-brand-green-50'
                     : isCurrent
                     ? 'border-brand-blue-500 shadow-lg'
                     : isLocked
@@ -214,7 +214,7 @@ export default async function ApprenticeCourseDetailPage({
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                         module.completed
-                          ? 'bg-green-500 text-white'
+                          ? 'bg-brand-green-500 text-white'
                           : isCurrent
                           ? 'bg-brand-blue-500 text-white'
                           : 'bg-slate-200 text-slate-500'
@@ -242,7 +242,7 @@ export default async function ApprenticeCourseDetailPage({
                     {/* Action */}
                     <div>
                       {module.completed ? (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 bg-brand-green-100 text-brand-green-700 rounded-full text-sm font-medium">
                           <span className="text-slate-400 flex-shrink-0">•</span>
                           Complete
                         </span>

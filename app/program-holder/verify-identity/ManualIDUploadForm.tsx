@@ -98,10 +98,10 @@ export default function ManualIDUploadForm({
     return (
       <div className="bg-white rounded-lg shadow-lg p-8">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-green-100 rounded-full mb-4">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
-          <h2 className="text-2xl font-bold text-green-900 mb-2">
+          <h2 className="text-2xl font-bold text-brand-green-900 mb-2">
             Documents Uploaded Successfully!
           </h2>
           <p className="text-black mb-6">
@@ -132,8 +132,8 @@ export default function ManualIDUploadForm({
           Upload photos of your government-issued ID and a selfie. Admin will
           review within 1-2 business days.
         </p>
-        <div className="mt-4 p-4 bg-green-50 border-l-4 border-green-400">
-          <p className="text-sm text-green-900">
+        <div className="mt-4 p-4 bg-brand-green-50 border-l-4 border-brand-green-400">
+          <p className="text-sm text-brand-green-900">
             <strong>
               <span className="text-slate-400 flex-shrink-0">•</span> FREE
             </strong>{' '}
@@ -150,10 +150,10 @@ export default function ManualIDUploadForm({
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded">
+        <div className="mb-6 p-4 bg-brand-red-50 border-l-4 border-brand-red-400 rounded">
           <div className="flex items-start gap-3">
-            <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-900">{error}</p>
+            <AlertCircle className="text-brand-red-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-brand-red-900">{error}</p>
           </div>
         </div>
       )}
@@ -162,7 +162,7 @@ export default function ManualIDUploadForm({
         {/* ID Front */}
         <div>
           <label className="block text-sm font-medium text-black mb-2">
-            ID Front <span className="text-red-600">*</span>
+            ID Front <span className="text-brand-red-600">*</span>
           </label>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-brand-blue-400 transition">
             <input
@@ -243,7 +243,7 @@ export default function ManualIDUploadForm({
         {/* Selfie */}
         <div>
           <label className="block text-sm font-medium text-black mb-2">
-            Selfie Holding ID <span className="text-red-600">*</span>
+            Selfie Holding ID <span className="text-brand-red-600">*</span>
           </label>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-brand-blue-400 transition">
             <input

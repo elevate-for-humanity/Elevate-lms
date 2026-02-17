@@ -87,7 +87,7 @@ export default function EnhancedDashboard({ role, userId }: DashboardProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white border border-slate-200 rounded-lg p-6">
           <div className="flex items-center justify-between mb-2">
-            <Bell className="w-8 h-8 text-orange-600" />
+            <Bell className="w-8 h-8 text-brand-orange-600" />
             <span className="text-2xl font-bold text-black">
               {stats.notifications}
             </span>
@@ -132,7 +132,7 @@ export default function EnhancedDashboard({ role, userId }: DashboardProps) {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           <a
             href="/messages"
-            className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors"
+            className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 rounded-lg hover:border-brand-orange-500 hover:bg-brand-orange-50 transition-colors"
           >
             <MessageSquare className="w-6 h-6 text-black mb-2" />
             <span className="text-xs font-semibold text-black">
@@ -142,7 +142,7 @@ export default function EnhancedDashboard({ role, userId }: DashboardProps) {
 
           <a
             href="/calendar"
-            className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors"
+            className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 rounded-lg hover:border-brand-orange-500 hover:bg-brand-orange-50 transition-colors"
           >
             <Calendar className="w-6 h-6 text-black mb-2" />
             <span className="text-xs font-semibold text-black">
@@ -152,7 +152,7 @@ export default function EnhancedDashboard({ role, userId }: DashboardProps) {
 
           <a
             href="/documents"
-            className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors"
+            className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 rounded-lg hover:border-brand-orange-500 hover:bg-brand-orange-50 transition-colors"
           >
             <Upload className="w-6 h-6 text-black mb-2" />
             <span className="text-xs font-semibold text-black">
@@ -162,7 +162,7 @@ export default function EnhancedDashboard({ role, userId }: DashboardProps) {
 
           <a
             href="/achievements"
-            className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors"
+            className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 rounded-lg hover:border-brand-orange-500 hover:bg-brand-orange-50 transition-colors"
           >
             <Award className="w-6 h-6 text-black mb-2" />
             <span className="text-xs font-semibold text-black">
@@ -172,7 +172,7 @@ export default function EnhancedDashboard({ role, userId }: DashboardProps) {
 
           <a
             href="/search"
-            className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors"
+            className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 rounded-lg hover:border-brand-orange-500 hover:bg-brand-orange-50 transition-colors"
           >
             <Search className="w-6 h-6 text-black mb-2" />
             <span className="text-xs font-semibold text-black">Search</span>
@@ -180,7 +180,7 @@ export default function EnhancedDashboard({ role, userId }: DashboardProps) {
 
           <a
             href="/reports"
-            className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors"
+            className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 rounded-lg hover:border-brand-orange-500 hover:bg-brand-orange-50 transition-colors"
           >
             <BarChart3 className="w-6 h-6 text-black mb-2" />
             <span className="text-xs font-semibold text-black">

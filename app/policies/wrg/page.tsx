@@ -38,9 +38,9 @@ export default function WRGPage() {
           <p className="text-sm text-gray-500 mb-8">Last Updated: December 22, 2024</p>
 
           {/* Award Highlight */}
-          <div className="bg-green-50 border border-green-200 rounded-xl p-8 mb-12 text-center">
-            <DollarSign className="w-12 h-12 text-green-600 mx-auto mb-3" />
-            <p className="text-4xl font-bold text-green-700 mb-2">Up to $7,500/year</p>
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-8 mb-12 text-center">
+            <DollarSign className="w-12 h-12 text-brand-green-600 mx-auto mb-3" />
+            <p className="text-4xl font-bold text-brand-green-700 mb-2">Up to $7,500/year</p>
             <p className="text-gray-600">Tuition and fees covered for qualifying Indiana residents</p>
           </div>
 
@@ -57,8 +57,8 @@ export default function WRGPage() {
           </div>
 
           <div className="my-8 grid md:grid-cols-2 gap-6">
-            <div className="bg-green-50 rounded-xl p-6 border border-green-200">
-              <h3 className="font-bold text-green-800 mb-4">Who Qualifies</h3>
+            <div className="bg-brand-green-50 rounded-xl p-6 border border-brand-green-200">
+              <h3 className="font-bold text-brand-green-800 mb-4">Who Qualifies</h3>
               <ul className="space-y-3">
                 {[
                   'Indiana resident',
@@ -142,7 +142,7 @@ export default function WRGPage() {
               <a href="/support" className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
                 <Phone className="w-4 h-4" /> Get Help Online
               </a>
-              <Link href="/apply" className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">
+              <Link href="/apply" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 transition">
                 Apply Now <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

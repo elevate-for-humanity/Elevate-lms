@@ -50,9 +50,9 @@ export default function CreatorCoursesPage() {
       </div>
 <div className="max-w-6xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-          <Link href="/" className="hover:text-orange-600">Home</Link>
+          <Link href="/" className="hover:text-brand-orange-600">Home</Link>
           <ChevronRight className="w-4 h-4" />
-          <Link href="/creator" className="hover:text-orange-600">Creator</Link>
+          <Link href="/creator" className="hover:text-brand-orange-600">Creator</Link>
           <ChevronRight className="w-4 h-4" />
           <span className="text-gray-900">My Courses</span>
         </nav>
@@ -62,7 +62,7 @@ export default function CreatorCoursesPage() {
             <h1 className="text-3xl font-bold text-gray-900">My Courses</h1>
             <p className="text-gray-600">Manage and create your course content</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+          <button className="flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
             <Plus className="w-4 h-4" /> Create Course
           </button>
         </div>
@@ -103,8 +103,8 @@ export default function CreatorCoursesPage() {
                 <tr key={course.id} className="hover:bg-gray-50">
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <BookOpen className="w-6 h-6 text-orange-600" />
+                      <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                        <BookOpen className="w-6 h-6 text-brand-orange-600" />
                       </div>
                       <div>
                         <p className="font-medium">{course.title}</p>
@@ -130,7 +130,7 @@ export default function CreatorCoursesPage() {
                   </td>
                   <td className="px-4 py-4">
                     <span className={`px-2 py-1 rounded-full text-xs ${
-                      course.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                      course.status === 'published' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-gray-100 text-gray-600'
                     }`}>
                       {course.status}
                     </span>
@@ -140,7 +140,7 @@ export default function CreatorCoursesPage() {
                     <div className="flex items-center gap-2">
                       <button className="p-1 hover:bg-gray-100 rounded"><Eye className="w-4 h-4 text-gray-500" /></button>
                       <button className="p-1 hover:bg-gray-100 rounded"><Edit className="w-4 h-4 text-gray-500" /></button>
-                      <button className="p-1 hover:bg-gray-100 rounded"><Trash2 className="w-4 h-4 text-red-500" /></button>
+                      <button className="p-1 hover:bg-gray-100 rounded"><Trash2 className="w-4 h-4 text-brand-red-500" /></button>
                     </div>
                   </td>
                 </tr>

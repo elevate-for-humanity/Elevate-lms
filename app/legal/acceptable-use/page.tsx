@@ -117,7 +117,7 @@ export default function AcceptableUsePage() {
 
             <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">6. Reporting Violations</h2>
             <p className="text-gray-700 mb-4">
-              If you become aware of any violation of this policy, please report it to: <a href="mailto:info@elevateforhumanity.org" className="text-green-600 hover:underline">info@elevateforhumanity.org</a>
+              If you become aware of any violation of this policy, please report it to: <a href="mailto:info@elevateforhumanity.org" className="text-brand-green-600 hover:underline">info@elevateforhumanity.org</a>
             </p>
 
             <div className="mt-12 pt-8 border-t border-gray-200">
@@ -125,9 +125,9 @@ export default function AcceptableUsePage() {
                 By using the Elevate For Humanity platform, you acknowledge that you have read, understood, and agree to comply with this Acceptable Use Policy.
               </p>
               <div className="mt-6 flex gap-4">
-                <Link href="/legal/eula" className="text-green-600 hover:underline">EULA</Link>
-                <Link href="/terms-of-service" className="text-green-600 hover:underline">Terms of Service</Link>
-                <Link href="/legal/disclosures" className="text-green-600 hover:underline">Disclosures</Link>
+                <Link href="/legal/eula" className="text-brand-green-600 hover:underline">EULA</Link>
+                <Link href="/terms-of-service" className="text-brand-green-600 hover:underline">Terms of Service</Link>
+                <Link href="/legal/disclosures" className="text-brand-green-600 hover:underline">Disclosures</Link>
               </div>
             </div>
           </div>

@@ -58,8 +58,8 @@ export function EmployerTalentPipeline() {
     sourced: 'bg-gray-100 text-black',
     screening: 'bg-brand-blue-100 text-brand-blue-700',
     interview: 'bg-purple-100 text-purple-700',
-    offer: 'bg-orange-100 text-orange-700',
-    hired: 'bg-green-100 text-green-700',
+    offer: 'bg-brand-orange-100 text-brand-orange-700',
+    hired: 'bg-brand-green-100 text-brand-green-700',
   };
 
   return (
@@ -67,7 +67,7 @@ export function EmployerTalentPipeline() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Talent Pipeline</h1>
-          <p className="text-red-100">Manage your candidate pipeline</p>
+          <p className="text-brand-red-100">Manage your candidate pipeline</p>
         </div>
       </div>
 
@@ -123,7 +123,7 @@ export function EmployerTalentPipeline() {
                 <p className="text-sm font-semibold text-black mb-2">Skills:</p>
                 <div className="flex flex-wrap gap-2">
                   {candidate.skills.map((skill) => (
-                    <span key={skill} className="px-3 py-2 bg-orange-100 text-orange-700 text-sm rounded">
+                    <span key={skill} className="px-3 py-2 bg-brand-orange-100 text-brand-orange-700 text-sm rounded">
                       {skill}
                     </span>
                   ))}

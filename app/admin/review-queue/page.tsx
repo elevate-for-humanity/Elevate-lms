@@ -123,7 +123,7 @@ export default async function ReviewQueuePage({
 
       {/* Queue Items */}
       {error ? (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 text-brand-red-700">
           Error loading queue
         </div>
       ) : !items || items.length === 0 ? (
@@ -180,7 +180,7 @@ export default async function ReviewQueuePage({
                           {item.reasons.map((reason: string, i: number) => (
                             <span
                               key={i}
-                              className="px-2 py-0.5 rounded text-xs bg-red-50 text-red-700"
+                              className="px-2 py-0.5 rounded text-xs bg-brand-red-50 text-brand-red-700"
                             >
                               {reason}
                             </span>

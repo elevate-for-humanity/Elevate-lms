@@ -67,7 +67,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
             {alerts.length > 0 && (
               <div className="relative">
                 <Bell className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs flex items-center justify-center">{alerts.length}</span>
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-red-500 rounded-full text-xs flex items-center justify-center">{alerts.length}</span>
               </div>
             )}
             <Link href="/apps/sam-gov/settings" className="p-2 hover:bg-brand-blue-800 rounded-lg">
@@ -105,7 +105,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
                   <span className="text-gray-500 text-sm">Active</span>
                   <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
-                <p className="text-3xl font-bold text-green-600">{entities.filter(e => e.registration_status === 'active').length}</p>
+                <p className="text-3xl font-bold text-brand-green-600">{entities.filter(e => e.registration_status === 'active').length}</p>
               </div>
               <div className="bg-white rounded-xl p-6 border">
                 <div className="flex items-center justify-between mb-2">
@@ -117,9 +117,9 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
               <div className="bg-white rounded-xl p-6 border">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-500 text-sm">Alerts</span>
-                  <AlertTriangle className="w-5 h-5 text-red-500" />
+                  <AlertTriangle className="w-5 h-5 text-brand-red-500" />
                 </div>
-                <p className="text-3xl font-bold text-red-600">{alerts.length}</p>
+                <p className="text-3xl font-bold text-brand-red-600">{alerts.length}</p>
               </div>
             </div>
 
@@ -131,7 +131,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
                 <p className="text-sm text-gray-500 mt-1">Start a new SAM.gov registration</p>
               </button>
               <button className="bg-white rounded-xl p-6 border hover:shadow-lg transition text-left">
-                <Upload className="w-8 h-8 text-green-600 mb-3" />
+                <Upload className="w-8 h-8 text-brand-green-600 mb-3" />
                 <h3 className="font-bold">Import Data</h3>
                 <p className="text-sm text-gray-500 mt-1">Import from CSV or SAM.gov</p>
               </button>
@@ -141,7 +141,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
                 <p className="text-sm text-gray-500 mt-1">Update from SAM.gov API</p>
               </button>
               <button className="bg-white rounded-xl p-6 border hover:shadow-lg transition text-left">
-                <Download className="w-8 h-8 text-orange-600 mb-3" />
+                <Download className="w-8 h-8 text-brand-orange-600 mb-3" />
                 <h3 className="font-bold">Export Data</h3>
                 <p className="text-sm text-gray-500 mt-1">Download registration data</p>
               </button>
@@ -171,7 +171,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
                       </div>
                       <div className="flex items-center gap-3">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                          entity.registration_status === 'active' ? 'bg-green-100 text-green-800' :
+                          entity.registration_status === 'active' ? 'bg-brand-green-100 text-brand-green-800' :
                           entity.registration_status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
@@ -218,7 +218,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
                     <div className="mt-2 space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-500">Status</span>
-                        <span className={entity.registration_status === 'active' ? 'text-green-600' : 'text-yellow-600'}>{entity.registration_status}</span>
+                        <span className={entity.registration_status === 'active' ? 'text-brand-green-600' : 'text-yellow-600'}>{entity.registration_status}</span>
                       </div>
                       {entity.sam_expiration_date && (
                         <div className="flex justify-between">

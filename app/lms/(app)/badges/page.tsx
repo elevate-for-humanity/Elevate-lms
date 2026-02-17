@@ -117,8 +117,8 @@ const iconMap: Record<string, any> = {
 const colorMap: Record<string, { bg: string; text: string; border: string }> = {
   blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600', border: 'border-brand-blue-200' },
   yellow: { bg: 'bg-yellow-100', text: 'text-yellow-600', border: 'border-yellow-200' },
-  green: { bg: 'bg-green-100', text: 'text-green-600', border: 'border-green-200' },
-  orange: { bg: 'bg-orange-100', text: 'text-orange-600', border: 'border-orange-200' },
+  green: { bg: 'bg-brand-green-100', text: 'text-brand-green-600', border: 'border-brand-green-200' },
+  orange: { bg: 'bg-brand-orange-100', text: 'text-brand-orange-600', border: 'border-brand-orange-200' },
   blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600', border: 'border-brand-blue-200' },
   pink: { bg: 'bg-pink-100', text: 'text-pink-600', border: 'border-pink-200' },
   cyan: { bg: 'bg-cyan-100', text: 'text-cyan-600', border: 'border-cyan-200' },
@@ -265,7 +265,7 @@ export default async function BadgesPage() {
                       <h3 className="font-bold text-slate-900 mb-1">{badge.name}</h3>
                       <p className="text-sm text-slate-600 mb-3">{badge.description}</p>
                       {earnedBadge && (
-                        <p className="text-xs text-green-600 font-medium">
+                        <p className="text-xs text-brand-green-600 font-medium">
                           Earned {new Date(earnedBadge.earned_at).toLocaleDateString()}
                         </p>
                       )}

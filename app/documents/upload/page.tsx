@@ -110,7 +110,7 @@ export default function DocumentUploadPage() {
                 required
                 value={documentType}
                 onChange={(e) => setDocumentType(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
               >
                 <option value="">Select type...</option>
                 <option value="certificate">Certificate</option>
@@ -129,7 +129,7 @@ export default function DocumentUploadPage() {
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 placeholder="Brief description of the document"
               />
             </div>
@@ -142,7 +142,7 @@ export default function DocumentUploadPage() {
                 type="file"
                 required
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
               />
               <p className="text-sm text-black mt-2">

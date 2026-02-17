@@ -65,7 +65,7 @@ export default function FAQSearch({ faqs }: FAQSearchProps) {
                 aria-expanded="false"
               >
                 <div className="flex items-start gap-4">
-                  <HelpCircle className="w-6 h-6 text-orange-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <HelpCircle className="w-6 h-6 text-brand-orange-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
                   <span className="font-medium text-gray-900">{faq.question}</span>
                 </div>
                 <ChevronDown className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform flex-shrink-0" aria-hidden="true" />

@@ -97,12 +97,12 @@ export default async function AddictionRehabilitationPage() {
         </section>
 
         {/* Crisis Banner */}
-        <section className="mb-12 bg-red-50 border border-red-200 rounded-xl p-6">
+        <section className="mb-12 bg-brand-red-50 border border-brand-red-200 rounded-xl p-6">
           <div className="flex items-center gap-4">
-            <Phone className="w-8 h-8 text-red-600 flex-shrink-0" />
+            <Phone className="w-8 h-8 text-brand-red-600 flex-shrink-0" />
             <div>
-              <h3 className="font-bold text-red-800">Need Immediate Help?</h3>
-              <p className="text-red-700">
+              <h3 className="font-bold text-brand-red-800">Need Immediate Help?</h3>
+              <p className="text-brand-red-700">
                 If you or someone you know is in crisis, call the SAMHSA National Helpline: 
                 <a href="tel:1-800-662-4357" className="font-bold ml-1">1-800-662-4357</a>
               </p>

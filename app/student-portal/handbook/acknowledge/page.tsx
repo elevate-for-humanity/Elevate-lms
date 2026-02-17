@@ -200,7 +200,7 @@ export default function HandbookAcknowledgePage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-4 border-brand-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-600">Loading handbook...</p>
         </div>
       </div>
@@ -212,8 +212,8 @@ export default function HandbookAcknowledgePage() {
       <div className="min-h-screen bg-slate-50 py-12">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-green-600" />
+            <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Check className="w-8 h-8 text-brand-green-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">
               Handbook Already Acknowledged
@@ -224,13 +224,13 @@ export default function HandbookAcknowledgePage() {
             <div className="flex gap-4 justify-center">
               <Link
                 href="/student-portal/handbook"
-                className="text-blue-600 hover:underline"
+                className="text-brand-blue-600 hover:underline"
               >
                 View Handbook
               </Link>
               <Link
                 href="/student-portal/onboarding"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-brand-blue-700 transition-colors"
               >
                 Continue Onboarding
                 <ChevronRight className="w-5 h-5" />
@@ -247,8 +247,8 @@ export default function HandbookAcknowledgePage() {
       <div className="min-h-screen bg-slate-50 py-12">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-green-600" />
+            <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Check className="w-8 h-8 text-brand-green-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">
               Handbook Acknowledged
@@ -278,8 +278,8 @@ export default function HandbookAcknowledgePage() {
         {/* Header */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <BookOpen className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <BookOpen className="w-6 h-6 text-brand-blue-600" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-slate-900">
@@ -312,7 +312,7 @@ export default function HandbookAcknowledgePage() {
                 key={section.id}
                 className={`flex-1 h-2 rounded-full ${
                   acknowledgments[section.acknowledgmentField]
-                    ? 'bg-green-500'
+                    ? 'bg-brand-green-500'
                     : 'bg-slate-200'
                 }`}
               />
@@ -322,11 +322,11 @@ export default function HandbookAcknowledgePage() {
 
         {/* Error Display */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-red-800 font-medium">Error</p>
-              <p className="text-red-700 text-sm">{error}</p>
+              <p className="text-brand-red-800 font-medium">Error</p>
+              <p className="text-brand-red-700 text-sm">{error}</p>
             </div>
           </div>
         )}
@@ -342,7 +342,7 @@ export default function HandbookAcknowledgePage() {
               <div
                 key={section.id}
                 className={`bg-white rounded-xl shadow-sm overflow-hidden border-2 transition-colors ${
-                  isAcknowledged ? 'border-green-500' : 'border-transparent'
+                  isAcknowledged ? 'border-brand-green-500' : 'border-transparent'
                 }`}
               >
                 {/* Section Header */}
@@ -354,11 +354,11 @@ export default function HandbookAcknowledgePage() {
                 >
                   <div
                     className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      isAcknowledged ? 'bg-green-100' : 'bg-slate-100'
+                      isAcknowledged ? 'bg-brand-green-100' : 'bg-slate-100'
                     }`}
                   >
                     {isAcknowledged ? (
-                      <Check className="w-5 h-5 text-green-600" />
+                      <Check className="w-5 h-5 text-brand-green-600" />
                     ) : (
                       <Icon className="w-5 h-5 text-slate-500" />
                     )}
@@ -403,7 +403,7 @@ export default function HandbookAcknowledgePage() {
                           onChange={() =>
                             handleAcknowledge(section.acknowledgmentField)
                           }
-                          className="mt-1 w-5 h-5 text-green-600 border-slate-300 rounded focus:ring-green-500"
+                          className="mt-1 w-5 h-5 text-brand-green-600 border-slate-300 rounded focus:ring-brand-green-500"
                         />
                         <span className="text-sm text-slate-700">
                           I have read and understand the{' '}
@@ -443,7 +443,7 @@ export default function HandbookAcknowledgePage() {
           disabled={!allAcknowledged || submitting}
           className={`w-full py-4 px-6 rounded-xl font-medium text-lg transition-colors ${
             allAcknowledged && !submitting
-              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
               : 'bg-slate-300 text-slate-500 cursor-not-allowed'
           }`}
         >

@@ -104,7 +104,7 @@ export function ApprenticeProgressWidget({
   return (
     <div className="bg-white rounded-xl border-2 border-slate-200 shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 text-white">
+      <div className="bg-gradient-to-r from-purple-600 to-brand-blue-600 p-4 text-white">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-bold">Apprenticeship Progress</h3>
@@ -126,7 +126,7 @@ export function ApprenticeProgressWidget({
           </div>
           <div className="w-full bg-slate-200 rounded-full h-4 overflow-hidden">
             <div
-              className="bg-gradient-to-r from-purple-500 to-blue-500 h-full transition-all duration-500 rounded-full"
+              className="bg-gradient-to-r from-purple-500 to-brand-blue-500 h-full transition-all duration-500 rounded-full"
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
@@ -151,15 +151,15 @@ export function ApprenticeProgressWidget({
           </div>
 
           {/* OJT Hours (Hands-on) */}
-          <div className="bg-green-50 rounded-lg p-3">
+          <div className="bg-brand-green-50 rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
-              <Briefcase className="w-4 h-4 text-green-600" />
-              <span className="text-xs font-semibold text-green-800">OJT (Hands-on)</span>
+              <Briefcase className="w-4 h-4 text-brand-green-600" />
+              <span className="text-xs font-semibold text-brand-green-800">OJT (Hands-on)</span>
             </div>
-            <div className="text-xl font-bold text-green-600">
+            <div className="text-xl font-bold text-brand-green-600">
               {summary.total_ojt_hours.toFixed(1)}
             </div>
-            <div className="text-xs text-green-600">Shop training</div>
+            <div className="text-xs text-brand-green-600">Shop training</div>
           </div>
         </div>
 
@@ -184,7 +184,7 @@ export function ApprenticeProgressWidget({
         {/* Status Breakdown */}
         <div className="flex items-center gap-4 text-xs">
           <div className="flex items-center gap-1">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <div className="w-2 h-2 bg-brand-green-500 rounded-full"></div>
             <span className="text-slate-600">Approved: {summary.approved_hours.toFixed(1)}h</span>
           </div>
           <div className="flex items-center gap-1">
@@ -218,7 +218,7 @@ export function ApprenticeProgressWidget({
           <div className="text-center p-2">
             <div className={`text-xs font-semibold ${
               summary.rapids_status === 'registered' || summary.rapids_status === 'active' 
-                ? 'text-green-600' 
+                ? 'text-brand-green-600' 
                 : 'text-amber-600'
             }`}>
               RAPIDS: {summary.rapids_status?.toUpperCase() || 'PENDING'}
@@ -230,7 +230,7 @@ export function ApprenticeProgressWidget({
           <div className="text-center p-2">
             <div className={`text-xs font-semibold ${
               summary.milady_completed 
-                ? 'text-green-600' 
+                ? 'text-brand-green-600' 
                 : summary.milady_enrolled 
                   ? 'text-brand-blue-600' 
                   : 'text-amber-600'
@@ -242,15 +242,15 @@ export function ApprenticeProgressWidget({
 
         {/* State Board Readiness */}
         {summary.ready_for_exam ? (
-          <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg p-4 text-center text-white">
+          <div className="bg-gradient-to-r from-brand-green-500 to-emerald-500 rounded-lg p-4 text-center text-white">
             <Award className="w-8 h-8 mx-auto mb-2" />
             <div className="font-bold">Ready for State Board!</div>
-            <div className="text-sm text-green-100">
+            <div className="text-sm text-brand-green-100">
               Schedule your Indiana IPLA exam
             </div>
           </div>
         ) : progressPercentage >= 100 ? (
-          <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg p-4 text-center text-white">
+          <div className="bg-gradient-to-r from-amber-500 to-brand-orange-500 rounded-lg p-4 text-center text-white">
             <Award className="w-8 h-8 mx-auto mb-2" />
             <div className="font-bold">Hours Complete!</div>
             <div className="text-sm text-amber-100">

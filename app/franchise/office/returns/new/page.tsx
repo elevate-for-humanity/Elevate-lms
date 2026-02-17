@@ -582,7 +582,7 @@ export default function NewReturnPage() {
               <hr />
               <div className="flex justify-between text-lg">
                 <span>{refundOrOwed >= 0 ? 'Refund:' : 'Amount Owed:'}</span>
-                <span className={`font-bold ${refundOrOwed >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                <span className={`font-bold ${refundOrOwed >= 0 ? 'text-brand-green-600' : 'text-brand-red-600'}`}>
                   ${Math.abs(refundOrOwed).toLocaleString()}
                 </span>
               </div>
@@ -653,7 +653,7 @@ export default function NewReturnPage() {
                   </div>
                   <div className="flex justify-between font-medium">
                     <span>{refundOrOwed >= 0 ? 'Refund:' : 'Owed:'}</span>
-                    <span className={refundOrOwed >= 0 ? 'text-green-600' : 'text-red-600'}>
+                    <span className={refundOrOwed >= 0 ? 'text-brand-green-600' : 'text-brand-red-600'}>
                       ${Math.abs(refundOrOwed).toLocaleString()}
                     </span>
                   </div>
@@ -673,7 +673,7 @@ export default function NewReturnPage() {
               </p>
             </div>
 
-            <div className="bg-orange-50 dark:bg-orange-950 border border-orange-200 rounded-lg p-4">
+            <div className="bg-brand-orange-50 dark:bg-brand-orange-950 border border-brand-orange-200 rounded-lg p-4">
               <p className="text-sm">
                 <strong>Note:</strong> This return will be submitted for ERO signature before being filed with the IRS.
                 The preparer's PTIN and your office's EFIN will be included on the return.

@@ -70,13 +70,13 @@ export function ReviewActions({
 
   if (item.status === 'resolved') {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 text-green-700">
+      <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4">
+        <div className="flex items-center gap-2 text-brand-green-700">
           <span className="text-slate-400 flex-shrink-0">•</span>
           <span className="font-medium">Resolved</span>
         </div>
         {item.resolution && (
-          <p className="text-sm text-green-600 mt-2">{item.resolution}</p>
+          <p className="text-sm text-brand-green-600 mt-2">{item.resolution}</p>
         )}
       </div>
     );
@@ -87,7 +87,7 @@ export function ReviewActions({
       <h3 className="font-semibold text-gray-900">Actions</h3>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded p-3 text-red-700 text-sm">
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded p-3 text-brand-red-700 text-sm">
           {error}
         </div>
       )}
@@ -135,7 +135,7 @@ export function ReviewActions({
       <button
         onClick={() => handleAction('approve')}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50"
+        className="w-full flex items-center justify-center gap-2 bg-brand-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-green-700 disabled:opacity-50"
       >
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <span className="text-slate-400 flex-shrink-0">•</span>}
         Approve
@@ -156,7 +156,7 @@ export function ReviewActions({
         <button
           onClick={() => handleAction('reject')}
           disabled={loading || !rejectReason.trim()}
-          className="w-full mt-2 flex items-center justify-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 disabled:opacity-50"
+          className="w-full mt-2 flex items-center justify-center gap-2 bg-brand-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-red-700 disabled:opacity-50"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
           Reject

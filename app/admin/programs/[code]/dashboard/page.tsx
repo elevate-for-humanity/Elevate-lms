@@ -31,7 +31,7 @@ export default async function ProgramDashboardPage({ params }: { params: { code:
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Participants</h3><p className="text-3xl font-bold text-gray-900 mt-2">{participants || 0}</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Completion Rate</h3><p className="text-3xl font-bold text-green-600 mt-2">72%</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Completion Rate</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">72%</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Avg. Progress</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">65%</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Status</h3><p className="text-xl font-bold text-gray-900 mt-2">{program?.status || 'Active'}</p></div>
         </div>

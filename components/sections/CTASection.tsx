@@ -26,7 +26,7 @@ export function CTASection({
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href={primaryCTA.href}
-            className="px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition-all"
+            className="px-8 py-4 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold rounded-lg transition-all"
           >
             {primaryCTA.text}
           </Link>

@@ -79,7 +79,7 @@ export default function DonationForm() {
             }}
             className={`py-4 px-6 rounded-lg font-semibold text-lg transition-all ${
               selectedAmount === amount && !customAmount
-                ? 'bg-orange-600 text-white shadow-lg scale-105'
+                ? 'bg-brand-orange-600 text-white shadow-lg scale-105'
                 : 'bg-slate-100 text-black hover:bg-slate-200'
             }`}
           >
@@ -107,14 +107,14 @@ export default function DonationForm() {
               setSelectedAmount(null);
             }}
             placeholder="Enter amount"
-            className="w-full pl-8 pr-4 py-3 border-2 border-slate-300 rounded-lg text-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none"
+            className="w-full pl-8 pr-4 py-3 border-2 border-slate-300 rounded-lg text-lg focus:border-brand-orange-500 focus:ring-2 focus:ring-brand-orange-200 outline-none"
           />
         </div>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        <div className="mb-4 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700 text-sm">
           {error}
         </div>
       )}

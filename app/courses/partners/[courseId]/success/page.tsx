@@ -113,7 +113,7 @@ export default async function EnrollmentSuccessPage({
             <h1 className="text-4xl font-bold mb-4 text-2xl md:text-3xl lg:text-4xl">
               Enrollment Successful!
             </h1>
-            <p className="text-base md:text-lg text-green-100">
+            <p className="text-base md:text-lg text-brand-green-100">
               You're all set to start learning
             </p>
           </div>
@@ -158,7 +158,7 @@ export default async function EnrollmentSuccessPage({
                 </div>
                 <div>
                   <p className="text-sm text-black">Status</p>
-                  <span className="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-brand-green-100 text-green-800">
+                  <span className="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-brand-green-100 text-brand-green-800">
                     {enrollment.enrollment_status}
                   </span>
                 </div>

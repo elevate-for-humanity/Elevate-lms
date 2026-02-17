@@ -33,15 +33,15 @@ const statusColors: Record<string, string> = {
   open: 'bg-brand-blue-100 text-brand-blue-700',
   in_progress: 'bg-yellow-100 text-yellow-700',
   waiting: 'bg-brand-blue-100 text-brand-blue-700',
-  resolved: 'bg-green-100 text-green-700',
+  resolved: 'bg-brand-green-100 text-brand-green-700',
   closed: 'bg-gray-100 text-gray-700',
 };
 
 const priorityColors: Record<string, string> = {
   low: 'bg-gray-100 text-gray-600',
   medium: 'bg-brand-blue-100 text-brand-blue-600',
-  high: 'bg-orange-100 text-orange-600',
-  urgent: 'bg-red-100 text-red-600',
+  high: 'bg-brand-orange-100 text-brand-orange-600',
+  urgent: 'bg-brand-red-100 text-brand-red-600',
 };
 
 
@@ -130,7 +130,7 @@ export default function AdminSupportPage() {
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
@@ -141,8 +141,8 @@ export default function AdminSupportPage() {
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <AlertCircle className="w-6 h-6 text-red-600" />
+              <div className="w-12 h-12 bg-brand-red-100 rounded-lg flex items-center justify-center">
+                <AlertCircle className="w-6 h-6 text-brand-red-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-black">{stats.urgent}</p>

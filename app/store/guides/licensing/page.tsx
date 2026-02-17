@@ -33,19 +33,19 @@ export default function LicensingGuidePage() {
           {/* Step 1 */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-              <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
+              <span className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
               Choose Your License Type
             </h2>
             <div className="mt-4 grid md:grid-cols-2 gap-6">
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                <h3 className="font-bold text-blue-900 mb-2">Managed Platform (Recommended)</h3>
-                <ul className="text-sm text-blue-800 space-y-1">
+              <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
+                <h3 className="font-bold text-brand-blue-900 mb-2">Managed Platform (Recommended)</h3>
+                <ul className="text-sm text-brand-blue-800 space-y-1">
                   <li>• Setup: $7,500–$15,000</li>
                   <li>• Monthly: $1,500–$3,500</li>
                   <li>• We handle hosting, security, updates</li>
                   <li>• Self-service checkout available</li>
                 </ul>
-                <Link href="/store/licenses/managed" className="inline-block mt-4 text-blue-600 font-medium hover:underline">
+                <Link href="/store/licenses/managed" className="inline-block mt-4 text-brand-blue-600 font-medium hover:underline">
                   View Managed License →
                 </Link>
               </div>
@@ -67,7 +67,7 @@ export default function LicensingGuidePage() {
           {/* Step 2 */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-              <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
+              <span className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
               Complete Checkout (Managed Only)
             </h2>
             <p className="text-slate-600 mt-4">
@@ -92,7 +92,7 @@ export default function LicensingGuidePage() {
           {/* Step 3 */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-              <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
+              <span className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
               Tenant Provisioning
             </h2>
             <p className="text-slate-600 mt-4">
@@ -117,7 +117,7 @@ export default function LicensingGuidePage() {
           {/* Step 4 */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-              <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">4</span>
+              <span className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">4</span>
               Invite Team & Assign Roles
             </h2>
             <p className="text-slate-600 mt-4">
@@ -133,7 +133,7 @@ export default function LicensingGuidePage() {
           {/* Step 5 */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-              <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">5</span>
+              <span className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">5</span>
               Add Programs & Content
             </h2>
             <p className="text-slate-600 mt-4">
@@ -158,7 +158,7 @@ export default function LicensingGuidePage() {
           {/* Step 6 */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-              <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">6</span>
+              <span className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">6</span>
               Domain Options
             </h2>
             <p className="text-slate-600 mt-4">
@@ -206,7 +206,7 @@ export default function LicensingGuidePage() {
           {/* Step 8 */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-              <span className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">8</span>
+              <span className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">8</span>
               Support & SLA
             </h2>
             <p className="text-slate-600 mt-4">
@@ -243,14 +243,14 @@ export default function LicensingGuidePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-blue-600 text-white">
+      <section className="py-16 px-4 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-black mb-4">Ready to Get Started?</h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/store/demo" className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-50">
+            <Link href="/store/demo" className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-50">
               Try Demo First
             </Link>
-            <Link href="/store/licenses/managed" className="inline-flex items-center justify-center gap-2 bg-blue-800 text-slate-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-900">
+            <Link href="/store/licenses/managed" className="inline-flex items-center justify-center gap-2 bg-brand-blue-800 text-slate-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-900">
               Start License Setup <ArrowRight className="w-5 h-5" />
             </Link>
           </div>

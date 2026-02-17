@@ -48,7 +48,7 @@ export default function PerformanceChart() {
         {/* Legend */}
         <div className="flex gap-6 mb-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-500 rounded"></div>
+            <div className="w-4 h-4 bg-brand-green-500 rounded"></div>
             <span>Employment Rate</span>
           </div>
           <div className="flex items-center gap-2">
@@ -56,7 +56,7 @@ export default function PerformanceChart() {
             <span>Credential Rate</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-orange-500 rounded"></div>
+            <div className="w-4 h-4 bg-brand-orange-500 rounded"></div>
             <span>Skill Gains</span>
           </div>
         </div>
@@ -78,7 +78,7 @@ export default function PerformanceChart() {
               <div key={idx} className="flex flex-col items-center">
                 <div className="flex items-end gap-1" style={{ height: chartHeight }}>
                   <div
-                    className="w-4 bg-green-500 rounded-t transition-all duration-500"
+                    className="w-4 bg-brand-green-500 rounded-t transition-all duration-500"
                     style={{ height: `${(item.employmentRate / maxValue) * chartHeight}px` }}
                     title={`Employment: ${item.employmentRate}%`}
                   ></div>
@@ -88,7 +88,7 @@ export default function PerformanceChart() {
                     title={`Credential: ${item.credentialRate}%`}
                   ></div>
                   <div
-                    className="w-4 bg-orange-500 rounded-t transition-all duration-500"
+                    className="w-4 bg-brand-orange-500 rounded-t transition-all duration-500"
                     style={{ height: `${(item.skillGains / maxValue) * chartHeight}px` }}
                     title={`Skills: ${item.skillGains}%`}
                   ></div>

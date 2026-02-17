@@ -40,9 +40,9 @@ export default function ResourceSection({
             key={resource.id}
             href={resource.url}
             download
-            className="flex items-center gap-3 p-4 bg-white border border-slate-200 rounded-lg hover:border-orange-500 transition"
+            className="flex items-center gap-3 p-4 bg-white border border-slate-200 rounded-lg hover:border-brand-orange-500 transition"
           >
-            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
               <svg
                 className="w-6 h-6 text-brand-orange-600"
                 fill="none"

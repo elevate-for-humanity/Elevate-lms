@@ -19,13 +19,13 @@ export default function ProgramTemplate() {
         <div className="max-w-7xl mx-auto px-6">
           {/* Badges */}
           <div className="flex flex-wrap items-center gap-3 mb-6">
-            <span className="px-4 py-2 bg-green-100 text-green-800 text-sm font-semibold rounded-full">
+            <span className="px-4 py-2 bg-brand-green-100 text-brand-green-800 text-sm font-semibold rounded-full">
               Funded with Funding
             </span>
-            <span className="px-4 py-2 bg-blue-100 text-blue-800 text-sm font-semibold rounded-full">
+            <span className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 text-sm font-semibold rounded-full">
               DOL Registered
             </span>
-            <span className="px-4 py-2 bg-orange-100 text-orange-800 text-sm font-semibold rounded-full">
+            <span className="px-4 py-2 bg-brand-orange-100 text-brand-orange-800 text-sm font-semibold rounded-full">
               Job Placement Assistance
             </span>
           </div>
@@ -167,7 +167,7 @@ export default function ProgramTemplate() {
       </section>
 
       {/* Funding Options */}
-      <section className="py-16 bg-blue-50">
+      <section className="py-16 bg-brand-blue-50">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-black mb-4">
             Funded with Funding

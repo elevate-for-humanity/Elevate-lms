@@ -119,7 +119,7 @@ export default function OrchestratorAdmin() {
 
   const getStatusColor = (hasError: boolean) => {
     return hasError
-      ? 'bg-brand-surface text-red-800'
+      ? 'bg-brand-surface text-brand-red-800'
       : 'bg-brand-surface text-brand-success';
   };
 

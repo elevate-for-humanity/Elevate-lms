@@ -294,7 +294,7 @@ export default function AutomaticCourseBuilder() {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
                     progress >= item.progress
-                      ? 'bg-green-500 text-white'
+                      ? 'bg-brand-green-500 text-white'
                       : progress >= item.progress - 20
                       ? 'bg-brand-blue-500 text-white'
                       : 'bg-slate-200 text-black'
@@ -325,8 +325,8 @@ export default function AutomaticCourseBuilder() {
       {showPreview && outline && (
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">
-              <svg className="w-10 h-10 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-100 rounded-full mb-4">
+              <svg className="w-10 h-10 text-brand-green-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
             </div>
@@ -402,8 +402,8 @@ export default function AutomaticCourseBuilder() {
           </div>
 
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-brand-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>

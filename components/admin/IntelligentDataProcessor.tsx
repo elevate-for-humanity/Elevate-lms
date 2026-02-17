@@ -423,8 +423,8 @@ Sarah Johnson IT Support         2025-01-22    sarah@email.com"
       {/* Results */}
       {processedData && (
         <div className="results space-y-6">
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <h3 className="font-semibold text-green-900 mb-2">
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4">
+            <h3 className="font-semibold text-brand-green-900 mb-2">
               ✅ Processing Complete!
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -472,11 +472,11 @@ Sarah Johnson IT Support         2025-01-22    sarah@email.com"
                 See au visualizations
               </div>
             </button>
-            <button className="p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-brand-surface text-left">
-              <div className="font-medium text-green-900">
+            <button className="p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg hover:bg-brand-surface text-left">
+              <div className="font-medium text-brand-green-900">
                 📈 Analytics Dashboard
               </div>
-              <div className="text-sm text-green-700 mt-1">
+              <div className="text-sm text-brand-green-700 mt-1">
                 Real-time retention tracking
               </div>
             </button>

@@ -53,7 +53,7 @@ export default function ProgramPaymentOptions({
   };
 
   return (
-    <div className="bg-white border-2 border-orange-600 rounded-xl p-8 shadow-xl">
+    <div className="bg-white border-2 border-brand-orange-600 rounded-xl p-8 shadow-xl">
       <div className="text-center mb-6">
         <h3 className="text-2xl font-bold mb-2">
           Don&apos;t Qualify for Free Funding?
@@ -79,7 +79,7 @@ export default function ProgramPaymentOptions({
 
       {/* Price Display */}
       <div className="text-center mb-8">
-        <div className="text-5xl font-bold text-orange-600 mb-2">
+        <div className="text-5xl font-bold text-brand-orange-600 mb-2">
           ${price.toLocaleString()}
         </div>
         <p className="text-black">One-time payment for {duration}</p>
@@ -92,19 +92,19 @@ export default function ProgramPaymentOptions({
           onClick={() => setPaymentMethod('full')}
           className={`w-full text-left p-6 rounded-lg border-2 transition ${
             paymentMethod === 'full'
-              ? 'border-green-600 bg-green-50'
-              : 'border-gray-300 hover:border-green-400'
+              ? 'border-brand-green-600 bg-brand-green-50'
+              : 'border-gray-300 hover:border-brand-green-400'
           }`}
         >
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-3">
-              <DollarSign className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+              <DollarSign className="w-6 h-6 text-brand-green-600 flex-shrink-0 mt-1" />
               <div>
                 <h4 className="font-bold text-lg mb-1">Pay in Full</h4>
                 <p className="text-sm text-black mb-2">
                   One-time payment - Start immediately
                 </p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-2xl font-bold text-brand-green-600">
                   ${price.toLocaleString()}
                 </p>
               </div>
@@ -181,7 +181,7 @@ export default function ProgramPaymentOptions({
       {/* Payment Button */}
       <button
         onClick={() => handlePayment(paymentMethod)}
-        className="w-full bg-orange-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-orange-700 transition"
+        className="w-full bg-brand-orange-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-brand-orange-700 transition"
       >
         {paymentMethod === 'full' && `Pay $${price.toLocaleString()} Now`}
         {paymentMethod === 'stripe' &&
@@ -217,7 +217,7 @@ export default function ProgramPaymentOptions({
         </p>
         <a
           href="/support"
-          className="text-orange-600 font-bold underline"
+          className="text-brand-orange-600 font-bold underline"
         >
           Call support center
         </a>

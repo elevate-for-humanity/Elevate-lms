@@ -105,8 +105,8 @@ export default async function StaffPortalAttendancePage() {
                       <td className="py-3 text-center">{record.hours_worked || 0}</td>
                       <td className="py-3 text-center">
                         <span className={`px-2 py-1 rounded text-sm ${
-                          record.status === 'present' ? 'bg-green-100 text-green-800' :
-                          record.status === 'absent' ? 'bg-red-100 text-red-800' :
+                          record.status === 'present' ? 'bg-brand-green-100 text-brand-green-800' :
+                          record.status === 'absent' ? 'bg-brand-red-100 text-brand-red-800' :
                           record.status === 'late' ? 'bg-yellow-100 text-yellow-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
@@ -122,8 +122,8 @@ export default async function StaffPortalAttendancePage() {
             <p className="text-gray-500">No attendance records found. Records will appear here once attendance is taken.</p>
           )}
           <div className="mt-4 flex items-center gap-6 text-sm text-gray-600">
-            <span><span className="text-green-600">●</span> Present</span>
-            <span><span className="text-red-600">✗</span> Absent</span>
+            <span><span className="text-brand-green-600">●</span> Present</span>
+            <span><span className="text-brand-red-600">✗</span> Absent</span>
             <span><span className="text-yellow-600">L</span> Late</span>
             <span><span className="text-brand-blue-600">E</span> Excused</span>
           </div>

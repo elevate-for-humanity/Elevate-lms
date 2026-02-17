@@ -52,8 +52,8 @@ export default function JRIPage() {
           </div>
 
           <div className="my-8 grid md:grid-cols-2 gap-6">
-            <div className="bg-green-50 rounded-xl p-6 border border-green-200">
-              <h3 className="font-bold text-green-800 mb-4">Who Qualifies</h3>
+            <div className="bg-brand-green-50 rounded-xl p-6 border border-brand-green-200">
+              <h3 className="font-bold text-brand-green-800 mb-4">Who Qualifies</h3>
               <ul className="space-y-3">
                 {[
                   'Currently or formerly incarcerated individuals',
@@ -137,7 +137,7 @@ export default function JRIPage() {
               <a href="/support" className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
                 <Phone className="w-4 h-4" /> Get Help Online
               </a>
-              <Link href="/apply" className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">
+              <Link href="/apply" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 transition">
                 Apply Now <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

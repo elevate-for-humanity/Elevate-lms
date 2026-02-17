@@ -62,9 +62,9 @@ const defaultAssurances: FinancialAssurance[] = [
 
 function getStatusColor(status: string) {
   switch (status) {
-    case 'active': return 'bg-green-100 text-green-700';
+    case 'active': return 'bg-brand-green-100 text-brand-green-700';
     case 'expiring_soon': return 'bg-yellow-100 text-yellow-700';
-    case 'expired': return 'bg-red-100 text-red-700';
+    case 'expired': return 'bg-brand-red-100 text-brand-red-700';
     case 'pending': return 'bg-brand-blue-100 text-brand-blue-700';
     default: return 'bg-gray-100 text-gray-700';
   }
@@ -177,7 +177,7 @@ export default async function FinancialAssurancePage() {
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
@@ -277,7 +277,7 @@ export default async function FinancialAssurancePage() {
                             <span className="block text-xs text-yellow-600">{daysUntil} days remaining</span>
                           )}
                           {daysUntil <= 0 && (
-                            <span className="block text-xs text-red-600">Expired</span>
+                            <span className="block text-xs text-brand-red-600">Expired</span>
                           )}
                         </div>
                       </td>
@@ -295,7 +295,7 @@ export default async function FinancialAssurancePage() {
                             Edit
                           </button>
                           {assurance.status === 'expiring_soon' && (
-                            <button className="text-orange-600 hover:text-orange-700 text-sm font-medium">
+                            <button className="text-brand-orange-600 hover:text-brand-orange-700 text-sm font-medium">
                               Renew
                             </button>
                           )}
@@ -319,21 +319,21 @@ export default async function FinancialAssurancePage() {
                   <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700">Indiana ETPL Surety Bond</span>
                 </div>
-                <span className="text-sm text-green-600 font-medium">Compliant</span>
+                <span className="text-sm text-brand-green-600 font-medium">Compliant</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-3">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700">General Liability Insurance</span>
                 </div>
-                <span className="text-sm text-green-600 font-medium">Compliant</span>
+                <span className="text-sm text-brand-green-600 font-medium">Compliant</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-3">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700">Workers Compensation</span>
                 </div>
-                <span className="text-sm text-green-600 font-medium">Compliant</span>
+                <span className="text-sm text-brand-green-600 font-medium">Compliant</span>
               </div>
             </div>
           </div>
@@ -354,7 +354,7 @@ export default async function FinancialAssurancePage() {
                         <span className="block text-sm text-gray-500">{assurance.provider}</span>
                       </div>
                       <div className="text-right">
-                        <span className={`text-sm font-medium ${daysUntil <= 30 ? 'text-red-600' : daysUntil <= 60 ? 'text-yellow-600' : 'text-gray-600'}`}>
+                        <span className={`text-sm font-medium ${daysUntil <= 30 ? 'text-brand-red-600' : daysUntil <= 60 ? 'text-yellow-600' : 'text-gray-600'}`}>
                           {daysUntil} days
                         </span>
                         <span className="block text-xs text-gray-500">

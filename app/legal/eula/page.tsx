@@ -116,9 +116,9 @@ export default function EULAPage() {
                 By using the Elevate For Humanity platform, you acknowledge that you have read, understood, and agree to be bound by this End User License Agreement.
               </p>
               <div className="mt-6 flex gap-4">
-                <Link href="/legal/terms-of-service" className="text-green-600 hover:underline">Terms of Service</Link>
-                <Link href="/legal/acceptable-use" className="text-green-600 hover:underline">Acceptable Use Policy</Link>
-                <Link href="/legal/disclosures" className="text-green-600 hover:underline">Disclosures</Link>
+                <Link href="/legal/terms-of-service" className="text-brand-green-600 hover:underline">Terms of Service</Link>
+                <Link href="/legal/acceptable-use" className="text-brand-green-600 hover:underline">Acceptable Use Policy</Link>
+                <Link href="/legal/disclosures" className="text-brand-green-600 hover:underline">Disclosures</Link>
               </div>
             </div>
           </div>

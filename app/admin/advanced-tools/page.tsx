@@ -100,7 +100,7 @@ const STORAGE_KEY = "elevate-admin-pinned-tools";
 function Badge({ kind }: { kind: NonNullable<ToolLink["badge"]> }) {
   const base = "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium";
   const byKind: Record<typeof kind, string> = {
-    TEST: "border-red-200 text-red-700 bg-red-50",
+    TEST: "border-brand-red-200 text-brand-red-700 bg-brand-red-50",
     POWER: "border-amber-200 text-amber-800 bg-amber-50",
     AI: "border-indigo-200 text-indigo-800 bg-indigo-50",
     SYSTEM: "border-slate-200 text-slate-800 bg-slate-50",

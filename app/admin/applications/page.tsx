@@ -45,8 +45,8 @@ const stateColors: Record<string, string> = {
   started: 'bg-gray-100 text-gray-800',
   pending: 'bg-yellow-100 text-yellow-800',
   submitted: 'bg-brand-blue-100 text-brand-blue-800',
-  approved: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
+  approved: 'bg-brand-green-100 text-brand-green-800',
+  rejected: 'bg-brand-red-100 text-brand-red-800',
   in_review: 'bg-brand-blue-100 text-brand-blue-800',
   eligibility_complete: 'bg-brand-blue-100 text-brand-blue-800',
   documents_complete: 'bg-indigo-100 text-indigo-800',
@@ -61,7 +61,7 @@ const typeLabels: Record<string, string> = {
 
 const typeColors: Record<string, string> = {
   student: 'bg-brand-blue-50 text-brand-blue-700 border-brand-blue-200',
-  partner: 'bg-green-50 text-green-700 border-green-200',
+  partner: 'bg-brand-green-50 text-brand-green-700 border-brand-green-200',
   employer: 'bg-brand-blue-50 text-brand-blue-700 border-brand-blue-200',
 };
 
@@ -232,7 +232,7 @@ export default async function ApplicationsPage({
         {/* Applications Table */}
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
           {error ? (
-            <div className="p-8 text-center text-red-600">
+            <div className="p-8 text-center text-brand-red-600">
               Error loading applications
             </div>
           ) : applications && applications.length > 0 ? (

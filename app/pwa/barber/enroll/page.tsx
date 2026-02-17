@@ -244,9 +244,9 @@ export default function BarberEnrollPage() {
 
         <main className="px-4 py-6 space-y-6">
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-              <p className="text-red-200 text-sm">{error}</p>
+            <div className="bg-brand-red-500/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
+              <p className="text-brand-red-200 text-sm">{error}</p>
             </div>
           )}
 
@@ -321,7 +321,7 @@ export default function BarberEnrollPage() {
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
       <div className="text-center max-w-md">
-        <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className="w-20 h-20 bg-brand-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
           <span className="text-slate-400 flex-shrink-0">•</span>
         </div>
         <h1 className="text-2xl font-bold text-white mb-4">Enrollment Complete!</h1>

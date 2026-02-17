@@ -76,7 +76,7 @@ export default function IntegrationsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/admin/integrations/google-classroom"
-              className="bg-brand-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Google Classroom
             </Link>
@@ -153,8 +153,8 @@ export default function IntegrationsPage() {
                     }
                     className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium ${
                       integration.is_active
-                        ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                        : 'bg-brand-green-100 text-green-700 hover:bg-green-200'
+                        ? 'bg-brand-red-100 text-brand-red-700 hover:bg-brand-red-200'
+                        : 'bg-brand-green-100 text-brand-green-700 hover:bg-brand-green-200'
                     }`}
                   >
                     {integration.is_active ? 'Disable' : 'Enable'}

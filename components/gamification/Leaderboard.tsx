@@ -51,7 +51,7 @@ export function Leaderboard() {
     <div className="elevate-card">
       <div className="elevate-card-header">
         <div className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-orange-600" />
+          <Trophy className="h-5 w-5 text-brand-orange-600" />
           <h3 className="elevate-card-title">Leaderboard</h3>
         </div>
         <span className="elevate-pill elevate-pill--orange">This Month</span>
@@ -62,7 +62,7 @@ export function Leaderboard() {
             key={user.rank}
             className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
               user.isCurrentUser
-                ? 'bg-brand-blue-50 border-2 border-orange-500'
+                ? 'bg-brand-blue-50 border-2 border-brand-orange-500'
                 : 'bg-gray-50 border border-gray-200 hover:border-gray-300'
             }`}
           >
@@ -99,7 +99,7 @@ export function Leaderboard() {
             </div>
             {/* Points */}
             <div className="text-right">
-              <div className="flex items-center gap-1 text-orange-600 font-bold">
+              <div className="flex items-center gap-1 text-brand-orange-600 font-bold">
                 <Award className="h-4 w-4" />
                 {(user.points || 0).toLocaleString()}
               </div>
@@ -111,7 +111,7 @@ export function Leaderboard() {
       <div className="mt-6 pt-6 border-t border-gray-200">
         <div className="flex items-center justify-between text-sm">
           <span className="text-black">Your Progress</span>
-          <div className="flex items-center gap-2 text-green-600 font-semibold">
+          <div className="flex items-center gap-2 text-brand-green-600 font-semibold">
             <TrendingUp className="h-4 w-4" />
             +230 pts this week
           </div>

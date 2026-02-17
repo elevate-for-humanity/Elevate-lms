@@ -122,7 +122,7 @@ export default async function EmployerDashboardOrchestrated() {
             <div
               className={`rounded-lg shadow-sm border p-6 ${
                 (applications?.length || 0) > 0
-                  ? 'bg-green-50 border-green-600'
+                  ? 'bg-brand-green-50 border-brand-green-600'
                   : 'bg-white border-slate-200'
               }`}
             >
@@ -130,14 +130,14 @@ export default async function EmployerDashboardOrchestrated() {
                 <Users
                   className={`h-11 w-11 ${
                     (applications?.length || 0) > 0
-                      ? 'text-green-600'
+                      ? 'text-brand-green-600'
                       : 'text-slate-400'
                   }`}
                 />
                 <span
                   className={`text-3xl font-bold ${
                     (applications?.length || 0) > 0
-                      ? 'text-green-900'
+                      ? 'text-brand-green-900'
                       : 'text-black'
                   }`}
                 >
@@ -147,7 +147,7 @@ export default async function EmployerDashboardOrchestrated() {
               <div
                 className={`text-sm ${
                   (applications?.length || 0) > 0
-                    ? 'text-green-900'
+                    ? 'text-brand-green-900'
                     : 'text-black'
                 }`}
               >
@@ -309,7 +309,7 @@ export default async function EmployerDashboardOrchestrated() {
                 </h3>
                 <div className="text-sm text-black">
                   {profile.verified ? (
-                    <span className="text-green-600 font-semibold">
+                    <span className="text-brand-green-600 font-semibold">
                       • Verified
                     </span>
                   ) : (

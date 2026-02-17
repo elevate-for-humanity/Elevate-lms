@@ -75,7 +75,7 @@ export function MobileMenu() {
         <div className="fixed inset-0 z-50 bg-white">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b">
-            <Link href="/" className="text-xl font-bold text-orange-600">
+            <Link href="/" className="text-xl font-bold text-brand-orange-600">
               Elevate
             </Link>
             <button
@@ -113,7 +113,7 @@ export function MobileMenu() {
                                 href={child.href}
                                 className={`block p-3 rounded-lg transition ${
                                   pathname === child.href
-                                    ? 'bg-orange-50 text-orange-600'
+                                    ? 'bg-brand-orange-50 text-brand-orange-600'
                                     : 'text-gray-600 hover:bg-gray-50'
                                 }`}
                               >
@@ -129,7 +129,7 @@ export function MobileMenu() {
                       href={item.href}
                       className={`block p-3 rounded-lg font-medium transition ${
                         pathname === item.href
-                          ? 'bg-orange-50 text-orange-600'
+                          ? 'bg-brand-orange-50 text-brand-orange-600'
                           : 'text-gray-900 hover:bg-gray-50'
                       }`}
                     >
@@ -150,7 +150,7 @@ export function MobileMenu() {
               </Link>
               <Link
                 href="/apply"
-                className="block w-full p-3 text-center text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition"
+                className="block w-full p-3 text-center text-white bg-brand-orange-600 rounded-lg hover:bg-brand-orange-700 transition"
               >
                 Apply Now
               </Link>

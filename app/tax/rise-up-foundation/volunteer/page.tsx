@@ -240,28 +240,28 @@ export default function VolunteerPage() {
       <section className="mt-8 rounded-2xl border bg-white p-8">
         <h2 className="text-2xl font-bold mb-4">Volunteer Roles</h2>
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="rounded-lg bg-green-50 p-6">
+          <div className="rounded-lg bg-brand-green-50 p-6">
             <h3 className="font-semibold text-lg mb-2">Tax Preparer</h3>
             <p className="text-sm text-black">
               Interview taxpayers, prepare returns, and ensure accuracy.
               Requires IRS certification.
             </p>
           </div>
-          <div className="rounded-lg bg-green-50 p-6">
+          <div className="rounded-lg bg-brand-green-50 p-6">
             <h3 className="font-semibold text-lg mb-2">Quality Reviewer</h3>
             <p className="text-sm text-black">
               Review completed returns for accuracy before e-filing. Requires
               advanced certification.
             </p>
           </div>
-          <div className="rounded-lg bg-green-50 p-6">
+          <div className="rounded-lg bg-brand-green-50 p-6">
             <h3 className="font-semibold text-lg mb-2">Greeter/Intake</h3>
             <p className="text-sm text-black">
               Welcome taxpayers, check documents, and complete intake forms. No
               certification required.
             </p>
           </div>
-          <div className="rounded-lg bg-green-50 p-6">
+          <div className="rounded-lg bg-brand-green-50 p-6">
             <h3 className="font-semibold text-lg mb-2">Site Coordinator</h3>
             <p className="text-sm text-black">
               Manage volunteer schedules, supplies, and site operations.
@@ -271,7 +271,7 @@ export default function VolunteerPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl bg-green-50 border-l-4 border-brand-green-600 p-6">
+      <section className="mt-8 rounded-2xl bg-brand-green-50 border-l-4 border-brand-green-600 p-6">
         <h2 className="text-xl font-bold mb-3">Ready to Make a Difference?</h2>
         <p className="text-black mb-6">
           Join our team of dedicated volunteers and help your community this tax
@@ -280,13 +280,13 @@ export default function VolunteerPage() {
         <div className="flex flex-wrap gap-4">
           <a
             href="/support"
-            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
+            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-brand-green-700 transition"
           >
             Call support center
           </a>
           <a
             href="mailto:info@elevateforhumanity.org"
-            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-green-50 transition"
+            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-brand-green-50 transition"
           >
             Email Us
           </a>

@@ -143,8 +143,8 @@ export default async function WioaPage() {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-green-50 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-3 text-green-900">
+            <div className="bg-brand-green-50 rounded-lg p-6">
+              <h3 className="text-lg font-bold mb-3 text-brand-green-900">
                 • Tuition
               </h3>
               <p className="text-black">
@@ -153,8 +153,8 @@ export default async function WioaPage() {
               </p>
             </div>
 
-            <div className="bg-green-50 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-3 text-green-900">
+            <div className="bg-brand-green-50 rounded-lg p-6">
+              <h3 className="text-lg font-bold mb-3 text-brand-green-900">
                 • Books & Materials
               </h3>
               <p className="text-black">
@@ -163,8 +163,8 @@ export default async function WioaPage() {
               </p>
             </div>
 
-            <div className="bg-green-50 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-3 text-green-900">
+            <div className="bg-brand-green-50 rounded-lg p-6">
+              <h3 className="text-lg font-bold mb-3 text-brand-green-900">
                 • Transportation
               </h3>
               <p className="text-black">
@@ -172,8 +172,8 @@ export default async function WioaPage() {
               </p>
             </div>
 
-            <div className="bg-green-50 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-3 text-green-900">
+            <div className="bg-brand-green-50 rounded-lg p-6">
+              <h3 className="text-lg font-bold mb-3 text-brand-green-900">
                 • Childcare
               </h3>
               <p className="text-black">
@@ -182,8 +182,8 @@ export default async function WioaPage() {
               </p>
             </div>
 
-            <div className="bg-green-50 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-3 text-green-900">
+            <div className="bg-brand-green-50 rounded-lg p-6">
+              <h3 className="text-lg font-bold mb-3 text-brand-green-900">
                 • Support Services
               </h3>
               <p className="text-black">
@@ -192,8 +192,8 @@ export default async function WioaPage() {
               </p>
             </div>
 
-            <div className="bg-green-50 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-3 text-green-900">
+            <div className="bg-brand-green-50 rounded-lg p-6">
+              <h3 className="text-lg font-bold mb-3 text-brand-green-900">
                 • Job Placement Help
               </h3>
               <p className="text-black">
@@ -345,8 +345,8 @@ export default async function WioaPage() {
             </div>
           </div>
 
-          <div className="mt-8 bg-orange-50 rounded-lg p-6">
-            <p className="text-orange-900 mb-4">
+          <div className="mt-8 bg-brand-orange-50 rounded-lg p-6">
+            <p className="text-brand-orange-900 mb-4">
               <strong>Need help navigating the process?</strong> We work with
               WorkOne centers every day. Contact us at{' '}
               <a href="/support" className="font-bold underline">

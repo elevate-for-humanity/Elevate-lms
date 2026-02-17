@@ -162,7 +162,7 @@ export default async function OngoingSupportPage() {
                           {new Date(session.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                      <span className="text-xs bg-brand-green-100 text-brand-green-700 px-2 py-1 rounded-full">
                         {session.status}
                       </span>
                     </div>

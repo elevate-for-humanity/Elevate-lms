@@ -71,7 +71,7 @@ export default function BarberProfilePage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
         <div className="text-center max-w-md">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
           <p className="text-slate-400 mb-6">{error}</p>
           <Link

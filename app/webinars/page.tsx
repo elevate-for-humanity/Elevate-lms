@@ -52,7 +52,7 @@ export default function WebinarsPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {upcomingWebinars.map((webinar, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border">
-                <div className="flex items-center gap-2 text-red-600 text-sm font-medium mb-3">
+                <div className="flex items-center gap-2 text-brand-red-600 text-sm font-medium mb-3">
                   <Calendar className="w-4 h-4" /> {webinar.date}
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{webinar.title}</h3>
@@ -61,7 +61,7 @@ export default function WebinarsPage() {
                   <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {webinar.time}</span>
                   <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {webinar.attendees}</span>
                 </div>
-                <button className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2">
+                <button className="w-full py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700 flex items-center justify-center gap-2">
                   <Bell className="w-4 h-4" /> Register
                 </button>
               </div>

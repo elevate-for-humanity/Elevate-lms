@@ -97,10 +97,10 @@ export default function FundingImpactPage() {
                 />
               </div>
               <div className="p-6 text-center">
-                <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
-                  <Award className="w-7 h-7 text-green-600" />
+                <div className="w-14 h-14 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
+                  <Award className="w-7 h-7 text-brand-green-600" />
                 </div>
-                <div className="text-4xl font-bold text-green-600 mb-2">92%</div>
+                <div className="text-4xl font-bold text-brand-green-600 mb-2">92%</div>
                 <div className="text-gray-700 font-medium">Credential Attainment</div>
                 <div className="text-sm text-gray-500 mt-1">Industry certifications earned</div>
               </div>
@@ -135,10 +135,10 @@ export default function FundingImpactPage() {
                 />
               </div>
               <div className="p-6 text-center">
-                <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
-                  <DollarSign className="w-7 h-7 text-orange-600" />
+                <div className="w-14 h-14 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
+                  <DollarSign className="w-7 h-7 text-brand-orange-600" />
                 </div>
-                <div className="text-4xl font-bold text-orange-600 mb-2">$18.50</div>
+                <div className="text-4xl font-bold text-brand-orange-600 mb-2">$18.50</div>
                 <div className="text-gray-700 font-medium">Average Starting Wage</div>
                 <div className="text-sm text-gray-500 mt-1">34% above minimum wage</div>
               </div>
@@ -189,8 +189,8 @@ export default function FundingImpactPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <GraduationCap className="w-6 h-6 text-green-600" />
+                  <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <GraduationCap className="w-6 h-6 text-brand-green-600" />
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Quality Training</h3>
@@ -202,8 +202,8 @@ export default function FundingImpactPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="w-6 h-6 text-orange-600" />
+                  <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <TrendingUp className="w-6 h-6 text-brand-orange-600" />
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Measured Outcomes</h3>
@@ -290,7 +290,7 @@ export default function FundingImpactPage() {
                   covered my IT certification training, and now I&apos;m a network technician making 
                   $22/hour with benefits.&quot;
                 </p>
-                <div className="flex items-center gap-2 text-green-600 font-semibold">
+                <div className="flex items-center gap-2 text-brand-green-600 font-semibold">
                   <TrendingUp className="w-4 h-4" />
                   <span>$14/hr → $22/hr</span>
                 </div>
@@ -320,7 +320,7 @@ export default function FundingImpactPage() {
                   &quot;As a single mom, I couldn&apos;t afford training. The Workforce Ready Grant paid for 
                   my medical assistant certification. I went from retail to healthcare in 12 weeks.&quot;
                 </p>
-                <div className="flex items-center gap-2 text-green-600 font-semibold">
+                <div className="flex items-center gap-2 text-brand-green-600 font-semibold">
                   <TrendingUp className="w-4 h-4" />
                   <span>$11/hr → $17/hr</span>
                 </div>
@@ -338,7 +338,7 @@ export default function FundingImpactPage() {
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-12 h-12 bg-brand-orange-600 rounded-full flex items-center justify-center text-white font-bold">
                     DW
                   </div>
                   <div>
@@ -350,7 +350,7 @@ export default function FundingImpactPage() {
                   &quot;Coming out of incarceration, I thought no one would give me a chance. JRI funding 
                   got me into the barber apprenticeship. Now I have my license and my own chair.&quot;
                 </p>
-                <div className="flex items-center gap-2 text-green-600 font-semibold">
+                <div className="flex items-center gap-2 text-brand-green-600 font-semibold">
                   <TrendingUp className="w-4 h-4" />
                   <span>$0/hr → $25/hr</span>
                 </div>
@@ -454,7 +454,7 @@ export default function FundingImpactPage() {
               </div>
             </div>
 
-            <div className="bg-green-50 rounded-xl overflow-hidden border border-green-200">
+            <div className="bg-brand-green-50 rounded-xl overflow-hidden border border-brand-green-200">
               <div className="relative h-48">
                 <Image
                   src="/images/heroes/homepage.jpg"
@@ -464,7 +464,7 @@ export default function FundingImpactPage() {
                 />
               </div>
               <div className="p-8">
-                <div className="w-14 h-14 bg-green-600 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-green-50">
+                <div className="w-14 h-14 bg-brand-green-600 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-brand-green-50">
                   <TrendingUp className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Economic Growth</h3>

@@ -84,11 +84,11 @@ export default function HiringNeedsPage() {
       </div>
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+      <div className="bg-gradient-to-r from-brand-blue-600 to-indigo-600 text-white">
         <div className="max-w-4xl mx-auto px-4 py-12">
           <Link 
             href="/onboarding/employer" 
-            className="inline-flex items-center gap-2 text-blue-100 hover:text-white mb-4"
+            className="inline-flex items-center gap-2 text-brand-blue-100 hover:text-white mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Overview
@@ -99,7 +99,7 @@ export default function HiringNeedsPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold">Tell Us About Your Hiring Needs</h1>
-              <p className="text-blue-100 mt-1">
+              <p className="text-brand-blue-100 mt-1">
                 Help us match you with qualified candidates from our programs
               </p>
             </div>
@@ -112,13 +112,13 @@ export default function HiringNeedsPage() {
           {/* Industry */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Building className="w-5 h-5 text-blue-600" />
+              <Building className="w-5 h-5 text-brand-blue-600" />
               Industry
             </h2>
             <select
               value={formData.industry}
               onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               required
             >
               <option value="">Select your industry</option>
@@ -131,7 +131,7 @@ export default function HiringNeedsPage() {
           {/* Position Types */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Users className="w-5 h-5 text-blue-600" />
+              <Users className="w-5 h-5 text-brand-blue-600" />
               Position Types
             </h2>
             <p className="text-gray-600 text-sm mb-4">Select all that apply</p>
@@ -143,7 +143,7 @@ export default function HiringNeedsPage() {
                   onClick={() => handlePositionTypeToggle(type.id)}
                   className={`p-4 rounded-lg border text-left transition-colors ${
                     formData.positionTypes.includes(type.id)
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-brand-blue-500 bg-brand-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
@@ -153,7 +153,7 @@ export default function HiringNeedsPage() {
                       <div className="text-sm text-gray-500">{type.description}</div>
                     </div>
                     {formData.positionTypes.includes(type.id) && (
-                      <CheckCircle className="w-5 h-5 text-blue-600" />
+                      <CheckCircle className="w-5 h-5 text-brand-blue-600" />
                     )}
                   </div>
                 </button>
@@ -164,13 +164,13 @@ export default function HiringNeedsPage() {
           {/* Number of Positions */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Users className="w-5 h-5 text-blue-600" />
+              <Users className="w-5 h-5 text-brand-blue-600" />
               How Many Positions?
             </h2>
             <select
               value={formData.positionsCount}
               onChange={(e) => setFormData({ ...formData, positionsCount: e.target.value })}
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               required
             >
               <option value="">Select number of positions</option>
@@ -185,7 +185,7 @@ export default function HiringNeedsPage() {
           {/* Hiring Timeline */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-blue-600" />
+              <Clock className="w-5 h-5 text-brand-blue-600" />
               Hiring Timeline
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
@@ -196,7 +196,7 @@ export default function HiringNeedsPage() {
                   onClick={() => setFormData({ ...formData, timeline: timeline.id })}
                   className={`p-4 rounded-lg border text-left transition-colors ${
                     formData.timeline === timeline.id
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-brand-blue-500 bg-brand-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
@@ -206,7 +206,7 @@ export default function HiringNeedsPage() {
                       <div className="text-sm text-gray-500">{timeline.description}</div>
                     </div>
                     {formData.timeline === timeline.id && (
-                      <CheckCircle className="w-5 h-5 text-blue-600" />
+                      <CheckCircle className="w-5 h-5 text-brand-blue-600" />
                     )}
                   </div>
                 </button>
@@ -217,7 +217,7 @@ export default function HiringNeedsPage() {
           {/* Location */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-blue-600" />
+              <MapPin className="w-5 h-5 text-brand-blue-600" />
               Work Location(s)
             </h2>
             <input
@@ -225,20 +225,20 @@ export default function HiringNeedsPage() {
               value={formData.locations}
               onChange={(e) => setFormData({ ...formData, locations: e.target.value })}
               placeholder="e.g., Indianapolis, IN; Remote; Multiple locations"
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             />
           </div>
 
           {/* Salary Range */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-blue-600" />
+              <DollarSign className="w-5 h-5 text-brand-blue-600" />
               Salary Range (Optional)
             </h2>
             <select
               value={formData.salaryRange}
               onChange={(e) => setFormData({ ...formData, salaryRange: e.target.value })}
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             >
               <option value="">Prefer not to say</option>
               <option value="under-30k">Under $30,000/year</option>
@@ -259,7 +259,7 @@ export default function HiringNeedsPage() {
               onChange={(e) => setFormData({ ...formData, additionalInfo: e.target.value })}
               placeholder="Tell us more about your ideal candidates, specific skills needed, or any other requirements..."
               rows={4}
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             />
           </div>
 
@@ -274,7 +274,7 @@ export default function HiringNeedsPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+              className="flex items-center gap-2 px-8 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium disabled:opacity-50"
             >
               {isSubmitting ? 'Saving...' : 'Continue'}
               <ChevronRight className="w-5 h-5" />

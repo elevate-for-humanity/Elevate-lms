@@ -31,7 +31,7 @@ export default async function JRIPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Participants</h3><p className="text-3xl font-bold text-gray-900 mt-2">{totalParticipants || 0}</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active</h3><p className="text-3xl font-bold text-green-600 mt-2">{activeParticipants || 0}</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">{activeParticipants || 0}</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Completion Rate</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">78%</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6"><h2 className="text-lg font-semibold mb-4">Program Overview</h2><p className="text-gray-500">JRI participant data and program management tools</p></div>

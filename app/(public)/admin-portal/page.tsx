@@ -46,7 +46,7 @@ export default function AdminPortalPublicPage() {
               <p className="text-slate-600">Manage students, instructors, employers, and partner accounts.</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">
-              <BarChart3 className="w-10 h-10 text-green-600 mb-4" />
+              <BarChart3 className="w-10 h-10 text-brand-green-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Analytics & Reports</h3>
               <p className="text-slate-600">Track enrollments, completions, placements, and program performance.</p>
             </div>
@@ -56,7 +56,7 @@ export default function AdminPortalPublicPage() {
               <p className="text-slate-600">Configure programs, courses, certifications, and platform settings.</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">
-              <Shield className="w-10 h-10 text-red-600 mb-4" />
+              <Shield className="w-10 h-10 text-brand-red-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Compliance Management</h3>
               <p className="text-slate-600">WIOA reporting, audit trails, and regulatory compliance tools.</p>
             </div>

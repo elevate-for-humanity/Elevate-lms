@@ -180,7 +180,7 @@ export default async function InstructorStudentsPage() {
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         enrollment.status === 'completed' 
-                          ? 'bg-green-100 text-green-800'
+                          ? 'bg-brand-green-100 text-brand-green-800'
                           : enrollment.status === 'active'
                           ? 'bg-brand-blue-100 text-brand-blue-800'
                           : 'bg-gray-100 text-gray-800'

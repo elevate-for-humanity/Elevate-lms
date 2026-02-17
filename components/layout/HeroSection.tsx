@@ -54,7 +54,7 @@ export function HeroSection({
         <div className="max-w-3xl">
           {/* Badge */}
           {badge && (
-            <div className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-6 py-3 text-sm font-bold mb-6 shadow-lg">
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand-orange-500 px-6 py-3 text-sm font-bold mb-6 shadow-lg">
               <span>{badge}</span>
             </div>
           )}
@@ -83,7 +83,7 @@ export function HeroSection({
             <div className="grid grid-cols-3 gap-6 mb-8 max-w-2xl">
               {stats.map((stat, index) => (
                 <div key={index}>
-                  <div className="text-3xl font-bold text-orange-400">{stat.value}</div>
+                  <div className="text-3xl font-bold text-brand-orange-400">{stat.value}</div>
                   <div className="text-sm text-slate-300">{stat.label}</div>
                 </div>
               ))}
@@ -96,7 +96,7 @@ export function HeroSection({
               {ctaPrimary && (
                 <Link
                   href={ctaPrimary.href}
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-all hover:scale-105 shadow-lg text-lg"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-orange-500 text-white font-semibold rounded-lg hover:bg-brand-orange-600 transition-all hover:scale-105 shadow-lg text-lg"
                 >
                   {ctaPrimary.text}
                   <ArrowRight size={20} />

@@ -55,7 +55,7 @@ export default function TrainingPage() {
           everything you need to know to prepare basic tax returns.
         </p>
 
-        <div className="rounded-lg bg-green-50 p-6 mb-6">
+        <div className="rounded-lg bg-brand-green-50 p-6 mb-6">
           <h3 className="font-semibold text-lg mb-3">Training Includes:</h3>
           <ul className="space-y-2">
             <li className="flex items-start gap-2">
@@ -93,7 +93,7 @@ export default function TrainingPage() {
           href="https://linklearncertification.com/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-brand-green-700 transition"
         >
           Open Link & Learn Taxes
           <svg
@@ -120,10 +120,10 @@ export default function TrainingPage() {
         </p>
 
         <div className="space-y-4">
-          <div className="rounded-lg border-2 border-green-200 p-6">
+          <div className="rounded-lg border-2 border-brand-green-200 p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-lg">Basic Certification</h3>
-              <span className="px-3 py-2 rounded-full bg-brand-green-100 text-green-800 text-xs font-semibold">
+              <span className="px-3 py-2 rounded-full bg-brand-green-100 text-brand-green-800 text-xs font-semibold">
                 RECOMMENDED FOR NEW VOLUNTEERS
               </span>
             </div>
@@ -288,7 +288,7 @@ export default function TrainingPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl bg-green-50 border-l-4 border-brand-green-600 p-6">
+      <section className="mt-8 rounded-2xl bg-brand-green-50 border-l-4 border-brand-green-600 p-6">
         <h2 className="text-xl font-bold mb-3">Ready to Start Training?</h2>
         <p className="text-black mb-6">
           Contact us to get your Link & Learn access code and begin your journey
@@ -297,13 +297,13 @@ export default function TrainingPage() {
         <div className="flex flex-wrap gap-4">
           <a
             href="/support"
-            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
+            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-brand-green-700 transition"
           >
             Call support center
           </a>
           <a
             href="mailto:info@elevateforhumanity.org"
-            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-green-50 transition"
+            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-brand-green-50 transition"
           >
             Email for Access Code
           </a>

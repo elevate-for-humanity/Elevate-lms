@@ -144,7 +144,7 @@ export default async function LowIncomePage() {
           <h2 className="text-2xl font-bold mb-6">What Counts as Income?</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <h3 className="font-semibold text-green-700 mb-3">Included:</h3>
+              <h3 className="font-semibold text-brand-green-700 mb-3">Included:</h3>
               <ul className="space-y-2 text-gray-600">
                 <li>• Wages and salaries</li>
                 <li>• Self-employment income</li>
@@ -155,7 +155,7 @@ export default async function LowIncomePage() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-red-700 mb-3">Not Included:</h3>
+              <h3 className="font-semibold text-brand-red-700 mb-3">Not Included:</h3>
               <ul className="space-y-2 text-gray-600">
                 <li>• SNAP/Food stamps</li>
                 <li>• Housing assistance</li>

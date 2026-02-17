@@ -13,12 +13,12 @@ export const metadata: Metadata = {
 // Status badge
 function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
-    active: 'bg-green-100 text-green-700',
+    active: 'bg-brand-green-100 text-brand-green-700',
     closed: 'bg-slate-100 text-slate-700',
     archived: 'bg-slate-100 text-slate-500',
     pending: 'bg-amber-100 text-amber-700',
-    eligible: 'bg-green-100 text-green-700',
-    ineligible: 'bg-red-100 text-red-700',
+    eligible: 'bg-brand-green-100 text-brand-green-700',
+    ineligible: 'bg-brand-red-100 text-brand-red-700',
   };
 
   return (
@@ -77,7 +77,7 @@ export default async function CaseFilesListPage() {
             <div className="text-slate-600 text-sm">Total Cases</div>
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-brand-green-600">
               {cases.filter(c => c.caseStatus === 'active').length}
             </div>
             <div className="text-slate-600 text-sm">Active</div>

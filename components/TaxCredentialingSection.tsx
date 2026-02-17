@@ -55,7 +55,7 @@ export function TaxCredentialingSection() {
               <a
                 href="https://www.irs.gov/pub/irs-pdf/f13615.pdf"
                 target="_blank"
-                className="text-red-700 underline" rel="noreferrer"
+                className="text-brand-red-700 underline" rel="noreferrer"
               >
                 Form 13615 – Volunteer Standards of Conduct Agreement
               </a>
@@ -64,7 +64,7 @@ export function TaxCredentialingSection() {
               <a
                 href="https://www.irs.gov/pub/irs-pdf/f6744.pdf"
                 target="_blank"
-                className="text-red-700 underline" rel="noreferrer"
+                className="text-brand-red-700 underline" rel="noreferrer"
               >
                 Form 6744 – VITA/TCE Volunteer Assistor&apos;s Test/Retest
               </a>
@@ -73,7 +73,7 @@ export function TaxCredentialingSection() {
               <a
                 href="https://www.irs.gov/pub/irs-pdf/p4012.pdf"
                 target="_blank"
-                className="text-red-700 underline" rel="noreferrer"
+                className="text-brand-red-700 underline" rel="noreferrer"
               >
                 Pub 4012 – VITA/TCE Volunteer Resource Guide
               </a>
@@ -82,7 +82,7 @@ export function TaxCredentialingSection() {
               <a
                 href="https://www.irs.gov/pub/irs-pdf/p4961.pdf"
                 target="_blank"
-                className="text-red-700 underline" rel="noreferrer"
+                className="text-brand-red-700 underline" rel="noreferrer"
               >
                 Pub 4961 – Volunteer Standards of Conduct (Ethics Training)
               </a>
@@ -91,7 +91,7 @@ export function TaxCredentialingSection() {
               <a
                 href="https://www.irs.gov/pub/irs-pdf/p5166.pdf"
                 target="_blank"
-                className="text-red-700 underline" rel="noreferrer"
+                className="text-brand-red-700 underline" rel="noreferrer"
               >
                 Pub 5166 – VITA/TCE Quality Site Requirements
               </a>
@@ -100,7 +100,7 @@ export function TaxCredentialingSection() {
               <a
                 href="https://www.irs.gov/pub/irs-pdf/f13614c.pdf"
                 target="_blank"
-                className="text-red-700 underline" rel="noreferrer"
+                className="text-brand-red-700 underline" rel="noreferrer"
               >
                 Form 13614-C – Intake/Interview &amp; Quality Review Sheet
               </a>
@@ -109,7 +109,7 @@ export function TaxCredentialingSection() {
               <a
                 href="https://www.irs.gov/pub/irs-pdf/f14446.pdf"
                 target="_blank"
-                className="text-red-700 underline" rel="noreferrer"
+                className="text-brand-red-700 underline" rel="noreferrer"
               >
                 Form 14446 – Virtual VITA/TCE Taxpayer Consent
               </a>
@@ -135,7 +135,7 @@ export function TaxCredentialingSection() {
               <a
                 href="https://academy.intuit.com/programs/tax-preparation"
                 target="_blank"
-                className="text-red-700 underline" rel="noreferrer"
+                className="text-brand-red-700 underline" rel="noreferrer"
               >
                 Intuit Academy – Tax Preparation (overview)
               </a>
@@ -144,7 +144,7 @@ export function TaxCredentialingSection() {
               <a
                 href="https://academy.intuit.com/programs/tax-level-1"
                 target="_blank"
-                className="text-red-700 underline" rel="noreferrer"
+                className="text-brand-red-700 underline" rel="noreferrer"
               >
                 Tax Level 1 – Federal Individual Tax Fundamentals
               </a>
@@ -153,7 +153,7 @@ export function TaxCredentialingSection() {
               <a
                 href="https://academy.intuit.com/programs/tax-level-2"
                 target="_blank"
-                className="text-red-700 underline" rel="noreferrer"
+                className="text-brand-red-700 underline" rel="noreferrer"
               >
                 Tax Level 2 – Advanced Topics
               </a>

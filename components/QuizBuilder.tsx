@@ -111,7 +111,7 @@ export function QuizBuilder() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Quiz Builder</h1>
-          <p className="text-red-100">Create interactive assessments for your courses</p>
+          <p className="text-brand-red-100">Create interactive assessments for your courses</p>
         </div>
       </div>
 
@@ -244,7 +244,7 @@ export function QuizBuilder() {
                             <span className="px-2 py-0.5 bg-brand-blue-100 text-brand-blue-700 text-xs rounded">
                               {q.type.replace('-', ' ')}
                             </span>
-                            <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded">
+                            <span className="px-2 py-0.5 bg-brand-green-100 text-brand-green-700 text-xs rounded">
                               {q.points} {q.points === 1 ? 'point' : 'points'}
                             </span>
                           </div>
@@ -252,7 +252,7 @@ export function QuizBuilder() {
                           {q.options && (
                             <ul className="space-y-1 text-sm">
                               {q.options.map((opt, i) => (
-                                <li key={i} className={`${q.correctAnswer === i ? 'text-green-600 font-semibold' : 'text-black'}`}>
+                                <li key={i} className={`${q.correctAnswer === i ? 'text-brand-green-600 font-semibold' : 'text-black'}`}>
                                   {q.correctAnswer === i && '• '}{opt}
                                 </li>
                               ))}
@@ -261,7 +261,7 @@ export function QuizBuilder() {
                         </div>
                         <button
                           onClick={() => removeQuestion(q.id)}
-                          className="text-brand-orange-600 hover:text-red-700"
+                          className="text-brand-orange-600 hover:text-brand-red-700"
                         >
                           ✕
                         </button>

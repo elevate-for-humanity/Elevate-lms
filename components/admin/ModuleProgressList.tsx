@@ -57,7 +57,7 @@ export default function ModuleProgressList({
   function getStatusColor(status: string) {
     switch (status) {
       case 'completed':
-        return 'text-green-400 bg-green-500/10 border-green-500/30';
+        return 'text-brand-green-400 bg-brand-green-500/10 border-brand-green-500/30';
       case 'in_progress':
         return 'text-brand-blue-400 bg-brand-blue-500/10 border-brand-blue-500/30';
       case 'awaiting_proof':
@@ -244,7 +244,7 @@ export default function ModuleProgressList({
             <div className="text-xs text-slate-400">Total</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-green-400">
+            <div className="text-2xl font-bold text-brand-green-400">
               {sortedProgress.filter(p => p.status === 'completed').length}
             </div>
             <div className="text-xs text-slate-400">Completed</div>

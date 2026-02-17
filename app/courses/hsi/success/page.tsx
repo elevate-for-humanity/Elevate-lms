@@ -47,23 +47,23 @@ export default async function HSISuccessPage({
       </div>
 
       {/* Success Hero */}
-      <section className="py-16 bg-green-50">
+      <section className="py-16 bg-brand-green-50">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Enrollment Confirmed!
           </h1>
           {enrollment?.course?.course_name && (
-            <p className="text-xl text-green-700 font-semibold mb-4">
+            <p className="text-xl text-brand-green-700 font-semibold mb-4">
               {enrollment.course.course_name}
             </p>
           )}
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
             You're now enrolled in HSI Safety Training. Check your email for login credentials and course access instructions.
           </p>
-          <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-6 py-3 rounded-full font-semibold">
+          <div className="inline-flex items-center gap-2 bg-brand-green-100 text-brand-green-800 px-6 py-3 rounded-full font-semibold">
             <Heart className="w-5 h-5" />
             Thank you for choosing Elevate for Humanity
           </div>
@@ -108,10 +108,10 @@ export default async function HSISuccessPage({
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm border text-center">
-              <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-7 h-7 text-orange-600" />
+              <div className="w-14 h-14 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-7 h-7 text-brand-orange-600" />
               </div>
-              <div className="text-sm text-orange-600 font-semibold mb-2">Step 2</div>
+              <div className="text-sm text-brand-orange-600 font-semibold mb-2">Step 2</div>
               <h3 className="font-bold text-gray-900 mb-2">Complete Online Training</h3>
               <p className="text-gray-600 text-sm">
                 Log in to the HSI platform and complete your online coursework at your own pace.
@@ -119,10 +119,10 @@ export default async function HSISuccessPage({
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm border text-center">
-              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="w-7 h-7 text-green-600" />
+              <div className="w-14 h-14 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Award className="w-7 h-7 text-brand-green-600" />
               </div>
-              <div className="text-sm text-green-600 font-semibold mb-2">Step 3</div>
+              <div className="text-sm text-brand-green-600 font-semibold mb-2">Step 3</div>
               <h3 className="font-bold text-gray-900 mb-2">Get Certified</h3>
               <p className="text-gray-600 text-sm">
                 Pass the skills assessment and receive your official HSI certification card.

@@ -17,8 +17,8 @@ export const metadata: Metadata = {
 const statusColors: Record<string, string> = {
   draft: 'bg-gray-100 text-gray-800',
   scheduled: 'bg-yellow-100 text-yellow-800',
-  active: 'bg-green-100 text-green-800',
-  paused: 'bg-orange-100 text-orange-800',
+  active: 'bg-brand-green-100 text-brand-green-800',
+  paused: 'bg-brand-orange-100 text-brand-orange-800',
   completed: 'bg-brand-blue-100 text-brand-blue-800',
 };
 
@@ -125,8 +125,8 @@ export default async function AdminCampaignsPage() {
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Send className="w-6 h-6 text-green-600" />
+              <div className="p-2 bg-brand-green-100 rounded-lg">
+                <Send className="w-6 h-6 text-brand-green-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{activeCampaigns || 0}</p>
@@ -147,8 +147,8 @@ export default async function AdminCampaignsPage() {
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <MousePointer className="w-6 h-6 text-orange-600" />
+              <div className="p-2 bg-brand-orange-100 rounded-lg">
+                <MousePointer className="w-6 h-6 text-brand-orange-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{clickRate}%</p>
@@ -162,7 +162,7 @@ export default async function AdminCampaignsPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           {error ? (
             <div className="p-8 text-center">
-              <div className="text-red-600 mb-4">Database table not found</div>
+              <div className="text-brand-red-600 mb-4">Database table not found</div>
               <p className="text-gray-600 mb-4">
                 Run the migration in Supabase Dashboard SQL Editor:
               </p>

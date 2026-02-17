@@ -14,7 +14,7 @@ export function HomeProgramStrip({ items }: HomeProgramStripProps) {
       <div className="mx-auto max-w-6xl px-3 py-5 text-white md:px-4">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-orange-400">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-orange-400">
               Program Pathways
             </p>
             <h2 className="text-base font-bold md:text-lg">
@@ -57,7 +57,7 @@ export function HomeProgramStrip({ items }: HomeProgramStripProps) {
                   {item.programId ? (
                     <Link
                       href={`/programs/${item.programId}`}
-                      className="text-[11px] font-semibold text-orange-300 hover:text-orange-200"
+                      className="text-[11px] font-semibold text-brand-orange-300 hover:text-brand-orange-200"
                     >
                       Explore this pathway →
                     </Link>

@@ -169,7 +169,7 @@ export function NotificationToggle({ className = '' }: NotificationToggleProps) 
       disabled={loading || permission === 'denied'}
       className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
         subscribed 
-          ? 'bg-green-500/20 text-green-400' 
+          ? 'bg-brand-green-500/20 text-brand-green-400' 
           : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
       } ${loading ? 'opacity-50 cursor-wait' : ''} ${className}`}
     >

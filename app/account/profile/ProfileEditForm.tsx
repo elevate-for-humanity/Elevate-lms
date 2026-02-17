@@ -205,7 +205,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
       {/* Message */}
       {message && (
         <div className={`p-4 rounded-lg ${
-          message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+          message.type === 'success' ? 'bg-brand-green-50 text-brand-green-700' : 'bg-brand-red-50 text-brand-red-700'
         }`}>
           {message.text}
         </div>

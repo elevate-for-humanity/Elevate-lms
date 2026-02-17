@@ -92,9 +92,9 @@ export default async function EnrollmentJobsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-black mb-1">Failed Jobs</p>
-                <p className="text-3xl font-bold text-red-600">{failedCount}</p>
+                <p className="text-3xl font-bold text-brand-red-600">{failedCount}</p>
               </div>
-              <XCircle className="h-12 w-12 text-red-600" />
+              <XCircle className="h-12 w-12 text-brand-red-600" />
             </div>
           </div>
 
@@ -151,7 +151,7 @@ export default async function EnrollmentJobsPage() {
                         <span
                           className={`px-3 py-2 rounded-full text-sm font-medium ${
                             job.status === 'failed'
-                              ? 'bg-red-100 text-red-800'
+                              ? 'bg-brand-red-100 text-brand-red-800'
                               : 'bg-yellow-100 text-yellow-800'
                           }`}
                         >
@@ -184,7 +184,7 @@ export default async function EnrollmentJobsPage() {
                           {job.attempt_count} / {job.max_attempts}
                         </p>
                         {job.last_error && (
-                          <p className="text-red-600 mt-2">
+                          <p className="text-brand-red-600 mt-2">
                             <span className="font-medium">Error:</span>{' '}
                             {job.last_error}
                           </p>

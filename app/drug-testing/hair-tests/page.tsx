@@ -173,7 +173,7 @@ export default function HairTestsPage() {
                       <ul className="grid md:grid-cols-2 gap-2">
                         {test.includes.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2 text-gray-700">
-                            <Circle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                            <Circle className="w-4 h-4 text-brand-green-500 flex-shrink-0 mt-0.5" />
                             <span className="text-sm">{item}</span>
                           </li>
                         ))}

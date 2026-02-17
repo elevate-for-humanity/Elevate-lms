@@ -133,19 +133,19 @@ export default function VideoUploader({
 
           {/* Success */}
           {result && !error && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-green-900 mb-1">
+                  <h4 className="font-semibold text-brand-green-900 mb-1">
                     Video Enhanced Successfully!
                   </h4>
-                  <p className="text-sm text-green-700 mb-3">
+                  <p className="text-sm text-brand-green-700 mb-3">
                     {result.message}
                   </p>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-green-700">Original:</span>
+                      <span className="text-brand-green-700">Original:</span>
                       <a
                         href={result.originalUrl}
                         target="_blank"
@@ -156,7 +156,7 @@ export default function VideoUploader({
                       </a>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-green-700 font-semibold">
+                      <span className="text-brand-green-700 font-semibold">
                         Enhanced:
                       </span>
                       <a
@@ -181,14 +181,14 @@ export default function VideoUploader({
 
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-10 w-10 text-brand-orange-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-semibold text-red-900 mb-1">
+                  <h4 className="font-semibold text-brand-red-900 mb-1">
                     Upload Failed
                   </h4>
-                  <p className="text-sm text-red-700">{error}</p>
+                  <p className="text-sm text-brand-red-700">{error}</p>
                 </div>
               </div>
             </div>

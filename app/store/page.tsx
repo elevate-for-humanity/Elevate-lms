@@ -18,7 +18,7 @@ export default function StorePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>
-              <p className="text-red-600 font-semibold text-sm tracking-wider mb-4">WHITE-LABEL WORKFORCE PLATFORM</p>
+              <p className="text-brand-red-600 font-semibold text-sm tracking-wider mb-4">WHITE-LABEL WORKFORCE PLATFORM</p>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-[1.1] mb-5">
                 License the LMS that runs workforce programs end to end.
               </h1>
@@ -29,7 +29,7 @@ export default function StorePage() {
                 You get your own branded instance. We handle the infrastructure. Your staff focuses on people, not data entry.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Link href="#pricing" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-lg transition">
+                <Link href="#pricing" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-6 py-3 rounded-lg transition">
                   See Pricing <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link href="/store/trial" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-lg hover:bg-slate-50 transition">
@@ -61,7 +61,7 @@ export default function StorePage() {
               { icon: Zap, title: 'Your Brand, Your Domain', desc: 'Your logo, colors, and URL. Students and employers see your organization. The platform is invisible.' },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-slate-200 p-5">
-                <item.icon className="w-5 h-5 text-red-600 mb-3" />
+                <item.icon className="w-5 h-5 text-brand-red-600 mb-3" />
                 <h3 className="font-bold text-slate-900 mb-1.5 text-sm">{item.title}</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
               </div>
@@ -96,7 +96,7 @@ export default function StorePage() {
       <section className="py-14 sm:py-20 bg-slate-50 border-y border-slate-200">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center gap-3 justify-center mb-3">
-            <Shield className="w-6 h-6 text-red-600" />
+            <Shield className="w-6 h-6 text-brand-red-600" />
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Built for compliance</h2>
           </div>
           <p className="text-slate-600 text-center mb-10">
@@ -128,8 +128,8 @@ export default function StorePage() {
           <p className="text-slate-600 text-center mb-10">Two deployment options. Most organizations choose Managed.</p>
           <div className="grid md:grid-cols-2 gap-6">
             {/* Managed */}
-            <div className="border-2 border-red-600 rounded-2xl p-8 relative">
-              <span className="absolute -top-3 left-6 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">Recommended</span>
+            <div className="border-2 border-brand-red-600 rounded-2xl p-8 relative">
+              <span className="absolute -top-3 left-6 bg-brand-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">Recommended</span>
               <h3 className="text-xl font-bold text-slate-900 mb-1">Managed Platform</h3>
               <div className="mb-4">
                 <span className="text-4xl font-black text-slate-900">$1,500</span>
@@ -146,7 +146,7 @@ export default function StorePage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/store/licensing/managed" className="block text-center bg-red-600 text-white font-semibold py-3 rounded-lg hover:bg-red-700 transition">
+              <Link href="/store/licensing/managed" className="block text-center bg-brand-red-600 text-white font-semibold py-3 rounded-lg hover:bg-brand-red-700 transition">
                 Get Started
               </Link>
             </div>
@@ -183,7 +183,7 @@ export default function StorePage() {
             Start a 14-day trial with your own programs and students. No credit card. No sales call required.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/store/trial" className="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-3.5 rounded-lg transition">
+            <Link href="/store/trial" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-8 py-3.5 rounded-lg transition">
               Start 14-Day Trial <ArrowRight className="w-4 h-4" />
             </Link>
             <Link href="/demo/admin" className="inline-flex items-center justify-center gap-2 bg-white text-slate-900 font-semibold px-8 py-3.5 rounded-lg hover:bg-slate-100 transition">

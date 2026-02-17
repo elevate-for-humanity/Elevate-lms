@@ -272,7 +272,7 @@ export default async function ProgramDetailPage({
             {(displayProgram.salaryMin || displayProgram.salaryMax) && (
               <div className="mb-8 p-4 bg-white rounded-lg">
                 <h2 className="text-xl font-semibold mb-2">Earning Potential</h2>
-                <p className="text-2xl font-bold text-green-700">
+                <p className="text-2xl font-bold text-brand-green-700">
                   ${displayProgram.salaryMin?.toLocaleString() || '—'} - ${displayProgram.salaryMax?.toLocaleString() || '—'} / year
                 </p>
               </div>

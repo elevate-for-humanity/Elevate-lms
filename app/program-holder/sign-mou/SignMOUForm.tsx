@@ -140,8 +140,8 @@ export function SignMOUForm() {
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-700">{error}</p>
+        <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg">
+          <p className="text-sm text-brand-red-700">{error}</p>
         </div>
       )}
 

@@ -52,7 +52,7 @@ export default function StoreDemoVideo() {
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20">
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform mb-4">
-              <Play className="w-11 h-11 text-red-600 ml-1" />
+              <Play className="w-11 h-11 text-brand-red-600 ml-1" />
             </div>
             <p className="text-white font-bold text-lg drop-shadow-lg">Watch Full Platform Walkthrough</p>
           </div>

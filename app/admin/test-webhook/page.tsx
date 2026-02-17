@@ -80,7 +80,7 @@ export default function TestWebhookPage() {
           <button
             onClick={handleTest}
             disabled={loading || !studentId || !programId}
-            className="w-full px-6 py-3 bg-brand-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-slate-300 font-semibold"
+            className="w-full px-6 py-3 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 disabled:bg-slate-300 font-semibold"
           >
             {loading ? 'Testing...' : 'Test Auto-Enrollment (No Payment)'}
           </button>
@@ -89,8 +89,8 @@ export default function TestWebhookPage() {
             <div
               className={`mt-4 p-4 rounded-lg ${
                 result.success
-                  ? 'bg-green-50 border border-green-200'
-                  : 'bg-red-50 border border-red-200'
+                  ? 'bg-brand-green-50 border border-brand-green-200'
+                  : 'bg-brand-red-50 border border-brand-red-200'
               }`}
             >
               <h3 className="font-bold mb-2">

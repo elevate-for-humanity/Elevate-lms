@@ -92,7 +92,7 @@ export default function ReportContentButton({
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
                   <Flag className="w-5 h-5 text-brand-orange-600" />
                 </div>
                 <div>
@@ -116,7 +116,7 @@ export default function ReportContentButton({
             {/* Content */}
             {submitted ? (
               <div className="p-6 text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <h4 className="text-lg font-semibold text-black mb-2">
@@ -145,7 +145,7 @@ export default function ReportContentButton({
                           value={r.value}
                           checked={reason === r.value}
                           onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setReason(e.target.value)}
-                          className="w-4 h-4 text-brand-orange-600 border-gray-300 focus:ring-red-500"
+                          className="w-4 h-4 text-brand-orange-600 border-gray-300 focus:ring-brand-red-500"
                         />
                         <span className="text-sm text-black">{r.label}</span>
                       </label>
@@ -162,7 +162,7 @@ export default function ReportContentButton({
                     value={description}
                     onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setDescription(e.target.value)}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
                     placeholder="Provide any additional context..."
                   />
                 </div>

@@ -71,12 +71,12 @@ export default async function AccountLicensesPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {license.status === 'active' ? (
-                      <span className="flex items-center gap-1 text-green-600 text-sm">
+                      <span className="flex items-center gap-1 text-brand-green-600 text-sm">
                         <span className="text-slate-400 flex-shrink-0">•</span>
                         Active
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-red-600 text-sm">
+                      <span className="flex items-center gap-1 text-brand-red-600 text-sm">
                         <AlertCircle className="w-4 h-4" />
                         {license.status}
                       </span>

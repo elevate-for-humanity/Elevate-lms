@@ -62,9 +62,9 @@ export default function LicensingArchitecturePage() {
                 <li>Service role bypasses RLS for admin operations</li>
               </ul>
             </div>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <h3 className="font-semibold text-green-800">Application Level</h3>
-              <ul className="mt-2 text-green-700 list-disc list-inside">
+            <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4">
+              <h3 className="font-semibold text-brand-green-800">Application Level</h3>
+              <ul className="mt-2 text-brand-green-700 list-disc list-inside">
                 <li>withTenant middleware validates tenant context</li>
                 <li>Requests without tenant_id are rejected</li>
                 <li>Tenant context injected into all protected routes</li>
@@ -89,15 +89,15 @@ export default function LicensingArchitecturePage() {
               <tbody className="divide-y divide-gray-200">
                 <tr>
                   <td className="px-4 py-3">License exists</td>
-                  <td className="px-4 py-3 text-red-600">Block access, log violation</td>
+                  <td className="px-4 py-3 text-brand-red-600">Block access, log violation</td>
                 </tr>
                 <tr>
                   <td className="px-4 py-3">License not expired</td>
-                  <td className="px-4 py-3 text-red-600">Block access, log violation</td>
+                  <td className="px-4 py-3 text-brand-red-600">Block access, log violation</td>
                 </tr>
                 <tr>
                   <td className="px-4 py-3">Feature entitled</td>
-                  <td className="px-4 py-3 text-red-600">Block feature, log violation</td>
+                  <td className="px-4 py-3 text-brand-red-600">Block feature, log violation</td>
                 </tr>
                 <tr>
                   <td className="px-4 py-3">User limit not exceeded</td>
@@ -105,7 +105,7 @@ export default function LicensingArchitecturePage() {
                 </tr>
                 <tr>
                   <td className="px-4 py-3">Charge disputed/refunded</td>
-                  <td className="px-4 py-3 text-red-600">Suspend license immediately</td>
+                  <td className="px-4 py-3 text-brand-red-600">Suspend license immediately</td>
                 </tr>
               </tbody>
             </table>
@@ -121,27 +121,27 @@ export default function LicensingArchitecturePage() {
             <h3 className="font-semibold mb-3">Tracked Events (provisioning_events)</h3>
             <ul className="space-y-2 text-gray-700">
               <li className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                <span className="w-3 h-3 bg-brand-green-500 rounded-full"></span>
                 payment_received
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                <span className="w-3 h-3 bg-brand-green-500 rounded-full"></span>
                 tenant_created
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                <span className="w-3 h-3 bg-brand-green-500 rounded-full"></span>
                 license_created
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                <span className="w-3 h-3 bg-brand-green-500 rounded-full"></span>
                 admin_created
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                <span className="w-3 h-3 bg-brand-green-500 rounded-full"></span>
                 email_sent
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-red-500 rounded-full"></span>
+                <span className="w-3 h-3 bg-brand-red-500 rounded-full"></span>
                 provisioning_failed (with error details)
               </li>
             </ul>

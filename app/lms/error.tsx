@@ -19,7 +19,7 @@ export default function LMSError({
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-        <AlertCircle className="h-16 w-16 text-red-600 mx-auto mb-6" />
+        <AlertCircle className="h-16 w-16 text-brand-red-600 mx-auto mb-6" />
 
         <h1 className="text-2xl font-bold text-black mb-4">
           LMS Loading Error
@@ -30,8 +30,8 @@ export default function LMSError({
         </p>
 
         {error.message && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-left">
-            <p className="text-sm text-red-800 font-mono break-words">
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6 text-left">
+            <p className="text-sm text-brand-red-800 font-mono break-words">
               {error.message}
             </p>
           </div>

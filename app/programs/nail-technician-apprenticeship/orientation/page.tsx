@@ -112,7 +112,7 @@ export default function NailTechOrientationPage() {
           <p className="text-sm text-slate-600">
             {config.tuition.fundingNote}
           </p>
-          <p className="text-sm text-red-600 font-medium">
+          <p className="text-sm text-brand-red-600 font-medium">
             Missed payments may result in program suspension. Contact us immediately if you anticipate payment issues.
           </p>
         </div>

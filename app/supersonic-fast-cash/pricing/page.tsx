@@ -125,7 +125,7 @@ export default function PricingPage() {
                   href="/supersonic-fast-cash/start"
                   className={`block w-full text-center py-3 px-4 rounded-lg font-semibold transition-colors ${
                     plan.popular
-                      ? 'bg-red-600 text-white hover:bg-red-700'
+                      ? 'bg-brand-red-600 text-white hover:bg-brand-red-700'
                       : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                   }`}
                 >
@@ -177,7 +177,7 @@ export default function PricingPage() {
           <div className="grid md:grid-cols-2 gap-8 mb-10">
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <div className="text-center mb-4">
-                <span className="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium mb-3">
+                <span className="inline-block bg-brand-green-100 text-brand-green-800 px-3 py-1 rounded-full text-sm font-medium mb-3">
                   Small Advance
                 </span>
                 <h3 className="text-xl font-semibold text-gray-900">$250 – $1,000</h3>
@@ -329,7 +329,7 @@ export default function PricingPage() {
           </p>
           <Link
             href="/supersonic-fast-cash/start"
-            className="inline-flex items-center justify-center px-8 py-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
+            className="inline-flex items-center justify-center px-8 py-4 bg-brand-red-600 text-white font-semibold rounded-lg hover:bg-brand-red-700 transition-colors"
           >
             Start Tax Preparation
             <ArrowRight className="ml-2 w-5 h-5" />

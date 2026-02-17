@@ -49,9 +49,9 @@ export function ConfirmDialog({
   };
 
   const Icon = variant === 'danger' ? Trash2 : variant === 'warning' ? AlertTriangle : CheckCircle;
-  const iconColor = variant === 'danger' ? 'text-red-600' : variant === 'warning' ? 'text-yellow-600' : 'text-brand-blue-600';
+  const iconColor = variant === 'danger' ? 'text-brand-red-600' : variant === 'warning' ? 'text-yellow-600' : 'text-brand-blue-600';
   const confirmButtonClass = variant === 'danger' 
-    ? 'bg-red-600 hover:bg-red-700 text-white' 
+    ? 'bg-brand-red-600 hover:bg-brand-red-700 text-white' 
     : variant === 'warning'
     ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
     : 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white';
@@ -61,7 +61,7 @@ export function ConfirmDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${variant === 'danger' ? 'bg-red-100' : variant === 'warning' ? 'bg-yellow-100' : 'bg-brand-blue-100'}`}>
+            <div className={`p-2 rounded-full ${variant === 'danger' ? 'bg-brand-red-100' : variant === 'warning' ? 'bg-yellow-100' : 'bg-brand-blue-100'}`}>
               <Icon className={`w-5 h-5 ${iconColor}`} />
             </div>
             <DialogTitle>{title}</DialogTitle>

@@ -96,7 +96,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
     <>
       {/* Cart Summary (if items) */}
       {cart.length > 0 && (
-        <div className="bg-green-600 text-white py-3 sticky top-0 z-50">
+        <div className="bg-brand-green-600 text-white py-3 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <ShoppingCart className="w-5 h-5" />
@@ -107,7 +107,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
               <button
                 onClick={handleCheckout}
                 disabled={checkingOut}
-                className="bg-white text-green-600 px-6 py-2 rounded-lg font-semibold hover:bg-green-50 disabled:opacity-50"
+                className="bg-white text-brand-green-600 px-6 py-2 rounded-lg font-semibold hover:bg-brand-green-50 disabled:opacity-50"
               >
                 {checkingOut ? 'Processing...' : 'Checkout'}
               </button>
@@ -120,7 +120,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
         {/* Bundle Offer */}
         {bundle && (
           <section className="mb-16">
-            <div className="bg-gradient-to-r from-blue-600 to-blue-600 rounded-2xl overflow-hidden shadow-xl">
+            <div className="bg-gradient-to-r from-brand-blue-600 to-brand-blue-600 rounded-2xl overflow-hidden shadow-xl">
               <div className="grid lg:grid-cols-2">
                 <div className="p-8 lg:p-12 text-white">
                   <span className="inline-block bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full mb-4">
@@ -149,7 +149,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                   <button
                     onClick={() => addToCart(bundle.id)}
                     disabled={cart.includes(bundle.id)}
-                    className="w-full sm:w-auto bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-50 transition disabled:bg-green-100 disabled:text-green-600 flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-50 transition disabled:bg-brand-green-100 disabled:text-brand-green-600 flex items-center justify-center gap-2"
                   >
                     {cart.includes(bundle.id) ? (
                       <>
@@ -243,7 +243,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                         <button
                           onClick={() => addToCart(course.id)}
                           disabled={cart.includes(course.id)}
-                          className="flex-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-blue-700 disabled:bg-green-600 flex items-center justify-center gap-1"
+                          className="flex-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-blue-700 disabled:bg-brand-green-600 flex items-center justify-center gap-1"
                         >
                           {cart.includes(course.id) ? (
                             <>

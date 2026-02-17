@@ -21,7 +21,7 @@ export default function PartnerResourcesPage() {
 <div className="container mx-auto px-4 max-w-4xl">
         <Link
           href="/partners"
-          className="inline-flex items-center text-orange-600 hover:underline mb-6"
+          className="inline-flex items-center text-brand-orange-600 hover:underline mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Partners
@@ -36,7 +36,7 @@ export default function PartnerResourcesPage() {
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-start gap-4">
-              <BookOpen className="h-10 w-10 text-orange-600 flex-shrink-0" />
+              <BookOpen className="h-10 w-10 text-brand-orange-600 flex-shrink-0" />
               <div className="flex-1">
                 <h3 className="text-xl font-semibold mb-2">
                   Partner Handbook
@@ -54,7 +54,7 @@ export default function PartnerResourcesPage() {
 
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-start gap-4">
-              <FileText className="h-10 w-10 text-orange-600 flex-shrink-0" />
+              <FileText className="h-10 w-10 text-brand-orange-600 flex-shrink-0" />
               <div className="flex-1">
                 <h3 className="text-xl font-semibold mb-2">MOU Templates</h3>
                 <p className="text-black mb-4">
@@ -69,7 +69,7 @@ export default function PartnerResourcesPage() {
 
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-start gap-4">
-              <Video className="h-10 w-10 text-orange-600 flex-shrink-0" />
+              <Video className="h-10 w-10 text-brand-orange-600 flex-shrink-0" />
               <div className="flex-1">
                 <h3 className="text-xl font-semibold mb-2">Training Videos</h3>
                 <p className="text-black mb-4">
@@ -83,7 +83,7 @@ export default function PartnerResourcesPage() {
           </div>
         </div>
 
-        <div className="mt-12 bg-orange-50 border border-orange-200 rounded-lg p-6">
+        <div className="mt-12 bg-brand-orange-50 border border-brand-orange-200 rounded-lg p-6">
           <h2 className="text-xl font-bold mb-2">Need More Help?</h2>
           <p className="text-black mb-4">
             Contact our partner support team for personalized assistance.

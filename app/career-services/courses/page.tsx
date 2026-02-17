@@ -104,8 +104,8 @@ export default async function CareerCoursesPage() {
               <p className="text-sm text-gray-600">Professional quality videos you can watch anytime</p>
             </div>
             <div className="text-center">
-              <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Download className="w-7 h-7 text-green-600" />
+              <div className="w-14 h-14 bg-brand-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Download className="w-7 h-7 text-brand-green-600" />
               </div>
               <h3 className="font-semibold mb-2">Downloadable Resources</h3>
               <p className="text-sm text-gray-600">Templates, worksheets, and checklists</p>
@@ -118,8 +118,8 @@ export default async function CareerCoursesPage() {
               <p className="text-sm text-gray-600">Earn a certificate upon completion</p>
             </div>
             <div className="text-center">
-              <div className="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <MessageSquare className="w-7 h-7 text-orange-600" />
+              <div className="w-14 h-14 bg-brand-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <MessageSquare className="w-7 h-7 text-brand-orange-600" />
               </div>
               <h3 className="font-semibold mb-2">Lifetime Access</h3>
               <p className="text-sm text-gray-600">Access your courses forever, including updates</p>
@@ -128,17 +128,17 @@ export default async function CareerCoursesPage() {
         </div>
 
         {/* Free for Students Banner */}
-        <div className="mt-16 bg-green-50 border-2 border-green-200 rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold text-green-900 mb-4">
+        <div className="mt-16 bg-brand-green-50 border-2 border-brand-green-200 rounded-2xl p-8 text-center">
+          <h2 className="text-2xl font-bold text-brand-green-900 mb-4">
             Enrolled in a Training Program?
           </h2>
-          <p className="text-green-700 mb-6 max-w-2xl mx-auto">
+          <p className="text-brand-green-700 mb-6 max-w-2xl mx-auto">
             All career services courses are included FREE for students enrolled in our WIOA-funded training programs. 
             Check your eligibility and get started today.
           </p>
           <Link
             href="/wioa-eligibility"
-            className="inline-flex items-center bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700"
+            className="inline-flex items-center bg-brand-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-brand-green-700"
           >
             Check Eligibility
             <ArrowRight className="w-5 h-5 ml-2" />

@@ -152,7 +152,7 @@ export default async function JobPostingsPage() {
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="text-xl font-bold text-gray-900">{job.title}</h3>
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            job.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                            job.status === 'Active' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-yellow-100 text-yellow-700'
                           }`}>
                             {job.status}
                           </span>

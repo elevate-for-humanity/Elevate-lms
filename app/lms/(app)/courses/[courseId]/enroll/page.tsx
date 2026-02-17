@@ -163,8 +163,8 @@ export default async function CourseEnrollPage({ params }: Props) {
                 <div className="mb-6">
                   {isFree ? (
                     <div className="flex items-center gap-2">
-                      <span className="text-3xl font-bold text-green-600">FREE</span>
-                      <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold">
+                      <span className="text-3xl font-bold text-brand-green-600">FREE</span>
+                      <span className="bg-brand-green-100 text-brand-green-800 text-xs px-2 py-1 rounded-full font-semibold">
                         No Cost
                       </span>
                     </div>

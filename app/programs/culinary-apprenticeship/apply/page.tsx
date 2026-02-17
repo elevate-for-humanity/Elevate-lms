@@ -22,7 +22,7 @@ export default function ApplyPage() {
             ]}
             className="text-white/80 mb-4"
           />
-          <span className="inline-block px-3 py-1 bg-orange-500 text-white text-sm font-semibold rounded-full mb-3">
+          <span className="inline-block px-3 py-1 bg-brand-orange-500 text-white text-sm font-semibold rounded-full mb-3">
             DOL REGISTERED APPRENTICESHIP
           </span>
           <h1 className="text-3xl md:text-4xl font-bold text-white">Apply for Youth Culinary Apprenticeship</h1>
@@ -36,14 +36,14 @@ export default function ApplyPage() {
           <h2 className="text-xl font-bold text-slate-900 mb-4">Program Quick Facts</h2>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="flex items-center gap-3">
-              <Clock className="w-6 h-6 text-orange-600" />
+              <Clock className="w-6 h-6 text-brand-orange-600" />
               <div>
                 <p className="text-sm text-slate-600">Duration</p>
                 <p className="font-bold text-slate-900">2,000 Hours (~1 year)</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Users className="w-6 h-6 text-green-600" />
+              <Users className="w-6 h-6 text-brand-green-600" />
               <div>
                 <p className="text-sm text-slate-600">Minimum Age</p>
                 <p className="font-bold text-slate-900">16 years old</p>
@@ -62,27 +62,27 @@ export default function ApplyPage() {
         {/* Requirements */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Requirements</h2>
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
+          <div className="bg-brand-orange-50 border border-brand-orange-200 rounded-xl p-6">
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
-                <span className="text-orange-600 font-bold">•</span>
-                <span className="text-orange-900">16 years or older (Youth program)</span>
+                <span className="text-brand-orange-600 font-bold">•</span>
+                <span className="text-brand-orange-900">16 years or older (Youth program)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-orange-600 font-bold">•</span>
-                <span className="text-orange-900">High school diploma, GED, or currently enrolled in school</span>
+                <span className="text-brand-orange-600 font-bold">•</span>
+                <span className="text-brand-orange-900">High school diploma, GED, or currently enrolled in school</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-orange-600 font-bold">•</span>
-                <span className="text-orange-900">Passion for food and cooking</span>
+                <span className="text-brand-orange-600 font-bold">•</span>
+                <span className="text-brand-orange-900">Passion for food and cooking</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-orange-600 font-bold">•</span>
-                <span className="text-orange-900">Able to stand for extended periods and work in hot environments</span>
+                <span className="text-brand-orange-600 font-bold">•</span>
+                <span className="text-brand-orange-900">Able to stand for extended periods and work in hot environments</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-orange-600 font-bold">•</span>
-                <span className="text-orange-900">Willing to work flexible hours including weekends</span>
+                <span className="text-brand-orange-600 font-bold">•</span>
+                <span className="text-brand-orange-900">Willing to work flexible hours including weekends</span>
               </li>
             </ul>
           </div>
@@ -102,8 +102,8 @@ export default function ApplyPage() {
               'Progressive wage increases',
               'Career advancement opportunities',
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 bg-green-50 p-3 rounded-lg">
-                <span className="text-green-600 font-bold">•</span>
+              <div key={i} className="flex items-center gap-3 bg-brand-green-50 p-3 rounded-lg">
+                <span className="text-brand-green-600 font-bold">•</span>
                 <span className="text-slate-700">{item}</span>
               </div>
             ))}
@@ -114,8 +114,8 @@ export default function ApplyPage() {
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* Option 1: Get More Information */}
           <div className="bg-slate-50 rounded-2xl p-8 text-center">
-            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-brand-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
@@ -125,24 +125,24 @@ export default function ApplyPage() {
             </p>
             <Link
               href="/inquiry?program=culinary-apprenticeship"
-              className="inline-flex items-center justify-center w-full px-6 py-4 bg-white text-orange-600 font-bold rounded-full border-2 border-orange-600 hover:bg-orange-50 transition"
+              className="inline-flex items-center justify-center w-full px-6 py-4 bg-white text-brand-orange-600 font-bold rounded-full border-2 border-brand-orange-600 hover:bg-brand-orange-50 transition"
             >
               Request Information
             </Link>
           </div>
 
           {/* Option 2: Start Enrollment */}
-          <div className="bg-gradient-to-br from-orange-600 to-orange-700 rounded-2xl p-8 text-center text-white">
+          <div className="bg-gradient-to-br from-brand-orange-600 to-brand-orange-700 rounded-2xl p-8 text-center text-white">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <ArrowRight className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold mb-2">Ready to Apply?</h3>
-            <p className="text-orange-100 mb-6">
+            <p className="text-brand-orange-100 mb-6">
               Start your application now. We'll review your eligibility and contact you within 2-3 business days.
             </p>
             <Link
               href="/apply/student?program=culinary-apprenticeship"
-              className="inline-flex items-center justify-center w-full px-6 py-4 bg-white text-orange-700 font-bold rounded-full hover:bg-orange-50 transition"
+              className="inline-flex items-center justify-center w-full px-6 py-4 bg-white text-brand-orange-700 font-bold rounded-full hover:bg-brand-orange-50 transition"
             >
               Start Application
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -154,8 +154,8 @@ export default function ApplyPage() {
         <div className="bg-slate-900 text-white rounded-xl p-6 text-center">
           <p className="mb-2">Questions about the program?</p>
           <p className="text-lg">
-            Call <a href="/support" className="text-orange-400 font-bold hover:underline">Get Help Online</a> or email{' '}
-            <a href="mailto:info@elevateforhumanity.org" className="text-orange-400 font-bold hover:underline">info@elevateforhumanity.org</a>
+            Call <a href="/support" className="text-brand-orange-400 font-bold hover:underline">Get Help Online</a> or email{' '}
+            <a href="mailto:info@elevateforhumanity.org" className="text-brand-orange-400 font-bold hover:underline">info@elevateforhumanity.org</a>
           </p>
         </div>
 
@@ -163,7 +163,7 @@ export default function ApplyPage() {
         <div className="mt-8">
           <Link
             href="/programs/culinary-apprenticeship"
-            className="inline-flex items-center text-orange-600 hover:text-orange-700"
+            className="inline-flex items-center text-brand-orange-600 hover:text-brand-orange-700"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Program Details

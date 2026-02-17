@@ -114,7 +114,7 @@ export default function ContactPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
             
             {formState === 'success' ? (
-              <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
+              <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-8 text-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Message Sent!</h3>
                 <p className="text-gray-600 mb-4">
@@ -130,16 +130,16 @@ export default function ContactPage() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 {formState === 'error' && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3" role="alert">
-                    <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-red-700 text-sm">{errorMessage}</p>
+                  <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 flex items-start gap-3" role="alert">
+                    <AlertCircle className="w-5 h-5 text-brand-red-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-brand-red-700 text-sm">{errorMessage}</p>
                   </div>
                 )}
                 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                      First Name <span className="text-red-500">*</span>
+                      First Name <span className="text-brand-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -152,7 +152,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                      Last Name <span className="text-red-500">*</span>
+                      Last Name <span className="text-brand-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -168,7 +168,7 @@ export default function ContactPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                      Email <span className="text-red-500">*</span>
+                      Email <span className="text-brand-red-500">*</span>
                     </label>
                     <input
                       type="email"
@@ -195,7 +195,7 @@ export default function ContactPage() {
                 
                 <div>
                   <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                    Subject <span className="text-red-500">*</span>
+                    Subject <span className="text-brand-red-500">*</span>
                   </label>
                   <select
                     id="subject"
@@ -218,7 +218,7 @@ export default function ContactPage() {
                 
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                    Message <span className="text-red-500">*</span>
+                    Message <span className="text-brand-red-500">*</span>
                   </label>
                   <textarea
                     id="message"
@@ -288,20 +288,20 @@ export default function ContactPage() {
                 className="space-y-4"
               >
                 <div>
-                  <label htmlFor="meetingName" className="block text-sm font-medium text-gray-700 mb-1">Your Name <span className="text-red-500">*</span></label>
+                  <label htmlFor="meetingName" className="block text-sm font-medium text-gray-700 mb-1">Your Name <span className="text-brand-red-500">*</span></label>
                   <input type="text" id="meetingName" name="meetingName" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" />
                 </div>
                 <div>
-                  <label htmlFor="meetingEmail" className="block text-sm font-medium text-gray-700 mb-1">Your Email <span className="text-red-500">*</span></label>
+                  <label htmlFor="meetingEmail" className="block text-sm font-medium text-gray-700 mb-1">Your Email <span className="text-brand-red-500">*</span></label>
                   <input type="email" id="meetingEmail" name="meetingEmail" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="meetingDate" className="block text-sm font-medium text-gray-700 mb-1">Date <span className="text-red-500">*</span></label>
+                    <label htmlFor="meetingDate" className="block text-sm font-medium text-gray-700 mb-1">Date <span className="text-brand-red-500">*</span></label>
                     <input type="date" id="meetingDate" name="meetingDate" required min={new Date().toISOString().split('T')[0]} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" />
                   </div>
                   <div>
-                    <label htmlFor="meetingTime" className="block text-sm font-medium text-gray-700 mb-1">Time <span className="text-red-500">*</span></label>
+                    <label htmlFor="meetingTime" className="block text-sm font-medium text-gray-700 mb-1">Time <span className="text-brand-red-500">*</span></label>
                     <select id="meetingTime" name="meetingTime" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500">
                       <option value="">Select...</option>
                       <option value="09:00">9:00 AM</option>
@@ -339,7 +339,7 @@ export default function ContactPage() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                  className="w-full bg-brand-red-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-red-700 transition-colors"
                 >
                   Book Meeting via Google Calendar
                 </button>

@@ -13,8 +13,8 @@ function CancelContent() {
     <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
       <div className="max-w-lg w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 md:p-12">
         <div className="text-center">
-          <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <XCircle className="w-12 h-12 text-red-400" />
+          <div className="w-20 h-20 bg-brand-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <XCircle className="w-12 h-12 text-brand-red-400" />
           </div>
 
           <h1 className="text-3xl font-bold text-slate-900 mb-4">

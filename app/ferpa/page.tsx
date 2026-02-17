@@ -134,7 +134,7 @@ export default async function FERPAPortal() {
 
           <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-orange-100 rounded-lg">
+              <div className="p-3 bg-brand-orange-100 rounded-lg">
                 <Clock className="w-6 h-6 text-brand-orange-600" />
               </div>
               <span className="text-sm text-slate-500">Pending</span>
@@ -207,9 +207,9 @@ export default async function FERPAPortal() {
 
           {/* Privacy Requests */}
           <Link href="/ferpa/requests" aria-label="Link" className="group">
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-lg hover:border-green-300 transition">
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-lg hover:border-brand-green-300 transition">
               <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 bg-brand-green-100 rounded-lg group-hover:bg-green-200 transition">
+                <div className="p-3 bg-brand-green-100 rounded-lg group-hover:bg-brand-green-200 transition">
                   <Users className="w-8 h-8 text-brand-green-600" />
                 </div>
                 <div>
@@ -281,9 +281,9 @@ export default async function FERPAPortal() {
             className="group"
             aria-label="FERPA Reports and Analytics"
           >
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-lg hover:border-orange-300 transition">
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-lg hover:border-brand-orange-300 transition">
               <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition">
+                <div className="p-3 bg-brand-orange-100 rounded-lg group-hover:bg-brand-orange-200 transition">
                   <BarChart3 className="w-8 h-8 text-brand-orange-600" />
                 </div>
                 <div>
@@ -351,9 +351,9 @@ export default async function FERPAPortal() {
             className="group"
             aria-label="FERPA Calendar and Important Deadlines"
           >
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-lg hover:border-red-300 transition">
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-lg hover:border-brand-red-300 transition">
               <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 bg-red-100 rounded-lg group-hover:bg-red-200 transition">
+                <div className="p-3 bg-brand-red-100 rounded-lg group-hover:bg-brand-red-200 transition">
                   <Calendar className="w-8 h-8 text-brand-orange-600" />
                 </div>
                 <div>
@@ -396,7 +396,7 @@ export default async function FERPAPortal() {
             </Link>
             <Link
               href="/ferpa/requests/new"
-              className="px-4 py-3 bg-brand-green-600 text-white rounded-lg hover:bg-green-700 transition text-center font-medium"
+              className="px-4 py-3 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 transition text-center font-medium"
               aria-label="Process New Access Request"
             >
               Process Request

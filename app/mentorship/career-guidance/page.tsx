@@ -80,7 +80,7 @@ export default function CareerGuidancePage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to Get Started?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">Connect with a mentor who can help guide your career.</p>
-          <Link href="/apply" className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <Link href="/apply" className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply for Mentorship <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

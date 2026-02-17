@@ -38,7 +38,7 @@ export default async function TenantsPage() {
                   <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center"><span className="text-brand-blue-600 font-bold">{(tenant.name || 'T')[0]}</span></div>
                   <div><p className="font-medium">{tenant.name}</p><p className="text-sm text-gray-500">{tenant.domain || 'No domain'}</p></div>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs ${tenant.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>{tenant.status || 'active'}</span>
+                <span className={`px-2 py-1 rounded-full text-xs ${tenant.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-gray-100 text-gray-600'}`}>{tenant.status || 'active'}</span>
               </div>
             )) : <div className="p-8 text-center text-gray-500">No tenants configured</div>}
           </div>

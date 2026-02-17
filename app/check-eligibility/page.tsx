@@ -74,7 +74,7 @@ export default function CheckEligibilityPage() {
                 'Are unemployed, underemployed, or seeking better-paying work',
                 'Are interested in training that leads directly to employment',
               ].map((item, i) => (
-                <li key={i} className="flex items-start gap-3 bg-green-50 p-4 rounded-lg">
+                <li key={i} className="flex items-start gap-3 bg-brand-green-50 p-4 rounded-lg">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-800">{item}</span>
                 </li>
@@ -85,7 +85,7 @@ export default function CheckEligibilityPage() {
           {/* You May Not Qualify */}
           <div className="mb-10">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <XCircle className="w-7 h-7 text-red-500" />
+              <XCircle className="w-7 h-7 text-brand-red-500" />
               You may not qualify if you:
             </h2>
             <ul className="space-y-4">
@@ -95,8 +95,8 @@ export default function CheckEligibilityPage() {
                 'Are already enrolled in another publicly funded training program',
                 'Are seeking training for personal enrichment only (not employment)',
               ].map((item, i) => (
-                <li key={i} className="flex items-start gap-3 bg-red-50 p-4 rounded-lg">
-                  <XCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <li key={i} className="flex items-start gap-3 bg-brand-red-50 p-4 rounded-lg">
+                  <XCircle className="w-5 h-5 text-brand-red-500 flex-shrink-0 mt-0.5" />
                   <span className="text-gray-800">{item}</span>
                 </li>
               ))}

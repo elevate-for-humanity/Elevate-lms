@@ -186,7 +186,7 @@ export default function UniversalSearch({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           autoFocus={autoFocus}
-          className="w-full pl-12 pr-10 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          className="w-full pl-12 pr-10 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
           aria-label="Search"
           aria-expanded={showDropdown}
           aria-haspopup="listbox"
@@ -214,7 +214,7 @@ export default function UniversalSearch({
                 onClick={() => handleAudienceSelect(filter.id)}
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   isSelected
-                    ? 'bg-orange-600 text-white'
+                    ? 'bg-brand-orange-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -231,8 +231,8 @@ export default function UniversalSearch({
         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50">
           {/* Results Header */}
           {selectedAudience && !query && (
-            <div className="px-4 py-3 bg-orange-50 border-b border-orange-100">
-              <div className="flex items-center gap-2 text-orange-800">
+            <div className="px-4 py-3 bg-brand-orange-50 border-b border-brand-orange-100">
+              <div className="flex items-center gap-2 text-brand-orange-800">
                 <Sparkles className="w-4 h-4" />
                 <span className="text-sm font-medium">
                   Recommended for {audienceFilters.find(f => f.id === selectedAudience)?.label.replace('For ', '')}
@@ -249,7 +249,7 @@ export default function UniversalSearch({
                   onClick={() => handleSelect(item)}
                   onMouseEnter={() => setHighlightedIndex(index)}
                   className={`w-full flex items-start gap-4 p-4 text-left transition-colors ${
-                    highlightedIndex === index ? 'bg-orange-50' : 'hover:bg-gray-50'
+                    highlightedIndex === index ? 'bg-brand-orange-50' : 'hover:bg-gray-50'
                   }`}
                 >
                   {/* Image */}
@@ -271,7 +271,7 @@ export default function UniversalSearch({
                         {categoryLabels[item.category] || item.category}
                       </span>
                       {item.badge && (
-                        <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium">
+                        <span className="text-xs bg-brand-orange-100 text-brand-orange-700 px-2 py-0.5 rounded-full font-medium">
                           {item.badge}
                         </span>
                       )}
@@ -279,13 +279,13 @@ export default function UniversalSearch({
                     <h4 className="font-semibold text-gray-900 truncate">{item.title}</h4>
                     <p className="text-sm text-gray-600 line-clamp-1">{item.description}</p>
                     {item.price && (
-                      <p className="text-sm font-bold text-orange-600 mt-1">{item.price}</p>
+                      <p className="text-sm font-bold text-brand-orange-600 mt-1">{item.price}</p>
                     )}
                   </div>
 
                   {/* Arrow */}
                   <ArrowRight className={`w-5 h-5 flex-shrink-0 transition-colors ${
-                    highlightedIndex === index ? 'text-orange-600' : 'text-gray-300'
+                    highlightedIndex === index ? 'text-brand-orange-600' : 'text-gray-300'
                   }`} />
                 </button>
               </li>

@@ -42,7 +42,7 @@ export default async function StaffOnboardingPage() {
           {steps.map((step, i) => (
             <div key={i} className="p-6 flex items-center gap-4">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                step.status === 'complete' ? 'bg-green-100' : step.status === 'current' ? 'bg-brand-blue-100' : 'bg-gray-100'
+                step.status === 'complete' ? 'bg-brand-green-100' : step.status === 'current' ? 'bg-brand-blue-100' : 'bg-gray-100'
               }`}>
                 {step.status === 'complete' ? (
                   <span className="text-slate-400 flex-shrink-0">•</span>
@@ -62,7 +62,7 @@ export default async function StaffOnboardingPage() {
                 </Link>
               )}
               {step.status === 'complete' && (
-                <span className="text-green-600 text-sm font-medium">Completed</span>
+                <span className="text-brand-green-600 text-sm font-medium">Completed</span>
               )}
             </div>
           ))}

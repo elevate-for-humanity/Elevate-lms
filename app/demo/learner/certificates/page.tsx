@@ -29,7 +29,7 @@ export default function DemoCertificatesPage() {
               </div>
               <div className="flex items-center gap-2">
                 <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                  c.status === 'Earned' ? 'bg-green-100 text-green-800' :
+                  c.status === 'Earned' ? 'bg-brand-green-100 text-brand-green-800' :
                   c.status === 'In Progress' ? 'bg-brand-blue-100 text-brand-blue-800' :
                   'bg-gray-100 text-gray-500'
                 }`}>{c.status}</span>

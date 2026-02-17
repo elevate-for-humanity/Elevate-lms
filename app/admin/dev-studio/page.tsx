@@ -344,7 +344,7 @@ export default function DevStudioPage() {
             disabled={!hasChanges || loading}
             className={`flex items-center gap-2 px-4 py-2 rounded ${
               hasChanges && !loading
-                ? 'bg-brand-green-600 hover:bg-green-700'
+                ? 'bg-brand-green-600 hover:bg-brand-green-700'
                 : 'bg-gray-600 cursor-not-allowed'
             }`}
           >

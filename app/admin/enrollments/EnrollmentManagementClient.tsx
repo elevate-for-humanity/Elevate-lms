@@ -242,9 +242,9 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
 
       {/* Error Display */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
           {error}
-          <button onClick={() => setError(null)} className="ml-4 text-red-500 hover:text-red-700">Dismiss</button>
+          <button onClick={() => setError(null)} className="ml-4 text-brand-red-500 hover:text-brand-red-700">Dismiss</button>
         </div>
       )}
 
@@ -256,7 +256,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <p className="text-sm text-gray-500">Active</p>
-          <p className="text-2xl font-bold text-green-600">{currentStats.active}</p>
+          <p className="text-2xl font-bold text-brand-green-600">{currentStats.active}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <p className="text-sm text-gray-500">Completed</p>
@@ -264,7 +264,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <p className="text-sm text-gray-500">At Risk</p>
-          <p className="text-2xl font-bold text-red-600">{currentStats.atRisk}</p>
+          <p className="text-2xl font-bold text-brand-red-600">{currentStats.atRisk}</p>
         </div>
       </div>
 
@@ -309,7 +309,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
           <tbody className="divide-y">
             {filteredEnrollments.length > 0 ? (
               filteredEnrollments.map((enrollment) => (
-                <tr key={enrollment.id} className={`hover:bg-gray-50 ${enrollment.at_risk ? 'bg-red-50' : ''}`}>
+                <tr key={enrollment.id} className={`hover:bg-gray-50 ${enrollment.at_risk ? 'bg-brand-red-50' : ''}`}>
                   <td className="px-6 py-4">
                     <div>
                       <p className="font-medium text-gray-900">{enrollment.student?.full_name || 'Unknown'}</p>
@@ -322,7 +322,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        enrollment.status === 'completed' ? 'bg-green-100 text-green-700' :
+                        enrollment.status === 'completed' ? 'bg-brand-green-100 text-brand-green-700' :
                         enrollment.status === 'active' ? 'bg-brand-blue-100 text-brand-blue-700' :
                         enrollment.status === 'withdrawn' ? 'bg-gray-100 text-gray-600' :
                         'bg-yellow-100 text-yellow-700'
@@ -330,7 +330,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
                         {enrollment.status || 'active'}
                       </span>
                       {enrollment.at_risk && (
-                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">At Risk</span>
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-brand-red-100 text-brand-red-700">At Risk</span>
                       )}
                     </div>
                   </td>
@@ -349,12 +349,12 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
                     <div className="flex justify-end gap-2">
                       <button onClick={() => openEditModal(enrollment)} className="px-3 py-1 text-sm border rounded hover:bg-gray-50">Edit</button>
                       {enrollment.status !== 'completed' && (
-                        <button onClick={() => markComplete(enrollment)} className="px-3 py-1 text-sm text-green-600 border border-green-200 rounded hover:bg-green-50">Complete</button>
+                        <button onClick={() => markComplete(enrollment)} className="px-3 py-1 text-sm text-brand-green-600 border border-brand-green-200 rounded hover:bg-brand-green-50">Complete</button>
                       )}
-                      <button onClick={() => toggleAtRisk(enrollment)} className={`px-3 py-1 text-sm border rounded ${enrollment.at_risk ? 'text-gray-600 border-gray-200 hover:bg-gray-50' : 'text-red-600 border-red-200 hover:bg-red-50'}`}>
+                      <button onClick={() => toggleAtRisk(enrollment)} className={`px-3 py-1 text-sm border rounded ${enrollment.at_risk ? 'text-gray-600 border-gray-200 hover:bg-gray-50' : 'text-brand-red-600 border-brand-red-200 hover:bg-brand-red-50'}`}>
                         {enrollment.at_risk ? 'Clear Risk' : 'Flag Risk'}
                       </button>
-                      <button onClick={() => handleDelete(enrollment.id)} className="px-3 py-1 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50">Delete</button>
+                      <button onClick={() => handleDelete(enrollment.id)} className="px-3 py-1 text-sm text-brand-red-600 border border-brand-red-200 rounded hover:bg-brand-red-50">Delete</button>
                     </div>
                   </td>
                 </tr>

@@ -13,9 +13,9 @@ export const metadata: Metadata = {
 };
 
 const statusColors: Record<string, string> = {
-  active: 'bg-green-100 text-green-800',
+  active: 'bg-brand-green-100 text-brand-green-800',
   inactive: 'bg-gray-100 text-gray-800',
-  revoked: 'bg-red-100 text-red-800',
+  revoked: 'bg-brand-red-100 text-brand-red-800',
 };
 
 export default async function AdminApiKeysPage() {
@@ -109,7 +109,7 @@ export default async function AdminApiKeysPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           {error ? (
             <div className="p-8 text-center">
-              <div className="text-red-600 mb-4">Database table not found</div>
+              <div className="text-brand-red-600 mb-4">Database table not found</div>
               <p className="text-gray-600 mb-4">
                 Run the migration in Supabase Dashboard SQL Editor:
               </p>
@@ -179,8 +179,8 @@ export default async function AdminApiKeysPage() {
                         <button className="p-2 hover:bg-gray-100 rounded-lg" title="View details">
                           <Eye className="w-4 h-4 text-gray-500" />
                         </button>
-                        <button className="p-2 hover:bg-red-50 rounded-lg" title="Revoke">
-                          <Trash2 className="w-4 h-4 text-red-500" />
+                        <button className="p-2 hover:bg-brand-red-50 rounded-lg" title="Revoke">
+                          <Trash2 className="w-4 h-4 text-brand-red-500" />
                         </button>
                       </div>
                     </td>

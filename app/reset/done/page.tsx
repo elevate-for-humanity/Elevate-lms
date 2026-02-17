@@ -31,7 +31,7 @@ export default async function ResetDonePage() {
         <Breadcrumbs items={[{ label: "Reset", href: "/reset" }, { label: "Done" }]} />
       </div>
 <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg text-center">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-slate-400 flex-shrink-0">•</span>
         </div>
         <h1 className="text-2xl font-bold text-black mb-2">

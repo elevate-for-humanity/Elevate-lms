@@ -474,10 +474,10 @@ export default function AnalyticsPage() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           campaign.openRate > 40
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-green-100 text-brand-green-800'
                             : campaign.openRate > 30
                               ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-red-100 text-red-800'
+                              : 'bg-brand-red-100 text-brand-red-800'
                         }`}
                       >
                         {campaign.openRate.toFixed(1)}%
@@ -487,10 +487,10 @@ export default function AnalyticsPage() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           campaign.clickRate > 8
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-green-100 text-brand-green-800'
                             : campaign.clickRate > 5
                               ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-red-100 text-red-800'
+                              : 'bg-brand-red-100 text-brand-red-800'
                         }`}
                       >
                         {campaign.clickRate.toFixed(1)}%
@@ -521,9 +521,9 @@ interface StatCardProps {
 function StatCard({ title, value, icon: Icon, color, trend }: StatCardProps) {
   const colorClasses = {
     blue: 'text-brand-blue-600 bg-brand-blue-50',
-    green: 'text-brand-green-600 bg-green-50',
+    green: 'text-brand-green-600 bg-brand-green-50',
     blue: 'text-brand-blue-600 bg-brand-blue-50',
-    red: 'text-brand-orange-600 bg-red-50',
+    red: 'text-brand-orange-600 bg-brand-red-50',
   };
 
   return (

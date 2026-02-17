@@ -148,7 +148,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
               >
                 <Link
                   href={item.href}
-                  className="flex items-center gap-1 px-4 py-2 text-sm font-semibold text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
+                  className="flex items-center gap-1 px-4 py-2 text-sm font-semibold text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 rounded-lg transition-all"
                 >
                   {item.name}
                   {item.dropdown && <ChevronDown className="h-4 w-4" />}
@@ -161,7 +161,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
                       <Link
                         key={subItem.name}
                         href={subItem.href}
-                        className="block px-4 py-2.5 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                        className="block px-4 py-2.5 text-sm font-medium text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 transition-colors"
                       >
                         {subItem.name}
                       </Link>
@@ -178,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
             {onSearchClick && (
               <button
                 onClick={onSearchClick}
-                className="p-2 text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
+                className="p-2 text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 rounded-lg transition-all"
                 aria-label="Search"
               >
                 <Search className="h-5 w-5" />
@@ -189,7 +189,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
             <div className="hidden lg:block relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 rounded-lg transition-all"
                 aria-expanded={isUserMenuOpen}
               >
                 <User className="h-5 w-5" />
@@ -207,35 +207,35 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
                     <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">Portals</div>
                     <Link
                       href="/student/dashboard"
-                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 transition-colors"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       Student Portal
                     </Link>
                     <Link
                       href="/employer-portal"
-                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 transition-colors"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       Employer Portal
                     </Link>
                     <Link
                       href="/partner/dashboard"
-                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 transition-colors"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       Partner Portal
                     </Link>
                     <Link
                       href="/mentor/dashboard"
-                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 transition-colors"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       Mentor Portal
                     </Link>
                     <Link
                       href="/shop/dashboard"
-                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 transition-colors"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       Shop Dashboard
@@ -244,14 +244,14 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
                     <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">Staff</div>
                     <Link
                       href="/admin"
-                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 transition-colors"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       Admin Dashboard
                     </Link>
                     <Link
                       href="/staff-portal/dashboard"
-                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 transition-colors"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       Staff Portal
@@ -259,7 +259,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
                     <div className="border-t border-slate-200 my-2" />
                     <Link
                       href="/login"
-                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                      className="block px-4 py-2.5 text-sm font-medium text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 transition-colors"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       Sign In
@@ -272,7 +272,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
             {/* Apply Button - Desktop */}
             <Link
               href="/apply"
-              className="hidden lg:inline-flex items-center gap-2 px-6 py-3 text-base font-bold text-white bg-orange-600 rounded-lg hover:bg-orange-700 hover:shadow-lg transition-all"
+              className="hidden lg:inline-flex items-center gap-2 px-6 py-3 text-base font-bold text-white bg-brand-orange-600 rounded-lg hover:bg-brand-orange-700 hover:shadow-lg transition-all"
             >
               Apply Now
             </Link>
@@ -280,7 +280,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
+              className="lg:hidden p-2 text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 rounded-lg transition-all"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
@@ -330,7 +330,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
                                 : item.name
                             )
                           }
-                          className="w-full flex items-center justify-between px-4 py-3 text-base font-semibold text-black hover:bg-orange-50 rounded-lg transition-all"
+                          className="w-full flex items-center justify-between px-4 py-3 text-base font-semibold text-black hover:bg-brand-orange-50 rounded-lg transition-all"
                         >
                           {item.name}
                           <ChevronRight
@@ -344,12 +344,12 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
 
                         {/* Expanded Dropdown */}
                         {mobileExpandedSection === item.name && (
-                          <div className="ml-4 mt-1 space-y-1 border-l-2 border-orange-200 pl-4">
+                          <div className="ml-4 mt-1 space-y-1 border-l-2 border-brand-orange-200 pl-4">
                             {item.dropdown.map((subItem) => (
                               <Link
                                 key={subItem.name}
                                 href={subItem.href}
-                                className="block px-4 py-2.5 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
+                                className="block px-4 py-2.5 text-sm font-medium text-black hover:text-brand-orange-600 hover:bg-brand-orange-50 rounded-lg transition-all"
                                 onClick={() => setIsMobileMenuOpen(false)}
                               >
                                 {subItem.name}
@@ -361,7 +361,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
                     ) : (
                       <Link
                         href={item.href}
-                        className="block px-4 py-3 text-base font-semibold text-black hover:bg-orange-50 rounded-lg transition-all"
+                        className="block px-4 py-3 text-base font-semibold text-black hover:bg-brand-orange-50 rounded-lg transition-all"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {item.name}
@@ -375,35 +375,35 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
                 <p className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">Portals</p>
                 <Link
                   href="/student/dashboard"
-                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-orange-50 rounded-lg transition-all"
+                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-brand-orange-50 rounded-lg transition-all"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Student Portal
                 </Link>
                 <Link
                   href="/employer-portal"
-                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-orange-50 rounded-lg transition-all"
+                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-brand-orange-50 rounded-lg transition-all"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Employer Portal
                 </Link>
                 <Link
                   href="/partner/dashboard"
-                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-orange-50 rounded-lg transition-all"
+                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-brand-orange-50 rounded-lg transition-all"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Partner Portal
                 </Link>
                 <Link
                   href="/mentor/dashboard"
-                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-orange-50 rounded-lg transition-all"
+                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-brand-orange-50 rounded-lg transition-all"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Mentor Portal
                 </Link>
                 <Link
                   href="/shop/dashboard"
-                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-orange-50 rounded-lg transition-all"
+                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-brand-orange-50 rounded-lg transition-all"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Shop Dashboard
@@ -413,21 +413,21 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
                 <p className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">Staff</p>
                 <Link
                   href="/admin"
-                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-orange-50 rounded-lg transition-all"
+                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-brand-orange-50 rounded-lg transition-all"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Admin Dashboard
                 </Link>
                 <Link
                   href="/staff-portal/dashboard"
-                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-orange-50 rounded-lg transition-all"
+                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-brand-orange-50 rounded-lg transition-all"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Staff Portal
                 </Link>
                 <Link
                   href="/login"
-                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-orange-50 rounded-lg transition-all"
+                  className="block px-4 py-3 text-base font-semibold text-black hover:bg-brand-orange-50 rounded-lg transition-all"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Sign In
@@ -436,7 +436,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
                 <div className="pt-4">
                   <Link
                     href="/apply"
-                    className="block px-6 py-4 text-lg font-bold text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition-all text-center shadow-lg"
+                    className="block px-6 py-4 text-lg font-bold text-white bg-brand-orange-600 rounded-lg hover:bg-brand-orange-700 transition-all text-center shadow-lg"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Apply Now
@@ -450,7 +450,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
                   </p>
                   <a
                     href="/support"
-                    className="block text-sm text-orange-600 font-medium hover:text-orange-700"
+                    className="block text-sm text-brand-orange-600 font-medium hover:text-brand-orange-700"
                   >
                     Call: Get Help
                   </a>

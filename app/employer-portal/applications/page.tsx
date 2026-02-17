@@ -72,8 +72,8 @@ export default async function ApplicationsPage() {
     'New': 'bg-brand-blue-100 text-brand-blue-700',
     'Reviewed': 'bg-yellow-100 text-yellow-700',
     'Interview': 'bg-brand-blue-100 text-brand-blue-700',
-    'Offered': 'bg-green-100 text-green-700',
-    'Rejected': 'bg-red-100 text-red-700',
+    'Offered': 'bg-brand-green-100 text-brand-green-700',
+    'Rejected': 'bg-brand-red-100 text-brand-red-700',
   };
 
   const newCount = applications.filter(a => a.status === 'New').length;
@@ -86,7 +86,7 @@ export default async function ApplicationsPage() {
     { label: 'New', count: newCount, color: 'text-brand-blue-600' },
     { label: 'In Review', count: reviewCount, color: 'text-yellow-600' },
     { label: 'Interview', count: interviewCount, color: 'text-brand-blue-600' },
-    { label: 'Offered', count: offeredCount, color: 'text-green-600' },
+    { label: 'Offered', count: offeredCount, color: 'text-brand-green-600' },
   ];
 
   return (

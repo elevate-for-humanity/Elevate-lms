@@ -28,7 +28,7 @@ export default function LicenseeOnboardingForm({
     return (
       <div className="text-center py-6">
         <span className="text-slate-400 flex-shrink-0">•</span>
-        <p className="text-green-600 font-medium">All agreements signed</p>
+        <p className="text-brand-green-600 font-medium">All agreements signed</p>
       </div>
     );
   }

@@ -306,12 +306,12 @@ export default function PayrollSetupForm({
             <div
               className={`border-2 border-dashed rounded-lg p-6 text-center ${
                 taxIdUploaded
-                  ? 'border-green-300 bg-green-50'
+                  ? 'border-brand-green-300 bg-brand-green-50'
                   : 'border-slate-300 bg-slate-50'
               }`}
             >
               {taxIdUploaded ? (
-                <div className="flex items-center justify-center gap-3 text-green-700">
+                <div className="flex items-center justify-center gap-3 text-brand-green-700">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="font-medium">W-9 Uploaded</span>
                 </div>
@@ -372,7 +372,7 @@ export default function PayrollSetupForm({
 
           {/* Error Message */}
           {error && (
-            <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            <div className="flex items-start gap-3 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
               <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
               <span className="text-sm">{error}</span>
             </div>

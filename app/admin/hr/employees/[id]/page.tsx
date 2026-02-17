@@ -95,9 +95,9 @@ export default async function EmployeeDetailPage({ params }: Props) {
   const manager = employee.managers?.profiles as any;
 
   const statusColors: Record<string, string> = {
-    active: 'bg-green-100 text-green-800',
+    active: 'bg-brand-green-100 text-brand-green-800',
     on_leave: 'bg-yellow-100 text-yellow-800',
-    terminated: 'bg-red-100 text-red-800',
+    terminated: 'bg-brand-red-100 text-brand-red-800',
     probation: 'bg-brand-blue-100 text-brand-blue-800',
   };
 
@@ -166,8 +166,8 @@ export default async function EmployeeDetailPage({ params }: Props) {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-green-600" />
+                <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-brand-green-600" />
                 </div>
                 <div>
                   <p className="text-sm text-slate-600">Start Date</p>
@@ -186,8 +186,8 @@ export default async function EmployeeDetailPage({ params }: Props) {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <User className="w-5 h-5 text-orange-600" />
+                <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                  <User className="w-5 h-5 text-brand-orange-600" />
                 </div>
                 <div>
                   <p className="text-sm text-slate-600">Reports To</p>
@@ -224,9 +224,9 @@ export default async function EmployeeDetailPage({ params }: Props) {
                       </p>
                     </div>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                      request.status === 'approved' ? 'bg-brand-green-100 text-brand-green-800' :
                       request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
+                      'bg-brand-red-100 text-brand-red-800'
                     }`}>
                       {request.status}
                     </span>
@@ -318,7 +318,7 @@ export default async function EmployeeDetailPage({ params }: Props) {
             <div className="space-y-4">
               {employee.salary && (
                 <div className="flex items-center gap-3">
-                  <DollarSign className="w-5 h-5 text-green-600" />
+                  <DollarSign className="w-5 h-5 text-brand-green-600" />
                   <div>
                     <p className="text-sm text-slate-600">Annual Salary</p>
                     <p className="text-xl font-bold text-slate-900">

@@ -67,7 +67,7 @@ export function CourseCompletionTracking() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Course Completion</h1>
-          <p className="text-red-100">Track your progress through milestones</p>
+          <p className="text-brand-red-100">Track your progress through milestones</p>
         </div>
       </div>
 
@@ -93,7 +93,7 @@ export function CourseCompletionTracking() {
             <Card key={milestone.id} className="p-6">
               <div className="flex items-start gap-4">
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
-                  milestone.completed ? 'bg-green-500 text-white' :
+                  milestone.completed ? 'bg-brand-green-500 text-white' :
                   milestone.progress > 0 ? 'bg-brand-blue-500 text-white' :
                   'bg-gray-300 text-black'
                 }`}>

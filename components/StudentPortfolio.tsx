@@ -290,34 +290,34 @@ export function StudentPortfolio() {
             />
             <div className="flex-1 text-center md:text-left">
               <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">{student.name}</h1>
-              <p className="text-xl text-red-100 mb-4">{student.title}</p>
-              <p className="text-red-50 max-w-2xl mb-6">{student.bio}</p>
+              <p className="text-xl text-brand-red-100 mb-4">{student.title}</p>
+              <p className="text-brand-red-50 max-w-2xl mb-6">{student.bio}</p>
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                <a href={`mailto:${student.email}`} className="text-white hover:text-red-100 transition-colors">
+                <a href={`mailto:${student.email}`} className="text-white hover:text-brand-red-100 transition-colors">
                   📧 Email
                 </a>
-                <a href={`tel:${student.phone}`} className="text-white hover:text-red-100 transition-colors">
+                <a href={`tel:${student.phone}`} className="text-white hover:text-brand-red-100 transition-colors">
                   📱 {student.phone}
                 </a>
                 <a href={`https://${student.linkedin}`} target="_blank" rel="noopener noreferrer"
-className="text-white hover:text-red-100 transition-colors">
+className="text-white hover:text-brand-red-100 transition-colors">
                   💼 LinkedIn
                 </a>
                 <a href={`https://${student.github}`} target="_blank" rel="noopener noreferrer"
-className="text-white hover:text-red-100 transition-colors">
+className="text-white hover:text-brand-red-100 transition-colors">
                   🔗 GitHub
                 </a>
                 <a href={`https://${student.portfolio}`} target="_blank" rel="noopener noreferrer"
-className="text-white hover:text-red-100 transition-colors">
+className="text-white hover:text-brand-red-100 transition-colors">
                   🌐 Portfolio
                 </a>
               </div>
             </div>
             <div className="flex gap-3">
-              <Button variant="secondary" className="bg-white text-brand-orange-600 hover:bg-red-50">
+              <Button variant="secondary" className="bg-white text-brand-orange-600 hover:bg-brand-red-50">
                 Download Resume
               </Button>
-              <Button variant="secondary" className="bg-red-700 text-white hover:bg-red-800">
+              <Button variant="secondary" className="bg-brand-red-700 text-white hover:bg-brand-red-800">
                 Contact Me
               </Button>
             </div>
@@ -335,7 +335,7 @@ className="text-white hover:text-red-100 transition-colors">
                 onClick={() => setActiveTab(tab)}
                 className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === tab
-                    ? 'border-red-600 text-brand-orange-600'
+                    ? 'border-brand-red-600 text-brand-orange-600'
                     : 'border-transparent text-gray-500 hover:text-black hover:border-gray-300'
                 }`}
               >
@@ -388,7 +388,7 @@ className="text-white hover:text-red-100 transition-colors">
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-3">
                       <h3 className="text-xl font-bold text-black">{project.title}</h3>
-                      <span className="px-2 py-2 bg-orange-100 text-orange-700 text-xs font-medium rounded">
+                      <span className="px-2 py-2 bg-brand-orange-100 text-brand-orange-700 text-xs font-medium rounded">
                         {project.category}
                       </span>
                     </div>
@@ -410,7 +410,7 @@ className="text-white hover:text-red-100 transition-colors">
                       <ul className="space-y-1">
                         {project.achievements.map((achievement, idx) => (
                           <li key={idx} className="text-xs text-black flex items-start">
-                            <span className="text-green-500 mr-1">•</span>
+                            <span className="text-brand-green-500 mr-1">•</span>
                             {achievement}
                           </li>
                         ))}
@@ -509,7 +509,7 @@ className="text-white hover:text-red-100 transition-colors">
                       </p>
                       <a
                         href={cert.credentialUrl}
-                        className="text-sm text-brand-orange-600 hover:text-red-700 font-medium"
+                        className="text-sm text-brand-orange-600 hover:text-brand-red-700 font-medium"
                       >
                         View Credential →
                       </a>
@@ -585,7 +585,7 @@ className="text-white hover:text-red-100 transition-colors">
                       <p className="text-sm text-black">Completed Projects</p>
                     </div>
                     <div>
-                      <p className="text-3xl font-bold text-orange-500">{certificates.length}</p>
+                      <p className="text-3xl font-bold text-brand-orange-500">{certificates.length}</p>
                       <p className="text-sm text-black">Certifications</p>
                     </div>
                     <div>
@@ -593,7 +593,7 @@ className="text-white hover:text-red-100 transition-colors">
                       <p className="text-sm text-black">Technical Skills</p>
                     </div>
                     <div>
-                      <p className="text-3xl font-bold text-orange-500">3+</p>
+                      <p className="text-3xl font-bold text-brand-orange-500">3+</p>
                       <p className="text-sm text-black">Years Experience</p>
                     </div>
                   </div>
@@ -603,7 +603,7 @@ className="text-white hover:text-red-100 transition-colors">
                   <h3 className="text-xl font-bold text-black mb-4">Interests</h3>
                   <div className="flex flex-wrap gap-2">
                     {['Web Development', 'Mobile Apps', 'Cloud Computing', 'AI/ML', 'Open Source', 'UI/UX Design', 'DevOps', 'Mentoring'].map((interest) => (
-                      <span key={interest} className="px-3 py-2    text-red-700 text-sm rounded-full">
+                      <span key={interest} className="px-3 py-2    text-brand-red-700 text-sm rounded-full">
                         {interest}
                       </span>
                     ))}
@@ -612,10 +612,10 @@ className="text-white hover:text-red-100 transition-colors">
 
                 <Card className="p-6    text-white">
                   <h3 className="text-xl font-bold mb-3">Let's Connect!</h3>
-                  <p className="text-red-50 text-sm mb-4">
+                  <p className="text-brand-red-50 text-sm mb-4">
                     I'm always open to discussing new opportunities, collaborations, or just chatting about tech.
                   </p>
-                  <Button variant="secondary" className="w-full bg-white text-brand-orange-600 hover:bg-red-50">
+                  <Button variant="secondary" className="w-full bg-white text-brand-orange-600 hover:bg-brand-red-50">
                     Schedule a Call
                   </Button>
                 </Card>

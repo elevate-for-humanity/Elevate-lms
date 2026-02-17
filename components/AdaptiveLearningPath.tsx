@@ -183,7 +183,7 @@ export function AdaptiveLearningPath() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Adaptive Learning Paths</h1>
-          <p className="text-red-100">AI-recommended courses tailored to your goals and skills</p>
+          <p className="text-brand-red-100">AI-recommended courses tailored to your goals and skills</p>
         </div>
       </div>
 
@@ -210,7 +210,7 @@ export function AdaptiveLearningPath() {
             <Card
               key={path.id}
               className={`p-6 cursor-pointer transition-all ${
-                selectedPath === path.id ? 'ring-2 ring-red-600' : ''
+                selectedPath === path.id ? 'ring-2 ring-brand-red-600' : ''
               }`}
               onClick={() => setSelectedPath(path.id)}
             >
@@ -233,12 +233,12 @@ export function AdaptiveLearningPath() {
               <div className="space-y-2">
                 {path.courses.slice(0, 3).map((course) => (
                   <div key={course.id} className="flex items-center gap-2 text-sm">
-                    {course.recommended && <span className="text-green-500">•</span>}
+                    {course.recommended && <span className="text-brand-green-500">•</span>}
                     <span className="text-black">{course.course_name}</span>
                     <span className={`px-2 py-0.5 rounded text-xs ${
                       course.difficulty === 'beginner' ? 'bg-brand-blue-100 text-brand-blue-700' :
                       course.difficulty === 'intermediate' ? 'bg-purple-100 text-purple-700' :
-                      'bg-red-100 text-red-700'
+                      'bg-brand-red-100 text-brand-red-700'
                     }`}>
                       {course.difficulty}
                     </span>
@@ -289,7 +289,7 @@ export function AdaptiveLearningPath() {
                         <p className="text-xs font-semibold text-black mb-1">Skills you'll learn:</p>
                         <div className="flex flex-wrap gap-1">
                           {course.skills.map((skill) => (
-                            <span key={skill} className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded">
+                            <span key={skill} className="px-2 py-0.5 bg-brand-orange-100 text-brand-orange-700 text-xs rounded">
                               {skill}
                             </span>
                           ))}
@@ -297,7 +297,7 @@ export function AdaptiveLearningPath() {
                       </div>
 
                       {course.recommended && (
-                        <div className="flex items-center gap-2 text-sm text-green-700">
+                        <div className="flex items-center gap-2 text-sm text-brand-green-700">
                           <span>•</span>
                           <span className="font-medium">Highly recommended for you</span>
                         </div>

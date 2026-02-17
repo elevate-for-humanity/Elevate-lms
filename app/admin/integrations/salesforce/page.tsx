@@ -59,7 +59,7 @@ export default function SalesforceIntegrationPage() {
               </div>
             </div>
             <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${
-              isConfigured ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+              isConfigured ? 'bg-brand-green-100 text-brand-green-700' : 'bg-yellow-100 text-yellow-700'
             }`}>
               {isConfigured ? (
                 <>
@@ -96,7 +96,7 @@ export default function SalesforceIntegrationPage() {
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center gap-3 mb-2">
-              <TrendingUp className="w-5 h-5 text-green-600" />
+              <TrendingUp className="w-5 h-5 text-brand-green-600" />
               <span className="font-medium text-gray-900">Opportunities</span>
             </div>
             <p className="text-3xl font-bold text-gray-900">{isConfigured ? '—' : '0'}</p>
@@ -181,11 +181,11 @@ export default function SalesforceIntegrationPage() {
             </div>
           ) : (
             <div className="p-6">
-              <div className="flex items-center gap-3 text-green-700 bg-green-50 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-3 text-brand-green-700 bg-brand-green-50 rounded-lg p-4 mb-6">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium">Salesforce is connected!</p>
-                  <p className="text-sm text-green-600">Your LMS data will sync automatically.</p>
+                  <p className="text-sm text-brand-green-600">Your LMS data will sync automatically.</p>
                 </div>
               </div>
               
@@ -253,8 +253,8 @@ export default function SalesforceIntegrationPage() {
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-5 h-5 text-green-600" />
+                <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-5 h-5 text-brand-green-600" />
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900">Secure Connection</h3>
@@ -271,8 +271,8 @@ export default function SalesforceIntegrationPage() {
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <RefreshCw className="w-5 h-5 text-orange-600" />
+                <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <RefreshCw className="w-5 h-5 text-brand-orange-600" />
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900">Bi-directional Sync</h3>

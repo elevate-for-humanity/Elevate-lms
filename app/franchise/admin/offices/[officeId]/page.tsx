@@ -312,7 +312,7 @@ export default function AdminOfficeDetailPage() {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-green-600">${stats.franchiseFees.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-brand-green-600">${stats.franchiseFees.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">Franchise Fees</p>
           </CardContent>
         </Card>

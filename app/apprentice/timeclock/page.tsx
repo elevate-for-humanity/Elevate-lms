@@ -357,7 +357,7 @@ export default function TimeclockPage() {
           </Link>
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="text-center">
-              <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <AlertTriangle className="w-12 h-12 text-brand-red-500 mx-auto mb-4" />
               <h2 className="text-xl font-bold text-gray-900 mb-2">Cannot Access Timeclock</h2>
               <p className="text-gray-600 mb-4">{contextError || 'Unable to load timeclock context'}</p>
               <button
@@ -447,7 +447,7 @@ export default function TimeclockPage() {
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <MapPin className={`w-5 h-5 mr-2 ${location.error ? 'text-red-500' : 'text-green-500'}`} />
+                <MapPin className={`w-5 h-5 mr-2 ${location.error ? 'text-brand-red-500' : 'text-brand-green-500'}`} />
                 <span className="text-sm font-medium">
                   {location.loading ? 'Getting location...' : 
                    location.error ? 'Location error' :
@@ -457,30 +457,30 @@ export default function TimeclockPage() {
               </div>
               {location.accuracy && (
                 <span className={`text-xs px-2 py-1 rounded ${
-                  location.accuracy <= MAX_ACCURACY_M ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                  location.accuracy <= MAX_ACCURACY_M ? 'bg-brand-green-100 text-brand-green-700' : 'bg-yellow-100 text-yellow-700'
                 }`}>
                   ±{Math.round(location.accuracy)}m
                 </span>
               )}
             </div>
             {location.error && (
-              <p className="text-sm text-red-600 mt-2">{location.error}</p>
+              <p className="text-sm text-brand-red-600 mt-2">{location.error}</p>
             )}
           </div>
 
           {/* Geofence Status */}
           {geofence.withinGeofence !== null && (
             <div className={`mb-6 p-4 rounded-lg ${
-              geofence.withinGeofence ? 'bg-green-50' : 'bg-red-50'
+              geofence.withinGeofence ? 'bg-brand-green-50' : 'bg-brand-red-50'
             }`}>
               <div className="flex items-center">
                 {geofence.withinGeofence ? (
                   <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
-                  <AlertTriangle className="w-5 h-5 mr-2 text-red-600" />
+                  <AlertTriangle className="w-5 h-5 mr-2 text-brand-red-600" />
                 )}
                 <span className={`text-sm font-medium ${
-                  geofence.withinGeofence ? 'text-green-700' : 'text-red-700'
+                  geofence.withinGeofence ? 'text-brand-green-700' : 'text-brand-red-700'
                 }`}>
                   {geofence.withinGeofence ? 'Within work site' : 'Outside work site'}
                   {geofence.distance && ` (${Math.round(geofence.distance)}m away)`}
@@ -491,10 +491,10 @@ export default function TimeclockPage() {
 
           {/* Error Display */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 rounded-lg">
+            <div className="mb-6 p-4 bg-brand-red-50 rounded-lg">
               <div className="flex items-center">
-                <AlertTriangle className="w-5 h-5 mr-2 text-red-600" />
-                <span className="text-sm text-red-700">{error}</span>
+                <AlertTriangle className="w-5 h-5 mr-2 text-brand-red-600" />
+                <span className="text-sm text-brand-red-700">{error}</span>
               </div>
             </div>
           )}
@@ -524,7 +524,7 @@ export default function TimeclockPage() {
               <button
                 onClick={() => handleAction('clock_in')}
                 disabled={actionLoading !== null || location.loading || !selectedSiteId}
-                className="w-full flex items-center justify-center px-6 py-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold rounded-lg transition-colors"
+                className="w-full flex items-center justify-center px-6 py-4 bg-brand-green-600 hover:bg-brand-green-700 disabled:bg-gray-400 text-white font-bold rounded-lg transition-colors"
               >
                 {actionLoading === 'clock_in' ? (
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
@@ -568,7 +568,7 @@ export default function TimeclockPage() {
                 <button
                   onClick={() => handleAction('clock_out')}
                   disabled={actionLoading !== null || isOnLunch}
-                  className="w-full flex items-center justify-center px-6 py-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-bold rounded-lg transition-colors"
+                  className="w-full flex items-center justify-center px-6 py-4 bg-brand-red-600 hover:bg-brand-red-700 disabled:bg-gray-400 text-white font-bold rounded-lg transition-colors"
                 >
                   {actionLoading === 'clock_out' ? (
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
@@ -583,10 +583,10 @@ export default function TimeclockPage() {
 
           {/* Shift Complete */}
           {shift.clockOutAt && (
-            <div className="mt-6 p-4 bg-green-50 rounded-lg">
+            <div className="mt-6 p-4 bg-brand-green-50 rounded-lg">
               <div className="flex items-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
-                <span className="text-sm font-medium text-green-700">
+                <span className="text-sm font-medium text-brand-green-700">
                   Shift complete! Clocked out at {new Date(shift.clockOutAt).toLocaleTimeString()}
                 </span>
               </div>

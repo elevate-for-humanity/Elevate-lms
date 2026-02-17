@@ -150,7 +150,7 @@ export default function IdentityVerificationFlow({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <Clock className="w-16 h-16 mx-auto mb-4 text-orange-600" />
+          <Clock className="w-16 h-16 mx-auto mb-4 text-brand-orange-600" />
           <h1 className="text-2xl font-bold text-black mb-4">
             Verification Pending
           </h1>
@@ -180,7 +180,7 @@ export default function IdentityVerificationFlow({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <AlertCircle className="w-16 h-16 mx-auto mb-4 text-red-600" />
+          <AlertCircle className="w-16 h-16 mx-auto mb-4 text-brand-red-600" />
           <h1 className="text-2xl font-bold text-black mb-4">
             Verification Failed
           </h1>
@@ -189,8 +189,8 @@ export default function IdentityVerificationFlow({
             support for assistance.
           </p>
           {verification.notes && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-left">
-              <p className="text-sm text-red-800">
+            <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6 text-left">
+              <p className="text-sm text-brand-red-800">
                 <strong>Reason:</strong> {verification.notes}
               </p>
             </div>
@@ -231,7 +231,7 @@ export default function IdentityVerificationFlow({
                   <h3 className="text-lg font-bold text-black">
                     Instant Verification
                   </h3>
-                  <span className="text-xs text-green-600 font-medium">
+                  <span className="text-xs text-brand-green-600 font-medium">
                     RECOMMENDED
                   </span>
                 </div>
@@ -281,7 +281,7 @@ export default function IdentityVerificationFlow({
               </p>
               <ul className="text-sm text-black space-y-2 mb-6">
                 <li className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-orange-600" />
+                  <Clock className="w-4 h-4 text-brand-orange-600" />
                   24-48 hour review
                 </li>
                 <li className="flex items-center gap-2">
@@ -328,7 +328,7 @@ export default function IdentityVerificationFlow({
           </p>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+            <div className="mb-4 p-3 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-800 text-sm">
               {error}
             </div>
           )}
@@ -378,7 +378,7 @@ export default function IdentityVerificationFlow({
           </p>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+            <div className="mb-4 p-3 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-800 text-sm">
               {error}
             </div>
           )}
@@ -410,7 +410,7 @@ export default function IdentityVerificationFlow({
                   Choose File
                 </label>
                 {uploadedDocs.id && (
-                  <div className="mt-3 flex items-center justify-center gap-2 text-green-600">
+                  <div className="mt-3 flex items-center justify-center gap-2 text-brand-green-600">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-sm">{uploadedDocs.id.name}</span>
                   </div>
@@ -444,7 +444,7 @@ export default function IdentityVerificationFlow({
                   Choose File
                 </label>
                 {uploadedDocs.ssn && (
-                  <div className="mt-3 flex items-center justify-center gap-2 text-green-600">
+                  <div className="mt-3 flex items-center justify-center gap-2 text-brand-green-600">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-sm">{uploadedDocs.ssn.name}</span>
                   </div>

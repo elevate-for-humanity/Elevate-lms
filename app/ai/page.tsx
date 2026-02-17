@@ -83,9 +83,9 @@ export default function AIHubPage() {
             {/* AI Chat */}
             <Link
               href="/ai-chat"
-              className="group bg-zinc-900   rounded-2xl p-8 border-2 border-green-200 hover:border-green-400 hover:shadow-xl transition-all"
+              className="group bg-zinc-900   rounded-2xl p-8 border-2 border-brand-green-200 hover:border-brand-green-400 hover:shadow-xl transition-all"
             >
-              <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-brand-green-600 rounded-xl flex items-center justify-center mb-6">
                 <MessageSquare className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-3">
@@ -95,7 +95,7 @@ export default function AIHubPage() {
                 Have a conversation with AI about your career goals, training
                 options, and next steps. Get personalized guidance instantly.
               </p>
-              <div className="flex items-center gap-2 text-green-600 font-semibold group-hover:gap-4 transition-all">
+              <div className="flex items-center gap-2 text-brand-green-600 font-semibold group-hover:gap-4 transition-all">
                 <span>Start Chatting</span>
                 <span>→</span>
               </div>
@@ -122,7 +122,7 @@ export default function AIHubPage() {
               </div>
               <div className="mt-6 pt-6 border-t border-brand-blue-200">
                 <div className="flex items-center gap-2 text-sm text-black">
-                  <Target className="w-4 h-4 text-orange-500" />
+                  <Target className="w-4 h-4 text-brand-orange-500" />
                   <span>For Instructors</span>
                 </div>
               </div>
@@ -131,9 +131,9 @@ export default function AIHubPage() {
             {/* AI Job Matcher */}
             <Link
               href="/ai/job-match"
-              className="group bg-zinc-900   rounded-2xl p-8 border-2 border-orange-200 hover:border-orange-400 hover:shadow-xl transition-all"
+              className="group bg-zinc-900   rounded-2xl p-8 border-2 border-brand-orange-200 hover:border-brand-orange-400 hover:shadow-xl transition-all"
             >
-              <div className="w-16 h-16 bg-orange-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-brand-orange-600 rounded-xl flex items-center justify-center mb-6">
                 <Briefcase className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-3">
@@ -143,7 +143,7 @@ export default function AIHubPage() {
                 Find jobs that match your skills and training. AI analyzes your
                 profile and recommends the best opportunities.
               </p>
-              <div className="flex items-center gap-2 text-orange-600 font-semibold group-hover:gap-4 transition-all">
+              <div className="flex items-center gap-2 text-brand-orange-600 font-semibold group-hover:gap-4 transition-all">
                 <span>Find Jobs</span>
                 <span>→</span>
               </div>
@@ -216,8 +216,8 @@ export default function AIHubPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-green-600">2</span>
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-brand-green-600">2</span>
               </div>
               <h3 className="text-xl font-bold text-black mb-2">
                 Get Instant Answers

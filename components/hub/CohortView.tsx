@@ -192,7 +192,7 @@ export default function CohortView({ showBy = 'program' }: { showBy?: 'program' 
               {/* Stats Row */}
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <div className="w-2 h-2 rounded-full bg-brand-green-500"></div>
                   <span className="text-slate-600">On Track:</span>
                   <span className="font-medium text-slate-900">{cohort.on_track}</span>
                 </div>
@@ -217,7 +217,7 @@ export default function CohortView({ showBy = 'program' }: { showBy?: 'program' 
                       style={{ width: `${(cohort.completed / cohort.total) * 100}%` }}
                     />
                     <div 
-                      className="bg-green-500"
+                      className="bg-brand-green-500"
                       style={{ width: `${(cohort.on_track / cohort.total) * 100}%` }}
                     />
                     <div 

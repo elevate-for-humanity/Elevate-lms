@@ -41,7 +41,7 @@ export default function Intro() {
               />
             </div>
             <div className="p-6">
-              <h3 className="text-xl font-bold text-green-900 mb-3">Industry Credentials</h3>
+              <h3 className="text-xl font-bold text-brand-green-900 mb-3">Industry Credentials</h3>
               <p className="text-sm text-black leading-relaxed mb-2">
                 Nationally recognized certifications from Certiport, HSI, CareerSafe, NRF, and Milady.
               </p>
@@ -52,7 +52,7 @@ export default function Intro() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-red-50 to-orange-50 p-8 rounded-lg text-center">
+        <div className="bg-gradient-to-r from-brand-red-50 to-brand-orange-50 p-8 rounded-lg text-center">
           <h3 className="text-2xl font-bold text-black mb-4">Who We Serve</h3>
           <p className="text-lg text-black leading-relaxed max-w-4xl mx-auto">
             Students seeking career training, displaced workers needing new skills, veterans transitioning to civilian careers, 

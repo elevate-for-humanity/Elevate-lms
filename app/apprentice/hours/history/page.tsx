@@ -71,7 +71,7 @@ export default async function HoursHistoryPage() {
             )}
           </div>
           <Link href="/apprentice/hours/log"
-            className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+            className="flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
             <Plus className="w-4 h-4" /> Log Hours
           </Link>
         </div>
@@ -88,7 +88,7 @@ export default async function HoursHistoryPage() {
             <p className="text-gray-600 text-sm">Approved Hours</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
-            <TrendingUp className="w-8 h-8 text-orange-500 mb-2" />
+            <TrendingUp className="w-8 h-8 text-brand-orange-500 mb-2" />
             <p className="text-2xl font-bold">{progressPercent}%</p>
             <p className="text-gray-600 text-sm">Progress to Goal</p>
           </div>
@@ -106,7 +106,7 @@ export default async function HoursHistoryPage() {
             <span className="text-gray-600">{approvedHours} / {targetHours}</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-4">
-            <div className="bg-orange-500 h-4 rounded-full transition-all" 
+            <div className="bg-brand-orange-500 h-4 rounded-full transition-all" 
               style={{ width: `${Math.min(100, progressPercent)}%` }} />
           </div>
           {pendingHours > 0 && (
@@ -142,8 +142,8 @@ export default async function HoursHistoryPage() {
                     <td className="px-4 py-3 text-sm">{entry.supervisor_name || 'N/A'}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-                        entry.status === 'approved' ? 'bg-green-100 text-green-700' :
-                        entry.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                        entry.status === 'approved' ? 'bg-brand-green-100 text-brand-green-700' :
+                        entry.status === 'rejected' ? 'bg-brand-red-100 text-brand-red-700' :
                         'bg-yellow-100 text-yellow-700'
                       }`}>
                         {entry.status === 'approved' && <span className="text-slate-400 flex-shrink-0">•</span>}
@@ -159,7 +159,7 @@ export default async function HoursHistoryPage() {
                     <p className="font-medium text-gray-900">No hours logged yet</p>
                     <p className="text-sm text-gray-500 mb-4">Start logging your apprenticeship hours</p>
                     <Link href="/apprentice/hours/log"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
                       <Plus className="w-4 h-4" /> Log Hours
                     </Link>
                   </td>

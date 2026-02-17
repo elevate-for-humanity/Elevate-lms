@@ -77,7 +77,7 @@ export function StudentSuccessCoaching() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Success Coaching</h1>
-          <p className="text-red-100">Your personalized path to success</p>
+          <p className="text-brand-red-100">Your personalized path to success</p>
         </div>
       </div>
 
@@ -89,7 +89,7 @@ export function StudentSuccessCoaching() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`py-4 px-2 border-b-2 font-medium ${
-                  activeTab === tab ? 'border-red-600 text-brand-orange-600' : 'border-transparent text-gray-500'
+                  activeTab === tab ? 'border-brand-red-600 text-brand-orange-600' : 'border-transparent text-gray-500'
                 }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -109,12 +109,12 @@ export function StudentSuccessCoaching() {
             </Card>
             <Card className="p-6">
               <h3 className="text-sm text-black mb-2">Active Goals</h3>
-              <p className="text-3xl font-bold text-orange-500">{goals.filter(g => g.status !== 'completed').length}</p>
+              <p className="text-3xl font-bold text-brand-orange-500">{goals.filter(g => g.status !== 'completed').length}</p>
               <p className="text-sm text-gray-500">2 in progress</p>
             </Card>
             <Card className="p-6">
               <h3 className="text-sm text-black mb-2">Success Rate</h3>
-              <p className="text-3xl font-bold text-green-600">85%</p>
+              <p className="text-3xl font-bold text-brand-green-600">85%</p>
               <p className="text-sm text-gray-500">Above average</p>
             </Card>
           </div>
@@ -139,7 +139,7 @@ export function StudentSuccessCoaching() {
                   </div>
                   <span className={`px-3 py-2 rounded text-sm ${
                     session.status === 'scheduled' ? 'bg-brand-blue-100 text-brand-blue-700' :
-                    session.status === 'completed' ? 'bg-green-100 text-green-700' :
+                    session.status === 'completed' ? 'bg-brand-green-100 text-brand-green-700' :
                     'bg-gray-100 text-black'
                   }`}>
                     {session.status}
@@ -165,7 +165,7 @@ export function StudentSuccessCoaching() {
                     <p className="text-sm text-gray-500">Due: {goal.dueDate}</p>
                   </div>
                   <span className={`px-3 py-2 rounded text-sm ${
-                    goal.status === 'on-track' ? 'bg-green-100 text-green-700' :
+                    goal.status === 'on-track' ? 'bg-brand-green-100 text-brand-green-700' :
                     goal.status === 'at-risk' ? 'bg-yellow-100 text-yellow-700' :
                     'bg-brand-blue-100 text-brand-blue-700'
                   }`}>

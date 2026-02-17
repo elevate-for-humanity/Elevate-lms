@@ -40,17 +40,17 @@ export default async function ApprenticeshipPage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Employers", href: "/employers" }, { label: "Apprenticeships" }]} />
       </div>
-<div className="bg-orange-600 text-white py-12">
+<div className="bg-brand-orange-600 text-white py-12">
         <div className="container mx-auto px-4">
           <Link
             href="/employers"
-            className="inline-flex items-center text-orange-100 hover:text-white mb-6"
+            className="inline-flex items-center text-brand-orange-100 hover:text-white mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Employers
           </Link>
           <h1 className="text-4xl font-bold mb-4">Apprenticeship Programs</h1>
-          <p className="text-xl text-orange-100 max-w-3xl">
+          <p className="text-xl text-brand-orange-100 max-w-3xl">
             Build your workforce through DOL-registered apprenticeship programs
             with our comprehensive support and infrastructure.
           </p>
@@ -120,7 +120,7 @@ export default async function ApprenticeshipPage() {
             </div>
           </section>
 
-          <section className="bg-orange-50 border border-orange-200 rounded-lg p-8 text-center">
+          <section className="bg-brand-orange-50 border border-brand-orange-200 rounded-lg p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">
               Ready to Start an Apprenticeship Program?
             </h2>

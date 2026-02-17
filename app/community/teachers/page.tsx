@@ -72,11 +72,11 @@ export default async function TeachersPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-green-600 text-white py-16">
+      <section className="bg-brand-green-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <GraduationCap className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Teacher Resources</h1>
-          <p className="text-xl text-green-100 max-w-2xl mx-auto">
+          <p className="text-xl text-brand-green-100 max-w-2xl mx-auto">
             Tools, guides, and community support for instructors
           </p>
         </div>
@@ -93,7 +93,7 @@ export default async function TeachersPage() {
             {/* Resources */}
             <section>
               <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <FileText className="w-6 h-6 text-green-600" />
+                <FileText className="w-6 h-6 text-brand-green-600" />
                 Teaching Resources
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
@@ -103,7 +103,7 @@ export default async function TeachersPage() {
                     <p className="text-gray-600 text-sm mb-4">{resource.description}</p>
                     <a
                       href={resource.url || '#'}
-                      className="inline-flex items-center gap-2 text-green-600 font-medium hover:underline"
+                      className="inline-flex items-center gap-2 text-brand-green-600 font-medium hover:underline"
                     >
                       <Download className="w-4 h-4" />
                       Download
@@ -116,7 +116,7 @@ export default async function TeachersPage() {
             {/* Training Videos */}
             <section>
               <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <Video className="w-6 h-6 text-green-600" />
+                <Video className="w-6 h-6 text-brand-green-600" />
                 Training Videos
               </h2>
               {videos && videos.length > 0 ? (
@@ -145,7 +145,7 @@ export default async function TeachersPage() {
                     <p className="text-sm text-gray-500">15 min • Introduction to the platform</p>
                   </Link>
                   <Link href="/resources/instructor-training" className="bg-white rounded-xl p-6 border hover:shadow-lg transition">
-                    <Video className="w-10 h-10 text-green-600 mb-3" />
+                    <Video className="w-10 h-10 text-brand-green-600 mb-3" />
                     <h3 className="font-bold">Best Practices</h3>
                     <p className="text-sm text-gray-500">20 min • Teaching techniques</p>
                   </Link>
@@ -161,22 +161,22 @@ export default async function TeachersPage() {
               <h3 className="font-bold text-lg mb-4">Quick Links</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/instructor/dashboard" className="text-green-600 hover:underline">
+                  <Link href="/instructor/dashboard" className="text-brand-green-600 hover:underline">
                     Instructor Dashboard
                   </Link>
                 </li>
                 <li>
-                  <Link href="/instructor/courses" className="text-green-600 hover:underline">
+                  <Link href="/instructor/courses" className="text-brand-green-600 hover:underline">
                     My Courses
                   </Link>
                 </li>
                 <li>
-                  <Link href="/instructor/students" className="text-green-600 hover:underline">
+                  <Link href="/instructor/students" className="text-brand-green-600 hover:underline">
                     Student Management
                   </Link>
                 </li>
                 <li>
-                  <Link href="/help/instructors" className="text-green-600 hover:underline">
+                  <Link href="/help/instructors" className="text-brand-green-600 hover:underline">
                     Help Center
                   </Link>
                 </li>
@@ -186,7 +186,7 @@ export default async function TeachersPage() {
             {/* Discussions */}
             <section className="bg-white rounded-xl border p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <Users className="w-5 h-5 text-green-600" />
+                <Users className="w-5 h-5 text-brand-green-600" />
                 Teacher Discussions
               </h3>
               {discussions && discussions.length > 0 ? (

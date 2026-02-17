@@ -66,7 +66,7 @@ export default function PayrollHistoryPage() {
               <p className="text-sm text-gray-600 mb-1">Gross Pay</p>
               <p className="text-2xl font-bold text-gray-900">${ytdTotals.grossPay.toLocaleString()}</p>
             </div>
-            <div className="bg-green-50 rounded-lg p-4">
+            <div className="bg-brand-green-50 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-1">Net Pay</p>
               <p className="text-2xl font-bold text-gray-900">${ytdTotals.netPay.toLocaleString()}</p>
             </div>
@@ -74,7 +74,7 @@ export default function PayrollHistoryPage() {
               <p className="text-sm text-gray-600 mb-1">Total Hours</p>
               <p className="text-2xl font-bold text-gray-900">{ytdTotals.hours}</p>
             </div>
-            <div className="bg-orange-50 rounded-lg p-4">
+            <div className="bg-brand-orange-50 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-1">Total Taxes</p>
               <p className="text-2xl font-bold text-gray-900">${ytdTotals.taxes.toLocaleString()}</p>
             </div>

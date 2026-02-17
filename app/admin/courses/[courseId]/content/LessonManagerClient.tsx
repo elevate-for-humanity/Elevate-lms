@@ -167,9 +167,9 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
 
       {/* Error Display */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
           {error}
-          <button onClick={() => setError(null)} className="ml-4 text-red-500 hover:text-red-700">Dismiss</button>
+          <button onClick={() => setError(null)} className="ml-4 text-brand-red-500 hover:text-brand-red-700">Dismiss</button>
         </div>
       )}
 
@@ -229,7 +229,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => openEditModal(lesson)} className="px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50">Edit</button>
-                  <button onClick={() => handleDelete(lesson.id)} className="px-3 py-1.5 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50">Delete</button>
+                  <button onClick={() => handleDelete(lesson.id)} className="px-3 py-1.5 text-sm text-brand-red-600 border border-brand-red-200 rounded-lg hover:bg-brand-red-50">Delete</button>
                 </div>
               </div>
             ))

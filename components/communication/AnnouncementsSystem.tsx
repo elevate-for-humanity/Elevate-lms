@@ -261,7 +261,7 @@ function AnnouncementCard({ announcement }: { announcement: Announcement }) {
               className="rounded-full"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-700 font-semibold">
+            <div className="w-10 h-10 rounded-full bg-brand-red-100 flex items-center justify-center text-brand-red-700 font-semibold">
               {announcement.authorName.charAt(0)}
             </div>
           )}
@@ -287,7 +287,7 @@ function AnnouncementCard({ announcement }: { announcement: Announcement }) {
           {announcement.viewCount} views
         </span>
         {!announcement.isRead && (
-          <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded-full font-medium">
+          <span className="px-2 py-0.5 bg-brand-red-100 text-brand-red-700 rounded-full font-medium">
             New
           </span>
         )}

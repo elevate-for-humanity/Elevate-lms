@@ -240,7 +240,7 @@ export function VoiceInput({ onCommand, className = '' }: VoiceInputProps) {
           'relative w-14 h-14 rounded-full flex items-center justify-center transition-all',
           'focus:outline-none focus:ring-2 focus:ring-offset-2',
           isListening
-            ? 'bg-brand-orange-500 hover:bg-brand-orange-600 focus:ring-red-500 animate-pulse'
+            ? 'bg-brand-orange-500 hover:bg-brand-orange-600 focus:ring-brand-red-500 animate-pulse'
             : 'bg-brand-orange-600 hover:bg-brand-orange-700 focus:ring-brand-blue-500',
           isSpeaking ? 'opacity-50 cursor-not-allowed' : '',
         ].join(' ')}

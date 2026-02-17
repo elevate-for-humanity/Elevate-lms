@@ -58,30 +58,30 @@ export default async function ClassroomPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-green-800 text-white py-20">
+      <section className="relative bg-brand-green-800 text-white py-20">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 mb-4">
-              <BookOpen className="w-6 h-6 text-green-300" />
-              <span className="text-green-200 font-medium">Community Classroom</span>
+              <BookOpen className="w-6 h-6 text-brand-green-300" />
+              <span className="text-brand-green-200 font-medium">Community Classroom</span>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold mb-6">
               Learn New Skills,<br />Advance Your Career
             </h1>
-            <p className="text-xl text-green-100 mb-8">
+            <p className="text-xl text-brand-green-100 mb-8">
               Access exclusive courses, tutorials, and resources designed to help you succeed in your career journey.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
                 href="#courses"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-green-800 font-semibold rounded-full hover:bg-green-50 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-brand-green-800 font-semibold rounded-full hover:bg-brand-green-50 transition-colors"
               >
                 Browse Courses
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
                 href="/community"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-green-700 text-white font-semibold rounded-full hover:bg-green-600 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-700 text-white font-semibold rounded-full hover:bg-brand-green-600 transition-colors"
               >
                 Back to Community
               </Link>
@@ -131,7 +131,7 @@ export default async function ClassroomPage() {
               <p className="text-gray-600 mb-6">Check back soon for new courses!</p>
               <Link
                 href="/community"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700"
               >
                 Back to Community
               </Link>
@@ -153,12 +153,12 @@ export default async function ClassroomPage() {
                           className="object-cover"
                         />
                       ) : (
-                        <div className="absolute inset-0 bg-green-600 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-brand-green-600 flex items-center justify-center">
                           <BookOpen className="w-16 h-16 text-white/50" />
                         </div>
                       )}
                       {isFree ? (
-                        <span className="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        <span className="absolute top-4 left-4 bg-brand-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                           FREE
                         </span>
                       ) : (
@@ -168,7 +168,7 @@ export default async function ClassroomPage() {
                       )}
                       <button className="absolute inset-0 flex items-center justify-center bg-slate-800/20 opacity-0 hover:opacity-100 transition-opacity">
                         <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
-                          <Play className="w-8 h-8 text-green-600 ml-1" />
+                          <Play className="w-8 h-8 text-brand-green-600 ml-1" />
                         </div>
                       </button>
                     </div>
@@ -196,7 +196,7 @@ export default async function ClassroomPage() {
 
                       <Link
                         href={`/courses/${course.id}`}
-                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-brand-green-600 text-white font-medium rounded-lg hover:bg-brand-green-700 transition-colors"
                       >
                         {isFree ? 'Start Learning' : 'View Course'}
                       </Link>
@@ -210,15 +210,15 @@ export default async function ClassroomPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-green-600">
+      <section className="py-16 bg-brand-green-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Learning?</h2>
-          <p className="text-green-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-brand-green-100 mb-8 max-w-2xl mx-auto">
             Join our community to access all free courses and unlock premium content.
           </p>
           <Link
             href="/community/join"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-green-600 font-semibold rounded-full hover:bg-green-50 transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-green-600 font-semibold rounded-full hover:bg-brand-green-50 transition-colors"
           >
             Join the Community
             <ArrowRight className="w-5 h-5" />

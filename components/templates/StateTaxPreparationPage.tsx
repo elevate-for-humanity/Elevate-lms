@@ -22,7 +22,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
       </div>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 py-20">
+      <section className="bg-gradient-to-br from-brand-blue-900 via-brand-blue-800 to-brand-blue-700 py-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center gap-2 text-brand-blue-200 mb-4">
             <MapPin className="w-5 h-5" />
@@ -39,7 +39,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
           <div className="flex flex-col sm:flex-row gap-4">
             <Link 
               href="/tax" 
-              className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-lg font-bold transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-500 hover:bg-brand-orange-600 text-white rounded-lg text-lg font-bold transition-colors"
             >
               <Calendar className="mr-2 w-5 h-5" />
               Schedule Appointment

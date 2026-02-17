@@ -305,7 +305,7 @@ export default function AssetGenerator() {
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="   px-6 py-4">
                 <h2 className="text-2xl font-semibold text-white">Preview</h2>
-                <p className="text-red-100 text-sm">{generatedAsset.summary}</p>
+                <p className="text-brand-red-100 text-sm">{generatedAsset.summary}</p>
               </div>
               <div className="p-6">
                 <div className="mb-4">
@@ -348,7 +348,7 @@ export default function AssetGenerator() {
                   </button>
                   <button
                     onClick={() => alert('Screenshot feature Available Now!')}
-                    className="flex-1 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors"
+                    className="flex-1 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-4 py-2 rounded-lg transition-colors"
                   >
                     Export as Image
                   </button>

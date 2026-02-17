@@ -433,10 +433,10 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
             </div>
 
             {error && (
-              <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="mb-6 bg-brand-red-50 border border-brand-red-200 rounded-lg p-4">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="w-5 h-5 text-brand-orange-600" />
-                  <p className="text-red-900">{error}</p>
+                  <p className="text-brand-red-900">{error}</p>
                 </div>
                 <button
                   onClick={() => {
@@ -491,7 +491,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
               <button
                 onClick={handleQuizSubmit}
                 disabled={Object.keys(answers).length < QUIZ_QUESTIONS.length}
-                className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:bg-slate-300 disabled:cursor-not-allowed"
+                className="flex-1 px-6 py-3 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 transition disabled:bg-slate-300 disabled:cursor-not-allowed"
               >
                 Submit Assessment
               </button>
@@ -509,7 +509,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
                 <h2 className="text-2xl font-bold text-black mb-2">
                   Assessment Passed!
                 </h2>
-                <p className="text-3xl font-bold text-green-600 mb-2">
+                <p className="text-3xl font-bold text-brand-green-600 mb-2">
                   {score}%
                 </p>
                 <p className="text-black">
@@ -686,10 +686,10 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="w-5 h-5 text-brand-orange-600" />
-                  <p className="text-red-900">{error}</p>
+                  <p className="text-brand-red-900">{error}</p>
                 </div>
               </div>
             )}

@@ -34,8 +34,8 @@ export default async function ModuleApprovalsPage() {
               <div key={module.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                 <div><p className="font-medium">{module.title}</p><p className="text-sm text-gray-500">{module.provider} • Submitted {new Date(module.created_at).toLocaleDateString()}</p></div>
                 <div className="flex gap-2">
-                  <button className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">Approve</button>
-                  <button className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">Reject</button>
+                  <button className="px-3 py-1 bg-brand-green-600 text-white rounded text-sm hover:bg-brand-green-700">Approve</button>
+                  <button className="px-3 py-1 bg-brand-red-600 text-white rounded text-sm hover:bg-brand-red-700">Reject</button>
                 </div>
               </div>
             )) : <div className="p-8 text-center text-gray-500">No modules pending approval</div>}

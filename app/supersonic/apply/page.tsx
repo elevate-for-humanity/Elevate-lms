@@ -46,9 +46,9 @@ export default async function SupersonicApplyPage() {
       </div>
 <div className="max-w-3xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-          <Link href="/" className="hover:text-orange-600">Home</Link>
+          <Link href="/" className="hover:text-brand-orange-600">Home</Link>
           <ChevronRight className="w-4 h-4" />
-          <Link href="/supersonic" className="hover:text-orange-600">Supersonic</Link>
+          <Link href="/supersonic" className="hover:text-brand-orange-600">Supersonic</Link>
           <ChevronRight className="w-4 h-4" />
           <span className="text-gray-900">Fast Cash Application</span>
         </nav>
@@ -65,11 +65,11 @@ export default async function SupersonicApplyPage() {
         {existingApplication && existingApplication.status !== 'rejected' ? (
           <div className="bg-white rounded-xl border p-8 text-center">
             <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
-              existingApplication.status === 'approved' ? 'bg-green-100' :
+              existingApplication.status === 'approved' ? 'bg-brand-green-100' :
               existingApplication.status === 'pending' ? 'bg-yellow-100' : 'bg-brand-blue-100'
             }`}>
               <Zap className={`w-8 h-8 ${
-                existingApplication.status === 'approved' ? 'text-green-600' :
+                existingApplication.status === 'approved' ? 'text-brand-green-600' :
                 existingApplication.status === 'pending' ? 'text-yellow-600' : 'text-brand-blue-600'
               }`} />
             </div>
@@ -82,11 +82,11 @@ export default async function SupersonicApplyPage() {
                 : 'Your application is being processed.'}
             </p>
             {existingApplication.estimated_amount && (
-              <p className="text-3xl font-bold text-green-600 mb-4">
+              <p className="text-3xl font-bold text-brand-green-600 mb-4">
                 ${existingApplication.estimated_amount.toLocaleString()}
               </p>
             )}
-            <Link href="/supersonic/status" className="text-orange-600 hover:text-orange-700">
+            <Link href="/supersonic/status" className="text-brand-orange-600 hover:text-brand-orange-700">
               View Application Status →
             </Link>
           </div>

@@ -79,8 +79,8 @@ export function EnrollmentStatusTracker({
                 {/* Icon */}
                 <div className={`
                   w-8 h-8 rounded-full flex items-center justify-center z-10
-                  ${isComplete ? 'bg-green-500 text-white' : ''}
-                  ${isCurrent ? 'bg-brand-blue-500 text-white ring-4 ring-blue-100' : ''}
+                  ${isComplete ? 'bg-brand-green-500 text-white' : ''}
+                  ${isCurrent ? 'bg-brand-blue-500 text-white ring-4 ring-brand-blue-100' : ''}
                   ${isPending ? 'bg-slate-100 text-slate-400 border border-slate-200' : ''}
                 `}>
                   {isComplete && <span className="text-slate-400 flex-shrink-0">•</span>}
@@ -99,7 +99,7 @@ export function EnrollmentStatusTracker({
                   
                   {/* Show start date on final step */}
                   {step.key === 'start_date_assigned' && startDate && isComplete && (
-                    <p className="text-sm font-medium text-green-600 mt-1">
+                    <p className="text-sm font-medium text-brand-green-600 mt-1">
                       Starts: {startDate}
                     </p>
                   )}
@@ -151,11 +151,11 @@ export function EnrollmentStatusBadge({
   const statusConfig: Record<EnrollmentStep, { label: string; color: string }> = {
     applied: { label: 'Application Submitted', color: 'bg-brand-blue-100 text-brand-blue-700' },
     eligibility_review: { label: 'Eligibility Review', color: 'bg-amber-100 text-amber-700' },
-    eligibility_confirmed: { label: 'Eligible', color: 'bg-green-100 text-green-700' },
-    funding_approved: { label: 'Funding Approved', color: 'bg-green-100 text-green-700' },
+    eligibility_confirmed: { label: 'Eligible', color: 'bg-brand-green-100 text-brand-green-700' },
+    funding_approved: { label: 'Funding Approved', color: 'bg-brand-green-100 text-brand-green-700' },
     enrolled: { label: 'Enrolled', color: 'bg-purple-100 text-purple-700' },
-    start_date_assigned: { label: 'Ready to Start', color: 'bg-green-100 text-green-700' },
-    active: { label: 'Active', color: 'bg-green-100 text-green-700' },
+    start_date_assigned: { label: 'Ready to Start', color: 'bg-brand-green-100 text-brand-green-700' },
+    active: { label: 'Active', color: 'bg-brand-green-100 text-brand-green-700' },
   };
 
   const config = statusConfig[currentStep];

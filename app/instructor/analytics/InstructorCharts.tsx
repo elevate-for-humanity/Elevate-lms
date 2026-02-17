@@ -52,7 +52,7 @@ export function StudentEngagementChart() {
           <span>Views</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-green-500 rounded"></div>
+          <div className="w-3 h-3 bg-brand-green-500 rounded"></div>
           <span>Completions</span>
         </div>
       </div>
@@ -66,7 +66,7 @@ export function StudentEngagementChart() {
                 title={`${item.views} views`}
               ></div>
               <div
-                className="flex-1 bg-green-500 rounded-t"
+                className="flex-1 bg-brand-green-500 rounded-t"
                 style={{ height: `${(item.completions / maxViews) * 100}%` }}
                 title={`${item.completions} completions`}
               ></div>
@@ -117,7 +117,7 @@ export function CoursePerformanceChart() {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-4">
             <div
-              className="bg-gradient-to-r from-blue-500 to-green-500 h-4 rounded-full flex items-center justify-end pr-2"
+              className="bg-gradient-to-r from-brand-blue-500 to-brand-green-500 h-4 rounded-full flex items-center justify-end pr-2"
               style={{ width: `${course.completion}%` }}
             >
               <span className="text-xs text-white font-medium">{course.completion}%</span>

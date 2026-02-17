@@ -47,7 +47,7 @@ export default function SubofficeOnboardingPage() {
           </p>
           <Link
             href="#start"
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-block"
+            className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-block"
           >
             Start Onboarding
           </Link>
@@ -132,7 +132,7 @@ export default function SubofficeOnboardingPage() {
                 <span>Payment released to main office</span>
               </div>
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold mr-3">
+                <div className="w-8 h-8 bg-brand-orange-500 text-white rounded-full flex items-center justify-center font-bold mr-3">
                   5
                 </div>
                 <span>
@@ -142,7 +142,7 @@ export default function SubofficeOnboardingPage() {
             </div>
           </div>
 
-          <div className="bg-red-500/20 border-2 border-red-300 rounded-lg p-6">
+          <div className="bg-brand-red-500/20 border-2 border-brand-red-300 rounded-lg p-6">
             <p className="text-lg">
               <strong>
                 If IRS delays or offsets a refund, your payout for that client
@@ -181,8 +181,8 @@ export default function SubofficeOnboardingPage() {
 
             {/* Step 2 */}
             <div className="bg-white p-8 rounded-lg shadow-md">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Upload className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Upload className="w-8 h-8 text-brand-green-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3 text-center">
                 Step 2: Upload Documents
@@ -219,8 +219,8 @@ export default function SubofficeOnboardingPage() {
 
             {/* Step 4 */}
             <div className="bg-white p-8 rounded-lg shadow-md">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileText className="w-8 h-8 text-orange-600" />
+              <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="w-8 h-8 text-brand-orange-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3 text-center">
                 Step 4: Compliance Test
@@ -236,7 +236,7 @@ export default function SubofficeOnboardingPage() {
 
             {/* Step 5 */}
             <div className="bg-white p-8 rounded-lg shadow-md">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <h3 className="text-xl font-bold text-black mb-3 text-center">
@@ -360,7 +360,7 @@ export default function SubofficeOnboardingPage() {
           </p>
           <Link
             href="/suboffice-onboarding/apply"
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-block"
+            className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-block"
           >
             Begin Application
           </Link>

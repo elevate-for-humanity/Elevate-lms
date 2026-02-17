@@ -48,7 +48,7 @@ export function HiringTrendsChart() {
     <div>
       <div className="flex gap-4 mb-3 text-xs">
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-green-500 rounded"></div>
+          <div className="w-3 h-3 bg-brand-green-500 rounded"></div>
           <span>Hires</span>
         </div>
         <div className="flex items-center gap-1">
@@ -61,7 +61,7 @@ export function HiringTrendsChart() {
           <div key={idx} className="flex-1 flex flex-col items-center">
             <div className="w-full flex gap-1 items-end" style={{ height: 100 }}>
               <div
-                className="flex-1 bg-green-500 rounded-t"
+                className="flex-1 bg-brand-green-500 rounded-t"
                 style={{ height: `${(item.hires / maxApps) * 100}%` }}
                 title={`${item.hires} hires`}
               ></div>
@@ -108,10 +108,10 @@ export function RetentionByRoleChart() {
   }
 
   const getRetentionColor = (pct: number) => {
-    if (pct >= 90) return 'bg-green-500';
+    if (pct >= 90) return 'bg-brand-green-500';
     if (pct >= 75) return 'bg-brand-blue-500';
     if (pct >= 60) return 'bg-yellow-500';
-    return 'bg-red-500';
+    return 'bg-brand-red-500';
   };
 
   return (

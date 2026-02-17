@@ -100,7 +100,7 @@ export function StudentTimeclockCard({
             className={`w-3 h-3 rounded-full ${
               timeclock.gpsPosition
                 ? timeclock.withinGeofence
-                  ? 'bg-green-500'
+                  ? 'bg-brand-green-500'
                   : 'bg-yellow-500'
                 : 'bg-gray-400'
             }`}
@@ -136,12 +136,12 @@ export function StudentTimeclockCard({
 
       {/* Auto Clock-Out Message */}
       {autoClockOutMessage && (
-        <div className="mb-4 p-3 rounded-md bg-red-50 border border-red-200">
-          <p className="text-sm text-red-800 font-medium">
+        <div className="mb-4 p-3 rounded-md bg-brand-red-50 border border-brand-red-200">
+          <p className="text-sm text-brand-red-800 font-medium">
             Shift Ended Automatically
           </p>
-          <p className="text-xs text-red-700 mt-1">{autoClockOutMessage}</p>
-          <p className="text-xs text-red-700 mt-2">
+          <p className="text-xs text-brand-red-700 mt-1">{autoClockOutMessage}</p>
+          <p className="text-xs text-brand-red-700 mt-2">
             You may clock in again to start a new shift.
           </p>
         </div>
@@ -149,8 +149,8 @@ export function StudentTimeclockCard({
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 p-3 rounded-md bg-red-50 border border-red-200">
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="mb-4 p-3 rounded-md bg-brand-red-50 border border-brand-red-200">
+          <p className="text-sm text-brand-red-800">{error}</p>
         </div>
       )}
 
@@ -180,7 +180,7 @@ export function StudentTimeclockCard({
 
       {/* Completed Shift Info */}
       {timeclock.clockOutAt && (
-        <div className="mb-4 p-3 rounded-md bg-green-50">
+        <div className="mb-4 p-3 rounded-md bg-brand-green-50">
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div>
               <span className="text-gray-600">Clock In:</span>
@@ -192,7 +192,7 @@ export function StudentTimeclockCard({
             </div>
             <div className="col-span-2">
               <span className="text-gray-600">Hours Worked:</span>
-              <span className="ml-2 font-semibold text-green-700">
+              <span className="ml-2 font-semibold text-brand-green-700">
                 {formatHours(timeclock.hoursWorked)}
               </span>
             </div>
@@ -210,7 +210,7 @@ export function StudentTimeclockCard({
             className={`w-full py-3 px-4 rounded-md font-medium text-white transition-colors ${
               timeclock.loading || !timeclock.withinGeofence
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-green-600 hover:bg-green-700'
+                : 'bg-brand-green-600 hover:bg-brand-green-700'
             }`}
           >
             {timeclock.loading ? 'Processing...' : 'Clock In'}
@@ -240,7 +240,7 @@ export function StudentTimeclockCard({
                 className={`py-3 px-4 rounded-md font-medium text-white transition-colors ${
                   timeclock.loading || !timeclock.withinGeofence
                     ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-red-600 hover:bg-red-700'
+                    : 'bg-brand-red-600 hover:bg-brand-red-700'
                 }`}
               >
                 Clock Out

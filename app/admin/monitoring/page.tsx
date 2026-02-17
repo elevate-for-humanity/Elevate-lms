@@ -79,13 +79,13 @@ export default function MonitoringDashboard() {
     switch (status) {
       case 'healthy':
       case 'pass':
-        return 'text-green-600 bg-green-100';
+        return 'text-brand-green-600 bg-brand-green-100';
       case 'degraded':
       case 'warn':
         return 'text-yellow-600 bg-yellow-100';
       case 'down':
       case 'fail':
-        return 'text-red-600 bg-red-100';
+        return 'text-brand-red-600 bg-brand-red-100';
       default:
         return 'text-black bg-gray-100';
     }
@@ -170,9 +170,9 @@ export default function MonitoringDashboard() {
         {/* Overall Status */}
         {status && (
           <div className={`mb-8 p-6 rounded-xl border-2 ${
-            status.overall === 'healthy' ? 'bg-green-50 border-green-200' :
+            status.overall === 'healthy' ? 'bg-brand-green-50 border-brand-green-200' :
             status.overall === 'degraded' ? 'bg-yellow-50 border-yellow-200' :
-            'bg-red-50 border-red-200'
+            'bg-brand-red-50 border-brand-red-200'
           }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -219,7 +219,7 @@ export default function MonitoringDashboard() {
             {/* Redis */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <Zap className="h-11 w-11 text-orange-600" />
+                <Zap className="h-11 w-11 text-brand-orange-600" />
                 <span className={`px-3 py-2 rounded-full text-sm font-medium ${getStatusColor(status.checks.redis.status)}`}>
                   {status.checks.redis.status}
                 </span>
@@ -250,7 +250,7 @@ export default function MonitoringDashboard() {
             {/* Email */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <Users className="h-11 w-11 text-green-600" />
+                <Users className="h-11 w-11 text-brand-green-600" />
                 <span className={`px-3 py-2 rounded-full text-sm font-medium ${getStatusColor(status.checks.email.status)}`}>
                   {status.checks.email.status}
                 </span>
@@ -279,7 +279,7 @@ export default function MonitoringDashboard() {
                 </div>
                 <div>
                   <div className="text-sm text-black">Error Rate</div>
-                  <div className="text-2xl font-bold text-red-600">
+                  <div className="text-2xl font-bold text-brand-red-600">
                     {((status.metrics.requests.errors / status.metrics.requests.total) * 100).toFixed(2)}%
                   </div>
                 </div>
@@ -293,21 +293,21 @@ export default function MonitoringDashboard() {
             {/* Rate Limiting */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center gap-3 mb-4">
-                <AlertCircle className="h-10 w-10 text-orange-600" />
+                <AlertCircle className="h-10 w-10 text-brand-orange-600" />
                 <h3 className="text-lg font-bold text-black">Rate Limits</h3>
               </div>
               <div className="space-y-3">
                 <div>
                   <div className="text-sm text-black">Blocked Requests</div>
-                  <div className="text-2xl font-bold text-red-600">{status.metrics.rateLimits.blocked.toLocaleString()}</div>
+                  <div className="text-2xl font-bold text-brand-red-600">{status.metrics.rateLimits.blocked.toLocaleString()}</div>
                 </div>
                 <div>
                   <div className="text-sm text-black">Allowed Requests</div>
-                  <div className="text-2xl font-bold text-green-600">{status.metrics.rateLimits.allowed.toLocaleString()}</div>
+                  <div className="text-2xl font-bold text-brand-green-600">{status.metrics.rateLimits.allowed.toLocaleString()}</div>
                 </div>
                 <div>
                   <div className="text-sm text-black">Block Rate</div>
-                  <div className="text-2xl font-bold text-orange-600">
+                  <div className="text-2xl font-bold text-brand-orange-600">
                     {((status.metrics.rateLimits.blocked / (status.metrics.rateLimits.blocked + status.metrics.rateLimits.allowed)) * 100).toFixed(2)}%
                   </div>
                 </div>
@@ -343,7 +343,7 @@ export default function MonitoringDashboard() {
         {/* Recent Errors */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center gap-3 mb-6">
-            <AlertCircle className="h-10 w-10 text-red-600" />
+            <AlertCircle className="h-10 w-10 text-brand-red-600" />
             <h3 className="text-lg font-bold text-black">Recent Errors</h3>
             <span className="ml-auto text-sm text-black">Last 10 errors</span>
           </div>
@@ -375,7 +375,7 @@ export default function MonitoringDashboard() {
                       <td className="py-3 px-4 text-sm text-black max-w-md truncate">{error.error}</td>
                       <td className="py-3 px-4">
                         <span className={`px-2 py-2 rounded text-xs font-medium ${
-                          error.statusCode >= 500 ? 'bg-red-100 text-red-700' :
+                          error.statusCode >= 500 ? 'bg-brand-red-100 text-brand-red-700' :
                           error.statusCode >= 400 ? 'bg-yellow-100 text-yellow-700' :
                           'bg-gray-100 text-black'
                         }`}>

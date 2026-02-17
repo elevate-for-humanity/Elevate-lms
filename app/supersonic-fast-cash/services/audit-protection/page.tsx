@@ -86,22 +86,22 @@ export default function AuditProtectionPage() {
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
               Audit Protection
-              <span className="block text-red-300">We&apos;ve Got Your Back</span>
+              <span className="block text-brand-red-300">We&apos;ve Got Your Back</span>
             </h1>
-            <p className="text-xl text-red-100 mb-8">
+            <p className="text-xl text-brand-red-100 mb-8">
               If the IRS comes knocking, you won&apos;t face them alone. Our tax professionals handle everything so you don&apos;t have to.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/supersonic-fast-cash/apply"
-                className="inline-flex items-center justify-center gap-2 bg-white text-red-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-red-50 transition-colors"
+                className="inline-flex items-center justify-center gap-2 bg-white text-brand-red-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-red-50 transition-colors"
               >
                 Get Protected
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
                 href="/supersonic-fast-cash/contact"
-                className="inline-flex items-center justify-center gap-2 bg-red-500/30 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-red-500/40 transition-colors border border-white/30"
+                className="inline-flex items-center justify-center gap-2 bg-brand-red-500/30 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-red-500/40 transition-colors border border-white/30"
               >
                 Get a Free Consultation
               </Link>
@@ -142,8 +142,8 @@ export default function AuditProtectionPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {coverageIncludes.map((item, idx) => (
               <div key={idx} className="bg-gray-50 rounded-2xl p-6 text-center">
-                <div className="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <item.icon className="w-7 h-7 text-red-600" />
+                <div className="w-14 h-14 bg-brand-red-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <item.icon className="w-7 h-7 text-brand-red-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
                 <p className="text-gray-600 text-sm">{item.description}</p>
@@ -175,7 +175,7 @@ export default function AuditProtectionPage() {
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-lg">
               <div className="text-center">
-                <Shield className="w-20 h-20 text-red-600 mx-auto mb-6" />
+                <Shield className="w-20 h-20 text-brand-red-600 mx-auto mb-6" />
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
                   Add Audit Protection
                 </h3>
@@ -184,7 +184,7 @@ export default function AuditProtectionPage() {
                 </p>
                 <Link
                   href="/supersonic-fast-cash/apply"
-                  className="inline-flex items-center justify-center gap-2 bg-red-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-red-700 transition-colors w-full"
+                  className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-red-700 transition-colors w-full"
                 >
                   Get Started
                   <ArrowRight className="w-5 h-5" />
@@ -221,12 +221,12 @@ export default function AuditProtectionPage() {
           <h2 className="text-3xl md:text-4xl font-black text-white mb-6">
             Don&apos;t Face the IRS Alone
           </h2>
-          <p className="text-xl text-red-100 mb-8">
+          <p className="text-xl text-brand-red-100 mb-8">
             Add audit protection to your tax return and file with confidence.
           </p>
           <Link
             href="/supersonic-fast-cash/apply"
-            className="inline-flex items-center justify-center gap-2 bg-white text-red-700 px-10 py-5 rounded-xl font-bold text-xl hover:bg-red-50 transition-colors shadow-lg"
+            className="inline-flex items-center justify-center gap-2 bg-white text-brand-red-700 px-10 py-5 rounded-xl font-bold text-xl hover:bg-brand-red-50 transition-colors shadow-lg"
           >
             🛡️ Get Protected Today
             <ArrowRight className="w-6 h-6" />

@@ -114,19 +114,19 @@ export function DocumentUploadForm({ requirements }: Props) {
 
   if (success) {
     return (
-      <div className="max-w-2xl mx-auto p-8 bg-green-50 border-2 border-green-600 rounded-lg">
+      <div className="max-w-2xl mx-auto p-8 bg-brand-green-50 border-2 border-brand-green-600 rounded-lg">
         <div className="flex items-center gap-4 mb-4">
           <span className="text-slate-400 flex-shrink-0">•</span>
           <div>
-            <h2 className="text-2xl font-bold text-green-900">
+            <h2 className="text-2xl font-bold text-brand-green-900">
               Document Uploaded!
             </h2>
-            <p className="text-green-700">
+            <p className="text-brand-green-700">
               Your document has been submitted for review.
             </p>
           </div>
         </div>
-        <p className="text-green-800">Redirecting to your documents page...</p>
+        <p className="text-brand-green-800">Redirecting to your documents page...</p>
       </div>
     );
   }
@@ -138,11 +138,11 @@ export function DocumentUploadForm({ requirements }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="p-4 bg-red-50 border-2 border-red-600 rounded-lg flex items-start gap-3">
-          <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+        <div className="p-4 bg-brand-red-50 border-2 border-brand-red-600 rounded-lg flex items-start gap-3">
+          <AlertCircle className="w-6 h-6 text-brand-red-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="font-bold text-red-900">Error</h3>
-            <p className="text-red-800">{error}</p>
+            <h3 className="font-bold text-brand-red-900">Error</h3>
+            <p className="text-brand-red-800">{error}</p>
           </div>
         </div>
       )}
@@ -209,8 +209,8 @@ export function DocumentUploadForm({ requirements }: Props) {
               PDF, JPG, PNG or WEBP (max 10MB)
             </p>
             {file && (
-              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-800 font-semibold">
+              <div className="mt-4 p-3 bg-brand-green-50 border border-brand-green-200 rounded-lg">
+                <p className="text-sm text-brand-green-800 font-semibold">
                   • {file.name} ({(file.size / 1024 / 1024).toFixed(2)}MB)
                 </p>
               </div>

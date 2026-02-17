@@ -91,7 +91,7 @@ export default async function AnalyticsPage() {
                     <metric.icon className="w-6 h-6 text-indigo-600" />
                   </div>
                   <span className={`flex items-center gap-1 text-sm font-medium ${
-                    metric.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                    metric.trend === 'up' ? 'text-brand-green-600' : 'text-brand-red-600'
                   }`}>
                     {metric.trend === 'up' ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                     {metric.change}
@@ -176,7 +176,7 @@ export default async function AnalyticsPage() {
                     <td className="px-6 py-4 text-gray-600">{job.applications}</td>
                     <td className="px-6 py-4 text-gray-600">{job.views}</td>
                     <td className="px-6 py-4">
-                      <span className="text-green-600 font-medium">{job.conversion}</span>
+                      <span className="text-brand-green-600 font-medium">{job.conversion}</span>
                     </td>
                   </tr>
                 ))}

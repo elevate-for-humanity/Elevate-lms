@@ -118,9 +118,9 @@ export default function AttendanceRecordForm({
                       newAtt[i].present = true; 
                       setAttendance(newAtt); 
                     }}
-                    className="w-4 h-4 text-green-600" 
+                    className="w-4 h-4 text-brand-green-600" 
                   />
-                  <span className="ml-2 text-green-600">Present</span>
+                  <span className="ml-2 text-brand-green-600">Present</span>
                 </label>
                 <label className="flex items-center cursor-pointer">
                   <input 
@@ -132,9 +132,9 @@ export default function AttendanceRecordForm({
                       newAtt[i].present = false; 
                       setAttendance(newAtt); 
                     }}
-                    className="w-4 h-4 text-red-600" 
+                    className="w-4 h-4 text-brand-red-600" 
                   />
-                  <span className="ml-2 text-red-600">Absent</span>
+                  <span className="ml-2 text-brand-red-600">Absent</span>
                 </label>
               </div>
             </div>

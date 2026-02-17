@@ -28,7 +28,7 @@ export default function InstructorPerformanceDashboard() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Instructor Performance</h1>
-          <p className="text-red-100">Track your teaching effectiveness</p>
+          <p className="text-brand-red-100">Track your teaching effectiveness</p>
         </div>
       </div>
 
@@ -50,12 +50,12 @@ export default function InstructorPerformanceDashboard() {
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Total Students</h3>
             <p className="text-3xl font-bold text-brand-orange-600">{metrics.totalStudents}</p>
-            <p className="text-sm text-green-600">↑ 12% from last period</p>
+            <p className="text-sm text-brand-green-600">↑ 12% from last period</p>
           </Card>
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Average Rating</h3>
-            <p className="text-3xl font-bold text-orange-500">{metrics.avgRating}</p>
+            <p className="text-3xl font-bold text-brand-orange-500">{metrics.avgRating}</p>
             <p className="text-sm text-black">⭐⭐⭐⭐⭐</p>
           </Card>
 
@@ -67,20 +67,20 @@ export default function InstructorPerformanceDashboard() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Completion Rate</h3>
-            <p className="text-3xl font-bold text-green-600">{metrics.completionRate}%</p>
-            <p className="text-sm text-green-600">Above average</p>
+            <p className="text-3xl font-bold text-brand-green-600">{metrics.completionRate}%</p>
+            <p className="text-sm text-brand-green-600">Above average</p>
           </Card>
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Avg Response Time</h3>
             <p className="text-3xl font-bold text-purple-600">{metrics.responseTime}h</p>
-            <p className="text-sm text-green-600">Excellent</p>
+            <p className="text-sm text-brand-green-600">Excellent</p>
           </Card>
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Student Engagement</h3>
             <p className="text-3xl font-bold text-indigo-600">{metrics.engagement}%</p>
-            <p className="text-sm text-green-600">Very high</p>
+            <p className="text-sm text-brand-green-600">Very high</p>
           </Card>
         </div>
 

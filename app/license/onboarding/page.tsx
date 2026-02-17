@@ -93,7 +93,7 @@ export default async function LicenseeOnboardingPage() {
                 <div className={`flex items-center ${index < steps.length - 1 ? 'flex-1' : ''}`}>
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                     step.completed 
-                      ? 'bg-green-100 text-green-600' 
+                      ? 'bg-brand-green-100 text-brand-green-600' 
                       : index === currentStep 
                         ? 'bg-brand-blue-100 text-brand-blue-600' 
                         : 'bg-gray-100 text-gray-400'
@@ -105,14 +105,14 @@ export default async function LicenseeOnboardingPage() {
                     )}
                   </div>
                   <div className="ml-3">
-                    <p className={`font-medium ${step.completed ? 'text-green-600' : index === currentStep ? 'text-brand-blue-600' : 'text-gray-500'}`}>
+                    <p className={`font-medium ${step.completed ? 'text-brand-green-600' : index === currentStep ? 'text-brand-blue-600' : 'text-gray-500'}`}>
                       {step.title}
                     </p>
                     <p className="text-sm text-gray-500">{step.description}</p>
                   </div>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`w-16 h-0.5 mx-4 ${step.completed ? 'bg-green-300' : 'bg-gray-200'}`} />
+                  <div className={`w-16 h-0.5 mx-4 ${step.completed ? 'bg-brand-green-300' : 'bg-gray-200'}`} />
                 )}
               </div>
             ))}

@@ -32,7 +32,7 @@ export default async function CourseSuccessPage({
       <div className="flex items-center justify-center px-4 py-16">
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           

@@ -140,7 +140,7 @@ export function DashboardUpload({
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="mb-4 bg-brand-red-50 border border-brand-red-200 text-brand-red-700 px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -188,7 +188,7 @@ export function DashboardUpload({
                   </a>
                   <button
                     onClick={() => handleDelete(file.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded transition"
+                    className="p-2 text-brand-red-600 hover:bg-brand-red-50 rounded transition"
                     title="Delete"
                   >
                     <Trash2 className="h-4 w-4" />

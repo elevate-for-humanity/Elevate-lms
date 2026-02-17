@@ -49,9 +49,9 @@ export default function SystemMonitorPage() {
 
         {/* Overall Status */}
         <div className={`mb-8 p-6 rounded-xl border-2 ${
-          status?.status === 'healthy' ? 'bg-green-50 border-green-200' :
+          status?.status === 'healthy' ? 'bg-brand-green-50 border-brand-green-200' :
           status?.status === 'degraded' ? 'bg-yellow-50 border-yellow-200' :
-          'bg-red-50 border-red-200'
+          'bg-brand-red-50 border-brand-red-200'
         }`}>
           <h2 className="text-2xl font-bold">
             Status: {status?.status?.toUpperCase() || 'UNKNOWN'}
@@ -85,7 +85,7 @@ export default function SystemMonitorPage() {
 
           {/* Memory */}
           <div className="bg-white rounded-xl border p-6">
-            <Zap className="h-11 w-11 text-orange-600 mb-4" />
+            <Zap className="h-11 w-11 text-brand-orange-600 mb-4" />
             <h3 className="font-bold mb-2">Memory</h3>
             <div className="text-sm">
               <div>Used: {status?.checks?.system?.memory?.used || 0} MB</div>
@@ -95,7 +95,7 @@ export default function SystemMonitorPage() {
 
           {/* Environment */}
           <div className="bg-white rounded-xl border p-6">
-            <Users className="h-11 w-11 text-green-600 mb-4" />
+            <Users className="h-11 w-11 text-brand-green-600 mb-4" />
             <h3 className="font-bold mb-2">Environment</h3>
             <div className="text-sm">
               <div>Status: {status?.checks?.environment?.status || 'unknown'}</div>

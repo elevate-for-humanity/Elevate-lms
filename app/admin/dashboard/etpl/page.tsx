@@ -76,10 +76,10 @@ export default async function EtplDashboard() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-green-200">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-brand-green-200">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
+                <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-brand-green-600" />
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-black">
@@ -104,10 +104,10 @@ export default async function EtplDashboard() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-orange-200">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-brand-orange-200">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                  <AlertCircle className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 bg-brand-orange-100 rounded-xl flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6 text-brand-orange-600" />
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-black">
@@ -128,7 +128,7 @@ export default async function EtplDashboard() {
           <div className="grid md:grid-cols-4 gap-6">
             <div className="bg-white rounded-2xl p-6 shadow-lg">
               <div className="flex items-center gap-3 mb-3">
-                <DollarSign className="w-8 h-8 text-green-600" />
+                <DollarSign className="w-8 h-8 text-brand-green-600" />
                 <div>
                   <div className="text-2xl font-bold text-black">
                     {funding.totalCases}
@@ -139,7 +139,7 @@ export default async function EtplDashboard() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-lg">
-              <div className="text-2xl font-bold text-green-600 mb-1">
+              <div className="text-2xl font-bold text-brand-green-600 mb-1">
                 {funding.approved}
               </div>
               <div className="text-sm text-black">Approved</div>
@@ -193,7 +193,7 @@ export default async function EtplDashboard() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-black">Approved</span>
-                <span className="font-bold text-green-600">
+                <span className="font-bold text-brand-green-600">
                   {employers.approved}
                 </span>
               </div>
@@ -226,7 +226,7 @@ export default async function EtplDashboard() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-black">Active</span>
-                <span className="font-bold text-green-600">
+                <span className="font-bold text-brand-green-600">
                   {rapids.active}
                 </span>
               </div>
@@ -242,14 +242,14 @@ export default async function EtplDashboard() {
 
         {/* WOTC Alerts */}
         {wotc.urgent > 0 && (
-          <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-6 mb-8">
+          <div className="bg-brand-red-50 border-2 border-brand-red-200 rounded-2xl p-6 mb-8">
             <div className="flex items-start gap-4">
               <AlertCircle className="w-8 h-8 text-brand-orange-600 flex-shrink-0" />
               <div>
-                <h3 className="text-xl font-bold text-red-900 mb-2">
+                <h3 className="text-xl font-bold text-brand-red-900 mb-2">
                   WOTC Deadline Alert
                 </h3>
-                <p className="text-red-800 mb-4">
+                <p className="text-brand-red-800 mb-4">
                   <strong>{wotc.urgent}</strong> apprentice(s) have WOTC
                   deadlines within 5 days. Submit forms immediately to preserve
                   tax credits.

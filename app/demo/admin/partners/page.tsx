@@ -31,7 +31,7 @@ export default function DemoPartnersPage() {
                 <td className="px-5 py-3 text-gray-600">{p.students}</td>
                 <td className="px-5 py-3">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                    p.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
+                    p.status === 'Active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-amber-100 text-amber-800'
                   }`}>{p.status}</span>
                 </td>
                 <td className="px-5 py-3 text-xs text-gray-500">{p.since}</td>

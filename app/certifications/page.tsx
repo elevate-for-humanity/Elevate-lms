@@ -34,7 +34,7 @@ export default function CertificationsPage() {
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <Award className="w-16 h-16 mx-auto mb-4 text-white/80" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Industry Certifications</h1>
-          <p className="text-xl text-green-100">Credentials that open doors to career opportunities</p>
+          <p className="text-xl text-brand-green-100">Credentials that open doors to career opportunities</p>
         </div>
       </section>
 
@@ -51,7 +51,7 @@ export default function CertificationsPage() {
                     fill
                     className="object-cover"
                   />
-                  <span className={`absolute top-3 right-3 text-xs font-bold px-2 py-1 rounded ${cert.demand === 'Required' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
+                  <span className={`absolute top-3 right-3 text-xs font-bold px-2 py-1 rounded ${cert.demand === 'Required' ? 'bg-brand-red-500 text-white' : 'bg-brand-green-500 text-white'}`}>
                     {cert.demand} Demand
                   </span>
                 </div>
@@ -61,7 +61,7 @@ export default function CertificationsPage() {
                     <p className="flex items-center"><Shield className="w-4 h-4 mr-2" />{cert.industry}</p>
                     <p className="flex items-center"><Clock className="w-4 h-4 mr-2" />{cert.duration}</p>
                   </div>
-                  <Link href="/programs" className="text-green-600 font-medium hover:text-green-700 inline-flex items-center">
+                  <Link href="/programs" className="text-brand-green-600 font-medium hover:text-brand-green-700 inline-flex items-center">
                     Learn More <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
                 </div>
@@ -81,7 +81,7 @@ export default function CertificationsPage() {
               { icon: Shield, title: 'Career Advancement', desc: 'Required for many positions and promotions' },
             ].map((item, i) => (
               <div key={i} className="text-center">
-                <item.icon className="w-12 h-12 text-green-600 mx-auto mb-4" />
+                <item.icon className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
                 <p className="text-gray-600">{item.desc}</p>
               </div>
@@ -116,11 +116,11 @@ export default function CertificationsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-green-700 text-white">
+      <section className="py-16 bg-brand-green-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Get Certified Today</h2>
-          <p className="text-xl text-green-100 mb-8">Start your journey toward industry-recognized credentials.</p>
-          <Link href="/apply" className="bg-white hover:bg-gray-100 text-green-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <p className="text-xl text-brand-green-100 mb-8">Start your journey toward industry-recognized credentials.</p>
+          <Link href="/apply" className="bg-white hover:bg-gray-100 text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply Now <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

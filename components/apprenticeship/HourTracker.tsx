@@ -128,8 +128,8 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
         <div className="text-center">
           {isClockedIn ? (
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-semibold">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <div className="inline-flex items-center gap-2 bg-brand-green-100 text-brand-green-700 px-4 py-2 rounded-full text-sm font-semibold">
+                <div className="w-2 h-2 bg-brand-green-500 rounded-full animate-pulse" />
                 Currently Clocked In
               </div>
               <div className="text-5xl font-bold text-black font-mono text-3xl md:text-4xl lg:text-5xl">
@@ -187,9 +187,9 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
             <div className="text-2xl font-bold text-brand-blue-600">{recentSessions.length}</div>
             <div className="text-xs text-black">Sessions</div>
           </div>
-          <div className="bg-green-50 rounded-xl p-4 text-center">
-            <Calendar className="w-6 h-6 text-green-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-green-600">
+          <div className="bg-brand-green-50 rounded-xl p-4 text-center">
+            <Calendar className="w-6 h-6 text-brand-green-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-brand-green-600">
               {recentSessions.length > 0 ? recentSessions[0].date : 'N/A'}
             </div>
             <div className="text-xs text-black">Last Session</div>
@@ -232,7 +232,7 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
           <div className="   rounded-xl p-6 text-center text-white">
             <Award className="w-12 h-12 mx-auto mb-3" />
             <div className="text-xl font-bold">Congratulations!</div>
-            <div className="text-sm text-green-100 mt-1">
+            <div className="text-sm text-brand-green-100 mt-1">
               You've completed all required hours for {programName}
             </div>
           </div>

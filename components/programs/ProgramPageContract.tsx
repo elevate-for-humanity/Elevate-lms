@@ -246,15 +246,15 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">Who This Is For</h2>
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-green-50 rounded-2xl p-8">
-              <h3 className="text-xl font-bold text-green-900 mb-4 flex items-center gap-2">
+            <div className="bg-brand-green-50 rounded-2xl p-8">
+              <h3 className="text-xl font-bold text-brand-green-900 mb-4 flex items-center gap-2">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 Ideal Candidates
               </h3>
               <ul className="space-y-3">
                 {config.audience.idealFor.map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-green-800">
-                    <span className="text-green-600 mt-1">•</span>
+                  <li key={i} className="flex items-start gap-3 text-brand-green-800">
+                    <span className="text-brand-green-600 mt-1">•</span>
                     {item}
                   </li>
                 ))}
@@ -396,18 +396,18 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
                 key={i}
                 className={`rounded-2xl p-6 ${
                   option === config.funding.primaryOption
-                    ? 'bg-green-50 border-2 border-green-500'
+                    ? 'bg-brand-green-50 border-2 border-brand-green-500'
                     : 'bg-white border border-gray-200'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <DollarSign className={`w-5 h-5 ${
-                    option === config.funding.primaryOption ? 'text-green-600' : 'text-gray-500'
+                    option === config.funding.primaryOption ? 'text-brand-green-600' : 'text-gray-500'
                   }`} />
                   <span className="font-semibold text-gray-900">{getFundingLabel(option)}</span>
                 </div>
                 {option === config.funding.primaryOption && (
-                  <span className="text-sm text-green-700">Most common option</span>
+                  <span className="text-sm text-brand-green-700">Most common option</span>
                 )}
               </div>
             ))}

@@ -84,15 +84,15 @@ export default function AcademicCalendarPage() {
                 <h3 className="text-xl font-bold text-gray-900 mb-4">{term.name}</h3>
                 <div className="space-y-3 text-gray-600">
                   <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-green-600" />
+                    <Clock className="w-5 h-5 text-brand-green-600" />
                     <span><strong>Start:</strong> {term.startDate}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-red-600" />
+                    <Clock className="w-5 h-5 text-brand-red-600" />
                     <span><strong>End:</strong> {term.endDate}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-orange-600" />
+                    <BookOpen className="w-5 h-5 text-brand-orange-600" />
                     <span><strong>Enrollment Deadline:</strong> {term.enrollmentDeadline}</span>
                   </div>
                 </div>

@@ -103,7 +103,7 @@ export default async function CompletionsPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-500">Total Completions</h3>
-              <span className="text-green-600 bg-green-100 p-2 rounded-lg">
+              <span className="text-brand-green-600 bg-brand-green-100 p-2 rounded-lg">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -142,7 +142,7 @@ export default async function CompletionsPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-500">Avg. Completion Time</h3>
-              <span className="text-orange-600 bg-orange-100 p-2 rounded-lg">
+              <span className="text-brand-orange-600 bg-brand-orange-100 p-2 rounded-lg">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -164,7 +164,7 @@ export default async function CompletionsPage() {
               recentCompletions.map((completion: any) => (
                 <div key={completion.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-brand-green-100 rounded-full flex items-center justify-center">
                       <span className="text-slate-400 flex-shrink-0">•</span>
                     </div>
                     <div>
@@ -182,7 +182,7 @@ export default async function CompletionsPage() {
                         ? new Date(completion.completed_at).toLocaleDateString()
                         : 'N/A'}
                     </p>
-                    <p className="text-sm text-green-600">100% complete</p>
+                    <p className="text-sm text-brand-green-600">100% complete</p>
                   </div>
                 </div>
               ))

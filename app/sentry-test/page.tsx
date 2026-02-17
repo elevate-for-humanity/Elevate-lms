@@ -28,7 +28,7 @@ export default function SentryTestPage() {
           onClick={() => {
             throw new Error("Sentry Frontend Test Error - Thrown");
           }}
-          className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+          className="px-6 py-3 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700 transition"
         >
           Throw Test Error
         </button>
@@ -55,7 +55,7 @@ export default function SentryTestPage() {
               console.error(err);
             }
           }}
-          className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
+          className="px-6 py-3 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition"
         >
           Trigger API Error
         </button>

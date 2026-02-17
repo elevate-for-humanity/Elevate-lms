@@ -68,10 +68,10 @@ export default function RiseFoundationProgramsPage() {
           {programs.map(program => (
             <div key={program.id} className="bg-white rounded-xl border p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between mb-4">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <GraduationCap className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                  <GraduationCap className="w-6 h-6 text-brand-orange-600" />
                 </div>
-                <span className="text-2xl font-bold text-orange-600">{program.amount}</span>
+                <span className="text-2xl font-bold text-brand-orange-600">{program.amount}</span>
               </div>
               
               <h3 className="text-xl font-semibold text-gray-900 mb-2">{program.name}</h3>
@@ -103,11 +103,11 @@ export default function RiseFoundationProgramsPage() {
                   <span>{program.filled}/{program.spots}</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-orange-500 h-2 rounded-full" style={{ width: `${(program.filled / program.spots) * 100}%` }} />
+                  <div className="bg-brand-orange-500 h-2 rounded-full" style={{ width: `${(program.filled / program.spots) * 100}%` }} />
                 </div>
               </div>
 
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+              <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
                 Apply Now <ArrowRight className="w-4 h-4" />
               </button>
             </div>

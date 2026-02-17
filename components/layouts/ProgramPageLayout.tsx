@@ -53,7 +53,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
             </div>
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-orange-600 hover:bg-orange-50 transition-all shadow-lg hover:scale-105 whitespace-nowrap"
+              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-brand-orange-600 hover:bg-brand-orange-50 transition-all shadow-lg hover:scale-105 whitespace-nowrap"
             >
               Apply Now →
             </Link>
@@ -78,7 +78,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
           <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
             <div className="max-w-3xl">
               {badge && (
-                <div className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2 text-sm font-bold text-white mb-6">
+                <div className="inline-flex items-center gap-2 rounded-full bg-brand-orange-500 px-4 py-2 text-sm font-bold text-white mb-6">
                   {badge}
                 </div>
               )}
@@ -91,7 +91,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/apply"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 text-white font-semibold rounded hover:bg-orange-600 transition-colors shadow-lg"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-500 text-white font-semibold rounded hover:bg-brand-orange-600 transition-colors shadow-lg"
                 >
                   Apply Now
                   <ArrowRight size={20} className="ml-2" />
@@ -137,7 +137,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
           <section className="grid gap-6 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1.1fr)] items-start mb-10">
         <div className="space-y-4">
           {badge && (
-            <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-2 text-[11px] font-semibold text-orange-700 border border-orange-100 uppercase tracking-wide">
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand-orange-50 px-3 py-2 text-[11px] font-semibold text-brand-orange-700 border border-brand-orange-100 uppercase tracking-wide">
               {badge}
             </div>
           )}
@@ -198,13 +198,13 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
           <div className="flex flex-wrap gap-3 mt-5">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center rounded-full bg-orange-600 px-5 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-orange-700"
+              className="inline-flex items-center justify-center rounded-full bg-brand-orange-600 px-5 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-brand-orange-700"
             >
               Apply Now – It&apos;s Free
             </Link>
             <Link
               href="/funding/wioa"
-              className="inline-flex items-center justify-center rounded-full border border-slate-300 px-4 py-2 text-xs sm:text-sm font-semibold text-black hover:border-orange-500 hover:text-orange-700"
+              className="inline-flex items-center justify-center rounded-full border border-slate-300 px-4 py-2 text-xs sm:text-sm font-semibold text-black hover:border-brand-orange-500 hover:text-brand-orange-700"
             >
               Talk to a Career Coach
             </Link>
@@ -219,7 +219,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
           <ul className="space-y-1 text-sm text-black">
             {jobTitles.map((job) => (
               <li key={job} className="flex gap-2">
-                <span className="mt-[2px] text-orange-500">●</span>
+                <span className="mt-[2px] text-brand-orange-500">●</span>
                 <span>{job}</span>
               </li>
             ))}
@@ -251,7 +251,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
           <ul className="space-y-2 text-sm text-black">
             {outcomes.map((item) => (
               <li key={item} className="flex gap-2">
-                <span className="mt-[3px] text-green-500">•</span>
+                <span className="mt-[3px] text-brand-green-500">•</span>
                 <span>{item}</span>
               </li>
             ))}
@@ -264,7 +264,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
           <ul className="space-y-2 text-sm text-black">
             {idealFor.map((item) => (
               <li key={item} className="flex gap-2">
-                <span className="mt-[3px] text-orange-500">★</span>
+                <span className="mt-[3px] text-brand-orange-500">★</span>
                 <span>{item}</span>
               </li>
             ))}
@@ -281,7 +281,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
           <ol className="space-y-2 text-sm text-black">
             {steps.map((step, index) => (
               <li key={index} className="flex gap-3">
-                <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-orange-600 text-[11px] font-semibold text-white">
+                <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-orange-600 text-[11px] font-semibold text-white">
                   {index + 1}
                 </span>
                 <span>{step}</span>
@@ -291,13 +291,13 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center rounded-full bg-orange-600 px-5 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-orange-700"
+              className="inline-flex items-center justify-center rounded-full bg-brand-orange-600 px-5 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-brand-orange-700"
             >
               Start Application
             </Link>
             <Link
               href="/funding"
-              className="inline-flex items-center justify-center rounded-full border border-slate-300 px-4 py-2 text-xs sm:text-sm font-semibold text-black hover:border-orange-500 hover:text-orange-700"
+              className="inline-flex items-center justify-center rounded-full border border-slate-300 px-4 py-2 text-xs sm:text-sm font-semibold text-black hover:border-brand-orange-500 hover:text-brand-orange-700"
             >
               Explore Funding Options
             </Link>
@@ -350,20 +350,20 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
               <h2 className="text-4xl md:text-5xl font-bold mb-6">
                 Ready to take the next step?
               </h2>
-              <p className="text-xl mb-8 text-orange-50">
+              <p className="text-xl mb-8 text-brand-orange-50">
                 We'll help you check WIOA/WRG eligibility and walk you through enrollment so you're not doing this alone.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/apply"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-orange-600 font-bold rounded-lg hover:bg-orange-50 transition-colors shadow-lg"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-lg hover:bg-brand-orange-50 transition-colors shadow-lg"
                 >
                   Apply Now
                   <ArrowRight size={20} className="ml-2" />
                 </Link>
                 <Link
                   href="/programs"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-orange-700 text-white font-semibold rounded-lg hover:bg-orange-800 transition-colors shadow-lg"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-700 text-white font-semibold rounded-lg hover:bg-brand-orange-800 transition-colors shadow-lg"
                 >
                   View All Programs
                 </Link>

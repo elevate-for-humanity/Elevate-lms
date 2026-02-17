@@ -38,8 +38,8 @@ const STATUS_CONFIG: Record<AvailabilityStatus, {
 }> = {
   open: {
     label: 'Open',
-    color: 'text-green-700',
-    bgColor: 'bg-green-100',
+    color: 'text-brand-green-700',
+    bgColor: 'bg-brand-green-100',
     icon: CheckCircle,
     description: 'Accepting applications',
   },
@@ -52,8 +52,8 @@ const STATUS_CONFIG: Record<AvailabilityStatus, {
   },
   closed: {
     label: 'Closed',
-    color: 'text-red-700',
-    bgColor: 'bg-red-100',
+    color: 'text-brand-red-700',
+    bgColor: 'bg-brand-red-100',
     icon: XCircle,
     description: 'Not accepting applications',
   },

@@ -106,7 +106,7 @@ export default function ShoppingCartPage() {
                             </div>
                             <button
                               onClick={() => removeItem(item.id)}
-                              className="text-gray-400 hover:text-red-600"
+                              className="text-gray-400 hover:text-brand-red-600"
                             >
                               <Trash2 className="w-5 h-5" />
                             </button>
@@ -178,7 +178,7 @@ export default function ShoppingCartPage() {
                     </button>
                   </div>
                   {promoApplied && (
-                    <p className="text-sm text-green-600 mt-1">10% discount applied!</p>
+                    <p className="text-sm text-brand-green-600 mt-1">10% discount applied!</p>
                   )}
                 </div>
 
@@ -188,7 +188,7 @@ export default function ShoppingCartPage() {
                     <span>${subtotal.toFixed(2)}</span>
                   </div>
                   {promoApplied && (
-                    <div className="flex justify-between text-green-600">
+                    <div className="flex justify-between text-brand-green-600">
                       <span>Discount (10%)</span>
                       <span>-${discount.toFixed(2)}</span>
                     </div>

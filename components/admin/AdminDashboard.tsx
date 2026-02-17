@@ -117,7 +117,7 @@ export default function AdminDashboard() {
               </p>
               <div className="mt-2">
                 {metrics.activeStudents > 0 && (
-                  <div className="flex items-center text-sm text-green-600">
+                  <div className="flex items-center text-sm text-brand-green-600">
                     <TrendingUp className="mr-1 h-4 w-4" />
                     Active students enrolled
                   </div>
@@ -138,7 +138,7 @@ export default function AdminDashboard() {
               </p>
               <div className="mt-2">
                 {metrics.completionRate >= 70 ? (
-                  <div className="flex items-center text-sm text-green-600">
+                  <div className="flex items-center text-sm text-brand-green-600">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                     Above target (70%)
                   </div>
@@ -164,7 +164,7 @@ export default function AdminDashboard() {
               </p>
               <div className="mt-2">
                 {metrics.placementRate >= 60 ? (
-                  <div className="flex items-center text-sm text-green-600">
+                  <div className="flex items-center text-sm text-brand-green-600">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                     Above target (60%)
                   </div>
@@ -292,7 +292,7 @@ export default function AdminDashboard() {
                 <div key={activity.id} className="flex items-start space-x-4 border-b pb-3 last:border-0">
                   <div className="mt-1">
                     {activity.type === 'enrollment' && <Users className="h-5 w-5 text-brand-blue-600" />}
-                    {activity.type === 'completion' && <GraduationCap className="h-5 w-5 text-green-600" />}
+                    {activity.type === 'completion' && <GraduationCap className="h-5 w-5 text-brand-green-600" />}
                     {activity.type === 'placement' && <Briefcase className="h-5 w-5 text-purple-600" />}
                     {activity.type === 'alert' && <AlertCircle className="h-5 w-5 text-brand-orange-600" />}
                   </div>
@@ -306,13 +306,13 @@ export default function AdminDashboard() {
                   {activity.priority && (
                     <div>
                       {activity.priority === 'high' && (
-                        <span className="text-xs bg-red-100 text-red-800 px-2 py-2 rounded">High</span>
+                        <span className="text-xs bg-brand-red-100 text-brand-red-800 px-2 py-2 rounded">High</span>
                       )}
                       {activity.priority === 'medium' && (
                         <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-2 rounded">Medium</span>
                       )}
                       {activity.priority === 'low' && (
-                        <span className="text-xs bg-green-100 text-green-800 px-2 py-2 rounded">Low</span>
+                        <span className="text-xs bg-brand-green-100 text-brand-green-800 px-2 py-2 rounded">Low</span>
                       )}
                     </div>
                   )}

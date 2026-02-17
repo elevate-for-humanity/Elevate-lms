@@ -17,8 +17,8 @@ export function TrustBadges() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center justify-items-center">
           {/* FERPA Compliant */}
           <div className="flex flex-col items-center text-center p-4">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3">
-              <Shield className="w-8 h-8 text-blue-600" />
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mb-3">
+              <Shield className="w-8 h-8 text-brand-blue-600" />
             </div>
             <div className="text-sm font-semibold text-black">FERPA</div>
             <div className="text-xs text-black">Compliant</div>
@@ -26,7 +26,7 @@ export function TrustBadges() {
 
           {/* WIOA Approved */}
           <div className="flex flex-col items-center text-center p-4">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-3">
+            <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mb-3">
               <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <div className="text-sm font-semibold text-black">WIOA</div>
@@ -35,8 +35,8 @@ export function TrustBadges() {
 
           {/* Industry Certified */}
           <div className="flex flex-col items-center text-center p-4">
-            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-3">
-              <Award className="w-8 h-8 text-orange-600" />
+            <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mb-3">
+              <Award className="w-8 h-8 text-brand-orange-600" />
             </div>
             <div className="text-sm font-semibold text-black">Industry</div>
             <div className="text-xs text-black">Certified Programs</div>
@@ -44,8 +44,8 @@ export function TrustBadges() {
 
           {/* Data Security */}
           <div className="flex flex-col items-center text-center p-4">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3">
-              <Lock className="w-8 h-8 text-blue-600" />
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mb-3">
+              <Lock className="w-8 h-8 text-brand-blue-600" />
             </div>
             <div className="text-sm font-semibold text-black">Secure</div>
             <div className="text-xs text-black">AES-256 Encrypted</div>
@@ -103,9 +103,9 @@ export function TrustBadges() {
 
 export function SecurityBadge() {
   return (
-    <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
-      <Lock className="w-4 h-4 text-green-600" />
-      <span className="text-sm font-medium text-green-900">
+    <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-50 border border-brand-green-200 rounded-lg">
+      <Lock className="w-4 h-4 text-brand-green-600" />
+      <span className="text-sm font-medium text-brand-green-900">
         Secure & FERPA Compliant
       </span>
     </div>
@@ -114,9 +114,9 @@ export function SecurityBadge() {
 
 export function AccreditationBadge() {
   return (
-    <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
-      <Award className="w-4 h-4 text-blue-600" />
-      <span className="text-sm font-medium text-blue-900">
+    <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
+      <Award className="w-4 h-4 text-brand-blue-600" />
+      <span className="text-sm font-medium text-brand-blue-900">
         WIOA Approved Provider
       </span>
     </div>

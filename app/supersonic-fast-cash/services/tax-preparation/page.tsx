@@ -56,7 +56,7 @@ export default function TaxPreparationPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-orange-50 rounded-lg p-8 border border-orange-200">
+            <div className="bg-brand-orange-50 rounded-lg p-8 border border-brand-orange-200">
               <h3 className="text-2xl font-bold mb-4">Apply Now</h3>
               <p className="text-gray-700 mb-6">
                 Contact us for a free consultation and personalized quote based on your tax situation.
@@ -77,7 +77,7 @@ export default function TaxPreparationPage() {
               </div>
               <Link
                 href="/supersonic-fast-cash/book-appointment"
-                className="block w-full bg-orange-600 hover:bg-orange-700 text-white text-center px-8 py-3 rounded-lg font-semibold transition-colors"
+                className="block w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white text-center px-8 py-3 rounded-lg font-semibold transition-colors"
               >
                 Book Free Consultation
               </Link>
@@ -97,15 +97,15 @@ export default function TaxPreparationPage() {
               <p className="text-black">PTIN-credentialed preparers ensure accuracy</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <DollarSign className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <DollarSign className="w-8 h-8 text-brand-green-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Maximum Refund</h3>
               <p className="text-black">We find every deduction and credit</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-8 h-8 text-orange-600" />
+              <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-brand-orange-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Fast Service</h3>
               <p className="text-black">Most returns completed same day</p>

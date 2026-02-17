@@ -190,7 +190,7 @@ export default function CosmetologyDocumentsPage() {
                     {governmentId.status === 'complete' && (
                       <button
                         onClick={() => setGovernmentId(null)}
-                        className="text-slate-400 hover:text-red-500"
+                        className="text-slate-400 hover:text-brand-red-500"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -250,7 +250,7 @@ export default function CosmetologyDocumentsPage() {
         </button>
 
         {!canSubmit && (
-          <p className="text-center text-red-600 text-sm mt-4 flex items-center justify-center gap-2">
+          <p className="text-center text-brand-red-600 text-sm mt-4 flex items-center justify-center gap-2">
             <AlertCircle className="w-4 h-4" />
             Please upload your government-issued ID to continue.
           </p>

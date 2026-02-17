@@ -12,7 +12,7 @@ const defaultNotifications = [
     id: 1,
     type: 'success',
     icon: CheckCircle,
-    color: 'text-green-600',
+    color: 'text-brand-green-600',
     title: 'Module Completed',
     message: 'You completed Module 2 in CNA Certification',
     time: '2 hours ago',
@@ -22,7 +22,7 @@ const defaultNotifications = [
     id: 2,
     type: 'achievement',
     icon: Award,
-    color: 'text-orange-600',
+    color: 'text-brand-orange-600',
     title: 'New Certificate',
     message: 'Your Barber Apprenticeship certificate is ready',
     time: '1 day ago',
@@ -38,8 +38,8 @@ const iconMap: Record<string, any> = {
 };
 
 const colorMap: Record<string, string> = {
-  success: 'text-green-600',
-  achievement: 'text-orange-600',
+  success: 'text-brand-green-600',
+  achievement: 'text-brand-orange-600',
   reminder: 'text-brand-orange-600',
   info: 'text-brand-orange-600',
 };

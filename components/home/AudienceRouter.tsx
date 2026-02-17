@@ -18,8 +18,8 @@ const AUDIENCES = [
     secondaryCta: 'Browse Programs',
     secondaryHref: '/programs',
     image: '/images/artlist/cropped/hero-training-3-square.jpg',
-    color: 'from-blue-600 to-blue-800',
-    accent: 'bg-blue-500',
+    color: 'from-brand-blue-600 to-brand-blue-800',
+    accent: 'bg-brand-blue-500',
     stats: [
       { value: '$0', label: 'Tuition for eligible students' },
       { value: '6–16', label: 'Weeks to credential' },

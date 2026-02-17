@@ -64,7 +64,7 @@ function ModuleCard({ module, onSelect, apprenticeHours }: {
           module.locked 
             ? 'bg-slate-700' 
             : progress === 100 
-              ? 'bg-green-500/20' 
+              ? 'bg-brand-green-500/20' 
               : 'bg-brand-blue-500/20'
         }`}>
           {module.locked ? (
@@ -93,7 +93,7 @@ function ModuleCard({ module, onSelect, apprenticeHours }: {
               <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full ${
-                    progress === 100 ? 'bg-green-500' : 'bg-brand-blue-500'
+                    progress === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'
                   }`}
                   style={{ width: `${progress}%` }}
                 />
@@ -121,12 +121,12 @@ function ChapterItem({ chapter, onComplete }: {
   const typeColor = chapter.type === 'video' ? 'text-brand-blue-400' 
     : chapter.type === 'quiz' ? 'text-amber-400' 
     : chapter.type === 'lab' ? 'text-brand-blue-400'
-    : 'text-green-400';
+    : 'text-brand-green-400';
     
   const typeBg = chapter.type === 'video' ? 'bg-brand-blue-500/20' 
     : chapter.type === 'quiz' ? 'bg-amber-500/20' 
     : chapter.type === 'lab' ? 'bg-brand-blue-500/20'
-    : 'bg-green-500/20';
+    : 'bg-brand-green-500/20';
 
   const handleToggleComplete = async () => {
     setCompleting(true);
@@ -241,7 +241,7 @@ export default function BarberTrainingPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
         <div className="text-center max-w-md">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-4">Unable to Load</h1>
           <p className="text-slate-400 mb-6">{error}</p>
           <Link

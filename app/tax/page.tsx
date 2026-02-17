@@ -52,7 +52,7 @@ export default function TaxServicesPage() {
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 w-full">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-6">
+            <div className="inline-flex items-center gap-2 bg-brand-green-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-6">
               <DollarSign className="w-4 h-4" />
               Tax Season 2026 - File by April 15th
             </div>
@@ -66,7 +66,7 @@ export default function TaxServicesPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/tax"
-                className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors"
+                className="inline-flex items-center justify-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors"
               >
                 <Users className="w-5 h-5" />
                 Free VITA Tax Prep
@@ -74,7 +74,7 @@ export default function TaxServicesPage() {
               </Link>
               <Link
                 href="/supersonic-fast-cash"
-                className="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors"
+                className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors"
               >
                 <Zap className="w-5 h-5" />
                 Supersonic Fast Cash
@@ -89,10 +89,10 @@ export default function TaxServicesPage() {
       <section className="py-4 bg-gray-100 border-b">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/tax" className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
+            <Link href="/tax" className="px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium hover:bg-brand-green-200 transition-colors">
               VITA Free Tax Prep
             </Link>
-            <Link href="/supersonic-fast-cash" className="px-4 py-2 bg-red-100 text-red-800 rounded-full text-sm font-medium hover:bg-red-200 transition-colors">
+            <Link href="/supersonic-fast-cash" className="px-4 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-sm font-medium hover:bg-brand-red-200 transition-colors">
               Supersonic Fast Cash
             </Link>
             <Link href="/tax" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
@@ -101,7 +101,7 @@ export default function TaxServicesPage() {
             <Link href="/tax" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               What to Bring
             </Link>
-            <Link href="/tax/volunteer" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
+            <Link href="/tax/volunteer" className="px-4 py-2 bg-brand-orange-100 text-brand-orange-800 rounded-full text-sm font-medium hover:bg-brand-orange-200 transition-colors">
               Volunteer
             </Link>
           </div>
@@ -122,7 +122,7 @@ export default function TaxServicesPage() {
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* VITA Free Tax Prep */}
-            <div className="bg-white rounded-2xl border-2 border-green-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-white rounded-2xl border-2 border-brand-green-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
                   src="/images/heroes/training-provider-2.jpg"
@@ -131,19 +131,19 @@ export default function TaxServicesPage() {
                   className="object-cover"
                 />
                 <div className="absolute bottom-4 left-4">
-                  <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                  <span className="bg-brand-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                     100% FREE
                   </span>
                 </div>
               </div>
               <div className="p-8">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                    <Users className="w-6 h-6 text-green-600" />
+                  <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center">
+                    <Users className="w-6 h-6 text-brand-green-600" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900">VITA Tax Preparation</h3>
-                    <p className="text-green-600 font-semibold">Rise Up Foundation</p>
+                    <p className="text-brand-green-600 font-semibold">Rise Up Foundation</p>
                   </div>
                 </div>
 
@@ -173,7 +173,7 @@ export default function TaxServicesPage() {
 
                 <Link
                   href="/tax"
-                  className="block w-full text-center px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold transition-colors"
+                  className="block w-full text-center px-6 py-4 bg-brand-green-600 hover:bg-brand-green-700 text-white rounded-xl font-bold transition-colors"
                 >
                   Get Free Tax Help
                   <ArrowRight className="inline-block w-5 h-5 ml-2" />
@@ -182,7 +182,7 @@ export default function TaxServicesPage() {
             </div>
 
             {/* Supersonic Fast Cash */}
-            <div className="bg-white rounded-2xl border-2 border-red-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-white rounded-2xl border-2 border-brand-red-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
                   src="/images/heroes-hq/tax-refund-hero.jpg"
@@ -191,19 +191,19 @@ export default function TaxServicesPage() {
                   className="object-cover"
                 />
                 <div className="absolute bottom-4 left-4">
-                  <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                  <span className="bg-brand-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                     PROFESSIONAL
                   </span>
                 </div>
               </div>
               <div className="p-8">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-                    <Zap className="w-6 h-6 text-red-600" />
+                  <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center">
+                    <Zap className="w-6 h-6 text-brand-red-600" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900">Supersonic Fast Cash</h3>
-                    <p className="text-red-600 font-semibold">Professional Tax Services</p>
+                    <p className="text-brand-red-600 font-semibold">Professional Tax Services</p>
                   </div>
                 </div>
 
@@ -233,7 +233,7 @@ export default function TaxServicesPage() {
 
                 <Link
                   href="/supersonic-fast-cash"
-                  className="block w-full text-center px-6 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-colors"
+                  className="block w-full text-center px-6 py-4 bg-brand-red-600 hover:bg-brand-red-700 text-white rounded-xl font-bold transition-colors"
                 >
                   Get Started Now
                   <ArrowRight className="inline-block w-5 h-5 ml-2" />
@@ -286,8 +286,8 @@ export default function TaxServicesPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-                <DollarSign className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center mb-4">
+                <DollarSign className="w-6 h-6 text-brand-green-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Maximum Refund</h3>
               <p className="text-gray-600">
@@ -308,8 +308,8 @@ export default function TaxServicesPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
-                <Award className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-brand-orange-100 rounded-xl flex items-center justify-center mb-4">
+                <Award className="w-6 h-6 text-brand-orange-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">IRS-Certified</h3>
               <p className="text-gray-600">
@@ -338,8 +338,8 @@ export default function TaxServicesPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4">
-                <MapPin className="w-6 h-6 text-red-600" />
+              <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center mb-4">
+                <MapPin className="w-6 h-6 text-brand-red-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Convenient Locations</h3>
               <p className="text-gray-600">
@@ -360,10 +360,10 @@ export default function TaxServicesPage() {
           <div className="grid md:grid-cols-3 gap-6">
             <Link
               href="/tax/volunteer"
-              className="bg-white p-6 rounded-xl border-2 border-gray-200 hover:border-green-500 hover:shadow-lg transition-all group"
+              className="bg-white p-6 rounded-xl border-2 border-gray-200 hover:border-brand-green-500 hover:shadow-lg transition-all group"
             >
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-600 transition-colors">
-                <Users className="w-6 h-6 text-green-600 group-hover:text-white" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-brand-green-600 transition-colors">
+                <Users className="w-6 h-6 text-brand-green-600 group-hover:text-white" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">
                 Volunteer With Us
@@ -371,7 +371,7 @@ export default function TaxServicesPage() {
               <p className="text-sm text-gray-600 mb-4">
                 Help your community by becoming a VITA volunteer tax preparer.
               </p>
-              <div className="flex items-center text-green-600 font-semibold text-sm">
+              <div className="flex items-center text-brand-green-600 font-semibold text-sm">
                 Learn More <ArrowRight className="w-4 h-4 ml-2" />
               </div>
             </Link>
@@ -439,14 +439,14 @@ export default function TaxServicesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/tax"
-              className="inline-flex items-center justify-center gap-2 bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-green-700 transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-brand-green-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-brand-green-700 transition-colors"
             >
               Free VITA Tax Prep
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/supersonic-fast-cash"
-              className="inline-flex items-center justify-center gap-2 bg-red-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-red-700 transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-brand-red-700 transition-colors"
             >
               Supersonic Fast Cash
               <ArrowRight className="w-5 h-5" />

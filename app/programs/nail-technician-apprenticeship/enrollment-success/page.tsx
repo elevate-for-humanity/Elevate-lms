@@ -64,7 +64,7 @@ export default async function EnrollmentSuccessPage() {
       <div className="max-w-lg w-full">
         {/* Success Icon */}
         <div className="text-center mb-8">
-          <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+          <div className="w-24 h-24 bg-brand-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           
@@ -83,8 +83,8 @@ export default async function EnrollmentSuccessPage() {
             
             <div className="flex justify-between items-center py-3 border-b border-slate-100">
               <span className="text-slate-600">Status</span>
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full font-bold text-sm">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-brand-green-100 text-brand-green-700 rounded-full font-bold text-sm">
+                <span className="w-2 h-2 bg-brand-green-500 rounded-full"></span>
                 Active
               </span>
             </div>

@@ -327,7 +327,7 @@ export default function NewWorkflowPage() {
                       {steps.length > 1 && (
                         <button
                           onClick={() => removeStep(step.id)}
-                          className="p-2 text-brand-orange-600 hover:bg-red-50 rounded-lg"
+                          className="p-2 text-brand-orange-600 hover:bg-brand-red-50 rounded-lg"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

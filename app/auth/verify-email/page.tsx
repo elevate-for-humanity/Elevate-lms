@@ -52,7 +52,7 @@ export default function VerifyEmailPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-6">
-          <Mail className="w-16 h-16 text-orange-600 mx-auto mb-4" />
+          <Mail className="w-16 h-16 text-brand-orange-600 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-black mb-2">
             Verify Your Email
           </h1>
@@ -63,13 +63,13 @@ export default function VerifyEmailPage() {
         </div>
 
         {status === 'sent' && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
+          <div className="mb-6 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg flex items-start gap-3">
             <span className="text-slate-400 flex-shrink-0">•</span>
             <div>
-              <p className="text-sm font-medium text-green-900">
+              <p className="text-sm font-medium text-brand-green-900">
                 Verification email sent!
               </p>
-              <p className="text-sm text-green-700">
+              <p className="text-sm text-brand-green-700">
                 Check your inbox and spam folder.
               </p>
             </div>
@@ -77,13 +77,13 @@ export default function VerifyEmailPage() {
         )}
 
         {status === 'error' && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3" role="alert">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-start gap-3" role="alert">
+            <AlertCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-red-900">
+              <p className="text-sm font-medium text-brand-red-900">
                 Error sending email
               </p>
-              <p className="text-sm text-red-700">
+              <p className="text-sm text-brand-red-700">
                 Please try again or contact support.
               </p>
             </div>
@@ -93,7 +93,7 @@ export default function VerifyEmailPage() {
         <button
           onClick={resendVerification}
           disabled={status === 'sending' || status === 'sent'}
-          className="w-full py-3 px-4 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="w-full py-3 px-4 bg-brand-orange-600 text-white font-semibold rounded-lg hover:bg-brand-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           {status === 'sending'
             ? 'Sending...'
@@ -107,7 +107,7 @@ export default function VerifyEmailPage() {
             Need help?{' '}
             <a
               href="/contact"
-              className="text-orange-600 hover:text-orange-700 font-medium"
+              className="text-brand-orange-600 hover:text-brand-orange-700 font-medium"
             >
               Contact Support
             </a>

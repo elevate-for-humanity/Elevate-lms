@@ -153,7 +153,7 @@ export function UserMenu({ user, isLoading }: UserMenuProps) {
             </Link>
             <button
               onClick={handleSignOut}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition text-left"
+              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-brand-red-600 hover:bg-gray-100 transition text-left"
               role="menuitem"
             >
               <LogOut className="w-4 h-4" />

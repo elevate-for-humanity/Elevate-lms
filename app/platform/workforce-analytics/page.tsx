@@ -79,7 +79,7 @@ export default function WorkforceAnalyticsPage() {
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border text-center">
                 <p className="text-3xl font-bold text-gray-900">{m.value}</p>
                 <p className="text-gray-600 text-sm mb-2">{m.label}</p>
-                <span className="text-green-600 text-sm font-medium">{m.change} YoY</span>
+                <span className="text-brand-green-600 text-sm font-medium">{m.change} YoY</span>
               </div>
             ))}
           </div>

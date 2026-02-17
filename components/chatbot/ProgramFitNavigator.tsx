@@ -76,7 +76,7 @@ export function ProgramFitNavigator({
   return (
     <div className={`bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+      <div className="bg-gradient-to-r from-brand-blue-600 to-brand-blue-700 px-6 py-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-white">
             Program Fit Navigator

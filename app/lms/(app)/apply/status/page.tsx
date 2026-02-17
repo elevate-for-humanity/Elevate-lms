@@ -81,17 +81,17 @@ export default function ApplicationStatusPage() {
         return {
           icon: <span className="text-slate-400 flex-shrink-0">•</span>,
           title: 'Application Approved!',
-          bgColor: 'bg-green-50',
-          borderColor: 'border-green-200',
+          bgColor: 'bg-brand-green-50',
+          borderColor: 'border-brand-green-200',
           message: 'Congratulations! Your application has been approved. You can now proceed to enrollment.',
           showEnrollButton: true,
         };
       case 'rejected':
         return {
-          icon: <XCircle className="w-20 h-20 text-red-500" />,
+          icon: <XCircle className="w-20 h-20 text-brand-red-500" />,
           title: 'Application Not Approved',
-          bgColor: 'bg-red-50',
-          borderColor: 'border-red-200',
+          bgColor: 'bg-brand-red-50',
+          borderColor: 'border-brand-red-200',
           message: 'Unfortunately, your application was not approved at this time. Please contact us for more information.',
           showEnrollButton: false,
         };

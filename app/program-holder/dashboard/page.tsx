@@ -73,7 +73,7 @@ export default function ProgramHolderDashboardPage() {
             <div key={index} className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <stat.icon className="w-8 h-8 text-brand-blue-600" />
-                <span className="text-sm text-green-600 font-medium">{stat.change}</span>
+                <span className="text-sm text-brand-green-600 font-medium">{stat.change}</span>
               </div>
               <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
               <p className="text-sm text-gray-600">{stat.label}</p>
@@ -102,7 +102,7 @@ export default function ProgramHolderDashboardPage() {
                       <td className="py-4 font-medium text-gray-900">{program.name}</td>
                       <td className="py-4 text-center text-gray-600">{program.students}</td>
                       <td className="py-4 text-center">
-                        <span className="text-green-600 font-medium">{program.completion}%</span>
+                        <span className="text-brand-green-600 font-medium">{program.completion}%</span>
                       </td>
                       <td className="py-4 text-right text-gray-900">${program.revenue.toLocaleString()}</td>
                     </tr>

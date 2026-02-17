@@ -177,7 +177,7 @@ export default async function SecurityPage() {
                     <Shield className="w-8 h-8 text-brand-blue-600" />
                     <span className={`px-2 py-1 rounded text-xs font-medium ${
                       cert.status === 'active' || cert.is_active
-                        ? 'bg-green-100 text-green-700' 
+                        ? 'bg-brand-green-100 text-brand-green-700' 
                         : 'bg-brand-blue-100 text-brand-blue-700'
                     }`}>
                       {cert.status === 'active' || cert.is_active ? 'Compliant' : cert.status || 'Pending'}

@@ -65,7 +65,7 @@ export function GlobalLeaderboard() {
           <div
             key={row.userId}
             className={`flex items-center justify-between rounded-lg px-3 py-2.5 ${
-              row.isYou ? "bg-orange-50" : "bg-slate-50"
+              row.isYou ? "bg-brand-orange-50" : "bg-slate-50"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -74,7 +74,7 @@ export function GlobalLeaderboard() {
               </span>
               <span
                 className={`font-medium ${
-                  row.isYou ? "text-orange-700" : "text-black"
+                  row.isYou ? "text-brand-orange-700" : "text-black"
                 }`}
               >
                 {row.isYou ? "You" : row.name}

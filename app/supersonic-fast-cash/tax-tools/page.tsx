@@ -88,16 +88,16 @@ export default async function TaxToolsPage() {
               href="https://www.irs.gov/forms-pubs/about-schedule-c-form-1040"
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-green-50 rounded-2xl p-6 border-2 border-green-200 hover:border-green-500 transition-all transform hover:scale-105"
+              className="group bg-brand-green-50 rounded-2xl p-6 border-2 border-brand-green-200 hover:border-brand-green-500 transition-all transform hover:scale-105"
             >
               <div className="flex items-start justify-between mb-4">
-                <h3 className="text-2xl font-black text-green-600">
+                <h3 className="text-2xl font-black text-brand-green-600">
                   Schedule C
                 </h3>
-                <ExternalLink className="w-6 h-6 text-green-600 group-hover:translate-x-1 transition-transform" />
+                <ExternalLink className="w-6 h-6 text-brand-green-600 group-hover:translate-x-1 transition-transform" />
               </div>
               <p className="text-black mb-4">Profit or Loss from Business</p>
-              <div className="flex items-center gap-2 text-green-600 font-bold">
+              <div className="flex items-center gap-2 text-brand-green-600 font-bold">
                 <Download className="w-5 h-5" />
                 <span>Download PDF</span>
               </div>
@@ -107,16 +107,16 @@ export default async function TaxToolsPage() {
               href="https://www.irs.gov/forms-pubs/about-form-w-2"
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-orange-50 rounded-2xl p-6 border-2 border-orange-200 hover:border-orange-500 transition-all transform hover:scale-105"
+              className="group bg-brand-orange-50 rounded-2xl p-6 border-2 border-brand-orange-200 hover:border-brand-orange-500 transition-all transform hover:scale-105"
             >
               <div className="flex items-start justify-between mb-4">
-                <h3 className="text-2xl font-black text-orange-600">
+                <h3 className="text-2xl font-black text-brand-orange-600">
                   Form W-2
                 </h3>
-                <ExternalLink className="w-6 h-6 text-orange-600 group-hover:translate-x-1 transition-transform" />
+                <ExternalLink className="w-6 h-6 text-brand-orange-600 group-hover:translate-x-1 transition-transform" />
               </div>
               <p className="text-black mb-4">Wage and Tax Statement</p>
-              <div className="flex items-center gap-2 text-orange-600 font-bold">
+              <div className="flex items-center gap-2 text-brand-orange-600 font-bold">
                 <Download className="w-5 h-5" />
                 <span>Download PDF</span>
               </div>
@@ -145,14 +145,14 @@ export default async function TaxToolsPage() {
               href="https://www.irs.gov/forms-pubs/about-schedule-a-form-1040"
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-red-50 rounded-2xl p-6 border-2 border-red-200 hover:border-red-500 transition-all transform hover:scale-105"
+              className="group bg-brand-red-50 rounded-2xl p-6 border-2 border-brand-red-200 hover:border-brand-red-500 transition-all transform hover:scale-105"
             >
               <div className="flex items-start justify-between mb-4">
-                <h3 className="text-2xl font-black text-red-600">Schedule A</h3>
-                <ExternalLink className="w-6 h-6 text-red-600 group-hover:translate-x-1 transition-transform" />
+                <h3 className="text-2xl font-black text-brand-red-600">Schedule A</h3>
+                <ExternalLink className="w-6 h-6 text-brand-red-600 group-hover:translate-x-1 transition-transform" />
               </div>
               <p className="text-black mb-4">Itemized Deductions</p>
-              <div className="flex items-center gap-2 text-red-600 font-bold">
+              <div className="flex items-center gap-2 text-brand-red-600 font-bold">
                 <Download className="w-5 h-5" />
                 <span>Download PDF</span>
               </div>
@@ -184,7 +184,7 @@ export default async function TaxToolsPage() {
       <section id="due-dates" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-12">
-            <Calendar className="w-12 h-12 text-green-600" />
+            <Calendar className="w-12 h-12 text-brand-green-600" />
             <h2 className="text-4xl font-black text-black">
               Important Tax Due Dates
             </h2>
@@ -211,12 +211,12 @@ export default async function TaxToolsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-4 bg-green-50 rounded-xl">
+                <div className="flex items-start gap-4 p-4 bg-brand-green-50 rounded-xl">
                   <div className="flex-shrink-0 w-20 text-center">
-                    <div className="text-3xl font-black text-green-600">
+                    <div className="text-3xl font-black text-brand-green-600">
                       MAR
                     </div>
-                    <div className="text-2xl font-black text-green-600">15</div>
+                    <div className="text-2xl font-black text-brand-green-600">15</div>
                   </div>
                   <div>
                     <div className="font-black text-black mb-1">
@@ -228,12 +228,12 @@ export default async function TaxToolsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-4 bg-orange-50 rounded-xl">
+                <div className="flex items-start gap-4 p-4 bg-brand-orange-50 rounded-xl">
                   <div className="flex-shrink-0 w-20 text-center">
-                    <div className="text-3xl font-black text-orange-600">
+                    <div className="text-3xl font-black text-brand-orange-600">
                       MAR
                     </div>
-                    <div className="text-2xl font-black text-orange-600">
+                    <div className="text-2xl font-black text-brand-orange-600">
                       15
                     </div>
                   </div>
@@ -273,10 +273,10 @@ export default async function TaxToolsPage() {
                 Quarterly Estimates
               </h3>
               <div className="space-y-4">
-                <div className="flex items-start gap-4 p-4 bg-red-50 rounded-xl">
+                <div className="flex items-start gap-4 p-4 bg-brand-red-50 rounded-xl">
                   <div className="flex-shrink-0 w-20 text-center">
-                    <div className="text-3xl font-black text-red-600">APR</div>
-                    <div className="text-2xl font-black text-red-600">15</div>
+                    <div className="text-3xl font-black text-brand-red-600">APR</div>
+                    <div className="text-2xl font-black text-brand-red-600">15</div>
                   </div>
                   <div>
                     <div className="font-black text-black mb-1">
@@ -288,10 +288,10 @@ export default async function TaxToolsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-4 bg-red-50 rounded-xl">
+                <div className="flex items-start gap-4 p-4 bg-brand-red-50 rounded-xl">
                   <div className="flex-shrink-0 w-20 text-center">
-                    <div className="text-3xl font-black text-red-600">JUN</div>
-                    <div className="text-2xl font-black text-red-600">15</div>
+                    <div className="text-3xl font-black text-brand-red-600">JUN</div>
+                    <div className="text-2xl font-black text-brand-red-600">15</div>
                   </div>
                   <div>
                     <div className="font-black text-black mb-1">
@@ -303,10 +303,10 @@ export default async function TaxToolsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-4 bg-red-50 rounded-xl">
+                <div className="flex items-start gap-4 p-4 bg-brand-red-50 rounded-xl">
                   <div className="flex-shrink-0 w-20 text-center">
-                    <div className="text-3xl font-black text-red-600">SEP</div>
-                    <div className="text-2xl font-black text-red-600">15</div>
+                    <div className="text-3xl font-black text-brand-red-600">SEP</div>
+                    <div className="text-2xl font-black text-brand-red-600">15</div>
                   </div>
                   <div>
                     <div className="font-black text-black mb-1">
@@ -318,10 +318,10 @@ export default async function TaxToolsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-4 bg-red-50 rounded-xl">
+                <div className="flex items-start gap-4 p-4 bg-brand-red-50 rounded-xl">
                   <div className="flex-shrink-0 w-20 text-center">
-                    <div className="text-3xl font-black text-red-600">JAN</div>
-                    <div className="text-2xl font-black text-red-600">15</div>
+                    <div className="text-3xl font-black text-brand-red-600">JAN</div>
+                    <div className="text-2xl font-black text-brand-red-600">15</div>
                   </div>
                   <div>
                     <div className="font-black text-black mb-1">
@@ -342,7 +342,7 @@ export default async function TaxToolsPage() {
       <section id="calculators" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-12">
-            <Calculator className="w-12 h-12 text-orange-600" />
+            <Calculator className="w-12 h-12 text-brand-orange-600" />
             <h2 className="text-4xl font-black text-black">
               Financial Calculators
             </h2>
@@ -370,14 +370,14 @@ export default async function TaxToolsPage() {
               href="https://www.irs.gov/individuals/tax-withholding-estimator"
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-green-50 rounded-2xl p-8 border-2 border-green-200 hover:border-green-500 transition-all transform hover:scale-105"
+              className="group bg-brand-green-50 rounded-2xl p-8 border-2 border-brand-green-200 hover:border-brand-green-500 transition-all transform hover:scale-105"
             >
-              <Calculator className="w-12 h-12 text-green-600 mb-4" />
+              <Calculator className="w-12 h-12 text-brand-green-600 mb-4" />
               <h3 className="text-2xl font-black text-black mb-3">
                 W-4 Calculator
               </h3>
               <p className="text-black mb-4">Adjust your withholding</p>
-              <div className="flex items-center gap-2 text-green-600 font-bold">
+              <div className="flex items-center gap-2 text-brand-green-600 font-bold">
                 <span>Calculate Now</span>
                 <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -387,14 +387,14 @@ export default async function TaxToolsPage() {
               href="https://www.irs.gov/businesses/small-businesses-self-employed/self-employment-tax-social-security-and-medicare-taxes"
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-orange-50 rounded-2xl p-8 border-2 border-orange-200 hover:border-orange-500 transition-all transform hover:scale-105"
+              className="group bg-brand-orange-50 rounded-2xl p-8 border-2 border-brand-orange-200 hover:border-brand-orange-500 transition-all transform hover:scale-105"
             >
-              <Calculator className="w-12 h-12 text-orange-600 mb-4" />
+              <Calculator className="w-12 h-12 text-brand-orange-600 mb-4" />
               <h3 className="text-2xl font-black text-black mb-3">
                 Self-Employment Tax
               </h3>
               <p className="text-black mb-4">Calculate SE tax liability</p>
-              <div className="flex items-center gap-2 text-orange-600 font-bold">
+              <div className="flex items-center gap-2 text-brand-orange-600 font-bold">
                 <span>Learn More</span>
                 <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -415,13 +415,13 @@ export default async function TaxToolsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/apply"
-              className="px-10 py-5 bg-white text-green-600 font-black rounded-xl hover:bg-gray-100 transition-all transform hover:scale-105 uppercase shadow-lg"
+              className="px-10 py-5 bg-white text-brand-green-600 font-black rounded-xl hover:bg-gray-100 transition-all transform hover:scale-105 uppercase shadow-lg"
             >
               Get Started
             </Link>
             <Link
               href="/supersonic-fast-cash/book-appointment"
-              className="px-10 py-5 bg-transparent border-3 border-white text-white font-black rounded-xl hover:bg-white hover:text-green-600 transition-all transform hover:scale-105 uppercase"
+              className="px-10 py-5 bg-transparent border-3 border-white text-white font-black rounded-xl hover:bg-white hover:text-brand-green-600 transition-all transform hover:scale-105 uppercase"
             >
               Book Appointment
             </Link>

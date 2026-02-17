@@ -87,7 +87,7 @@ export default async function AddProductPage() {
             <div className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Product Name <span className="text-red-500">*</span>
+                  Product Name <span className="text-brand-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -99,7 +99,7 @@ export default async function AddProductPage() {
               </div>
               <div>
                 <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                  Description <span className="text-red-500">*</span>
+                  Description <span className="text-brand-red-500">*</span>
                 </label>
                 <textarea
                   id="description"
@@ -111,7 +111,7 @@ export default async function AddProductPage() {
               </div>
               <div>
                 <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-                  Category <span className="text-red-500">*</span>
+                  Category <span className="text-brand-red-500">*</span>
                 </label>
                 <select
                   id="category"
@@ -136,7 +136,7 @@ export default async function AddProductPage() {
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-                  Price <span className="text-red-500">*</span>
+                  Price <span className="text-brand-red-500">*</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>

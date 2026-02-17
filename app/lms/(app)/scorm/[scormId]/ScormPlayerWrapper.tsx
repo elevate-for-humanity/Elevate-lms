@@ -197,7 +197,7 @@ export function ScormPlayerWrapper({
           </div>
           <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all ${isCompleted ? 'bg-green-500' : 'bg-blue-600'}`}
+              className={`h-full rounded-full transition-all ${isCompleted ? 'bg-brand-green-500' : 'bg-brand-blue-600'}`}
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -208,7 +208,7 @@ export function ScormPlayerWrapper({
           </div>
         )}
         {isCompleted && (
-          <div className="flex items-center gap-1 text-green-600 text-sm font-medium">
+          <div className="flex items-center gap-1 text-brand-green-600 text-sm font-medium">
             <span className="text-slate-400 flex-shrink-0">•</span>
             Complete
           </div>
@@ -216,7 +216,7 @@ export function ScormPlayerWrapper({
         {isCompleted && (
           <button
             onClick={handleRestart}
-            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+            className="flex items-center gap-1 text-sm text-brand-blue-600 hover:text-brand-blue-700"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             Restart
@@ -229,7 +229,7 @@ export function ScormPlayerWrapper({
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
             <div className="text-center">
-              <div className="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent mx-auto" />
+              <div className="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-brand-blue-600 border-t-transparent mx-auto" />
               <p className="text-sm text-slate-600">Loading SCORM content...</p>
             </div>
           </div>
@@ -237,15 +237,15 @@ export function ScormPlayerWrapper({
 
         {error && (
           <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
-            <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center max-w-md">
-              <p className="text-sm font-medium text-red-900">{error}</p>
+            <div className="rounded-xl border border-brand-red-200 bg-brand-red-50 p-6 text-center max-w-md">
+              <p className="text-sm font-medium text-brand-red-900">{error}</p>
               <button
                 onClick={() => {
                   setError(null);
                   setLoading(true);
                   if (iframeRef.current) iframeRef.current.src = launchUrl;
                 }}
-                className="mt-3 text-sm text-blue-600 hover:text-blue-700"
+                className="mt-3 text-sm text-brand-blue-600 hover:text-brand-blue-700"
               >
                 Try Again
               </button>
@@ -265,7 +265,7 @@ export function ScormPlayerWrapper({
           />
         ) : (
           <div className="h-full w-full flex items-center justify-center">
-            <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <div className="w-10 h-10 border-4 border-brand-blue-600 border-t-transparent rounded-full animate-spin" />
           </div>
         )}
       </div>

@@ -35,12 +35,12 @@ export default function LMSStandardsPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8 flex items-center justify-between">
+        <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4 mb-8 flex items-center justify-between">
           <div>
-            <p className="font-medium text-green-900">Official LMS Standards Document</p>
-            <p className="text-sm text-green-700">Authoritative reference for course creation and educational governance.</p>
+            <p className="font-medium text-brand-green-900">Official LMS Standards Document</p>
+            <p className="text-sm text-brand-green-700">Authoritative reference for course creation and educational governance.</p>
           </div>
-          <a href="/docs/LMS_Governance_and_Course_Standards.pdf" download className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+          <a href="/docs/LMS_Governance_and_Course_Standards.pdf" download className="flex items-center gap-2 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700">
             <Download className="w-4 h-4" /> PDF
           </a>
         </div>
@@ -48,21 +48,21 @@ export default function LMSStandardsPage() {
         <nav className="bg-gray-50 rounded-lg p-6 mb-10">
           <h2 className="font-semibold mb-4">Contents</h2>
           <ol className="space-y-2 text-sm">
-            <li><a href="#purpose" className="text-green-600 hover:underline">1. Purpose & Scope</a></li>
-            <li><a href="#course-types" className="text-green-600 hover:underline">2. Course Types & Structure</a></li>
-            <li><a href="#creation" className="text-green-600 hover:underline">3. Course Creation Standards</a></li>
-            <li><a href="#instructors" className="text-green-600 hover:underline">4. Instructor Requirements</a></li>
-            <li><a href="#certification" className="text-green-600 hover:underline">5. Certification & Credentials</a></li>
-            <li><a href="#quality" className="text-green-600 hover:underline">6. Quality Assurance</a></li>
-            <li><a href="#student-policies" className="text-green-600 hover:underline">7. Student Policies</a></li>
-            <li><a href="#responsibilities" className="text-green-600 hover:underline">8. Roles & Responsibilities</a></li>
-            <li><a href="#versioning" className="text-green-600 hover:underline">9. Versioning & Review</a></li>
+            <li><a href="#purpose" className="text-brand-green-600 hover:underline">1. Purpose & Scope</a></li>
+            <li><a href="#course-types" className="text-brand-green-600 hover:underline">2. Course Types & Structure</a></li>
+            <li><a href="#creation" className="text-brand-green-600 hover:underline">3. Course Creation Standards</a></li>
+            <li><a href="#instructors" className="text-brand-green-600 hover:underline">4. Instructor Requirements</a></li>
+            <li><a href="#certification" className="text-brand-green-600 hover:underline">5. Certification & Credentials</a></li>
+            <li><a href="#quality" className="text-brand-green-600 hover:underline">6. Quality Assurance</a></li>
+            <li><a href="#student-policies" className="text-brand-green-600 hover:underline">7. Student Policies</a></li>
+            <li><a href="#responsibilities" className="text-brand-green-600 hover:underline">8. Roles & Responsibilities</a></li>
+            <li><a href="#versioning" className="text-brand-green-600 hover:underline">9. Versioning & Review</a></li>
           </ol>
         </nav>
 
         <section id="purpose" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <BookOpen className="w-6 h-6 text-green-600" />
+            <BookOpen className="w-6 h-6 text-brand-green-600" />
             1. Purpose & Scope
           </h2>
           <h3 className="text-lg font-semibold mt-6 mb-3">1.1 Purpose</h3>
@@ -80,7 +80,7 @@ export default function LMSStandardsPage() {
 
         <section id="course-types" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Settings className="w-6 h-6 text-green-600" />
+            <Settings className="w-6 h-6 text-brand-green-600" />
             2. Course Types & Structure
           </h2>
           
@@ -149,7 +149,7 @@ export default function LMSStandardsPage() {
 
         <section id="instructors" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Users className="w-6 h-6 text-green-600" />
+            <Users className="w-6 h-6 text-brand-green-600" />
             4. Instructor Requirements
           </h2>
           
@@ -185,7 +185,7 @@ export default function LMSStandardsPage() {
 
         <section id="certification" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Award className="w-6 h-6 text-green-600" />
+            <Award className="w-6 h-6 text-brand-green-600" />
             5. Certification & Credentials
           </h2>
           
@@ -251,7 +251,7 @@ export default function LMSStandardsPage() {
 
         <section id="student-policies" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Clock className="w-6 h-6 text-green-600" />
+            <Clock className="w-6 h-6 text-brand-green-600" />
             7. Student Policies
           </h2>
           

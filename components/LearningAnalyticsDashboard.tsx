@@ -144,7 +144,7 @@ export default function LearningAnalyticsDashboard() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Learning Analytics</h1>
-          <p className="text-red-100">Automated insights into your learning journey</p>
+          <p className="text-brand-red-100">Automated insights into your learning journey</p>
         </div>
       </div>
 
@@ -166,19 +166,19 @@ export default function LearningAnalyticsDashboard() {
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Study Time (hours)</h3>
             <p className="text-3xl font-bold text-brand-orange-600">{learningMetrics.studyTime}</p>
-            <p className="text-sm text-green-600">↑ 12% from last period</p>
+            <p className="text-sm text-brand-green-600">↑ 12% from last period</p>
           </Card>
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Completion Rate</h3>
-            <p className="text-3xl font-bold text-orange-500">{learningMetrics.completionRate}%</p>
-            <p className="text-sm text-green-600">↑ 5% from last period</p>
+            <p className="text-3xl font-bold text-brand-orange-500">{learningMetrics.completionRate}%</p>
+            <p className="text-sm text-brand-green-600">↑ 5% from last period</p>
           </Card>
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Average Score</h3>
-            <p className="text-3xl font-bold text-green-600">{learningMetrics.averageScore}%</p>
-            <p className="text-sm text-green-600">↑ 3% from last period</p>
+            <p className="text-3xl font-bold text-brand-green-600">{learningMetrics.averageScore}%</p>
+            <p className="text-sm text-brand-green-600">↑ 3% from last period</p>
           </Card>
 
           <Card className="p-6">
@@ -195,7 +195,7 @@ export default function LearningAnalyticsDashboard() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">On Track</h3>
-            <p className="text-3xl font-bold text-green-600">{learningMetrics.onTrackPercentage}%</p>
+            <p className="text-3xl font-bold text-brand-green-600">{learningMetrics.onTrackPercentage}%</p>
             <p className="text-sm text-black">Meeting milestones</p>
           </Card>
         </div>
@@ -219,7 +219,7 @@ export default function LearningAnalyticsDashboard() {
                     </div>
                     <div className="w-20 bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-green-500 h-2 rounded-full"
+                        className="bg-brand-green-500 h-2 rounded-full"
                         style={{ width: `${day.score}%` }}
                       />
                     </div>
@@ -244,10 +244,10 @@ export default function LearningAnalyticsDashboard() {
                 <p className="text-xs text-purple-600 mt-1">Video content and hands-on exercises work best</p>
               </div>
 
-              <div className="p-4 bg-orange-50 rounded">
-                <h4 className="font-semibold text-orange-900 mb-1">Optimal Session Length</h4>
-                <p className="text-sm text-orange-700">45-60 minutes</p>
-                <p className="text-xs text-orange-600 mt-1">Performance drops after 60 minutes</p>
+              <div className="p-4 bg-brand-orange-50 rounded">
+                <h4 className="font-semibold text-brand-orange-900 mb-1">Optimal Session Length</h4>
+                <p className="text-sm text-brand-orange-700">45-60 minutes</p>
+                <p className="text-xs text-brand-orange-600 mt-1">Performance drops after 60 minutes</p>
               </div>
             </div>
           </Card>
@@ -260,8 +260,8 @@ export default function LearningAnalyticsDashboard() {
               <div
                 key={insight.id}
                 className={`p-4 rounded-lg border-l-4 ${
-                  insight.type === 'risk' ? 'bg-red-50 border-red-500' :
-                  insight.type === 'opportunity' ? 'bg-green-50 border-green-500' :
+                  insight.type === 'risk' ? 'bg-brand-red-50 border-brand-red-500' :
+                  insight.type === 'opportunity' ? 'bg-brand-green-50 border-brand-green-500' :
                   'bg-brand-blue-50 border-brand-blue-500'
                 }`}
               >

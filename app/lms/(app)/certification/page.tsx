@@ -109,7 +109,7 @@ export default async function CertificationPage() {
           <div className="text-gray-600 text-sm">In Progress</div>
         </div>
         <div className="bg-white rounded-xl shadow-sm border p-5 text-center">
-          <FileText className="w-8 h-8 text-green-500 mx-auto mb-2" />
+          <FileText className="w-8 h-8 text-brand-green-500 mx-auto mb-2" />
           <div className="text-2xl font-bold">{availableCerts?.length || 0}</div>
           <div className="text-gray-600 text-sm">Available</div>
         </div>

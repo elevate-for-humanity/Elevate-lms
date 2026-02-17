@@ -64,20 +64,20 @@ export function CreateCourseForm({ categories, programs }: Props) {
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border p-6 space-y-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 text-sm text-brand-red-700">
           {error}
         </div>
       )}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Course Title <span className="text-red-500">*</span>
+          Course Title <span className="text-brand-red-500">*</span>
         </label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
           placeholder="Enter course title"
           required
         />
@@ -90,7 +90,7 @@ export function CreateCourseForm({ categories, programs }: Props) {
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
           rows={4}
           placeholder="Course description"
         />
@@ -135,7 +135,7 @@ export function CreateCourseForm({ categories, programs }: Props) {
           id="is_published"
           checked={isPublished}
           onChange={(e) => setIsPublished(e.target.checked)}
-          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          className="h-4 w-4 rounded border-gray-300 text-brand-blue-600 focus:ring-brand-blue-500"
         />
         <label htmlFor="is_published" className="text-sm text-gray-700">
           Publish immediately
@@ -146,7 +146,7 @@ export function CreateCourseForm({ categories, programs }: Props) {
         <button
           type="submit"
           disabled={saving}
-          className="flex-1 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2 font-medium"
+          className="flex-1 bg-brand-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 flex items-center justify-center gap-2 font-medium"
         >
           {saving && <Loader2 className="w-4 h-4 animate-spin" />}
           {saving ? 'Creating...' : 'Create Course'}

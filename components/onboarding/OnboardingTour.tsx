@@ -176,7 +176,7 @@ export function OnboardingTour({
           {/* Progress Bar */}
           <div className="h-1 bg-gray-100">
             <div 
-              className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-500"
+              className="h-full bg-gradient-to-r from-brand-blue-500 to-indigo-600 transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>

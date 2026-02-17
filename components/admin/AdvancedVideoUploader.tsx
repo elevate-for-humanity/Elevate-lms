@@ -107,7 +107,7 @@ Apply today and start your journey.`;
               className="w-full text-sm text-black file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-blue-50 file:text-brand-blue-700 hover:file:bg-brand-blue-100"
             />
             {videoFile && (
-              <p className="mt-2 text-sm text-green-600">
+              <p className="mt-2 text-sm text-brand-green-600">
                 ✓ {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(2)} MB)
               </p>
             )}
@@ -190,7 +190,7 @@ Apply today and start your journey.`;
                     className="w-full text-sm text-black file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
                   />
                   {voiceoverFile && (
-                    <p className="mt-2 text-sm text-green-600">
+                    <p className="mt-2 text-sm text-brand-green-600">
                       ✓ {voiceoverFile.name}
                     </p>
                   )}
@@ -202,18 +202,18 @@ Apply today and start your journey.`;
           {/* Background Music */}
           <div className="border-2 border-slate-200 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-4">
-              <Music className="h-10 w-10 text-green-600" />
+              <Music className="h-10 w-10 text-brand-green-600" />
               <h3 className="text-lg font-bold text-black">3. Add Background Music (Optional)</h3>
             </div>
             <input
               type="file"
               accept="audio/*"
               onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setMusicFile(e.target.files?.[0] || null)}
-              className="w-full text-sm text-black file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+              className="w-full text-sm text-black file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-green-50 file:text-brand-green-700 hover:file:bg-brand-green-100"
             />
             {musicFile && (
               <>
-                <p className="mt-2 text-sm text-green-600">
+                <p className="mt-2 text-sm text-brand-green-600">
                   ✓ {musicFile.name}
                 </p>
                 <div className="mt-3 flex items-center gap-4">
@@ -273,14 +273,14 @@ Apply today and start your journey.`;
 
           {/* Success */}
           {result && !error && (
-            <div className="   border-2 border-green-200 rounded-lg p-6">
+            <div className="   border-2 border-brand-green-200 rounded-lg p-6">
               <div className="flex items-start gap-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div className="flex-1">
-                  <h4 className="text-xl font-bold text-green-900 mb-2">
+                  <h4 className="text-xl font-bold text-brand-green-900 mb-2">
                     🎉 Video Enhanced Successfully!
                   </h4>
-                  <p className="text-green-700 mb-4">
+                  <p className="text-brand-green-700 mb-4">
                     {result.message}
                   </p>
 
@@ -322,7 +322,7 @@ Apply today and start your journey.`;
                       href={result.enhancedUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block w-full text-center py-3 px-6 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors"
+                      className="block w-full text-center py-3 px-6 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition-colors"
                     >
                       ▶️ View Enhanced Video
                     </a>
@@ -331,7 +331,7 @@ Apply today and start your journey.`;
                         navigator.clipboard.writeText(`${window.location.origin}${result.enhancedUrl}`);
                         alert('URL copied to clipboard!');
                       }}
-                      className="block w-full text-center py-3 px-6 bg-white text-green-700 font-bold rounded-lg border-2 border-green-600 hover:bg-green-50 transition-colors"
+                      className="block w-full text-center py-3 px-6 bg-white text-brand-green-700 font-bold rounded-lg border-2 border-brand-green-600 hover:bg-brand-green-50 transition-colors"
                     >
                       📋 Copy Video URL
                     </button>
@@ -343,12 +343,12 @@ Apply today and start your journey.`;
 
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6">
+            <div className="bg-brand-red-50 border-2 border-brand-red-200 rounded-lg p-6">
               <div className="flex items-start gap-4">
                 <AlertCircle className="h-10 w-10 text-brand-orange-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-red-900 mb-1">Processing Failed</h4>
-                  <p className="text-sm text-red-700">{error}</p>
+                  <h4 className="font-bold text-brand-red-900 mb-1">Processing Failed</h4>
+                  <p className="text-sm text-brand-red-700">{error}</p>
                 </div>
               </div>
             </div>
@@ -378,9 +378,9 @@ Apply today and start your journey.`;
             <li>• Perfect timing</li>
           </ul>
         </div>
-        <div className="bg-green-50 rounded-lg p-6 border-2 border-green-200">
-          <h4 className="font-bold text-green-900 mb-3">🎵 Background Music</h4>
-          <ul className="text-sm text-green-700 space-y-1">
+        <div className="bg-brand-green-50 rounded-lg p-6 border-2 border-brand-green-200">
+          <h4 className="font-bold text-brand-green-900 mb-3">🎵 Background Music</h4>
+          <ul className="text-sm text-brand-green-700 space-y-1">
             <li>• Au to video length</li>
             <li>• Volume control</li>
             <li>• Mixed with voiceover</li>

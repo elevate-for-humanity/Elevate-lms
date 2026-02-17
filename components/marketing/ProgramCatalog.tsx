@@ -33,7 +33,7 @@ export function ProgramCatalog() {
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
         <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-300">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-orange-300">
               Popular programs
             </h2>
             <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-50">
@@ -47,7 +47,7 @@ export function ProgramCatalog() {
           </div>
           <Link
             href="/programs"
-            className="inline-flex items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-50 hover:border-red-300 hover:bg-slate-900"
+            className="inline-flex items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-50 hover:border-brand-red-300 hover:bg-slate-900"
           >
             View full program directory →
           </Link>
@@ -82,7 +82,7 @@ export function ProgramCatalog() {
               <p className="mt-3 text-sm text-slate-300">
                 {program.summary}
               </p>
-              <span className="mt-4 inline-flex text-sm font-semibold text-orange-300 group-hover:text-emerald-200">
+              <span className="mt-4 inline-flex text-sm font-semibold text-brand-orange-300 group-hover:text-emerald-200">
                 Learn more →
               </span>
             </Link>

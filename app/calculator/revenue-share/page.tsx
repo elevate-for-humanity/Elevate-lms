@@ -169,7 +169,7 @@ export default function RevenueShareCalculator() {
                     <span>Main Office Share (40%)</span>
                     <span>-${mainOfficeBaseShare.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-green-600 font-semibold">
+                  <div className="flex justify-between text-brand-green-600 font-semibold">
                     <span>Your Share (60%)</span>
                     <span>+${subofficeShare.toFixed(2)}</span>
                   </div>
@@ -184,16 +184,16 @@ export default function RevenueShareCalculator() {
                   </span>
                 </div>
 
-                <div className="bg-green-50 rounded-lg p-4 mt-4 border-2 border-green-200">
+                <div className="bg-brand-green-50 rounded-lg p-4 mt-4 border-2 border-brand-green-200">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="font-semibold text-green-900">
+                    <span className="font-semibold text-brand-green-900">
                       Your Total per Return
                     </span>
-                    <span className="text-3xl font-bold text-green-600">
+                    <span className="text-3xl font-bold text-brand-green-600">
                       ${subofficeShare.toFixed(2)}
                     </span>
                   </div>
-                  <div className="text-xs text-green-700 mt-2">
+                  <div className="text-xs text-brand-green-700 mt-2">
                     60% of base tax prep fee only
                   </div>
                 </div>
@@ -217,7 +217,7 @@ export default function RevenueShareCalculator() {
             </div>
 
             {/* Monthly & Annual Projections */}
-            <div className="bg-green-600 rounded-lg shadow-md p-8 text-white">
+            <div className="bg-brand-green-600 rounded-lg shadow-md p-8 text-white">
               <h2 className="text-2xl font-bold mb-6">
                 Your Potential Earnings
               </h2>
@@ -266,7 +266,7 @@ export default function RevenueShareCalculator() {
                   </div>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-green-600">
+                  <div className="text-2xl font-bold text-brand-green-600">
                     ${(annualRevenue / (numberOfReturns * 4)).toFixed(0)}
                   </div>
                   <div className="text-xs text-black">Avg per Return</div>
@@ -278,7 +278,7 @@ export default function RevenueShareCalculator() {
                   <div className="text-xs text-black">Your Margin</div>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-orange-600">
+                  <div className="text-2xl font-bold text-brand-orange-600">
                     ${(annualRevenue * 0.3).toLocaleString()}
                   </div>
                   <div className="text-xs text-black">Est. Taxes (30%)</div>
@@ -303,7 +303,7 @@ export default function RevenueShareCalculator() {
                 <li>• 1 preparer</li>
               </ul>
               <div className="mt-4 pt-4 border-t">
-                <div className="text-2xl font-bold text-green-600">$30,000</div>
+                <div className="text-2xl font-bold text-brand-green-600">$30,000</div>
                 <div className="text-xs text-black">
                   Annual revenue (60% of $250 × 50 × 4)
                 </div>
@@ -321,7 +321,7 @@ export default function RevenueShareCalculator() {
                 <li>• 2 preparers</li>
               </ul>
               <div className="mt-4 pt-4 border-t">
-                <div className="text-2xl font-bold text-green-600">$72,000</div>
+                <div className="text-2xl font-bold text-brand-green-600">$72,000</div>
                 <div className="text-xs text-black">
                   Annual revenue (60% of $300 × 100 × 4)
                 </div>
@@ -336,7 +336,7 @@ export default function RevenueShareCalculator() {
                 <li>• 4 preparers</li>
               </ul>
               <div className="mt-4 pt-4 border-t">
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-2xl font-bold text-brand-green-600">
                   $168,000
                 </div>
                 <div className="text-xs text-black">
@@ -389,7 +389,7 @@ export default function RevenueShareCalculator() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/suboffice-onboarding"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all"
+              className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all"
             >
               Start Onboarding
             </Link>

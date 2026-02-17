@@ -117,7 +117,7 @@ export default async function TaxFilingReportsPage() {
               <button className="w-full px-4 py-2 bg-brand-blue-600 text-white rounded-md hover:bg-brand-blue-700" aria-label="Action button">
                 Export to CSV
               </button>
-              <button className="w-full px-4 py-2 bg-brand-green-600 text-white rounded-md hover:bg-green-700" aria-label="Action button">
+              <button className="w-full px-4 py-2 bg-brand-green-600 text-white rounded-md hover:bg-brand-green-700" aria-label="Action button">
                 Export to PDF
               </button>
               <button className="w-full px-4 py-2 bg-brand-blue-600 text-white rounded-md hover:bg-brand-blue-700" aria-label="Action button">

@@ -81,7 +81,7 @@ export default function NewAppointmentPage() {
             <h2 className="text-lg font-bold text-gray-900 mb-6">Appointment Details</h2>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>
+              <div className="mb-4 p-3 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700 text-sm">{error}</div>
             )}
 
             <div className="space-y-6">

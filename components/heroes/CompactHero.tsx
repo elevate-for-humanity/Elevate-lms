@@ -35,7 +35,7 @@ export function CompactHero({
   const backgrounds = {
     default: 'bg-white',
     muted: 'bg-gray-50',
-    gradient: 'bg-gradient-to-b from-blue-50 to-white',
+    gradient: 'bg-gradient-to-b from-brand-blue-50 to-white',
   };
 
   return (

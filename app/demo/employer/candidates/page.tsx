@@ -21,7 +21,7 @@ export default function DemoCandidatesPage() {
                 <div className="font-semibold text-gray-900">{c.name}</div>
                 <div className="text-sm text-gray-500">{c.program} · {c.completion} complete</div>
               </div>
-              <div className="flex items-center gap-1 bg-green-50 text-green-700 px-2.5 py-1 rounded-full text-xs font-semibold">
+              <div className="flex items-center gap-1 bg-brand-green-50 text-brand-green-700 px-2.5 py-1 rounded-full text-xs font-semibold">
                 <Star className="w-3 h-3" /> {c.match}% match
               </div>
             </div>

@@ -123,7 +123,7 @@ export function AssignmentActivity({
                 />
                 <label
                   htmlFor="file-upload"
-                  className="cursor-pointer text-sm text-brand-orange-600 hover:text-red-700 font-medium"
+                  className="cursor-pointer text-sm text-brand-orange-600 hover:text-brand-red-700 font-medium"
                 >
                   Click to upload
                 </label>
@@ -192,9 +192,9 @@ export function AssignmentActivity({
 
       {!canSubmit && (
         <div className="border-t border-slate-200 pt-6">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 text-center">
             <AlertCircle className="w-8 h-8 text-brand-orange-600 mx-auto mb-2" />
-            <p className="text-red-800 font-medium">
+            <p className="text-brand-red-800 font-medium">
               This assignment is overdue and no longer accepts submissions.
             </p>
           </div>

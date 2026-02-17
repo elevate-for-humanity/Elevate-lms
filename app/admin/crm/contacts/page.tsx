@@ -57,9 +57,9 @@ export default async function ContactsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Hot': return 'bg-red-100 text-red-700';
-      case 'Warm': return 'bg-orange-100 text-orange-700';
-      case 'Active': return 'bg-green-100 text-green-700';
+      case 'Hot': return 'bg-brand-red-100 text-brand-red-700';
+      case 'Warm': return 'bg-brand-orange-100 text-brand-orange-700';
+      case 'Active': return 'bg-brand-green-100 text-brand-green-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -67,7 +67,7 @@ export default async function ContactsPage() {
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'Lead': return 'bg-brand-blue-100 text-brand-blue-700';
-      case 'Customer': return 'bg-green-100 text-green-700';
+      case 'Customer': return 'bg-brand-green-100 text-brand-green-700';
       case 'Partner': return 'bg-brand-blue-100 text-brand-blue-700';
       default: return 'bg-gray-100 text-gray-700';
     }

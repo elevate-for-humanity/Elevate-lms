@@ -44,8 +44,8 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
           />
           {product.badge && (
             <span className={`absolute top-3 left-3 px-2 py-1 text-xs font-bold rounded-full ${
-              product.badge === 'Best Seller' ? 'bg-orange-500 text-white' :
-              product.badge === 'New' ? 'bg-green-500 text-white' :
+              product.badge === 'Best Seller' ? 'bg-brand-orange-500 text-white' :
+              product.badge === 'New' ? 'bg-brand-green-500 text-white' :
               'bg-brand-blue-500 text-white'
             }`}>
               {product.badge}
@@ -85,8 +85,8 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
           />
           {product.badge && (
             <span className={`absolute top-3 left-3 px-2 py-1 text-xs font-bold rounded-full ${
-              product.badge === 'Best Seller' ? 'bg-orange-500 text-white' :
-              product.badge === 'New' ? 'bg-green-500 text-white' :
+              product.badge === 'Best Seller' ? 'bg-brand-orange-500 text-white' :
+              product.badge === 'New' ? 'bg-brand-green-500 text-white' :
               'bg-brand-blue-500 text-white'
             }`}>
               {product.badge}
@@ -101,7 +101,7 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
             </div>
             <button 
               onClick={(e) => { e.preventDefault(); setIsWishlisted(!isWishlisted); }}
-              className={`p-2 rounded-lg transition ${isWishlisted ? 'text-red-500' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`p-2 rounded-lg transition ${isWishlisted ? 'text-brand-red-500' : 'text-gray-400 hover:text-gray-600'}`}
             >
               <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
             </button>
@@ -161,8 +161,8 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
         {product.badge && (
           <div className="absolute top-4 left-4">
             <span className={`px-3 py-1 text-xs font-bold rounded-full ${
-              product.badge === 'Best Seller' ? 'bg-orange-500 text-white' :
-              product.badge === 'New' ? 'bg-green-500 text-white' :
+              product.badge === 'Best Seller' ? 'bg-brand-orange-500 text-white' :
+              product.badge === 'New' ? 'bg-brand-green-500 text-white' :
               'bg-brand-blue-500 text-white'
             }`}>
               {product.badge}
@@ -174,7 +174,7 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
         <button 
           onClick={(e) => { e.preventDefault(); setIsWishlisted(!isWishlisted); }}
           className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition ${
-            isWishlisted ? 'bg-red-500 text-white' : 'bg-white/90 text-gray-600 hover:bg-white'
+            isWishlisted ? 'bg-brand-red-500 text-white' : 'bg-white/90 text-gray-600 hover:bg-white'
           }`}
         >
           <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
@@ -216,7 +216,7 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
           <div className="grid grid-cols-2 gap-2 mb-6">
             {product.features.slice(0, 4).map((feature, j) => (
               <div key={j} className="flex items-center gap-2 text-sm text-gray-600">
-                <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                <Check className="w-4 h-4 text-brand-green-500 flex-shrink-0" />
                 <span className="truncate">{feature}</span>
               </div>
             ))}

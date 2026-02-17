@@ -171,7 +171,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
     return (
       <button
         onClick={handleOpen}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 rounded-full shadow-lg transition-all hover:scale-105"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-4 py-3 rounded-full shadow-lg transition-all hover:scale-105"
         aria-label="Open store guide"
       >
         <Image
@@ -204,7 +204,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
           <div className="bg-white border-b border-slate-200 p-4">
             <div className="flex items-center gap-3">
               {/* Avatar Image */}
-              <div className={`w-14 h-14 rounded-full overflow-hidden border-2 flex-shrink-0 ${isSpeaking ? 'border-red-500 animate-pulse' : 'border-slate-200'}`}>
+              <div className={`w-14 h-14 rounded-full overflow-hidden border-2 flex-shrink-0 ${isSpeaking ? 'border-brand-red-500 animate-pulse' : 'border-slate-200'}`}>
                 <Image
                   src="/images/team-hq/instructor-1.jpg"
                   alt="Store Guide"
@@ -227,7 +227,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
                 className="p-2 hover:bg-slate-100 rounded-full"
                 title={isMuted ? 'Unmute' : 'Mute'}
               >
-                {isMuted ? <VolumeX className="w-5 h-5 text-slate-400" /> : <Volume2 className="w-5 h-5 text-red-500" />}
+                {isMuted ? <VolumeX className="w-5 h-5 text-slate-400" /> : <Volume2 className="w-5 h-5 text-brand-red-500" />}
               </button>
               <button
                 onClick={handleClose}
@@ -252,7 +252,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
                     <button
                       key={choice.id}
                       onClick={() => handleChoiceSelect(choice)}
-                      className="w-full flex items-center gap-3 p-3 bg-white hover:bg-orange-50 border-2 border-gray-200 hover:border-orange-500 rounded-xl transition-all text-left"
+                      className="w-full flex items-center gap-3 p-3 bg-white hover:bg-brand-orange-50 border-2 border-gray-200 hover:border-brand-orange-500 rounded-xl transition-all text-left"
                     >
                       {/* Choice Image */}
                       <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
@@ -303,8 +303,8 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
                 </p>
 
                 {selectedChoice?.startTour && (
-                  <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
-                    <p className="text-sm text-orange-800 font-medium">
+                  <div className="bg-brand-orange-50 border border-brand-orange-200 rounded-xl p-4 mb-6">
+                    <p className="text-sm text-brand-orange-800 font-medium">
                       Would you like a quick tour?
                     </p>
                   </div>
@@ -321,7 +321,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
                       </button>
                       <button
                         onClick={() => handleConfirm(true)}
-                        className="flex-1 py-3 px-4 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700"
+                        className="flex-1 py-3 px-4 bg-brand-orange-600 text-white rounded-lg font-medium hover:bg-brand-orange-700"
                       >
                         Yes, show me
                       </button>
@@ -329,7 +329,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
                   ) : (
                     <button
                       onClick={() => handleConfirm(false)}
-                      className="w-full py-3 px-4 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700"
+                      className="w-full py-3 px-4 bg-brand-orange-600 text-white rounded-lg font-medium hover:bg-brand-orange-700"
                     >
                       Let's go!
                     </button>

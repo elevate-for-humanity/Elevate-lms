@@ -463,7 +463,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
             </div>
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-orange-600 hover:bg-orange-50 transition-all shadow-lg hover:scale-105 whitespace-nowrap"
+              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-brand-orange-600 hover:bg-brand-orange-50 transition-all shadow-lg hover:scale-105 whitespace-nowrap"
             >
               Apply Now →
             </Link>
@@ -488,7 +488,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
           <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
             <div className="max-w-3xl">
               {config.badge && (
-                <div className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2 text-sm font-bold text-white mb-6">
+                <div className="inline-flex items-center gap-2 rounded-full bg-brand-orange-500 px-4 py-2 text-sm font-bold text-white mb-6">
                   {config.badge}
                 </div>
               )}
@@ -502,7 +502,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
                 {config.primaryCta && (
                   <Link
                     href={config.primaryCta.href}
-                    className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 text-white font-semibold rounded hover:bg-orange-600 transition-colors shadow-lg"
+                    className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-500 text-white font-semibold rounded hover:bg-brand-orange-600 transition-colors shadow-lg"
                   >
                     {config.primaryCta.label}
                     <ArrowRight size={20} className="ml-2" />
@@ -550,7 +550,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid lg:grid-cols-2 gap-12">
             <div>
-              <p className="text-sm font-semibold text-orange-600 uppercase tracking-wide mb-3">
+              <p className="text-sm font-semibold text-brand-orange-600 uppercase tracking-wide mb-3">
                 {config.categoryLabel}
               </p>
               <h2 className="text-4xl font-light text-black mb-6 leading-tight text-2xl md:text-3xl lg:text-4xl">
@@ -567,7 +567,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
               <ul className="space-y-3 text-black">
                 {config.bullets.map((b) => (
                   <li key={b} className="flex gap-3">
-                    <span className="text-orange-500 font-bold">•</span>
+                    <span className="text-brand-orange-500 font-bold">•</span>
                     <span>{b}</span>
                   </li>
                 ))}

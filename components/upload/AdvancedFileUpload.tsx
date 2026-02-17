@@ -264,13 +264,13 @@ export function AdvancedFileUpload({
             {files.length} file{files.length !== 1 ? 's' : ''}
           </span>
           {successCount > 0 && (
-            <span className="text-green-600">• {successCount} uploaded</span>
+            <span className="text-brand-green-600">• {successCount} uploaded</span>
           )}
           {uploadingCount > 0 && (
             <span className="text-brand-blue-600">↑ {uploadingCount} uploading</span>
           )}
           {errorCount > 0 && (
-            <span className="text-red-600">✗ {errorCount} failed</span>
+            <span className="text-brand-red-600">✗ {errorCount} failed</span>
           )}
         </div>
       )}
@@ -329,7 +329,7 @@ export function AdvancedFileUpload({
 
                   {/* Error Message */}
                   {uploadFile.status === 'error' && (
-                    <p className="text-xs text-red-600 mt-1">
+                    <p className="text-xs text-brand-red-600 mt-1">
                       {uploadFile.error}
                     </p>
                   )}
@@ -346,7 +346,7 @@ export function AdvancedFileUpload({
                   {uploadFile.status === 'error' && (
                     <button
                       onClick={() => retryUpload(uploadFile)}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-brand-red-500 hover:text-brand-red-700"
                       title="Retry upload"
                     >
                       <AlertCircle className="h-5 w-5" />
@@ -375,7 +375,7 @@ export function AdvancedFileUpload({
             const urls = files.filter((f) => f.url).map((f) => f.url!);
             onComplete(urls);
           }}
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition"
+          className="w-full bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold py-3 px-6 rounded-lg transition"
         >
           Complete Upload ({successCount} files)
         </button>

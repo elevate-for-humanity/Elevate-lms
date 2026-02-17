@@ -126,7 +126,7 @@ export default async function StaffDashboard() {
 
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-2">
-              <BookOpen className="h-11 w-11 text-green-600" />
+              <BookOpen className="h-11 w-11 text-brand-green-600" />
               <span className="text-3xl font-bold text-black">
                 {activeEnrollments || 0}
               </span>
@@ -236,12 +236,12 @@ export default async function StaffDashboard() {
                 </div>
               )}
               {(atRiskCount || 0) === 0 && (pendingEnrollments || 0) === 0 && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="flex items-center gap-2 text-green-900 font-semibold">
+                <div className="p-3 bg-brand-green-50 border border-brand-green-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-brand-green-900 font-semibold">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                     All Caught Up!
                   </div>
-                  <div className="text-sm text-green-800 mt-1">
+                  <div className="text-sm text-brand-green-800 mt-1">
                     No urgent tasks at this time
                   </div>
                 </div>
@@ -289,7 +289,7 @@ export default async function StaffDashboard() {
                         <span
                           className={`px-2 py-2 rounded-full text-xs ${
                             enrollment.status === 'completed'
-                              ? 'bg-green-100 text-green-800'
+                              ? 'bg-brand-green-100 text-brand-green-800'
                               : enrollment.status === 'active'
                                 ? 'bg-brand-blue-100 text-brand-blue-800'
                                 : enrollment.status === 'pending'

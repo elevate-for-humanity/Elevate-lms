@@ -158,7 +158,7 @@ export default async function ProgramsPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight mb-4">
             Find Your <span className="text-brand-blue-600">Career Path.</span><br />
-            <span className="text-red-600">Start Free.</span>
+            <span className="text-brand-red-600">Start Free.</span>
           </h1>
           <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-6">
             If you're here, you're in the right place. This program is designed to take you from interested to enrolled, then into class with a clear next step at every stage.
@@ -184,7 +184,7 @@ export default async function ProgramsPage() {
             <div key={i} className="flex items-center gap-8 mx-4">
               {['Healthcare', 'Skilled Trades', 'Technology', 'CDL', 'Barbering', 'Business', 'Free Training'].map((text, j) => (
                 <span key={j} className="text-white/80 text-base font-medium flex items-center gap-4">
-                  {text}<span className="text-red-500">★</span>
+                  {text}<span className="text-brand-red-500">★</span>
                 </span>
               ))}
             </div>
@@ -292,7 +292,7 @@ export default async function ProgramsPage() {
                   'Industry-Recognized Certifications',
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-3 p-2.5 bg-white rounded-lg shadow-sm">
-                    <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 text-brand-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                     <span className="font-medium text-slate-700 text-sm">{item}</span>

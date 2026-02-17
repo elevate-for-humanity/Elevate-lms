@@ -29,7 +29,7 @@ export default function DemoHoursPage() {
             </button>
           </div>
           <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-            <div className="h-full bg-green-500 rounded-full" style={{ width: `${pct}%` }} />
+            <div className="h-full bg-brand-green-500 rounded-full" style={{ width: `${pct}%` }} />
           </div>
           <div className="text-xs text-gray-500 mt-1">{pct}% complete · {requiredHours - totalHours} hours remaining</div>
         </div>
@@ -54,7 +54,7 @@ export default function DemoHoursPage() {
                   <td className="px-5 py-3 font-semibold text-gray-900">{h.hours}h</td>
                   <td className="px-5 py-3 text-gray-600">{h.supervisor}</td>
                   <td className="px-5 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${h.approved ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${h.approved ? 'bg-brand-green-100 text-brand-green-800' : 'bg-amber-100 text-amber-800'}`}>
                       {h.approved ? 'Approved' : 'Pending'}
                     </span>
                   </td>

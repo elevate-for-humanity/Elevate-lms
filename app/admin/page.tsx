@@ -196,10 +196,10 @@ export default async function AdminHubPage() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="bg-white rounded-lg border p-4 hover:shadow-sm hover:border-blue-200 transition group"
+                  className="bg-white rounded-lg border p-4 hover:shadow-sm hover:border-brand-blue-200 transition group"
                 >
-                  <item.icon className="w-5 h-5 text-gray-400 group-hover:text-blue-600 mb-2" />
-                  <p className="font-medium text-gray-900 text-sm group-hover:text-blue-600">
+                  <item.icon className="w-5 h-5 text-gray-400 group-hover:text-brand-blue-600 mb-2" />
+                  <p className="font-medium text-gray-900 text-sm group-hover:text-brand-blue-600">
                     {item.label}
                   </p>
                   <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>

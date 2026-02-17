@@ -79,7 +79,7 @@ export default async function JobsPage() {
         </div>
         <Link
           href="/admin/jobs/new"
-          className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center gap-2"
+          className="px-4 py-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
           Post New Job
@@ -91,8 +91,8 @@ export default async function JobsPage() {
         {stats.map((stat) => (
           <div key={stat.label} className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <stat.icon className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                <stat.icon className="w-6 h-6 text-brand-orange-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stat.value}</p>
@@ -111,16 +111,16 @@ export default async function JobsPage() {
             <input
               type="text"
               placeholder="Search jobs..."
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
             />
           </div>
-          <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500">
+          <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500">
             <option value="">All Statuses</option>
             <option value="active">Active</option>
             <option value="paused">Paused</option>
             <option value="closed">Closed</option>
           </select>
-          <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500">
+          <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500">
             <option value="">All Types</option>
             <option value="full-time">Full-time</option>
             <option value="part-time">Part-time</option>
@@ -159,7 +159,7 @@ export default async function JobsPage() {
                 <td className="px-6 py-4">
                   <span className={`px-2 py-2 rounded-full text-xs font-medium ${
                     job.status === 'active' 
-                      ? 'bg-green-100 text-green-800' 
+                      ? 'bg-brand-green-100 text-brand-green-800' 
                       : 'bg-yellow-100 text-yellow-800'
                   }`}>
                     {job.status}
@@ -174,7 +174,7 @@ export default async function JobsPage() {
                       <Edit className="w-4 h-4 text-gray-500" />
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded-lg" title="Delete">
-                      <Trash2 className="w-4 h-4 text-red-500" />
+                      <Trash2 className="w-4 h-4 text-brand-red-500" />
                     </button>
                   </div>
                 </td>

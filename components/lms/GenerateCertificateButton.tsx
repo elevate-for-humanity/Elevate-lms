@@ -89,13 +89,13 @@ export function GenerateCertificateButton({
         </p>
       )}
       {message && (
-        <div className="elevate-card bg-green-50 border-green-200 p-3">
-          <p className="text-sm text-green-800 font-medium">• {message}</p>
+        <div className="elevate-card bg-brand-green-50 border-brand-green-200 p-3">
+          <p className="text-sm text-brand-green-800 font-medium">• {message}</p>
         </div>
       )}
       {error && (
-        <div className="elevate-card bg-red-50 border-red-200 p-3">
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="elevate-card bg-brand-red-50 border-brand-red-200 p-3">
+          <p className="text-sm text-brand-red-800">{error}</p>
         </div>
       )}
     </div>

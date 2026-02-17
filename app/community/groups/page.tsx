@@ -91,7 +91,7 @@ export default async function GroupsPage() {
             {user && (
               <Link
                 href="/community/groups/create"
-                className="mt-4 md:mt-0 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center"
+                className="mt-4 md:mt-0 bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Create Group
@@ -145,7 +145,7 @@ export default async function GroupsPage() {
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-bold text-gray-900">{group.name}</h3>
                       {group.isPublic ? (
-                        <Globe className="w-4 h-4 text-green-600" title="Public Group" />
+                        <Globe className="w-4 h-4 text-brand-green-600" title="Public Group" />
                       ) : (
                         <Lock className="w-4 h-4 text-gray-400" title="Private Group" />
                       )}
@@ -204,7 +204,7 @@ export default async function GroupsPage() {
                             {group.category || 'General'}
                           </span>
                           {isMember && (
-                            <span className="bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
+                            <span className="bg-brand-green-500 text-white text-xs font-medium px-2 py-1 rounded">
                               Joined
                             </span>
                           )}
@@ -214,7 +214,7 @@ export default async function GroupsPage() {
                         <div className="flex items-start justify-between mb-2">
                           <h3 className="font-bold text-gray-900">{group.name}</h3>
                           {group.is_public ? (
-                            <Globe className="w-4 h-4 text-green-600" title="Public Group" />
+                            <Globe className="w-4 h-4 text-brand-green-600" title="Public Group" />
                           ) : (
                             <Lock className="w-4 h-4 text-gray-400" title="Private Group" />
                           )}

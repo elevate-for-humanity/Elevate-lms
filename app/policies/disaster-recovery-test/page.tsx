@@ -19,7 +19,7 @@ export default function DisasterRecoveryTestPage() {
         <article className="bg-white rounded-xl shadow-sm p-8 md:p-12 mt-6">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <Shield className="w-8 h-8 text-green-600" />
+              <Shield className="w-8 h-8 text-brand-green-600" />
               <h1 className="text-4xl font-bold text-black">Disaster Recovery Test Report</h1>
         </div>
         <p className="text-sm text-gray-600">Test Date: January 24, 2026</p>
@@ -27,12 +27,12 @@ export default function DisasterRecoveryTestPage() {
 
       <div className="prose prose-lg max-w-none">
         {/* Test Result Banner */}
-        <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-8">
+        <div className="bg-brand-green-50 border-2 border-brand-green-200 rounded-lg p-6 mb-8">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 flex-shrink-0">•</span>
             <div>
-              <h2 className="text-2xl font-bold text-green-800 m-0">Test Result: SUCCESS</h2>
-              <p className="text-green-700 m-0">All recovery objectives met. No production data impacted.</p>
+              <h2 className="text-2xl font-bold text-brand-green-800 m-0">Test Result: SUCCESS</h2>
+              <p className="text-brand-green-700 m-0">All recovery objectives met. No production data impacted.</p>
             </div>
           </div>
         </div>
@@ -152,23 +152,23 @@ export default function DisasterRecoveryTestPage() {
 
         <h2 className="text-2xl font-bold text-black mt-8 mb-4">Validation Results</h2>
         <div className="space-y-3 mb-6">
-          <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+          <div className="flex items-center gap-3 p-3 bg-brand-green-50 rounded-lg">
             <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="text-black">All database tables restored successfully</span>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+          <div className="flex items-center gap-3 p-3 bg-brand-green-50 rounded-lg">
             <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="text-black">Row counts match production baseline</span>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+          <div className="flex items-center gap-3 p-3 bg-brand-green-50 rounded-lg">
             <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="text-black">Foreign key relationships intact</span>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+          <div className="flex items-center gap-3 p-3 bg-brand-green-50 rounded-lg">
             <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="text-black">Application successfully connected to restored database</span>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+          <div className="flex items-center gap-3 p-3 bg-brand-green-50 rounded-lg">
             <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="text-black">No production data impacted during test</span>
           </div>

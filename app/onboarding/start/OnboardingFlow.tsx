@@ -98,7 +98,7 @@ export default function OnboardingFlow({
                         isCurrent
                           ? 'bg-brand-blue-50 border-2 border-brand-blue-600'
                           : isComplete
-                            ? 'bg-green-50 border border-green-200 hover:bg-brand-green-100'
+                            ? 'bg-brand-green-50 border border-brand-green-200 hover:bg-brand-green-100'
                             : 'bg-slate-50 border border-slate-200 hover:bg-slate-100'
                       }`}
                     >
@@ -113,7 +113,7 @@ export default function OnboardingFlow({
                         <div
                           className={`text-sm font-medium ${
                             isComplete
-                              ? 'text-green-900'
+                              ? 'text-brand-green-900'
                               : isCurrent
                                 ? 'text-brand-blue-900'
                                 : 'text-black'
@@ -136,7 +136,7 @@ export default function OnboardingFlow({
                     currentStep === documents.length
                       ? 'bg-brand-blue-50 border-2 border-brand-blue-600'
                       : payrollComplete
-                        ? 'bg-green-50 border border-green-200 hover:bg-brand-green-100'
+                        ? 'bg-brand-green-50 border border-brand-green-200 hover:bg-brand-green-100'
                         : 'bg-slate-50 border border-slate-200 hover:bg-slate-100'
                   }`}
                 >
@@ -151,7 +151,7 @@ export default function OnboardingFlow({
                     <div
                       className={`text-sm font-medium ${
                         payrollComplete
-                          ? 'text-green-900'
+                          ? 'text-brand-green-900'
                           : currentStep === documents.length
                             ? 'text-brand-blue-900'
                             : 'text-black'
@@ -348,7 +348,7 @@ function DocumentStep({
         </div>
 
         {error && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          <div className="mt-4 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700 text-sm">
             {error}
           </div>
         )}

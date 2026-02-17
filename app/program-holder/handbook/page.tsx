@@ -327,16 +327,16 @@ export default async function ProgramHolderHandbookPage() {
             outlined above. You understand that failure to comply may result in
             termination of your Program Holder agreement.
           </p>
-          <div className="mt-4 p-4 bg-green-50 border-l-4 border-green-400">
-            <p className="font-semibold text-green-900">
+          <div className="mt-4 p-4 bg-brand-green-50 border-l-4 border-brand-green-400">
+            <p className="font-semibold text-brand-green-900">
               <span className="text-slate-400 flex-shrink-0">•</span> Approval Process:
             </p>
-            <p className="text-sm mt-2 text-green-800">
+            <p className="text-sm mt-2 text-brand-green-800">
               Once you acknowledge this handbook AND sign the MOU (Memorandum of
               Understanding), you are OFFICIALLY APPROVED as a Program Holder.
               This means:
             </p>
-            <ul className="text-sm mt-2 text-green-800 list-disc list-inside">
+            <ul className="text-sm mt-2 text-brand-green-800 list-disc list-inside">
               <li>You can immediately begin enrolling students</li>
               <li>You are authorized to operate training programs</li>
               <li>You are eligible to receive payments per the MOU terms</li>
@@ -344,7 +344,7 @@ export default async function ProgramHolderHandbookPage() {
                 Your organization is in good standing with Elevate for Humanity
               </li>
             </ul>
-            <p className="text-sm mt-2 text-green-800 font-semibold">
+            <p className="text-sm mt-2 text-brand-green-800 font-semibold">
               Signing the MOU = Approved Status
             </p>
           </div>

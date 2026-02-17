@@ -74,7 +74,7 @@ export default function WorkOneLocator() {
         {/* Location Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {workOneLocations.map((location, index) => (
-            <div key={index} className="bg-slate-50 rounded-lg p-6 hover:shadow-xl transition-shadow border-2 border-slate-200 hover:border-orange-500">
+            <div key={index} className="bg-slate-50 rounded-lg p-6 hover:shadow-xl transition-shadow border-2 border-slate-200 hover:border-brand-orange-500">
               <div className="flex items-start gap-3 mb-4">
                 <div className="text-3xl">📍</div>
                 <div className="flex-1">
@@ -86,7 +86,7 @@ export default function WorkOneLocator() {
                     </p>
                     <p className="flex items-center gap-2">
                       <span>📞</span>
-                      <a href={`tel:${location.phone.replace(/[^0-9]/g, '')}`} className="hover:text-orange-600">
+                      <a href={`tel:${location.phone.replace(/[^0-9]/g, '')}`} className="hover:text-brand-orange-600">
                         {location.phone}
                       </a>
                     </p>
@@ -103,7 +103,7 @@ export default function WorkOneLocator() {
                   href={location.mapUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 px-4 py-2 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-all text-center text-sm"
+                  className="flex-1 px-4 py-2 bg-brand-orange-600 text-white font-semibold rounded-lg hover:bg-brand-orange-700 transition-all text-center text-sm"
                 >
                   Get Directions
                 </a>
@@ -152,7 +152,7 @@ export default function WorkOneLocator() {
                 href="https://www.indianacareerconnect.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all shadow-lg"
+                className="px-8 py-4 bg-brand-orange-600 text-white font-bold rounded-full hover:bg-brand-orange-700 transition-all shadow-lg"
               >
                 Schedule Virtual Appointment
               </a>

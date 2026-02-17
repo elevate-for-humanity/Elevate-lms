@@ -54,19 +54,19 @@ export default async function VerifyIdentityPage() {
         </section>
 
         <div className="max-w-4xl mx-auto px-6 py-12">
-          <div className="bg-green-50 border-2 border-green-600 rounded-lg p-8">
+          <div className="bg-brand-green-50 border-2 border-brand-green-600 rounded-lg p-8">
             <div className="flex items-center gap-4 mb-4">
               <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
-                <h2 className="text-3xl font-bold text-green-900">
+                <h2 className="text-3xl font-bold text-brand-green-900">
                   Verification Complete!
                 </h2>
-                <p className="text-lg text-green-700">
+                <p className="text-lg text-brand-green-700">
                   Your identity has been successfully verified.
                 </p>
               </div>
             </div>
-            <div className="mt-6 p-4 bg-white rounded-lg border border-green-200">
+            <div className="mt-6 p-4 bg-white rounded-lg border border-brand-green-200">
               <p className="text-sm text-black">
                 <strong>Verified on:</strong>{' '}
                 {new Date(verification.verified_at).toLocaleDateString()}
@@ -137,22 +137,22 @@ export default async function VerifyIdentityPage() {
         </section>
 
         <div className="max-w-4xl mx-auto px-6 py-12">
-          <div className="bg-red-50 border-2 border-red-600 rounded-lg p-8 mb-8">
-            <h2 className="text-2xl font-bold text-red-900 mb-4">
+          <div className="bg-brand-red-50 border-2 border-brand-red-600 rounded-lg p-8 mb-8">
+            <h2 className="text-2xl font-bold text-brand-red-900 mb-4">
               Verification Rejected
             </h2>
-            <p className="text-red-800 mb-4">
+            <p className="text-brand-red-800 mb-4">
               Unfortunately, we were unable to verify your identity with the
               information provided.
             </p>
             {verification.rejection_reason && (
-              <div className="p-4 bg-white rounded-lg border border-red-200 mb-4">
+              <div className="p-4 bg-white rounded-lg border border-brand-red-200 mb-4">
                 <p className="text-sm text-black">
                   <strong>Reason:</strong> {verification.rejection_reason}
                 </p>
               </div>
             )}
-            <p className="text-red-800">
+            <p className="text-brand-red-800">
               Please submit a new verification with updated information below.
             </p>
           </div>

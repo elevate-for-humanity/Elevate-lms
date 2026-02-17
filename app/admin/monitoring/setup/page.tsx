@@ -79,9 +79,9 @@ export default function MonitoringSetupPage() {
         {/* Status Card */}
         {result && (
           <div className={`mb-8 p-6 rounded-xl border-2 ${
-            result.status === 'ready' ? 'bg-green-50 border-green-200' :
+            result.status === 'ready' ? 'bg-brand-green-50 border-brand-green-200' :
             result.status === 'needs_setup' ? 'bg-yellow-50 border-yellow-200' :
-            'bg-red-50 border-red-200'
+            'bg-brand-red-50 border-brand-red-200'
           }`}>
             <div className="flex items-center gap-4 mb-4">
               {result.status === 'ready' ? (
@@ -101,7 +101,7 @@ export default function MonitoringSetupPage() {
               <div className="mt-6">
                 <Link
                   href="/admin/monitoring"
-                  className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition-colors"
+                  className="inline-block px-6 py-3 bg-brand-green-600 text-white rounded-lg font-bold hover:bg-brand-green-700 transition-colors"
                 >
                   Go to Monitoring Dashboard →
                 </Link>
@@ -120,7 +120,7 @@ export default function MonitoringSetupPage() {
                 {result.checks.tableExists ? (
                   <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
-                  <AlertCircle className="h-5 w-5 text-red-600" />
+                  <AlertCircle className="h-5 w-5 text-brand-red-600" />
                 )}
               </div>
               <p className="text-sm text-black">
@@ -137,7 +137,7 @@ export default function MonitoringSetupPage() {
                 {result.checks.canQuery ? (
                   <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
-                  <AlertCircle className="h-5 w-5 text-red-600" />
+                  <AlertCircle className="h-5 w-5 text-brand-red-600" />
                 )}
               </div>
               <p className="text-sm text-black">
@@ -154,7 +154,7 @@ export default function MonitoringSetupPage() {
                 {result.checks.canInsert ? (
                   <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
-                  <AlertCircle className="h-5 w-5 text-red-600" />
+                  <AlertCircle className="h-5 w-5 text-brand-red-600" />
                 )}
               </div>
               <p className="text-sm text-black">
@@ -180,9 +180,9 @@ export default function MonitoringSetupPage() {
                     {exists ? (
                       <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
-                      <AlertCircle className="h-3 w-3 text-red-600" />
+                      <AlertCircle className="h-3 w-3 text-brand-red-600" />
                     )}
-                    <span className={exists ? 'text-black' : 'text-red-600'}>
+                    <span className={exists ? 'text-black' : 'text-brand-red-600'}>
                       {col}
                     </span>
                   </div>

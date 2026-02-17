@@ -117,7 +117,7 @@ export function RAPIDSDataCollection({
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date of Birth <span className="text-red-500">*</span>
+                Date of Birth <span className="text-brand-red-500">*</span>
               </label>
               <input
                 type="date"
@@ -129,7 +129,7 @@ export function RAPIDSDataCollection({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Gender <span className="text-red-500">*</span>
+                Gender <span className="text-brand-red-500">*</span>
               </label>
               <select
                 value={data.gender || ''}
@@ -175,7 +175,7 @@ export function RAPIDSDataCollection({
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Race/Ethnicity <span className="text-red-500">*</span>
+                Race/Ethnicity <span className="text-brand-red-500">*</span>
               </label>
               <select
                 value={data.raceEthnicity || ''}
@@ -190,7 +190,7 @@ export function RAPIDSDataCollection({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Education Level <span className="text-red-500">*</span>
+                Education Level <span className="text-brand-red-500">*</span>
               </label>
               <select
                 value={data.educationLevel || ''}
@@ -297,7 +297,7 @@ export function RAPIDSDataCollection({
               I understand that {programName} is a USDOL Registered Apprenticeship program and 
               I consent to my information being reported to the Department of Labor for compliance 
               and EEO purposes. I certify that the information provided is accurate.
-              <span className="text-red-500"> *</span>
+              <span className="text-brand-red-500"> *</span>
             </span>
           </label>
         </div>
@@ -305,7 +305,7 @@ export function RAPIDSDataCollection({
 
       {/* Validation Status */}
       {data.rapidsConsent && data.dateOfBirth && data.gender && data.raceEthnicity && data.educationLevel && (
-        <div className="mt-6 flex items-center gap-2 text-green-600">
+        <div className="mt-6 flex items-center gap-2 text-brand-green-600">
           <span className="text-slate-400 flex-shrink-0">•</span>
           <span className="text-sm font-medium">RAPIDS information complete</span>
         </div>

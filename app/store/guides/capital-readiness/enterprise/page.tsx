@@ -12,12 +12,12 @@ export default function EnterpriseCapitalReadinessPage() {
           <div className="flex items-center justify-between">
             <Link 
               href="/store/guides/capital-readiness"
-              className="flex items-center gap-2 text-blue-300 hover:text-slate-900 transition-colors"
+              className="flex items-center gap-2 text-brand-blue-300 hover:text-slate-900 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Capital Readiness Guide
             </Link>
-            <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm font-medium border border-blue-500/30">
+            <span className="px-3 py-1 bg-brand-blue-500/20 text-brand-blue-300 rounded-full text-sm font-medium border border-brand-blue-500/30">
               Level 4: Enterprise
             </span>
           </div>
@@ -27,7 +27,7 @@ export default function EnterpriseCapitalReadinessPage() {
       {/* Hero Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 rounded-full text-blue-300 text-sm font-medium mb-6 border border-blue-500/30">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-500/20 rounded-full text-brand-blue-300 text-sm font-medium mb-6 border border-brand-blue-500/30">
             <Building2 className="w-4 h-4" />
             Enterprise & Government Deployment
           </div>
@@ -49,7 +49,7 @@ export default function EnterpriseCapitalReadinessPage() {
         <section className="mb-16">
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-              <Globe className="w-6 h-6 text-blue-400" />
+              <Globe className="w-6 h-6 text-brand-blue-400" />
               Enterprise Deployment Overview
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
@@ -83,7 +83,7 @@ export default function EnterpriseCapitalReadinessPage() {
                     "Data residency compliance"
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-3 text-gray-300">
-                      <Shield className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <Shield className="w-5 h-5 text-brand-blue-400 flex-shrink-0 mt-0.5" />
                       {item}
                     </li>
                   ))}
@@ -96,7 +96,7 @@ export default function EnterpriseCapitalReadinessPage() {
         {/* Government Procurement */}
         <section className="mb-16">
           <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3">
-            <Scale className="w-6 h-6 text-blue-400" />
+            <Scale className="w-6 h-6 text-brand-blue-400" />
             Government Procurement Pathways
           </h2>
           
@@ -142,11 +142,11 @@ export default function EnterpriseCapitalReadinessPage() {
               <div key={i} className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">{pathway.title}</h3>
                 <div className="flex gap-4 mb-4">
-                  <span className="text-sm text-blue-300 flex items-center gap-1">
+                  <span className="text-sm text-brand-blue-300 flex items-center gap-1">
                     <Clock className="w-4 h-4" />
                     {pathway.timeline}
                   </span>
-                  <span className="text-sm text-green-300 flex items-center gap-1">
+                  <span className="text-sm text-brand-green-300 flex items-center gap-1">
                     <DollarSign className="w-4 h-4" />
                     {pathway.threshold}
                   </span>
@@ -156,7 +156,7 @@ export default function EnterpriseCapitalReadinessPage() {
                 <ul className="space-y-2">
                   {pathway.steps.map((step, j) => (
                     <li key={j} className="text-sm text-gray-300 flex items-start gap-2">
-                      <span className="text-blue-400 font-medium">{j + 1}.</span>
+                      <span className="text-brand-blue-400 font-medium">{j + 1}.</span>
                       {step}
                     </li>
                   ))}
@@ -169,7 +169,7 @@ export default function EnterpriseCapitalReadinessPage() {
         {/* Compliance Frameworks */}
         <section className="mb-16">
           <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3">
-            <FileCheck className="w-6 h-6 text-green-400" />
+            <FileCheck className="w-6 h-6 text-brand-green-400" />
             Compliance & Security Frameworks
           </h2>
           
@@ -196,10 +196,10 @@ export default function EnterpriseCapitalReadinessPage() {
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         item.status === "Compliant" 
-                          ? "bg-green-500/20 text-green-300" 
+                          ? "bg-brand-green-500/20 text-brand-green-300" 
                           : item.status === "In Progress"
                           ? "bg-yellow-500/20 text-yellow-300"
-                          : "bg-blue-500/20 text-blue-300"
+                          : "bg-brand-blue-500/20 text-brand-blue-300"
                       }`}>
                         {item.status}
                       </span>
@@ -215,7 +215,7 @@ export default function EnterpriseCapitalReadinessPage() {
         {/* Implementation Timeline */}
         <section className="mb-16">
           <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3">
-            <Clock className="w-6 h-6 text-red-600" />
+            <Clock className="w-6 h-6 text-brand-red-600" />
             Enterprise Implementation Timeline
           </h2>
           
@@ -270,11 +270,11 @@ export default function EnterpriseCapitalReadinessPage() {
                 }
               ].map((phase, i) => (
                 <div key={i} className="relative pl-20">
-                  <div className="absolute left-6 w-4 h-4 rounded-full bg-blue-500 border-4 border-slate-900"></div>
+                  <div className="absolute left-6 w-4 h-4 rounded-full bg-brand-blue-500 border-4 border-slate-900"></div>
                   <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
                     <div className="flex flex-wrap items-center gap-4 mb-4">
                       <h3 className="text-lg font-semibold text-slate-900">{phase.phase}</h3>
-                      <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm">
+                      <span className="px-3 py-1 bg-brand-blue-500/20 text-brand-blue-300 rounded-full text-sm">
                         {phase.duration}
                       </span>
                     </div>
@@ -475,7 +475,7 @@ export default function EnterpriseCapitalReadinessPage() {
 
         {/* CTA */}
         <section className="text-center">
-          <div className="bg-blue-500/20 rounded-2xl border border-blue-500/30 p-12">
+          <div className="bg-brand-blue-500/20 rounded-2xl border border-brand-blue-500/30 p-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
               Ready for Enterprise Deployment?
             </h2>
@@ -486,7 +486,7 @@ export default function EnterpriseCapitalReadinessPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contact?type=enterprise"
-                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+                className="px-8 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition-colors"
               >
                 Schedule Enterprise Consultation
               </Link>

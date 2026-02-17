@@ -334,10 +334,10 @@ export default async function StudentPortalPage() {
               <Link
                 key={index}
                 href={service.href}
-                className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-green-600 transition text-center group"
+                className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-brand-green-600 transition text-center group"
               >
-                <service.icon className="w-12 h-12 text-green-600 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-black mb-2 group-hover:text-green-600 transition">
+                <service.icon className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-black mb-2 group-hover:text-brand-green-600 transition">
                   {service.title}
                 </h3>
                 <p className="text-gray-600 text-sm">{service.description}</p>
@@ -347,7 +347,7 @@ export default async function StudentPortalPage() {
           <div className="text-center mt-8">
             <Link
               href="/career-services"
-              className="inline-flex items-center gap-2 bg-green-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-green-700 transition"
+              className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-green-700 transition"
             >
               View All Career Services
               <ExternalLink className="w-5 h-5" />

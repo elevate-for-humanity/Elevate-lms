@@ -35,7 +35,7 @@ export default function PaymentMethodSelector({
         disabled={disabled}
         className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
           selectedMethod === 'stripe'
-            ? 'border-blue-500 bg-blue-50'
+            ? 'border-brand-blue-500 bg-brand-blue-50'
             : 'border-slate-200 hover:border-slate-300'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
       >
@@ -59,7 +59,7 @@ export default function PaymentMethodSelector({
           </div>
         </div>
         {selectedMethod === 'stripe' && (
-          <p className="text-xs text-blue-600 mt-2">
+          <p className="text-xs text-brand-blue-600 mt-2">
             Pay in full or split into payments with Affirm, Klarna, or Afterpay
           </p>
         )}
@@ -82,7 +82,7 @@ export default function PaymentMethodSelector({
           <div>
             <div className="flex items-center gap-2">
               <p className="font-semibold text-slate-900">Sezzle</p>
-              <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded">
+              <span className="px-2 py-0.5 bg-brand-green-100 text-brand-green-700 text-xs font-medium rounded">
                 0% Interest
               </span>
             </div>

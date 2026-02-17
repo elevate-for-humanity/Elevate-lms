@@ -171,12 +171,12 @@ export function FundingEligibilityQuiz() {
     return (
       <div className="max-w-2xl mx-auto">
         {/* Result Header */}
-        <div className={`p-8 rounded-2xl text-center mb-8 ${isEligible ? 'bg-green-50 border-2 border-green-200' : 'bg-amber-50 border-2 border-amber-200'}`}>
+        <div className={`p-8 rounded-2xl text-center mb-8 ${isEligible ? 'bg-brand-green-50 border-2 border-brand-green-200' : 'bg-amber-50 border-2 border-amber-200'}`}>
           {isEligible ? (
             <>
               <span className="text-slate-400 flex-shrink-0">•</span>
-              <h2 className="text-3xl font-bold text-green-800 mb-2">You Likely Qualify!</h2>
-              <p className="text-green-700 text-lg">
+              <h2 className="text-3xl font-bold text-brand-green-800 mb-2">You Likely Qualify!</h2>
+              <p className="text-brand-green-700 text-lg">
                 Based on your answers, you may be eligible for <strong>{eligiblePrograms.length}</strong> funding program{eligiblePrograms.length > 1 ? 's' : ''}
               </p>
             </>

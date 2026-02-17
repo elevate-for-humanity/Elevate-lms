@@ -184,8 +184,8 @@ export default function SocialProof() {
           </div>
 
           <div className="bg-white rounded-xl p-6 shadow-lg text-center border border-slate-200">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
-              <TrendingUp className="w-6 h-6 text-green-600" />
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-brand-green-100 rounded-full mb-3">
+              <TrendingUp className="w-6 h-6 text-brand-green-600" />
             </div>
             <div className="text-3xl font-bold text-black mb-1">87%</div>
             <div className="text-sm text-black">Job Placement</div>
@@ -248,7 +248,7 @@ export default function SocialProof() {
                 </div>
                 {currentTestimonial.salary && (
                   <div className="flex items-center gap-3">
-                    <TrendingUp className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <TrendingUp className="w-5 h-5 text-brand-green-600 flex-shrink-0" />
                     <span className="text-black font-semibold">
                       Starting salary: {currentTestimonial.salary}
                     </span>

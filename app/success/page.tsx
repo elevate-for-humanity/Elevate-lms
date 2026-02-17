@@ -71,7 +71,7 @@ export default async function SuccessStoriesPage() {
                   CNA, Medical Assistant, and Home Health Aide graduates now
                   working in hospitals and clinics across Indiana.
                 </p>
-                <Link href="/programs/healthcare" className="text-orange-600 font-semibold hover:underline">
+                <Link href="/programs/healthcare" className="text-brand-orange-600 font-semibold hover:underline">
                   View Programs →
                 </Link>
               </div>
@@ -92,7 +92,7 @@ export default async function SuccessStoriesPage() {
                   Barber, HVAC, and Building Maintenance graduates earning
                   $40K-$60K annually.
                 </p>
-                <Link href="/programs/skilled-trades" className="text-orange-600 font-semibold hover:underline">
+                <Link href="/programs/skilled-trades" className="text-brand-orange-600 font-semibold hover:underline">
                   View Programs →
                 </Link>
               </div>
@@ -113,7 +113,7 @@ export default async function SuccessStoriesPage() {
                   Entrepreneurs and tech professionals building successful
                   careers and businesses.
                 </p>
-                <Link href="/programs/business" className="text-orange-600 font-semibold hover:underline">
+                <Link href="/programs/business" className="text-brand-orange-600 font-semibold hover:underline">
                   View Programs →
                 </Link>
               </div>
@@ -130,23 +130,23 @@ export default async function SuccessStoriesPage() {
           </h2>
           <div className="grid md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
             <div>
-              <div className="text-4xl font-bold text-orange-600 mb-2">
+              <div className="text-4xl font-bold text-brand-orange-600 mb-2">
                 5,000+
               </div>
               <p className="text-black">Students Trained</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-orange-600 mb-2">85%</div>
+              <div className="text-4xl font-bold text-brand-orange-600 mb-2">85%</div>
               <p className="text-black">Job Placement Rate</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-orange-600 mb-2">
+              <div className="text-4xl font-bold text-brand-orange-600 mb-2">
                 $45K
               </div>
               <p className="text-black">Average Starting Salary</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-orange-600 mb-2">90%</div>
+              <div className="text-4xl font-bold text-brand-orange-600 mb-2">90%</div>
               <p className="text-black">Student Satisfaction</p>
             </div>
           </div>
@@ -154,12 +154,12 @@ export default async function SuccessStoriesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-orange-600 text-white">
+      <section className="py-16 bg-brand-orange-600 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">
             Ready to Write Your Success Story?
           </h2>
-          <p className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-brand-orange-100 mb-8 max-w-2xl mx-auto">
             Students across Indiana have transformed their lives through
             our training programs.
           </p>

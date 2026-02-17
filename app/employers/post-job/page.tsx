@@ -75,7 +75,7 @@ export default function PostJobPage() {
         <Breadcrumbs items={[{ label: "Employers", href: "/employers" }, { label: "Post Job" }]} />
       </div>
 <div className="container mx-auto px-4 max-w-4xl">
-        <Link href="/employers" className="inline-flex items-center text-orange-600 hover:underline mb-6">
+        <Link href="/employers" className="inline-flex items-center text-brand-orange-600 hover:underline mb-6">
           ← Back to Employers
         </Link>
         
@@ -96,7 +96,7 @@ export default function PostJobPage() {
                   required
                   value={formData.companyName}
                   onChange={(e) => setFormData({...formData, companyName: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 />
               </div>
 
@@ -109,7 +109,7 @@ export default function PostJobPage() {
                   required
                   value={formData.jobTitle}
                   onChange={(e) => setFormData({...formData, jobTitle: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 />
               </div>
 
@@ -122,7 +122,7 @@ export default function PostJobPage() {
                   required
                   value={formData.location}
                   onChange={(e) => setFormData({...formData, location: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                   placeholder="City, State"
                 />
               </div>
@@ -135,7 +135,7 @@ export default function PostJobPage() {
                   required
                   value={formData.jobType}
                   onChange={(e) => setFormData({...formData, jobType: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 >
                   <option value="full-time">Full-Time</option>
                   <option value="part-time">Part-Time</option>
@@ -152,7 +152,7 @@ export default function PostJobPage() {
                   type="text"
                   value={formData.salary}
                   onChange={(e) => setFormData({...formData, salary: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                   placeholder="$40,000 - $60,000"
                 />
               </div>
@@ -166,7 +166,7 @@ export default function PostJobPage() {
                   required
                   value={formData.contactEmail}
                   onChange={(e) => setFormData({...formData, contactEmail: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 />
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function PostJobPage() {
                 rows={6}
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 placeholder="Describe the role, responsibilities, and what makes this opportunity great..."
               />
             </div>
@@ -194,7 +194,7 @@ export default function PostJobPage() {
                 rows={4}
                 value={formData.requirements}
                 onChange={(e) => setFormData({...formData, requirements: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 placeholder="List required skills, certifications, experience..."
               />
             </div>

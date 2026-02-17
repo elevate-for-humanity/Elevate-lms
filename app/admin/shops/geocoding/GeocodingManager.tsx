@@ -113,13 +113,13 @@ export default function GeocodingManager({ shops }: Props) {
           </button>
           <button
             onClick={() => setFilter('geocoded')}
-            className={`px-3 py-1 rounded text-sm ${filter === 'geocoded' ? 'bg-green-600 text-white' : 'bg-gray-100'}`}
+            className={`px-3 py-1 rounded text-sm ${filter === 'geocoded' ? 'bg-brand-green-600 text-white' : 'bg-gray-100'}`}
           >
             Geocoded
           </button>
           <button
             onClick={() => setFilter('failed')}
-            className={`px-3 py-1 rounded text-sm ${filter === 'failed' ? 'bg-red-600 text-white' : 'bg-gray-100'}`}
+            className={`px-3 py-1 rounded text-sm ${filter === 'failed' ? 'bg-brand-red-600 text-white' : 'bg-gray-100'}`}
           >
             Failed
           </button>
@@ -171,19 +171,19 @@ export default function GeocodingManager({ shops }: Props) {
                 </td>
                 <td className="px-4 py-3">
                   {results[shop.id] === 'success' ? (
-                    <span className="flex items-center gap-1 text-green-600 text-sm">
+                    <span className="flex items-center gap-1 text-brand-green-600 text-sm">
                       <span className="text-slate-400 flex-shrink-0">•</span> Done
                     </span>
                   ) : results[shop.id] === 'error' ? (
-                    <span className="flex items-center gap-1 text-red-600 text-sm">
+                    <span className="flex items-center gap-1 text-brand-red-600 text-sm">
                       <XCircle className="w-4 h-4" /> Error
                     </span>
                   ) : shop.geocoded_at ? (
-                    <span className="text-green-600 text-sm">
+                    <span className="text-brand-green-600 text-sm">
                       {shop.geocode_source}
                     </span>
                   ) : shop.geocode_failed_at ? (
-                    <span className="text-red-600 text-sm" title={shop.geocode_error || ''}>
+                    <span className="text-brand-red-600 text-sm" title={shop.geocode_error || ''}>
                       Failed
                     </span>
                   ) : currentShop === shop.id ? (

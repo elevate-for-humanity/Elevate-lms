@@ -101,7 +101,7 @@ export default async function ContactsPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-500">Unread</h3>
-              <span className="text-red-600 bg-red-100 p-2 rounded-lg">
+              <span className="text-brand-red-600 bg-brand-red-100 p-2 rounded-lg">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
@@ -127,7 +127,7 @@ export default async function ContactsPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-500">Avg Response</h3>
-              <span className="text-green-600 bg-green-100 p-2 rounded-lg">
+              <span className="text-brand-green-600 bg-brand-green-100 p-2 rounded-lg">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -161,8 +161,8 @@ export default async function ContactsPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4">
                       <div className={`w-2 h-2 rounded-full mt-2 ${
-                        contact.status === 'unread' ? 'bg-red-500' :
-                        contact.status === 'pending' ? 'bg-yellow-500' : 'bg-green-500'
+                        contact.status === 'unread' ? 'bg-brand-red-500' :
+                        contact.status === 'pending' ? 'bg-yellow-500' : 'bg-brand-green-500'
                       }`} />
                       <div>
                         <p className="font-medium text-gray-900">{contact.name || 'Anonymous'}</p>
@@ -177,9 +177,9 @@ export default async function ContactsPage() {
                           : 'N/A'}
                       </p>
                       <span className={`inline-block mt-1 px-2 py-1 rounded-full text-xs font-medium ${
-                        contact.status === 'unread' ? 'bg-red-100 text-red-800' :
+                        contact.status === 'unread' ? 'bg-brand-red-100 text-brand-red-800' :
                         contact.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                        'bg-green-100 text-green-800'
+                        'bg-brand-green-100 text-brand-green-800'
                       }`}>
                         {contact.status || 'unread'}
                       </span>

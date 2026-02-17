@@ -168,18 +168,18 @@ export default async function TaxCareersPage() {
       <section className="bg-white text-white py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-3xl">
-            <div className="inline-block bg-yellow-400 text-green-900 px-4 py-2 rounded-full font-bold text-sm mb-4">
+            <div className="inline-block bg-yellow-400 text-brand-green-900 px-4 py-2 rounded-full font-bold text-sm mb-4">
               NOW HIRING FOR TAX SEASON 2025
             </div>
             <h1 className="text-5xl font-bold mb-6">Join Our Tax Team</h1>
-            <p className="text-2xl text-green-100 mb-8">
+            <p className="text-2xl text-brand-green-100 mb-8">
               Earn $20-$50/hour as an PTIN-credentialed tax preparer. Work from home
               anywhere in the USA or in our Indianapolis offices.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="#apply"
-                className="inline-block px-8 py-4 bg-yellow-400 text-green-900 font-bold rounded-lg hover:bg-yellow-300 transition text-lg text-center"
+                className="inline-block px-8 py-4 bg-yellow-400 text-brand-green-900 font-bold rounded-lg hover:bg-yellow-300 transition text-lg text-center"
               >
                 Apply Now
               </Link>
@@ -198,7 +198,7 @@ export default async function TaxCareersPage() {
       <section className="py-16 bg-yellow-50 border-y-4 border-yellow-400">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-8">
-            <div className="inline-block bg-yellow-400 text-green-900 px-6 py-3 rounded-full font-bold text-lg mb-4">
+            <div className="inline-block bg-yellow-400 text-brand-green-900 px-6 py-3 rounded-full font-bold text-lg mb-4">
               <DollarSign className="w-5 h-5 inline-block" /> REFERRAL BONUS
               PROGRAM
             </div>
@@ -213,7 +213,7 @@ export default async function TaxCareersPage() {
 
           <div className="bg-white rounded-xl p-8 shadow-lg max-w-3xl mx-auto">
             <div className="text-center mb-6">
-              <div className="text-5xl font-bold text-green-600 mb-2">$50</div>
+              <div className="text-5xl font-bold text-brand-green-600 mb-2">$50</div>
               <p className="text-lg font-bold">Per Completed Tax Return</p>
             </div>
 
@@ -272,7 +272,7 @@ export default async function TaxCareersPage() {
               </ul>
             </div>
 
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+            <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6 mb-6">
               <h3 className="font-bold text-lg mb-3">Example Earnings:</h3>
               <div className="space-y-2 text-sm">
                 <p>
@@ -295,13 +295,13 @@ export default async function TaxCareersPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="mailto:info@elevateforhumanity.org?subject=Employee Referral"
-                className="inline-block px-8 py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition"
+                className="inline-block px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition"
               >
                 Submit a Referral
               </a>
               <a
                 href="/support"
-                className="inline-block px-8 py-4 bg-white border-2 border-green-600 text-green-600 font-bold rounded-lg hover:bg-green-50 transition"
+                className="inline-block px-8 py-4 bg-white border-2 border-brand-green-600 text-brand-green-600 font-bold rounded-lg hover:bg-brand-green-50 transition"
               >
                 Call 317-314-3757
               </a>
@@ -402,11 +402,11 @@ export default async function TaxCareersPage() {
                   </p>
                 </div>
 
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <p className="font-bold text-green-900 mb-2">
+                <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4">
+                  <p className="font-bold text-brand-green-900 mb-2">
                     <span className="text-slate-400 flex-shrink-0">•</span> Good News!
                   </p>
-                  <p className="text-green-800">
+                  <p className="text-brand-green-800">
                     You DON'T need your own EFIN to work with us. We provide
                     EFIN access to all our tax preparers. You can file under our
                     company EFIN.
@@ -544,8 +544,8 @@ export default async function TaxCareersPage() {
                   key={benefit.title}
                   className="bg-white rounded-xl p-8 shadow-lg text-center"
                 >
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Icon className="w-8 h-8 text-green-600" />
+                  <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Icon className="w-8 h-8 text-brand-green-600" />
                   </div>
                   <h3 className="text-xl font-bold mb-3">{benefit.title}</h3>
                   <p className="text-black">{benefit.description}</p>
@@ -570,7 +570,7 @@ export default async function TaxCareersPage() {
             {positions.map((position) => (
               <div
                 key={position.title}
-                className="bg-white border-2 border-gray-200 rounded-xl p-8 hover:border-green-600 transition"
+                className="bg-white border-2 border-gray-200 rounded-xl p-8 hover:border-brand-green-600 transition"
               >
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
                   <div>
@@ -578,7 +578,7 @@ export default async function TaxCareersPage() {
                       {position.title}
                     </h3>
                     <div className="flex flex-wrap gap-3 text-sm">
-                      <span className="px-3 py-2 bg-green-100 text-green-700 rounded-full font-semibold">
+                      <span className="px-3 py-2 bg-brand-green-100 text-brand-green-700 rounded-full font-semibold">
                         {position.type}
                       </span>
                       <span className="px-3 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-full font-semibold">
@@ -587,7 +587,7 @@ export default async function TaxCareersPage() {
                     </div>
                   </div>
                   <div className="mt-4 md:mt-0">
-                    <div className="text-3xl font-bold text-green-600">
+                    <div className="text-3xl font-bold text-brand-green-600">
                       {position.pay}
                     </div>
                   </div>
@@ -609,7 +609,7 @@ export default async function TaxCareersPage() {
 
                 <Link
                   href="#apply"
-                  className="inline-block px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition"
+                  className="inline-block px-6 py-3 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition"
                 >
                   Apply for This Position
                 </Link>
@@ -632,7 +632,7 @@ export default async function TaxCareersPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full bg-white rounded-xl shadow-lg">
-              <thead className="bg-green-600 text-white">
+              <thead className="bg-brand-green-600 text-white">
                 <tr>
                   <th className="px-6 py-4 text-left">Feature</th>
                   <th className="px-6 py-4 text-center">
@@ -646,7 +646,7 @@ export default async function TaxCareersPage() {
               <tbody className="divide-y">
                 <tr>
                   <td className="px-6 py-4 font-semibold">Hourly Pay</td>
-                  <td className="px-6 py-4 text-center text-green-600 font-bold">
+                  <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
                     $20-$50
                   </td>
                   <td className="px-6 py-4 text-center">$12-$25</td>
@@ -655,7 +655,7 @@ export default async function TaxCareersPage() {
                 </tr>
                 <tr className="bg-gray-50">
                   <td className="px-6 py-4 font-semibold">Work From Home</td>
-                  <td className="px-6 py-4 text-center text-green-600 font-bold">
+                  <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
                     <span className="text-slate-400 flex-shrink-0">•</span> Yes
                   </td>
                   <td className="px-6 py-4 text-center">
@@ -670,7 +670,7 @@ export default async function TaxCareersPage() {
                 </tr>
                 <tr>
                   <td className="px-6 py-4 font-semibold">Flexible Schedule</td>
-                  <td className="px-6 py-4 text-center text-green-600 font-bold">
+                  <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
                     <span className="text-slate-400 flex-shrink-0">•</span> Yes
                   </td>
                   <td className="px-6 py-4 text-center">
@@ -687,7 +687,7 @@ export default async function TaxCareersPage() {
                   <td className="px-6 py-4 font-semibold">
                     Performance Bonuses
                   </td>
-                  <td className="px-6 py-4 text-center text-green-600 font-bold">
+                  <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
                     <span className="text-slate-400 flex-shrink-0">•</span> Yes
                   </td>
                   <td className="px-6 py-4 text-center">
@@ -702,7 +702,7 @@ export default async function TaxCareersPage() {
                 </tr>
                 <tr>
                   <td className="px-6 py-4 font-semibold">Year-Round Work</td>
-                  <td className="px-6 py-4 text-center text-green-600 font-bold">
+                  <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
                     <span className="text-slate-400 flex-shrink-0">•</span> Available
                   </td>
                   <td className="px-6 py-4 text-center">
@@ -717,7 +717,7 @@ export default async function TaxCareersPage() {
                 </tr>
                 <tr className="bg-gray-50">
                   <td className="px-6 py-4 font-semibold">Training Provided</td>
-                  <td className="px-6 py-4 text-center text-green-600 font-bold">
+                  <td className="px-6 py-4 text-center text-brand-green-600 font-bold">
                     <span className="text-slate-400 flex-shrink-0">•</span> Free
                   </td>
                   <td className="px-6 py-4 text-center">
@@ -753,7 +753,7 @@ export default async function TaxCareersPage() {
             </p>
             <Link
               href="/supersonic-fast-cash/careers/apply"
-              className="inline-block bg-green-600 text-white px-12 py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition"
+              className="inline-block bg-brand-green-600 text-white px-12 py-4 rounded-lg font-bold text-lg hover:bg-brand-green-700 transition"
             >
               Complete Application Form
             </Link>
@@ -767,14 +767,14 @@ export default async function TaxCareersPage() {
               Questions? Contact us at{' '}
               <a
                 href="/support"
-                className="text-green-600 font-bold underline"
+                className="text-brand-green-600 font-bold underline"
               >
                 317-314-3757
               </a>{' '}
               or email{' '}
               <a
                 href="mailto:info@elevateforhumanity.org"
-                className="text-green-600 font-bold underline"
+                className="text-brand-green-600 font-bold underline"
               >
                 info@elevateforhumanity.org
               </a>

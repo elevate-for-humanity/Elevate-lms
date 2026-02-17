@@ -136,7 +136,7 @@ export default function AdminAgreementsPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
+          <AlertCircle className="w-12 h-12 text-brand-red-600 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Access Denied</h1>
           <p className="text-slate-600">{error || 'Admin access required'}</p>
         </div>
@@ -189,8 +189,8 @@ export default function AdminAgreementsPage() {
 
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Check className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <Check className="w-6 h-6 text-brand-green-600" />
               </div>
               <div>
                 <p className="text-sm text-slate-500">Agreement Types</p>
@@ -326,7 +326,7 @@ export default function AdminAgreementsPage() {
         {/* SQL Query Helper */}
         <div className="mt-8 bg-slate-800 rounded-xl p-6">
           <h3 className="text-white font-semibold mb-4">Audit Query</h3>
-          <pre className="text-green-400 text-sm overflow-x-auto">
+          <pre className="text-brand-green-400 text-sm overflow-x-auto">
 {`SELECT agreement_type, document_version, COUNT(*)
 FROM public.license_agreement_acceptances
 GROUP BY 1, 2

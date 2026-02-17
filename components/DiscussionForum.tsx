@@ -112,7 +112,7 @@ export function DiscussionForum({
               >
             ) => setNewPost(e.target.value)}
             placeholder="Share your thoughts, ask a question, or start a discussion..."
-            className="w-full p-4 border rounded-lg min-h-[120px] focus:ring-2 focus:ring-red-500 focus:border-red-500"
+            className="w-full p-4 border rounded-lg min-h-[120px] focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500"
           />
           <div className="flex justify-end">
             <Button

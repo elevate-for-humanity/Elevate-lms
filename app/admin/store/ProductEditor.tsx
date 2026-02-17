@@ -113,7 +113,7 @@ export default function ProductEditor() {
       <button
         onClick={publish}
         disabled={loading}
-        className="w-full bg-brand-green-600 text-white p-3 rounded hover:bg-green-700 disabled:bg-green-300 disabled:cursor-not-allowed transition-colors font-medium"
+        className="w-full bg-brand-green-600 text-white p-3 rounded hover:bg-brand-green-700 disabled:bg-brand-green-300 disabled:cursor-not-allowed transition-colors font-medium"
       >
         {loading ? 'Publishing...' : 'Publish Product'}
       </button>

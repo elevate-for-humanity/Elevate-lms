@@ -110,7 +110,7 @@ export default async function AlumniPage() {
           <div className="text-gray-600 text-sm">Employed</div>
         </div>
         <div className="bg-white rounded-xl shadow-sm border p-5 text-center">
-          <Users className="w-8 h-8 text-green-600 mx-auto mb-2" />
+          <Users className="w-8 h-8 text-brand-green-600 mx-auto mb-2" />
           <div className="text-2xl font-bold">50+</div>
           <div className="text-gray-600 text-sm">Companies</div>
         </div>

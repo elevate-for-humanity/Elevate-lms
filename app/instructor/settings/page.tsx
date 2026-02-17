@@ -133,7 +133,7 @@ export default async function InstructorSettingsPage() {
         {/* Notifications */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center gap-3 mb-6">
-            <Bell className="w-6 h-6 text-orange-600" />
+            <Bell className="w-6 h-6 text-brand-orange-600" />
             <h2 className="text-lg font-semibold">Notifications</h2>
           </div>
           

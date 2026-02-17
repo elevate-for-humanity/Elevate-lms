@@ -97,7 +97,7 @@ export default async function CampaignsPage() {
               <span className="text-sm font-semibold text-black">
                 Open Rate
               </span>
-              <Eye className="w-5 h-5 text-green-600" />
+              <Eye className="w-5 h-5 text-brand-green-600" />
             </div>
             <p className="text-3xl font-bold text-black">{openRate}%</p>
             <p className="text-sm text-black mt-1">
@@ -123,7 +123,7 @@ export default async function CampaignsPage() {
               <span className="text-sm font-semibold text-black">
                 Campaigns
               </span>
-              <Users className="w-5 h-5 text-orange-600" />
+              <Users className="w-5 h-5 text-brand-orange-600" />
             </div>
             <p className="text-3xl font-bold text-black">
               {campaigns?.length || 0}
@@ -162,7 +162,7 @@ export default async function CampaignsPage() {
                         </span>
                         <span className="text-black">
                           Opened:{' '}
-                          <span className="font-semibold text-green-600">
+                          <span className="font-semibold text-brand-green-600">
                             {campaign.opened_count || 0}
                           </span>
                         </span>
@@ -178,7 +178,7 @@ export default async function CampaignsPage() {
                       <span
                         className={`inline-block px-3 py-2 rounded-full text-xs font-semibold ${
                           campaign.status === 'sent'
-                            ? 'bg-green-100 text-green-700'
+                            ? 'bg-brand-green-100 text-brand-green-700'
                             : campaign.status === 'draft'
                               ? 'bg-gray-100 text-black'
                               : 'bg-brand-blue-100 text-brand-blue-700'

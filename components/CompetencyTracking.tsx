@@ -91,14 +91,14 @@ export default function CompetencyTracking() {
   const levelColors: Record<string, string> = {
     beginner: 'bg-brand-blue-100 text-brand-blue-700',
     intermediate: 'bg-purple-100 text-purple-700',
-    advanced: 'bg-orange-100 text-orange-700',
-    expert: 'bg-red-100 text-red-700',
+    advanced: 'bg-brand-orange-100 text-brand-orange-700',
+    expert: 'bg-brand-red-100 text-brand-red-700',
   };
 
   const statusColors: Record<string, string> = {
     'not-started': 'bg-gray-100 text-black',
     'in-progress': 'bg-yellow-100 text-yellow-700',
-    'mastered': 'bg-green-100 text-green-700',
+    'mastered': 'bg-brand-green-100 text-brand-green-700',
   };
 
   return (
@@ -106,7 +106,7 @@ export default function CompetencyTracking() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Competency Tracking</h1>
-          <p className="text-red-100">Monitor your skill development and mastery</p>
+          <p className="text-brand-red-100">Monitor your skill development and mastery</p>
         </div>
       </div>
 
@@ -118,7 +118,7 @@ export default function CompetencyTracking() {
           </Card>
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Mastered</h3>
-            <p className="text-3xl font-bold text-green-600">
+            <p className="text-3xl font-bold text-brand-green-600">
               {competencies.filter(c => c.status === 'mastered').length}
             </p>
           </Card>
@@ -130,7 +130,7 @@ export default function CompetencyTracking() {
           </Card>
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Avg Progress</h3>
-            <p className="text-3xl font-bold text-orange-600">
+            <p className="text-3xl font-bold text-brand-orange-600">
               {Math.round(competencies.reduce((sum, c) => sum + c.progress, 0) / competencies.length)}%
             </p>
           </Card>
@@ -207,11 +207,11 @@ export default function CompetencyTracking() {
               <p className="text-sm text-black">Can apply with guidance</p>
             </div>
             <div>
-              <h4 className="font-semibold text-orange-700 mb-2">Advanced</h4>
+              <h4 className="font-semibold text-brand-orange-700 mb-2">Advanced</h4>
               <p className="text-sm text-black">Independent application</p>
             </div>
             <div>
-              <h4 className="font-semibold text-red-700 mb-2">Expert</h4>
+              <h4 className="font-semibold text-brand-red-700 mb-2">Expert</h4>
               <p className="text-sm text-black">Can teach and mentor others</p>
             </div>
           </div>

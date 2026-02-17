@@ -79,8 +79,8 @@ export function LiveMetrics() {
 
   if (error || !metrics) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-        <p className="text-red-700">{error || 'Metrics unavailable'}</p>
+      <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-6">
+        <p className="text-brand-red-700">{error || 'Metrics unavailable'}</p>
       </div>
     );
   }
@@ -146,9 +146,9 @@ export function LiveMetrics() {
 
   const colorClasses: Record<string, string> = {
     blue: 'bg-brand-blue-50 text-brand-blue-600',
-    green: 'bg-green-50 text-green-600',
+    green: 'bg-brand-green-50 text-brand-green-600',
     purple: 'bg-purple-50 text-purple-600',
-    orange: 'bg-orange-50 text-orange-600',
+    orange: 'bg-brand-orange-50 text-brand-orange-600',
     indigo: 'bg-indigo-50 text-indigo-600',
     yellow: 'bg-yellow-50 text-yellow-600',
   };
@@ -166,13 +166,13 @@ export function LiveMetrics() {
   return (
     <div className="space-y-8">
       {/* Verification Badge */}
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+      <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4 flex items-center gap-3">
         <span className="text-slate-400 flex-shrink-0">•</span>
         <div>
-          <p className="text-sm font-semibold text-green-900">
+          <p className="text-sm font-semibold text-brand-green-900">
             • Live Data Verified
           </p>
-          <p className="text-xs text-green-700">
+          <p className="text-xs text-brand-green-700">
             Real-time metrics from production database • Last updated:{' '}
             {formatTimeAgo(metrics.lastUpdated)}
           </p>
@@ -192,7 +192,7 @@ export function LiveMetrics() {
                 <div className={`p-3 rounded-lg ${colorClasses[stat.color]}`}>
                   <Icon className="h-10 w-10" />
                 </div>
-                <Activity className="h-4 w-4 text-green-500 animate-pulse" />
+                <Activity className="h-4 w-4 text-brand-green-500 animate-pulse" />
               </div>
               <p className="text-3xl font-bold text-black mb-1">
                 {stat.value}
@@ -212,13 +212,13 @@ export function LiveMetrics() {
           <h3 className="text-lg font-bold text-black">
             Course Completion Rate
           </h3>
-          <span className="text-2xl font-bold text-green-600">
+          <span className="text-2xl font-bold text-brand-green-600">
             {metrics.metrics.completionRate}%
           </span>
         </div>
         <div className="w-full bg-slate-200 rounded-full h-4 overflow-hidden">
           <div
-            className="bg-green-600 h-full rounded-full transition-all duration-1000"
+            className="bg-brand-green-600 h-full rounded-full transition-all duration-1000"
             style={{ width: `${metrics.metrics.completionRate}%` }}
           />
         </div>
@@ -243,7 +243,7 @@ export function LiveMetrics() {
                 key={index}
                 className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg"
               >
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <div className="w-2 h-2 bg-brand-green-500 rounded-full animate-pulse" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-black truncate">
                     New enrollment: {activity.courseTitle}

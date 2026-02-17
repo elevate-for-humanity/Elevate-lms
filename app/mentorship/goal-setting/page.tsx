@@ -34,7 +34,7 @@ export default function GoalSettingPage() {
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <Target className="w-16 h-16 mx-auto mb-4 text-white/80" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Goal Setting</h1>
-          <p className="text-xl text-orange-100">Turn your dreams into achievable milestones</p>
+          <p className="text-xl text-brand-orange-100">Turn your dreams into achievable milestones</p>
         </div>
       </section>
 
@@ -52,8 +52,8 @@ export default function GoalSettingPage() {
               { letter: 'R', word: 'Relevant', desc: 'Align goals with your career aspirations' },
               { letter: 'T', word: 'Time-bound', desc: 'Set deadlines to create urgency and focus' },
             ].map((item, i) => (
-              <div key={i} className="flex items-center bg-orange-50 rounded-lg p-4">
-                <div className="w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl mr-4">{item.letter}</div>
+              <div key={i} className="flex items-center bg-brand-orange-50 rounded-lg p-4">
+                <div className="w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl mr-4">{item.letter}</div>
                 <div>
                   <h3 className="font-bold text-gray-900">{item.word}</h3>
                   <p className="text-gray-600 text-sm">{item.desc}</p>
@@ -69,17 +69,17 @@ export default function GoalSettingPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">What We Help With</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-              <Calendar className="w-12 h-12 text-orange-600 mx-auto mb-4" />
+              <Calendar className="w-12 h-12 text-brand-orange-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">Short-term Goals</h3>
               <p className="text-gray-600">Weekly and monthly objectives to build momentum</p>
             </div>
             <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-              <TrendingUp className="w-12 h-12 text-orange-600 mx-auto mb-4" />
+              <TrendingUp className="w-12 h-12 text-brand-orange-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">Long-term Vision</h3>
               <p className="text-gray-600">1-5 year career plans and milestones</p>
             </div>
             <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-              <Award className="w-12 h-12 text-orange-600 mx-auto mb-4" />
+              <Award className="w-12 h-12 text-brand-orange-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">Accountability</h3>
               <p className="text-gray-600">Regular check-ins to keep you on track</p>
             </div>
@@ -87,11 +87,11 @@ export default function GoalSettingPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-orange-600 text-white">
+      <section className="py-16 bg-brand-orange-600 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Set Goals That Matter</h2>
-          <p className="text-xl text-orange-100 mb-8">Work with a mentor to create your roadmap to success.</p>
-          <Link href="/apply" className="bg-white hover:bg-gray-100 text-orange-600 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <p className="text-xl text-brand-orange-100 mb-8">Work with a mentor to create your roadmap to success.</p>
+          <Link href="/apply" className="bg-white hover:bg-gray-100 text-brand-orange-600 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply for Mentorship <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

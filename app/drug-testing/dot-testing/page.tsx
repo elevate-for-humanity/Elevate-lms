@@ -128,7 +128,7 @@ export default function DotTestingPage() {
       </section>
 
       {/* What is DOT Testing */}
-      <section className="py-12 bg-orange-50">
+      <section className="py-12 bg-brand-orange-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -149,7 +149,7 @@ export default function DotTestingPage() {
                   'Specific 5-panel drug test (no variations)',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2 text-gray-700">
-                    <FileCheck className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
+                    <FileCheck className="w-5 h-5 text-brand-orange-500 flex-shrink-0 mt-0.5" />
                     {item}
                   </li>
                 ))}
@@ -157,7 +157,7 @@ export default function DotTestingPage() {
             </div>
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Users className="w-5 h-5 text-orange-500" />
+                <Users className="w-5 h-5 text-brand-orange-500" />
                 Who Needs DOT Testing?
               </h3>
               <div className="grid gap-3">
@@ -193,7 +193,7 @@ export default function DotTestingPage() {
             {dotTests.map((test) => (
               <div
                 key={test.name}
-                className={`bg-white rounded-xl overflow-hidden shadow-lg border-2 ${test.popular ? 'border-orange-500' : 'border-gray-200'}`}
+                className={`bg-white rounded-xl overflow-hidden shadow-lg border-2 ${test.popular ? 'border-brand-orange-500' : 'border-gray-200'}`}
               >
                 <div className="relative h-40">
                   <Image
@@ -203,7 +203,7 @@ export default function DotTestingPage() {
                     className="object-cover"
                   />
                   {test.popular && (
-                    <div className="absolute top-3 left-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                    <div className="absolute top-3 left-3 bg-brand-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
                       MOST COMMON
                     </div>
                   )}
@@ -227,7 +227,7 @@ export default function DotTestingPage() {
                   
                   <a
                     href="/support"
-                    className="block w-full text-center bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition text-sm"
+                    className="block w-full text-center bg-brand-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-brand-orange-600 transition text-sm"
                   >
                     Schedule Now
                   </a>
@@ -239,11 +239,11 @@ export default function DotTestingPage() {
       </section>
 
       {/* Violation Warning */}
-      <section className="py-12 bg-red-50">
+      <section className="py-12 bg-brand-red-50">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <AlertTriangle className="w-6 h-6 text-red-600" />
+            <div className="w-12 h-12 bg-brand-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <AlertTriangle className="w-6 h-6 text-brand-red-600" />
             </div>
             <div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Had a DOT Violation?</h3>
@@ -257,7 +257,7 @@ export default function DotTestingPage() {
               </p>
               <a
                 href="/support"
-                className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 transition"
+                className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700 transition"
               >
                 <Phone className="w-4 h-4" />
                 Get Help Now
@@ -294,7 +294,7 @@ export default function DotTestingPage() {
               </ul>
               <a
                 href="/support"
-                className="inline-flex items-center gap-2 bg-orange-500 text-white px-8 py-4 rounded-lg font-bold hover:bg-orange-600 transition"
+                className="inline-flex items-center gap-2 bg-brand-orange-500 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-orange-600 transition"
               >
                 <Phone className="w-5 h-5" />
                 Join Consortium
@@ -313,15 +313,15 @@ export default function DotTestingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-orange-500 text-white">
+      <section className="py-16 bg-brand-orange-500 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need DOT-Compliant Testing?</h2>
-          <p className="text-xl text-orange-100 mb-8">
+          <p className="text-xl text-brand-orange-100 mb-8">
             We ensure full compliance with all FMCSA regulations. Schedule online for same-day appointments.
           </p>
           <a
             href="/support"
-            className="inline-flex items-center gap-2 bg-white text-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
+            className="inline-flex items-center gap-2 bg-white text-brand-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
           >
             <Phone className="w-5 h-5" />
             Get Help Online

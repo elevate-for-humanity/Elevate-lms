@@ -48,7 +48,7 @@ export function PathwayBlock({ variant = 'light', className = '' }: PathwayBlock
                 className="object-cover"
               />
             </div>
-            <div className={`text-sm font-bold mb-2 ${isDark ? 'text-green-400' : 'text-green-600'}`}>Step 2</div>
+            <div className={`text-sm font-bold mb-2 ${isDark ? 'text-brand-green-400' : 'text-brand-green-600'}`}>Step 2</div>
             <h3 className={`text-lg font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Complete Training
             </h3>
@@ -67,7 +67,7 @@ export function PathwayBlock({ variant = 'light', className = '' }: PathwayBlock
                 className="object-cover"
               />
             </div>
-            <div className={`text-sm font-bold mb-2 ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>Step 3</div>
+            <div className={`text-sm font-bold mb-2 ${isDark ? 'text-brand-orange-400' : 'text-brand-orange-600'}`}>Step 3</div>
             <h3 className={`text-lg font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Get Placed
             </h3>

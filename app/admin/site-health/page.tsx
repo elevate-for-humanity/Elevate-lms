@@ -33,9 +33,9 @@ export default async function SiteHealthPage() {
           <h1 className="text-3xl font-bold text-gray-900">Site Health</h1>
           <p className="text-gray-600 mt-2">Monitor system status and performance</p>
         </div>
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 flex items-center gap-3">
-          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          <div><p className="font-medium text-green-800">All Systems Operational</p><p className="text-sm text-green-700">Last checked: just now</p></div>
+        <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4 mb-6 flex items-center gap-3">
+          <svg className="w-6 h-6 text-brand-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <div><p className="font-medium text-brand-green-800">All Systems Operational</p><p className="text-sm text-brand-green-700">Last checked: just now</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-4 border-b"><h2 className="font-semibold">Service Status</h2></div>
@@ -43,12 +43,12 @@ export default async function SiteHealthPage() {
             {healthChecks.map((check) => (
               <div key={check.name} className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                  <span className="w-3 h-3 bg-brand-green-500 rounded-full"></span>
                   <span className="font-medium">{check.name}</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="text-sm text-gray-500">{check.latency}</span>
-                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">{check.status}</span>
+                  <span className="px-2 py-1 bg-brand-green-100 text-brand-green-800 rounded text-xs">{check.status}</span>
                 </div>
               </div>
             ))}

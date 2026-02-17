@@ -135,7 +135,7 @@ export default function ScholarshipsPage() {
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
               <GraduationCap className="w-4 h-4" /> Funding Available
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
@@ -145,7 +145,7 @@ export default function ScholarshipsPage() {
               Don&apos;t let cost stop you. Most students pay $0 for training through WIOA funding, scholarships, and employer sponsorships.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
+              <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
                 Check Eligibility <ArrowRight className="w-5 h-5" />
               </Link>
               <Link href="/apply" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
@@ -161,7 +161,7 @@ export default function ScholarshipsPage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <div className="text-3xl font-bold text-green-400">85%</div>
+              <div className="text-3xl font-bold text-brand-green-400">85%</div>
               <div className="text-slate-400 text-sm">Students Pay $0</div>
             </div>
             <div>
@@ -193,12 +193,12 @@ export default function ScholarshipsPage() {
               <div key={i} className="bg-white rounded-xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                      <option.icon className="w-6 h-6 text-green-600" />
+                    <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center">
+                      <option.icon className="w-6 h-6 text-brand-green-600" />
                     </div>
                     <div>
                       <h3 className="font-bold text-xl text-slate-900">{option.title}</h3>
-                      <p className="text-green-600 font-semibold">{option.amount} covered</p>
+                      <p className="text-brand-green-600 font-semibold">{option.amount} covered</p>
                     </div>
                   </div>
                 </div>
@@ -224,7 +224,7 @@ export default function ScholarshipsPage() {
       </section>
 
       {/* WIOA Section */}
-      <section className="py-16 bg-green-50">
+      <section className="py-16 bg-brand-green-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -256,7 +256,7 @@ export default function ScholarshipsPage() {
                   </div>
                 </div>
               </div>
-              <Link href="/wioa-eligibility" className="mt-8 inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
+              <Link href="/wioa-eligibility" className="mt-8 inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
                 Check WIOA Eligibility <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -277,7 +277,7 @@ export default function ScholarshipsPage() {
                   'Lack of high school diploma',
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-slate-700">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-6 h-6 bg-brand-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-slate-400 flex-shrink-0">•</span>
                     </div>
                     {item}
@@ -302,7 +302,7 @@ export default function ScholarshipsPage() {
               <div key={i} className="bg-white rounded-xl p-6 shadow-lg border border-slate-200 text-center">
                 <Award className="w-10 h-10 text-yellow-500 mx-auto mb-4" />
                 <h3 className="font-bold text-lg text-slate-900 mb-2">{scholarship.name}</h3>
-                <div className="text-2xl font-bold text-green-600 mb-2">{scholarship.amount}</div>
+                <div className="text-2xl font-bold text-brand-green-600 mb-2">{scholarship.amount}</div>
                 <div className="text-sm text-slate-500 mb-4">Deadline: {scholarship.deadline}</div>
                 <p className="text-sm text-slate-600">{scholarship.criteria}</p>
               </div>
@@ -319,7 +319,7 @@ export default function ScholarshipsPage() {
           <div className="grid md:grid-cols-4 gap-6">
             {steps.map((step, i) => (
               <div key={i} className="text-center">
-                <div className="w-14 h-14 bg-green-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                <div className="w-14 h-14 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                   {step.num}
                 </div>
                 <h3 className="font-bold text-slate-900 mb-2">{step.title}</h3>
@@ -373,7 +373,7 @@ export default function ScholarshipsPage() {
             85% of our students pay $0 for training. Let us help you find funding.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Check Eligibility <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/apply" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">

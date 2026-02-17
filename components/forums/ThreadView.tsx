@@ -130,7 +130,7 @@ export function ThreadView({
           <div
             key={reply.id}
             className={`bg-slate-800 rounded-lg p-4 ${
-              reply.is_solution ? "border-2 border-green-500" : ""
+              reply.is_solution ? "border-2 border-brand-green-500" : ""
             }`}
           >
             <div className="flex items-start gap-4">
@@ -138,7 +138,7 @@ export function ThreadView({
                 <div className="flex items-center gap-2 mb-2">
                   <span className="font-semibold text-white">{reply.author_name}</span>
                   {reply.is_solution && (
-                    <span className="flex items-center gap-1 text-xs bg-green-500/20 text-green-400 px-2 py-2 rounded">
+                    <span className="flex items-center gap-1 text-xs bg-brand-green-500/20 text-brand-green-400 px-2 py-2 rounded">
                       <span className="text-slate-400 flex-shrink-0">•</span>
                       Solution
                     </span>
@@ -150,7 +150,7 @@ export function ThreadView({
                 <p className="text-slate-300 mb-3">{reply.content}</p>
                 <button
                   onClick={() => onUpvote(reply.id)}
-                  className="flex items-center gap-1 text-sm text-slate-400 hover:text-orange-400 transition-colors"
+                  className="flex items-center gap-1 text-sm text-slate-400 hover:text-brand-orange-400 transition-colors"
                 >
                   <ThumbsUp className="w-4 h-4" />
                   <span>{reply.upvotes}</span>
@@ -169,13 +169,13 @@ export function ThreadView({
             value={replyContent}
             onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setReplyContent(e.target.value)}
             placeholder="Share your thoughts..."
-            className="w-full bg-slate-900 text-white rounded-lg p-4 min-h-[120px] focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="w-full bg-slate-900 text-white rounded-lg p-4 min-h-[120px] focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
             disabled={isSubmitting}
           />
           <button
             type="submit"
             disabled={isSubmitting || !replyContent.trim()}
-            className="px-6 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-6 py-2 bg-brand-orange-500 text-white rounded-lg font-medium hover:bg-brand-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isSubmitting ? "Posting..." : "Post Reply"}
           </button>

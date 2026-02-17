@@ -239,7 +239,7 @@ export default function StoreBuilderPage() {
                     />
                     <button
                       onClick={() => removeFeature(index)}
-                      className="px-3 py-2 text-brand-orange-600 hover:bg-red-50 rounded-lg"
+                      className="px-3 py-2 text-brand-orange-600 hover:bg-brand-red-50 rounded-lg"
                     >
                       Remove
                     </button>

@@ -157,9 +157,9 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
 
       {/* Error Display */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
           {error}
-          <button onClick={() => setError(null)} className="ml-4 text-red-500 hover:text-red-700">Dismiss</button>
+          <button onClick={() => setError(null)} className="ml-4 text-brand-red-500 hover:text-brand-red-700">Dismiss</button>
         </div>
       )}
 
@@ -171,11 +171,11 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Published</h3>
-          <p className="text-3xl font-bold text-green-600">{publishedCount}</p>
+          <p className="text-3xl font-bold text-brand-green-600">{publishedCount}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Drafts</h3>
-          <p className="text-3xl font-bold text-orange-600">{draftCount}</p>
+          <p className="text-3xl font-bold text-brand-orange-600">{draftCount}</p>
         </div>
       </div>
 
@@ -194,14 +194,14 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
           <p className="font-medium text-gray-900">Templates</p>
         </Link>
         <Link href="/admin/course-builder/media" className="bg-white rounded-lg shadow-sm border p-4 hover:shadow-md text-center">
-          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+            <svg className="w-5 h-5 text-brand-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
           </div>
           <p className="font-medium text-gray-900">Media Library</p>
         </Link>
         <Link href="/admin/course-builder/assessments" className="bg-white rounded-lg shadow-sm border p-4 hover:shadow-md text-center">
-          <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-            <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+          <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+            <svg className="w-5 h-5 text-brand-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
           </div>
           <p className="font-medium text-gray-900">Assessments</p>
         </Link>
@@ -226,7 +226,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
                     <h3 className="font-semibold text-gray-900">{course.title}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${course.is_published ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${course.is_published ? 'bg-brand-green-100 text-brand-green-700' : 'bg-brand-orange-100 text-brand-orange-700'}`}>
                       {course.is_published ? 'Published' : 'Draft'}
                     </span>
                   </div>
@@ -238,13 +238,13 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => togglePublish(course)} className={`px-3 py-1.5 text-sm rounded-lg ${course.is_published ? 'bg-orange-100 text-orange-700 hover:bg-orange-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
+                  <button onClick={() => togglePublish(course)} className={`px-3 py-1.5 text-sm rounded-lg ${course.is_published ? 'bg-brand-orange-100 text-brand-orange-700 hover:bg-brand-orange-200' : 'bg-brand-green-100 text-brand-green-700 hover:bg-brand-green-200'}`}>
                     {course.is_published ? 'Unpublish' : 'Publish'}
                   </button>
                   <button onClick={() => openEditModal(course)} className="px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50">Edit</button>
                   <Link href={`/admin/courses/${course.id}/content`} className="px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50">Lessons</Link>
                   <Link href={`/admin/courses/${course.id}/quizzes`} className="px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50">Quizzes</Link>
-                  <button onClick={() => handleDelete(course.id)} className="px-3 py-1.5 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50">Delete</button>
+                  <button onClick={() => handleDelete(course.id)} className="px-3 py-1.5 text-sm text-brand-red-600 border border-brand-red-200 rounded-lg hover:bg-brand-red-50">Delete</button>
                 </div>
               </div>
             ))}

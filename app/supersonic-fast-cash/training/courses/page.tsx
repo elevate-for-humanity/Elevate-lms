@@ -58,7 +58,7 @@ export default async function TrainingCoursesPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Tax Preparer Training Courses
             </h1>
-            <p className="text-xl text-orange-100 mb-6">
+            <p className="text-xl text-brand-orange-100 mb-6">
               {displayCourses.length} professional courses with {totalLessons} lessons to become a certified tax preparer
             </p>
             <div className="flex flex-wrap gap-4">
@@ -115,7 +115,7 @@ export default async function TrainingCoursesPage() {
                   </div>
 
                   {/* Certification */}
-                  <div className="flex items-center gap-2 text-sm text-green-600 mb-4">
+                  <div className="flex items-center gap-2 text-sm text-brand-green-600 mb-4">
                     <Award className="w-4 h-4" />
                     <span className="line-clamp-1">{course.certification_name}</span>
                   </div>
@@ -123,7 +123,7 @@ export default async function TrainingCoursesPage() {
                   {/* Action Button */}
                   <Link
                     href={`/supersonic-fast-cash/training/courses/${course.course_id}`}
-                    className="flex items-center justify-center gap-2 w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold transition-colors"
+                    className="flex items-center justify-center gap-2 w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white py-3 rounded-lg font-semibold transition-colors"
                   >
                     View Course
                     <ChevronRight className="w-4 h-4" />
@@ -148,7 +148,7 @@ export default async function TrainingCoursesPage() {
           </div>
           <Link
             href="/supersonic-fast-cash/careers"
-            className="inline-block bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
+            className="inline-block bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
           >
             Apply to Join Our Team
           </Link>

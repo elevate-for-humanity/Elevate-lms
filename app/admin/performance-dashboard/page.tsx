@@ -132,8 +132,8 @@ export default async function AdminPerformanceDashboardPage() {
                 <p className="text-3xl font-bold text-gray-900 mt-1">{enrollmentRate}%</p>
                 <p className="text-sm text-gray-500 mt-1">Lead to enrollment</p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <GraduationCap className="w-6 h-6 text-brand-green-600" />
               </div>
             </div>
           </div>
@@ -156,8 +156,8 @@ export default async function AdminPerformanceDashboardPage() {
                 <p className="text-3xl font-bold text-gray-900 mt-1">{wotcApprovalRate}%</p>
                 <p className="text-sm text-gray-500 mt-1">{approvedWotc || 0} of {wotcApplications || 0}</p>
               </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-brand-orange-600" />
               </div>
             </div>
           </div>
@@ -174,7 +174,7 @@ export default async function AdminPerformanceDashboardPage() {
                 <p className="text-sm text-gray-500">Total Courses</p>
               </div>
               <div className="text-center">
-                <p className="text-4xl font-bold text-green-600">{publishedCourses || 0}</p>
+                <p className="text-4xl font-bold text-brand-green-600">{publishedCourses || 0}</p>
                 <p className="text-sm text-gray-500">Published</p>
               </div>
               <div className="text-center">
@@ -202,7 +202,7 @@ export default async function AdminPerformanceDashboardPage() {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
-                        className="bg-green-500 h-2 rounded-full" 
+                        className="bg-brand-green-500 h-2 rounded-full" 
                         style={{ width: `${stats.total > 0 ? (stats.published / stats.total) * 100 : 0}%` }}
                       />
                     </div>
@@ -301,7 +301,7 @@ export default async function AdminPerformanceDashboardPage() {
               href="/admin/campaigns"
               className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-brand-blue-300 transition-colors"
             >
-              <Award className="w-5 h-5 text-green-600" />
+              <Award className="w-5 h-5 text-brand-green-600" />
               <span className="font-medium text-gray-900">Campaigns</span>
             </Link>
             <Link 
@@ -315,7 +315,7 @@ export default async function AdminPerformanceDashboardPage() {
               href="/admin/wotc"
               className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-brand-blue-300 transition-colors"
             >
-              <DollarSign className="w-5 h-5 text-orange-600" />
+              <DollarSign className="w-5 h-5 text-brand-orange-600" />
               <span className="font-medium text-gray-900">WOTC</span>
             </Link>
           </div>

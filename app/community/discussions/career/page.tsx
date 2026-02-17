@@ -65,7 +65,7 @@ export default async function CareerDiscussionsPage() {
           </div>
           {user && (
             <Link href="/community/discussions/new?category=career"
-              className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+              className="flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
               <Plus className="w-4 h-4" /> New Discussion
             </Link>
           )}
@@ -87,7 +87,7 @@ export default async function CareerDiscussionsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       {discussion.is_pinned && (
-                        <Pin className="w-4 h-4 text-orange-500" />
+                        <Pin className="w-4 h-4 text-brand-orange-500" />
                       )}
                       <h3 className="font-medium text-gray-900 truncate">{discussion.title}</h3>
                     </div>
@@ -119,7 +119,7 @@ export default async function CareerDiscussionsPage() {
               <p className="text-sm text-gray-500 mb-4">Be the first to start a career discussion</p>
               {user && (
                 <Link href="/community/discussions/new?category=career"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
                   <Plus className="w-4 h-4" /> Start Discussion
                 </Link>
               )}

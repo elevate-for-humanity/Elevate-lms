@@ -93,7 +93,7 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-xl border p-6">
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-4 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
           {error}
         </div>
       )}
@@ -103,7 +103,7 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
           <label className="block text-sm font-medium text-gray-700 mb-1">Group Name *</label>
           <input type="text" value={formData.name}
             onChange={e => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500"
             placeholder="e.g., CNA Exam Prep Group" required />
         </div>
 
@@ -111,7 +111,7 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
           <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
           <textarea rows={4} value={formData.description}
             onChange={e => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500"
             placeholder="What will your group focus on? What are your goals?" />
         </div>
 
@@ -119,7 +119,7 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
           <label className="block text-sm font-medium text-gray-700 mb-1">Related Program</label>
           <select value={formData.programId}
             onChange={e => setFormData({ ...formData, programId: e.target.value })}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500">
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500">
             <option value="">Select a program (optional)</option>
             {programs.map(program => (
               <option key={program.id} value={program.id}>{program.name}</option>
@@ -131,7 +131,7 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
           <label className="block text-sm font-medium text-gray-700 mb-1">Meeting Schedule</label>
           <input type="text" value={formData.meetingSchedule}
             onChange={e => setFormData({ ...formData, meetingSchedule: e.target.value })}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500"
             placeholder="e.g., Tuesdays and Thursdays at 7 PM EST" />
         </div>
 
@@ -139,7 +139,7 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
           <label className="block text-sm font-medium text-gray-700 mb-1">Maximum Members</label>
           <select value={formData.maxMembers}
             onChange={e => setFormData({ ...formData, maxMembers: e.target.value })}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500">
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500">
             <option value="5">5 members</option>
             <option value="10">10 members</option>
             <option value="15">15 members</option>
@@ -152,11 +152,11 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
           <label className="block text-sm font-medium text-gray-700 mb-2">Visibility</label>
           <div className="flex gap-4">
             <label className={`flex-1 flex items-center gap-3 p-4 border rounded-lg cursor-pointer ${
-              !formData.isPrivate ? 'border-orange-500 bg-orange-50' : 'hover:bg-gray-50'
+              !formData.isPrivate ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:bg-gray-50'
             }`}>
               <input type="radio" name="visibility" checked={!formData.isPrivate}
                 onChange={() => setFormData({ ...formData, isPrivate: false })}
-                className="w-4 h-4 text-orange-500" />
+                className="w-4 h-4 text-brand-orange-500" />
               <Globe className="w-5 h-5 text-gray-500" />
               <div>
                 <p className="font-medium">Public</p>
@@ -164,11 +164,11 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
               </div>
             </label>
             <label className={`flex-1 flex items-center gap-3 p-4 border rounded-lg cursor-pointer ${
-              formData.isPrivate ? 'border-orange-500 bg-orange-50' : 'hover:bg-gray-50'
+              formData.isPrivate ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:bg-gray-50'
             }`}>
               <input type="radio" name="visibility" checked={formData.isPrivate}
                 onChange={() => setFormData({ ...formData, isPrivate: true })}
-                className="w-4 h-4 text-orange-500" />
+                className="w-4 h-4 text-brand-orange-500" />
               <Lock className="w-5 h-5 text-gray-500" />
               <div>
                 <p className="font-medium">Private</p>
@@ -180,7 +180,7 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
 
         <div className="pt-4 border-t">
           <button type="submit" disabled={isSubmitting}
-            className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50">
+            className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600 disabled:opacity-50">
             <Users className="w-5 h-5" />
             {isSubmitting ? 'Creating...' : 'Create Study Group'}
           </button>

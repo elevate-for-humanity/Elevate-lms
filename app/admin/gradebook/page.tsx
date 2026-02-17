@@ -59,11 +59,11 @@ export default async function AdminGradebookIndexPage() {
                 className="flex items-center justify-between bg-white rounded-xl border p-5 hover:shadow-sm transition group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-blue-100 rounded-lg">
-                    <BookOpen className="w-5 h-5 text-blue-600" />
+                  <div className="p-3 bg-brand-blue-100 rounded-lg">
+                    <BookOpen className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <div>
-                    <h2 className="font-semibold text-gray-900 group-hover:text-blue-600 transition">
+                    <h2 className="font-semibold text-gray-900 group-hover:text-brand-blue-600 transition">
                       {course.title}
                     </h2>
                     <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
@@ -75,7 +75,7 @@ export default async function AdminGradebookIndexPage() {
                     </div>
                   </div>
                 </div>
-                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition" />
+                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-brand-blue-600 transition" />
               </Link>
             ))
           ) : (

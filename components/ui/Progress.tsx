@@ -29,7 +29,7 @@ export const Progress: React.FC<ProgressProps> = ({
 
   const variants = {
     default: 'bg-brand-orange-600',
-    success: 'bg-green-600',
+    success: 'bg-brand-green-600',
     warning: 'bg-yellow-600',
     error: 'bg-brand-orange-600',
   };

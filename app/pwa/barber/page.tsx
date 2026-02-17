@@ -42,8 +42,8 @@ function LandingPage() {
       {/* Features */}
       <div className="px-6 py-8 space-y-4">
         <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
-          <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-            <Clock className="w-5 h-5 text-green-400" />
+          <div className="w-10 h-10 bg-brand-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Clock className="w-5 h-5 text-brand-green-400" />
           </div>
           <div>
             <h3 className="text-white font-semibold">Track Your Hours</h3>
@@ -142,7 +142,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
           </div>
           <div className="h-3 bg-white/20 rounded-full overflow-hidden mb-3">
             <div 
-              className="h-full bg-green-500 rounded-full transition-all duration-500"
+              className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
               style={{ width: `${Math.min(progressPercent, 100)}%` }}
             />
           </div>
@@ -166,7 +166,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
           </div>
           <div className="bg-slate-800 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="w-5 h-5 text-green-400" />
+              <TrendingUp className="w-5 h-5 text-brand-green-400" />
               <span className="text-slate-400 text-sm">Remaining</span>
             </div>
             <p className="text-2xl font-bold text-white">{formatHours(hoursRemaining)} hrs</p>
@@ -197,15 +197,15 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
         <div className="space-y-3">
           <h2 className="text-white font-bold text-lg">Quick Actions</h2>
           
-          <Link href="/pwa/barber/checkin" className="flex items-center gap-4 bg-green-500/20 border border-green-500/30 rounded-xl p-4 active:opacity-80">
-            <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+          <Link href="/pwa/barber/checkin" className="flex items-center gap-4 bg-brand-green-500/20 border border-brand-green-500/30 rounded-xl p-4 active:opacity-80">
+            <div className="w-12 h-12 bg-brand-green-500 rounded-xl flex items-center justify-center">
               <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">Check In</p>
-              <p className="text-green-300 text-sm">Start tracking your hours</p>
+              <p className="text-brand-green-300 text-sm">Start tracking your hours</p>
             </div>
-            <ChevronRight className="w-5 h-5 text-green-400" />
+            <ChevronRight className="w-5 h-5 text-brand-green-400" />
           </Link>
 
           <Link href="/pwa/barber/hours/submit" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
@@ -220,8 +220,8 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
           </Link>
 
           <Link href="/pwa/barber/log-hours" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
-              <Plus className="w-6 h-6 text-green-400" />
+            <div className="w-12 h-12 bg-brand-green-500/20 rounded-xl flex items-center justify-center">
+              <Plus className="w-6 h-6 text-brand-green-400" />
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">Quick Log</p>

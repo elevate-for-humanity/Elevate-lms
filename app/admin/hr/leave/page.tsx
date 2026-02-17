@@ -30,7 +30,7 @@ export default async function LeavePage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Pending Requests</h3><p className="text-3xl font-bold text-yellow-600 mt-2">{requests?.length || 0}</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Approved This Month</h3><p className="text-3xl font-bold text-green-600 mt-2">12</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Approved This Month</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">12</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">On Leave Today</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">3</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
@@ -40,8 +40,8 @@ export default async function LeavePage() {
               <div key={req.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                 <div><p className="font-medium">{req.profiles?.full_name}</p><p className="text-sm text-gray-500">{req.leave_type} • {req.start_date} to {req.end_date}</p></div>
                 <div className="flex gap-2">
-                  <button className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">Approve</button>
-                  <button className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">Deny</button>
+                  <button className="px-3 py-1 bg-brand-green-600 text-white rounded text-sm hover:bg-brand-green-700">Approve</button>
+                  <button className="px-3 py-1 bg-brand-red-600 text-white rounded text-sm hover:bg-brand-red-700">Deny</button>
                 </div>
               </div>
             )) : <div className="p-8 text-center text-gray-500">No pending requests</div>}

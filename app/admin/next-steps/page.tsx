@@ -229,7 +229,7 @@ export default function AdminNextStepsPage() {
                           </div>
                         </div>
                       ) : (
-                        <span className="text-xs font-semibold text-red-700">
+                        <span className="text-xs font-semibold text-brand-red-700">
                           Missing
                         </span>
                       )}

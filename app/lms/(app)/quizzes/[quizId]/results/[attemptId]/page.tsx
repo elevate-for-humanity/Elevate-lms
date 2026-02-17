@@ -244,13 +244,13 @@ export default async function QuizResultsPage({ params }: Props) {
                     key={answer.id}
                     className={`p-4 rounded-xl border-2 ${
                       answer.is_correct
-                        ? 'border-green-200 bg-green-50'
-                        : 'border-red-200 bg-red-50'
+                        ? 'border-brand-green-200 bg-brand-green-50'
+                        : 'border-brand-red-200 bg-brand-red-50'
                     }`}
                   >
                     <div className="flex items-start gap-3 mb-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        answer.is_correct ? 'bg-green-500' : 'bg-red-500'
+                        answer.is_correct ? 'bg-brand-green-500' : 'bg-brand-red-500'
                       } text-white font-bold text-sm`}>
                         {index + 1}
                       </div>
@@ -263,26 +263,26 @@ export default async function QuizResultsPage({ params }: Props) {
                       {answer.is_correct ? (
                         <span className="text-slate-400 flex-shrink-0">•</span>
                       ) : (
-                        <XCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
+                        <XCircle className="w-6 h-6 text-brand-red-500 flex-shrink-0" />
                       )}
                     </div>
 
                     <div className="ml-11 space-y-2">
                       <div className={`p-3 rounded-lg ${
                         answer.is_correct
-                          ? 'bg-green-100 border border-green-300'
-                          : 'bg-red-100 border border-red-300'
+                          ? 'bg-brand-green-100 border border-brand-green-300'
+                          : 'bg-brand-red-100 border border-brand-red-300'
                       }`}>
                         <p className="text-sm font-medium text-slate-700">Your answer:</p>
-                        <p className={answer.is_correct ? 'text-green-800' : 'text-red-800'}>
+                        <p className={answer.is_correct ? 'text-brand-green-800' : 'text-brand-red-800'}>
                           {selectedAnswer?.answer_text || 'No answer selected'}
                         </p>
                       </div>
 
                       {!answer.is_correct && correctAnswer && (
-                        <div className="p-3 rounded-lg bg-green-100 border border-green-300">
+                        <div className="p-3 rounded-lg bg-brand-green-100 border border-brand-green-300">
                           <p className="text-sm font-medium text-slate-700">Correct answer:</p>
-                          <p className="text-green-800">{correctAnswer.answer_text}</p>
+                          <p className="text-brand-green-800">{correctAnswer.answer_text}</p>
                         </div>
                       )}
                     </div>

@@ -112,8 +112,8 @@ export function AcknowledgeHandbookForm() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
-          <p className="text-red-800 font-medium">{error}</p>
+        <div className="bg-brand-red-50 border-2 border-brand-red-200 rounded-lg p-4">
+          <p className="text-brand-red-800 font-medium">{error}</p>
         </div>
       )}
 

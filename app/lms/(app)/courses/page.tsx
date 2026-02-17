@@ -171,7 +171,7 @@ export default async function InteractiveCoursesPage() {
                     </div>
                     {isEnrolled && (
                       <div className="absolute top-3 right-3">
-                        <span className="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium">
+                        <span className="bg-brand-green-600 text-white px-2 py-1 rounded text-xs font-medium">
                           Enrolled
                         </span>
                       </div>
@@ -197,7 +197,7 @@ export default async function InteractiveCoursesPage() {
                     {isEnrolled ? (
                       <Link
                         href={`/lms/courses/${course.id}`}
-                        className="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-2 rounded-lg font-medium transition"
+                        className="block w-full bg-brand-green-600 hover:bg-brand-green-700 text-white text-center py-2 rounded-lg font-medium transition"
                       >
                         Continue Learning ({enrollment?.progress || 0}%)
                       </Link>

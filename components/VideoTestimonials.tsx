@@ -237,7 +237,7 @@ export default function VideoTestimonials() {
                           <div className="text-sm text-black flex-1">{testimonial.beforeJob}</div>
                         </div>
                         <div className="flex items-start gap-2">
-                          <div className="text-xs font-semibold text-green-600 w-16">AFTER:</div>
+                          <div className="text-xs font-semibold text-brand-green-600 w-16">AFTER:</div>
                           <div className="text-sm text-black font-semibold flex-1">{testimonial.afterJob}</div>
                         </div>
                       </div>
@@ -246,7 +246,7 @@ export default function VideoTestimonials() {
                       <div className="pt-4 border-t border-gray-200">
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-black">New Salary:</span>
-                          <span className="text-lg font-bold text-green-600">{testimonial.salary}</span>
+                          <span className="text-lg font-bold text-brand-green-600">{testimonial.salary}</span>
                         </div>
                       </div>
 
@@ -293,7 +293,7 @@ export default function VideoTestimonials() {
             <div className="text-black">Graduate Employment Rate</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-bold text-green-600 mb-2 text-2xl md:text-3xl lg:text-4xl">$15K+</div>
+            <div className="text-4xl font-bold text-brand-green-600 mb-2 text-2xl md:text-3xl lg:text-4xl">$15K+</div>
             <div className="text-black">Average Salary Increase</div>
           </div>
           <div className="text-center">
@@ -301,7 +301,7 @@ export default function VideoTestimonials() {
             <div className="text-black">Success Stories</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-bold text-orange-600 mb-2 text-2xl md:text-3xl lg:text-4xl">4.9★</div>
+            <div className="text-4xl font-bold text-brand-orange-600 mb-2 text-2xl md:text-3xl lg:text-4xl">4.9★</div>
             <div className="text-black">Student Satisfaction</div>
           </div>
         </motion.div>
@@ -374,7 +374,7 @@ export default function VideoTestimonials() {
                   </div>
                   <div className="text-right">
                     <div className="text-sm text-black">New Salary</div>
-                    <div className="text-2xl font-bold text-green-600">{selectedVideo.salary}</div>
+                    <div className="text-2xl font-bold text-brand-green-600">{selectedVideo.salary}</div>
                   </div>
                 </div>
 
@@ -383,8 +383,8 @@ export default function VideoTestimonials() {
                     <div className="text-xs font-semibold text-gray-500 mb-1">BEFORE</div>
                     <div className="text-black">{selectedVideo.beforeJob}</div>
                   </div>
-                  <div className="bg-green-50 rounded-lg p-4">
-                    <div className="text-xs font-semibold text-green-600 mb-1">AFTER</div>
+                  <div className="bg-brand-green-50 rounded-lg p-4">
+                    <div className="text-xs font-semibold text-brand-green-600 mb-1">AFTER</div>
                     <div className="text-black font-semibold">{selectedVideo.afterJob}</div>
                   </div>
                 </div>

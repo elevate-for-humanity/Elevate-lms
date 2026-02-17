@@ -86,8 +86,8 @@ export default async function ClientPortalPage() {
 
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-brand-green-600" />
               </div>
               <div>
                 <div className="text-3xl font-bold text-black">
@@ -142,7 +142,7 @@ export default async function ClientPortalPage() {
                         <span
                           className={`px-3 py-2 rounded-full text-sm font-medium ${
                             appointment.status === 'confirmed'
-                              ? 'bg-green-100 text-green-700'
+                              ? 'bg-brand-green-100 text-brand-green-700'
                               : appointment.status === 'pending'
                                 ? 'bg-yellow-100 text-yellow-700'
                                 : appointment.status === 'completed'
@@ -228,7 +228,7 @@ export default async function ClientPortalPage() {
                         <span
                           className={`px-2 py-2 rounded text-xs font-medium ${
                             doc.status === 'reviewed'
-                              ? 'bg-green-100 text-green-700'
+                              ? 'bg-brand-green-100 text-brand-green-700'
                               : doc.status === 'pending_review'
                                 ? 'bg-yellow-100 text-yellow-700'
                                 : 'bg-gray-100 text-black'

@@ -94,7 +94,7 @@ export default function PageAvatar({ videoSrc, title, position = 'default', loop
           className="absolute inset-0 z-20 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors cursor-pointer"
           aria-label="Play video"
         >
-          <span className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-base font-bold rounded-full px-6 py-3 transition-colors shadow-lg">
+          <span className="flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white text-base font-bold rounded-full px-6 py-3 transition-colors shadow-lg">
             <Play className="w-6 h-6 fill-white" />
             {hasStarted ? 'Resume' : 'Play'}
           </span>

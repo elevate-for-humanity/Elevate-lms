@@ -187,13 +187,13 @@ export default function UnifiedPaymentFlow({
               onClick={() => setPaymentType('plan')}
               className={`p-6 rounded-lg border-2 transition-all text-left ${
                 paymentType === 'plan'
-                  ? 'border-green-600 bg-green-50'
+                  ? 'border-brand-green-600 bg-brand-green-50'
                   : 'border-slate-200 hover:border-slate-300'
               }`}
             >
               <div className="flex items-start justify-between mb-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Calendar className="w-6 h-6 text-green-600" />
+                <div className="p-2 bg-brand-green-100 rounded-lg">
+                  <Calendar className="w-6 h-6 text-brand-green-600" />
                 </div>
                 {paymentType === 'plan' && (
                   <span className="text-slate-400 flex-shrink-0">•</span>
@@ -319,7 +319,7 @@ export default function UnifiedPaymentFlow({
       {/* Security Notice */}
       <div className="bg-slate-50 rounded-lg p-4 mb-6">
         <div className="flex items-start gap-3">
-          <Shield className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+          <Shield className="w-5 h-5 text-brand-green-600 mt-0.5 flex-shrink-0" />
           <div className="text-sm text-black">
             <p className="font-semibold mb-1">Secure Payment Processing</p>
             <p>
@@ -332,12 +332,12 @@ export default function UnifiedPaymentFlow({
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6">
           <div className="flex items-start gap-2">
             <AlertCircle className="w-5 h-5 text-brand-orange-600 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-red-900">Payment Error</p>
-              <p className="text-sm text-red-700 mt-1">{error}</p>
+              <p className="font-semibold text-brand-red-900">Payment Error</p>
+              <p className="text-sm text-brand-red-700 mt-1">{error}</p>
             </div>
           </div>
         </div>

@@ -40,7 +40,7 @@ export function VerifiedCredentials() {
     <section className="py-16 bg-slate-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-brand-green-100 text-brand-green-800 px-4 py-2 rounded-full mb-4">
             <Shield className="h-4 w-4" />
             <span className="text-sm font-semibold">Verified Credentials</span>
           </div>
@@ -60,7 +60,7 @@ export function VerifiedCredentials() {
               className="bg-white border-2 border-slate-200 rounded-lg p-6"
             >
               <div className="flex items-start justify-between mb-4">
-                <Shield className="h-10 w-10 text-green-600 flex-shrink-0" />
+                <Shield className="h-10 w-10 text-brand-green-600 flex-shrink-0" />
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
 

@@ -57,9 +57,9 @@ export default function NewMessagePage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-6">New Message</h1>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
-              <AlertCircle className="w-5 h-5 text-red-600 mr-3 flex-shrink-0 mt-0.5" />
-              <p className="text-red-800">{error}</p>
+            <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-start">
+              <AlertCircle className="w-5 h-5 text-brand-red-600 mr-3 flex-shrink-0 mt-0.5" />
+              <p className="text-brand-red-800">{error}</p>
             </div>
           )}
 

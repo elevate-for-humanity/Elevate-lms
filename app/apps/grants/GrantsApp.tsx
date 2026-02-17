@@ -50,19 +50,19 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
       )}
 
       {/* Header */}
-      <header className="bg-green-800 text-white">
+      <header className="bg-brand-green-800 text-white">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-green-800" />
+              <DollarSign className="w-6 h-6 text-brand-green-800" />
             </div>
             <div>
               <h1 className="font-bold">Grants Discovery</h1>
-              <p className="text-green-200 text-sm">Find & Manage Funding</p>
+              <p className="text-brand-green-200 text-sm">Find & Manage Funding</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/apps/grants/settings" className="p-2 hover:bg-green-700 rounded-lg">
+            <Link href="/apps/grants/settings" className="p-2 hover:bg-brand-green-700 rounded-lg">
               <Settings className="w-5 h-5" />
             </Link>
           </div>
@@ -72,7 +72,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-4 py-3 text-sm font-medium rounded-t-lg ${activeTab === tab ? 'bg-gray-50 text-green-900' : 'text-green-200 hover:bg-green-700'}`}
+              className={`px-4 py-3 text-sm font-medium rounded-t-lg ${activeTab === tab ? 'bg-gray-50 text-brand-green-900' : 'text-brand-green-200 hover:bg-brand-green-700'}`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
@@ -98,7 +98,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
               <button onClick={() => setShowFilters(!showFilters)} className="px-4 py-3 border rounded-lg flex items-center gap-2">
                 <Filter className="w-5 h-5" /> Filters
               </button>
-              <button className="px-4 py-3 bg-green-600 text-white rounded-lg flex items-center gap-2">
+              <button className="px-4 py-3 bg-brand-green-600 text-white rounded-lg flex items-center gap-2">
                 <RefreshCw className="w-5 h-5" /> Sync Grants.gov
               </button>
             </div>
@@ -107,7 +107,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
             <div className="grid md:grid-cols-4 gap-4">
               <div className="bg-white rounded-lg p-4 border">
                 <p className="text-gray-500 text-sm">Available Grants</p>
-                <p className="text-2xl font-bold text-green-600">{opportunities.length}</p>
+                <p className="text-2xl font-bold text-brand-green-600">{opportunities.length}</p>
               </div>
               <div className="bg-white rounded-lg p-4 border">
                 <p className="text-gray-500 text-sm">Saved</p>
@@ -119,7 +119,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
               </div>
               <div className="bg-white rounded-lg p-4 border">
                 <p className="text-gray-500 text-sm">Closing Soon</p>
-                <p className="text-2xl font-bold text-orange-600">
+                <p className="text-2xl font-bold text-brand-orange-600">
                   {opportunities.filter(o => {
                     const deadline = new Date(o.deadline);
                     const daysUntil = (deadline.getTime() - Date.now()) / (1000 * 60 * 60 * 24);
@@ -148,7 +148,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
                         <h3 className="text-lg font-semibold mb-1">{grant.title}</h3>
                         <p className="text-gray-600 mb-3">{grant.agency}</p>
                         <div className="flex items-center gap-6 text-sm">
-                          <span className="text-green-600 font-medium">
+                          <span className="text-brand-green-600 font-medium">
                             {grant.amount_min && grant.amount_max 
                               ? `${formatCurrency(grant.amount_min)} - ${formatCurrency(grant.amount_max)}`
                               : 'Amount varies'}
@@ -169,7 +169,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
                         </button>
                         <Link 
                           href={`/apps/grants/opportunity/${grant.id}`}
-                          className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium"
+                          className="px-4 py-2 bg-brand-green-600 text-white rounded-lg text-sm font-medium"
                         >
                           View Details
                         </Link>
@@ -204,7 +204,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
           <div className="bg-white rounded-xl border p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">My Applications</h2>
-              <button className="px-4 py-2 bg-green-600 text-white rounded-lg flex items-center gap-2">
+              <button className="px-4 py-2 bg-brand-green-600 text-white rounded-lg flex items-center gap-2">
                 <Plus className="w-5 h-5" /> New Application
               </button>
             </div>
@@ -221,7 +221,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
                       </div>
                       <div className="flex items-center gap-3">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                          app.status === 'awarded' ? 'bg-green-100 text-green-800' :
+                          app.status === 'awarded' ? 'bg-brand-green-100 text-brand-green-800' :
                           app.status === 'submitted' ? 'bg-brand-blue-100 text-brand-blue-800' :
                           app.status === 'draft' ? 'bg-gray-100 text-gray-800' :
                           'bg-yellow-100 text-yellow-800'
@@ -260,9 +260,9 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
                   return (
                     <div key={grant.id} className="flex items-center gap-4 p-4 border rounded-lg">
                       <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                        daysUntil <= 7 ? 'bg-red-100 text-red-600' :
-                        daysUntil <= 30 ? 'bg-orange-100 text-orange-600' :
-                        'bg-green-100 text-green-600'
+                        daysUntil <= 7 ? 'bg-brand-red-100 text-brand-red-600' :
+                        daysUntil <= 30 ? 'bg-brand-orange-100 text-brand-orange-600' :
+                        'bg-brand-green-100 text-brand-green-600'
                       }`}>
                         <Calendar className="w-6 h-6" />
                       </div>
@@ -271,7 +271,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
                         <p className="text-sm text-gray-500">{deadline.toLocaleDateString()}</p>
                       </div>
                       <div className="text-right">
-                        <p className={`font-bold ${daysUntil <= 7 ? 'text-red-600' : daysUntil <= 30 ? 'text-orange-600' : 'text-green-600'}`}>
+                        <p className={`font-bold ${daysUntil <= 7 ? 'text-brand-red-600' : daysUntil <= 30 ? 'text-brand-orange-600' : 'text-brand-green-600'}`}>
                           {daysUntil} days
                         </p>
                       </div>

@@ -31,7 +31,7 @@ export default async function TrainingPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Programs</h3><p className="text-3xl font-bold text-gray-900 mt-2">{count || 0}</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active</h3><p className="text-3xl font-bold text-green-600 mt-2">{activeCount || 0}</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">{activeCount || 0}</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Participants</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">847</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Completion Rate</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">76%</p></div>
         </div>
@@ -41,7 +41,7 @@ export default async function TrainingPage() {
             {programs && programs.length > 0 ? programs.map((prog: any) => (
               <div key={prog.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                 <div><p className="font-medium">{prog.title}</p><p className="text-sm text-gray-500">{prog.provider || 'Provider'} • {prog.duration || 'Duration N/A'}</p></div>
-                <span className={`px-2 py-1 rounded-full text-xs ${prog.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>{prog.status || 'draft'}</span>
+                <span className={`px-2 py-1 rounded-full text-xs ${prog.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-gray-100 text-gray-600'}`}>{prog.status || 'draft'}</span>
               </div>
             )) : <div className="p-8 text-center text-gray-500">No programs found</div>}
           </div>

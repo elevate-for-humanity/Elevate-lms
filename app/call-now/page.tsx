@@ -39,17 +39,17 @@ export default function GetStartedPage() {
             </Link>
 
             <Link href="/inquiry" className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group">
-              <HelpCircle className="w-10 h-10 text-green-600 mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-green-600">Ask a Question</h3>
+              <HelpCircle className="w-10 h-10 text-brand-green-600 mb-4" />
+              <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-green-600">Ask a Question</h3>
               <p className="text-gray-600 mb-4">Not sure which program is right for you? Submit an inquiry and get a personalized response within 24 hours.</p>
-              <span className="text-green-600 font-semibold flex items-center gap-2">Get Info <ArrowRight className="w-4 h-4" /></span>
+              <span className="text-brand-green-600 font-semibold flex items-center gap-2">Get Info <ArrowRight className="w-4 h-4" /></span>
             </Link>
 
             <Link href="/wioa-eligibility" className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group">
-              <DollarSign className="w-10 h-10 text-orange-600 mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-orange-600">Check Funding Eligibility</h3>
+              <DollarSign className="w-10 h-10 text-brand-orange-600 mb-4" />
+              <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-orange-600">Check Funding Eligibility</h3>
               <p className="text-gray-600 mb-4">See if you qualify for free training through WIOA, WRG, or JRI funding. Takes less than 2 minutes.</p>
-              <span className="text-orange-600 font-semibold flex items-center gap-2">Check Eligibility <ArrowRight className="w-4 h-4" /></span>
+              <span className="text-brand-orange-600 font-semibold flex items-center gap-2">Check Eligibility <ArrowRight className="w-4 h-4" /></span>
             </Link>
 
             <Link href="/employer" className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group">
@@ -67,10 +67,10 @@ export default function GetStartedPage() {
             </Link>
 
             <Link href="/support" className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group">
-              <MessageSquare className="w-10 h-10 text-red-600 mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-red-600">Technical Support</h3>
+              <MessageSquare className="w-10 h-10 text-brand-red-600 mb-4" />
+              <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-red-600">Technical Support</h3>
               <p className="text-gray-600 mb-4">Having trouble with your account, courses, or the platform? Submit a support ticket and get help fast.</p>
-              <span className="text-red-600 font-semibold flex items-center gap-2">Get Support <ArrowRight className="w-4 h-4" /></span>
+              <span className="text-brand-red-600 font-semibold flex items-center gap-2">Get Support <ArrowRight className="w-4 h-4" /></span>
             </Link>
           </div>
         </div>

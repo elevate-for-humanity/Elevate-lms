@@ -113,35 +113,35 @@ export default function TestPaymentsPage() {
             Payment Flow Status
           </h2>
           <div className="space-y-3">
-            <div className="flex items-start gap-3 p-3 bg-green-50 rounded border border-green-200">
+            <div className="flex items-start gap-3 p-3 bg-brand-green-50 rounded border border-brand-green-200">
               <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
-                <div className="font-medium text-green-900">
+                <div className="font-medium text-brand-green-900">
                   Stripe Checkout Integration
                 </div>
-                <div className="text-sm text-green-700">
+                <div className="text-sm text-brand-green-700">
                   Checkout sessions can be created for product purchases
                 </div>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-3 bg-green-50 rounded border border-green-200">
+            <div className="flex items-start gap-3 p-3 bg-brand-green-50 rounded border border-brand-green-200">
               <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
-                <div className="font-medium text-green-900">
+                <div className="font-medium text-brand-green-900">
                   Webhook Processing
                 </div>
-                <div className="text-sm text-green-700">
+                <div className="text-sm text-brand-green-700">
                   Payment events are processed and user access is updated
                 </div>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-3 bg-green-50 rounded border border-green-200">
+            <div className="flex items-start gap-3 p-3 bg-brand-green-50 rounded border border-brand-green-200">
               <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
-                <div className="font-medium text-green-900">
+                <div className="font-medium text-brand-green-900">
                   Subscription Management
                 </div>
-                <div className="text-sm text-green-700">
+                <div className="text-sm text-brand-green-700">
                   Recurring subscriptions are tracked and updated
                 </div>
               </div>

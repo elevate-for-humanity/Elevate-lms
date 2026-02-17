@@ -75,7 +75,7 @@ export function VideoShell({
       {title && (
         <div className="pointer-events-none absolute inset-x-0 top-0 p-4">
           <div className="rounded-2xl     px-4 py-3 max-w-[90%]">
-            <p className="text-[0.65rem] tracking-[0.2em] text-orange-300 uppercase mb-1">
+            <p className="text-[0.65rem] tracking-[0.2em] text-brand-orange-300 uppercase mb-1">
               Elevate for Humanity
             </p>
             <h2 className="text-white font-semibold text-sm sm:text-base leading-tight line-clamp-2">
@@ -94,7 +94,7 @@ export function VideoShell({
               </p>
             )}
             <div className="mt-2 flex flex-wrap items-center gap-2 text-[0.7rem]">
-              <span className="px-2 py-0.5 rounded-full bg-orange-500/90 font-semibold uppercase tracking-wide text-[0.65rem]">
+              <span className="px-2 py-0.5 rounded-full bg-brand-orange-500/90 font-semibold uppercase tracking-wide text-[0.65rem]">
                 Innovate • Elevate • Reset
               </span>
               <span className="px-2 py-0.5 rounded-full bg-brand-blue-600/80 border border-brand-blue-400/40 text-slate-100">

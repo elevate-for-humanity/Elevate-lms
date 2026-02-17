@@ -15,7 +15,7 @@ export default function OrderSuccessPage({
   return (
     <div className="min-h-screen bg-pink-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <span className="text-slate-400 flex-shrink-0">•</span>
         </div>
         

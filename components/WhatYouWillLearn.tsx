@@ -40,7 +40,7 @@ export function SkillsYouWillGain({ skills, className = '' }: SkillsYouWillGainP
         {skills.map((skill, index) => (
           <span
             key={index}
-            className="inline-flex items-center px-4 py-2 rounded-full bg-red-50 text-red-700 text-sm font-medium border border-red-200 hover:bg-red-100 transition"
+            className="inline-flex items-center px-4 py-2 rounded-full bg-brand-red-50 text-brand-red-700 text-sm font-medium border border-brand-red-200 hover:bg-brand-red-100 transition"
           >
             {skill}
           </span>

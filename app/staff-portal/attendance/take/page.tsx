@@ -75,11 +75,11 @@ export default async function TakeAttendancePage() {
       </div>
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+      <div className="bg-gradient-to-r from-brand-blue-600 to-indigo-600 text-white">
         <div className="max-w-6xl mx-auto px-4 py-12">
           <Link 
             href="/staff-portal/attendance" 
-            className="inline-flex items-center gap-2 text-blue-100 hover:text-white mb-4"
+            className="inline-flex items-center gap-2 text-brand-blue-100 hover:text-white mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Attendance
@@ -91,7 +91,7 @@ export default async function TakeAttendancePage() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold">Take Attendance</h1>
-                <p className="text-blue-100 mt-1">{today}</p>
+                <p className="text-brand-blue-100 mt-1">{today}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg">
@@ -112,7 +112,7 @@ export default async function TakeAttendancePage() {
               <h2 className="text-lg font-semibold text-gray-900">Select Cohort</h2>
               <p className="text-sm text-gray-600">Choose the class or program to take attendance for</p>
             </div>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 min-w-[250px]">
+            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 min-w-[250px]">
               <option value="">Select a cohort...</option>
               {cohortList.map((cohort: any) => (
                 <option key={cohort.id} value={cohort.id}>{cohort.name}</option>
@@ -132,7 +132,7 @@ export default async function TakeAttendancePage() {
               <p className="text-sm text-gray-600">{studentList.length} students enrolled</p>
             </div>
             <div className="flex gap-2">
-              <button className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200">
+              <button className="px-4 py-2 text-sm bg-brand-green-100 text-brand-green-700 rounded-lg hover:bg-brand-green-200">
                 Mark All Present
               </button>
               <button className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
@@ -169,7 +169,7 @@ export default async function TakeAttendancePage() {
                     <div className="flex items-center gap-3">
                       {/* Status Buttons */}
                       <div className="flex gap-2">
-                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-green-300 bg-green-50 text-green-700 hover:bg-green-100">
+                        <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-brand-green-300 bg-brand-green-50 text-brand-green-700 hover:bg-brand-green-100">
                           <CheckCircle className="w-4 h-4" />
                           Present
                         </button>
@@ -195,7 +195,7 @@ export default async function TakeAttendancePage() {
                           max="12"
                           step="0.5"
                           defaultValue="8"
-                          className="w-20 px-3 py-2 border rounded-lg text-center focus:ring-2 focus:ring-blue-500"
+                          className="w-20 px-3 py-2 border rounded-lg text-center focus:ring-2 focus:ring-brand-blue-500"
                         />
                         <span className="text-sm text-gray-500">hrs</span>
                       </div>
@@ -207,7 +207,7 @@ export default async function TakeAttendancePage() {
                     <input
                       type="text"
                       placeholder="Add notes (optional)..."
-                      className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     />
                   </div>
                 </div>
@@ -222,7 +222,7 @@ export default async function TakeAttendancePage() {
               </p>
               <Link
                 href="/staff-portal/students/add"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
               >
                 Add Students
               </Link>
@@ -234,15 +234,15 @@ export default async function TakeAttendancePage() {
             <div className="p-6 border-t bg-gray-50 flex items-center justify-between">
               <div className="text-sm text-gray-600">
                 <span className="font-medium text-gray-900">{studentList.length}</span> students • 
-                <span className="text-green-600 ml-2">0 present</span> • 
-                <span className="text-red-600 ml-2">0 absent</span> • 
+                <span className="text-brand-green-600 ml-2">0 present</span> • 
+                <span className="text-brand-red-600 ml-2">0 absent</span> • 
                 <span className="text-yellow-600 ml-2">0 late</span>
               </div>
               <div className="flex gap-4">
                 <button className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-white text-gray-700">
                   Save as Draft
                 </button>
-                <button className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+                <button className="flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium">
                   <Save className="w-5 h-5" />
                   Submit Attendance
                 </button>
@@ -252,19 +252,19 @@ export default async function TakeAttendancePage() {
         </div>
 
         {/* Quick Tips */}
-        <div className="mt-6 bg-blue-50 rounded-xl p-6">
+        <div className="mt-6 bg-brand-blue-50 rounded-xl p-6">
           <h3 className="font-semibold text-gray-900 mb-3">Quick Tips</h3>
           <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-700">
             <div className="flex items-start gap-2">
-              <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Use &quot;Mark All Present&quot; for quick entry, then adjust individual records</span>
             </div>
             <div className="flex items-start gap-2">
-              <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Add notes for absences to track reasons and patterns</span>
             </div>
             <div className="flex items-start gap-2">
-              <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Save as draft if you need to complete attendance later</span>
             </div>
           </div>

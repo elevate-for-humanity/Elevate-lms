@@ -175,7 +175,7 @@ export default function DocumentsPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-green-100 rounded-full mb-4">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Documents Received</h2>
@@ -208,7 +208,7 @@ export default function DocumentsPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4">
                   <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-                    doc.uploaded ? 'bg-green-100' : 'bg-gray-100'
+                    doc.uploaded ? 'bg-brand-green-100' : 'bg-gray-100'
                   }`}>
                     {doc.uploaded ? (
                       <span className="text-slate-400 flex-shrink-0">•</span>
@@ -267,7 +267,7 @@ export default function DocumentsPage() {
 
         {/* Error Message */}
         {error && (
-          <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="flex items-center gap-2 bg-brand-red-50 border border-brand-red-200 text-brand-red-700 px-4 py-3 rounded-lg mb-6">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             {error}
           </div>

@@ -376,14 +376,14 @@ export default async function AccreditationPage() {
 
         {/* Action Items */}
         {warningItems > 0 && (
-          <div className="mt-8 bg-orange-50 border border-orange-200 rounded-lg p-6">
+          <div className="mt-8 bg-brand-orange-50 border border-brand-orange-200 rounded-lg p-6">
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-6 h-6 text-brand-orange-600 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold text-orange-900 mb-2">
+                <h3 className="text-lg font-semibold text-brand-orange-900 mb-2">
                   Action Required: {warningItems} Items Need Attention
                 </h3>
-                <ul className="space-y-2 text-orange-800">
+                <ul className="space-y-2 text-brand-orange-800">
                   <li>
                     • Complete ECR integration with Milady for automated
                     reporting

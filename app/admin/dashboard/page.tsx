@@ -200,24 +200,24 @@ export default async function AdminDashboardOrchestrated() {
         (overdueReports || 0) > 0 ||
         (lowComplianceHolders?.length || 0) > 0) && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-          <div className="bg-red-50 border-2 border-red-600 rounded-lg p-4 sm:p-6">
+          <div className="bg-brand-red-50 border-2 border-brand-red-600 rounded-lg p-4 sm:p-6">
             <div className="flex items-start gap-3 sm:gap-4">
-              <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 flex-shrink-0" />
+              <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-brand-red-600 flex-shrink-0" />
               <div className="flex-1">
-                <h2 className="text-lg sm:text-xl font-bold text-red-900 mb-2 sm:mb-3">
+                <h2 className="text-lg sm:text-xl font-bold text-brand-red-900 mb-2 sm:mb-3">
                   Critical Issues Requiring Attention
                 </h2>
                 <div className="space-y-2">
                   {(atRiskStudents || 0) > 0 && (
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-3 bg-white rounded-lg">
-                      <span className="text-sm sm:text-base text-red-900 font-semibold">
+                      <span className="text-sm sm:text-base text-brand-red-900 font-semibold">
                         {atRiskStudents} student
                         {(atRiskStudents || 0) > 1 ? 's' : ''} at risk of
                         dropping out
                       </span>
                       <Link
                         href="/admin/students?filter=at-risk"
-                        className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition text-center"
+                        className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-brand-red-600 text-white rounded-lg font-semibold hover:bg-brand-red-700 transition text-center"
                       >
                         Review
                       </Link>
@@ -225,13 +225,13 @@ export default async function AdminDashboardOrchestrated() {
                   )}
                   {(overdueReports || 0) > 0 && (
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-3 bg-white rounded-lg">
-                      <span className="text-sm sm:text-base text-red-900 font-semibold">
+                      <span className="text-sm sm:text-base text-brand-red-900 font-semibold">
                         {overdueReports} overdue compliance report
                         {(overdueReports || 0) > 1 ? 's' : ''}
                       </span>
                       <Link
                         href="/admin/compliance?filter=overdue"
-                        className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition text-center"
+                        className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-brand-red-600 text-white rounded-lg font-semibold hover:bg-brand-red-700 transition text-center"
                       >
                         Review
                       </Link>
@@ -239,7 +239,7 @@ export default async function AdminDashboardOrchestrated() {
                   )}
                   {(lowComplianceHolders?.length || 0) > 0 && (
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-3 bg-white rounded-lg">
-                      <span className="text-sm sm:text-base text-red-900 font-semibold">
+                      <span className="text-sm sm:text-base text-brand-red-900 font-semibold">
                         {lowComplianceHolders?.length} program holder
                         {(lowComplianceHolders?.length || 0) > 1
                           ? 's'
@@ -248,7 +248,7 @@ export default async function AdminDashboardOrchestrated() {
                       </span>
                       <Link
                         href="/admin/program-holders?filter=low-compliance"
-                        className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition text-center"
+                        className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-brand-red-600 text-white rounded-lg font-semibold hover:bg-brand-red-700 transition text-center"
                       >
                         Review
                       </Link>
@@ -282,11 +282,11 @@ export default async function AdminDashboardOrchestrated() {
                 Total Enrolled
               </div>
             </div>
-            <div className="bg-green-50 rounded-lg shadow-sm border border-green-600 p-4 sm:p-6">
-              <div className="text-2xl sm:text-3xl font-bold text-green-900 mb-1 sm:mb-2">
+            <div className="bg-brand-green-50 rounded-lg shadow-sm border border-brand-green-600 p-4 sm:p-6">
+              <div className="text-2xl sm:text-3xl font-bold text-brand-green-900 mb-1 sm:mb-2">
                 {activeStudents || 0}
               </div>
-              <div className="text-xs sm:text-sm text-green-900">Active</div>
+              <div className="text-xs sm:text-sm text-brand-green-900">Active</div>
             </div>
             <div
               className={`rounded-lg shadow-sm border p-4 sm:p-6 ${
@@ -342,17 +342,17 @@ export default async function AdminDashboardOrchestrated() {
               </div>
               <div className="text-xs sm:text-sm text-brand-blue-900">Partner Active</div>
             </div>
-            <div className="bg-orange-50 rounded-lg shadow-sm border border-orange-200 p-4 sm:p-6">
-              <div className="text-2xl sm:text-3xl font-bold text-orange-900 mb-1 sm:mb-2">
+            <div className="bg-brand-orange-50 rounded-lg shadow-sm border border-brand-orange-200 p-4 sm:p-6">
+              <div className="text-2xl sm:text-3xl font-bold text-brand-orange-900 mb-1 sm:mb-2">
                 {studentEnrollmentsTotal || 0}
               </div>
-              <div className="text-xs sm:text-sm text-orange-900">Apprenticeship Total</div>
+              <div className="text-xs sm:text-sm text-brand-orange-900">Apprenticeship Total</div>
             </div>
-            <div className="bg-orange-50 rounded-lg shadow-sm border border-orange-600 p-4 sm:p-6">
-              <div className="text-2xl sm:text-3xl font-bold text-orange-900 mb-1 sm:mb-2">
+            <div className="bg-brand-orange-50 rounded-lg shadow-sm border border-brand-orange-600 p-4 sm:p-6">
+              <div className="text-2xl sm:text-3xl font-bold text-brand-orange-900 mb-1 sm:mb-2">
                 {studentEnrollmentsActive || 0}
               </div>
-              <div className="text-xs sm:text-sm text-orange-900">Apprenticeship Active</div>
+              <div className="text-xs sm:text-sm text-brand-orange-900">Apprenticeship Active</div>
             </div>
           </div>
         </div>
@@ -372,29 +372,29 @@ export default async function AdminDashboardOrchestrated() {
                 Total Registered
               </div>
             </div>
-            <div className="bg-green-50 rounded-lg shadow-sm border border-green-600 p-4 sm:p-6">
-              <div className="text-2xl sm:text-3xl font-bold text-green-900 mb-1 sm:mb-2">
+            <div className="bg-brand-green-50 rounded-lg shadow-sm border border-brand-green-600 p-4 sm:p-6">
+              <div className="text-2xl sm:text-3xl font-bold text-brand-green-900 mb-1 sm:mb-2">
                 {verifiedProgramHolders || 0}
               </div>
-              <div className="text-xs sm:text-sm text-green-900">Verified</div>
+              <div className="text-xs sm:text-sm text-brand-green-900">Verified</div>
             </div>
             <div
               className={`rounded-lg shadow-sm border p-4 sm:p-6 ${
                 (overdueReports || 0) > 0
-                  ? 'bg-red-50 border-red-600'
+                  ? 'bg-brand-red-50 border-brand-red-600'
                   : 'bg-white border-slate-200'
               }`}
             >
               <div
                 className={`text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 ${
-                  (overdueReports || 0) > 0 ? 'text-red-900' : 'text-black'
+                  (overdueReports || 0) > 0 ? 'text-brand-red-900' : 'text-black'
                 }`}
               >
                 {overdueReports || 0}
               </div>
               <div
                 className={`text-xs sm:text-sm ${
-                  (overdueReports || 0) > 0 ? 'text-red-900' : 'text-black'
+                  (overdueReports || 0) > 0 ? 'text-brand-red-900' : 'text-black'
                 }`}
               >
                 Overdue Reports
@@ -432,7 +432,7 @@ export default async function AdminDashboardOrchestrated() {
         {/* Employers & Placements */}
         <div className="mb-6 sm:mb-8">
           <h3 className="text-base sm:text-lg font-bold text-black mb-3 sm:mb-4 flex items-center gap-2">
-            <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+            <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-brand-green-600" />
             Employers & Placements
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
@@ -452,11 +452,11 @@ export default async function AdminDashboardOrchestrated() {
                 Active Job Postings
               </div>
             </div>
-            <div className="bg-green-50 rounded-lg shadow-sm border border-green-600 p-4 sm:p-6">
-              <div className="text-2xl sm:text-3xl font-bold text-green-900 mb-1 sm:mb-2">
+            <div className="bg-brand-green-50 rounded-lg shadow-sm border border-brand-green-600 p-4 sm:p-6">
+              <div className="text-2xl sm:text-3xl font-bold text-brand-green-900 mb-1 sm:mb-2">
                 {jobPlacements || 0}
               </div>
-              <div className="text-xs sm:text-sm text-green-900">
+              <div className="text-xs sm:text-sm text-brand-green-900">
                 Total Placements
               </div>
             </div>
@@ -466,7 +466,7 @@ export default async function AdminDashboardOrchestrated() {
         {/* Programs */}
         <div className="mb-6 sm:mb-8">
           <h3 className="text-base sm:text-lg font-bold text-black mb-3 sm:mb-4 flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
+            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-brand-orange-600" />
             Programs
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -478,11 +478,11 @@ export default async function AdminDashboardOrchestrated() {
                 Total Programs
               </div>
             </div>
-            <div className="bg-green-50 rounded-lg shadow-sm border border-green-600 p-4 sm:p-6">
-              <div className="text-2xl sm:text-3xl font-bold text-green-900 mb-1 sm:mb-2">
+            <div className="bg-brand-green-50 rounded-lg shadow-sm border border-brand-green-600 p-4 sm:p-6">
+              <div className="text-2xl sm:text-3xl font-bold text-brand-green-900 mb-1 sm:mb-2">
                 {activePrograms || 0}
               </div>
-              <div className="text-xs sm:text-sm text-green-900">
+              <div className="text-xs sm:text-sm text-brand-green-900">
                 Active Programs
               </div>
             </div>
@@ -559,7 +559,7 @@ export default async function AdminDashboardOrchestrated() {
             </div>
             <div className="p-3">
               <p className="text-slate-600 text-sm">Track placements</p>
-              <span className="inline-flex items-center gap-1 text-green-600 font-medium text-sm mt-1 group-hover:gap-2 transition-all">
+              <span className="inline-flex items-center gap-1 text-brand-green-600 font-medium text-sm mt-1 group-hover:gap-2 transition-all">
                 Open <ArrowRight className="w-4 h-4" />
               </span>
             </div>
@@ -582,7 +582,7 @@ export default async function AdminDashboardOrchestrated() {
             </div>
             <div className="p-3">
               <p className="text-slate-600 text-sm">Export data</p>
-              <span className="inline-flex items-center gap-1 text-orange-600 font-medium text-sm mt-1 group-hover:gap-2 transition-all">
+              <span className="inline-flex items-center gap-1 text-brand-orange-600 font-medium text-sm mt-1 group-hover:gap-2 transition-all">
                 Open <ArrowRight className="w-4 h-4" />
               </span>
             </div>
@@ -594,22 +594,22 @@ export default async function AdminDashboardOrchestrated() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6">
           <div className="flex items-center gap-3 mb-6">
-            <Shield className="h-6 w-6 text-green-600" />
+            <Shield className="h-6 w-6 text-brand-green-600" />
             <h2 className="text-xl font-bold text-black">Compliance Snapshot</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
+            <div className="flex items-center gap-3 p-4 bg-brand-green-50 rounded-lg border border-brand-green-200">
               <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
-                <div className="text-sm font-medium text-green-900">Audit Logging</div>
-                <div className="text-xs text-green-700">Enabled</div>
+                <div className="text-sm font-medium text-brand-green-900">Audit Logging</div>
+                <div className="text-xs text-brand-green-700">Enabled</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
+            <div className="flex items-center gap-3 p-4 bg-brand-green-50 rounded-lg border border-brand-green-200">
               <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
-                <div className="text-sm font-medium text-green-900">Route Access</div>
-                <div className="text-xs text-green-700">Role-gated</div>
+                <div className="text-sm font-medium text-brand-green-900">Route Access</div>
+                <div className="text-xs text-brand-green-700">Role-gated</div>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg border border-slate-200">

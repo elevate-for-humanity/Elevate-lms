@@ -288,7 +288,7 @@ export function ProductPage({ product }: ProductPageProps) {
             <div className="grid grid-cols-2 gap-3 mb-6">
               {product.features.slice(0, 4).map((feature, i) => (
                 <div key={i} className="flex items-center gap-2 text-sm">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                  <Check className="w-5 h-5 text-brand-green-500 flex-shrink-0" />
                   <span>{feature.title}</span>
                 </div>
               ))}
@@ -340,7 +340,7 @@ export function ProductPage({ product }: ProductPageProps) {
               <button 
                 onClick={() => setIsWishlisted(!isWishlisted)}
                 className={`w-14 h-14 rounded-xl border-2 flex items-center justify-center transition ${
-                  isWishlisted ? 'border-red-500 bg-red-50 text-red-500' : 'border-gray-200 hover:border-gray-300'
+                  isWishlisted ? 'border-brand-red-500 bg-brand-red-50 text-brand-red-500' : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <Heart className={`w-6 h-6 ${isWishlisted ? 'fill-current' : ''}`} />
@@ -484,7 +484,7 @@ export function ProductPage({ product }: ProductPageProps) {
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-bold">{review.author}</span>
                           {review.verified && (
-                            <span className="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">Verified</span>
+                            <span className="bg-brand-green-100 text-brand-green-800 text-xs px-2 py-0.5 rounded-full">Verified</span>
                           )}
                         </div>
                         <div className="flex items-center gap-2 mb-2">
@@ -540,7 +540,7 @@ export function ProductPage({ product }: ProductPageProps) {
               <ul className="space-y-3">
                 {product.whatsIncluded.map((item, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <Check className="w-5 h-5 text-brand-green-500 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-600">{item}</span>
                   </li>
                 ))}

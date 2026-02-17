@@ -219,7 +219,7 @@ export default function EnrollPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <AlertCircle className="w-16 h-16 text-brand-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Program Not Found
           </h2>
@@ -252,11 +252,11 @@ export default function EnrollPage() {
                     {program.name}
                   </h1>
                   {program.is_free === true ? (
-                    <span className="px-3 py-1 bg-green-500 text-white text-sm font-bold rounded-full">
+                    <span className="px-3 py-1 bg-brand-green-500 text-white text-sm font-bold rounded-full">
                       FREE
                     </span>
                   ) : program.funding_eligible ? (
-                    <span className="px-3 py-1 bg-green-500 text-white text-sm font-bold rounded-full">
+                    <span className="px-3 py-1 bg-brand-green-500 text-white text-sm font-bold rounded-full">
                       FREE with WIOA/WRG
                     </span>
                   ) : (program.price || program.total_cost) ? (
@@ -285,9 +285,9 @@ export default function EnrollPage() {
               <div
                 className={`mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg flex items-start gap-2 sm:gap-3 text-sm sm:text-base ${
                   message.includes('Error')
-                    ? 'bg-red-50 text-red-800 border border-red-200'
+                    ? 'bg-brand-red-50 text-brand-red-800 border border-brand-red-200'
                     : message.includes('successful')
-                      ? 'bg-green-50 text-green-800 border border-green-200'
+                      ? 'bg-brand-green-50 text-brand-green-800 border border-brand-green-200'
                       : 'bg-brand-blue-50 text-brand-blue-800 border border-brand-blue-200'
                 }`}
               >

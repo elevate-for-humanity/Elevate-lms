@@ -23,7 +23,7 @@ export default function HighlightStrip() {
             key={idx}
             className="flex items-center gap-2 rounded-full bg-slate-50 px-3 py-2 text-xs font-medium text-black ring-1 ring-slate-200 md:text-sm"
           >
-            <span className="text-orange-600">{it.icon}</span>
+            <span className="text-brand-orange-600">{it.icon}</span>
             <span>{it.label}</span>
             {it.sub && <span className="hidden text-slate-500 md:inline">· {it.sub}</span>}
           </div>

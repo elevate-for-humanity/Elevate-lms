@@ -67,9 +67,9 @@ export default function InstantTestsPage() {
         <Breadcrumbs items={[{ label: "Drug Testing", href: "/drug-testing" }, { label: "Instant Tests" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 bg-green-800 text-white">
+      <section className="relative py-20 bg-brand-green-800 text-white">
         <div className="max-w-6xl mx-auto px-6">
-          <Link href="/drug-testing" className="inline-flex items-center gap-2 text-green-200 hover:text-white mb-6 transition">
+          <Link href="/drug-testing" className="inline-flex items-center gap-2 text-brand-green-200 hover:text-white mb-6 transition">
             <ArrowLeft className="w-4 h-4" />
             Back to Drug Testing
           </Link>
@@ -77,7 +77,7 @@ export default function InstantTestsPage() {
             <Zap className="w-10 h-10" />
             <h1 className="text-4xl md:text-5xl font-bold">Instant Rapid Tests</h1>
           </div>
-          <p className="text-xl text-green-100 max-w-2xl">
+          <p className="text-xl text-brand-green-100 max-w-2xl">
             Get preliminary results in just 5-10 minutes. Perfect for high-volume screening, 
             post-accident testing, or when you need answers fast.
           </p>
@@ -90,22 +90,22 @@ export default function InstantTestsPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">How Instant Tests Work</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-green-600">1</span>
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-brand-green-600">1</span>
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Collect Sample</h3>
               <p className="text-gray-600 text-sm">Urine sample collected at any of our 20,000+ locations</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-green-600">2</span>
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-brand-green-600">2</span>
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Rapid Analysis</h3>
               <p className="text-gray-600 text-sm">On-site testing device provides preliminary results in minutes</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-green-600">3</span>
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-brand-green-600">3</span>
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Results</h3>
               <p className="text-gray-600 text-sm">Negative = done. Positive = sent to lab for confirmation.</p>
@@ -130,7 +130,7 @@ export default function InstantTestsPage() {
             {instantTests.map((test) => (
               <div
                 key={test.name}
-                className={`bg-white rounded-2xl overflow-hidden shadow-lg border-2 ${test.popular ? 'border-green-500' : 'border-gray-200'}`}
+                className={`bg-white rounded-2xl overflow-hidden shadow-lg border-2 ${test.popular ? 'border-brand-green-500' : 'border-gray-200'}`}
               >
                 <div className="relative h-48">
                   <Image
@@ -140,7 +140,7 @@ export default function InstantTestsPage() {
                     className="object-cover"
                   />
                   {test.popular && (
-                    <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                    <div className="absolute top-4 left-4 bg-brand-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                       BEST VALUE
                     </div>
                   )}
@@ -151,12 +151,12 @@ export default function InstantTestsPage() {
                   <p className="text-gray-600 text-sm mb-4">{test.description}</p>
                   
                   <div className="flex items-baseline gap-2 mb-4">
-                    <span className="text-3xl font-bold text-green-600">${test.price}</span>
+                    <span className="text-3xl font-bold text-brand-green-600">${test.price}</span>
                     <span className="text-gray-500">per person</span>
                   </div>
                   
                   <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                    <Clock className="w-4 h-4 text-green-500" />
+                    <Clock className="w-4 h-4 text-brand-green-500" />
                     <span>{test.turnaround}</span>
                   </div>
                   
@@ -173,7 +173,7 @@ export default function InstantTestsPage() {
                   
                   <a
                     href="/support"
-                    className="block w-full text-center bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition"
+                    className="block w-full text-center bg-brand-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-green-700 transition"
                   >
                     Order Now
                   </a>
@@ -205,15 +205,15 @@ export default function InstantTestsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-green-600 text-white">
+      <section className="py-16 bg-brand-green-600 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need Fast Results?</h2>
-          <p className="text-xl text-green-100 mb-8">
+          <p className="text-xl text-brand-green-100 mb-8">
             Schedule online to schedule instant testing at a location near you.
           </p>
           <a
             href="/support"
-            className="inline-flex items-center gap-2 bg-white text-green-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
+            className="inline-flex items-center gap-2 bg-white text-brand-green-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
           >
             <Phone className="w-5 h-5" />
             Get Help Online

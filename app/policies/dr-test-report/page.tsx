@@ -21,46 +21,46 @@ export default function DRTestReportPage() {
         <article className="bg-white rounded-xl shadow-sm p-8 md:p-12">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-black">Disaster Recovery Test Report</h1>
-                <p className="text-green-600 font-medium">Test Completed Successfully</p>
+                <p className="text-brand-green-600 font-medium">Test Completed Successfully</p>
               </div>
             </div>
           </div>
 
           {/* Test Summary */}
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
-            <h2 className="text-xl font-bold text-green-900 mb-4">Test Summary</h2>
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-6 mb-8">
+            <h2 className="text-xl font-bold text-brand-green-900 mb-4">Test Summary</h2>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-green-600" />
+                <Calendar className="w-5 h-5 text-brand-green-600" />
                 <div>
-                  <p className="text-sm text-green-700">Test Date</p>
-                  <p className="font-semibold text-green-900">January 24, 2026</p>
+                  <p className="text-sm text-brand-green-700">Test Date</p>
+                  <p className="font-semibold text-brand-green-900">January 24, 2026</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Database className="w-5 h-5 text-green-600" />
+                <Database className="w-5 h-5 text-brand-green-600" />
                 <div>
-                  <p className="text-sm text-green-700">Backup Source</p>
-                  <p className="font-semibold text-green-900">Supabase Automated Daily Backup</p>
+                  <p className="text-sm text-brand-green-700">Backup Source</p>
+                  <p className="font-semibold text-brand-green-900">Supabase Automated Daily Backup</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-green-600" />
+                <Clock className="w-5 h-5 text-brand-green-600" />
                 <div>
-                  <p className="text-sm text-green-700">Recovery Time</p>
-                  <p className="font-semibold text-green-900">&lt; 4 hours (within RTO)</p>
+                  <p className="text-sm text-brand-green-700">Recovery Time</p>
+                  <p className="font-semibold text-brand-green-900">&lt; 4 hours (within RTO)</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Shield className="w-5 h-5 text-green-600" />
+                <Shield className="w-5 h-5 text-brand-green-600" />
                 <div>
-                  <p className="text-sm text-green-700">Result</p>
-                  <p className="font-semibold text-green-900">PASSED</p>
+                  <p className="text-sm text-brand-green-700">Result</p>
+                  <p className="font-semibold text-brand-green-900">PASSED</p>
                 </div>
               </div>
             </div>
@@ -119,25 +119,25 @@ export default function DRTestReportPage() {
                     <td className="px-4 py-3 border-b text-black">Recovery Time (RTO)</td>
                     <td className="px-4 py-3 border-b text-black">24 hours</td>
                     <td className="px-4 py-3 border-b text-black">&lt; 4 hours</td>
-                    <td className="px-4 py-3 border-b text-green-600 font-semibold">• PASS</td>
+                    <td className="px-4 py-3 border-b text-brand-green-600 font-semibold">• PASS</td>
                   </tr>
                   <tr>
                     <td className="px-4 py-3 border-b text-black">Recovery Point (RPO)</td>
                     <td className="px-4 py-3 border-b text-black">24 hours</td>
                     <td className="px-4 py-3 border-b text-black">&lt; 24 hours</td>
-                    <td className="px-4 py-3 border-b text-green-600 font-semibold">• PASS</td>
+                    <td className="px-4 py-3 border-b text-brand-green-600 font-semibold">• PASS</td>
                   </tr>
                   <tr>
                     <td className="px-4 py-3 border-b text-black">Data Integrity</td>
                     <td className="px-4 py-3 border-b text-black">100%</td>
                     <td className="px-4 py-3 border-b text-black">100%</td>
-                    <td className="px-4 py-3 border-b text-green-600 font-semibold">• PASS</td>
+                    <td className="px-4 py-3 border-b text-brand-green-600 font-semibold">• PASS</td>
                   </tr>
                   <tr>
                     <td className="px-4 py-3 border-b text-black">Application Function</td>
                     <td className="px-4 py-3 border-b text-black">Operational</td>
                     <td className="px-4 py-3 border-b text-black">Operational</td>
-                    <td className="px-4 py-3 border-b text-green-600 font-semibold">• PASS</td>
+                    <td className="px-4 py-3 border-b text-brand-green-600 font-semibold">• PASS</td>
                   </tr>
                 </tbody>
               </table>

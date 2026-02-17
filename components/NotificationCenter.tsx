@@ -83,9 +83,9 @@ export function NotificationCenter() {
 
   const getColor = (type: string) => {
     switch (type) {
-      case 'success': return 'bg-green-100 text-green-700 border-green-200';
+      case 'success': return 'bg-brand-green-100 text-brand-green-700 border-brand-green-200';
       case 'warning': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'error': return 'bg-red-100 text-red-700 border-red-200';
+      case 'error': return 'bg-brand-red-100 text-brand-red-700 border-brand-red-200';
       default: return 'bg-brand-blue-100 text-brand-blue-700 border-brand-blue-200';
     }
   };
@@ -95,7 +95,7 @@ export function NotificationCenter() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Notifications</h1>
-          <p className="text-red-100">Stay updated with real-time alerts</p>
+          <p className="text-brand-red-100">Stay updated with real-time alerts</p>
         </div>
       </div>
 

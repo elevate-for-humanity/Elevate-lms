@@ -42,7 +42,7 @@ export default async function AdminGeocodingPage() {
           <div className="text-sm text-gray-500">Total Shops</div>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-3xl font-bold text-green-600">{geocoded.length}</div>
+          <div className="text-3xl font-bold text-brand-green-600">{geocoded.length}</div>
           <div className="text-sm text-gray-500">Geocoded</div>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
@@ -50,7 +50,7 @@ export default async function AdminGeocodingPage() {
           <div className="text-sm text-gray-500">Needs Geocoding</div>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-3xl font-bold text-red-600">{failed.length}</div>
+          <div className="text-3xl font-bold text-brand-red-600">{failed.length}</div>
           <div className="text-sm text-gray-500">Failed</div>
         </div>
       </div>

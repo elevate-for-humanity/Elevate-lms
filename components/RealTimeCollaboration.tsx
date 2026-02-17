@@ -125,9 +125,9 @@ export function RealTimeCollaboration({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'online':
-        return 'bg-green-500';
+        return 'bg-brand-green-500';
       case 'away':
-        return 'bg-orange-500';
+        return 'bg-brand-orange-500';
       default:
         return 'bg-gray-400';
     }
@@ -187,7 +187,7 @@ export function RealTimeCollaboration({
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <MessageCircle className="text-orange-600" size={24} />
+            <MessageCircle className="text-brand-orange-600" size={24} />
             <CardTitle>Group Chat</CardTitle>
           </div>
         </CardHeader>
@@ -222,7 +222,7 @@ export function RealTimeCollaboration({
                 onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setNewMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                 placeholder="Type a message..."
-                className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500"
               />
               <Button onClick={sendMessage} className="bg-brand-orange-600 hover:bg-brand-orange-700">
                 Send
@@ -236,7 +236,7 @@ export function RealTimeCollaboration({
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <Share2 className="text-green-600" size={24} />
+            <Share2 className="text-brand-green-600" size={24} />
             <CardTitle>Screen Sharing</CardTitle>
           </div>
         </CardHeader>
@@ -244,7 +244,7 @@ export function RealTimeCollaboration({
           <div className="text-center py-8">
             <Share2 className="mx-auto text-gray-400 mb-4" size={48} />
             <p className="text-black mb-4">Share your screen with the study group</p>
-            <Button className="bg-green-600 hover:bg-green-700">
+            <Button className="bg-brand-green-600 hover:bg-brand-green-700">
               Start Screen Share
             </Button>
           </div>

@@ -80,9 +80,9 @@ export default async function HubPage() {
             <Link
               key={item.name}
               href={item.href}
-              className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-md hover:border-green-300 transition group"
+              className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-md hover:border-brand-green-300 transition group"
             >
-              <item.icon className="w-6 h-6 text-slate-400 group-hover:text-green-600 mb-2" />
+              <item.icon className="w-6 h-6 text-slate-400 group-hover:text-brand-green-600 mb-2" />
               <h3 className="font-medium text-slate-900">{item.name}</h3>
               <p className="text-sm text-slate-700">{item.description}</p>
             </Link>

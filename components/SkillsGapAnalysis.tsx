@@ -109,7 +109,7 @@ export default function SkillsGapAnalysis() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Skills Gap Analysis</h1>
-          <p className="text-red-100">Identify and close skill gaps in your workforce</p>
+          <p className="text-brand-red-100">Identify and close skill gaps in your workforce</p>
         </div>
       </div>
 
@@ -125,15 +125,15 @@ export default function SkillsGapAnalysis() {
               </p>
               <div className="flex gap-4 text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">•</span>
+                  <span className="text-brand-green-600">•</span>
                   <span>Real-time analysis</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">•</span>
+                  <span className="text-brand-green-600">•</span>
                   <span>Personalized recommendations</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">•</span>
+                  <span className="text-brand-green-600">•</span>
                   <span>Track progress</span>
                 </div>
               </div>
@@ -160,7 +160,7 @@ export default function SkillsGapAnalysis() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Average Gap</h3>
-            <p className="text-3xl font-bold text-orange-500">
+            <p className="text-3xl font-bold text-brand-orange-500">
               {Math.round(skillGaps.reduce((sum, g) => sum + g.gap, 0) / skillGaps.length)}%
             </p>
             <p className="text-sm text-black">Across all skills</p>
@@ -184,7 +184,7 @@ export default function SkillsGapAnalysis() {
                   <div>
                     <h4 className="text-lg font-bold">{gap.skill}</h4>
                     <span className={`inline-block mt-1 px-3 py-2 rounded text-xs font-medium ${
-                      gap.priority === 'high' ? 'bg-red-100 text-red-700' :
+                      gap.priority === 'high' ? 'bg-brand-red-100 text-brand-red-700' :
                       gap.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
                       'bg-brand-blue-100 text-brand-blue-700'
                     }`}>
@@ -204,7 +204,7 @@ export default function SkillsGapAnalysis() {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
                     <div
-                      className="bg-orange-500 h-3 rounded-full"
+                      className="bg-brand-orange-500 h-3 rounded-full"
                       style={{ width: `${gap.currentLevel}%` }}
                     />
                   </div>
@@ -215,7 +215,7 @@ export default function SkillsGapAnalysis() {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div
-                      className="bg-green-600 h-3 rounded-full"
+                      className="bg-brand-green-600 h-3 rounded-full"
                       style={{ width: `${gap.requiredLevel}%` }}
                     />
                   </div>
@@ -267,7 +267,7 @@ export default function SkillsGapAnalysis() {
                             <div className="w-16 bg-gray-200 rounded-full h-2">
                               <div
                                 className={`h-2 rounded-full ${
-                                  level >= 70 ? 'bg-green-600' :
+                                  level >= 70 ? 'bg-brand-green-600' :
                                   level >= 50 ? 'bg-yellow-600' :
                                   'bg-brand-orange-600'
                                 }`}
@@ -290,9 +290,9 @@ export default function SkillsGapAnalysis() {
           <Card className="p-6">
             <h3 className="text-xl font-bold mb-4">Action Plan</h3>
             <div className="space-y-3">
-              <div className="p-4 bg-red-50 rounded">
-                <h4 className="font-semibold text-red-900 mb-2">🔴 Immediate (1-2 months)</h4>
-                <ul className="text-sm text-red-700 space-y-1">
+              <div className="p-4 bg-brand-red-50 rounded">
+                <h4 className="font-semibold text-brand-red-900 mb-2">🔴 Immediate (1-2 months)</h4>
+                <ul className="text-sm text-brand-red-700 space-y-1">
                   <li>• Enroll team in TypeScript Fundamentals</li>
                   <li>• Start AWS Cloud Practitioner certification</li>
                 </ul>
@@ -317,9 +317,9 @@ export default function SkillsGapAnalysis() {
           <Card className="p-6">
             <h3 className="text-xl font-bold mb-4">ROI Projection</h3>
             <div className="space-y-4">
-              <div className="p-4 bg-green-50 rounded">
-                <h4 className="font-semibold text-green-900 mb-2">Expected Benefits</h4>
-                <ul className="text-sm text-green-700 space-y-2">
+              <div className="p-4 bg-brand-green-50 rounded">
+                <h4 className="font-semibold text-brand-green-900 mb-2">Expected Benefits</h4>
+                <ul className="text-sm text-brand-green-700 space-y-2">
                   <li className="flex justify-between">
                     <span>Productivity increase:</span>
                     <span className="font-bold">+25%</span>

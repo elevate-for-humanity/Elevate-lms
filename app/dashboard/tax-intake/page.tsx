@@ -68,10 +68,10 @@ export default async function TaxIntakePage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-700';
+      case 'completed': return 'bg-brand-green-100 text-brand-green-700';
       case 'in_progress': return 'bg-brand-blue-100 text-brand-blue-700';
       case 'pending': return 'bg-yellow-100 text-yellow-700';
-      case 'cancelled': return 'bg-red-100 text-red-700';
+      case 'cancelled': return 'bg-brand-red-100 text-brand-red-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -80,9 +80,9 @@ export default async function TaxIntakePage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-          <Link href="/" className="hover:text-orange-600">Home</Link>
+          <Link href="/" className="hover:text-brand-orange-600">Home</Link>
           <ChevronRight className="w-4 h-4" />
-          <Link href="/admin" className="hover:text-orange-600">Admin</Link>
+          <Link href="/admin" className="hover:text-brand-orange-600">Admin</Link>
           <ChevronRight className="w-4 h-4" />
           <span className="text-gray-900">Tax Intake</span>
         </nav>
@@ -93,7 +93,7 @@ export default async function TaxIntakePage() {
             <p className="text-gray-600">Manage tax preparation appointments</p>
           </div>
           <Link href="/tax"
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+            className="px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
             Schedule Appointment
           </Link>
         </div>
@@ -177,7 +177,7 @@ export default async function TaxIntakePage() {
                     </td>
                     <td className="px-4 py-4">
                       <Link href={`/dashboard/tax-intake/${intake.id}`}
-                        className="text-orange-600 hover:text-orange-700 text-sm">
+                        className="text-brand-orange-600 hover:text-brand-orange-700 text-sm">
                         View Details
                       </Link>
                     </td>

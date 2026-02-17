@@ -45,7 +45,7 @@ export default function ContentPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Acceptable Content</h2>
             
-            <div className="bg-green-50 rounded-xl p-6 border-2 border-green-200 mb-6">
+            <div className="bg-brand-green-50 rounded-xl p-6 border-2 border-brand-green-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Encouraged Content</h3>
               <p className="text-black mb-4">We welcome content that is:</p>
               <ul className="list-disc pl-6 text-black space-y-2">
@@ -62,7 +62,7 @@ export default function ContentPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Prohibited Content</h2>
             
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Illegal Content</h3>
               <p className="text-black mb-2">Absolutely prohibited:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -75,7 +75,7 @@ export default function ContentPage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Harmful Content</h3>
               <p className="text-black mb-2">Do not post:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -234,7 +234,7 @@ export default function ContentPage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Repeated Violations</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Temporary suspension from posting (1-30 days)</li>
@@ -244,7 +244,7 @@ export default function ContentPage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Severe Violations</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Permanent ban from platforms</li>

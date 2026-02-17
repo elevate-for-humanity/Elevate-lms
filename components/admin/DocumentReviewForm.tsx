@@ -60,11 +60,11 @@ export function DocumentReviewForm({ document, adminId }: Props) {
   return (
     <div className="space-y-6">
       {error && (
-        <div className="p-4 bg-red-50 border-2 border-red-600 rounded-lg flex items-start gap-3">
-          <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+        <div className="p-4 bg-brand-red-50 border-2 border-brand-red-600 rounded-lg flex items-start gap-3">
+          <AlertCircle className="w-6 h-6 text-brand-red-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="font-bold text-red-900">Error</h3>
-            <p className="text-red-800">{error}</p>
+            <h3 className="font-bold text-brand-red-900">Error</h3>
+            <p className="text-brand-red-800">{error}</p>
           </div>
         </div>
       )}
@@ -174,19 +174,19 @@ export function DocumentReviewForm({ document, adminId }: Props) {
               onClick={() => setAction('approve')}
               className={`w-full p-4 border-2 rounded-lg flex items-center gap-3 transition ${
                 action === 'approve'
-                  ? 'border-green-600 bg-green-50'
-                  : 'border-slate-300 hover:border-green-600'
+                  ? 'border-brand-green-600 bg-brand-green-50'
+                  : 'border-slate-300 hover:border-brand-green-600'
               }`}
             >
               <span className="text-slate-400 flex-shrink-0">•</span>
               <div className="text-left">
                 <p
-                  className={`font-bold ${action === 'approve' ? 'text-green-900' : 'text-black'}`}
+                  className={`font-bold ${action === 'approve' ? 'text-brand-green-900' : 'text-black'}`}
                 >
                   Approve Document
                 </p>
                 <p
-                  className={`text-sm ${action === 'approve' ? 'text-green-700' : 'text-black'}`}
+                  className={`text-sm ${action === 'approve' ? 'text-brand-green-700' : 'text-black'}`}
                 >
                   Document meets requirements and is approved
                 </p>
@@ -198,21 +198,21 @@ export function DocumentReviewForm({ document, adminId }: Props) {
               onClick={() => setAction('reject')}
               className={`w-full p-4 border-2 rounded-lg flex items-center gap-3 transition ${
                 action === 'reject'
-                  ? 'border-red-600 bg-red-50'
-                  : 'border-slate-300 hover:border-red-600'
+                  ? 'border-brand-red-600 bg-brand-red-50'
+                  : 'border-slate-300 hover:border-brand-red-600'
               }`}
             >
               <XCircle
-                className={`w-6 h-6 ${action === 'reject' ? 'text-red-600' : 'text-slate-400'}`}
+                className={`w-6 h-6 ${action === 'reject' ? 'text-brand-red-600' : 'text-slate-400'}`}
               />
               <div className="text-left">
                 <p
-                  className={`font-bold ${action === 'reject' ? 'text-red-900' : 'text-black'}`}
+                  className={`font-bold ${action === 'reject' ? 'text-brand-red-900' : 'text-black'}`}
                 >
                   Reject Document
                 </p>
                 <p
-                  className={`text-sm ${action === 'reject' ? 'text-red-700' : 'text-black'}`}
+                  className={`text-sm ${action === 'reject' ? 'text-brand-red-700' : 'text-black'}`}
                 >
                   Document does not meet requirements
                 </p>
@@ -261,8 +261,8 @@ export function DocumentReviewForm({ document, adminId }: Props) {
         <div
           className={`p-6 rounded-lg border-2 ${
             document.status === 'approved'
-              ? 'bg-green-50 border-green-600'
-              : 'bg-red-50 border-red-600'
+              ? 'bg-brand-green-50 border-brand-green-600'
+              : 'bg-brand-red-50 border-brand-red-600'
           }`}
         >
           <h2 className="text-xl font-bold mb-2">

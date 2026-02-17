@@ -176,8 +176,8 @@ export default function CurvatureCareersPage() {
               <p className="text-gray-600 text-sm">Clear path from apprentice to senior technician</p>
             </div>
             <div className="text-center p-6">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Heart className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="w-8 h-8 text-brand-green-600" />
               </div>
               <h3 className="font-bold mb-2">Community Impact</h3>
               <p className="text-gray-600 text-sm">Partner with VITA and Selfish Inc. nonprofits</p>

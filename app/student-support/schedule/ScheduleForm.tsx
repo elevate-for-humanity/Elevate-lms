@@ -98,7 +98,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
                   </p>
                 </div>
                 <span className={`px-2 py-1 rounded text-xs ${
-                  apt.status === 'scheduled' ? 'bg-green-100 text-green-700' :
+                  apt.status === 'scheduled' ? 'bg-brand-green-100 text-brand-green-700' :
                   apt.status === 'completed' ? 'bg-brand-blue-100 text-brand-blue-700' :
                   'bg-gray-100 text-gray-700'
                 }`}>
@@ -112,7 +112,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
 
       {message && (
         <div className={`p-4 rounded-lg ${
-          message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+          message.type === 'success' ? 'bg-brand-green-50 text-brand-green-700 border border-brand-green-200' : 'bg-brand-red-50 text-brand-red-700 border border-brand-red-200'
         }`}>
           {message.text}
         </div>
@@ -126,7 +126,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
             {advisors.map(advisor => (
               <button key={advisor.id} onClick={() => setSelectedAdvisor(advisor.id)}
                 className={`p-4 rounded-lg border text-left transition ${
-                  selectedAdvisor === advisor.id ? 'border-orange-500 bg-orange-50' : 'hover:border-gray-300'
+                  selectedAdvisor === advisor.id ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:border-gray-300'
                 }`}>
                 <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mb-3">
                   {advisor.avatar_url ? (
@@ -153,7 +153,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
             <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
             <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
               min={minDate}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Available Times</label>
@@ -161,7 +161,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
               {timeSlots.map(time => (
                 <button key={time} onClick={() => setSelectedTime(time)}
                   className={`px-3 py-2 text-sm rounded-lg border ${
-                    selectedTime === time ? 'bg-orange-500 text-white border-orange-500' : 'hover:border-gray-300'
+                    selectedTime === time ? 'bg-brand-orange-500 text-white border-brand-orange-500' : 'hover:border-gray-300'
                   }`}>
                   {time}
                 </button>
@@ -182,7 +182,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
           ].map(type => (
             <button key={type.id} onClick={() => setMeetingType(type.id)}
               className={`flex-1 flex items-center justify-center gap-2 p-4 rounded-lg border ${
-                meetingType === type.id ? 'border-orange-500 bg-orange-50' : 'hover:border-gray-300'
+                meetingType === type.id ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:border-gray-300'
               }`}>
               <type.icon className="w-5 h-5" />
               <span>{type.label}</span>
@@ -196,7 +196,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
         <h2 className="text-lg font-semibold mb-4">4. Additional Notes (Optional)</h2>
         <textarea rows={3} value={notes} onChange={e => setNotes(e.target.value)}
           placeholder="What would you like to discuss?"
-          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
       </div>
 
       {/* Summary & Confirm */}
@@ -226,7 +226,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
         </div>
         <button onClick={handleSubmit} 
           disabled={!selectedAdvisor || !selectedDate || !selectedTime || isSubmitting}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed">
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600 disabled:opacity-50 disabled:cursor-not-allowed">
           <span className="text-slate-400 flex-shrink-0">•</span>
           {isSubmitting ? 'Scheduling...' : 'Confirm Appointment'}
         </button>

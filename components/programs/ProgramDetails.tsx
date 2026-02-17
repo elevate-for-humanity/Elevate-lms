@@ -61,7 +61,7 @@ export function ProgramDetails({ program }: { program: Program }) {
               </div>
               <div className="flex justify-between items-center py-2 border-b border-slate-100">
                 <span className="text-xs text-black">Cost</span>
-                <span className="text-sm font-bold text-green-600">$0*</span>
+                <span className="text-sm font-bold text-brand-green-600">$0*</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-slate-100">
                 <span className="text-xs text-black">Format</span>
@@ -82,10 +82,10 @@ export function ProgramDetails({ program }: { program: Program }) {
             </p>
 
             {isBarberProgram && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-4">
+              <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-3 mt-4">
                 <div className="flex items-start gap-2">
                   <svg
-                    className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5"
+                    className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -96,10 +96,10 @@ export function ProgramDetails({ program }: { program: Program }) {
                     />
                   </svg>
                   <div>
-                    <p className="text-xs font-bold text-green-900 mb-1">
+                    <p className="text-xs font-bold text-brand-green-900 mb-1">
                       Earn While You Learn
                     </p>
-                    <p className="text-xs text-green-800">
+                    <p className="text-xs text-brand-green-800">
                       Work in a real barbershop and get paid while completing
                       your training. You can attend school while working at the
                       shop!
@@ -115,7 +115,7 @@ export function ProgramDetails({ program }: { program: Program }) {
               </h4>
               <a
                 href={`/apply?program=${program.slug}`}
-                className="block text-center rounded-lg bg-orange-500 px-6 py-3 text-sm font-bold text-white hover:bg-orange-600 transition-colors"
+                className="block text-center rounded-lg bg-brand-orange-500 px-6 py-3 text-sm font-bold text-white hover:bg-brand-orange-600 transition-colors"
               >
                 Apply Now
               </a>
@@ -166,7 +166,7 @@ export function ProgramDetails({ program }: { program: Program }) {
                   <div className="space-y-2 text-xs text-brand-blue-800 mt-3">
                     <div className="flex items-center gap-2">
                       <svg
-                        className="w-4 h-4 text-green-600"
+                        className="w-4 h-4 text-brand-green-600"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -182,7 +182,7 @@ export function ProgramDetails({ program }: { program: Program }) {
                     </div>
                     <div className="flex items-center gap-2">
                       <svg
-                        className="w-4 h-4 text-green-600"
+                        className="w-4 h-4 text-brand-green-600"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -198,7 +198,7 @@ export function ProgramDetails({ program }: { program: Program }) {
                     </div>
                     <div className="flex items-center gap-2">
                       <svg
-                        className="w-4 h-4 text-green-600"
+                        className="w-4 h-4 text-brand-green-600"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -214,7 +214,7 @@ export function ProgramDetails({ program }: { program: Program }) {
                     </div>
                     <div className="flex items-center gap-2">
                       <svg
-                        className="w-4 h-4 text-green-600"
+                        className="w-4 h-4 text-brand-green-600"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >

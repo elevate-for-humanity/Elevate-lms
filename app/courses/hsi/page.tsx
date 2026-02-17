@@ -207,7 +207,7 @@ export default async function HsiPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
                     className="w-8 h-8 text-brand-orange-600"
                     fill="none"
@@ -228,7 +228,7 @@ export default async function HsiPage() {
                 </p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
                     className="w-8 h-8 text-brand-orange-600"
                     fill="none"
@@ -249,7 +249,7 @@ export default async function HsiPage() {
                 </p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
                     className="w-8 h-8 text-brand-orange-600"
                     fill="none"
@@ -282,13 +282,13 @@ export default async function HsiPage() {
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Ready to Get Certified?
             </h2>
-            <p className="text-base md:text-lg text-red-100 mb-8">
+            <p className="text-base md:text-lg text-brand-red-100 mb-8">
               Start your safety training today. All courses are Funded
               through WIOA funding.
             </p>
             <Link
               href="/contact"
-              className="inline-block bg-white text-brand-orange-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-red-50 transition-colors"
+              className="inline-block bg-white text-brand-orange-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-50 transition-colors"
             >
               Apply Now - It's Free
             </Link>

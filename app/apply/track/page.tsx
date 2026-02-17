@@ -44,16 +44,16 @@ const statusConfig = {
   approved: {
     icon: CheckCircle,
     color: 'text-brand-green-600',
-    bg: 'bg-green-50',
-    border: 'border-green-200',
+    bg: 'bg-brand-green-50',
+    border: 'border-brand-green-200',
     label: 'Approved',
     description: 'Congratulations! Your application has been approved.',
   },
   rejected: {
     icon: XCircle,
     color: 'text-brand-orange-600',
-    bg: 'bg-red-50',
-    border: 'border-red-200',
+    bg: 'bg-brand-red-50',
+    border: 'border-brand-red-200',
     label: 'Not Approved',
     description:
       'Unfortunately, we cannot proceed with your application at this time.',
@@ -171,7 +171,7 @@ export default function TrackApplicationPage() {
                 id="applicationId"
                 value={searchId}
                 onChange={(e) => setSearchId(e.target.value)}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                 placeholder="e.g., 123e4567-e89b-12d3-a456-426614174000"
               />
             </div>
@@ -192,13 +192,13 @@ export default function TrackApplicationPage() {
                 id="email"
                 value={searchEmail}
                 onChange={(e) => setSearchEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                 placeholder="your.email@address.com"
               />
             </div>
 
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg">
                 <p className="text-sm text-brand-orange-600">{error}</p>
               </div>
             )}

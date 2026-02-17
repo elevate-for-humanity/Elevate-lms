@@ -141,7 +141,7 @@ export default function StudentApplicationPage() {
             {existingApplication.status === 'approved' ? (
               <span className="text-slate-400 flex-shrink-0">•</span>
             ) : existingApplication.status === 'rejected' ? (
-              <AlertCircle className="w-16 h-16 text-red-500" />
+              <AlertCircle className="w-16 h-16 text-brand-red-500" />
             ) : (
               <FileText className="w-16 h-16 text-brand-blue-500" />
             )}
@@ -151,8 +151,8 @@ export default function StudentApplicationPage() {
             You submitted an application on {new Date(existingApplication.submitted_at).toLocaleDateString()}
           </p>
           <div className={`inline-block px-4 py-2 rounded-full text-sm font-medium ${
-            existingApplication.status === 'approved' ? 'bg-green-100 text-green-800' :
-            existingApplication.status === 'rejected' ? 'bg-red-100 text-red-800' :
+            existingApplication.status === 'approved' ? 'bg-brand-green-100 text-brand-green-800' :
+            existingApplication.status === 'rejected' ? 'bg-brand-red-100 text-brand-red-800' :
             'bg-yellow-100 text-yellow-800'
           }`}>
             Status: {existingApplication.status.charAt(0).toUpperCase() + existingApplication.status.slice(1)}
@@ -193,8 +193,8 @@ export default function StudentApplicationPage() {
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800">{error}</p>
+        <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg">
+          <p className="text-brand-red-800">{error}</p>
         </div>
       )}
 
@@ -217,7 +217,7 @@ export default function StudentApplicationPage() {
         {/* Program Selection */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Program <span className="text-red-500">*</span>
+            Program <span className="text-brand-red-500">*</span>
           </label>
           <select
             required
@@ -253,7 +253,7 @@ export default function StudentApplicationPage() {
         {/* Education */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Highest Education Level <span className="text-red-500">*</span>
+            Highest Education Level <span className="text-brand-red-500">*</span>
           </label>
           <select
             required
@@ -274,7 +274,7 @@ export default function StudentApplicationPage() {
         {/* Employment Status */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Current Employment Status <span className="text-red-500">*</span>
+            Current Employment Status <span className="text-brand-red-500">*</span>
           </label>
           <select
             required
@@ -294,7 +294,7 @@ export default function StudentApplicationPage() {
         {/* Funding Source */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            How do you plan to pay for training? <span className="text-red-500">*</span>
+            How do you plan to pay for training? <span className="text-brand-red-500">*</span>
           </label>
           <select
             required

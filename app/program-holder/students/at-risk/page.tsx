@@ -158,12 +158,12 @@ export default async function AtRiskStudentsPage() {
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <TrendingDown className="h-11 w-11 text-red-600" />
+                  <TrendingDown className="h-11 w-11 text-brand-red-600" />
                   <h3 className="text-sm font-medium text-black">
                     Requires Intervention
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-red-600">
+                <p className="text-3xl font-bold text-brand-red-600">
                   {Math.floor(studentsNeedingAttention.length * 0.3)}
                 </p>
               </div>
@@ -286,7 +286,7 @@ export default async function AtRiskStudentsPage() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <AlertTriangle className="h-16 w-16 text-green-300 mx-auto mb-4" />
+                  <AlertTriangle className="h-16 w-16 text-brand-green-300 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-black mb-2">
                     No At-Risk Students
                   </h3>

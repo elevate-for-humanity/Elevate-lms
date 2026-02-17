@@ -20,7 +20,7 @@ interface ProgressTrackerProps {
 export function ProgressTracker({ modules, overallProgress }: ProgressTrackerProps) {
   const getStatusIcon = (status: Module['status']) => {
     if (status === 'completed') return <span className="text-slate-400 flex-shrink-0">•</span>;
-    if (status === 'in-progress') return <Clock className="text-orange-600" size={24} />;
+    if (status === 'in-progress') return <Clock className="text-brand-orange-600" size={24} />;
     return <Circle className="text-gray-400" size={24} />;
   };
 

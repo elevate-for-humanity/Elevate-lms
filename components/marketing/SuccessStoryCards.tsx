@@ -66,10 +66,10 @@ export default function SuccessStoryCards() {
                     <span className="text-sm text-black">{story.beforeJob}</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <TrendingUp className="w-4 h-4 text-green-600 mt-0.5" />
+                    <TrendingUp className="w-4 h-4 text-brand-green-600 mt-0.5" />
                     <div>
                       <div className="text-sm font-semibold text-zinc-900">{story.afterJob}</div>
-                      <div className="text-sm text-green-600 font-semibold">{story.salary}</div>
+                      <div className="text-sm text-brand-green-600 font-semibold">{story.salary}</div>
                     </div>
                   </div>
                 </div>

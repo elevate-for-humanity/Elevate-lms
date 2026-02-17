@@ -90,7 +90,7 @@ export default function VirtualCareerFair() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Virtual Career Fair 2024</h1>
-          <p className="text-red-100">Connect with top employers from anywhere</p>
+          <p className="text-brand-red-100">Connect with top employers from anywhere</p>
           <div className="mt-4 flex gap-4">
             <div className="bg-white/20 px-4 py-2 rounded">
               <span className="font-bold">{employers.length}</span> Employers
@@ -113,7 +113,7 @@ export default function VirtualCareerFair() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`py-4 px-2 border-b-2 font-medium ${
-                  activeTab === tab ? 'border-red-600 text-brand-orange-600' : 'border-transparent text-gray-500'
+                  activeTab === tab ? 'border-brand-red-600 text-brand-orange-600' : 'border-transparent text-gray-500'
                 }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -133,7 +133,7 @@ export default function VirtualCareerFair() {
                   <div className="flex-1">
                     <h3 className="text-xl font-bold">{employer.name}</h3>
                     <p className="text-sm text-black">{employer.industry}</p>
-                    <p className="text-sm text-orange-600 font-semibold mt-1">
+                    <p className="text-sm text-brand-orange-600 font-semibold mt-1">
                       {employer.openPositions} open positions
                     </p>
                   </div>
@@ -166,7 +166,7 @@ export default function VirtualCareerFair() {
                       <span className={`px-3 py-2 rounded text-xs font-medium ${
                         session.type === 'workshop' ? 'bg-brand-blue-100 text-brand-blue-700' :
                         session.type === 'panel' ? 'bg-purple-100 text-purple-700' :
-                        'bg-green-100 text-green-700'
+                        'bg-brand-green-100 text-brand-green-700'
                       }`}>
                         {session.type}
                       </span>

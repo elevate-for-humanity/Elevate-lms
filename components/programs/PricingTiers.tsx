@@ -75,14 +75,14 @@ export function PricingTiers({
   // Don't show pricing if everything is free/funded
   if (basePrice === 0 && examVoucherPrice === 0 && fundingAvailable) {
     return (
-      <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6">
+      <div className="bg-brand-green-50 border-2 border-brand-green-200 rounded-2xl p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-            <Check className="w-6 h-6 text-green-600" />
+          <div className="w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center">
+            <Check className="w-6 h-6 text-brand-green-600" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-green-900">100% Funded Training</h3>
-            <p className="text-green-700">No cost to eligible participants</p>
+            <h3 className="text-xl font-bold text-brand-green-900">100% Funded Training</h3>
+            <p className="text-brand-green-700">No cost to eligible participants</p>
           </div>
         </div>
         <p className="text-gray-700 mb-4">
@@ -91,7 +91,7 @@ export function PricingTiers({
         </p>
         <Link
           href={`/apply?program=${programSlug}`}
-          className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold transition"
+          className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-6 py-3 rounded-xl font-semibold transition"
         >
           Check Your Eligibility
         </Link>
@@ -134,7 +134,7 @@ export function PricingTiers({
 
             <div className="text-center mb-6">
               {tier.price === 0 ? (
-                <div className="text-3xl font-bold text-green-600">FREE</div>
+                <div className="text-3xl font-bold text-brand-green-600">FREE</div>
               ) : (
                 <div>
                   <span className="text-3xl font-bold text-gray-900">${tier.price.toLocaleString()}</span>
@@ -145,7 +145,7 @@ export function PricingTiers({
             <ul className="space-y-3 mb-6">
               {tier.includes.map((item, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-sm">
-                  <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-brand-green-500 flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700">{item}</span>
                 </li>
               ))}

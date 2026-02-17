@@ -168,7 +168,7 @@ export default function EligibilityPreQualifier() {
         </div>
         <div className="w-full bg-slate-200 rounded-full h-2">
           <div
-            className="bg-gradient-to-r from-blue-500 to-emerald-500 h-2 rounded-full transition-all duration-500 ease-out"
+            className="bg-gradient-to-r from-brand-blue-500 to-emerald-500 h-2 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progressAfter}%` }}
           />
         </div>
@@ -176,8 +176,8 @@ export default function EligibilityPreQualifier() {
 
       {/* Question */}
       <div className="text-center mb-8">
-        <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <Icon className="w-7 h-7 text-blue-600" />
+        <div className="w-14 h-14 bg-brand-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <Icon className="w-7 h-7 text-brand-blue-600" />
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">
           {step.question}
@@ -191,9 +191,9 @@ export default function EligibilityPreQualifier() {
           <button
             key={option.value}
             onClick={() => handleSelect(option.value)}
-            className={`w-full text-left p-5 rounded-2xl border-2 transition-all hover:border-blue-400 hover:shadow-md hover:-translate-y-0.5 ${
+            className={`w-full text-left p-5 rounded-2xl border-2 transition-all hover:border-brand-blue-400 hover:shadow-md hover:-translate-y-0.5 ${
               answers[step.id] === option.value
-                ? 'border-blue-500 bg-blue-50 shadow-md'
+                ? 'border-brand-blue-500 bg-brand-blue-50 shadow-md'
                 : 'border-slate-200 bg-white'
             }`}
           >

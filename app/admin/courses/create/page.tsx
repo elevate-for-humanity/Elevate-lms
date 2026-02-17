@@ -53,13 +53,13 @@ export default async function CreateCoursePage() {
         <nav className="text-sm mb-6">
           <ol className="flex items-center space-x-2 text-gray-500">
             <li>
-              <Link href="/admin" className="hover:text-blue-600">
+              <Link href="/admin" className="hover:text-brand-blue-600">
                 Admin
               </Link>
             </li>
             <li>/</li>
             <li>
-              <Link href="/admin/courses" className="hover:text-blue-600">
+              <Link href="/admin/courses" className="hover:text-brand-blue-600">
                 Courses
               </Link>
             </li>

@@ -31,7 +31,7 @@ export default async function PartnerReportsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active Partners</h3><p className="text-3xl font-bold text-gray-900 mt-2">24</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Referrals</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">156</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Placements</h3><p className="text-3xl font-bold text-green-600 mt-2">89</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Placements</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">89</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Success Rate</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">78%</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6"><h2 className="text-lg font-semibold mb-4">Partner Performance</h2><p className="text-gray-500">Detailed partner metrics and collaboration data</p></div>

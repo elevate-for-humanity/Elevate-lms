@@ -349,7 +349,7 @@ export default function UploadDocumentsPage() {
                         {formatFileSize(file.size)}
                       </p>
                       {file.error && (
-                        <p className="text-sm text-red-600 mt-1">
+                        <p className="text-sm text-brand-red-600 mt-1">
                           {file.error}
                         </p>
                       )}
@@ -363,7 +363,7 @@ export default function UploadDocumentsPage() {
                       <span className="text-slate-400 flex-shrink-0">•</span>
                     )}
                     {file.status === 'error' && (
-                      <AlertCircle className="w-6 h-6 text-red-600" />
+                      <AlertCircle className="w-6 h-6 text-brand-red-600" />
                     )}
                     <button
                       onClick={() => removeFile(file.name)}
@@ -410,16 +410,16 @@ export default function UploadDocumentsPage() {
                     <ul className="space-y-3">
                       {category.documents.map((doc) => (
                         <li key={doc.id} className="flex items-start gap-3">
-                          <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${doc.required ? 'bg-red-100' : 'bg-gray-100'}`}>
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${doc.required ? 'bg-brand-red-100' : 'bg-gray-100'}`}>
                             {doc.required ? (
-                              <span className="text-red-600 text-xs font-bold">!</span>
+                              <span className="text-brand-red-600 text-xs font-bold">!</span>
                             ) : (
                               <span className="text-slate-400 flex-shrink-0">•</span>
                             )}
                           </div>
                           <div>
                             <span className="font-medium text-black">{doc.name}</span>
-                            {doc.required && <span className="text-red-600 text-xs ml-2">(Required)</span>}
+                            {doc.required && <span className="text-brand-red-600 text-xs ml-2">(Required)</span>}
                             <p className="text-sm text-gray-600">{doc.description}</p>
                           </div>
                         </li>

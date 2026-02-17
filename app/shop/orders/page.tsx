@@ -101,8 +101,8 @@ export default async function OrderHistoryPage() {
       pending: { label: 'Pending', color: 'bg-yellow-100 text-yellow-700', icon: Clock },
       processing: { label: 'Processing', color: 'bg-brand-blue-100 text-brand-blue-700', icon: Package },
       shipped: { label: 'Shipped', color: 'bg-brand-blue-100 text-brand-blue-700', icon: Truck },
-      delivered: { label: 'Delivered', color: 'bg-green-100 text-green-700', icon: Circle },
-      cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-700', icon: Clock },
+      delivered: { label: 'Delivered', color: 'bg-brand-green-100 text-brand-green-700', icon: Circle },
+      cancelled: { label: 'Cancelled', color: 'bg-brand-red-100 text-brand-red-700', icon: Clock },
     };
     return configs[status] || configs.pending;
   };

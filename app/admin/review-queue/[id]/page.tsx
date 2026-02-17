@@ -145,8 +145,8 @@ export default async function ReviewDetailPage({
   const statusColors: Record<string, string> = {
     open: 'bg-yellow-100 text-yellow-800',
     in_progress: 'bg-brand-blue-100 text-brand-blue-800',
-    resolved: 'bg-green-100 text-green-800',
-    escalated: 'bg-red-100 text-red-800',
+    resolved: 'bg-brand-green-100 text-brand-green-800',
+    escalated: 'bg-brand-red-100 text-brand-red-800',
   };
 
   return (
@@ -180,14 +180,14 @@ export default async function ReviewDetailPage({
         <div className="lg:col-span-2 space-y-6">
           {/* Reasons */}
           {item.reasons && item.reasons.length > 0 && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <h3 className="font-semibold text-red-800 mb-2 flex items-center gap-2">
+            <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4">
+              <h3 className="font-semibold text-brand-red-800 mb-2 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" />
                 Review Reasons
               </h3>
               <ul className="space-y-1">
                 {item.reasons.map((reason: string, i: number) => (
-                  <li key={i} className="text-red-700 text-sm">• {reason}</li>
+                  <li key={i} className="text-brand-red-700 text-sm">• {reason}</li>
                 ))}
               </ul>
             </div>
@@ -229,7 +229,7 @@ export default async function ReviewDetailPage({
                   <div className="flex items-center gap-2">
                     <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div
-                        className={`h-full ${extraction.confidence >= 0.8 ? 'bg-green-500' : extraction.confidence >= 0.6 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                        className={`h-full ${extraction.confidence >= 0.8 ? 'bg-brand-green-500' : extraction.confidence >= 0.6 ? 'bg-yellow-500' : 'bg-brand-red-500'}`}
                         style={{ width: `${(extraction.confidence || 0) * 100}%` }}
                       />
                     </div>
@@ -239,8 +239,8 @@ export default async function ReviewDetailPage({
                 <div className="flex items-center gap-4 text-sm">
                   <span className="text-gray-600">Status:</span>
                   <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                    extraction.status === 'passed' ? 'bg-green-100 text-green-700' :
-                    extraction.status === 'failed' ? 'bg-red-100 text-red-700' :
+                    extraction.status === 'passed' ? 'bg-brand-green-100 text-brand-green-700' :
+                    extraction.status === 'failed' ? 'bg-brand-red-100 text-brand-red-700' :
                     'bg-yellow-100 text-yellow-700'
                   }`}>
                     {extraction.status}
@@ -251,7 +251,7 @@ export default async function ReviewDetailPage({
                     <span className="text-gray-600 text-sm">Validation Errors:</span>
                     <ul className="mt-1 space-y-1">
                       {extraction.validation_errors.map((err: string, i: number) => (
-                        <li key={i} className="text-red-600 text-xs">• {err}</li>
+                        <li key={i} className="text-brand-red-600 text-xs">• {err}</li>
                       ))}
                     </ul>
                   </div>
@@ -326,8 +326,8 @@ export default async function ReviewDetailPage({
                   <div key={decision.id} className="border-l-2 border-gray-200 pl-4 py-2">
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                        decision.decision === 'approved' ? 'bg-green-100 text-green-700' :
-                        decision.decision === 'rejected' ? 'bg-red-100 text-red-700' :
+                        decision.decision === 'approved' ? 'bg-brand-green-100 text-brand-green-700' :
+                        decision.decision === 'rejected' ? 'bg-brand-red-100 text-brand-red-700' :
                         'bg-yellow-100 text-yellow-700'
                       }`}>
                         {decision.decision}

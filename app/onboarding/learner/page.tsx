@@ -158,7 +158,7 @@ export default async function LearnerOnboardingPage() {
             </div>
             <div className="h-3 bg-brand-blue-800 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-green-400 rounded-full transition-all duration-500"
+                className="h-full bg-brand-green-400 rounded-full transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -168,15 +168,15 @@ export default async function LearnerOnboardingPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {allComplete ? (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8 text-center">
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6 mb-8 text-center">
             <span className="text-slate-400 flex-shrink-0">•</span>
-            <h2 className="text-2xl font-bold text-green-900 mb-2">Onboarding Complete!</h2>
-            <p className="text-green-700 mb-4">
+            <h2 className="text-2xl font-bold text-brand-green-900 mb-2">Onboarding Complete!</h2>
+            <p className="text-brand-green-700 mb-4">
               You're all set to begin your training. Head to your dashboard to get started.
             </p>
             <Link
               href="/lms/dashboard"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700"
             >
               Go to Dashboard
               <ArrowRight className="w-5 h-5" />
@@ -200,12 +200,12 @@ export default async function LearnerOnboardingPage() {
               <div
                 key={step.id}
                 className={`bg-white rounded-lg border p-6 ${
-                  isComplete ? 'border-green-200' : 'border-gray-200'
+                  isComplete ? 'border-brand-green-200' : 'border-gray-200'
                 }`}
               >
                 <div className="flex items-start gap-4">
                   <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-                    isComplete ? 'bg-green-100' : 'bg-gray-100'
+                    isComplete ? 'bg-brand-green-100' : 'bg-gray-100'
                   }`}>
                     {isComplete ? (
                       <span className="text-slate-400 flex-shrink-0">•</span>
@@ -216,11 +216,11 @@ export default async function LearnerOnboardingPage() {
                   
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className={`font-semibold ${isComplete ? 'text-green-900' : 'text-gray-900'}`}>
+                      <h3 className={`font-semibold ${isComplete ? 'text-brand-green-900' : 'text-gray-900'}`}>
                         {step.title}
                       </h3>
                       {step.required && !isComplete && (
-                        <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded">Required</span>
+                        <span className="text-xs bg-brand-red-100 text-brand-red-700 px-2 py-0.5 rounded">Required</span>
                       )}
                     </div>
                     <p className="text-gray-600 text-sm mb-3">{step.description}</p>

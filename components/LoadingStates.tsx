@@ -56,7 +56,7 @@ export function Spinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
   };
 
   return (
-    <div className={`${sizeClasses[size]} border-orange-600 border-t-transparent rounded-full animate-spin`} />
+    <div className={`${sizeClasses[size]} border-brand-orange-600 border-t-transparent rounded-full animate-spin`} />
   );
 }
 
@@ -97,7 +97,7 @@ export function DotsLoading() {
       {[0, 1, 2].map((i) => (
         <div
           key={i}
-          className="w-3 h-3 bg-orange-600 rounded-full animate-bounce"
+          className="w-3 h-3 bg-brand-orange-600 rounded-full animate-bounce"
           style={{ animationDelay: `${i * 0.15}s` }}
         />
       ))}
@@ -112,7 +112,7 @@ export function PulseLoading() {
       {[0, 1, 2].map((i) => (
         <div
           key={i}
-          className="w-4 h-4 bg-orange-600 rounded-full animate-pulse"
+          className="w-4 h-4 bg-brand-orange-600 rounded-full animate-pulse"
           style={{ animationDelay: `${i * 0.2}s` }}
         />
       ))}
@@ -137,7 +137,7 @@ export function ButtonLoading({ children, loading }: { children: React.ReactNode
   return (
     <button
       disabled={loading}
-      className="relative inline-flex items-center justify-center gap-2 px-6 py-3 bg-orange-600 text-white font-bold rounded-full button-scale disabled:opacity-50 disabled:cursor-not-allowed"
+      className="relative inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-orange-600 text-white font-bold rounded-full button-scale disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {loading && (
         <Spinner size="sm" />

@@ -56,7 +56,7 @@ export default function DemoWioaPage() {
                   <span className="flex items-center gap-1">
                     {p.status === 'Active' && <span className="text-slate-400 flex-shrink-0">•</span>}
                     {p.status === 'Pending Docs' && <Clock className="w-3.5 h-3.5 text-amber-500" />}
-                    {p.status === 'Ineligible' && <AlertTriangle className="w-3.5 h-3.5 text-red-500" />}
+                    {p.status === 'Ineligible' && <AlertTriangle className="w-3.5 h-3.5 text-brand-red-500" />}
                     <span className="text-xs">{p.status}</span>
                   </span>
                 </td>

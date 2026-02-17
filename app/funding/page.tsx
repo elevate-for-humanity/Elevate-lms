@@ -70,7 +70,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
                 <Image src="/images/heroes/workforce-partner-2.jpg" alt="Workforce Ready Grant" fill sizes="100vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
+                <div className="absolute top-3 left-3 bg-brand-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">WRG — Workforce Ready Grant</h3>
@@ -80,7 +80,7 @@ export default function FundingPage() {
                 <div className="space-y-2 mb-4">
                   {['Covers tuition for eligible programs', 'High-demand industry certifications', 'No repayment required', 'Available to Indiana residents'].map((item) => (
                     <div key={item} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-orange-500 rounded-full flex-shrink-0" />
+                      <span className="w-1.5 h-1.5 bg-brand-orange-500 rounded-full flex-shrink-0" />
                       <span className="text-slate-700 text-sm">{item}</span>
                     </div>
                   ))}
@@ -95,7 +95,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
                 <Image src="/images/heroes/workforce-partner-3.jpg" alt="JRI funding" fill sizes="100vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
+                <div className="absolute top-3 left-3 bg-brand-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">JRI — Justice Reinvestment Initiative</h3>
@@ -105,7 +105,7 @@ export default function FundingPage() {
                 <div className="space-y-2 mb-4">
                   {['Full tuition coverage', 'Certification and exam fees', 'Transportation assistance', 'Case management support'].map((item) => (
                     <div key={item} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-red-500 rounded-full flex-shrink-0" />
+                      <span className="w-1.5 h-1.5 bg-brand-red-500 rounded-full flex-shrink-0" />
                       <span className="text-slate-700 text-sm">{item}</span>
                     </div>
                   ))}
@@ -120,7 +120,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
                 <Image src="/images/homepage/funding-navigation.png" alt="On the job training" fill sizes="100vw" className="object-cover" />
-                <div className="absolute top-3 left-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">Earn & Learn</div>
+                <div className="absolute top-3 left-3 bg-brand-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">Earn & Learn</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">OJT — On-the-Job Training</h3>
@@ -130,7 +130,7 @@ export default function FundingPage() {
                 <div className="space-y-2 mb-4">
                   {['Paid from day one', 'Employer wage reimbursement (50-75%)', 'Leads to permanent employment', 'Available across industries'].map((item) => (
                     <div key={item} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-green-600 rounded-full flex-shrink-0" />
+                      <span className="w-1.5 h-1.5 bg-brand-green-600 rounded-full flex-shrink-0" />
                       <span className="text-slate-700 text-sm">{item}</span>
                     </div>
                   ))}

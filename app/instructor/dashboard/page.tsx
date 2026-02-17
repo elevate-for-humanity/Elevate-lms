@@ -147,7 +147,7 @@ export default async function ProgramHolderDashboard() {
 
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-brand-orange-100 flex items-center justify-center">
                 <Clock className="text-brand-orange-600" size={24} />
               </div>
               <div>
@@ -199,7 +199,7 @@ export default async function ProgramHolderDashboard() {
                           <span
                             className={`px-3 py-2 rounded-full text-xs font-medium ${
                               student.status === 'active'
-                                ? 'bg-brand-green-100 text-green-700'
+                                ? 'bg-brand-green-100 text-brand-green-700'
                                 : student.status === 'completed'
                                   ? 'bg-brand-blue-100 text-brand-blue-700'
                                   : 'bg-gray-100 text-black'

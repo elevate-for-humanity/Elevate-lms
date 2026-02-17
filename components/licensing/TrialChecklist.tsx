@@ -271,7 +271,7 @@ export function TrialChecklist({
   return (
     <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+      <div className="bg-gradient-to-r from-brand-blue-600 to-brand-blue-700 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-bold text-white">
@@ -318,7 +318,7 @@ export function TrialChecklist({
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                       phaseCompleted === phaseTotal
-                        ? 'bg-green-100 text-green-700'
+                        ? 'bg-brand-green-100 text-brand-green-700'
                         : 'bg-slate-100 text-slate-600'
                     }`}
                   >
@@ -355,12 +355,12 @@ export function TrialChecklist({
                       <div
                         key={step.id}
                         className={`flex items-start gap-3 p-3 rounded-lg transition-colors ${
-                          isComplete ? 'bg-green-50' : 'bg-slate-50 hover:bg-slate-100'
+                          isComplete ? 'bg-brand-green-50' : 'bg-slate-50 hover:bg-slate-100'
                         }`}
                       >
                         <div
                           className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            isComplete ? 'bg-green-200' : 'bg-white border border-slate-200'
+                            isComplete ? 'bg-brand-green-200' : 'bg-white border border-slate-200'
                           }`}
                         >
                           {isComplete ? (
@@ -372,7 +372,7 @@ export function TrialChecklist({
                         <div className="flex-1 min-w-0">
                           <p
                             className={`font-medium ${
-                              isComplete ? 'text-green-800' : 'text-slate-900'
+                              isComplete ? 'text-brand-green-800' : 'text-slate-900'
                             }`}
                           >
                             {step.label}
@@ -390,7 +390,7 @@ export function TrialChecklist({
                         {!isComplete && onStepComplete && (
                           <button
                             onClick={() => onStepComplete(step.id)}
-                            className="flex-shrink-0 text-slate-400 hover:text-green-600 text-sm"
+                            className="flex-shrink-0 text-slate-400 hover:text-brand-green-600 text-sm"
                             title="Mark as complete"
                           >
                             <Circle className="w-5 h-5" />

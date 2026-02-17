@@ -131,7 +131,7 @@ export default async function HelpArticlePage({ params }: { params: Params }) {
             <div className="mt-8 pt-8 border-t border-gray-200">
               <p className="text-center text-gray-700 mb-4">Was this article helpful?</p>
               <div className="flex justify-center gap-4">
-                <button className="flex items-center gap-2 px-6 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition font-medium">
+                <button className="flex items-center gap-2 px-6 py-3 bg-brand-green-100 text-brand-green-700 rounded-lg hover:bg-brand-green-200 transition font-medium">
                   <ThumbsUp className="w-5 h-5" />
                   Yes, helpful
                 </button>

@@ -114,7 +114,7 @@ export default function HoursExportPage() {
         </div>
 
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="mb-6 bg-brand-red-50 border border-brand-red-200 text-brand-red-700 px-4 py-3 rounded">
             {error}
           </div>
         )}

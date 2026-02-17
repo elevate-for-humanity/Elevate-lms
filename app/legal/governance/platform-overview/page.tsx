@@ -40,13 +40,13 @@ export default function PlatformOverviewPage() {
 
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Download Banner */}
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-8 flex items-center justify-between">
+        <div className="bg-brand-orange-50 border border-brand-orange-200 rounded-lg p-4 mb-8 flex items-center justify-between">
           <div>
-            <p className="font-medium text-orange-900">Official Document</p>
-            <p className="text-sm text-orange-700">This is the authoritative version. All other references must align with this document.</p>
+            <p className="font-medium text-brand-orange-900">Official Document</p>
+            <p className="text-sm text-brand-orange-700">This is the authoritative version. All other references must align with this document.</p>
           </div>
           <a href="/docs/Platform_Overview_and_Governance.pdf" download
-            className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+            className="flex items-center gap-2 px-4 py-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700">
             <Download className="w-4 h-4" /> Download PDF
           </a>
         </div>
@@ -55,19 +55,19 @@ export default function PlatformOverviewPage() {
         <div className="bg-gray-50 rounded-lg p-6 mb-10">
           <h2 className="font-semibold mb-4">Table of Contents</h2>
           <ol className="space-y-2 text-sm">
-            <li><a href="#purpose" className="text-orange-600 hover:underline">1. Purpose and Scope</a></li>
-            <li><a href="#components" className="text-orange-600 hover:underline">2. Platform Components</a></li>
-            <li><a href="#users" className="text-orange-600 hover:underline">3. User Types and Roles</a></li>
-            <li><a href="#governance" className="text-orange-600 hover:underline">4. Governance Model</a></li>
-            <li><a href="#content" className="text-orange-600 hover:underline">5. Content and Language Controls</a></li>
-            <li><a href="#versioning" className="text-orange-600 hover:underline">6. Versioning and Review Cadence</a></li>
+            <li><a href="#purpose" className="text-brand-orange-600 hover:underline">1. Purpose and Scope</a></li>
+            <li><a href="#components" className="text-brand-orange-600 hover:underline">2. Platform Components</a></li>
+            <li><a href="#users" className="text-brand-orange-600 hover:underline">3. User Types and Roles</a></li>
+            <li><a href="#governance" className="text-brand-orange-600 hover:underline">4. Governance Model</a></li>
+            <li><a href="#content" className="text-brand-orange-600 hover:underline">5. Content and Language Controls</a></li>
+            <li><a href="#versioning" className="text-brand-orange-600 hover:underline">6. Versioning and Review Cadence</a></li>
           </ol>
         </div>
 
         {/* Section 1 */}
         <section id="purpose" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-sm font-bold">1</span>
+            <span className="w-8 h-8 bg-brand-orange-100 rounded-full flex items-center justify-center text-brand-orange-600 text-sm font-bold">1</span>
             Purpose and Scope
           </h2>
           
@@ -101,7 +101,7 @@ export default function PlatformOverviewPage() {
         {/* Section 2 */}
         <section id="components" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-sm font-bold">2</span>
+            <span className="w-8 h-8 bg-brand-orange-100 rounded-full flex items-center justify-center text-brand-orange-600 text-sm font-bold">2</span>
             Platform Components
           </h2>
 
@@ -112,7 +112,7 @@ export default function PlatformOverviewPage() {
           <div className="space-y-6">
             <div className="border rounded-lg p-6">
               <div className="flex items-center gap-3 mb-3">
-                <Building2 className="w-6 h-6 text-orange-600" />
+                <Building2 className="w-6 h-6 text-brand-orange-600" />
                 <h3 className="text-lg font-semibold">2.1 Main Website (elevateforhumanity.org)</h3>
               </div>
               <p className="text-gray-700 mb-3"><strong>Function:</strong> Public-facing information, program discovery, application intake, and organizational communication.</p>
@@ -132,7 +132,7 @@ export default function PlatformOverviewPage() {
 
             <div className="border rounded-lg p-6">
               <div className="flex items-center gap-3 mb-3">
-                <Shield className="w-6 h-6 text-green-600" />
+                <Shield className="w-6 h-6 text-brand-green-600" />
                 <h3 className="text-lg font-semibold">2.3 Store (E-Commerce)</h3>
               </div>
               <p className="text-gray-700 mb-3"><strong>Function:</strong> Product sales, course purchases, program enrollment payments, and merchandise.</p>
@@ -156,7 +156,7 @@ export default function PlatformOverviewPage() {
         {/* Section 3 */}
         <section id="users" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-sm font-bold">3</span>
+            <span className="w-8 h-8 bg-brand-orange-100 rounded-full flex items-center justify-center text-brand-orange-600 text-sm font-bold">3</span>
             User Types and Roles
           </h2>
 
@@ -227,7 +227,7 @@ export default function PlatformOverviewPage() {
         {/* Section 4 */}
         <section id="governance" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-sm font-bold">4</span>
+            <span className="w-8 h-8 bg-brand-orange-100 rounded-full flex items-center justify-center text-brand-orange-600 text-sm font-bold">4</span>
             Governance Model
           </h2>
 
@@ -290,7 +290,7 @@ export default function PlatformOverviewPage() {
         {/* Section 5 */}
         <section id="content" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-sm font-bold">5</span>
+            <span className="w-8 h-8 bg-brand-orange-100 rounded-full flex items-center justify-center text-brand-orange-600 text-sm font-bold">5</span>
             Content and Language Controls
           </h2>
 
@@ -318,7 +318,7 @@ export default function PlatformOverviewPage() {
         {/* Section 6 */}
         <section id="versioning" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-sm font-bold">6</span>
+            <span className="w-8 h-8 bg-brand-orange-100 rounded-full flex items-center justify-center text-brand-orange-600 text-sm font-bold">6</span>
             Versioning and Review Cadence
           </h2>
 

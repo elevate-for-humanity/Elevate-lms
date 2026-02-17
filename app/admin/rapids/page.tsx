@@ -94,7 +94,7 @@ export default function RapidsAdminPage() {
               href="/api/admin/rapids/export?type=registrations&format=csv"
               className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <Download className="w-5 h-5 text-green-600" />
+              <Download className="w-5 h-5 text-brand-green-600" />
               <div>
                 <p className="font-medium text-gray-900">New Registrations</p>
                 <p className="text-xs text-gray-500">Pending apprentice registrations</p>
@@ -124,7 +124,7 @@ export default function RapidsAdminPage() {
               href="/api/admin/rapids/export?type=cancellations&format=csv"
               className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <Download className="w-5 h-5 text-red-600" />
+              <Download className="w-5 h-5 text-brand-red-600" />
               <div>
                 <p className="font-medium text-gray-900">Cancellations</p>
                 <p className="text-xs text-gray-500">Withdrawals & terminations</p>
@@ -212,7 +212,7 @@ export default function RapidsAdminPage() {
                       <div className="text-sm text-gray-500 font-mono">{program.slug}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-green-100 text-brand-green-800">
                         <Circle className="w-3 h-3" />
                         Yes
                       </span>
@@ -229,7 +229,7 @@ export default function RapidsAdminPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1 text-sm text-green-600">
+                      <span className="inline-flex items-center gap-1 text-sm text-brand-green-600">
                         <FileText className="w-4 h-4" />
                         On file
                       </span>

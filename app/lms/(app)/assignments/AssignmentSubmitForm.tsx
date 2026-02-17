@@ -44,7 +44,7 @@ export function AssignmentSubmitForm({ assignmentId, assignmentTitle }: Assignme
 
       <form id="assignment-form" action={handleSubmit} className="space-y-4">
         {message && (
-          <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
+          <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-brand-green-50 text-brand-green-800 border border-brand-green-200' : 'bg-brand-red-50 text-brand-red-800 border border-brand-red-200'}`}>
             {message.text}
           </div>
         )}

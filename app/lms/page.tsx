@@ -108,7 +108,7 @@ export default async function LMSPage() {
               <Link href="/lms/notifications" className="relative p-3 bg-slate-100 rounded-full hover:bg-slate-200 transition">
                 <Bell className="w-5 h-5 text-slate-600" />
                 {notificationCount && notificationCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium">
+                  <span className="absolute -top-1 -right-1 bg-brand-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium">
                     {notificationCount > 9 ? '9+' : notificationCount}
                   </span>
                 )}
@@ -129,7 +129,7 @@ export default async function LMSPage() {
             <div className="text-sm text-slate-500 mt-1">Courses Enrolled</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl sm:text-5xl font-bold text-green-600">{completedCourses}</div>
+            <div className="text-4xl sm:text-5xl font-bold text-brand-green-600">{completedCourses}</div>
             <div className="text-sm text-slate-500 mt-1">Completed</div>
           </div>
           <div className="text-center">
@@ -137,7 +137,7 @@ export default async function LMSPage() {
             <div className="text-sm text-slate-500 mt-1">Certificates</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl sm:text-5xl font-bold text-red-600">{totalProgress}%</div>
+            <div className="text-4xl sm:text-5xl font-bold text-brand-red-600">{totalProgress}%</div>
             <div className="text-sm text-slate-500 mt-1">Overall Progress</div>
           </div>
         </div>
@@ -221,13 +221,13 @@ export default async function LMSPage() {
                 </div>
                 <div className="space-y-4">
                   {typedProgramEnrollments.map((enrollment: any) => (
-                    <Link key={enrollment.id} href={`/programs/${enrollment.program?.slug || enrollment.program?.id}`} className="flex items-center gap-4 p-4 bg-green-50 rounded-2xl hover:bg-green-100 transition">
-                      <div className="w-12 h-12 bg-green-200 rounded-xl flex items-center justify-center"><Award className="w-6 h-6 text-green-700" /></div>
+                    <Link key={enrollment.id} href={`/programs/${enrollment.program?.slug || enrollment.program?.id}`} className="flex items-center gap-4 p-4 bg-brand-green-50 rounded-2xl hover:bg-brand-green-100 transition">
+                      <div className="w-12 h-12 bg-brand-green-200 rounded-xl flex items-center justify-center"><Award className="w-6 h-6 text-brand-green-700" /></div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-slate-900 truncate">{enrollment.program?.name || 'Program'}</h3>
                         <p className="text-sm text-slate-500">{enrollment.status === 'IN_PROGRESS' ? 'In Progress' : enrollment.status}</p>
                       </div>
-                      <span className="px-3 py-1 bg-green-200 text-green-800 text-xs font-semibold rounded-full">Workforce</span>
+                      <span className="px-3 py-1 bg-brand-green-200 text-brand-green-800 text-xs font-semibold rounded-full">Workforce</span>
                     </Link>
                   ))}
                   {typedStudentEnrollments.map((enrollment: any) => (
@@ -259,7 +259,7 @@ export default async function LMSPage() {
                         <p className="text-sm text-slate-500">{assignment.course_title}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-red-600">{new Date(assignment.due_date).toLocaleDateString()}</p>
+                        <p className="text-sm font-semibold text-brand-red-600">{new Date(assignment.due_date).toLocaleDateString()}</p>
                         <p className="text-xs text-slate-500">Due</p>
                       </div>
                     </div>

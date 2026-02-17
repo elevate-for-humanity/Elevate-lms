@@ -135,7 +135,7 @@ export default async function MobileAppPage() {
             </div>
 
             <div className="text-center p-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-orange-100 rounded-full mb-4">
                 <Zap className="w-8 h-8 text-brand-orange-600" />
               </div>
               <h3 className="text-lg font-semibold mb-3 text-black">
@@ -147,7 +147,7 @@ export default async function MobileAppPage() {
             </div>
 
             <div className="text-center p-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-red-100 rounded-full mb-4">
                 <Download className="w-8 h-8 text-brand-orange-600" />
               </div>
               <h3 className="text-lg font-semibold mb-3 text-black">

@@ -126,7 +126,7 @@ export default function TaxCalculatorPage() {
 <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-brand-green-100 text-brand-green-700 px-4 py-2 rounded-full mb-4">
             <Calculator className="w-4 h-4" />
             <span className="text-sm font-semibold">
               Real-Time Tax Calculator
@@ -147,7 +147,7 @@ export default function TaxCalculatorPage() {
             {/* Filing Status */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <span className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <span className="w-8 h-8 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                   1
                 </span>
                 Filing Status
@@ -168,8 +168,8 @@ export default function TaxCalculatorPage() {
                     onClick={() => updateField('filing_status', status.value)}
                     className={`p-4 rounded-xl border-2 font-semibold transition ${
                       taxReturn.filing_status === status.value
-                        ? 'border-green-600 bg-green-50 text-green-700'
-                        : 'border-gray-200 hover:border-green-300'
+                        ? 'border-brand-green-600 bg-brand-green-50 text-brand-green-700'
+                        : 'border-gray-200 hover:border-brand-green-300'
                     }`}
                   >
                     {status.label}
@@ -191,7 +191,7 @@ export default function TaxCalculatorPage() {
                       parseInt(e.target.value) || 0
                     )
                   }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-green-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -199,7 +199,7 @@ export default function TaxCalculatorPage() {
             {/* Income */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <span className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <span className="w-8 h-8 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                   2
                 </span>
                 Income
@@ -225,7 +225,7 @@ export default function TaxCalculatorPage() {
                         )
                       }
                       placeholder="50,000"
-                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-green-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -249,7 +249,7 @@ export default function TaxCalculatorPage() {
                         )
                       }
                       placeholder="0"
-                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-green-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -273,7 +273,7 @@ export default function TaxCalculatorPage() {
                         )
                       }
                       placeholder="0"
-                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-green-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -297,7 +297,7 @@ export default function TaxCalculatorPage() {
                         )
                       }
                       placeholder="0"
-                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-green-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -321,7 +321,7 @@ export default function TaxCalculatorPage() {
                         )
                       }
                       placeholder="0"
-                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-green-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -331,7 +331,7 @@ export default function TaxCalculatorPage() {
             {/* Deductions */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <span className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <span className="w-8 h-8 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                   3
                 </span>
                 Deductions
@@ -343,8 +343,8 @@ export default function TaxCalculatorPage() {
                     onClick={() => updateField('standard_deduction', true)}
                     className={`flex-1 p-4 rounded-xl border-2 font-semibold transition ${
                       taxReturn.standard_deduction
-                        ? 'border-green-600 bg-green-50 text-green-700'
-                        : 'border-gray-200 hover:border-green-300'
+                        ? 'border-brand-green-600 bg-brand-green-50 text-brand-green-700'
+                        : 'border-gray-200 hover:border-brand-green-300'
                     }`}
                   >
                     Standard Deduction
@@ -353,8 +353,8 @@ export default function TaxCalculatorPage() {
                     onClick={() => updateField('standard_deduction', false)}
                     className={`flex-1 p-4 rounded-xl border-2 font-semibold transition ${
                       !taxReturn.standard_deduction
-                        ? 'border-green-600 bg-green-50 text-green-700'
-                        : 'border-gray-200 hover:border-green-300'
+                        ? 'border-brand-green-600 bg-brand-green-50 text-brand-green-700'
+                        : 'border-gray-200 hover:border-brand-green-300'
                     }`}
                   >
                     Itemized Deductions
@@ -381,7 +381,7 @@ export default function TaxCalculatorPage() {
                           )
                         }
                         placeholder="15,000"
-                        className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                        className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-green-500 focus:outline-none"
                       />
                     </div>
                   </div>
@@ -407,7 +407,7 @@ export default function TaxCalculatorPage() {
                         )
                       }
                       placeholder="0"
-                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-green-500 focus:outline-none"
                     />
                   </div>
                   <p className="text-xs text-black mt-1">
@@ -420,7 +420,7 @@ export default function TaxCalculatorPage() {
             {/* Withholding */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <span className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <span className="w-8 h-8 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                   4
                 </span>
                 Tax Payments
@@ -443,7 +443,7 @@ export default function TaxCalculatorPage() {
                         setFederalWithholding(parseFloat(e.target.value) || 0)
                       }
                       placeholder="6,000"
-                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-green-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -464,7 +464,7 @@ export default function TaxCalculatorPage() {
                         setEstimatedPayments(parseFloat(e.target.value) || 0)
                       }
                       placeholder="0"
-                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                      className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-green-500 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -544,7 +544,7 @@ export default function TaxCalculatorPage() {
 
                     <div className="flex justify-between">
                       <span className="text-black">Deductions</span>
-                      <span className="font-semibold text-green-600">
+                      <span className="font-semibold text-brand-green-600">
                         -{formatCurrency(calculation.deductions)}
                       </span>
                     </div>
@@ -558,7 +558,7 @@ export default function TaxCalculatorPage() {
 
                     <div className="flex justify-between">
                       <span className="text-black">Federal Tax</span>
-                      <span className="font-semibold text-red-600">
+                      <span className="font-semibold text-brand-red-600">
                         {formatCurrency(calculation.federal_tax)}
                       </span>
                     </div>
@@ -568,7 +568,7 @@ export default function TaxCalculatorPage() {
                         <span className="text-black">
                           Self-Employment Tax
                         </span>
-                        <span className="font-semibold text-red-600">
+                        <span className="font-semibold text-brand-red-600">
                           {formatCurrency(calculation.self_employment_tax)}
                         </span>
                       </div>
@@ -576,14 +576,14 @@ export default function TaxCalculatorPage() {
 
                     <div className="flex justify-between pt-3 border-t font-bold">
                       <span>Total Tax</span>
-                      <span className="text-red-600">
+                      <span className="text-brand-red-600">
                         {formatCurrency(calculation.total_tax)}
                       </span>
                     </div>
 
                     <div className="flex justify-between">
                       <span className="text-black">Tax Payments</span>
-                      <span className="font-semibold text-green-600">
+                      <span className="font-semibold text-brand-green-600">
                         {formatCurrency(refundResult?.total_payments || 0)}
                       </span>
                     </div>
@@ -616,7 +616,7 @@ export default function TaxCalculatorPage() {
 
                 <Link
                   href="/supersonic-fast-cash/diy/start"
-                  className="block w-full text-center px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition"
+                  className="block w-full text-center px-6 py-3 bg-brand-green-600 text-white rounded-xl font-semibold hover:bg-brand-green-700 transition"
                 >
                   File Your Return →
                 </Link>

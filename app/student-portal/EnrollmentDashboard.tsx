@@ -67,8 +67,8 @@ export default function EnrollmentDashboard() {
 
   if (error) {
     return (
-      <div className="bg-red-50 rounded-xl p-6 border border-red-200">
-        <div className="flex items-center gap-3 text-red-700">
+      <div className="bg-brand-red-50 rounded-xl p-6 border border-brand-red-200">
+        <div className="flex items-center gap-3 text-brand-red-700">
           <AlertCircle className="w-5 h-5" />
           <p>Unable to load enrollments. Please try again later.</p>
         </div>
@@ -98,7 +98,7 @@ export default function EnrollmentDashboard() {
       case 'partner':
         return { label: 'Partner Course', icon: Building2, color: 'text-brand-blue-600 bg-brand-blue-50' };
       case 'hybrid':
-        return { label: 'Apprenticeship', icon: GraduationCap, color: 'text-orange-600 bg-orange-50' };
+        return { label: 'Apprenticeship', icon: GraduationCap, color: 'text-brand-orange-600 bg-brand-orange-50' };
       default:
         return { label: 'Online Course', icon: BookOpen, color: 'text-brand-blue-600 bg-brand-blue-50' };
     }

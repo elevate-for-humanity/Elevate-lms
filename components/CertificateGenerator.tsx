@@ -24,7 +24,7 @@ export default function CertificateGenerator({
   };
   return (
     <div className="space-y-6">
-      <Card className="border-4 border-red-600">
+      <Card className="border-4 border-brand-red-600">
         <CardContent className="p-12 text-center">
           <div className="mb-8">
             <Award className="mx-auto text-brand-orange-600" size={64} />
@@ -69,7 +69,7 @@ export default function CertificateGenerator({
           <Download size={16} className="mr-2" />
           Download PDF
         </Button>
-        <Button onClick={handleShare} variant="outline" className="border-orange-500 text-orange-700 hover:bg-orange-50">
+        <Button onClick={handleShare} variant="outline" className="border-brand-orange-500 text-brand-orange-700 hover:bg-brand-orange-50">
           <Share2 size={16} className="mr-2" />
           Share on LinkedIn
         </Button>

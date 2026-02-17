@@ -29,9 +29,9 @@ export default async function MobileSyncPage() {
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h2 className="text-lg font-semibold mb-4">Sync Status</h2>
-            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
-              <span className="w-3 h-3 bg-green-500 rounded-full"></span>
-              <div><p className="font-medium text-green-800">Sync Active</p><p className="text-sm text-green-700">Last sync: 2 minutes ago</p></div>
+            <div className="flex items-center gap-3 p-4 bg-brand-green-50 rounded-lg">
+              <span className="w-3 h-3 bg-brand-green-500 rounded-full"></span>
+              <div><p className="font-medium text-brand-green-800">Sync Active</p><p className="text-sm text-brand-green-700">Last sync: 2 minutes ago</p></div>
             </div>
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">

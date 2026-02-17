@@ -43,7 +43,7 @@ export default function RiseUpFoundationPage() {
       </div>
 
       <section className="rounded-2xl border bg-white p-8 shadow-sm">
-        <div className="inline-block px-3 py-2 rounded-full bg-brand-green-100 text-green-800 text-xs font-semibold mb-4">
+        <div className="inline-block px-3 py-2 rounded-full bg-brand-green-100 text-brand-green-800 text-xs font-semibold mb-4">
           FREE TAX HELP
         </div>
         <h1 className="text-4xl font-bold tracking-tight">
@@ -61,18 +61,18 @@ export default function RiseUpFoundationPage() {
         </p>
 
         <div className="mt-8 grid md:grid-cols-3 gap-4">
-          <div className="rounded-lg bg-green-50 p-6">
-            <div className="text-3xl font-bold text-green-700">100%</div>
+          <div className="rounded-lg bg-brand-green-50 p-6">
+            <div className="text-3xl font-bold text-brand-green-700">100%</div>
             <div className="text-sm text-black mt-1">Free Service</div>
           </div>
-          <div className="rounded-lg bg-green-50 p-6">
-            <div className="text-3xl font-bold text-green-700">IRS</div>
+          <div className="rounded-lg bg-brand-green-50 p-6">
+            <div className="text-3xl font-bold text-brand-green-700">IRS</div>
             <div className="text-sm text-black mt-1">
               Certified Volunteers
             </div>
           </div>
-          <div className="rounded-lg bg-green-50 p-6">
-            <div className="text-3xl font-bold text-green-700">$0</div>
+          <div className="rounded-lg bg-brand-green-50 p-6">
+            <div className="text-3xl font-bold text-brand-green-700">$0</div>
             <div className="text-sm text-black mt-1">No Hidden Fees</div>
           </div>
         </div>
@@ -81,7 +81,7 @@ export default function RiseUpFoundationPage() {
       <section className="mt-8 grid md:grid-cols-2 gap-6">
         <Link
           href="/tax/rise-up-foundation/free-tax-help"
-          className="block rounded-2xl border-2 border-green-200 bg-white p-6 hover:shadow-lg transition"
+          className="block rounded-2xl border-2 border-brand-green-200 bg-white p-6 hover:shadow-lg transition"
         >
           <h2 className="text-xl font-bold text-black">Get Free Tax Help</h2>
           <p className="mt-2 text-black">
@@ -95,7 +95,7 @@ export default function RiseUpFoundationPage() {
 
         <Link
           href="/tax/rise-up-foundation/volunteer"
-          className="block rounded-2xl border-2 border-green-200 bg-white p-6 hover:shadow-lg transition"
+          className="block rounded-2xl border-2 border-brand-green-200 bg-white p-6 hover:shadow-lg transition"
         >
           <h2 className="text-xl font-bold text-black">Volunteer With Us</h2>
           <p className="mt-2 text-black">
@@ -108,7 +108,7 @@ export default function RiseUpFoundationPage() {
 
         <Link
           href="/tax/rise-up-foundation/training"
-          className="block rounded-2xl border-2 border-green-200 bg-white p-6 hover:shadow-lg transition"
+          className="block rounded-2xl border-2 border-brand-green-200 bg-white p-6 hover:shadow-lg transition"
         >
           <h2 className="text-xl font-bold text-black">
             Volunteer Training
@@ -124,7 +124,7 @@ export default function RiseUpFoundationPage() {
 
         <Link
           href="/tax/rise-up-foundation/site-locator"
-          className="block rounded-2xl border-2 border-green-200 bg-white p-6 hover:shadow-lg transition"
+          className="block rounded-2xl border-2 border-brand-green-200 bg-white p-6 hover:shadow-lg transition"
         >
           <h2 className="text-xl font-bold text-black">Find a VITA Site</h2>
           <p className="mt-2 text-black">

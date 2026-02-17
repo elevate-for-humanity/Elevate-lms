@@ -78,7 +78,7 @@ const services = [
 ];
 
 const colorClasses: Record<string, { bg: string; text: string; border: string; light: string }> = {
-  green: { bg: 'bg-green-600', text: 'text-green-600', border: 'border-green-200', light: 'bg-green-50' },
+  green: { bg: 'bg-brand-green-600', text: 'text-brand-green-600', border: 'border-brand-green-200', light: 'bg-brand-green-50' },
   blue: { bg: 'bg-brand-blue-600', text: 'text-brand-blue-600', border: 'border-brand-blue-200', light: 'bg-brand-blue-50' },
   blue: { bg: 'bg-brand-blue-600', text: 'text-brand-blue-600', border: 'border-brand-blue-200', light: 'bg-brand-blue-50' },
   amber: { bg: 'bg-amber-600', text: 'text-amber-600', border: 'border-amber-200', light: 'bg-amber-50' },
@@ -96,7 +96,7 @@ export default function CommunityServicesPage() {
       <section className="relative py-20 bg-slate-800">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-6">
-            <Heart className="w-4 h-4 text-red-400" />
+            <Heart className="w-4 h-4 text-brand-red-400" />
             All Services Free for Qualifying Residents
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-white mb-6">
@@ -109,7 +109,7 @@ export default function CommunityServicesPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/tax"
-              className="px-8 py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition"
+              className="px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition"
             >
               Free Tax Prep
             </Link>
@@ -135,7 +135,7 @@ export default function CommunityServicesPage() {
           <h2 className="text-3xl font-bold text-center mb-12">How Our Community Ecosystem Works</h2>
           <div className="grid md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">1</div>
+              <div className="w-16 h-16 bg-brand-green-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">1</div>
               <h3 className="font-bold mb-2">Get Free Tax Help</h3>
               <p className="text-gray-600 text-sm">Start at our VITA site for free tax preparation</p>
             </div>
@@ -211,7 +211,7 @@ export default function CommunityServicesPage() {
           </p>
           <div className="grid md:grid-cols-3 gap-6 text-left">
             <div className="bg-white/10 rounded-xl p-6">
-              <h3 className="font-bold text-green-400 mb-2">VITA Tax Services</h3>
+              <h3 className="font-bold text-brand-green-400 mb-2">VITA Tax Services</h3>
               <p className="text-slate-300 text-sm">Income under $64,000/year</p>
             </div>
             <div className="bg-white/10 rounded-xl p-6">
@@ -242,7 +242,7 @@ export default function CommunityServicesPage() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition"
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition"
             >
               <Phone className="w-5 h-5" />
               Get Help Online

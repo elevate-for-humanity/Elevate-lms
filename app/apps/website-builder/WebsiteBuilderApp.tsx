@@ -125,10 +125,10 @@ export function WebsiteBuilderApp({ user, subscription, websites: initialWebsite
             {websites.map(website => (
               <div key={website.id} className="bg-white rounded-xl border overflow-hidden hover:shadow-lg transition">
                 {/* Preview */}
-                <div className="aspect-video bg-gradient-to-br from-blue-100 to-blue-100 flex items-center justify-center relative">
+                <div className="aspect-video bg-gradient-to-br from-brand-blue-100 to-brand-blue-100 flex items-center justify-center relative">
                   <Layout className="w-12 h-12 text-brand-blue-300" />
                   {website.is_published && (
-                    <span className="absolute top-3 right-3 px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
+                    <span className="absolute top-3 right-3 px-2 py-1 bg-brand-green-500 text-white text-xs font-bold rounded-full">
                       Live
                     </span>
                   )}
@@ -159,7 +159,7 @@ export function WebsiteBuilderApp({ user, subscription, websites: initialWebsite
                     )}
                     <button
                       onClick={() => deleteWebsite(website.id)}
-                      className="px-3 py-2 border rounded-lg text-red-500 hover:bg-red-50"
+                      className="px-3 py-2 border rounded-lg text-brand-red-500 hover:bg-brand-red-50"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

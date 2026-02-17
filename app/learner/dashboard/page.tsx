@@ -160,12 +160,12 @@ export default async function LearnerDashboardPage() {
               <button className="relative p-2 text-gray-500 hover:text-gray-700">
                 <Bell className="w-5 h-5" />
                 {notifications && notifications.length > 0 && (
-                  <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
+                  <span className="absolute top-0 right-0 w-2 h-2 bg-brand-red-500 rounded-full" />
                 )}
               </button>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                  <span className="text-orange-600 font-medium text-sm">
+                <div className="w-8 h-8 bg-brand-orange-100 rounded-full flex items-center justify-center">
+                  <span className="text-brand-orange-600 font-medium text-sm">
                     {userName.charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -203,7 +203,7 @@ export default async function LearnerDashboardPage() {
 
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
@@ -215,8 +215,8 @@ export default async function LearnerDashboardPage() {
 
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                <Clock className="w-6 h-6 text-brand-orange-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Training Hours</p>
@@ -246,7 +246,7 @@ export default async function LearnerDashboardPage() {
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-gray-900">My Programs</h2>
-                  <Link href="/programs" className="text-sm text-orange-600 hover:text-orange-700 font-medium">
+                  <Link href="/programs" className="text-sm text-brand-orange-600 hover:text-brand-orange-700 font-medium">
                     Browse All Programs
                   </Link>
                 </div>
@@ -278,14 +278,14 @@ export default async function LearnerDashboardPage() {
                               </div>
                               <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
-                                  className="bg-orange-500 h-2 rounded-full transition-all"
+                                  className="bg-brand-orange-500 h-2 rounded-full transition-all"
                                   style={{ width: `${enrollment.progress || 0}%` }}
                                 />
                               </div>
                             </div>
                             <Link
                               href={`/courses/${enrollment.course_id}/learn`}
-                              className="px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition flex items-center gap-2"
+                              className="px-4 py-2 bg-brand-orange-600 text-white text-sm font-medium rounded-lg hover:bg-brand-orange-700 transition flex items-center gap-2"
                             >
                               <Play className="w-4 h-4" />
                               Continue
@@ -305,7 +305,7 @@ export default async function LearnerDashboardPage() {
                     <p className="text-gray-500 mb-4">Start your learning journey by enrolling in a program.</p>
                     <Link
                       href="/programs"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-brand-orange-600 text-white font-medium rounded-lg hover:bg-brand-orange-700 transition"
                     >
                       Browse Programs
                       <ChevronRight className="w-4 h-4" />
@@ -330,7 +330,7 @@ export default async function LearnerDashboardPage() {
                   href="/certificates"
                   className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
                 >
-                  <Award className="w-8 h-8 text-green-600 mb-2" />
+                  <Award className="w-8 h-8 text-brand-green-600 mb-2" />
                   <span className="text-sm font-medium text-gray-700">Certificates</span>
                 </Link>
                 <Link
@@ -358,7 +358,7 @@ export default async function LearnerDashboardPage() {
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-gray-900">Recent Achievements</h2>
-                  <Link href="/achievements" className="text-sm text-orange-600 hover:text-orange-700">
+                  <Link href="/achievements" className="text-sm text-brand-orange-600 hover:text-brand-orange-700">
                     View All
                   </Link>
                 </div>
@@ -401,7 +401,7 @@ export default async function LearnerDashboardPage() {
                   <div className="space-y-4">
                     {notifications.map((notification: any) => (
                       <div key={notification.id} className="flex items-start gap-3">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full mt-2" />
+                        <div className="w-2 h-2 bg-brand-orange-500 rounded-full mt-2" />
                         <div>
                           <p className="font-medium text-gray-900 text-sm">{notification.title}</p>
                           <p className="text-xs text-gray-500 line-clamp-2">{notification.message}</p>
@@ -419,14 +419,14 @@ export default async function LearnerDashboardPage() {
             </div>
 
             {/* Resources */}
-            <div className="bg-orange-500 rounded-xl p-6 text-white">
+            <div className="bg-brand-orange-500 rounded-xl p-6 text-white">
               <h3 className="font-semibold mb-2">Need Help?</h3>
-              <p className="text-sm text-orange-100 mb-4">
+              <p className="text-sm text-brand-orange-100 mb-4">
                 Our support team is here to help you succeed in your training.
               </p>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-orange-600 font-medium rounded-lg hover:bg-orange-50 transition text-sm"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-brand-orange-600 font-medium rounded-lg hover:bg-brand-orange-50 transition text-sm"
               >
                 <MessageSquare className="w-4 h-4" />
                 Contact Support
@@ -438,7 +438,7 @@ export default async function LearnerDashboardPage() {
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-gray-900">Certificates</h2>
-                  <Link href="/certificates" className="text-sm text-orange-600 hover:text-orange-700">
+                  <Link href="/certificates" className="text-sm text-brand-orange-600 hover:text-brand-orange-700">
                     View All
                   </Link>
                 </div>
@@ -448,8 +448,8 @@ export default async function LearnerDashboardPage() {
                   <div className="space-y-4">
                     {certificates.map((cert: any) => (
                       <div key={cert.id} className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                          <Award className="w-5 h-5 text-green-600" />
+                        <div className="w-10 h-10 bg-brand-green-100 rounded-full flex items-center justify-center">
+                          <Award className="w-5 h-5 text-brand-green-600" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-gray-900 text-sm truncate">

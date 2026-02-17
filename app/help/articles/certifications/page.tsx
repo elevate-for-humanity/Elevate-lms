@@ -59,8 +59,8 @@ export default function CertificationsHelpPage() {
               <h3 className="font-semibold mb-2">Earn Certificates</h3>
               <p className="text-sm text-gray-600">Complete courses and pass assessments to earn industry-recognized credentials.</p>
             </div>
-            <div className="bg-green-50 rounded-lg p-6">
-              <FileText className="w-8 h-8 text-green-600 mb-3" />
+            <div className="bg-brand-green-50 rounded-lg p-6">
+              <FileText className="w-8 h-8 text-brand-green-600 mb-3" />
               <h3 className="font-semibold mb-2">Access Anytime</h3>
               <p className="text-sm text-gray-600">View and download your certificates from your dashboard 24/7.</p>
             </div>

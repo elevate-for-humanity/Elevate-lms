@@ -101,9 +101,9 @@ export default async function EventsPage() {
     const colors: Record<string, string> = {
       'info_session': 'bg-brand-blue-100 text-brand-blue-700',
       'workshop': 'bg-brand-blue-100 text-brand-blue-700',
-      'career_fair': 'bg-green-100 text-green-700',
+      'career_fair': 'bg-brand-green-100 text-brand-green-700',
       'graduation': 'bg-yellow-100 text-yellow-700',
-      'networking': 'bg-orange-100 text-orange-700',
+      'networking': 'bg-brand-orange-100 text-brand-orange-700',
     };
     return colors[type] || 'bg-gray-100 text-gray-700';
   };

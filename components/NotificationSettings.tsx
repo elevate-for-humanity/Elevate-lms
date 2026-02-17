@@ -93,19 +93,19 @@ export default function NotificationSettings() {
         <p>Receive notifications about:</p>
         <ul className="space-y-2 ml-4">
           <li className="flex items-center gap-2">
-            <Check size={16} className="text-green-500" />
+            <Check size={16} className="text-brand-green-500" />
             New course releases
           </li>
           <li className="flex items-center gap-2">
-            <Check size={16} className="text-green-500" />
+            <Check size={16} className="text-brand-green-500" />
             Achievement unlocks
           </li>
           <li className="flex items-center gap-2">
-            <Check size={16} className="text-green-500" />
+            <Check size={16} className="text-brand-green-500" />
             Course reminders
           </li>
           <li className="flex items-center gap-2">
-            <Check size={16} className="text-green-500" />
+            <Check size={16} className="text-brand-green-500" />
             Important updates
           </li>
         </ul>
@@ -117,7 +117,7 @@ export default function NotificationSettings() {
             disabled={testSent}
             className={`w-full px-4 py-2 rounded-lg font-medium text-sm transition-all ${
               testSent
-                ? 'bg-green-100 text-green-700'
+                ? 'bg-brand-green-100 text-brand-green-700'
                 : 'bg-gray-100 text-black hover:bg-gray-200 active:scale-98'
             }`}
           >

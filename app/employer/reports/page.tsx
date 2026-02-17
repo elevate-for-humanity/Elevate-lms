@@ -46,7 +46,7 @@ export default async function EmployerReportsPage() {
             <div className="text-sm text-black">Active Postings</div>
           </div>
           <div className="border rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-green-600 mb-2">0</div>
+            <div className="text-3xl font-bold text-brand-green-600 mb-2">0</div>
             <div className="text-sm text-black">Applications</div>
           </div>
           <div className="border rounded-lg p-4 text-center">

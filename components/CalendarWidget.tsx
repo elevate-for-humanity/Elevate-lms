@@ -80,7 +80,7 @@ export function CalendarWidget({ userId }: CalendarWidgetProps) {
       case 'deadline':
         return 'bg-brand-orange-500';
       case 'class':
-        return 'bg-green-500';
+        return 'bg-brand-green-500';
       default:
         return 'bg-slate-500';
     }
@@ -147,9 +147,9 @@ export function CalendarWidget({ userId }: CalendarWidgetProps) {
                 onClick={() => setSelectedDate(date)}
                 className={`aspect-square p-1 rounded-lg border transition ${
                   isSelected
-                    ? 'border-emerald-500 bg-red-50'
+                    ? 'border-emerald-500 bg-brand-red-50'
                     : isToday
-                    ? 'border-red-300 bg-red-50/50'
+                    ? 'border-brand-red-300 bg-brand-red-50/50'
                     : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                 }`}
               >

@@ -136,7 +136,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
             )}
 
             {/* Credentials & Outcomes Box */}
-            <div className="mt-8 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-brand-blue-200 rounded-2xl p-6">
+            <div className="mt-8 bg-gradient-to-br from-brand-blue-50 to-indigo-50 border-2 border-brand-blue-200 rounded-2xl p-6">
               <h3 className="text-xl font-bold mb-4 text-brand-blue-900 flex items-center gap-2">
                 <span className="text-2xl">🎓</span> Credentials You'll Earn
               </h3>
@@ -158,10 +158,10 @@ export function ProgramTemplate({ program }: { program: Program }) {
 
               {/* Third-Party Certifications */}
               {program.credential && (
-                <div className="bg-white rounded-xl p-4 border border-green-200">
+                <div className="bg-white rounded-xl p-4 border border-brand-green-200">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-green-600 font-bold">•</span>
+                    <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-brand-green-600 font-bold">•</span>
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-900">Industry Certification</h4>
@@ -181,15 +181,15 @@ export function ProgramTemplate({ program }: { program: Program }) {
                 <h4 className="font-semibold text-brand-blue-900 mb-2">What Happens After Completion?</h4>
                 <ul className="space-y-2 text-sm text-gray-700">
                   <li className="flex items-center gap-2">
-                    <span className="text-green-500">→</span>
+                    <span className="text-brand-green-500">→</span>
                     Career services support and job placement assistance
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-green-500">→</span>
+                    <span className="text-brand-green-500">→</span>
                     Access to employer partner network
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-green-500">→</span>
+                    <span className="text-brand-green-500">→</span>
                     Pathway to advanced certifications and career growth
                   </li>
                 </ul>
@@ -210,8 +210,8 @@ export function ProgramTemplate({ program }: { program: Program }) {
                   Program Specializations:
                 </h3>
                 <div className="grid md:grid-cols-2 gap-4 mb-6">
-                  <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-4">
-                    <h4 className="font-bold text-orange-900 mb-2">
+                  <div className="bg-brand-orange-50 border-2 border-brand-orange-200 rounded-xl p-4">
+                    <h4 className="font-bold text-brand-orange-900 mb-2">
                       DOT Urine Drug Testing
                     </h4>
                     <p className="text-sm text-black">
@@ -219,24 +219,24 @@ export function ProgramTemplate({ program }: { program: Program }) {
                       procedures
                     </p>
                   </div>
-                  <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-4">
-                    <h4 className="font-bold text-orange-900 mb-2">
+                  <div className="bg-brand-orange-50 border-2 border-brand-orange-200 rounded-xl p-4">
+                    <h4 className="font-bold text-brand-orange-900 mb-2">
                       DOT Breath Alcohol Testing
                     </h4>
                     <p className="text-sm text-black">
                       Breath Alcohol Technician (BAT) certification
                     </p>
                   </div>
-                  <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-4">
-                    <h4 className="font-bold text-orange-900 mb-2">
+                  <div className="bg-brand-orange-50 border-2 border-brand-orange-200 rounded-xl p-4">
+                    <h4 className="font-bold text-brand-orange-900 mb-2">
                       Non-DOT Testing
                     </h4>
                     <p className="text-sm text-black">
                       Workplace and employer-mandated testing programs
                     </p>
                   </div>
-                  <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-4">
-                    <h4 className="font-bold text-orange-900 mb-2">
+                  <div className="bg-brand-orange-50 border-2 border-brand-orange-200 rounded-xl p-4">
+                    <h4 className="font-bold text-brand-orange-900 mb-2">
                       Oral Fluid Testing
                     </h4>
                     <p className="text-sm text-black">

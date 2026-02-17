@@ -65,7 +65,7 @@ export default async function BusinessFinancialPage() {
           {/* Hero Content */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-              <div className="inline-flex items-center gap-2 bg-orange-600 text-white px-4 py-2 rounded-full mb-6">
+              <div className="inline-flex items-center gap-2 bg-brand-orange-600 text-white px-4 py-2 rounded-full mb-6">
                 <Briefcase className="w-5 h-5" />
                 <span className="text-sm font-bold uppercase tracking-wide">
                   Business & Finance
@@ -83,7 +83,7 @@ export default async function BusinessFinancialPage() {
               <div className="flex flex-col gap-4 sm:flex-row justify-center">
                 <Link
                   href="#programs"
-                  className="inline-flex items-center justify-center rounded-xl px-8 py-4 text-lg font-bold bg-white text-orange-600 hover:bg-gray-100 transition shadow-lg"
+                  className="inline-flex items-center justify-center rounded-xl px-8 py-4 text-lg font-bold bg-white text-brand-orange-600 hover:bg-gray-100 transition shadow-lg"
                 >
                   View Programs
                 </Link>
@@ -148,25 +148,25 @@ export default async function BusinessFinancialPage() {
           <div className="bg-white rounded-xl p-8 shadow-sm">
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-6 h-6 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span className="text-black">
                   Individuals seeking career change or advancement
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-6 h-6 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span className="text-black">
                   No prior experience required for most programs
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-6 h-6 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span className="text-black">
                   Justice-impacted individuals welcome
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-6 h-6 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span className="text-black">
                   Barriers support available
                 </span>
@@ -184,23 +184,23 @@ export default async function BusinessFinancialPage() {
           </h2>
           <p className="text-black mb-6">You may qualify for:</p>
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-brand-blue-50 rounded-lg p-6">
               <h3 className="font-bold text-black mb-2">WIOA</h3>
               <p className="text-black text-sm">
                 Workforce Innovation and Opportunity Act funding
               </p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-brand-blue-50 rounded-lg p-6">
               <h3 className="font-bold text-black mb-2">WRG</h3>
               <p className="text-black text-sm">Workforce Ready Grant</p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-brand-blue-50 rounded-lg p-6">
               <h3 className="font-bold text-black mb-2">JRI</h3>
               <p className="text-black text-sm">
                 Justice Reinvestment Initiative
               </p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-brand-blue-50 rounded-lg p-6">
               <h3 className="font-bold text-black mb-2">
                 Employer Sponsorship
               </h3>
@@ -256,17 +256,17 @@ export default async function BusinessFinancialPage() {
           </h2>
           <p className="text-black mb-6">Students typically move into:</p>
           <div className="grid md:grid-cols-3 gap-4">
-            <div className="bg-green-50 rounded-lg p-6 text-center">
+            <div className="bg-brand-green-50 rounded-lg p-6 text-center">
               <h3 className="font-bold text-black mb-2">
                 Administrative Assistant
               </h3>
             </div>
-            <div className="bg-green-50 rounded-lg p-6 text-center">
+            <div className="bg-brand-green-50 rounded-lg p-6 text-center">
               <h3 className="font-bold text-black mb-2">
                 Financial Services Rep
               </h3>
             </div>
-            <div className="bg-green-50 rounded-lg p-6 text-center">
+            <div className="bg-brand-green-50 rounded-lg p-6 text-center">
               <h3 className="font-bold text-black mb-2">
                 Customer Service Specialist
               </h3>

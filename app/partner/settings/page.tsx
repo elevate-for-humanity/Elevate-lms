@@ -44,9 +44,9 @@ export default function PartnerSettingsPage() {
         </div>
 
         {saved && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
+          <div className="mb-6 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg flex items-center gap-3">
             <span className="text-slate-400 flex-shrink-0">•</span>
-            <span className="text-green-800">Settings saved successfully!</span>
+            <span className="text-brand-green-800">Settings saved successfully!</span>
           </div>
         )}
 
@@ -84,8 +84,8 @@ export default function PartnerSettingsPage() {
           {/* Primary Contact */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <User className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <User className="w-5 h-5 text-brand-green-600" />
               </div>
               <h2 className="text-lg font-semibold text-gray-900">Primary Contact</h2>
             </div>
@@ -147,7 +147,7 @@ export default function PartnerSettingsPage() {
                       onChange={(e) => setSettings({ ...settings, [item.key]: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-brand-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
                   </label>
                 </div>
               ))}

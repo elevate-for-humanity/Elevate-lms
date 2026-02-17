@@ -17,7 +17,7 @@ export default function AboutPage() {
 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-green-500 rounded-2xl mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-500 rounded-2xl mb-6">
             <Zap className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-slate-900 mb-4">Welcome to Elevate Hub</h1>
@@ -51,8 +51,8 @@ export default function AboutPage() {
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-200 p-6">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-              <BookOpen className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center mb-4">
+              <BookOpen className="w-6 h-6 text-brand-green-600" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">Quality Education</h3>
             <p className="text-slate-600">
@@ -73,8 +73,8 @@ export default function AboutPage() {
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-200 p-6">
-            <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
-              <Heart className="w-6 h-6 text-orange-600" />
+            <div className="w-12 h-12 bg-brand-orange-100 rounded-xl flex items-center justify-center mb-4">
+              <Heart className="w-6 h-6 text-brand-orange-600" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">Accessible to All</h3>
             <p className="text-slate-600">
@@ -89,44 +89,44 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-4">Community Guidelines</h2>
           <ul className="space-y-3 text-slate-600">
             <li className="flex items-start gap-3">
-              <span className="text-green-500 font-bold">1.</span>
+              <span className="text-brand-green-500 font-bold">1.</span>
               <span><strong>Be Respectful</strong> - Treat all members with kindness and respect.</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-green-500 font-bold">2.</span>
+              <span className="text-brand-green-500 font-bold">2.</span>
               <span><strong>Stay On Topic</strong> - Keep discussions relevant to learning and career growth.</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-green-500 font-bold">3.</span>
+              <span className="text-brand-green-500 font-bold">3.</span>
               <span><strong>Help Others</strong> - Share your knowledge and support fellow learners.</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-green-500 font-bold">4.</span>
+              <span className="text-brand-green-500 font-bold">4.</span>
               <span><strong>No Spam</strong> - Avoid self-promotion and irrelevant content.</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-green-500 font-bold">5.</span>
+              <span className="text-brand-green-500 font-bold">5.</span>
               <span><strong>Protect Privacy</strong> - Don&apos;t share personal information without consent.</span>
             </li>
           </ul>
         </div>
 
         {/* CTA */}
-        <div className="bg-green-500 rounded-2xl p-8 text-center text-white">
+        <div className="bg-brand-green-500 rounded-2xl p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-green-100 mb-6">
+          <p className="text-brand-green-100 mb-6">
             Learners across Indiana are transforming their careers.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link 
               href="/hub" 
-              className="px-6 py-3 bg-white text-green-600 rounded-lg font-medium hover:bg-green-50"
+              className="px-6 py-3 bg-white text-brand-green-600 rounded-lg font-medium hover:bg-brand-green-50"
             >
               Enter Community
             </Link>
             <Link 
               href="/programs" 
-              className="px-6 py-3 bg-green-600 text-white border-2 border-white rounded-lg font-medium hover:bg-green-700"
+              className="px-6 py-3 bg-brand-green-600 text-white border-2 border-white rounded-lg font-medium hover:bg-brand-green-700"
             >
               Browse Programs
             </Link>

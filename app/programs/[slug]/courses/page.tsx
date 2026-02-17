@@ -177,7 +177,7 @@ export default function ProgramCoursesPage() {
                     />
                     <div className="absolute top-4 right-4">
                       {course.price === 0 && (
-                        <span className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                        <span className="bg-brand-green-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
                           FREE
                         </span>
                       )}
@@ -212,7 +212,7 @@ export default function ProgramCoursesPage() {
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         {course.price === 0 ? (
-                          <div className="text-2xl font-bold text-green-600">FREE</div>
+                          <div className="text-2xl font-bold text-brand-green-600">FREE</div>
                         ) : (
                           <>
                             <div className="text-2xl font-bold text-black">${course.price}</div>
@@ -223,7 +223,7 @@ export default function ProgramCoursesPage() {
                         )}
                       </div>
                       {course.funding && (
-                        <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                        <div className="text-xs bg-brand-green-100 text-brand-green-800 px-2 py-1 rounded">
                           {course.funding}
                         </div>
                       )}

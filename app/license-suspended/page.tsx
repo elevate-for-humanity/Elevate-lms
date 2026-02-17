@@ -15,8 +15,8 @@ export default function LicenseSuspendedPage() {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
         {/* Warning Icon */}
-        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <AlertTriangle className="w-8 h-8 text-red-600" />
+        <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <AlertTriangle className="w-8 h-8 text-brand-red-600" />
         </div>
 
         {/* Title */}
@@ -35,7 +35,7 @@ export default function LicenseSuspendedPage() {
           {/* Update Billing Button */}
           <Link
             href="/billing"
-            className="flex items-center justify-center gap-2 w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition"
+            className="flex items-center justify-center gap-2 w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition"
           >
             <CreditCard className="w-5 h-5" />
             Update Billing
@@ -50,7 +50,7 @@ export default function LicenseSuspendedPage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a
                 href="mailto:support@elevateforhumanity.org"
-                className="flex items-center justify-center gap-2 text-slate-700 hover:text-orange-600 transition"
+                className="flex items-center justify-center gap-2 text-slate-700 hover:text-brand-orange-600 transition"
               >
                 <Mail className="w-4 h-4" />
                 <span className="text-sm">Email Support</span>
@@ -58,7 +58,7 @@ export default function LicenseSuspendedPage() {
               
               <a
                 href="tel:+1-800-555-0123"
-                className="flex items-center justify-center gap-2 text-slate-700 hover:text-orange-600 transition"
+                className="flex items-center justify-center gap-2 text-slate-700 hover:text-brand-orange-600 transition"
               >
                 <Phone className="w-4 h-4" />
                 <span className="text-sm">Call Support</span>

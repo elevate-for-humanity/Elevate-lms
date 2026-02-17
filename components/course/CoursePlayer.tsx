@@ -93,7 +93,7 @@ export function CoursePlayer() {
           {/* Video Controls */}
           <div className="absolute bottom-0 left-0 right-0    p-4">
             <div className="flex items-center gap-4">
-              <button className="text-white hover:text-red-500 transition-colors">
+              <button className="text-white hover:text-brand-red-500 transition-colors">
                 {isPlaying ? (
                   <Pause className="h-5 w-5" />
                 ) : (
@@ -106,10 +106,10 @@ export function CoursePlayer() {
               <span className="text-white text-sm">
                 8:30 / {currentLesson.duration}
               </span>
-              <button className="text-white hover:text-red-500 transition-colors">
+              <button className="text-white hover:text-brand-red-500 transition-colors">
                 <Volume2 className="h-5 w-5" />
               </button>
-              <button className="text-white hover:text-red-500 transition-colors">
+              <button className="text-white hover:text-brand-red-500 transition-colors">
                 <Maximize className="h-5 w-5" />
               </button>
             </div>
@@ -184,10 +184,10 @@ export function CoursePlayer() {
               disabled={lesson.locked}
               className={`w-full text-left p-3 rounded-lg border transition-all ${
                 currentLesson.id === lesson.id
-                  ? 'border-red-500 bg-red-50'
+                  ? 'border-brand-red-500 bg-brand-red-50'
                   : lesson.locked
                     ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60'
-                    : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
+                    : 'border-gray-200 hover:border-brand-red-300 hover:bg-gray-50'
               }`}
             >
               <div className="flex items-start gap-3">

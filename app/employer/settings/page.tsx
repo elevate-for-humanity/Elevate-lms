@@ -134,7 +134,7 @@ export default async function EmployerSettingsPage() {
         {/* Contact Information */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">
-            <User className="w-6 h-6 text-green-600" />
+            <User className="w-6 h-6 text-brand-green-600" />
             <h2 className="text-lg font-semibold">Contact Information</h2>
           </div>
           
@@ -222,13 +222,13 @@ export default async function EmployerSettingsPage() {
           </div>
           
           {profile.verified ? (
-            <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <Shield className="w-5 h-5 text-green-600" />
+            <div className="flex items-center gap-3 p-4 bg-brand-green-50 rounded-lg">
+              <div className="w-10 h-10 bg-brand-green-100 rounded-full flex items-center justify-center">
+                <Shield className="w-5 h-5 text-brand-green-600" />
               </div>
               <div>
-                <div className="font-semibold text-green-900">Account Verified</div>
-                <div className="text-sm text-green-700">
+                <div className="font-semibold text-brand-green-900">Account Verified</div>
+                <div className="text-sm text-brand-green-700">
                   You have full access to all employer features.
                 </div>
               </div>
@@ -259,7 +259,7 @@ export default async function EmployerSettingsPage() {
         {/* Notification Preferences */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center gap-3 mb-6">
-            <Bell className="w-6 h-6 text-orange-600" />
+            <Bell className="w-6 h-6 text-brand-orange-600" />
             <h2 className="text-lg font-semibold">Notification Preferences</h2>
           </div>
           

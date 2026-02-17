@@ -119,9 +119,9 @@ export default async function StaffReportsPage() {
       <div className="py-8">
       <div className="max-w-7xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-          <Link href="/" className="hover:text-orange-600">Home</Link>
+          <Link href="/" className="hover:text-brand-orange-600">Home</Link>
           <ChevronRight className="w-4 h-4" />
-          <Link href="/staff-portal" className="hover:text-orange-600">Staff Portal</Link>
+          <Link href="/staff-portal" className="hover:text-brand-orange-600">Staff Portal</Link>
           <ChevronRight className="w-4 h-4" />
           <span className="text-gray-900">Reports</span>
         </nav>
@@ -139,15 +139,15 @@ export default async function StaffReportsPage() {
             <Users className="w-8 h-8 text-brand-blue-500 mb-2" />
             <p className="text-2xl font-bold">{totalStudents || 0}</p>
             <p className="text-gray-600 text-sm">Total Students</p>
-            <p className="text-xs text-green-600 mt-1">+{newStudentsThisWeek || 0} this week</p>
+            <p className="text-xs text-brand-green-600 mt-1">+{newStudentsThisWeek || 0} this week</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
-            <GraduationCap className="w-8 h-8 text-green-500 mb-2" />
+            <GraduationCap className="w-8 h-8 text-brand-green-500 mb-2" />
             <p className="text-2xl font-bold">{activeEnrollments || 0}</p>
             <p className="text-gray-600 text-sm">Active Enrollments</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
-            <TrendingUp className="w-8 h-8 text-orange-500 mb-2" />
+            <TrendingUp className="w-8 h-8 text-brand-orange-500 mb-2" />
             <p className="text-2xl font-bold">{completedThisMonth || 0}</p>
             <p className="text-gray-600 text-sm">Completed This Month</p>
           </div>
@@ -163,8 +163,8 @@ export default async function StaffReportsPage() {
           {reportTypes.map(report => (
             <Link key={report.name} href={report.href}
               className="bg-white rounded-xl p-6 border hover:shadow-md transition flex items-start gap-4">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <report.icon className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <report.icon className="w-6 h-6 text-brand-orange-600" />
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900">{report.name}</h3>
@@ -209,7 +209,7 @@ export default async function StaffReportsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded text-xs ${
-                        enrollment.status === 'active' ? 'bg-green-100 text-green-700' :
+                        enrollment.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' :
                         enrollment.status === 'completed' ? 'bg-brand-blue-100 text-brand-blue-700' :
                         enrollment.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                         'bg-gray-100 text-gray-700'

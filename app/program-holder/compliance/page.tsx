@@ -177,7 +177,7 @@ export default async function CompliancePage() {
                         ? 'text-brand-green-600'
                         : overallScore >= 70
                           ? 'text-yellow-600'
-                          : 'text-red-600'
+                          : 'text-brand-red-600'
                     }`}
                   >
                     {overallScore}%
@@ -186,7 +186,7 @@ export default async function CompliancePage() {
                     className={`text-sm font-medium mt-2 ${
                       complianceStatus === 'compliant'
                         ? 'text-brand-green-600'
-                        : 'text-red-600'
+                        : 'text-brand-red-600'
                     }`}
                   >
                     {complianceStatus === 'compliant'
@@ -204,7 +204,7 @@ export default async function CompliancePage() {
                       ? 'bg-brand-green-600'
                       : overallScore >= 70
                         ? 'bg-yellow-600'
-                        : 'bg-red-600'
+                        : 'bg-brand-red-600'
                   }`}
                   style={{ width: `${overallScore}%` }}
                 />
@@ -270,14 +270,14 @@ export default async function CompliancePage() {
                       key={index}
                       className={`flex items-start p-4 rounded-lg border-2 ${
                         issue.severity === 'high'
-                          ? 'bg-red-50 border-red-200'
+                          ? 'bg-brand-red-50 border-brand-red-200'
                           : 'bg-yellow-50 border-yellow-200'
                       }`}
                     >
                       <AlertTriangle
                         className={`h-10 w-10 mr-3 flex-shrink-0 mt-0.5 ${
                           issue.severity === 'high'
-                            ? 'text-red-600'
+                            ? 'text-brand-red-600'
                             : 'text-yellow-600'
                         }`}
                       />
@@ -303,12 +303,12 @@ export default async function CompliancePage() {
 
             {/* No Issues */}
             {issues.length === 0 && (
-              <div className="bg-green-50 border-2 border-green-200 rounded-lg p-8 mb-8 text-center">
+              <div className="bg-brand-green-50 border-2 border-brand-green-200 rounded-lg p-8 mb-8 text-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
-                <h3 className="text-2xl font-bold text-green-900 mb-2">
+                <h3 className="text-2xl font-bold text-brand-green-900 mb-2">
                   All Clear!
                 </h3>
-                <p className="text-green-800">
+                <p className="text-brand-green-800">
                   Your program is fully compliant. Keep up the great work!
                 </p>
               </div>

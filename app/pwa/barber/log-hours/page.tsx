@@ -58,10 +58,10 @@ export default function LogHoursPage() {
 
       <main className="px-4 py-6">
         {success ? (
-          <div className="bg-green-500/20 border border-green-500/30 rounded-xl p-6 text-center">
+          <div className="bg-brand-green-500/20 border border-brand-green-500/30 rounded-xl p-6 text-center">
             <span className="text-slate-400 flex-shrink-0">•</span>
             <h2 className="text-white font-bold text-xl mb-2">Hours Logged!</h2>
-            <p className="text-green-200">Your training hours have been recorded.</p>
+            <p className="text-brand-green-200">Your training hours have been recorded.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">

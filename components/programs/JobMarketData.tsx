@@ -14,7 +14,7 @@ export function JobMarketData({ averageSalary, salaryRange, jobGrowth }: JobMark
 
         <div className="grid md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-lg shadow-sm">
-            <DollarSign className="w-8 h-8 text-green-600 mb-3" />
+            <DollarSign className="w-8 h-8 text-brand-green-600 mb-3" />
             <div className="text-2xl font-bold text-black mb-1">{averageSalary}</div>
             <div className="text-sm text-black">Average Salary in Indiana</div>
           </div>
@@ -26,7 +26,7 @@ export function JobMarketData({ averageSalary, salaryRange, jobGrowth }: JobMark
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-sm">
-            <Briefcase className="w-8 h-8 text-orange-600 mb-3" />
+            <Briefcase className="w-8 h-8 text-brand-orange-600 mb-3" />
             <div className="text-2xl font-bold text-black mb-1">{salaryRange}</div>
             <div className="text-sm text-black">Salary Range</div>
           </div>

@@ -106,7 +106,7 @@ export default function ProgramOrientationVideo({
               {hasWatched ? 'Watch Again' : 'Watch Orientation'}
             </button>
             {hasWatched && (
-              <span className="ml-3 text-sm text-green-600 font-medium">
+              <span className="ml-3 text-sm text-brand-green-600 font-medium">
                 • Completed
               </span>
             )}
@@ -151,7 +151,7 @@ export default function ProgramOrientationVideo({
                 {description}
               </p>
               {hasWatched && (
-                <div className="flex items-center gap-2 text-green-600">
+                <div className="flex items-center gap-2 text-brand-green-600">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="font-medium">
                     Orientation completed! You can close this window.

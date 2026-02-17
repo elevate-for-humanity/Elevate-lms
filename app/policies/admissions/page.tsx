@@ -108,7 +108,7 @@ export default function AdmissionsPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     2
                   </div>
                   <div>
@@ -146,7 +146,7 @@ export default function AdmissionsPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     4
                   </div>
                   <div>
@@ -165,7 +165,7 @@ export default function AdmissionsPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     5
                   </div>
                   <div>
@@ -201,7 +201,7 @@ export default function AdmissionsPage() {
             <p className="text-black mb-4">We accept various funding sources:</p>
             
             <div className="grid md:grid-cols-2 gap-6 mb-6">
-              <div className="bg-green-50 rounded-lg p-6 border-2 border-green-200">
+              <div className="bg-brand-green-50 rounded-lg p-6 border-2 border-brand-green-200">
                 <h3 className="text-lg font-bold text-black mb-3">Government Programs</h3>
                 <ul className="list-disc pl-6 text-black space-y-2">
                   <li>WIOA (Workforce Innovation and Opportunity Act)</li>

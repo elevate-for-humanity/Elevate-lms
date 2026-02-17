@@ -38,7 +38,7 @@ export default function DemoEnrollmentsPage() {
       case 'active': return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'completed': return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'pending': return <Clock className="w-3.5 h-3.5 text-amber-500" />;
-      case 'at_risk': return <AlertTriangle className="w-3.5 h-3.5 text-red-500" />;
+      case 'at_risk': return <AlertTriangle className="w-3.5 h-3.5 text-brand-red-500" />;
       default: return <XCircle className="w-3.5 h-3.5 text-gray-400" />;
     }
   };
@@ -46,7 +46,7 @@ export default function DemoEnrollmentsPage() {
   return (
     <DemoPageShell title="Enrollments" description="All currently enrolled students across programs." portal="admin">
       {toast && (
-        <div className="fixed top-20 right-4 z-50 bg-green-600 text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium animate-fade-in-up">
+        <div className="fixed top-20 right-4 z-50 bg-brand-green-600 text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium animate-fade-in-up">
           {toast}
         </div>
       )}
@@ -60,7 +60,7 @@ export default function DemoEnrollmentsPage() {
             placeholder="Search students by name or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+            className="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500 outline-none"
           />
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -125,18 +125,18 @@ export default function DemoEnrollmentsPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: `${s.progress || 0}%` }} />
+                          <div className="h-full bg-brand-green-500 rounded-full transition-all" style={{ width: `${s.progress || 0}%` }} />
                         </div>
                         <span className="text-xs text-gray-500">{s.progress || 0}%</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`text-xs font-medium ${(s.attendance || 0) >= 90 ? 'text-green-600' : (s.attendance || 0) >= 80 ? 'text-amber-600' : 'text-red-600'}`}>
+                      <span className={`text-xs font-medium ${(s.attendance || 0) >= 90 ? 'text-brand-green-600' : (s.attendance || 0) >= 80 ? 'text-amber-600' : 'text-brand-red-600'}`}>
                         {s.attendance || 0}%
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">{s.funding}</span>
+                      <span className="text-xs bg-brand-blue-50 text-brand-blue-700 px-2 py-0.5 rounded">{s.funding}</span>
                     </td>
                     <td className="px-4 py-3">
                       {expandedId === s.id ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}

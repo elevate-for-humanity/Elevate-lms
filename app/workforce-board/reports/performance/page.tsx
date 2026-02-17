@@ -28,10 +28,10 @@ export default async function PerformanceReportPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Employment Rate</h3><p className="text-3xl font-bold text-green-600 mt-2">78%</p><p className="text-sm text-gray-500">Target: 75%</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Employment Rate</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">78%</p><p className="text-sm text-gray-500">Target: 75%</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Credential Rate</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">85%</p><p className="text-sm text-gray-500">Target: 80%</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Median Earnings</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">$32K</p><p className="text-sm text-gray-500">Target: $30K</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Measurable Skill Gains</h3><p className="text-3xl font-bold text-orange-600 mt-2">72%</p><p className="text-sm text-gray-500">Target: 70%</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Measurable Skill Gains</h3><p className="text-3xl font-bold text-brand-orange-600 mt-2">72%</p><p className="text-sm text-gray-500">Target: 70%</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6"><h2 className="text-lg font-semibold mb-4">Performance Trends</h2><PerformanceChart /></div>
       </div>

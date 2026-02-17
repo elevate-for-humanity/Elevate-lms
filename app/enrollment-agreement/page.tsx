@@ -59,7 +59,7 @@ export default function EnrollmentAgreementPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Program Information</h2>
           <p className="text-gray-700 mb-4">
             The specific program, duration, schedule, tuition, and fees are detailed in your 
-            individual enrollment form and the <Link href="/tuition-fees" className="text-orange-600 hover:underline">Tuition & Fees Schedule</Link>.
+            individual enrollment form and the <Link href="/tuition-fees" className="text-brand-orange-600 hover:underline">Tuition & Fees Schedule</Link>.
           </p>
           <p className="text-gray-700">
             Programs are delivered through <strong>hybrid instruction</strong>, combining online 
@@ -91,8 +91,8 @@ export default function EnrollmentAgreementPage() {
           <ul className="list-disc list-inside text-gray-700 space-y-2">
             <li>Attend all scheduled classes and training sessions as required</li>
             <li>Complete all online coursework and assignments by specified deadlines</li>
-            <li>Maintain satisfactory academic progress as defined in the <Link href="/satisfactory-academic-progress" className="text-orange-600 hover:underline">SAP Policy</Link></li>
-            <li>Comply with the <Link href="/attendance-policy" className="text-orange-600 hover:underline">Attendance Policy</Link></li>
+            <li>Maintain satisfactory academic progress as defined in the <Link href="/satisfactory-academic-progress" className="text-brand-orange-600 hover:underline">SAP Policy</Link></li>
+            <li>Comply with the <Link href="/attendance-policy" className="text-brand-orange-600 hover:underline">Attendance Policy</Link></li>
             <li>Pay all tuition and fees according to the agreed payment schedule</li>
             <li>Conduct themselves professionally and respectfully</li>
             <li>Notify the School promptly of any changes to contact information</li>
@@ -162,7 +162,7 @@ export default function EnrollmentAgreementPage() {
         <section className="mb-10">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">5. All Sales Final - No Refunds</h2>
           
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-6">
             <p className="text-gray-700 mb-4">
               <strong>ALL SALES ARE FINAL. NO REFUNDS WILL BE ISSUED.</strong>
             </p>
@@ -217,7 +217,7 @@ export default function EnrollmentAgreementPage() {
         <section className="mb-10">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">7. No Guarantees</h2>
           
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-6">
             <p className="text-gray-700 mb-4">
               <strong>Elevate for Humanity does NOT guarantee:</strong>
             </p>
@@ -255,7 +255,7 @@ export default function EnrollmentAgreementPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Dispute Resolution</h2>
           <p className="text-gray-700 mb-4">
             Any disputes arising from this agreement shall first be addressed through the 
-            School's internal <Link href="/grievance" className="text-orange-600 hover:underline">Grievance Process</Link>.
+            School's internal <Link href="/grievance" className="text-brand-orange-600 hover:underline">Grievance Process</Link>.
           </p>
           <p className="text-gray-700">
             If the dispute cannot be resolved internally, either party may file a complaint 
@@ -274,10 +274,10 @@ export default function EnrollmentAgreementPage() {
             </p>
             <ul className="list-disc list-inside text-gray-700 space-y-2">
               <li>You have read and understand this Enrollment Agreement</li>
-              <li>You have reviewed the <Link href="/tuition-fees" className="text-orange-600 hover:underline">Tuition & Fees Schedule</Link></li>
+              <li>You have reviewed the <Link href="/tuition-fees" className="text-brand-orange-600 hover:underline">Tuition & Fees Schedule</Link></li>
               <li>You understand that <strong>all sales are final and no refunds will be issued</strong></li>
               <li>You understand that the School may terminate your enrollment for rule violations</li>
-              <li>You have reviewed the <Link href="/disclosures" className="text-orange-600 hover:underline">Student Consumer Information</Link></li>
+              <li>You have reviewed the <Link href="/disclosures" className="text-brand-orange-600 hover:underline">Student Consumer Information</Link></li>
               <li>You agree to be bound by the terms of this agreement</li>
               <li>Your electronic signature has the same legal effect as a handwritten signature</li>
             </ul>
@@ -303,10 +303,10 @@ export default function EnrollmentAgreementPage() {
             Questions about this agreement? Contact us at Get Help Online or info@elevateforhumanity.org
           </p>
           <div className="flex flex-wrap gap-4 text-sm">
-            <Link href="/disclosures" className="text-orange-600 hover:underline">Student Disclosures</Link>
-            <Link href="/tuition-fees" className="text-orange-600 hover:underline">Tuition & Fees</Link>
-            <Link href="/refund-policy" className="text-orange-600 hover:underline">Refund Policy</Link>
-            <Link href="/grievance" className="text-orange-600 hover:underline">Grievance Policy</Link>
+            <Link href="/disclosures" className="text-brand-orange-600 hover:underline">Student Disclosures</Link>
+            <Link href="/tuition-fees" className="text-brand-orange-600 hover:underline">Tuition & Fees</Link>
+            <Link href="/refund-policy" className="text-brand-orange-600 hover:underline">Refund Policy</Link>
+            <Link href="/grievance" className="text-brand-orange-600 hover:underline">Grievance Policy</Link>
           </div>
         </div>
       {/* CTA Section */}

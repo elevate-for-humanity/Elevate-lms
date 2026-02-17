@@ -28,7 +28,7 @@ export function AchievementsStrip({ achievements }: Props) {
           className="flex min-w-[120px] flex-col items-start gap-1 rounded-xl bg-slate-50 px-3 py-2 text-xs"
         >
           <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-100 text-xs">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-orange-100 text-xs">
               {a.icon ?? "⭐"}
             </span>
             <span className="font-medium text-black">{a.name}</span>

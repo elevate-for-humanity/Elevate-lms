@@ -44,13 +44,13 @@ function OnboardingItem({
       {!done && action && href && (
         <Link
           href={href}
-          className="px-3 py-2 text-sm font-semibold text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg transition"
+          className="px-3 py-2 text-sm font-semibold text-brand-orange-600 hover:text-brand-orange-700 hover:bg-brand-orange-50 rounded-lg transition"
         >
           {action}
         </Link>
       )}
       {done && (
-        <span className="text-xs text-green-600 font-semibold">Complete</span>
+        <span className="text-xs text-brand-green-600 font-semibold">Complete</span>
       )}
     </div>
   );
@@ -94,7 +94,7 @@ export function OnboardingChecklist({ onboarding }: OnboardingChecklistProps) {
       <div className="p-6">
         {allComplete ? (
           <div className="text-center py-6">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <h3 className="text-lg font-bold text-black mb-2">

@@ -99,7 +99,7 @@ export default function CareerCounselingPage() {
           </p>
           <Link
             href="/career-services/contact"
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center"
+            className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center"
           >
             Schedule a Session <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
@@ -210,15 +210,15 @@ export default function CareerCounselingPage() {
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center text-sm text-gray-600">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Identify transferable skills
                 </li>
                 <li className="flex items-center text-sm text-gray-600">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Explore new industries
                 </li>
                 <li className="flex items-center text-sm text-gray-600">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Plan your transition
                 </li>
               </ul>
@@ -231,15 +231,15 @@ export default function CareerCounselingPage() {
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center text-sm text-gray-600">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Explore career options
                 </li>
                 <li className="flex items-center text-sm text-gray-600">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Build your professional brand
                 </li>
                 <li className="flex items-center text-sm text-gray-600">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Navigate the job market
                 </li>
               </ul>
@@ -252,15 +252,15 @@ export default function CareerCounselingPage() {
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center text-sm text-gray-600">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Address employment gaps
                 </li>
                 <li className="flex items-center text-sm text-gray-600">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Update your skills
                 </li>
                 <li className="flex items-center text-sm text-gray-600">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Rebuild confidence
                 </li>
               </ul>
@@ -287,15 +287,15 @@ export default function CareerCounselingPage() {
               </p>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   60-minute sessions
                 </li>
                 <li className="flex items-center">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Hands-on activities
                 </li>
                 <li className="flex items-center">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Access to resource library
                 </li>
               </ul>
@@ -311,15 +311,15 @@ export default function CareerCounselingPage() {
               </p>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Flexible scheduling
                 </li>
                 <li className="flex items-center">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   No travel required
                 </li>
                 <li className="flex items-center">
-                  <Circle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-brand-green-600 mr-2" />
                   Screen sharing for resources
                 </li>
               </ul>

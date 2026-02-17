@@ -128,7 +128,7 @@ export default async function LearnerDetailPage({ params }: Props) {
               <div className="flex items-center gap-2 mt-1">
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                   learner.status === 'active' 
-                    ? 'bg-green-100 text-green-800' 
+                    ? 'bg-brand-green-100 text-brand-green-800' 
                     : 'bg-gray-100 text-gray-800'
                 }`}>
                   {learner.status || 'Active'}
@@ -169,7 +169,7 @@ export default async function LearnerDetailPage({ params }: Props) {
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
               <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <div>
@@ -241,7 +241,7 @@ export default async function LearnerDetailPage({ params }: Props) {
                         </span>
                       </div>
                       <span className={`text-xs ${
-                        enrollment.status === 'completed' ? 'text-green-600' :
+                        enrollment.status === 'completed' ? 'text-brand-green-600' :
                         enrollment.status === 'active' ? 'text-brand-blue-600' : 'text-slate-500'
                       }`}>
                         {enrollment.status}
@@ -263,7 +263,7 @@ export default async function LearnerDetailPage({ params }: Props) {
                 {recentActivity.map((activity: any) => (
                   <div key={activity.id} className="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      activity.completed ? 'bg-green-100' : 'bg-brand-blue-100'
+                      activity.completed ? 'bg-brand-green-100' : 'bg-brand-blue-100'
                     }`}>
                       {activity.completed ? (
                         <span className="text-slate-400 flex-shrink-0">•</span>

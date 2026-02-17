@@ -52,8 +52,8 @@ export default function HostShopsPage() {
               />
             </div>
             <div>
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-6">
-                <Users className="w-8 h-8 text-green-700" />
+              <div className="w-16 h-16 bg-brand-green-100 rounded-2xl flex items-center justify-center mb-6">
+                <Users className="w-8 h-8 text-brand-green-700" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">Get Trained, Motivated Help</h3>
               <p className="text-lg text-black mb-4">
@@ -61,13 +61,13 @@ export default function HostShopsPage() {
               </p>
               <ul className="space-y-2 text-black">
                 <li className="flex items-center gap-2">
-                  <span className="text-green-600 font-bold">•</span> Extra hands during busy hours
+                  <span className="text-brand-green-600 font-bold">•</span> Extra hands during busy hours
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-green-600 font-bold">•</span> Pre-screened, committed learners
+                  <span className="text-brand-green-600 font-bold">•</span> Pre-screened, committed learners
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-green-600 font-bold">•</span> Potential future employees
+                  <span className="text-brand-green-600 font-bold">•</span> Potential future employees
                 </li>
               </ul>
             </div>
@@ -157,7 +157,7 @@ export default function HostShopsPage() {
                 'Carry appropriate business insurance',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="text-green-600 font-bold text-xl">•</span>
+                  <span className="text-brand-green-600 font-bold text-xl">•</span>
                   <span className="text-black text-lg">{item}</span>
                 </li>
               ))}
@@ -239,7 +239,7 @@ export default function HostShopsPage() {
               </div>
             ))}
           </div>
-          <div className="mt-8 bg-green-50 border-2 border-green-600 rounded-xl p-6 text-center">
+          <div className="mt-8 bg-brand-green-50 border-2 border-brand-green-600 rounded-xl p-6 text-center">
             <p className="text-black font-medium text-lg">
               Host shops must be approved before they can host apprentices. Enrollment includes intake and Host Shop Agreement acceptance.
             </p>
@@ -264,7 +264,7 @@ export default function HostShopsPage() {
             </Link>
             <Link
               href="/portal/partner/enroll/host-shop"
-              className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-bold transition"
+              className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold transition"
             >
               Enroll as a Host Shop
             </Link>

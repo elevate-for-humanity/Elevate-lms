@@ -107,7 +107,7 @@ const credentials: VerifiableCredential[] = [
 
 function StatusBadge({ status }: { status: 'active' | 'pending' | 'renewal' }) {
   const styles = {
-    active: 'bg-green-100 text-green-800 border-green-200',
+    active: 'bg-brand-green-100 text-brand-green-800 border-brand-green-200',
     pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     renewal: 'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-200',
   };

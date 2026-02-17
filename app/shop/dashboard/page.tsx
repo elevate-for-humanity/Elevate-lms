@@ -103,7 +103,7 @@ export default async function ShopDashboardPage() {
               </div>
               <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
               <p className="text-sm text-gray-600">{stat.label}</p>
-              <p className="text-xs text-green-600 mt-1">{stat.change}</p>
+              <p className="text-xs text-brand-green-600 mt-1">{stat.change}</p>
             </div>
           ))}
         </div>
@@ -133,7 +133,7 @@ export default async function ShopDashboardPage() {
                       <td className="py-4 text-gray-900">${order.total}</td>
                       <td className="py-4">
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          order.status === 'delivered' ? 'bg-green-100 text-green-700' :
+                          order.status === 'delivered' ? 'bg-brand-green-100 text-brand-green-700' :
                           order.status === 'shipped' ? 'bg-brand-blue-100 text-brand-blue-700' :
                           order.status === 'processing' ? 'bg-yellow-100 text-yellow-700' :
                           'bg-gray-100 text-gray-700'

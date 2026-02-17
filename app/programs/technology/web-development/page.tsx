@@ -200,7 +200,7 @@ export default function WebDevelopmentPage() {
               <div key={i} className="bg-white rounded-xl p-6 border shadow-sm text-center">
                 <h3 className="font-bold text-black mb-2">{c.title}</h3>
                 <p className="text-2xl font-bold text-purple-600 mb-1">{c.salary}</p>
-                <span className="text-sm text-green-600 font-medium">{c.growth}</span>
+                <span className="text-sm text-brand-green-600 font-medium">{c.growth}</span>
               </div>
             ))}
           </div>
@@ -213,7 +213,7 @@ export default function WebDevelopmentPage() {
           <h2 className="text-3xl font-bold text-black mb-8 text-center">Who Should Apply</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white rounded-2xl p-8 shadow-sm border">
-              <h3 className="text-xl font-bold text-green-700 mb-4">Requirements</h3>
+              <h3 className="text-xl font-bold text-brand-green-700 mb-4">Requirements</h3>
               <ul className="space-y-3">
                 {[
                   'High school diploma or GED',

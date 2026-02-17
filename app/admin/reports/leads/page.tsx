@@ -54,10 +54,10 @@ export default async function LeadsReportPage() {
     contacted: 'bg-yellow-100 text-yellow-700',
     qualified: 'bg-brand-blue-100 text-brand-blue-700',
     appointment_set: 'bg-indigo-100 text-indigo-700',
-    application_started: 'bg-orange-100 text-orange-700',
-    enrolled: 'bg-green-100 text-green-700',
+    application_started: 'bg-brand-orange-100 text-brand-orange-700',
+    enrolled: 'bg-brand-green-100 text-brand-green-700',
     not_interested: 'bg-gray-100 text-gray-600',
-    unqualified: 'bg-red-100 text-red-700',
+    unqualified: 'bg-brand-red-100 text-brand-red-700',
   };
 
   const sourceLabels: Record<string, string> = {
@@ -98,8 +98,8 @@ export default async function LeadsReportPage() {
           
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <TrendingUp className="w-5 h-5 text-green-600" />
+              <div className="p-2 bg-brand-green-100 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-brand-green-600" />
               </div>
               <span className="text-sm text-gray-600">New This Month</span>
             </div>
@@ -190,7 +190,7 @@ export default async function LeadsReportPage() {
                         </div>
                         <div className="w-full bg-gray-100 rounded-full h-2">
                           <div 
-                            className="bg-green-600 h-2 rounded-full" 
+                            className="bg-brand-green-600 h-2 rounded-full" 
                             style={{ width: `${(count / (totalLeads || 1)) * 100}%` }}
                           />
                         </div>

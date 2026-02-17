@@ -188,12 +188,12 @@ export default function AutomationQAPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
+              <CheckCircle className="h-4 w-4 text-brand-green-500" />
               Auto-Approved
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.autoApproved}</div>
+            <div className="text-2xl font-bold text-brand-green-600">{stats.autoApproved}</div>
           </CardContent>
         </Card>
         <Card>
@@ -210,12 +210,12 @@ export default function AutomationQAPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Users className="h-4 w-4 text-blue-500" />
+              <Users className="h-4 w-4 text-brand-blue-500" />
               Human Decisions
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.humanDecisions}</div>
+            <div className="text-2xl font-bold text-brand-blue-600">{stats.humanDecisions}</div>
           </CardContent>
         </Card>
         <Card>
@@ -453,7 +453,7 @@ export default function AutomationQAPage() {
                   {reviewItems.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8">
-                        <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                        <CheckCircle className="h-8 w-8 text-brand-green-500 mx-auto mb-2" />
                         <p className="text-muted-foreground">All caught up! No items pending review.</p>
                       </TableCell>
                     </TableRow>
@@ -471,11 +471,11 @@ export default function AutomationQAPage() {
 function OutcomeBadge({ outcome }: { outcome: string }) {
   switch (outcome) {
     case 'approved':
-      return <Badge className="bg-green-100 text-green-800">Approved</Badge>;
+      return <Badge className="bg-brand-green-100 text-brand-green-800">Approved</Badge>;
     case 'routed_to_review':
       return <Badge className="bg-amber-100 text-amber-800">To Review</Badge>;
     case 'rejected':
-      return <Badge className="bg-red-100 text-red-800">Rejected</Badge>;
+      return <Badge className="bg-brand-red-100 text-brand-red-800">Rejected</Badge>;
     default:
       return <Badge variant="secondary">{outcome}</Badge>;
   }

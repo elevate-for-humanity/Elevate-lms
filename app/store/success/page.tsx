@@ -84,7 +84,7 @@ export default async function StoreSuccessPage({
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-16">
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl font-bold mb-2">Thank You for Your Order!</h1>
@@ -128,7 +128,7 @@ export default async function StoreSuccessPage({
                     {item.product?.download_url && (
                       <a
                         href={item.product.download_url}
-                        className="flex items-center gap-1 text-green-600 font-medium hover:underline"
+                        className="flex items-center gap-1 text-brand-green-600 font-medium hover:underline"
                       >
                         <Download className="w-4 h-4" /> Download
                       </a>
@@ -151,7 +151,7 @@ export default async function StoreSuccessPage({
                     className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
                   >
                     <span>{purchase.product.name}</span>
-                    <Download className="w-5 h-5 text-green-600" />
+                    <Download className="w-5 h-5 text-brand-green-600" />
                   </a>
                 ))}
               </div>
@@ -166,7 +166,7 @@ export default async function StoreSuccessPage({
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/store"
-              className="inline-flex items-center justify-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700"
+              className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-red-700"
             >
               Continue Shopping
             </Link>

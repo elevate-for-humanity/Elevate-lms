@@ -106,7 +106,7 @@ function EnrollmentConfirmedContent() {
       <div className="max-w-2xl mx-auto">
         {/* Success Icon */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-100 rounded-full mb-4">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900">
@@ -129,7 +129,7 @@ function EnrollmentConfirmedContent() {
               <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <p className="text-sm text-gray-500">Status</p>
-                <p className="font-semibold text-green-600">Active Enrollment</p>
+                <p className="font-semibold text-brand-green-600">Active Enrollment</p>
               </div>
             </div>
 

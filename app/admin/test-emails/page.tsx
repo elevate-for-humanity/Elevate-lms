@@ -76,8 +76,8 @@ export default function TestEmailsPage() {
           <div
             className={`mb-6 p-4 rounded-lg border ${
               result.success
-                ? 'bg-green-50 border-green-200 text-green-800'
-                : 'bg-red-50 border-red-200 text-red-800'
+                ? 'bg-brand-green-50 border-brand-green-200 text-brand-green-800'
+                : 'bg-brand-red-50 border-brand-red-200 text-brand-red-800'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -148,7 +148,7 @@ export default function TestEmailsPage() {
             <button
               onClick={() => sendTestEmail('reminder')}
               disabled={loading}
-              className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-lg hover:border-brand-orange-500 hover:bg-brand-orange-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="w-8 h-8 text-brand-orange-600" />
               <div className="text-center">
@@ -164,7 +164,7 @@ export default function TestEmailsPage() {
             <button
               onClick={() => sendTestEmail('notification')}
               disabled={loading}
-              className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-lg hover:border-brand-green-500 hover:bg-brand-green-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="w-8 h-8 text-brand-green-600" />
               <div className="text-center">

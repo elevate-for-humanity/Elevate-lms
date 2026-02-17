@@ -21,14 +21,14 @@ export default function PartnerCompliancePage() {
 <div className="container mx-auto px-4 max-w-4xl">
         <Link
           href="/partners"
-          className="inline-flex items-center text-orange-600 hover:underline mb-6"
+          className="inline-flex items-center text-brand-orange-600 hover:underline mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Partners
         </Link>
 
         <div className="text-center mb-12">
-          <Shield className="h-16 w-16 text-orange-600 mx-auto mb-4" />
+          <Shield className="h-16 w-16 text-brand-orange-600 mx-auto mb-4" />
           <h1 className="text-4xl font-bold mb-4">Compliance Tools</h1>
           <p className="text-xl text-black">
             Everything you need to maintain WIOA and DOL compliance.
@@ -37,7 +37,7 @@ export default function PartnerCompliancePage() {
 
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-            <FileText className="h-12 w-12 text-orange-600 mx-auto mb-4" />
+            <FileText className="h-12 w-12 text-brand-orange-600 mx-auto mb-4" />
             <h3 className="font-semibold text-lg mb-2">Reporting</h3>
             <p className="text-black text-sm mb-4">
               Automated WIOA reporting and documentation
@@ -50,7 +50,7 @@ export default function PartnerCompliancePage() {
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-            <BarChart3 className="h-12 w-12 text-orange-600 mx-auto mb-4" />
+            <BarChart3 className="h-12 w-12 text-brand-orange-600 mx-auto mb-4" />
             <h3 className="font-semibold text-lg mb-2">Analytics</h3>
             <p className="text-black text-sm mb-4">
               Track student outcomes and performance
@@ -63,7 +63,7 @@ export default function PartnerCompliancePage() {
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-            <Shield className="h-12 w-12 text-orange-600 mx-auto mb-4" />
+            <Shield className="h-12 w-12 text-brand-orange-600 mx-auto mb-4" />
             <h3 className="font-semibold text-lg mb-2">Documentation</h3>
             <p className="text-black text-sm mb-4">
               Access compliance guides and templates
@@ -76,7 +76,7 @@ export default function PartnerCompliancePage() {
           </div>
         </div>
 
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
+        <div className="bg-brand-orange-50 border border-brand-orange-200 rounded-lg p-6">
           <h2 className="text-xl font-bold mb-2">Need Help?</h2>
           <p className="text-black mb-4">
             Our compliance team is here to support you. Access your partner

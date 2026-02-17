@@ -60,12 +60,12 @@ export default async function ModerationPage() {
                   </div>
                   <div className="flex gap-2">
                     <form action={`/api/admin/moderation/${post.id}/approve`} method="POST">
-                      <button className="bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700" aria-label="Approve post">
+                      <button className="bg-brand-green-600 text-white px-3 py-2 rounded text-sm hover:bg-brand-green-700" aria-label="Approve post">
                         Approve
                       </button>
                     </form>
                     <form action={`/api/admin/moderation/${post.id}/remove`} method="POST">
-                      <button className="bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700" aria-label="Remove post">
+                      <button className="bg-brand-red-600 text-white px-3 py-2 rounded text-sm hover:bg-brand-red-700" aria-label="Remove post">
                         Remove
                       </button>
                     </form>

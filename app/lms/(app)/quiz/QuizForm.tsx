@@ -62,11 +62,11 @@ export function QuizForm({ quizId, quizTitle, questions }: QuizFormProps) {
       </div>
 
       {result ? (
-        <div className={`p-8 text-center ${result.success ? 'bg-green-50' : 'bg-red-50'}`}>
+        <div className={`p-8 text-center ${result.success ? 'bg-brand-green-50' : 'bg-brand-red-50'}`}>
           <span className="text-slate-400 flex-shrink-0">•</span>
           <h3 className="text-xl font-bold mb-2">{result.message}</h3>
           {result.score !== undefined && (
-            <p className="text-2xl font-bold text-green-600">Score: {result.score}%</p>
+            <p className="text-2xl font-bold text-brand-green-600">Score: {result.score}%</p>
           )}
         </div>
       ) : (

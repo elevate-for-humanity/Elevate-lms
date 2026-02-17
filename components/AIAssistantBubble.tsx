@@ -154,7 +154,7 @@ export function AIAssistantBubble() {
           className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 flex bg-brand-orange-600 text-white rounded-full p-4 shadow-2xl hover:bg-brand-orange-700 transition-all hover:scale-110"
         >
           <MessageCircle className="h-10 w-10" />
-          <span className="absolute -top-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white" />
+          <span className="absolute -top-1 -right-1 bg-brand-green-500 w-4 h-4 rounded-full border-2 border-white" />
         </button>
       )}
 
@@ -168,7 +168,7 @@ export function AIAssistantBubble() {
               <div>
                 <h3 className="font-bold text-lg">Elevate AI Assistant</h3>
                 <p className="text-xs text-white/80 flex items-center gap-1">
-                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                  <span className="w-2 h-2 bg-brand-green-400 rounded-full animate-pulse" />
                   Online
                 </p>
               </div>

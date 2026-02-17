@@ -64,14 +64,14 @@ export default function CareerServicesContactPage() {
 
             {/* Email */}
             <div className="bg-gray-50 rounded-xl p-8 text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-8 h-8 text-brand-green-600" />
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Email Us</h2>
               <p className="text-gray-600 mb-4">Get a response within 24 hours</p>
               <a
                 href="mailto:info@elevateforhumanity.org"
-                className="text-lg font-bold text-green-600 hover:text-green-700 break-all"
+                className="text-lg font-bold text-brand-green-600 hover:text-brand-green-700 break-all"
               >
                 info@elevateforhumanity.org
               </a>
@@ -173,7 +173,7 @@ export default function CareerServicesContactPage() {
               href="/career-services/resume-building"
               className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition flex items-center"
             >
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+              <div className="w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center mr-4">
                 <span className="text-2xl">📄</span>
               </div>
               <div>
@@ -215,7 +215,7 @@ export default function CareerServicesContactPage() {
               href="/career-services/job-placement"
               className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition flex items-center"
             >
-              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-4">
+              <div className="w-12 h-12 bg-brand-orange-100 rounded-full flex items-center justify-center mr-4">
                 <span className="text-2xl">💼</span>
               </div>
               <div>

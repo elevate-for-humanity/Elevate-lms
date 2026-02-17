@@ -78,7 +78,7 @@ export default async function CommunityPage() {
               href="/lms/groups"
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
             >
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
                 <svg
                   className="w-6 h-6 text-brand-green-600"
                   fill="none"

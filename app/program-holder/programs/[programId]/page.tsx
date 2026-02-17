@@ -119,7 +119,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
             <p className="text-slate-600">{program.description}</p>
             <div className="flex items-center gap-2 mt-2">
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                program.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                program.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-gray-100 text-gray-800'
               }`}>
                 {program.status || 'Active'}
               </span>
@@ -165,7 +165,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
               <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <div>

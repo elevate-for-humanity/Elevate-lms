@@ -232,7 +232,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                       {completedLessons > 0 ? 'Continue Learning' : 'Start Course'}
                     </Link>
                   ) : (
-                    <div className="text-center py-3 bg-green-100 text-green-800 rounded-xl font-semibold">
+                    <div className="text-center py-3 bg-brand-green-100 text-brand-green-800 rounded-xl font-semibold">
                       <span className="text-slate-400 flex-shrink-0">•</span>
                       Course Completed!
                     </div>
@@ -291,7 +291,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                         >
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                             isCompleted
-                              ? 'bg-green-100 text-green-600'
+                              ? 'bg-brand-green-100 text-brand-green-600'
                               : 'bg-brand-blue-100 text-brand-blue-600'
                           }`}>
                             {isCompleted ? (
@@ -375,7 +375,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-600">Certificate</span>
-                  <span className="font-medium text-green-600">Yes</span>
+                  <span className="font-medium text-brand-green-600">Yes</span>
                 </div>
               </div>
             </div>

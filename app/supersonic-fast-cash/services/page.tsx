@@ -209,8 +209,8 @@ export default async function ServicesPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <DollarSign className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <DollarSign className="w-8 h-8 text-brand-green-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-2">
                 Maximum Refund
@@ -236,7 +236,7 @@ export default async function ServicesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-orange-500">
+      <section className="py-16 bg-brand-orange-500">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Ready to Get Started?</h2>
           <p className="text-lg text-white mb-8">
@@ -245,13 +245,13 @@ export default async function ServicesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/book-appointment"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-orange-500 font-bold rounded hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-orange-500 font-bold rounded hover:bg-gray-100 transition-colors"
             >
               Book Appointment
             </Link>
             <Link
               href="/support"
-              className="inline-flex items-center justify-center px-8 py-4 bg-transparent text-white font-bold rounded hover:bg-orange-600 transition-colors border-2 border-white"
+              className="inline-flex items-center justify-center px-8 py-4 bg-transparent text-white font-bold rounded hover:bg-brand-orange-600 transition-colors border-2 border-white"
             >
               Call Get Help Online
             </Link>

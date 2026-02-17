@@ -38,21 +38,21 @@ const SETTINGS_SECTIONS = [
     description: 'Manage email and push notification preferences',
     icon: Bell,
     href: '/lms/settings/notifications',
-    color: 'bg-orange-100 text-orange-600',
+    color: 'bg-brand-orange-100 text-brand-orange-600',
   },
   {
     title: 'Security',
     description: 'Change password and manage two-factor authentication',
     icon: Lock,
     href: '/lms/settings/security',
-    color: 'bg-red-100 text-red-600',
+    color: 'bg-brand-red-100 text-brand-red-600',
   },
   {
     title: 'Privacy',
     description: 'Control your data and privacy settings',
     icon: Shield,
     href: '/lms/settings/privacy',
-    color: 'bg-green-100 text-green-600',
+    color: 'bg-brand-green-100 text-brand-green-600',
   },
   {
     title: 'Language & Region',
@@ -223,14 +223,14 @@ export default async function SettingsPage() {
             <form action="/api/auth/signout" method="POST">
               <button
                 type="submit"
-                className="flex items-center justify-between p-6 hover:bg-red-50 transition w-full text-left"
+                className="flex items-center justify-between p-6 hover:bg-brand-red-50 transition w-full text-left"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                    <LogOut className="w-5 h-5 text-red-600" />
+                  <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
+                    <LogOut className="w-5 h-5 text-brand-red-600" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-red-600">Sign Out</h3>
+                    <h3 className="font-medium text-brand-red-600">Sign Out</h3>
                     <p className="text-sm text-slate-600">Sign out of your account on this device</p>
                   </div>
                 </div>

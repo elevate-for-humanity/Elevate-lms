@@ -138,7 +138,7 @@ export function ProgramDetailTemplate({ data }: ProgramDetailTemplateProps) {
         <section className="bg-gray-50 py-16">
           <div className="mx-auto max-w-4xl px-6">
             <div className="flex items-center gap-3 mb-6">
-              <Briefcase className="w-8 h-8 text-green-600" />
+              <Briefcase className="w-8 h-8 text-brand-green-600" />
               <h2 className="text-3xl font-bold text-black">Career Outcomes</h2>
             </div>
             <div className="bg-white rounded-xl p-8 shadow-sm">

@@ -59,8 +59,8 @@ export function EnrollmentPaymentWidget({
       </p>
 
       {error && (
-        <div className="mt-3 rounded-md bg-red-900/20 border border-red-800 p-3">
-          <p className="text-[11px] text-red-300">{error}</p>
+        <div className="mt-3 rounded-md bg-brand-red-900/20 border border-brand-red-800 p-3">
+          <p className="text-[11px] text-brand-red-300">{error}</p>
         </div>
       )}
 

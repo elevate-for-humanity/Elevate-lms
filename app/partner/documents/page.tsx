@@ -93,11 +93,11 @@ export default function PartnerDocumentsPage() {
       case 'accepted':
         return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'rejected':
-        return <X className="w-5 h-5 text-red-500" />;
+        return <X className="w-5 h-5 text-brand-red-500" />;
       case 'pending':
         return <Clock className="w-5 h-5 text-amber-500" />;
       case 'expired':
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
+        return <AlertCircle className="w-5 h-5 text-brand-red-500" />;
       default:
         return <AlertCircle className="w-5 h-5 text-slate-400" />;
     }
@@ -105,10 +105,10 @@ export default function PartnerDocumentsPage() {
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      accepted: 'bg-green-100 text-green-700',
-      rejected: 'bg-red-100 text-red-700',
+      accepted: 'bg-brand-green-100 text-brand-green-700',
+      rejected: 'bg-brand-red-100 text-brand-red-700',
       pending: 'bg-amber-100 text-amber-700',
-      expired: 'bg-red-100 text-red-700',
+      expired: 'bg-brand-red-100 text-brand-red-700',
       missing: 'bg-slate-100 text-slate-600',
     };
     return styles[status] || styles.missing;
@@ -156,23 +156,23 @@ export default function PartnerDocumentsPage() {
           </div>
           <div className="w-full bg-slate-200 rounded-full h-3">
             <div 
-              className={`h-3 rounded-full transition-all ${allComplete ? 'bg-green-500' : 'bg-brand-blue-600'}`}
+              className={`h-3 rounded-full transition-all ${allComplete ? 'bg-brand-green-500' : 'bg-brand-blue-600'}`}
               style={{ width: `${progress}%` }}
             />
           </div>
           {allComplete && (
-            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
+            <div className="mt-4 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg flex items-center gap-3">
               <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
-                <p className="font-medium text-green-800">All documents accepted!</p>
-                <p className="text-sm text-green-600">Your partner account is now active.</p>
+                <p className="font-medium text-brand-green-800">All documents accepted!</p>
+                <p className="text-sm text-brand-green-600">Your partner account is now active.</p>
               </div>
             </div>
           )}
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700">
+          <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-center gap-3 text-brand-red-700">
             <AlertCircle className="w-5 h-5" />
             {error}
           </div>
@@ -184,8 +184,8 @@ export default function PartnerDocumentsPage() {
             <div 
               key={doc.id} 
               className={`bg-white rounded-xl p-6 border ${
-                doc.status === 'accepted' ? 'border-green-200' : 
-                doc.status === 'rejected' ? 'border-red-200' : 
+                doc.status === 'accepted' ? 'border-brand-green-200' : 
+                doc.status === 'rejected' ? 'border-brand-red-200' : 
                 'border-slate-200'
               }`}
             >
@@ -195,7 +195,7 @@ export default function PartnerDocumentsPage() {
                   <div>
                     <h3 className="font-semibold text-slate-900">
                       {doc.document_name}
-                      {doc.is_required && <span className="text-red-500 ml-1">*</span>}
+                      {doc.is_required && <span className="text-brand-red-500 ml-1">*</span>}
                     </h3>
                     <p className="text-sm text-slate-500">{doc.description}</p>
                   </div>
@@ -206,19 +206,19 @@ export default function PartnerDocumentsPage() {
               </div>
 
               {doc.document && doc.status === 'rejected' && doc.document.rejection_reason && (
-                <div className="mb-4 p-3 bg-red-50 rounded-lg text-sm text-red-700">
+                <div className="mb-4 p-3 bg-brand-red-50 rounded-lg text-sm text-brand-red-700">
                   <strong>Rejection reason:</strong> {doc.document.rejection_reason}
                 </div>
               )}
 
               {doc.document && doc.status === 'accepted' && (
-                <div className="mb-4 p-3 bg-green-50 rounded-lg flex items-center justify-between">
-                  <span className="text-sm text-green-700">{doc.document.file_name}</span>
+                <div className="mb-4 p-3 bg-brand-green-50 rounded-lg flex items-center justify-between">
+                  <span className="text-sm text-brand-green-700">{doc.document.file_name}</span>
                   <a 
                     href={doc.document.file_url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-sm text-green-600 hover:underline"
+                    className="text-sm text-brand-green-600 hover:underline"
                   >
                     View
                   </a>
@@ -265,7 +265,7 @@ export default function PartnerDocumentsPage() {
           {allComplete ? (
             <Link
               href="/partner/dashboard"
-              className="flex items-center gap-2 px-8 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+              className="flex items-center gap-2 px-8 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 transition-colors"
             >
               Go to Dashboard
               <ArrowRight className="w-5 h-5" />

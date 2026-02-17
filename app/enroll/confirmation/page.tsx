@@ -91,12 +91,12 @@ function EnrollConfirmationContent() {
   }
 
   return (
-    <div className="min-h-screen bg-green-50 py-12 px-4">
+    <div className="min-h-screen bg-brand-green-50 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Success Header */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <PartyPopper className="w-10 h-10 text-green-600" />
+          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <PartyPopper className="w-10 h-10 text-brand-green-600" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Enrollment Confirmed!
@@ -141,7 +141,7 @@ function EnrollConfirmationContent() {
           <div className="space-y-4">
             {/* Completed steps */}
             <div className="flex items-center gap-4">
-              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-brand-green-100 flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
@@ -151,7 +151,7 @@ function EnrollConfirmationContent() {
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-brand-green-100 flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>

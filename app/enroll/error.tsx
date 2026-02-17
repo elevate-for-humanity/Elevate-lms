@@ -19,8 +19,8 @@ export default function EnrollmentError({
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-6">
-          <AlertTriangle className="w-8 h-8 text-red-600" />
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-red-100 rounded-full mb-6">
+          <AlertTriangle className="w-8 h-8 text-brand-red-600" />
         </div>
         
         <h1 className="text-2xl font-bold text-gray-900 mb-2">

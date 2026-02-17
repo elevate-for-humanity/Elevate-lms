@@ -147,7 +147,7 @@ export function ProgramPageTemplate({
             {enrollLink && (
               <Link
                 href={enrollLink}
-                className="inline-flex items-center justify-center rounded-xl bg-green-600 px-8 py-4 text-lg font-bold text-white hover:bg-green-700 transition-all shadow-xl"
+                className="inline-flex items-center justify-center rounded-xl bg-brand-green-600 px-8 py-4 text-lg font-bold text-white hover:bg-brand-green-700 transition-all shadow-xl"
               >
                 Enroll Now <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
@@ -198,16 +198,16 @@ export function ProgramPageTemplate({
 
       {/* Funding Banner */}
       {fundingAvailable && (
-        <section className="bg-green-600 py-6">
+        <section className="bg-brand-green-600 py-6">
           <div className="mx-auto max-w-6xl px-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-white">
                 <p className="font-bold text-lg">Funding May Be Available</p>
-                <p className="text-green-100">Eligible participants may qualify for {fundingTypes.join(', ')} funding</p>
+                <p className="text-brand-green-100">Eligible participants may qualify for {fundingTypes.join(', ')} funding</p>
               </div>
               <Link
                 href="/funding"
-                className="bg-white text-green-700 px-6 py-3 rounded-lg font-bold hover:bg-green-50 transition"
+                className="bg-white text-brand-green-700 px-6 py-3 rounded-lg font-bold hover:bg-brand-green-50 transition"
               >
                 Check Eligibility
               </Link>
@@ -223,14 +223,14 @@ export function ProgramPageTemplate({
           
           <div className="grid md:grid-cols-2 gap-8">
             {/* Included */}
-            <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-8">
-              <h3 className="text-xl font-bold text-green-900 mb-6 flex items-center gap-2">
+            <div className="bg-brand-green-50 border-2 border-brand-green-200 rounded-2xl p-8">
+              <h3 className="text-xl font-bold text-brand-green-900 mb-6 flex items-center gap-2">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 Included in Program
               </h3>
               <ul className="space-y-4">
                 {included.map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-green-900">
+                  <li key={i} className="flex items-start gap-3 text-brand-green-900">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>{item}</span>
                   </li>
@@ -301,7 +301,7 @@ export function ProgramPageTemplate({
             
             {outcomes.careerPaths && outcomes.careerPaths.length > 0 && (
               <div className="bg-slate-800 rounded-2xl p-6">
-                <Users className="w-10 h-10 text-green-400 mb-4" />
+                <Users className="w-10 h-10 text-brand-green-400 mb-4" />
                 <h3 className="text-xl font-bold mb-4">Career Paths</h3>
                 <ul className="space-y-2">
                   {outcomes.careerPaths.map((path, i) => (
@@ -315,7 +315,7 @@ export function ProgramPageTemplate({
               <div className="bg-slate-800 rounded-2xl p-6">
                 <DollarSign className="w-10 h-10 text-brand-blue-400 mb-4" />
                 <h3 className="text-xl font-bold mb-4">Earning Potential</h3>
-                <p className="text-3xl font-bold text-green-400">{outcomes.averageSalary}</p>
+                <p className="text-3xl font-bold text-brand-green-400">{outcomes.averageSalary}</p>
                 <p className="text-slate-400 mt-2">Average annual salary</p>
               </div>
             )}

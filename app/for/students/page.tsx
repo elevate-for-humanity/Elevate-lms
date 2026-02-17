@@ -73,7 +73,7 @@ export default function StudentsPage() {
         />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-green-600 px-4 py-2 rounded-full mb-6">
+          <div className="inline-flex items-center gap-2 bg-brand-green-600 px-4 py-2 rounded-full mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="font-semibold">Funded Training</span>
           </div>

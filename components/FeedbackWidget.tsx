@@ -119,7 +119,7 @@ export default function FeedbackWidget({ userId }: FeedbackWidgetProps) {
             {submitted ? (
               <div className="flex-1 flex items-center justify-center p-12">
                 <div className="text-center">
-                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <h4 className="text-2xl font-bold text-black mb-2">

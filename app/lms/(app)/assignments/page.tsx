@@ -97,12 +97,12 @@ export default async function AssignmentsPage() {
 
     if (submission) {
       if (submission.grade !== null) {
-        return { status: 'graded', label: 'Graded', color: 'bg-green-100 text-green-700', icon: CheckCircle };
+        return { status: 'graded', label: 'Graded', color: 'bg-brand-green-100 text-brand-green-700', icon: CheckCircle };
       }
       return { status: 'submitted', label: 'Submitted', color: 'bg-brand-blue-100 text-brand-blue-700', icon: CheckCircle };
     }
     if (dueDate < now) {
-      return { status: 'overdue', label: 'Overdue', color: 'bg-red-100 text-red-700', icon: AlertCircle };
+      return { status: 'overdue', label: 'Overdue', color: 'bg-brand-red-100 text-brand-red-700', icon: AlertCircle };
     }
     return { status: 'pending', label: 'Pending', color: 'bg-yellow-100 text-yellow-700', icon: Clock };
   };
@@ -168,7 +168,7 @@ export default async function AssignmentsPage() {
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
@@ -179,8 +179,8 @@ export default async function AssignmentsPage() {
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                <AlertCircle className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
+                <AlertCircle className="w-5 h-5 text-brand-red-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.overdue}</div>
@@ -219,14 +219,14 @@ export default async function AssignmentsPage() {
                               <Calendar className="w-4 h-4" />
                               <span>Due: {formatDate(assignment.due_date)}</span>
                             </div>
-                            <div className={`font-medium ${statusInfo.status === 'overdue' ? 'text-red-600' : statusInfo.status === 'pending' ? 'text-orange-600' : 'text-green-600'}`}>
+                            <div className={`font-medium ${statusInfo.status === 'overdue' ? 'text-brand-red-600' : statusInfo.status === 'pending' ? 'text-brand-orange-600' : 'text-brand-green-600'}`}>
                               {getDaysUntilDue(assignment.due_date)}
                             </div>
                             {assignment.max_points && <div className="text-slate-500">{assignment.max_points} points</div>}
                           </div>
                           {submission?.grade !== null && submission?.grade !== undefined && (
-                            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 bg-green-50 rounded-lg">
-                              <span className="text-sm text-green-700">Grade: <strong>{submission.grade}/{assignment.max_points || 100}</strong></span>
+                            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 bg-brand-green-50 rounded-lg">
+                              <span className="text-sm text-brand-green-700">Grade: <strong>{submission.grade}/{assignment.max_points || 100}</strong></span>
                             </div>
                           )}
                         </div>

@@ -94,8 +94,8 @@ export default async function UpdatesPage() {
       <div className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-6 py-12">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-              <Megaphone className="w-6 h-6 text-orange-600" />
+            <div className="w-12 h-12 bg-brand-orange-100 rounded-xl flex items-center justify-center">
+              <Megaphone className="w-6 h-6 text-brand-orange-600" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Updates & Announcements</h1>
@@ -115,12 +115,12 @@ export default async function UpdatesPage() {
               <Bell className="w-6 h-6" />
               <div>
                 <p className="font-semibold">Get Updates Delivered</p>
-                <p className="text-orange-100 text-sm">Subscribe to receive program announcements and funding alerts</p>
+                <p className="text-brand-orange-100 text-sm">Subscribe to receive program announcements and funding alerts</p>
               </div>
             </div>
             <Link
               href="/contact"
-              className="px-6 py-2 bg-white text-orange-600 rounded-lg font-semibold hover:bg-orange-50 transition-colors"
+              className="px-6 py-2 bg-white text-brand-orange-600 rounded-lg font-semibold hover:bg-brand-orange-50 transition-colors"
             >
               Subscribe
             </Link>
@@ -133,11 +133,11 @@ export default async function UpdatesPage() {
             <Link
               key={index}
               href={update.href}
-              className="block bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-orange-200 transition-all group"
+              className="block bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-brand-orange-200 transition-all group"
             >
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-orange-100 transition-colors">
-                  <update.icon className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 bg-brand-orange-50 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-brand-orange-100 transition-colors">
+                  <update.icon className="w-6 h-6 text-brand-orange-600" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -146,12 +146,12 @@ export default async function UpdatesPage() {
                       {update.category}
                     </span>
                   </div>
-                  <h2 className="text-xl font-semibold text-gray-900 group-hover:text-orange-600 transition-colors">
+                  <h2 className="text-xl font-semibold text-gray-900 group-hover:text-brand-orange-600 transition-colors">
                     {update.title}
                   </h2>
                   <p className="text-gray-600 mt-2">{update.description}</p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all flex-shrink-0" />
+                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-brand-orange-600 group-hover:translate-x-1 transition-all flex-shrink-0" />
               </div>
             </Link>
           ))}
@@ -162,7 +162,7 @@ export default async function UpdatesPage() {
           <p className="text-gray-500 mb-4">Looking for older announcements?</p>
           <Link
             href="/news"
-            className="inline-flex items-center gap-2 text-orange-600 font-semibold hover:text-orange-700"
+            className="inline-flex items-center gap-2 text-brand-orange-600 font-semibold hover:text-brand-orange-700"
           >
             View News Archive
             <ArrowRight className="w-4 h-4" />

@@ -31,7 +31,7 @@ export default async function FollowUpsPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Follow-Ups</h3><p className="text-3xl font-bold text-gray-900 mt-2">{count || 0}</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Overdue</h3><p className="text-3xl font-bold text-red-600 mt-2">{overdueCount || 0}</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Overdue</h3><p className="text-3xl font-bold text-brand-red-600 mt-2">{overdueCount || 0}</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Due This Week</h3><p className="text-3xl font-bold text-yellow-600 mt-2">12</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
@@ -39,7 +39,7 @@ export default async function FollowUpsPage() {
             {followUps && followUps.length > 0 ? followUps.map((fu: any) => (
               <div key={fu.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                 <div><p className="font-medium">{fu.profiles?.full_name || 'Participant'}</p><p className="text-sm text-gray-500">{fu.type} • Due: {fu.due_date ? new Date(fu.due_date).toLocaleDateString() : 'N/A'}</p></div>
-                <span className={`px-2 py-1 rounded-full text-xs ${fu.status === 'completed' ? 'bg-green-100 text-green-800' : fu.status === 'overdue' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>{fu.status || 'pending'}</span>
+                <span className={`px-2 py-1 rounded-full text-xs ${fu.status === 'completed' ? 'bg-brand-green-100 text-brand-green-800' : fu.status === 'overdue' ? 'bg-brand-red-100 text-brand-red-800' : 'bg-yellow-100 text-yellow-800'}`}>{fu.status || 'pending'}</span>
               </div>
             )) : <div className="p-8 text-center text-gray-500">No follow-ups scheduled</div>}
           </div>

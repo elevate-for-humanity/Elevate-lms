@@ -44,7 +44,7 @@ export function ProgramPaymentButton({
           ${price.toLocaleString()}
         </div>
         {etplProgramId && (
-          <div className="text-sm text-green-600 mt-2">
+          <div className="text-sm text-brand-green-600 mt-2">
             • ETPL Approved - Funding Available
           </div>
         )}
@@ -56,7 +56,7 @@ export function ProgramPaymentButton({
           <button
             onClick={() => handlePayment('funding')}
             disabled={loading}
-            className="w-full py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
+            className="w-full py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition flex items-center justify-center gap-2"
           >
             <Award className="w-5 h-5" />
             Apply for 100% Free Training
@@ -67,7 +67,7 @@ export function ProgramPaymentButton({
         <button
           onClick={() => handlePayment('full')}
           disabled={loading}
-          className="w-full py-4 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2"
+          className="w-full py-4 bg-brand-orange-500 text-white font-bold rounded-lg hover:bg-brand-orange-600 transition flex items-center justify-center gap-2"
         >
           <CreditCard className="w-5 h-5" />
           Pay ${price.toLocaleString()} Now
@@ -89,15 +89,15 @@ export function ProgramPaymentButton({
       <div className="mt-6 pt-6 border-t border-slate-200">
         <div className="text-sm text-black space-y-2">
           <div className="flex items-center gap-2">
-            <span className="text-green-600">•</span>
+            <span className="text-brand-green-600">•</span>
             <span>Secure payment via Stripe</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-green-600">•</span>
+            <span className="text-brand-green-600">•</span>
             <span>30-day money-back guarantee</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-green-600">•</span>
+            <span className="text-brand-green-600">•</span>
             <span>Instant access after payment</span>
           </div>
           {partnerUrl && (

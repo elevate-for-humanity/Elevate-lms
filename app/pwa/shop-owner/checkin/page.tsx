@@ -94,12 +94,12 @@ export default function ShopCheckInPage() {
 
       <main className="px-4 py-6 space-y-6">
         {error ? (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center">
-            <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <p className="text-red-200 mb-4">{error}</p>
+          <div className="bg-brand-red-500/10 border border-brand-red-500/30 rounded-xl p-6 text-center">
+            <AlertCircle className="w-12 h-12 text-brand-red-400 mx-auto mb-4" />
+            <p className="text-brand-red-200 mb-4">{error}</p>
             <button
               onClick={handleRefresh}
-              className="bg-red-500 text-white px-6 py-2 rounded-xl font-medium"
+              className="bg-brand-red-500 text-white px-6 py-2 rounded-xl font-medium"
             >
               Try Again
             </button>
@@ -135,7 +135,7 @@ export default function ShopCheckInPage() {
                   className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center hover:bg-slate-600"
                 >
                   {copied ? (
-                    <Check className="w-5 h-5 text-green-400" />
+                    <Check className="w-5 h-5 text-brand-green-400" />
                   ) : (
                     <Copy className="w-5 h-5 text-slate-400" />
                   )}

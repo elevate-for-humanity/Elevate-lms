@@ -96,8 +96,8 @@ export function HelpBanner({
 }) {
   const styles = {
     info: 'bg-brand-blue-50 border-brand-blue-200 text-brand-blue-900',
-    warning: 'bg-orange-50 border-orange-200 text-orange-900',
-    success: 'bg-green-50 border-green-200 text-green-900',
+    warning: 'bg-brand-orange-50 border-brand-orange-200 text-brand-orange-900',
+    success: 'bg-brand-green-50 border-brand-green-200 text-brand-green-900',
   };
 
   return (

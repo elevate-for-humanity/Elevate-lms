@@ -15,7 +15,7 @@ export default function DataSharingPage() {
         <div className="bg-white rounded-xl shadow-sm border">
           <div className="p-6 border-b flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Shield className="w-8 h-8 text-green-600" />
+              <Shield className="w-8 h-8 text-brand-green-600" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Data Sharing Agreement</h1>
                 <p className="text-gray-600">Student data protection and sharing protocols</p>

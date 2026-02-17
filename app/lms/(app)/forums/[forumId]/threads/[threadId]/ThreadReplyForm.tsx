@@ -49,7 +49,7 @@ export default function ThreadReplyForm({ threadId, forumId }: Props) {
   return (
     <form onSubmit={handleSubmit}>
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        <div className="mb-4 p-3 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700 text-sm">
           {error}
         </div>
       )}

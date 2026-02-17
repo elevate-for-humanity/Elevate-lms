@@ -142,9 +142,9 @@ export default async function WIOAEligibilityPage() {
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
-                          app.status === 'approved' ? 'bg-green-100 text-green-700' :
+                          app.status === 'approved' ? 'bg-brand-green-100 text-brand-green-700' :
                           app.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                          app.status === 'denied' ? 'bg-red-100 text-red-700' :
+                          app.status === 'denied' ? 'bg-brand-red-100 text-brand-red-700' :
                           'bg-gray-100 text-gray-700'
                         }`}>
                           {app.status === 'approved' && <span className="text-slate-400 flex-shrink-0">•</span>}

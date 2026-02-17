@@ -139,7 +139,7 @@ export function SocialLearningCommunity() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Learning Community</h1>
-          <p className="text-red-100">Connect, collaborate, and learn together</p>
+          <p className="text-brand-red-100">Connect, collaborate, and learn together</p>
         </div>
       </div>
 
@@ -151,7 +151,7 @@ export function SocialLearningCommunity() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`py-4 px-2 border-b-2 font-medium capitalize ${
-                  activeTab === tab ? 'border-red-600 text-brand-orange-600' : 'border-transparent text-gray-500'
+                  activeTab === tab ? 'border-brand-red-600 text-brand-orange-600' : 'border-transparent text-gray-500'
                 }`}
               >
                 {tab}
@@ -201,7 +201,7 @@ export function SocialLearningCommunity() {
                       <p className="text-black mb-3">{post.content}</p>
                       <div className="flex flex-wrap gap-2 mb-3">
                         {post.tags.map((tag) => (
-                          <span key={tag} className="px-2 py-2 bg-orange-100 text-orange-700 text-xs rounded">
+                          <span key={tag} className="px-2 py-2 bg-brand-orange-100 text-brand-orange-700 text-xs rounded">
                             #{tag}
                           </span>
                         ))}
@@ -209,7 +209,7 @@ export function SocialLearningCommunity() {
                       <div className="flex gap-4 text-sm text-black">
                         <button className="hover:text-brand-orange-600">❤️ {post.likes}</button>
                         <button className="hover:text-brand-blue-600">💬 {post.comments}</button>
-                        <button className="hover:text-green-600">🔗 Share</button>
+                        <button className="hover:text-brand-green-600">🔗 Share</button>
                       </div>
                     </div>
                   </div>
@@ -291,8 +291,8 @@ export function SocialLearningCommunity() {
               <h3 className="text-lg font-bold mb-2">Best practices for API error handling</h3>
               <p className="text-sm text-black mb-3">Posted by Sarah Lee • 18 replies • Last activity 3 hours ago</p>
               <div className="flex gap-2">
-                <span className="px-2 py-2 bg-green-100 text-green-700 text-xs rounded">#Backend</span>
-                <span className="px-2 py-2 bg-orange-100 text-orange-700 text-xs rounded">#BestPractices</span>
+                <span className="px-2 py-2 bg-brand-green-100 text-brand-green-700 text-xs rounded">#Backend</span>
+                <span className="px-2 py-2 bg-brand-orange-100 text-brand-orange-700 text-xs rounded">#BestPractices</span>
               </div>
             </Card>
           </div>

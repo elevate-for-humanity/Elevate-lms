@@ -85,7 +85,7 @@ export default function HealthcarePage() {
                     </div>
                   </div>
                   <div className="p-6 bg-white">
-                    <p className="text-orange-500 font-bold text-lg group-hover:text-orange-600 transition-colors flex items-center gap-2">
+                    <p className="text-brand-orange-500 font-bold text-lg group-hover:text-brand-orange-600 transition-colors flex items-center gap-2">
                       Learn More
                       <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </p>
@@ -107,7 +107,7 @@ export default function HealthcarePage() {
               </h2>
               <ul className="space-y-4">
                 <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-6 h-6 bg-brand-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>
@@ -121,7 +121,7 @@ export default function HealthcarePage() {
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-6 h-6 bg-brand-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>
@@ -132,7 +132,7 @@ export default function HealthcarePage() {
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-6 h-6 bg-brand-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>
@@ -146,7 +146,7 @@ export default function HealthcarePage() {
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-6 h-6 bg-brand-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>

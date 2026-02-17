@@ -62,7 +62,7 @@ export default function OfflineIndicator() {
     >
       <div
         className={`px-4 py-3 text-white text-sm font-medium flex items-center justify-between ${
-          isOnline ? 'bg-green-600' : 'bg-orange-600'
+          isOnline ? 'bg-brand-green-600' : 'bg-brand-orange-600'
         }`}
       >
         <div className="flex items-center gap-2">

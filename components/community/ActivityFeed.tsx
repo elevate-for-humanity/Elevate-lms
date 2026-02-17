@@ -55,18 +55,18 @@ export default function ActivityFeed() {
       case 'discussion':
         return <MessageSquare className="w-5 h-5 text-brand-blue-500" />;
       case 'like':
-        return <Heart className="w-5 h-5 text-red-500" />;
+        return <Heart className="w-5 h-5 text-brand-red-500" />;
       case 'achievement':
       case 'certificate':
         return <Award className="w-5 h-5 text-yellow-500" />;
       case 'course':
       case 'lesson':
-        return <BookOpen className="w-5 h-5 text-green-500" />;
+        return <BookOpen className="w-5 h-5 text-brand-green-500" />;
       case 'group':
       case 'member':
         return <Users className="w-5 h-5 text-purple-500" />;
       case 'event':
-        return <Calendar className="w-5 h-5 text-orange-500" />;
+        return <Calendar className="w-5 h-5 text-brand-orange-500" />;
       default:
         return <MessageSquare className="w-5 h-5 text-gray-500" />;
     }

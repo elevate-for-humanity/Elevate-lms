@@ -35,7 +35,7 @@ export default function Page() {
 
         <div className="relative container mx-auto px-4 py-20">
           <div className="max-w-4xl text-white">
-            <p className="text-sm font-bold uppercase tracking-wide text-orange-400 mb-4">
+            <p className="text-sm font-bold uppercase tracking-wide text-brand-orange-400 mb-4">
               Begin Your Journey
             </p>
             <h1 className="text-5xl md:text-6xl font-bold mb-6 drop-shadow-2xl">

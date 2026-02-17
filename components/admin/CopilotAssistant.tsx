@@ -173,11 +173,11 @@ export function CopilotAssistant() {
             key={index}
             className={`p-4 rounded-lg border-l-4 ${
               msg.type === 'success'
-                ? 'bg-green-50 border-green-400 text-brand-success'
+                ? 'bg-brand-green-50 border-brand-green-400 text-brand-success'
                 : msg.type === 'warning'
                   ? 'bg-yellow-50 border-yellow-400 text-yellow-800'
                   : msg.type === 'error'
-                    ? 'bg-red-50 border-red-400 text-red-800'
+                    ? 'bg-brand-red-50 border-brand-red-400 text-brand-red-800'
                     : 'bg-brand-blue-50 border-brand-blue-400 text-brand-info'
             }`}
           >

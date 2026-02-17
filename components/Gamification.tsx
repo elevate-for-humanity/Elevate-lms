@@ -35,7 +35,7 @@ export function Gamification({ points, level, achievements, streak }: Gamificati
               <div className="text-sm text-black">Total Points</div>
             </div>
             <div className="text-right">
-              <div className="text-3xl font-bold text-orange-600">Level {level}</div>
+              <div className="text-3xl font-bold text-brand-orange-600">Level {level}</div>
               <div className="text-sm text-black">{nextLevelPoints - points} to next level</div>
             </div>
           </div>
@@ -52,8 +52,8 @@ export function Gamification({ points, level, achievements, streak }: Gamificati
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-orange-100 rounded-lg">
-              <Zap className="text-orange-600" size={24} />
+            <div className="p-3 bg-brand-orange-100 rounded-lg">
+              <Zap className="text-brand-orange-600" size={24} />
             </div>
             <div>
               <div className="text-2xl font-bold">{streak} Day Streak</div>
@@ -77,7 +77,7 @@ export function Gamification({ points, level, achievements, streak }: Gamificati
                   key={achievement.id}
                   className={`p-4 border-2 rounded-lg text-center ${
                     achievement.earned
-                      ? 'border-red-600 bg-red-50'
+                      ? 'border-brand-red-600 bg-brand-red-50'
                       : 'border-gray-200 bg-gray-50 opacity-50'
                   }`}
                 >

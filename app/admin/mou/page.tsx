@@ -32,7 +32,7 @@ export default async function MOUPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total MOUs</h3><p className="text-3xl font-bold text-gray-900 mt-2">{count || 0}</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active</h3><p className="text-3xl font-bold text-green-600 mt-2">{mous?.filter((m: any) => m.status === 'active').length || 0}</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">{mous?.filter((m: any) => m.status === 'active').length || 0}</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Pending</h3><p className="text-3xl font-bold text-yellow-600 mt-2">{mous?.filter((m: any) => m.status === 'pending').length || 0}</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
@@ -40,7 +40,7 @@ export default async function MOUPage() {
             {mous && mous.length > 0 ? mous.map((mou: any) => (
               <div key={mou.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                 <div><p className="font-medium">{mou.partner_name || 'Partner'}</p><p className="text-sm text-gray-500">{mou.type} • Expires: {mou.expiry_date ? new Date(mou.expiry_date).toLocaleDateString() : 'N/A'}</p></div>
-                <span className={`px-2 py-1 rounded-full text-xs ${mou.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>{mou.status || 'pending'}</span>
+                <span className={`px-2 py-1 rounded-full text-xs ${mou.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-yellow-100 text-yellow-800'}`}>{mou.status || 'pending'}</span>
               </div>
             )) : <div className="p-8 text-center text-gray-500">No MOUs found</div>}
           </div>

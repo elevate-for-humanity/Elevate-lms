@@ -26,8 +26,8 @@ const stateButtonLabels: Record<string, string> = {
 
 const stateButtonColors: Record<string, string> = {
   in_review: 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white',
-  approved: 'bg-green-600 hover:bg-green-700 text-white',
-  rejected: 'bg-red-600 hover:bg-red-700 text-white',
+  approved: 'bg-brand-green-600 hover:bg-brand-green-700 text-white',
+  rejected: 'bg-brand-red-600 hover:bg-brand-red-700 text-white',
   submitted: 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white',
 };
 
@@ -92,7 +92,7 @@ export default function TransitionButtons({
         ))}
       </div>
       {error && (
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="text-sm text-brand-red-600">{error}</p>
       )}
     </div>
   );

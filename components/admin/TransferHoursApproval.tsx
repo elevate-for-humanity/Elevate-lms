@@ -112,8 +112,8 @@ export default function TransferHoursApproval({
         <div
           key={th.id}
           className={`border rounded-lg overflow-hidden transition-all ${
-            th.status === 'approved' ? 'border-green-500/30 bg-green-500/5' :
-            th.status === 'rejected' ? 'border-red-500/30 bg-brand-orange-500/5' :
+            th.status === 'approved' ? 'border-brand-green-500/30 bg-brand-green-500/5' :
+            th.status === 'rejected' ? 'border-brand-red-500/30 bg-brand-orange-500/5' :
             'border-slate-600 bg-slate-800/30'
           }`}
         >
@@ -249,8 +249,8 @@ export default function TransferHoursApproval({
               )}
 
               {th.status === 'approved' && (
-                <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
-                  <div className="text-sm text-green-400 font-medium mb-2">
+                <div className="bg-brand-green-500/10 border border-brand-green-500/30 rounded-lg p-3">
+                  <div className="text-sm text-brand-green-400 font-medium mb-2">
                     ✓ Approved Hours Applied
                   </div>
                   <div className="text-xs text-slate-300 space-y-1">
@@ -264,8 +264,8 @@ export default function TransferHoursApproval({
               )}
 
               {th.status === 'rejected' && (
-                <div className="bg-brand-orange-500/10 border border-red-500/30 rounded-lg p-3">
-                  <div className="text-sm text-red-400 font-medium">
+                <div className="bg-brand-orange-500/10 border border-brand-red-500/30 rounded-lg p-3">
+                  <div className="text-sm text-brand-red-400 font-medium">
                     ✗ Transfer Hours Rejected
                   </div>
                 </div>

@@ -161,7 +161,7 @@ export default function ClientIntakeDashboard() {
                   placeholder="Search clients..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none"
+                  className="w-full pl-10 pr-4 py-2 border-2 border-gray-200 rounded-lg focus:border-brand-green-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -170,7 +170,7 @@ export default function ClientIntakeDashboard() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none"
+                className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-brand-green-500 focus:outline-none"
               >
                 <option value="all">All Status</option>
                 <option value="in_progress">In Progress</option>
@@ -270,7 +270,7 @@ export default function ClientIntakeDashboard() {
                       <span
                         className={`inline-flex items-center gap-1 px-2 py-2 rounded-full text-xs font-semibold ${
                           client.status === 'completed'
-                            ? 'bg-green-100 text-green-700'
+                            ? 'bg-brand-green-100 text-brand-green-700'
                             : client.status === 'review'
                               ? 'bg-yellow-100 text-yellow-700'
                               : 'bg-brand-blue-100 text-brand-blue-700'

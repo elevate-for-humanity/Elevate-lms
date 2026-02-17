@@ -1,4 +1,10 @@
 /**
+ * @deprecated Use canonical enrollment routes:
+ *   - /api/enroll (student enrollment)
+ *   - /api/enrollment/submit (comprehensive wizard)
+ *   - /api/enrollments/create-enforced (admin/partner)
+ */
+/**
  * CANONICAL ENROLLMENT CHECKOUT ENDPOINT
  * 
  * This is the SOURCE OF TRUTH for program enrollments.

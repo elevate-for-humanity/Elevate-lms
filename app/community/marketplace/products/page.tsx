@@ -99,7 +99,7 @@ export default async function MarketplaceProductsPage() {
                     )}
                     <div className="flex items-center justify-between">
                       <span className={`text-lg font-bold ${
-                        product.price === 0 ? 'text-green-600' : 'text-gray-900'
+                        product.price === 0 ? 'text-brand-green-600' : 'text-gray-900'
                       }`}>
                         {product.price === 0 ? 'Free' : `$${product.price}`}
                       </span>

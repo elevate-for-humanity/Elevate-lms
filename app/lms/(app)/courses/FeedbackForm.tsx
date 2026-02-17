@@ -35,12 +35,12 @@ export function FeedbackForm({ courseId, courseName, onSubmit }: FeedbackFormPro
 
   if (submitted) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
-        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Star className="w-6 h-6 text-green-600 fill-current" />
+      <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-6 text-center">
+        <div className="w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Star className="w-6 h-6 text-brand-green-600 fill-current" />
         </div>
-        <h3 className="text-lg font-bold text-green-800 mb-2">Thank You!</h3>
-        <p className="text-green-700">Your feedback helps us improve our courses.</p>
+        <h3 className="text-lg font-bold text-brand-green-800 mb-2">Thank You!</h3>
+        <p className="text-brand-green-700">Your feedback helps us improve our courses.</p>
       </div>
     );
   }

@@ -161,7 +161,7 @@ export default async function SponsorLicensingPage() {
             {/* Professional */}
             <div className="bg-zinc-900   rounded-3xl shadow-2xl border-4 border-indigo-400 p-8 relative transform lg:scale-105">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold">
+                <div className="bg-brand-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold">
                   MOST POPULAR
                 </div>
               </div>
@@ -194,37 +194,37 @@ export default async function SponsorLicensingPage() {
 
               <div className="space-y-3 mb-8">
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-white">
                     Everything in Starter
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-white">
                     White-label branding (logo, domain, email)
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-white">
                     Multi-trade programs
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-white">
                     WOTC + OJT tracking
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-white">
                     ETPL performance dashboards
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-green-400 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-white">
                     WorkOne read-only oversight views
                   </span>
@@ -392,7 +392,7 @@ export default async function SponsorLicensingPage() {
       <section className="py-20 bg-zinc-900  ">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <div className="inline-block px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-bold mb-4">
+            <div className="inline-block px-4 py-2 bg-brand-green-100 text-brand-green-700 rounded-full text-sm font-bold mb-4">
               Allowed & Safe
             </div>
             <h2 className="text-4xl font-bold text-black mb-4">
@@ -403,7 +403,7 @@ export default async function SponsorLicensingPage() {
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl p-8 shadow-lg border-2 border-green-200">
+          <div className="bg-white rounded-3xl p-8 shadow-lg border-2 border-brand-green-200">
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="text-center">
                 <div className="text-3xl font-bold text-black mb-2">
@@ -437,7 +437,7 @@ export default async function SponsorLicensingPage() {
               </div>
             </div>
 
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+            <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-4">
               <p className="text-sm text-black">
                 <strong className="text-black">Rule:</strong> Never bill
                 training, wages, kits, or grant-funded costs.

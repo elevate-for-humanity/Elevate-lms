@@ -40,7 +40,7 @@ export default async function TransferHoursPage() {
       case 'approved':
         return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'denied':
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
+        return <AlertCircle className="w-5 h-5 text-brand-red-500" />;
       default:
         return <Clock className="w-5 h-5 text-yellow-500" />;
     }
@@ -49,9 +49,9 @@ export default async function TransferHoursPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
-        return 'bg-green-100 text-green-700';
+        return 'bg-brand-green-100 text-brand-green-700';
       case 'denied':
-        return 'bg-red-100 text-red-700';
+        return 'bg-brand-red-100 text-brand-red-700';
       default:
         return 'bg-yellow-100 text-yellow-700';
     }

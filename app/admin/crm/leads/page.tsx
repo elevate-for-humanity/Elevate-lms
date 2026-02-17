@@ -57,8 +57,8 @@ export default async function LeadsPage() {
       case 'Discovery': return 'bg-brand-blue-100 text-brand-blue-700';
       case 'Qualified': return 'bg-yellow-100 text-yellow-700';
       case 'Proposal': return 'bg-brand-blue-100 text-brand-blue-700';
-      case 'Negotiation': return 'bg-orange-100 text-orange-700';
-      case 'Closed Won': return 'bg-green-100 text-green-700';
+      case 'Negotiation': return 'bg-brand-orange-100 text-brand-orange-700';
+      case 'Closed Won': return 'bg-brand-green-100 text-brand-green-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -84,14 +84,14 @@ export default async function LeadsPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Target className="w-8 h-8 text-orange-600" />
+                <Target className="w-8 h-8 text-brand-orange-600" />
                 <h1 className="text-3xl font-bold text-gray-900">Leads</h1>
               </div>
               <p className="text-gray-600">Track and manage your sales pipeline</p>
             </div>
             <Link
               href="/admin/crm/leads/new"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-orange-600 text-white font-semibold rounded-lg hover:bg-brand-orange-700 transition-colors"
             >
               <Plus className="w-5 h-5" />
               Add Lead
@@ -108,7 +108,7 @@ export default async function LeadsPage() {
               <div key={index}>
                 <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                 <p className="text-gray-500 text-sm">{stat.label}</p>
-                <p className="text-green-600 text-sm font-medium">{stat.change}</p>
+                <p className="text-brand-green-600 text-sm font-medium">{stat.change}</p>
               </div>
             ))}
           </div>
@@ -124,7 +124,7 @@ export default async function LeadsPage() {
               <input
                 type="text"
                 placeholder="Search leads..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
               />
             </div>
             <div className="flex gap-3">
@@ -182,7 +182,7 @@ export default async function LeadsPage() {
                       <div className="flex items-center gap-2">
                         <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-orange-500 rounded-full"
+                            className="h-full bg-brand-orange-500 rounded-full"
                             style={{ width: `${lead.probability}%` }}
                           />
                         </div>
@@ -201,7 +201,7 @@ export default async function LeadsPage() {
                     <td className="px-6 py-4">
                       <Link
                         href={`/admin/crm/leads/${lead.id}`}
-                        className="text-orange-600 hover:text-orange-700 font-medium text-sm"
+                        className="text-brand-orange-600 hover:text-brand-orange-700 font-medium text-sm"
                       >
                         View
                       </Link>

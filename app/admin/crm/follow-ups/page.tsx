@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default async function CRMFollowUpsPage() {
   const auth = await requireAdmin();
   if ('error' in auth) {
-    return <div className="p-8 text-center text-red-600">Access denied</div>;
+    return <div className="p-8 text-center text-brand-red-600">Access denied</div>;
   }
 
   const supabase = await createClient();
@@ -52,7 +52,7 @@ export default async function CRMFollowUpsPage() {
   const typeIcon = (type: string) => {
     switch (type) {
       case 'call': return <Phone className="w-5 h-5 text-brand-blue-600" />;
-      case 'email': return <Mail className="w-5 h-5 text-green-600" />;
+      case 'email': return <Mail className="w-5 h-5 text-brand-green-600" />;
       case 'meeting': return <Calendar className="w-5 h-5 text-purple-600" />;
       default: return <Clock className="w-5 h-5 text-gray-500" />;
     }
@@ -61,7 +61,7 @@ export default async function CRMFollowUpsPage() {
   const typeBg = (type: string) => {
     switch (type) {
       case 'call': return 'bg-brand-blue-100';
-      case 'email': return 'bg-green-100';
+      case 'email': return 'bg-brand-green-100';
       case 'meeting': return 'bg-purple-100';
       default: return 'bg-gray-100';
     }
@@ -106,8 +106,8 @@ export default async function CRMFollowUpsPage() {
           {stats.map((stat, index) => (
             <div key={index} className="bg-white rounded-xl shadow-sm p-6">
               <div className={`w-3 h-3 rounded-full mb-3 ${
-                stat.color === 'red' ? 'bg-red-500' :
-                stat.color === 'yellow' ? 'bg-yellow-500' : 'bg-green-500'
+                stat.color === 'red' ? 'bg-brand-red-500' :
+                stat.color === 'yellow' ? 'bg-yellow-500' : 'bg-brand-green-500'
               }`} />
               <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
               <p className="text-sm text-gray-600">{stat.label}</p>
@@ -127,7 +127,7 @@ export default async function CRMFollowUpsPage() {
               {items.map((item) => {
                 const isOverdue = item.status !== 'completed' && item.due_date && new Date(item.due_date) < now;
                 return (
-                  <div key={item.id} className={`p-4 flex items-center gap-4 hover:bg-gray-50 ${isOverdue ? 'bg-red-50' : ''}`}>
+                  <div key={item.id} className={`p-4 flex items-center gap-4 hover:bg-gray-50 ${isOverdue ? 'bg-brand-red-50' : ''}`}>
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${typeBg(item.follow_up_type)}`}>
                       {typeIcon(item.follow_up_type)}
                     </div>
@@ -135,7 +135,7 @@ export default async function CRMFollowUpsPage() {
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-gray-900">{contactName(item)}</p>
                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                          item.priority === 'high' ? 'bg-red-100 text-red-700' :
+                          item.priority === 'high' ? 'bg-brand-red-100 text-brand-red-700' :
                           item.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
                           'bg-gray-100 text-gray-700'
                         }`}>
@@ -144,13 +144,13 @@ export default async function CRMFollowUpsPage() {
                       </div>
                       <p className="text-sm text-gray-500">{item.description || item.title}</p>
                     </div>
-                    <div className={`flex items-center gap-2 text-sm ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-500'}`}>
+                    <div className={`flex items-center gap-2 text-sm ${isOverdue ? 'text-brand-red-600 font-medium' : 'text-gray-500'}`}>
                       <Clock className="w-4 h-4" />
                       {formatDate(item.due_date)}
                       {isOverdue && <span className="text-xs">(overdue)</span>}
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      item.status === 'completed' ? 'bg-green-100 text-green-700' :
+                      item.status === 'completed' ? 'bg-brand-green-100 text-brand-green-700' :
                       item.status === 'scheduled' ? 'bg-brand-blue-100 text-brand-blue-700' :
                       'bg-yellow-100 text-yellow-700'
                     }`}>

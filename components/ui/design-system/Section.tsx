@@ -27,8 +27,8 @@ const variantClasses = {
   white: 'bg-white',
   slate: 'bg-slate-50',
   blue: 'bg-brand-blue-50',
-  green: 'bg-green-50',
-  orange: 'bg-orange-50',
+  green: 'bg-brand-green-50',
+  orange: 'bg-brand-orange-50',
 };
 
 export function Section({

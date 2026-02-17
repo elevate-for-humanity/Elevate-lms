@@ -101,7 +101,7 @@ export default async function SignaturesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/admin/signatures/new"
-              className="bg-brand-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Request New Signature
             </Link>
@@ -190,13 +190,13 @@ export default async function SignaturesPage() {
                             </span>
                           )}
                           {signature.status === 'pending' && (
-                            <span className="flex items-center gap-1 text-brand-orange-600 text-sm font-medium bg-orange-100 px-3 py-2 rounded-full">
+                            <span className="flex items-center gap-1 text-brand-orange-600 text-sm font-medium bg-brand-orange-100 px-3 py-2 rounded-full">
                               <Clock className="h-4 w-4" />
                               Pending
                             </span>
                           )}
                           {signature.status === 'declined' && (
-                            <span className="flex items-center gap-1 text-brand-orange-600 text-sm font-medium bg-red-100 px-3 py-2 rounded-full">
+                            <span className="flex items-center gap-1 text-brand-orange-600 text-sm font-medium bg-brand-red-100 px-3 py-2 rounded-full">
                               <XCircle className="h-4 w-4" />
                               Declined
                             </span>

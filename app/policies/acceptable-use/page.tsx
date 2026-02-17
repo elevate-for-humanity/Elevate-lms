@@ -77,7 +77,7 @@ export default function AcceptableUsePage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Prohibited Uses</h2>
 
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Illegal Activities</h3>
               <p className="text-black mb-2">Strictly prohibited:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -90,7 +90,7 @@ export default function AcceptableUsePage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Security Violations</h3>
               <p className="text-black mb-2">Prohibited security activities:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -197,7 +197,7 @@ export default function AcceptableUsePage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Serious Violations</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Extended suspension of access (1-6 months)</li>
@@ -208,7 +208,7 @@ export default function AcceptableUsePage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Severe Violations</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Permanent revocation of access privileges</li>

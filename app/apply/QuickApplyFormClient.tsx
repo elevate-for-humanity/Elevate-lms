@@ -210,7 +210,7 @@ Preferred Contact: ${form.preferredContact}`,
           </div>
 
           {/* Calendly CTA */}
-          <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-6 mb-6 max-w-2xl mx-auto">
+          <div className="bg-brand-orange-50 border-2 border-brand-orange-200 rounded-xl p-6 mb-6 max-w-2xl mx-auto">
             <h3 className="text-lg font-bold text-black mb-2">
               Want to Talk Sooner?
             </h3>
@@ -276,7 +276,7 @@ Preferred Contact: ${form.preferredContact}`,
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {errorMessage && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="rounded-2xl border border-brand-red-200 bg-brand-red-50 px-4 py-3 text-sm text-brand-red-800">
           {errorMessage}
         </div>
       )}

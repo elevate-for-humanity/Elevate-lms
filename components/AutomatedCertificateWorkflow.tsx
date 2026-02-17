@@ -52,7 +52,7 @@ export function AutomatedCertificateWorkflow() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Certificate Generation</h1>
-          <p className="text-red-100">Automated workflow for issuing certificates</p>
+          <p className="text-brand-red-100">Automated workflow for issuing certificates</p>
         </div>
       </div>
 
@@ -78,9 +78,9 @@ export function AutomatedCertificateWorkflow() {
             <Card className="p-6">
               <h2 className="text-2xl font-bold mb-4">Automation Rules</h2>
               <div className="space-y-3">
-                <div className="p-4 bg-green-50 rounded">
-                  <p className="font-semibold text-green-900">• Au on course completion</p>
-                  <p className="text-sm text-green-700">Certificates created automatically when students finish</p>
+                <div className="p-4 bg-brand-green-50 rounded">
+                  <p className="font-semibold text-brand-green-900">• Au on course completion</p>
+                  <p className="text-sm text-brand-green-700">Certificates created automatically when students finish</p>
                 </div>
                 <div className="p-4 bg-brand-blue-50 rounded">
                   <p className="font-semibold text-brand-blue-900">• Email delivery enabled</p>
@@ -102,7 +102,7 @@ export function AutomatedCertificateWorkflow() {
                   <div
                     key={template.id}
                     className={`p-3 rounded cursor-pointer ${
-                      selectedTemplate === template.id ? 'bg-red-100 border-2 border-red-600' : 'bg-gray-50'
+                      selectedTemplate === template.id ? 'bg-brand-red-100 border-2 border-brand-red-600' : 'bg-gray-50'
                     }`}
                     onClick={() => setSelectedTemplate(template.id)}
                   >

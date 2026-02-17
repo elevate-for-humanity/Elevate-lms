@@ -110,7 +110,7 @@ export default async function MentorSessionsPage() {
                       <p className="font-semibold text-gray-900">{session.mentee}</p>
                       <p className="text-sm text-gray-600">{session.topic}</p>
                     </div>
-                    {session.type === 'video' ? <Video className="w-5 h-5 text-brand-blue-600" /> : <MapPin className="w-5 h-5 text-green-600" />}
+                    {session.type === 'video' ? <Video className="w-5 h-5 text-brand-blue-600" /> : <MapPin className="w-5 h-5 text-brand-green-600" />}
                   </div>
                   <div className="flex items-center gap-4 text-sm text-gray-600">
                     <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {session.date}</span>

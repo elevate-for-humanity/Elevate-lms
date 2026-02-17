@@ -63,7 +63,7 @@ export default function UserProgressBar() {
   if (isLoading || !user || !activeEnrollment) return null;
 
   return (
-    <section className="py-6 sm:py-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-green-50 to-blue-50 border-b border-green-100">
+    <section className="py-6 sm:py-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-brand-green-50 to-brand-blue-50 border-b border-brand-green-100">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -77,13 +77,13 @@ export default function UserProgressBar() {
           <div className="flex items-center gap-4">
             <div className="w-48 h-3 bg-slate-200 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-green-500 rounded-full transition-all duration-500"
+                className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
                 style={{ width: `${activeEnrollment.progress || 0}%` }}
               />
             </div>
             <Link
               href="/lms/dashboard"
-              className="inline-flex items-center justify-center bg-green-600 text-white px-5 py-2.5 rounded-full font-semibold hover:bg-green-700 transition-colors text-sm"
+              className="inline-flex items-center justify-center bg-brand-green-600 text-white px-5 py-2.5 rounded-full font-semibold hover:bg-brand-green-700 transition-colors text-sm"
             >
               Continue Learning
             </Link>

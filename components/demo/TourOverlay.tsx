@@ -121,11 +121,11 @@ export function TourOverlay({ tourId: propTourId, stepNumber: propStepNumber }: 
     return (
       <button
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-4 right-4 z-50 bg-orange-600 text-white px-4 py-3 rounded-full shadow-lg hover:bg-orange-700 transition flex items-center gap-2"
+        className="fixed bottom-4 right-4 z-50 bg-brand-orange-600 text-white px-4 py-3 rounded-full shadow-lg hover:bg-brand-orange-700 transition flex items-center gap-2"
       >
         <Play className="w-5 h-5" />
         <span className="font-semibold">Resume Tour</span>
-        <span className="bg-orange-500 px-2 py-0.5 rounded-full text-sm">
+        <span className="bg-brand-orange-500 px-2 py-0.5 rounded-full text-sm">
           {stepParam}/{totalSteps}
         </span>
       </button>
@@ -146,7 +146,7 @@ export function TourOverlay({ tourId: propTourId, stepNumber: propStepNumber }: 
         {/* Header */}
         <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-orange-600 p-1.5 rounded-lg">
+            <div className="bg-brand-orange-600 p-1.5 rounded-lg">
               <Play className="w-4 h-4" />
             </div>
             <div>
@@ -175,7 +175,7 @@ export function TourOverlay({ tourId: propTourId, stepNumber: propStepNumber }: 
         {/* Progress Bar */}
         <div className="h-1 bg-slate-200">
           <div 
-            className="h-full bg-orange-600 transition-all duration-300"
+            className="h-full bg-brand-orange-600 transition-all duration-300"
             style={{ width: `${(stepParam / totalSteps) * 100}%` }}
           />
         </div>
@@ -246,7 +246,7 @@ export function TourOverlay({ tourId: propTourId, stepNumber: propStepNumber }: 
             
             <button
               onClick={handleNext}
-              className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-xl font-semibold transition"
+              className="flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-5 py-2.5 rounded-xl font-semibold transition"
             >
               {isLastStep ? (
                 <>

@@ -152,14 +152,14 @@ export function ProgramPageLocked({
       </section>
 
       {/* 4. WHAT IT COSTS */}
-      <section className="py-16 bg-green-50">
+      <section className="py-16 bg-brand-green-50">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-black mb-8">
             What It Costs
           </h2>
 
-          <div className="bg-white border-2 border-green-600 rounded-lg p-12 mb-6">
-            <div className="text-5xl font-bold text-green-600 mb-4">{cost}</div>
+          <div className="bg-white border-2 border-brand-green-600 rounded-lg p-12 mb-6">
+            <div className="text-5xl font-bold text-brand-green-600 mb-4">{cost}</div>
             <div className="text-xl text-black">Funded by {fundedBy}</div>
           </div>
 
@@ -188,7 +188,7 @@ export function ProgramPageLocked({
 
               {avgSalary && (
                 <div className="bg-slate-50 p-6 rounded-lg text-center">
-                  <DollarSign className="h-11 w-11 text-green-600 mx-auto mb-4" />
+                  <DollarSign className="h-11 w-11 text-brand-green-600 mx-auto mb-4" />
                   <div className="text-sm text-black mb-2">
                     Average Salary
                   </div>

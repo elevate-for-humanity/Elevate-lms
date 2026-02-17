@@ -19,7 +19,7 @@ export function PushNotificationService() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Push Notifications</h1>
-          <p className="text-red-100">Stay updated with instant alerts</p>
+          <p className="text-brand-red-100">Stay updated with instant alerts</p>
         </div>
       </div>
 
@@ -33,7 +33,7 @@ export function PushNotificationService() {
             <button
               onClick={() => setIsEnabled(!isEnabled)}
               className={`relative w-14 h-8 rounded-full transition-colors ${
-                isEnabled ? 'bg-green-500' : 'bg-gray-300'
+                isEnabled ? 'bg-brand-green-500' : 'bg-gray-300'
               }`}
             >
               <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${

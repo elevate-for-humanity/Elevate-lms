@@ -34,7 +34,7 @@ export default function ProgramHero({
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3">{title}</h1>
             <p className="text-lg md:text-xl text-slate-300 mb-6 max-w-3xl mx-auto">{description}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/apply" className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition-colors">
+              <Link href="/apply" className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-brand-orange-500 rounded-lg hover:bg-brand-orange-600 transition-colors">
                 Apply Now - Free Training
               </Link>
               <Link href="/contact" className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-slate-300 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors border border-slate-500">
@@ -57,7 +57,7 @@ export default function ProgramHero({
                 <div className="text-black">Program Duration</div>
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
-                <div className="text-3xl font-bold text-green-600 mb-2">{cost}</div>
+                <div className="text-3xl font-bold text-brand-green-600 mb-2">{cost}</div>
                 <div className="text-black">100% Funded</div>
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
@@ -65,7 +65,7 @@ export default function ProgramHero({
                 <div className="text-black">Job Placement</div>
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
-                <div className="text-3xl font-bold text-orange-600 mb-2">{salary}</div>
+                <div className="text-3xl font-bold text-brand-orange-600 mb-2">{salary}</div>
                 <div className="text-black">Starting Salary</div>
               </div>
             </div>

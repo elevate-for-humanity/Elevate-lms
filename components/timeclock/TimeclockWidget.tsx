@@ -42,8 +42,8 @@ export function TimeclockWidget({ siteId, partnerId, programId }: TimeclockWidge
         );
       case 'clocked_in':
         return (
-          <div className="flex items-center gap-2 text-green-600">
-            <span className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
+          <div className="flex items-center gap-2 text-brand-green-600">
+            <span className="w-3 h-3 rounded-full bg-brand-green-500 animate-pulse" />
             <span>Clocked in</span>
           </div>
         );
@@ -56,8 +56,8 @@ export function TimeclockWidget({ siteId, partnerId, programId }: TimeclockWidge
         );
       case 'auto_clocked_out':
         return (
-          <div className="flex items-center gap-2 text-red-600">
-            <span className="w-3 h-3 rounded-full bg-red-500" />
+          <div className="flex items-center gap-2 text-brand-red-600">
+            <span className="w-3 h-3 rounded-full bg-brand-red-500" />
             <span>Auto clocked out</span>
           </div>
         );
@@ -70,8 +70,8 @@ export function TimeclockWidget({ siteId, partnerId, programId }: TimeclockWidge
         );
       case 'error':
         return (
-          <div className="flex items-center gap-2 text-red-600">
-            <span className="w-3 h-3 rounded-full bg-red-500" />
+          <div className="flex items-center gap-2 text-brand-red-600">
+            <span className="w-3 h-3 rounded-full bg-brand-red-500" />
             <span>Error</span>
           </div>
         );
@@ -101,19 +101,19 @@ export function TimeclockWidget({ siteId, partnerId, programId }: TimeclockWidge
 
     if (status.state === 'auto_clocked_out') {
       return (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-4">
           <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-brand-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <h4 className="font-medium text-red-800">Automatically clocked out</h4>
-              <p className="text-sm text-red-700 mt-1">
+              <h4 className="font-medium text-brand-red-800">Automatically clocked out</h4>
+              <p className="text-sm text-brand-red-700 mt-1">
                 You were clocked out at {formatTime(status.clockOutAt)} for leaving the work site for more than 15 minutes.
               </p>
               <button
                 onClick={resetAfterAutoClockOut}
-                className="mt-2 text-sm text-red-700 underline hover:text-red-800"
+                className="mt-2 text-sm text-brand-red-700 underline hover:text-brand-red-800"
               >
                 Dismiss and clock in again
               </button>
@@ -145,12 +145,12 @@ export function TimeclockWidget({ siteId, partnerId, programId }: TimeclockWidge
     if (!status.error) return null;
 
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+      <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-4">
         <div className="flex items-start gap-3">
-          <svg className="w-5 h-5 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-brand-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p className="text-sm text-red-700">{status.error}</p>
+          <p className="text-sm text-brand-red-700">{status.error}</p>
         </div>
       </div>
     );
@@ -158,9 +158,9 @@ export function TimeclockWidget({ siteId, partnerId, programId }: TimeclockWidge
 
   const renderActions = () => {
     const buttonBase = "px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
-    const primaryButton = `${buttonBase} bg-green-600 text-white hover:bg-green-700`;
+    const primaryButton = `${buttonBase} bg-brand-green-600 text-white hover:bg-brand-green-700`;
     const secondaryButton = `${buttonBase} bg-gray-200 text-gray-800 hover:bg-gray-300`;
-    const dangerButton = `${buttonBase} bg-red-600 text-white hover:bg-red-700`;
+    const dangerButton = `${buttonBase} bg-brand-red-600 text-white hover:bg-brand-red-700`;
 
     switch (status.state) {
       case 'idle':

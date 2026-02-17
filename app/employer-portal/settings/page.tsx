@@ -98,7 +98,7 @@ export default async function EmployerSettingsPage() {
                       type={field.type}
                       defaultValue={field.value}
                       name={field.name}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-green-500 focus:border-transparent"
                       placeholder={`Enter ${field.label.toLowerCase()}`}
                     />
                   </div>
@@ -121,14 +121,14 @@ export default async function EmployerSettingsPage() {
               {['New candidate applications', 'WOTC status updates', 'Program announcements'].map((item) => (
                 <label key={item} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
                   <span className="text-gray-700">{item}</span>
-                  <input type="checkbox" defaultChecked className="w-5 h-5 text-green-600 rounded" />
+                  <input type="checkbox" defaultChecked className="w-5 h-5 text-brand-green-600 rounded" />
                 </label>
               ))}
             </div>
           </div>
 
           <div className="flex justify-end">
-            <button className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700">
+            <button className="px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700">
               Save Changes
             </button>
           </div>

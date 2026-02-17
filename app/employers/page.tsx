@@ -44,7 +44,7 @@ export default function EmployersPage() {
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 w-full">
           <div className="max-w-2xl bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
-            <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
+            <div className="inline-flex items-center gap-2 bg-brand-orange-100 text-brand-orange-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
               <Building2 className="w-4 h-4" />
               For Employers
             </div>
@@ -58,7 +58,7 @@ export default function EmployersPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/contact?type=employer"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-semibold rounded-lg transition-colors"
               >
                 Partner With Us
                 <ArrowRight className="w-5 h-5" />
@@ -88,13 +88,13 @@ export default function EmployersPage() {
             <Link href="/hire-graduates" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               Hire Graduates
             </Link>
-            <Link href="/ojt-and-funding" className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
+            <Link href="/ojt-and-funding" className="px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium hover:bg-brand-green-200 transition-colors">
               OJT & Funding
             </Link>
             <Link href="/workforce-partners" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               Workforce Partners
             </Link>
-            <Link href="/programs" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
+            <Link href="/programs" className="px-4 py-2 bg-brand-orange-100 text-brand-orange-800 rounded-full text-sm font-medium hover:bg-brand-orange-200 transition-colors">
               View Programs
             </Link>
           </div>
@@ -173,7 +173,7 @@ export default function EmployersPage() {
               },
             ].map((item) => (
               <div key={item.step} className="bg-white rounded-2xl p-6 shadow-sm">
-                <div className="w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center text-lg font-bold mb-4">
+                <div className="w-10 h-10 bg-brand-orange-500 text-white rounded-full flex items-center justify-center text-lg font-bold mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
@@ -190,7 +190,7 @@ export default function EmployersPage() {
           <div className="bg-gray-900 rounded-3xl p-8 md:p-12 text-white">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
-                <Building2 className="w-12 h-12 text-orange-400 mb-4" />
+                <Building2 className="w-12 h-12 text-brand-orange-400 mb-4" />
                 <h2 className="text-3xl font-bold mb-4">
                   Host an Apprentice
                 </h2>
@@ -213,7 +213,7 @@ export default function EmployersPage() {
                 </ul>
                 <Link
                   href="/contact?type=host-shop"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-semibold rounded-full transition-colors"
                 >
                   Become a Host Shop
                   <ArrowRight className="w-5 h-5" />
@@ -251,25 +251,25 @@ export default function EmployersPage() {
       <EmployerPartners variant="full" showStats={true} showCTA={false} />
 
       {/* CTA */}
-      <section className="py-20 bg-orange-500 text-white">
+      <section className="py-20 bg-brand-orange-500 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
             Ready to Build Your Team?
           </h2>
-          <p className="text-xl text-orange-100 mb-8">
+          <p className="text-xl text-brand-orange-100 mb-8">
             Contact us to discuss your hiring needs and access our talent pipeline.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact?type=employer"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-orange-600 font-semibold rounded-full hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-orange-600 font-semibold rounded-full hover:bg-gray-100 transition-colors"
             >
               Contact Us
               <ArrowRight className="w-5 h-5" />
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-orange-700 text-white font-semibold rounded-full hover:bg-orange-800 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-orange-700 text-white font-semibold rounded-full hover:bg-brand-orange-800 transition-colors"
             >
               <Phone className="w-5 h-5" />
               Get Help Online

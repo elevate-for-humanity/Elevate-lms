@@ -40,14 +40,14 @@ export function MOUStatusBadge({
     },
     signed_by_holder: {
       label: 'Awaiting Countersignature',
-      color: 'text-orange-700',
-      bgColor: 'bg-orange-100',
+      color: 'text-brand-orange-700',
+      bgColor: 'bg-brand-orange-100',
       icon: Clock,
     },
     fully_executed: {
       label: 'Fully Executed',
-      color: 'text-green-700',
-      bgColor: 'bg-green-100',
+      color: 'text-brand-green-700',
+      bgColor: 'bg-brand-green-100',
       icon: CheckCircle2,
     },
   };
@@ -92,11 +92,11 @@ export function MOUStatusAlert({
 }) {
   if (status === 'fully_executed') {
     return (
-      <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+      <div className="flex items-start gap-3 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg">
         <span className="text-slate-400 flex-shrink-0">•</span>
         <div>
-          <p className="font-medium text-green-900">MOU Fully Executed</p>
-          <p className="text-sm text-green-700 mt-1">
+          <p className="font-medium text-brand-green-900">MOU Fully Executed</p>
+          <p className="text-sm text-brand-green-700 mt-1">
             Your MOU is fully signed and you can now enroll participants and
             receive revenue share payments.
           </p>
@@ -107,13 +107,13 @@ export function MOUStatusAlert({
 
   if (status === 'signed_by_holder') {
     return (
-      <div className="flex items-start gap-3 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-        <Clock className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
+      <div className="flex items-start gap-3 p-4 bg-brand-orange-50 border border-brand-orange-200 rounded-lg">
+        <Clock className="h-5 w-5 text-brand-orange-600 mt-0.5 flex-shrink-0" />
         <div>
-          <p className="font-medium text-orange-900">
+          <p className="font-medium text-brand-orange-900">
             MOU Awaiting Countersignature
           </p>
-          <p className="text-sm text-orange-700 mt-1">
+          <p className="text-sm text-brand-orange-700 mt-1">
             You've signed the MOU. An Elevate representative will countersign
             and provide the fully executed copy.
           </p>

@@ -91,7 +91,7 @@ export function MiladyAccessCard({
           </div>
         </div>
         {miladyCompleted ? (
-          <span className="bg-green-500 text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1">
+          <span className="bg-brand-green-500 text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1">
             <span className="text-slate-400 flex-shrink-0">•</span>
             Complete
           </span>

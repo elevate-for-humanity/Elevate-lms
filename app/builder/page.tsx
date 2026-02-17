@@ -339,10 +339,10 @@ export default function BuildPage() {
                 </div>
                 <div className="space-y-2 text-sm text-slate-400">
                   <p className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-400" /> Analyzing your requirements
+                    <Check className="w-4 h-4 text-brand-green-400" /> Analyzing your requirements
                   </p>
                   <p className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-400" /> Selecting template & colors
+                    <Check className="w-4 h-4 text-brand-green-400" /> Selecting template & colors
                   </p>
                   <p className="flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin" /> Generating content...
@@ -408,14 +408,14 @@ export default function BuildPage() {
               </div>
 
               {/* Upgrade CTA */}
-              <div className="mt-6 p-6 bg-green-500/20 border border-green-500/30 rounded-xl">
-                <p className="text-green-400 font-bold mb-2">Ready to launch?</p>
+              <div className="mt-6 p-6 bg-brand-green-500/20 border border-brand-green-500/30 rounded-xl">
+                <p className="text-brand-green-400 font-bold mb-2">Ready to launch?</p>
                 <p className="text-slate-300 text-sm mb-4">
                   Upgrade to publish your site and start enrolling students.
                 </p>
                 <a
                   href={`/store?preview=${generatedSite.previewId}`}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold rounded-lg transition-colors"
                 >
                   Choose a Plan
                   <ArrowRight className="w-4 h-4" />

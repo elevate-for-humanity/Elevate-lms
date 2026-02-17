@@ -141,7 +141,7 @@ export function AchievementsBadges({ userId }: AchievementsBadgesProps) {
               key={badge.id}
               className={`relative p-4 rounded-lg border-2 transition-all ${
                 isEarned
-                  ? 'border-emerald-500 bg-red-50 hover:shadow-lg'
+                  ? 'border-emerald-500 bg-brand-red-50 hover:shadow-lg'
                   : 'border-slate-200 bg-slate-50 opacity-60'
               }`}
             >

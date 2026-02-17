@@ -99,8 +99,8 @@ export default async function PortfolioPage() {
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <Award className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center">
+                <Award className="w-6 h-6 text-brand-green-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900">
@@ -254,7 +254,7 @@ export default async function PortfolioPage() {
             </div>
 
             {/* Gamification Stats */}
-            <div className="bg-orange-500 rounded-xl p-6 mb-6">
+            <div className="bg-brand-orange-500 rounded-xl p-6 mb-6">
               <PointsDisplay userId={user.id} />
             </div>
 

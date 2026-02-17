@@ -26,8 +26,8 @@ const typeLabels = {
 };
 
 const typeColors = {
-  upgrade: 'bg-green-600',
-  upsell: 'bg-orange-600',
+  upgrade: 'bg-brand-green-600',
+  upsell: 'bg-brand-orange-600',
   'cross-sell': 'bg-brand-blue-600',
   bundle: 'bg-purple-600',
 };
@@ -55,14 +55,14 @@ export default function ProductRecommendations({ productId, showAvatar = true }:
   const bundles = recommendations.filter(r => r.type === 'bundle');
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 to-orange-50 rounded-2xl border border-orange-200 overflow-hidden">
+    <div className="bg-gradient-to-br from-slate-50 to-brand-orange-50 rounded-2xl border border-brand-orange-200 overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center justify-between p-4 bg-white/50 hover:bg-white/80 transition"
       >
         <div className="flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-orange-600" />
+          <Sparkles className="w-5 h-5 text-brand-orange-600" />
           <span className="font-bold text-black">Recommended For You</span>
           <span className="text-sm text-gray-500">({recommendations.length} suggestions)</span>
         </div>
@@ -75,7 +75,7 @@ export default function ProductRecommendations({ productId, showAvatar = true }:
           {showAvatar && avatarMessage && (
             <div className="bg-white rounded-xl p-4 border border-gray-200 flex gap-4">
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-orange-500">
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-brand-orange-500">
                   <Image
                     src="/images/team-hq/instructor-1.jpg"
                     alt="Sales Guide"
@@ -156,7 +156,7 @@ function RecommendationCard({
   const color = typeColors[recommendation.type];
 
   return (
-    <div className={`bg-white rounded-xl overflow-hidden border-2 ${priority ? 'border-green-500 shadow-lg' : 'border-gray-200'} relative group`}>
+    <div className={`bg-white rounded-xl overflow-hidden border-2 ${priority ? 'border-brand-green-500 shadow-lg' : 'border-gray-200'} relative group`}>
       <button
         onClick={onDismiss}
         className="absolute top-2 right-2 p-1 bg-gray-100 hover:bg-gray-200 rounded-full opacity-0 group-hover:opacity-100 transition z-10"
@@ -189,12 +189,12 @@ function RecommendationCard({
             <div>
               <span className="text-lg font-black text-black">{recommendation.product.priceDisplay}</span>
               {recommendation.savings && (
-                <span className="ml-2 text-sm text-green-600 font-medium">{recommendation.savings}</span>
+                <span className="ml-2 text-sm text-brand-green-600 font-medium">{recommendation.savings}</span>
               )}
             </div>
             <Link
               href={recommendation.product.href}
-              className="inline-flex items-center gap-1 text-orange-600 font-semibold text-sm hover:text-orange-700"
+              className="inline-flex items-center gap-1 text-brand-orange-600 font-semibold text-sm hover:text-brand-orange-700"
             >
               Learn More
               <ArrowRight className="w-4 h-4" />
@@ -217,7 +217,7 @@ function SmallRecommendationCard({
   return (
     <Link
       href={recommendation.product.href}
-      className="flex items-center gap-3 bg-white rounded-lg p-3 border border-gray-200 hover:border-orange-500 hover:shadow transition group"
+      className="flex items-center gap-3 bg-white rounded-lg p-3 border border-gray-200 hover:border-brand-orange-500 hover:shadow transition group"
     >
       <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
         <Image
@@ -231,7 +231,7 @@ function SmallRecommendationCard({
         <p className="font-medium text-black text-sm truncate">{recommendation.product.shortName}</p>
         <p className="text-xs text-gray-500">{recommendation.product.priceDisplay}</p>
       </div>
-      <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-orange-600 transition" />
+      <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-brand-orange-600 transition" />
     </Link>
   );
 }

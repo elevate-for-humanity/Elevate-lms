@@ -103,7 +103,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
               {category}
             </span>
             {funding && (
-              <span className="px-2 py-2 bg-green-100 text-green-700 text-xs font-semibold rounded">
+              <span className="px-2 py-2 bg-brand-green-100 text-brand-green-700 text-xs font-semibold rounded">
                 {funding}
               </span>
             )}
@@ -262,7 +262,7 @@ export const StatCard: React.FC<StatCardProps> = ({
       <div className="text-4xl font-bold text-brand-orange-600 mb-2 text-2xl md:text-3xl lg:text-4xl">{number}</div>
       <div className="text-sm font-semibold text-black uppercase tracking-wide">{label}</div>
       {trend && (
-        <div className={`text-xs mt-2 ${trend.direction === 'up' ? 'text-green-600' : 'text-brand-orange-600'}`}>
+        <div className={`text-xs mt-2 ${trend.direction === 'up' ? 'text-brand-green-600' : 'text-brand-orange-600'}`}>
           {trend.direction === 'up' ? '↑' : '↓'} {trend.value}
         </div>
       )}

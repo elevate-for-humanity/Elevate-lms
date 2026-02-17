@@ -27,23 +27,23 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
       change: '+12%',
       icon: Users,
       color: 'text-brand-orange-600',
-      bgColor: 'bg-red-100',
+      bgColor: 'bg-brand-red-100',
     },
     {
       title: 'Active Students',
       value: data.activeStudents.toLocaleString(),
       change: '+8%',
       icon: TrendingUp,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
+      color: 'text-brand-green-600',
+      bgColor: 'bg-brand-green-100',
     },
     {
       title: 'Completion Rate',
       value: `${data.completionRate}%`,
       change: '+5%',
       icon: CheckCircle,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-100',
+      color: 'text-brand-orange-600',
+      bgColor: 'bg-brand-orange-100',
     },
     {
       title: 'Average Score',
@@ -83,7 +83,7 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
       change: '+18%',
       icon: DollarSign,
       color: 'text-brand-orange-600',
-      bgColor: 'bg-red-100',
+      bgColor: 'bg-brand-red-100',
     },
   ];
 
@@ -116,7 +116,7 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
                   <div className={`p-3 rounded-lg ${stat.bgColor}`}>
                     <Icon className={stat.color} size={24} />
                   </div>
-                  <span className="text-sm font-semibold text-green-600">{stat.change}</span>
+                  <span className="text-sm font-semibold text-brand-green-600">{stat.change}</span>
                 </div>
                 <div className="text-2xl font-bold mb-1">{stat.value}</div>
                 <div className="text-sm text-black">{stat.title}</div>
@@ -142,7 +142,7 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
                       <div className="text-sm text-black">{course.students} students</div>
                     </div>
                     <div className="text-right">
-                      <div className="font-semibold text-green-600">{course.completion}%</div>
+                      <div className="font-semibold text-brand-green-600">{course.completion}%</div>
                       <div className="text-xs text-gray-500">completion</div>
                     </div>
                   </div>

@@ -101,8 +101,8 @@ function PaymentForm({
   if (success) {
     return (
       <div className="text-center py-12">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Check className="w-10 h-10 text-green-600" />
+        <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Check className="w-10 h-10 text-brand-green-600" />
         </div>
         <h3 className="text-2xl font-bold text-black mb-2">
           Payment Successful!
@@ -133,7 +133,7 @@ function PaymentForm({
             </span>
           </div>
           {referralCode && (
-            <div className="flex justify-between text-green-600">
+            <div className="flex justify-between text-brand-green-600">
               <span>Referral Discount</span>
               <span>Applied</span>
             </div>
@@ -157,8 +157,8 @@ function PaymentForm({
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4">
+          <p className="text-sm text-brand-red-800">{error}</p>
         </div>
       )}
 

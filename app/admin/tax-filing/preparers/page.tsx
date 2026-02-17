@@ -102,7 +102,7 @@ export default async function TaxPreparersPage() {
                       </h3>
                       <p className="text-sm text-black">{item.email}</p>
                       <div className="mt-2 flex gap-2">
-                        <span className="px-2 py-2 bg-brand-green-100 text-green-800 text-xs rounded">
+                        <span className="px-2 py-2 bg-brand-green-100 text-brand-green-800 text-xs rounded">
                           VITA Certified
                         </span>
                         <span className="px-2 py-2 bg-brand-blue-100 text-brand-blue-800 text-xs rounded">

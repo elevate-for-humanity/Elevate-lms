@@ -566,14 +566,14 @@ fill="white" />
       </div>
       {/* Generation Status */}
       {isGenerating && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+        <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6 mb-6">
           <div className="flex items-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600 mr-4" />
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-green-600 mr-4" />
             <div>
-              <h3 className="font-semibold text-green-900">
+              <h3 className="font-semibold text-brand-green-900">
                 🤖 Generating Excel File with Charts...
               </h3>
-              <div className="text-sm text-green-700 mt-1">
+              <div className="text-sm text-brand-green-700 mt-1">
                 <div>✅ Creating pie charts with professional formatting</div>
                 <div>✅ Adding data tables and WIOA compliance sheets</div>
                 <div>✅ Applying colors, labels, and percentages</div>

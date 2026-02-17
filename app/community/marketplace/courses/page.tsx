@@ -138,7 +138,7 @@ export default function CommunityCoursesPage() {
                 <div className="absolute top-3 right-3">
                   <span className={`text-sm font-bold px-3 py-1 rounded ${
                     course.price === 'Free' 
-                      ? 'bg-green-500 text-white' 
+                      ? 'bg-brand-green-500 text-white' 
                       : 'bg-white text-gray-900'
                   }`}>
                     {course.price}

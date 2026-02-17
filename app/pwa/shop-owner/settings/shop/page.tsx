@@ -128,16 +128,16 @@ export default function ShopDetailsPage() {
 
       <main className="px-4 py-6 space-y-6">
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-red-200 text-sm">{error}</p>
+          <div className="bg-brand-red-500/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
+            <p className="text-brand-red-200 text-sm">{error}</p>
           </div>
         )}
 
         {success && (
-          <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 flex items-start gap-3">
+          <div className="bg-brand-green-500/10 border border-brand-green-500/30 rounded-xl p-4 flex items-start gap-3">
             <span className="text-slate-400 flex-shrink-0">•</span>
-            <p className="text-green-200 text-sm">Changes saved successfully</p>
+            <p className="text-brand-green-200 text-sm">Changes saved successfully</p>
           </div>
         )}
 

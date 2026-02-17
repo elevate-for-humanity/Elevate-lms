@@ -123,7 +123,7 @@ export default function LiveChatPage() {
             <div>
               <h1 className="font-semibold">Live Chat Support</h1>
               <p className="text-xs text-sky-200 flex items-center gap-1">
-                <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                <span className="w-2 h-2 bg-brand-green-400 rounded-full"></span>
                 Online
               </p>
             </div>

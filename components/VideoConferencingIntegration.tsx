@@ -55,7 +55,7 @@ export function VideoConferencingIntegration() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Video Conferencing</h1>
-          <p className="text-red-100">Join live sessions and meetings</p>
+          <p className="text-brand-red-100">Join live sessions and meetings</p>
         </div>
       </div>
 
@@ -71,7 +71,7 @@ export function VideoConferencingIntegration() {
               <div className="flex justify-between items-start mb-3">
                 <h3 className="text-xl font-bold">{meeting.title}</h3>
                 <span className={`px-3 py-2 rounded text-xs font-medium ${
-                  meeting.status === 'live' ? 'bg-red-100 text-red-700' :
+                  meeting.status === 'live' ? 'bg-brand-red-100 text-brand-red-700' :
                   meeting.status === 'upcoming' ? 'bg-brand-blue-100 text-brand-blue-700' :
                   'bg-gray-100 text-black'
                 }`}>

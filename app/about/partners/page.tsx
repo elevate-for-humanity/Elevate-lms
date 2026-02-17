@@ -94,7 +94,7 @@ export default async function PartnersPage() {
         <section className="py-16 bg-slate-50">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-center gap-3 mb-8">
-              <Award className="w-8 h-8 text-green-600" />
+              <Award className="w-8 h-8 text-brand-green-600" />
               <h2 className="text-3xl font-bold text-slate-900">Certification Partners</h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -154,7 +154,7 @@ export default async function PartnersPage() {
         <section className="py-16 bg-slate-50">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-center gap-3 mb-8">
-              <Briefcase className="w-8 h-8 text-orange-600" />
+              <Briefcase className="w-8 h-8 text-brand-orange-600" />
               <h2 className="text-3xl font-bold text-slate-900">Employer Partners</h2>
             </div>
             <p className="text-slate-600 mb-8">

@@ -54,7 +54,7 @@ export default function AIUsagePage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Acceptable Uses</h2>
             
-            <div className="bg-green-50 rounded-xl p-6 border-2 border-green-200 mb-6">
+            <div className="bg-brand-green-50 rounded-xl p-6 border-2 border-brand-green-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Learning Support</h3>
               <p className="text-black mb-4">AI tools may be used for:</p>
               <ul className="list-disc pl-6 text-black space-y-2">
@@ -70,7 +70,7 @@ export default function AIUsagePage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Prohibited Uses</h2>
             
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Academic Dishonesty</h3>
               <p className="text-black mb-2">Strictly prohibited:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -83,7 +83,7 @@ export default function AIUsagePage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Misuse of AI Systems</h3>
               <p className="text-black mb-2">Do not:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -174,7 +174,7 @@ export default function AIUsagePage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Second Offense</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Failure of the course</li>
@@ -184,7 +184,7 @@ export default function AIUsagePage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Severe or Repeated Violations</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Dismissal from program</li>

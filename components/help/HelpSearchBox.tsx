@@ -59,11 +59,11 @@ export function HelpSearchBox() {
             value={query}
             onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setQuery(e.target.value)}
             placeholder='Search help articles (e.g. "barber apprenticeship attendance")'
-            className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm shadow-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+            className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm shadow-sm outline-none focus:border-brand-orange-500 focus:ring-2 focus:ring-brand-orange-100"
           />
           <button
             type="submit"
-            className="rounded-2xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600"
+            className="rounded-2xl bg-brand-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-orange-600"
           >
             {loading ? 'Searching…' : 'Search'}
           </button>
@@ -76,7 +76,7 @@ export function HelpSearchBox() {
             <Link
               key={r.id}
               href={`/help/${r.slug}`}
-              className="block rounded-xl border border-slate-100 bg-white px-4 py-3 text-sm shadow-sm hover:border-orange-500 hover:bg-orange-50"
+              className="block rounded-xl border border-slate-100 bg-white px-4 py-3 text-sm shadow-sm hover:border-brand-orange-500 hover:bg-brand-orange-50"
             >
               <p className="font-semibold text-black">{r.title}</p>
               <p className="mt-1 text-xs text-slate-500">

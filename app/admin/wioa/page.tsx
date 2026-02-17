@@ -68,11 +68,11 @@ export default async function WIOAPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'verified':
-        return <span className="px-2 py-2 bg-green-100 text-green-800 rounded-full text-xs font-medium">Verified</span>;
+        return <span className="px-2 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-xs font-medium">Verified</span>;
       case 'pending':
         return <span className="px-2 py-2 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Pending</span>;
       case 'needs_docs':
-        return <span className="px-2 py-2 bg-red-100 text-red-800 rounded-full text-xs font-medium">Needs Docs</span>;
+        return <span className="px-2 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-xs font-medium">Needs Docs</span>;
       default:
         return <span className="px-2 py-2 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">{status}</span>;
     }
@@ -93,7 +93,7 @@ export default async function WIOAPage() {
           </button>
           <Link
             href="/admin/wioa/verify"
-            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition flex items-center gap-2"
+            className="px-4 py-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition flex items-center gap-2"
           >
             <FileText className="w-5 h-5" />
             New Verification
@@ -108,12 +108,12 @@ export default async function WIOAPage() {
             <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${
               stat.color === 'blue' ? 'bg-brand-blue-100' :
               stat.color === 'yellow' ? 'bg-yellow-100' :
-              stat.color === 'green' ? 'bg-green-100' : 'bg-red-100'
+              stat.color === 'green' ? 'bg-brand-green-100' : 'bg-brand-red-100'
             }`}>
               <stat.icon className={`w-6 h-6 ${
                 stat.color === 'blue' ? 'text-brand-blue-600' :
                 stat.color === 'yellow' ? 'text-yellow-600' :
-                stat.color === 'green' ? 'text-green-600' : 'text-red-600'
+                stat.color === 'green' ? 'text-brand-green-600' : 'text-brand-red-600'
               }`} />
             </div>
             <p className="text-2xl font-bold">{stat.value}</p>
@@ -124,15 +124,15 @@ export default async function WIOAPage() {
 
       {/* Quick Links */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <Link href="/admin/wioa/eligibility" className="bg-white rounded-xl shadow-sm border p-4 hover:border-orange-300 transition">
+        <Link href="/admin/wioa/eligibility" className="bg-white rounded-xl shadow-sm border p-4 hover:border-brand-orange-300 transition">
           <h3 className="font-semibold text-gray-900">Eligibility Criteria</h3>
           <p className="text-sm text-gray-600 mt-1">View and manage WIOA eligibility requirements</p>
         </Link>
-        <Link href="/admin/wioa/reports" className="bg-white rounded-xl shadow-sm border p-4 hover:border-orange-300 transition">
+        <Link href="/admin/wioa/reports" className="bg-white rounded-xl shadow-sm border p-4 hover:border-brand-orange-300 transition">
           <h3 className="font-semibold text-gray-900">Compliance Reports</h3>
           <p className="text-sm text-gray-600 mt-1">Generate quarterly and annual reports</p>
         </Link>
-        <Link href="/admin/wioa/documents" className="bg-white rounded-xl shadow-sm border p-4 hover:border-orange-300 transition">
+        <Link href="/admin/wioa/documents" className="bg-white rounded-xl shadow-sm border p-4 hover:border-brand-orange-300 transition">
           <h3 className="font-semibold text-gray-900">Document Templates</h3>
           <p className="text-sm text-gray-600 mt-1">Access required forms and templates</p>
         </Link>
@@ -146,16 +146,16 @@ export default async function WIOAPage() {
             <input
               type="text"
               placeholder="Search participants..."
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
             />
           </div>
-          <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500">
+          <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500">
             <option value="">All Statuses</option>
             <option value="verified">Verified</option>
             <option value="pending">Pending</option>
             <option value="needs_docs">Needs Documents</option>
           </select>
-          <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500">
+          <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500">
             <option value="">All Programs</option>
             <option value="healthcare">Healthcare</option>
             <option value="hvac">HVAC</option>
@@ -187,7 +187,7 @@ export default async function WIOAPage() {
                 <td className="px-6 py-4">{getStatusBadge(p.status)}</td>
                 <td className="px-6 py-4 text-gray-600">{p.date}</td>
                 <td className="px-6 py-4">
-                  <Link href={`/admin/wioa/${p.id}`} className="text-orange-600 hover:text-orange-700 font-medium">
+                  <Link href={`/admin/wioa/${p.id}`} className="text-brand-orange-600 hover:text-brand-orange-700 font-medium">
                     View Details
                   </Link>
                 </td>

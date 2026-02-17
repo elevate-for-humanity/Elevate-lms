@@ -60,7 +60,7 @@ export function FinancialAidCalculator() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Financial Aid Calculator</h1>
-          <p className="text-red-100">Estimate your financial aid eligibility</p>
+          <p className="text-brand-red-100">Estimate your financial aid eligibility</p>
         </div>
       </div>
 
@@ -115,9 +115,9 @@ export function FinancialAidCalculator() {
                   <p className="text-2xl font-bold">${results.totalCost.toLocaleString()}</p>
                 </div>
 
-                <div className="p-4 bg-green-50 rounded">
-                  <p className="text-sm text-green-700">Grants & Scholarships</p>
-                  <p className="text-2xl font-bold text-green-600">
+                <div className="p-4 bg-brand-green-50 rounded">
+                  <p className="text-sm text-brand-green-700">Grants & Scholarships</p>
+                  <p className="text-2xl font-bold text-brand-green-600">
                     ${results.grants.toLocaleString()}
                   </p>
                 </div>
@@ -129,9 +129,9 @@ export function FinancialAidCalculator() {
                   </p>
                 </div>
 
-                <div className="p-4 bg-orange-50 rounded">
-                  <p className="text-sm text-orange-700">Out of Pocket</p>
-                  <p className="text-2xl font-bold text-orange-600">
+                <div className="p-4 bg-brand-orange-50 rounded">
+                  <p className="text-sm text-brand-orange-700">Out of Pocket</p>
+                  <p className="text-2xl font-bold text-brand-orange-600">
                     ${results.outOfPocket.toLocaleString()}
                   </p>
                 </div>

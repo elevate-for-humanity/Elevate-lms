@@ -118,12 +118,12 @@ export function InteractiveQuiz({
     return (
       <div className="bg-slate-800 rounded-lg p-8 text-center">
         <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${
-          passed ? "bg-green-500/20" : "bg-brand-orange-500/20"
+          passed ? "bg-brand-green-500/20" : "bg-brand-orange-500/20"
         }`}>
           {passed ? (
             <span className="text-slate-400 flex-shrink-0">•</span>
           ) : (
-            <XCircle className="w-12 h-12 text-red-400" />
+            <XCircle className="w-12 h-12 text-brand-red-400" />
           )}
         </div>
 
@@ -150,7 +150,7 @@ export function InteractiveQuiz({
           </button>
           <button
             onClick={() => window.history.back()}
-            className="px-6 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors"
+            className="px-6 py-3 bg-brand-orange-500 text-white rounded-lg font-semibold hover:bg-brand-orange-600 transition-colors"
           >
             Continue Learning
           </button>
@@ -169,7 +169,7 @@ export function InteractiveQuiz({
         </div>
         <div className="w-full bg-slate-700 rounded-full h-2">
           <div
-            className="bg-orange-500 rounded-full h-2 transition-all"
+            className="bg-brand-orange-500 rounded-full h-2 transition-all"
             style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
           />
         </div>
@@ -202,7 +202,7 @@ export function InteractiveQuiz({
               disabled={showFeedback}
               className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                 isSelected
-                  ? "border-orange-500 bg-orange-500/10"
+                  ? "border-brand-orange-500 bg-brand-orange-500/10"
                   : "border-slate-700 bg-slate-900 hover:border-slate-600"
               } ${showFeedback ? "cursor-not-allowed" : "cursor-pointer"}`}
             >
@@ -216,20 +216,20 @@ export function InteractiveQuiz({
       {showFeedback && (
         <div className={`p-4 rounded-lg mb-6 ${
           JSON.stringify(answers[question.id]) === JSON.stringify(question.correct_answer)
-            ? "bg-green-500/20 border border-green-500/50"
-            : "bg-brand-orange-500/20 border border-red-500/50"
+            ? "bg-brand-green-500/20 border border-brand-green-500/50"
+            : "bg-brand-orange-500/20 border border-brand-red-500/50"
         }`}>
           <div className="flex items-start gap-3">
             {JSON.stringify(answers[question.id]) === JSON.stringify(question.correct_answer) ? (
               <span className="text-slate-400 flex-shrink-0">•</span>
             ) : (
-              <AlertCircle className="w-6 h-6 text-red-400 flex-shrink-0 mt-1" />
+              <AlertCircle className="w-6 h-6 text-brand-red-400 flex-shrink-0 mt-1" />
             )}
             <div>
               <p className={`font-semibold mb-2 ${
                 JSON.stringify(answers[question.id]) === JSON.stringify(question.correct_answer)
-                  ? "text-green-400"
-                  : "text-red-400"
+                  ? "text-brand-green-400"
+                  : "text-brand-red-400"
               }`}>
                 {JSON.stringify(answers[question.id]) === JSON.stringify(question.correct_answer)
                   ? "Correct!"
@@ -246,7 +246,7 @@ export function InteractiveQuiz({
         <button
           onClick={handleNext}
           disabled={!answers[question.id]}
-          className="px-6 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+          className="px-6 py-3 bg-brand-orange-500 text-white rounded-lg font-semibold hover:bg-brand-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
         >
           {isLastQuestion ? "Finish Quiz" : "Next Question"}
           <ArrowRight className="w-5 h-5" />

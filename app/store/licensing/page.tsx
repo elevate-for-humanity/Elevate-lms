@@ -84,7 +84,7 @@ export default function StoreLicensesPage() {
                 Two ways to run the Workforce OS. Pick the model that fits your organization.
               </p>
               <p className="mt-3 text-sm text-slate-600">
-                Not sure yet? <Link href="/store/trial" className="text-red-600 hover:underline">Start a free 14-day trial</Link> or <Link href="/store/demos" className="text-red-600 hover:underline">view the demo</Link> first.
+                Not sure yet? <Link href="/store/trial" className="text-brand-red-600 hover:underline">Start a free 14-day trial</Link> or <Link href="/store/demos" className="text-brand-red-600 hover:underline">view the demo</Link> first.
               </p>
             </div>
             <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-xl border border-slate-200">

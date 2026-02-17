@@ -90,7 +90,7 @@ export default async function CertificationsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/admin/certifications/bulk"
-              className="bg-brand-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Bulk Operations
             </Link>

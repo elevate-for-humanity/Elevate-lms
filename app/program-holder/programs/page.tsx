@@ -81,7 +81,7 @@ export default function ProgramHolderProgramsPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${program.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${program.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-gray-100 text-gray-700'}`}>
                       {program.status}
                     </span>
                   </td>
@@ -89,7 +89,7 @@ export default function ProgramHolderProgramsPage() {
                   <td className="px-6 py-4 text-center">
                     <div className="flex items-center justify-center gap-2">
                       <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-green-500 rounded-full" style={{ width: `${program.completion}%` }}></div>
+                        <div className="h-full bg-brand-green-500 rounded-full" style={{ width: `${program.completion}%` }}></div>
                       </div>
                       <span className="text-sm text-gray-600">{program.completion}%</span>
                     </div>
@@ -99,7 +99,7 @@ export default function ProgramHolderProgramsPage() {
                     <div className="flex items-center justify-center gap-2">
                       <button className="p-2 text-gray-600 hover:text-brand-blue-600 hover:bg-brand-blue-50 rounded"><Eye className="w-4 h-4" /></button>
                       <button className="p-2 text-gray-600 hover:text-brand-blue-600 hover:bg-brand-blue-50 rounded"><Edit className="w-4 h-4" /></button>
-                      <button className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
+                      <button className="p-2 text-gray-600 hover:text-brand-red-600 hover:bg-brand-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>

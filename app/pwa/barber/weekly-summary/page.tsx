@@ -134,7 +134,7 @@ export default function WeeklySummaryPage() {
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <div className="w-3 h-3 rounded-full bg-brand-green-500" />
                 <span className="text-slate-300">Sanitation</span>
               </div>
               <span className="text-white font-medium">{summary.sanitationHours} hrs</span>
@@ -152,7 +152,7 @@ export default function WeeklySummaryPage() {
               style={{ width: `${(summary.theoryHours / summary.totalHours) * 100}%` }}
             />
             <div 
-              className="bg-green-500 h-full"
+              className="bg-brand-green-500 h-full"
               style={{ width: `${(summary.sanitationHours / summary.totalHours) * 100}%` }}
             />
           </div>
@@ -162,10 +162,10 @@ export default function WeeklySummaryPage() {
         <div className="bg-slate-800 rounded-xl p-4">
           <h2 className="text-white font-medium mb-4">Approval Status</h2>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 text-center">
+            <div className="bg-brand-green-500/10 border border-brand-green-500/30 rounded-xl p-4 text-center">
               <span className="text-slate-400 flex-shrink-0">•</span>
               <p className="text-2xl font-bold text-white">{summary.approvedHours}</p>
-              <p className="text-green-400 text-sm">Approved</p>
+              <p className="text-brand-green-400 text-sm">Approved</p>
             </div>
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-center">
               <Clock className="w-6 h-6 text-amber-400 mx-auto mb-2" />

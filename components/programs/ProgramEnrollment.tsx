@@ -145,9 +145,9 @@ export default function ProgramEnrollment({ program, userId, onEnrollmentComplet
       {/* Pricing Section */}
       <div className="mb-6">
         {program.isFree || program.price === 0 ? (
-          <div className="bg-green-50 border-2 border-green-500 rounded-lg p-6 text-center">
-            <p className="text-4xl font-bold text-green-700 mb-2 text-2xl md:text-3xl lg:text-4xl">FREE</p>
-            <p className="text-green-600">No payment required</p>
+          <div className="bg-brand-green-50 border-2 border-brand-green-500 rounded-lg p-6 text-center">
+            <p className="text-4xl font-bold text-brand-green-700 mb-2 text-2xl md:text-3xl lg:text-4xl">FREE</p>
+            <p className="text-brand-green-600">No payment required</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -175,7 +175,7 @@ export default function ProgramEnrollment({ program, userId, onEnrollmentComplet
                 </div>
                 <div className="text-right">
                   <p className="text-3xl font-bold text-black">${fullPrice}</p>
-                  <p className="text-sm text-green-600">Best Value</p>
+                  <p className="text-sm text-brand-green-600">Best Value</p>
                 </div>
               </div>
             </div>
@@ -220,32 +220,32 @@ export default function ProgramEnrollment({ program, userId, onEnrollmentComplet
         <h3 className="font-semibold text-black mb-3">What's Included:</h3>
         <ul className="space-y-2">
           <li className="flex items-start">
-            <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 text-brand-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
             <span className="text-black">Full course access</span>
           </li>
           <li className="flex items-start">
-            <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 text-brand-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
             <span className="text-black">Certificate upon completion</span>
           </li>
           <li className="flex items-start">
-            <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 text-brand-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
             <span className="text-black">Instructor support</span>
           </li>
           <li className="flex items-start">
-            <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 text-brand-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
             <span className="text-black">Downloadable resources</span>
           </li>
           {!program.isFree && program.price > 0 && (
             <li className="flex items-start">
-              <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-brand-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <span className="text-black">30-day money-back guarantee</span>
@@ -256,7 +256,7 @@ export default function ProgramEnrollment({ program, userId, onEnrollmentComplet
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="mb-4 bg-brand-red-50 border border-brand-red-200 text-brand-red-700 px-4 py-3 rounded">
           {error}
         </div>
       )}

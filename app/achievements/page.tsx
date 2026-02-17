@@ -67,7 +67,7 @@ export default async function AchievementsPage() {
             <Breadcrumbs items={[{ label: 'Achievements' }]} />
           </div>
         </div>
-        <section className="bg-gradient-to-br from-yellow-500 to-orange-500 text-white py-16">
+        <section className="bg-gradient-to-br from-yellow-500 to-brand-orange-500 text-white py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <Trophy className="w-16 h-16 mx-auto mb-4" />
             <h1 className="text-4xl font-extrabold mb-4">Earn Achievements & Badges</h1>
@@ -79,7 +79,7 @@ export default async function AchievementsPage() {
               <div className="bg-white/20 rounded-xl p-4"><Award className="w-8 h-8 mx-auto mb-2" /><p className="font-bold">Certified</p><p className="text-sm text-white/80">Earn a certification</p></div>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/signup" className="bg-white text-orange-600 font-bold px-8 py-4 rounded-lg hover:bg-orange-50 transition">Create Free Account</Link>
+              <Link href="/signup" className="bg-white text-brand-orange-600 font-bold px-8 py-4 rounded-lg hover:bg-brand-orange-50 transition">Create Free Account</Link>
               <Link href="/programs" className="border-2 border-white text-white font-bold px-8 py-4 rounded-lg hover:bg-white/10 transition">Browse Programs</Link>
             </div>
           </div>
@@ -144,7 +144,7 @@ export default async function AchievementsPage() {
             <Link href="/" className="text-xl font-bold text-gray-900">
               Elevate for Humanity
             </Link>
-            <Link href="/learner/dashboard" className="text-sm text-orange-600 hover:text-orange-700">
+            <Link href="/learner/dashboard" className="text-sm text-brand-orange-600 hover:text-brand-orange-700">
               Back to Dashboard
             </Link>
           </div>
@@ -188,8 +188,8 @@ export default async function AchievementsPage() {
 
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Target className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <Target className="w-6 h-6 text-brand-green-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Completion</p>
@@ -230,7 +230,7 @@ export default async function AchievementsPage() {
                           <span className="text-xs text-gray-400">
                             Earned {new Date(item.earned_at).toLocaleDateString()}
                           </span>
-                          <span className="text-xs font-medium text-orange-600">
+                          <span className="text-xs font-medium text-brand-orange-600">
                             +{achievement.points} pts
                           </span>
                         </div>
@@ -281,10 +281,10 @@ export default async function AchievementsPage() {
                           {achievement.description}
                         </p>
                         <div className="flex items-center justify-between">
-                          <span className={`text-xs ${isEarned ? 'text-green-600 font-medium' : 'text-gray-400'}`}>
+                          <span className={`text-xs ${isEarned ? 'text-brand-green-600 font-medium' : 'text-gray-400'}`}>
                             {isEarned ? '• Earned' : 'Locked'}
                           </span>
-                          <span className={`text-xs font-medium ${isEarned ? 'text-orange-600' : 'text-gray-400'}`}>
+                          <span className={`text-xs font-medium ${isEarned ? 'text-brand-orange-600' : 'text-gray-400'}`}>
                             {achievement.points} pts
                           </span>
                         </div>
@@ -303,7 +303,7 @@ export default async function AchievementsPage() {
               </p>
               <Link
                 href="/programs"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-orange-600 text-white font-medium rounded-lg hover:bg-brand-orange-700 transition"
               >
                 Start Learning
               </Link>

@@ -131,7 +131,7 @@ export default async function TalentPipelinePage() {
               Access pre-trained, certified candidates ready to work. No recruitment fees, no hassle—just qualified talent for your open positions.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact" className="px-8 py-4 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition-colors">Start Building Your Pipeline</Link>
+              <Link href="/contact" className="px-8 py-4 bg-brand-orange-600 text-white font-bold rounded-lg hover:bg-brand-orange-700 transition-colors">Start Building Your Pipeline</Link>
               <Link href="/employers/post-job" className="px-8 py-4 bg-slate-700 text-white font-bold rounded-lg hover:bg-slate-600 transition-colors border border-slate-500">Post a Job Now</Link>
             </div>
           </div>
@@ -139,24 +139,24 @@ export default async function TalentPipelinePage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-orange-600 text-white">
+      <section className="py-12 bg-brand-orange-600 text-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-4xl md:text-5xl font-bold">85%</div>
-              <div className="text-orange-200">Job Placement Rate</div>
+              <div className="text-brand-orange-200">Job Placement Rate</div>
             </div>
             <div>
               <div className="text-4xl md:text-5xl font-bold">1,000+</div>
-              <div className="text-orange-200">Graduates Placed</div>
+              <div className="text-brand-orange-200">Graduates Placed</div>
             </div>
             <div>
               <div className="text-4xl md:text-5xl font-bold">$0</div>
-              <div className="text-orange-200">Recruitment Cost</div>
+              <div className="text-brand-orange-200">Recruitment Cost</div>
             </div>
             <div>
               <div className="text-4xl md:text-5xl font-bold">90%</div>
-              <div className="text-orange-200">6-Month Retention</div>
+              <div className="text-brand-orange-200">6-Month Retention</div>
             </div>
           </div>
         </div>
@@ -176,13 +176,13 @@ export default async function TalentPipelinePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {pipelineSteps.map((item) => (
               <div key={item.step} className="relative">
-                <div className="bg-orange-600 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4">
+                <div className="bg-brand-orange-600 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
                 <p className="text-gray-600">{item.description}</p>
                 {item.step < 4 && (
-                  <ArrowRight className="hidden lg:block absolute top-6 -right-4 w-8 h-8 text-orange-300" />
+                  <ArrowRight className="hidden lg:block absolute top-6 -right-4 w-8 h-8 text-brand-orange-300" />
                 )}
               </div>
             ))}
@@ -204,7 +204,7 @@ export default async function TalentPipelinePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {benefits.map((benefit) => (
               <div key={benefit.title} className="bg-white p-8 rounded-xl shadow-sm">
-                <benefit.icon className="w-12 h-12 text-orange-600 mb-4" />
+                <benefit.icon className="w-12 h-12 text-brand-orange-600 mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{benefit.title}</h3>
                 <p className="text-gray-600">{benefit.description}</p>
               </div>
@@ -248,7 +248,7 @@ export default async function TalentPipelinePage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <Building2 className="w-16 h-16 text-orange-500 mb-6" />
+              <Building2 className="w-16 h-16 text-brand-orange-500 mb-6" />
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
                 Funded Through Workforce Grants
               </h2>
@@ -289,25 +289,25 @@ export default async function TalentPipelinePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-orange-600 text-white">
+      <section className="py-16 md:py-24 bg-brand-orange-600 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Build Your Talent Pipeline?
           </h2>
-          <p className="text-xl text-orange-100 mb-8">
+          <p className="text-xl text-brand-orange-100 mb-8">
             Contact us today to discuss your hiring needs and learn how we can help you 
             find qualified candidates for your open positions.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="px-8 py-4 bg-white text-orange-600 font-bold rounded-full hover:bg-orange-50 transition-all"
+              className="px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-full hover:bg-brand-orange-50 transition-all"
             >
               Contact Our Team
             </Link>
             <a
               href="/support"
-              className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-orange-600 transition-all"
+              className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-brand-orange-600 transition-all"
             >
               Call support center
             </a>

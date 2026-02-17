@@ -132,7 +132,7 @@ export default async function LessonsPage() {
                       <td className="px-6 py-4 text-sm text-gray-600">{lesson.duration || '—'}</td>
                       <td className="px-6 py-4 text-sm">
                         {lesson.video_url ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Yes</span>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-green-100 text-brand-green-800">Yes</span>
                         ) : (
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">No</span>
                         )}

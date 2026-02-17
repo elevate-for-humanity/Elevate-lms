@@ -139,7 +139,7 @@ d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.
           </button>
           <button
             onClick={() => onDelete(module.id)}
-            className="p-2 text-black hover:text-brand-orange-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="p-2 text-black hover:text-brand-orange-600 hover:bg-brand-red-50 rounded-lg transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">
@@ -261,7 +261,7 @@ export default function DragDropBuilder({ courseId, initialModules = [], onSave 
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+            className="px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 transition-colors"
           >
             Save Course
           </button>

@@ -102,7 +102,7 @@ export const Select: React.FC<SelectProps> = ({
       {label && (
         <label className="block text-sm font-semibold text-black mb-2">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-brand-red-500 ml-1">*</span>}
         </label>
       )}
 
@@ -114,7 +114,7 @@ export const Select: React.FC<SelectProps> = ({
           className={`
             w-full px-4 py-2 text-left border rounded-md transition-all duration-200
             focus:outline-none focus:ring-2 focus:ring-offset-1
-            ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-300 focus:border-orange-500 focus:ring-brand-blue-500'}
+            ${error ? 'border-brand-red-500 focus:border-brand-red-500 focus:ring-brand-red-500' : 'border-slate-300 focus:border-brand-orange-500 focus:ring-brand-blue-500'}
             ${disabled ? 'bg-slate-100 cursor-not-allowed opacity-60' : 'bg-white cursor-pointer hover:border-slate-400'}
             ${fullWidth ? 'w-full' : ''}
           `}

@@ -202,13 +202,13 @@ export default async function DocumentCategoryPage({ params }: Props) {
                             <a
                               href={doc.url}
                               download
-                              className="p-2 text-slate-600 hover:text-green-600 hover:bg-green-50 rounded-lg"
+                              className="p-2 text-slate-600 hover:text-brand-green-600 hover:bg-brand-green-50 rounded-lg"
                               title="Download"
                             >
                               <Download className="w-4 h-4" />
                             </a>
                             <button
-                              className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                              className="p-2 text-slate-600 hover:text-brand-red-600 hover:bg-brand-red-50 rounded-lg"
                               title="Delete"
                             >
                               <Trash2 className="w-4 h-4" />

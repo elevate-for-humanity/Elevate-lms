@@ -119,7 +119,7 @@ export default async function AccountSettingsPage() {
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" defaultChecked className="sr-only peer" />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
               </label>
             </div>
 
@@ -134,7 +134,7 @@ export default async function AccountSettingsPage() {
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
               </label>
             </div>
 
@@ -158,8 +158,8 @@ export default async function AccountSettingsPage() {
         </div>
 
         {/* Danger Zone */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-red-200">
-          <h2 className="font-semibold text-red-600 mb-4 flex items-center gap-2">
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-brand-red-200">
+          <h2 className="font-semibold text-brand-red-600 mb-4 flex items-center gap-2">
             <Trash2 className="w-5 h-5" />
             Danger Zone
           </h2>
@@ -168,7 +168,7 @@ export default async function AccountSettingsPage() {
           </p>
           <button
             type="button"
-            className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors text-sm font-medium"
+            className="px-4 py-2 border border-brand-red-300 text-brand-red-600 rounded-lg hover:bg-brand-red-50 transition-colors text-sm font-medium"
           >
             Delete Account
           </button>

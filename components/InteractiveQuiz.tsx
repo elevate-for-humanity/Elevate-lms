@@ -80,11 +80,11 @@ export function InteractiveQuiz({ questions, onComplete }: InteractiveQuizProps)
                   selectedAnswer === index
                     ? showFeedback
                       ? isCorrect
-                        ? 'border-green-500 bg-green-50'
-                        : 'border-red-500 bg-red-50'
-                      : 'border-red-600 bg-red-50'
-                    : 'border-gray-200 hover:border-red-300'
-                } ${showFeedback && index === question.correctAnswer ? 'border-green-500 bg-green-50' : ''}`}
+                        ? 'border-brand-green-500 bg-brand-green-50'
+                        : 'border-brand-red-500 bg-brand-red-50'
+                      : 'border-brand-red-600 bg-brand-red-50'
+                    : 'border-gray-200 hover:border-brand-red-300'
+                } ${showFeedback && index === question.correctAnswer ? 'border-brand-green-500 bg-brand-green-50' : ''}`}
               >
                 <div className="flex items-center justify-between">
                   <span>{option}</span>
@@ -101,8 +101,8 @@ export function InteractiveQuiz({ questions, onComplete }: InteractiveQuizProps)
         </div>
 
         {showFeedback && (
-          <div className={`p-4 rounded-lg ${isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-            <p className={`font-semibold mb-2 ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>
+          <div className={`p-4 rounded-lg ${isCorrect ? 'bg-brand-green-50 border border-brand-green-200' : 'bg-brand-red-50 border border-brand-red-200'}`}>
+            <p className={`font-semibold mb-2 ${isCorrect ? 'text-brand-green-800' : 'text-brand-red-800'}`}>
               {isCorrect ? '• Correct!' : '✗ Incorrect'}
             </p>
             <p className="text-sm text-black">{question.explanation}</p>

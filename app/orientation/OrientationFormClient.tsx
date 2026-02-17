@@ -27,7 +27,7 @@ export default function OrientationFormClient() {
     >
       <div>
         <label htmlFor="orientName" className="block text-sm font-medium text-gray-700 mb-1">
-          Your Name <span className="text-red-500">*</span>
+          Your Name <span className="text-brand-red-500">*</span>
         </label>
         <input
           type="text"
@@ -39,7 +39,7 @@ export default function OrientationFormClient() {
       </div>
       <div>
         <label htmlFor="orientEmail" className="block text-sm font-medium text-gray-700 mb-1">
-          Your Email <span className="text-red-500">*</span>
+          Your Email <span className="text-brand-red-500">*</span>
         </label>
         <input
           type="email"
@@ -52,7 +52,7 @@ export default function OrientationFormClient() {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="orientDate" className="block text-sm font-medium text-gray-700 mb-1">
-            Date <span className="text-red-500">*</span>
+            Date <span className="text-brand-red-500">*</span>
           </label>
           <input
             type="date"
@@ -64,7 +64,7 @@ export default function OrientationFormClient() {
         </div>
         <div>
           <label htmlFor="orientTime" className="block text-sm font-medium text-gray-700 mb-1">
-            Time <span className="text-red-500">*</span>
+            Time <span className="text-brand-red-500">*</span>
           </label>
           <select
             id="orientTime"
@@ -84,7 +84,7 @@ export default function OrientationFormClient() {
       </div>
       <button
         type="submit"
-        className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+        className="w-full bg-brand-red-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-red-700 transition-colors"
       >
         Book Orientation via Google Calendar
       </button>

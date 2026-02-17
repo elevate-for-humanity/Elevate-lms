@@ -159,7 +159,7 @@ export default async function ForumPage({ params }: Props) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       {thread.is_pinned && (
-                        <Pin className="w-4 h-4 text-orange-500" />
+                        <Pin className="w-4 h-4 text-brand-orange-500" />
                       )}
                       {thread.is_locked && (
                         <Lock className="w-4 h-4 text-slate-400" />

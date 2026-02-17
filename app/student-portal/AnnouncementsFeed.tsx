@@ -48,7 +48,7 @@ export default function AnnouncementsFeed() {
       <section className="bg-gray-100 py-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-3 mb-8">
-            <Bell className="w-8 h-8 text-orange-600" />
+            <Bell className="w-8 h-8 text-brand-orange-600" />
             <h2 className="text-3xl font-black text-black">Announcements</h2>
           </div>
           <div className="animate-pulse grid md:grid-cols-3 gap-6">
@@ -95,9 +95,9 @@ export default function AnnouncementsFeed() {
     switch (severity) {
       case 'important':
       case 'urgent':
-        return 'border-red-600';
+        return 'border-brand-red-600';
       case 'event':
-        return 'border-green-600';
+        return 'border-brand-green-600';
       default:
         return 'border-brand-blue-600';
     }
@@ -107,9 +107,9 @@ export default function AnnouncementsFeed() {
     switch (severity) {
       case 'important':
       case 'urgent':
-        return 'bg-red-100 text-red-700';
+        return 'bg-brand-red-100 text-brand-red-700';
       case 'event':
-        return 'bg-green-100 text-green-700';
+        return 'bg-brand-green-100 text-brand-green-700';
       default:
         return 'bg-brand-blue-100 text-brand-blue-700';
     }
@@ -128,7 +128,7 @@ export default function AnnouncementsFeed() {
     <section className="bg-gray-100 py-16">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center gap-3 mb-8">
-          <Bell className="w-8 h-8 text-orange-600" />
+          <Bell className="w-8 h-8 text-brand-orange-600" />
           <h2 className="text-3xl font-black text-black">Announcements</h2>
         </div>
         <div className="grid md:grid-cols-3 gap-6">

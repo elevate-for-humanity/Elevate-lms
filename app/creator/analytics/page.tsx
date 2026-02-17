@@ -103,7 +103,7 @@ export default async function CreatorAnalyticsPage() {
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="text-sm text-black mb-2">Total Enrollments</div>
-              <div className="text-3xl font-bold text-green-600">{totalEnrollments}</div>
+              <div className="text-3xl font-bold text-brand-green-600">{totalEnrollments}</div>
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="text-sm text-black mb-2">Active Students</div>
@@ -111,7 +111,7 @@ export default async function CreatorAnalyticsPage() {
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="text-sm text-black mb-2">Completion Rate</div>
-              <div className="text-3xl font-bold text-orange-600">{completionRate}%</div>
+              <div className="text-3xl font-bold text-brand-orange-600">{completionRate}%</div>
             </div>
           </div>
 
@@ -121,7 +121,7 @@ export default async function CreatorAnalyticsPage() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-black">This Month</span>
-                  <span className="font-semibold text-green-600">+{Math.floor(totalEnrollments * 0.3)}</span>
+                  <span className="font-semibold text-brand-green-600">+{Math.floor(totalEnrollments * 0.3)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-black">Last Month</span>
@@ -133,7 +133,7 @@ export default async function CreatorAnalyticsPage() {
                 </div>
                 <div className="pt-4 border-t">
                   <div className="text-sm text-slate-500">
-                    Growth Rate: <span className="text-green-600 font-semibold">+20%</span>
+                    Growth Rate: <span className="text-brand-green-600 font-semibold">+20%</span>
                   </div>
                 </div>
               </div>
@@ -169,11 +169,11 @@ export default async function CreatorAnalyticsPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center p-2 bg-slate-50 rounded">
                     <span className="text-sm">Course 1</span>
-                    <span className="text-sm font-semibold text-green-600">95% completion</span>
+                    <span className="text-sm font-semibold text-brand-green-600">95% completion</span>
                   </div>
                   <div className="flex justify-between items-center p-2 bg-slate-50 rounded">
                     <span className="text-sm">Course 2</span>
-                    <span className="text-sm font-semibold text-green-600">88% completion</span>
+                    <span className="text-sm font-semibold text-brand-green-600">88% completion</span>
                   </div>
                   <div className="flex justify-between items-center p-2 bg-slate-50 rounded">
                     <span className="text-sm">Course 3</span>
@@ -196,11 +196,11 @@ export default async function CreatorAnalyticsPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-black">Positive Feedback</span>
-                  <span className="font-semibold text-green-600">92%</span>
+                  <span className="font-semibold text-brand-green-600">92%</span>
                 </div>
                 <div className="pt-4 border-t">
                   <div className="text-sm text-slate-500">
-                    Recommendation Rate: <span className="text-green-600 font-semibold">89%</span>
+                    Recommendation Rate: <span className="text-brand-green-600 font-semibold">89%</span>
                   </div>
                 </div>
               </div>

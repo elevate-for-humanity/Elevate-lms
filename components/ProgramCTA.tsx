@@ -16,7 +16,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
                 Ready to Start Your Career?
               </h2>
-              <p className="text-xl mb-8 text-orange-50">
+              <p className="text-xl mb-8 text-brand-orange-50">
                 Join {programName} and get 100% free training through WIOA funding. No tuition, no debt, just career opportunities.
               </p>
 
@@ -33,7 +33,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">100% Free Training</h3>
-                    <p className="text-orange-50">Fully funded through WIOA, WRG, and JRI programs</p>
+                    <p className="text-brand-orange-50">Fully funded through WIOA, WRG, and JRI programs</p>
                   </div>
                 </div>
 
@@ -48,7 +48,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">Job Placement Support</h3>
-                    <p className="text-orange-50">We help you find employment after graduation</p>
+                    <p className="text-brand-orange-50">We help you find employment after graduation</p>
                   </div>
                 </div>
 
@@ -63,7 +63,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">Hands-On Training</h3>
-                    <p className="text-orange-50">Real-world experience with industry professionals</p>
+                    <p className="text-brand-orange-50">Real-world experience with industry professionals</p>
                   </div>
                 </div>
               </div>
@@ -71,13 +71,13 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/apply"
-                  className="inline-block px-8 py-4 bg-white text-orange-600 font-bold rounded-full hover:bg-orange-50 transition-all shadow-xl text-center text-lg"
+                  className="inline-block px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-full hover:bg-brand-orange-50 transition-all shadow-xl text-center text-lg"
                 >
                   Apply Now - Free Training
                 </Link>
                 <a
                   href="/support"
-                  className="inline-block px-8 py-4 bg-transparent text-white font-bold rounded-full border-2 border-white hover:bg-white hover:text-orange-600 transition-all text-center text-lg"
+                  className="inline-block px-8 py-4 bg-transparent text-white font-bold rounded-full border-2 border-white hover:bg-white hover:text-brand-orange-600 transition-all text-center text-lg"
                 >
                   Call 317-314-3757
                 </a>
@@ -119,19 +119,19 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
 
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center font-bold">1</div>
+                  <div className="w-8 h-8 bg-brand-orange-600 rounded-full flex items-center justify-center font-bold">1</div>
                   <p className="text-slate-300">Create account at IndianaCareerConnect.com</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center font-bold">2</div>
+                  <div className="w-8 h-8 bg-brand-orange-600 rounded-full flex items-center justify-center font-bold">2</div>
                   <p className="text-slate-300">Schedule appointment with career advisor</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center font-bold">3</div>
+                  <div className="w-8 h-8 bg-brand-orange-600 rounded-full flex items-center justify-center font-bold">3</div>
                   <p className="text-slate-300">Get approved for WIOA funding</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center font-bold">4</div>
+                  <div className="w-8 h-8 bg-brand-orange-600 rounded-full flex items-center justify-center font-bold">4</div>
                   <p className="text-slate-300">Enroll with Elevate for Humanity</p>
                 </div>
               </div>
@@ -140,7 +140,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                 href="https://www.indianacareerconnect.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block px-8 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all shadow-xl text-lg"
+                className="inline-block px-8 py-4 bg-brand-orange-600 text-white font-bold rounded-full hover:bg-brand-orange-700 transition-all shadow-xl text-lg"
               >
                 Go to Indiana Career Connect →
               </a>
@@ -177,7 +177,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                 <p className="text-black mb-4">
                   One-on-one guidance to help you choose the right career path and achieve your goals.
                 </p>
-                <Link href="/advising" aria-label="Link" className="text-orange-600 font-semibold hover:underline">
+                <Link href="/advising" aria-label="Link" className="text-brand-orange-600 font-semibold hover:underline">
                   Schedule Counseling →
                 </Link>
               </div>
@@ -198,7 +198,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                 <p className="text-black mb-4">
                   We connect you with employers actively hiring in your field. Resume help and interview prep included.
                 </p>
-                <Link href="/employers" aria-label="Link" className="text-orange-600 font-semibold hover:underline">
+                <Link href="/employers" aria-label="Link" className="text-brand-orange-600 font-semibold hover:underline">
                   View Employers →
                 </Link>
               </div>
@@ -219,7 +219,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                 <p className="text-black mb-4">
                   Transportation assistance, childcare support, and other services to help you complete training.
                 </p>
-                <Link href="/support" aria-label="Link" className="text-orange-600 font-semibold hover:underline">
+                <Link href="/support" aria-label="Link" className="text-brand-orange-600 font-semibold hover:underline">
                   Learn More →
                 </Link>
               </div>

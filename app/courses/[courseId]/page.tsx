@@ -201,7 +201,7 @@ export default async function CourseDetailPage({
               {!enrollment && (
                 <Link
                   href={user ? `/courses/${courseId}/enroll` : '/login'}
-                  className="block w-full text-center bg-orange-500 hover:bg-orange-600 text-white px-6 py-4 rounded-xl font-bold transition-colors"
+                  className="block w-full text-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-6 py-4 rounded-xl font-bold transition-colors"
                 >
                   {user ? 'Enroll Now' : 'Sign In to Enroll'}
                 </Link>

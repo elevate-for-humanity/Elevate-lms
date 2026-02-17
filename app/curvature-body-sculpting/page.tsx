@@ -245,8 +245,8 @@ export default function CurvatureBodySculptingPage() {
               <p className="text-gray-600 text-sm">Body and mind wellness</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-brand-green-600" />
               </div>
               <h3 className="font-bold mb-2">Community Focused</h3>
               <p className="text-gray-600 text-sm">VITA & Selfish Inc. partner</p>
@@ -337,7 +337,7 @@ export default function CurvatureBodySculptingPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/tax"
-              className="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition"
+              className="px-6 py-3 bg-brand-green-600 text-white font-medium rounded-lg hover:bg-brand-green-700 transition"
             >
               Free Tax Services (VITA)
             </Link>

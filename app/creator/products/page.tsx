@@ -103,8 +103,8 @@ export default async function CreatorProductsPage() {
               const statusColors = {
                 draft: 'bg-gray-100 text-black',
                 pending_review: 'bg-yellow-100 text-yellow-700',
-                approved: 'bg-brand-green-100 text-green-700',
-                rejected: 'bg-red-100 text-red-700',
+                approved: 'bg-brand-green-100 text-brand-green-700',
+                rejected: 'bg-brand-red-100 text-brand-red-700',
                 archived: 'bg-gray-100 text-black',
               };
 
@@ -169,8 +169,8 @@ export default async function CreatorProductsPage() {
                     </div>
 
                     {product.rejection_reason && (
-                      <div className="bg-red-50 border border-red-200 rounded p-2 mb-3">
-                        <p className="text-xs text-red-700">
+                      <div className="bg-brand-red-50 border border-brand-red-200 rounded p-2 mb-3">
+                        <p className="text-xs text-brand-red-700">
                           <strong>Rejected:</strong> {product.rejection_reason}
                         </p>
                       </div>

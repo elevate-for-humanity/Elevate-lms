@@ -28,9 +28,9 @@ export default async function TimePage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Hours This Week</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">156h</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Clocked In</h3><p className="text-3xl font-bold text-green-600 mt-2">18</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Overtime</h3><p className="text-3xl font-bold text-orange-600 mt-2">12h</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Absent Today</h3><p className="text-3xl font-bold text-red-600 mt-2">2</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Clocked In</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">18</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Overtime</h3><p className="text-3xl font-bold text-brand-orange-600 mt-2">12h</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Absent Today</h3><p className="text-3xl font-bold text-brand-red-600 mt-2">2</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6"><h2 className="text-lg font-semibold mb-4">Time Entries</h2><p className="text-gray-500 text-center py-4">Time tracking data will appear here</p></div>
       </div>

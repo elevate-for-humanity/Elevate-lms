@@ -228,7 +228,7 @@ export default function EmailMarketingPage() {
                         <span
                           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                             campaign.status === 'Sent'
-                              ? 'bg-brand-green-100 text-green-800'
+                              ? 'bg-brand-green-100 text-brand-green-800'
                               : campaign.status === 'Scheduled'
                                 ? 'bg-brand-blue-100 text-brand-blue-800'
                                 : 'bg-slate-100 text-black'

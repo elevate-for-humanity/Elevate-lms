@@ -47,7 +47,7 @@ export function HomeHero({ images }: HomeHeroProps) {
           {/* TEXT SIDE */}
           <div className="space-y-3 text-white">
             {current.badge && (
-              <span className="inline-flex items-center rounded-full bg-orange-500/15 px-3 py-2 text-[11px] font-semibold text-orange-300">
+              <span className="inline-flex items-center rounded-full bg-brand-orange-500/15 px-3 py-2 text-[11px] font-semibold text-brand-orange-300">
                 {current.badge}
               </span>
             )}
@@ -61,7 +61,7 @@ export function HomeHero({ images }: HomeHeroProps) {
               {current.ctaHref && current.ctaLabel && (
                 <Link
                   href={current.ctaHref}
-                  className="rounded-md bg-orange-500 px-4 py-2 font-semibold text-white shadow-sm hover:bg-orange-600"
+                  className="rounded-md bg-brand-orange-500 px-4 py-2 font-semibold text-white shadow-sm hover:bg-brand-orange-600"
                 >
                   {current.ctaLabel}
                 </Link>

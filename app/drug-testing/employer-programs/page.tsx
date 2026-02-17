@@ -238,7 +238,7 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* DOT Compliance */}
-      <section className="py-16 bg-orange-50">
+      <section className="py-16 bg-brand-orange-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -264,7 +264,7 @@ export default function EmployerProgramsPage() {
               </ul>
               <Link
                 href="/drug-testing/dot-testing"
-                className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-600 transition"
+                className="inline-flex items-center gap-2 bg-brand-orange-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-orange-600 transition"
               >
                 Learn About DOT Testing
               </Link>

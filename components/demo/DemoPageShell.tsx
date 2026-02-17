@@ -52,7 +52,7 @@ export function DemoPageShell({ title, description, portal = 'admin', children }
 
   const nav = portal === 'employer' ? employerNav : portal === 'learner' ? learnerNav : adminNav;
   const portalLabel = portal === 'employer' ? 'Employer Portal' : portal === 'learner' ? 'Student Portal' : 'Admin Portal';
-  const portalColor = portal === 'employer' ? 'bg-brand-blue-600' : portal === 'learner' ? 'bg-green-600' : 'bg-slate-800';
+  const portalColor = portal === 'employer' ? 'bg-brand-blue-600' : portal === 'learner' ? 'bg-brand-green-600' : 'bg-slate-800';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -101,7 +101,7 @@ export function DemoPageShell({ title, description, portal = 'admin', children }
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                     isActive
-                      ? 'bg-red-50 text-red-700 font-semibold border-r-2 border-red-600'
+                      ? 'bg-brand-red-50 text-brand-red-700 font-semibold border-r-2 border-brand-red-600'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >

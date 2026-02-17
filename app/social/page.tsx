@@ -57,7 +57,7 @@ const socialPlatforms = [
   {
     name: 'YouTube',
     icon: Youtube,
-    color: 'bg-red-600 hover:bg-red-700',
+    color: 'bg-brand-red-600 hover:bg-brand-red-700',
     href: 'https://www.youtube.com/@elevateforhumanity',
     followers: '1.5K',
     description: 'Watch tutorials, student testimonials, and program overviews',
@@ -75,7 +75,7 @@ const socialPlatforms = [
   {
     name: 'Instagram',
     icon: Instagram,
-    color: 'bg-slate-700 hover:from-blue-700 hover:via-pink-700 hover:to-orange-600',
+    color: 'bg-slate-700 hover:from-brand-blue-700 hover:via-pink-700 hover:to-brand-orange-600',
     href: 'https://www.instagram.com/elevateforhumanity',
     followers: '3.4K',
     description: 'Behind-the-scenes content, student spotlights, and daily inspiration',
@@ -307,8 +307,8 @@ export default function SocialMediaPage() {
           <div className="flex items-center justify-between mb-12">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Youtube className="w-6 h-6 text-red-600" />
-                <span className="text-red-600 font-medium">YouTube Channel</span>
+                <Youtube className="w-6 h-6 text-brand-red-600" />
+                <span className="text-brand-red-600 font-medium">YouTube Channel</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-slate-900">
                 Featured Videos
@@ -318,7 +318,7 @@ export default function SocialMediaPage() {
               href="https://www.youtube.com/@elevateforhumanity"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden md:inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-full font-medium hover:bg-red-700 transition-colors"
+              className="hidden md:inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 text-white rounded-full font-medium hover:bg-brand-red-700 transition-colors"
             >
               <Youtube className="w-5 h-5" />
               Subscribe
@@ -345,7 +345,7 @@ export default function SocialMediaPage() {
                     onClick={() => setActiveVideo(video.youtubeId)}
                     className="absolute inset-0 flex items-center justify-center"
                   >
-                    <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                    <div className="w-16 h-16 bg-brand-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                       <Play className="w-7 h-7 text-white ml-1" fill="white" />
                     </div>
                   </button>

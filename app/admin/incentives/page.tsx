@@ -285,12 +285,12 @@ export default function IncentivesPage() {
                       <span
                         className={`px-2 py-2 text-xs rounded ${
                           incentive.status === 'paid'
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-green-100 text-brand-green-800'
                             : incentive.status === 'approved'
                               ? 'bg-brand-blue-100 text-brand-blue-800'
                               : incentive.status === 'pending'
                                 ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-red-100 text-red-800'
+                                : 'bg-brand-red-100 text-brand-red-800'
                         }`}
                       >
                         {incentive.status}

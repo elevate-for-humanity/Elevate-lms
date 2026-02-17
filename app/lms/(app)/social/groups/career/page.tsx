@@ -97,7 +97,7 @@ export default async function CareerGroupPage() {
       </div>
 
       {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
+      <div className="bg-gradient-to-r from-brand-blue-600 to-cyan-600 text-white">
         <div className="max-w-6xl mx-auto px-4 py-12">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-6">
@@ -106,7 +106,7 @@ export default async function CareerGroupPage() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold">Career Changers</h1>
-                <p className="text-blue-100 mt-2 max-w-xl">
+                <p className="text-brand-blue-100 mt-2 max-w-xl">
                   A supportive community for those transitioning to new careers. Share your journey, 
                   get advice, and connect with others making similar changes.
                 </p>
@@ -129,7 +129,7 @@ export default async function CareerGroupPage() {
               <button className="p-2 bg-white/20 rounded-lg hover:bg-white/30">
                 <Settings className="w-5 h-5" />
               </button>
-              <button className="px-4 py-2 bg-white text-blue-700 rounded-lg hover:bg-blue-50 font-medium">
+              <button className="px-4 py-2 bg-white text-brand-blue-700 rounded-lg hover:bg-brand-blue-50 font-medium">
                 Joined
               </button>
             </div>
@@ -157,15 +157,15 @@ export default async function CareerGroupPage() {
               </div>
               <div className="flex gap-2 mt-4 pt-4 border-t">
                 <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-600">
-                  <FileText className="w-5 h-5 text-blue-600" />
+                  <FileText className="w-5 h-5 text-brand-blue-600" />
                   Article
                 </button>
                 <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-600">
-                  <Calendar className="w-5 h-5 text-orange-600" />
+                  <Calendar className="w-5 h-5 text-brand-orange-600" />
                   Event
                 </button>
                 <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-600">
-                  <MessageSquare className="w-5 h-5 text-green-600" />
+                  <MessageSquare className="w-5 h-5 text-brand-green-600" />
                   Question
                 </button>
               </div>
@@ -194,24 +194,24 @@ export default async function CareerGroupPage() {
                           <span>•</span>
                           <span>{post.time}</span>
                         </div>
-                        <h3 className="font-semibold text-gray-900 mt-1 hover:text-blue-600 cursor-pointer">
+                        <h3 className="font-semibold text-gray-900 mt-1 hover:text-brand-blue-600 cursor-pointer">
                           {post.title}
                         </h3>
                         <p className="text-gray-600 text-sm mt-1">{post.preview}</p>
                         <div className="flex items-center gap-4 mt-3">
-                          <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-sm">
+                          <button className="flex items-center gap-1 text-gray-500 hover:text-brand-blue-600 text-sm">
                             <ThumbsUp className="w-4 h-4" />
                             {post.likes}
                           </button>
-                          <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-sm">
+                          <button className="flex items-center gap-1 text-gray-500 hover:text-brand-blue-600 text-sm">
                             <MessageCircle className="w-4 h-4" />
                             {post.comments}
                           </button>
-                          <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-sm">
+                          <button className="flex items-center gap-1 text-gray-500 hover:text-brand-blue-600 text-sm">
                             <Share2 className="w-4 h-4" />
                             Share
                           </button>
-                          <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-sm ml-auto">
+                          <button className="flex items-center gap-1 text-gray-500 hover:text-brand-blue-600 text-sm ml-auto">
                             <Bookmark className="w-4 h-4" />
                           </button>
                         </div>
@@ -221,7 +221,7 @@ export default async function CareerGroupPage() {
                 ))}
               </div>
               <div className="p-4 border-t text-center">
-                <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                <button className="text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm">
                   View All Discussions
                 </button>
               </div>
@@ -256,8 +256,8 @@ export default async function CareerGroupPage() {
               <div className="space-y-3">
                 {groupResources.map((resource, i) => (
                   <button key={i} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 text-left">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <resource.icon className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                      <resource.icon className="w-5 h-5 text-brand-blue-600" />
                     </div>
                     <div>
                       <div className="font-medium text-gray-900 text-sm">{resource.title}</div>
@@ -272,7 +272,7 @@ export default async function CareerGroupPage() {
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-gray-900">Members</h3>
-                <Link href="#" className="text-blue-600 hover:text-blue-700 text-sm">See All</Link>
+                <Link href="#" className="text-brand-blue-600 hover:text-brand-blue-700 text-sm">See All</Link>
               </div>
               <div className="flex -space-x-2">
                 {[...Array(8)].map((_, i) => (
@@ -282,14 +282,14 @@ export default async function CareerGroupPage() {
                   +148
                 </div>
               </div>
-              <button className="w-full mt-4 px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 text-sm font-medium flex items-center justify-center gap-2">
+              <button className="w-full mt-4 px-4 py-2 border border-brand-blue-600 text-brand-blue-600 rounded-lg hover:bg-brand-blue-50 text-sm font-medium flex items-center justify-center gap-2">
                 <Plus className="w-4 h-4" />
                 Invite Members
               </button>
             </div>
 
             {/* Related Groups */}
-            <div className="bg-blue-50 rounded-xl p-6">
+            <div className="bg-brand-blue-50 rounded-xl p-6">
               <h3 className="font-semibold text-gray-900 mb-3">Related Groups</h3>
               <div className="space-y-3">
                 <Link href="/lms/social/groups/healthcare" className="block p-3 bg-white rounded-lg hover:shadow-sm">

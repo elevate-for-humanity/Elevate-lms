@@ -30,8 +30,8 @@ export default function InstantEnrollButton({
   const baseClasses = 'inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variantClasses = {
-    primary: 'bg-orange-500 hover:bg-orange-600 text-white',
-    secondary: 'bg-white hover:bg-gray-50 text-orange-600 border-2 border-orange-500',
+    primary: 'bg-brand-orange-500 hover:bg-brand-orange-600 text-white',
+    secondary: 'bg-white hover:bg-gray-50 text-brand-orange-600 border-2 border-brand-orange-500',
   };
 
   return (

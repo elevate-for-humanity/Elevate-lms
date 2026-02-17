@@ -43,7 +43,7 @@ export function HomeHero() {
           </p>
           <Link
             href="/programs"
-            className="inline-flex items-center gap-3 bg-red-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-red-700 transition-colors"
+            className="inline-flex items-center gap-3 bg-brand-red-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-brand-red-700 transition-colors"
           >
             Explore training paths near you
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

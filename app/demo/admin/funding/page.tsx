@@ -37,7 +37,7 @@ export default function DemoFundingPage() {
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${pct > 85 ? 'bg-amber-500' : 'bg-green-500'}`} style={{ width: `${pct}%` }} />
+                        <div className={`h-full rounded-full ${pct > 85 ? 'bg-amber-500' : 'bg-brand-green-500'}`} style={{ width: `${pct}%` }} />
                       </div>
                       <span className="text-xs text-gray-500">{pct}%</span>
                     </div>

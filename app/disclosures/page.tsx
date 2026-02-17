@@ -49,7 +49,7 @@ export default function DisclosuresPage() {
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 w-full">
           <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 text-white text-sm font-semibold rounded-full mb-6">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white text-sm font-semibold rounded-full mb-6">
               <Shield className="w-4 h-4" />
               Transparency & Compliance
             </span>
@@ -63,7 +63,7 @@ export default function DisclosuresPage() {
             <div className="flex flex-wrap gap-4">
               <Link
                 href="#policies"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-colors"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-semibold rounded-lg transition-colors"
               >
                 View All Policies
                 <ArrowRight className="w-5 h-5" />
@@ -85,19 +85,19 @@ export default function DisclosuresPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <div className="text-3xl font-bold text-orange-400">DOL</div>
+              <div className="text-3xl font-bold text-brand-orange-400">DOL</div>
               <div className="text-gray-300 text-sm">Registered Sponsor</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-orange-400">WIOA</div>
+              <div className="text-3xl font-bold text-brand-orange-400">WIOA</div>
               <div className="text-gray-300 text-sm">Approved Provider</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-orange-400">ETPL</div>
+              <div className="text-3xl font-bold text-brand-orange-400">ETPL</div>
               <div className="text-gray-300 text-sm">Listed Training</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-orange-400">100%</div>
+              <div className="text-3xl font-bold text-brand-orange-400">100%</div>
               <div className="text-gray-300 text-sm">Compliant</div>
             </div>
           </div>
@@ -130,7 +130,7 @@ export default function DisclosuresPage() {
                 </div>
                 <Link
                   href="/about"
-                  className="inline-flex items-center gap-2 mt-6 text-orange-600 font-semibold hover:text-orange-700"
+                  className="inline-flex items-center gap-2 mt-6 text-brand-orange-600 font-semibold hover:text-brand-orange-700"
                 >
                   Learn More About Us
                   <ArrowRight className="w-4 h-4" />
@@ -167,7 +167,7 @@ export default function DisclosuresPage() {
                 </div>
                 <Link
                   href="/accreditation"
-                  className="inline-flex items-center gap-2 mt-6 text-orange-600 font-semibold hover:text-orange-700"
+                  className="inline-flex items-center gap-2 mt-6 text-brand-orange-600 font-semibold hover:text-brand-orange-700"
                 >
                   View All Credentials
                   <ArrowRight className="w-4 h-4" />
@@ -267,8 +267,8 @@ export default function DisclosuresPage() {
           {/* Financial Policies */}
           <div className="mb-12">
             <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-brand-green-600" />
               </div>
               Financial Policies
             </h3>
@@ -284,15 +284,15 @@ export default function DisclosuresPage() {
                   <Link
                     key={policy.href}
                     href={policy.href}
-                    className="group bg-white border-2 border-gray-100 rounded-xl p-5 hover:border-green-500 hover:shadow-lg transition-all"
+                    className="group bg-white border-2 border-gray-100 rounded-xl p-5 hover:border-brand-green-500 hover:shadow-lg transition-all"
                   >
-                    <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-100 transition">
-                      <Icon className="w-6 h-6 text-green-600" />
+                    <div className="w-12 h-12 bg-brand-green-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-brand-green-100 transition">
+                      <Icon className="w-6 h-6 text-brand-green-600" />
                     </div>
-                    <h4 className="font-semibold text-gray-900 group-hover:text-green-600 transition">
+                    <h4 className="font-semibold text-gray-900 group-hover:text-brand-green-600 transition">
                       {policy.title}
                     </h4>
-                    <span className="text-sm text-gray-500 group-hover:text-green-500 flex items-center gap-1 mt-2">
+                    <span className="text-sm text-gray-500 group-hover:text-brand-green-500 flex items-center gap-1 mt-2">
                       View Policy <ArrowRight className="w-3 h-3" />
                     </span>
                   </Link>
@@ -304,8 +304,8 @@ export default function DisclosuresPage() {
           {/* Compliance Policies */}
           <div className="mb-12">
             <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Scale className="w-5 h-5 text-orange-600" />
+              <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                <Scale className="w-5 h-5 text-brand-orange-600" />
               </div>
               Compliance & Non-Discrimination
             </h3>
@@ -321,15 +321,15 @@ export default function DisclosuresPage() {
                   <Link
                     key={policy.href}
                     href={policy.href}
-                    className="group bg-white border-2 border-gray-100 rounded-xl p-5 hover:border-orange-500 hover:shadow-lg transition-all"
+                    className="group bg-white border-2 border-gray-100 rounded-xl p-5 hover:border-brand-orange-500 hover:shadow-lg transition-all"
                   >
-                    <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-orange-100 transition">
-                      <Icon className="w-6 h-6 text-orange-600" />
+                    <div className="w-12 h-12 bg-brand-orange-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-brand-orange-100 transition">
+                      <Icon className="w-6 h-6 text-brand-orange-600" />
                     </div>
-                    <h4 className="font-semibold text-gray-900 group-hover:text-orange-600 transition">
+                    <h4 className="font-semibold text-gray-900 group-hover:text-brand-orange-600 transition">
                       {policy.title}
                     </h4>
-                    <span className="text-sm text-gray-500 group-hover:text-orange-500 flex items-center gap-1 mt-2">
+                    <span className="text-sm text-gray-500 group-hover:text-brand-orange-500 flex items-center gap-1 mt-2">
                       View Policy <ArrowRight className="w-3 h-3" />
                     </span>
                   </Link>
@@ -392,22 +392,22 @@ export default function DisclosuresPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-orange-400" />
+                    <Mail className="w-5 h-5 text-brand-orange-400" />
                   </div>
                   <div>
                     <p className="text-gray-400 text-sm">Email</p>
-                    <a href="mailto:info@elevateforhumanity.org" className="text-white hover:text-orange-400">
+                    <a href="mailto:info@elevateforhumanity.org" className="text-white hover:text-brand-orange-400">
                       info@elevateforhumanity.org
                     </a>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-                    <Phone className="w-5 h-5 text-orange-400" />
+                    <Phone className="w-5 h-5 text-brand-orange-400" />
                   </div>
                   <div>
                     <p className="text-gray-400 text-sm">Phone</p>
-                    <a href="/support" className="text-white hover:text-orange-400">
+                    <a href="/support" className="text-white hover:text-brand-orange-400">
                       Get Help Online
                     </a>
                   </div>
@@ -421,7 +421,7 @@ export default function DisclosuresPage() {
               </p>
               <Link
                 href="/policies/grievance"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-colors w-full justify-center"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-semibold rounded-lg transition-colors w-full justify-center"
               >
                 View Grievance Procedure
                 <ArrowRight className="w-5 h-5" />

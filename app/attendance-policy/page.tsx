@@ -54,7 +54,7 @@ export default function AttendancePolicyPage() {
               </ul>
             </div>
             
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+            <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-3">In-Person Component</h3>
               <p className="text-gray-700 mb-3">Attendance is measured by:</p>
               <ul className="list-disc list-inside text-gray-700 space-y-2">
@@ -221,7 +221,7 @@ export default function AttendancePolicyPage() {
               </ul>
             </div>
             
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
+            <div className="bg-brand-orange-50 border border-brand-orange-200 rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-3">Attendance Probation</h3>
               <p className="text-gray-700">
                 Students whose attendance falls below 80% will be placed on attendance probation. 
@@ -230,7 +230,7 @@ export default function AttendancePolicyPage() {
               </p>
             </div>
             
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-3">Withdrawal for Non-Attendance</h3>
               <p className="text-gray-700 mb-3">
                 Students may be administratively withdrawn from the program if:
@@ -242,7 +242,7 @@ export default function AttendancePolicyPage() {
               </ul>
               <p className="text-gray-700 mt-3">
                 Students withdrawn for non-attendance may be eligible for re-enrollment 
-                in a future cohort. See the <Link href="/refund-policy" className="text-orange-600 hover:underline">Refund Policy</Link> for 
+                in a future cohort. See the <Link href="/refund-policy" className="text-brand-orange-600 hover:underline">Refund Policy</Link> for 
                 financial implications of withdrawal.
               </p>
             </div>
@@ -254,7 +254,7 @@ export default function AttendancePolicyPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Appeals</h2>
           <p className="text-gray-700 mb-4">
             Students who believe their attendance record is inaccurate or who have extenuating 
-            circumstances may appeal attendance-related decisions through the <Link href="/grievance" className="text-orange-600 hover:underline">Grievance Process</Link>.
+            circumstances may appeal attendance-related decisions through the <Link href="/grievance" className="text-brand-orange-600 hover:underline">Grievance Process</Link>.
           </p>
           <p className="text-gray-700">
             Appeals must be submitted in writing within 5 business days of receiving an 
@@ -271,10 +271,10 @@ export default function AttendancePolicyPage() {
             Questions about attendance? Contact your program coordinator or call Get Help Online.
           </p>
           <div className="flex flex-wrap gap-4 text-sm">
-            <Link href="/disclosures" className="text-orange-600 hover:underline">Student Disclosures</Link>
-            <Link href="/satisfactory-academic-progress" className="text-orange-600 hover:underline">SAP Policy</Link>
-            <Link href="/refund-policy" className="text-orange-600 hover:underline">Refund Policy</Link>
-            <Link href="/grievance" className="text-orange-600 hover:underline">Grievance Policy</Link>
+            <Link href="/disclosures" className="text-brand-orange-600 hover:underline">Student Disclosures</Link>
+            <Link href="/satisfactory-academic-progress" className="text-brand-orange-600 hover:underline">SAP Policy</Link>
+            <Link href="/refund-policy" className="text-brand-orange-600 hover:underline">Refund Policy</Link>
+            <Link href="/grievance" className="text-brand-orange-600 hover:underline">Grievance Policy</Link>
           </div>
         </div>
       {/* CTA Section */}

@@ -32,7 +32,7 @@ export default function DemoCoursesPage() {
               )}
             </div>
             <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div className={`h-full rounded-full ${c.progress === 100 ? 'bg-green-500' : 'bg-brand-blue-500'}`} style={{ width: `${c.progress}%` }} />
+              <div className={`h-full rounded-full ${c.progress === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'}`} style={{ width: `${c.progress}%` }} />
             </div>
           </div>
         ))}

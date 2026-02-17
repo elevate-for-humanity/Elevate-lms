@@ -118,7 +118,7 @@ export function ProgramHero({ program }: { program: Program }) {
                   <span className="text-3xl sm:text-4xl md:text-5xl">
                     {getIcon()}
                   </span>
-                  <p className="text-xs sm:text-sm uppercase tracking-wide text-orange-400 font-semibold">
+                  <p className="text-xs sm:text-sm uppercase tracking-wide text-brand-orange-400 font-semibold">
                     Elevate Workforce Pathway
                   </p>
                 </div>
@@ -131,7 +131,7 @@ export function ProgramHero({ program }: { program: Program }) {
                 <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
                   <a
                     href={`/apply?program=${program.slug}`}
-                    className="inline-flex items-center justify-center bg-orange-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold hover:bg-orange-600 transition shadow-lg text-center whitespace-nowrap text-sm sm:text-base"
+                    className="inline-flex items-center justify-center bg-brand-orange-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold hover:bg-brand-orange-600 transition shadow-lg text-center whitespace-nowrap text-sm sm:text-base"
                   >
                     Apply Now
                   </a>
@@ -157,23 +157,23 @@ export function ProgramHero({ program }: { program: Program }) {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="text-center">
                 <div className="text-sm text-black mb-1">Duration</div>
-                <div className="text-3xl font-bold text-orange-500">
+                <div className="text-3xl font-bold text-brand-orange-500">
                   {program.duration}
                 </div>
               </div>
               <div className="text-center">
                 <div className="text-sm text-black mb-1">Cost</div>
-                <div className="text-3xl font-bold text-orange-500">$0</div>
+                <div className="text-3xl font-bold text-brand-orange-500">$0</div>
               </div>
               <div className="text-center">
                 <div className="text-sm text-black mb-1">Format</div>
-                <div className="text-lg font-bold text-orange-500">
+                <div className="text-lg font-bold text-brand-orange-500">
                   {program.delivery}
                 </div>
               </div>
               <div className="text-center">
                 <div className="text-sm text-black mb-1">Credential</div>
-                <div className="text-lg font-bold text-orange-500">
+                <div className="text-lg font-bold text-brand-orange-500">
                   {program.credential.split(':')[0] || 'Certificate'}
                 </div>
               </div>

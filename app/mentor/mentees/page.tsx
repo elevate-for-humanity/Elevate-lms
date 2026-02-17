@@ -95,14 +95,14 @@ export default async function MenteesPage() {
                     <td className="px-6 py-4 text-gray-600">{mentee.startDate}</td>
                     <td className="px-6 py-4 text-center text-gray-600">{mentee.sessions}</td>
                     <td className="px-6 py-4 text-center">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${mentee.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${mentee.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-gray-100 text-gray-700'}`}>
                         {mentee.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <button className="p-2 text-brand-blue-600 hover:bg-brand-blue-50 rounded"><MessageSquare className="w-4 h-4" /></button>
-                        <button className="p-2 text-green-600 hover:bg-green-50 rounded"><Calendar className="w-4 h-4" /></button>
+                        <button className="p-2 text-brand-green-600 hover:bg-brand-green-50 rounded"><Calendar className="w-4 h-4" /></button>
                       </div>
                     </td>
                   </tr>

@@ -189,13 +189,13 @@ export default function AdminOfficesPage() {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+            <div className="text-2xl font-bold text-brand-green-600">{stats.active}</div>
             <p className="text-xs text-muted-foreground">Active</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-orange-600">{stats.pending}</div>
+            <div className="text-2xl font-bold text-brand-orange-600">{stats.pending}</div>
             <p className="text-xs text-muted-foreground">Pending</p>
           </CardContent>
         </Card>

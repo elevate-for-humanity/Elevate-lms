@@ -89,7 +89,7 @@ export default function EnrollmentCounter() {
               <Zap className="w-4 h-4" />
               {isLive && (
                 <motion.div
-                  className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full"
+                  className="absolute -top-1 -right-1 w-2 h-2 bg-brand-green-400 rounded-full"
                   animate={{ scale: [1, 1.5, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
@@ -123,7 +123,7 @@ export default function EnrollmentCounter() {
               {formatNumber(totalCount.get())}
             </motion.div>
             <div className="text-white/80 font-semibold">Total Enrollments</div>
-            <div className="mt-4 flex items-center gap-2 text-green-300 text-sm">
+            <div className="mt-4 flex items-center gap-2 text-brand-green-300 text-sm">
               <TrendingUp className="w-4 h-4" />
               <span>Growing daily</span>
             </div>
@@ -174,8 +174,8 @@ export default function EnrollmentCounter() {
               {formatNumber(todayCount.get())}
             </motion.div>
             <div className="text-white/80 font-semibold">Enrolled Today</div>
-            <div className="mt-4 flex items-center gap-2 text-green-300 text-sm">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            <div className="mt-4 flex items-center gap-2 text-brand-green-300 text-sm">
+              <div className="w-2 h-2 bg-brand-green-400 rounded-full animate-pulse" />
               <span>Updated {timeSinceUpdate}</span>
             </div>
           </motion.div>
@@ -212,7 +212,7 @@ export default function EnrollmentCounter() {
         >
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <div className="w-2 h-2 bg-brand-green-400 rounded-full animate-pulse" />
               Recent Enrollments
             </h3>
             <span className="text-sm text-white/60">Live updates</span>

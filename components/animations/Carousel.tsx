@@ -132,7 +132,7 @@ d="M9 5l7 7-7 7" />
             onClick={() => goToSlide(index)}
             className={`w-3 h-3 rounded-full transition-all duration-300 ${
               index === currentIndex
-                ? 'bg-orange-500 w-8'
+                ? 'bg-brand-orange-500 w-8'
                 : 'bg-white/50 hover:bg-white/80'
             }`}
             aria-label={`Go to slide ${index + 1}`}

@@ -32,7 +32,7 @@ export default function PathwaysPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Find Your Career Pathway</h1>
           <p className="text-xl text-brand-blue-100 mb-8">Explore training programs designed to launch your career in high-demand industries</p>
-          <Link href="/apply" className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <Link href="/apply" className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Get Started <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>
@@ -91,7 +91,7 @@ export default function PathwaysPage() {
           <h2 className="text-3xl font-bold mb-6">Have Questions?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">Use our live chat or apply online - we respond within 24 hours.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/apply" className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition">Apply Now</Link>
+            <Link href="/apply" className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition">Apply Now</Link>
             <Link href="/contact" className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg text-lg font-bold transition border-2 border-white/30">Contact Us</Link>
           </div>
         </div>

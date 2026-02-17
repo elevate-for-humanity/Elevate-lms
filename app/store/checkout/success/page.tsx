@@ -34,7 +34,7 @@ function CheckoutSuccessContent() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green-600 mx-auto mb-4" />
           <p className="text-gray-600">Confirming your subscription...</p>
         </div>
       </div>
@@ -46,8 +46,8 @@ function CheckoutSuccessContent() {
       <div className="max-w-xl mx-auto px-4">
         {/* Success Header */}
         <div className="text-center mb-10">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-green-600" />
+          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="w-10 h-10 text-brand-green-600" />
           </div>
           <h1 className="text-3xl font-black text-gray-900 mb-3">
             Trial Started Successfully
@@ -158,7 +158,7 @@ function CheckoutSuccessContent() {
 function LoadingFallback() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <Loader2 className="w-10 h-10 text-green-500 animate-spin" />
+      <Loader2 className="w-10 h-10 text-brand-green-500 animate-spin" />
     </div>
   );
 }

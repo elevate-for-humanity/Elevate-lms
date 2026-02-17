@@ -172,19 +172,19 @@ export default function TrustStrip({ variant = 'default', showAnimation = true, 
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
             <div className="text-center">
               <div className="text-3xl font-extrabold">{formatNumber(animatedStats.studentsEnrolled)}+</div>
-              <div className="text-sm text-red-100 font-medium">Students Trained</div>
+              <div className="text-sm text-brand-red-100 font-medium">Students Trained</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-extrabold">{animatedStats.jobPlacementRate}%</div>
-              <div className="text-sm text-red-100 font-medium">Job Placement</div>
+              <div className="text-sm text-brand-red-100 font-medium">Job Placement</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-extrabold">$0</div>
-              <div className="text-sm text-red-100 font-medium">Cost to Students</div>
+              <div className="text-sm text-brand-red-100 font-medium">Cost to Students</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-extrabold">100%</div>
-              <div className="text-sm text-red-100 font-medium">Funded Programs</div>
+              <div className="text-sm text-brand-red-100 font-medium">Funded Programs</div>
             </div>
           </div>
         </div>
@@ -203,8 +203,8 @@ export default function TrustStrip({ variant = 'default', showAnimation = true, 
               <div className="text-3xl font-bold text-gray-900">{formatNumber(animatedStats.studentsEnrolled)}+</div>
               <div className="text-sm text-gray-600">Students Enrolled</div>
             </div>
-            <div className="text-center p-6 rounded-xl bg-green-50 hover:bg-green-100 transition">
-              <GraduationCap className="w-8 h-8 text-green-600 mx-auto mb-3" />
+            <div className="text-center p-6 rounded-xl bg-brand-green-50 hover:bg-brand-green-100 transition">
+              <GraduationCap className="w-8 h-8 text-brand-green-600 mx-auto mb-3" />
               <div className="text-3xl font-bold text-gray-900">{animatedStats.programsOffered}</div>
               <div className="text-sm text-gray-600">Training Programs</div>
             </div>
@@ -213,8 +213,8 @@ export default function TrustStrip({ variant = 'default', showAnimation = true, 
               <div className="text-3xl font-bold text-gray-900">{animatedStats.jobPlacementRate}%</div>
               <div className="text-sm text-gray-600">Job Placement Rate</div>
             </div>
-            <div className="text-center p-6 rounded-xl bg-orange-50 hover:bg-orange-100 transition">
-              <Award className="w-8 h-8 text-orange-600 mx-auto mb-3" />
+            <div className="text-center p-6 rounded-xl bg-brand-orange-50 hover:bg-brand-orange-100 transition">
+              <Award className="w-8 h-8 text-brand-orange-600 mx-auto mb-3" />
               <div className="text-3xl font-bold text-gray-900">{formatNumber(animatedStats.certificatesIssued)}</div>
               <div className="text-sm text-gray-600">Certificates Issued</div>
             </div>
@@ -252,7 +252,7 @@ export default function TrustStrip({ variant = 'default', showAnimation = true, 
             <div className="text-gray-600">Students Trained</div>
           </div>
           <div>
-            <div className="text-3xl font-extrabold text-green-600">{animatedStats.jobPlacementRate}%</div>
+            <div className="text-3xl font-extrabold text-brand-green-600">{animatedStats.jobPlacementRate}%</div>
             <div className="text-gray-600">Job Placement</div>
           </div>
         </div>

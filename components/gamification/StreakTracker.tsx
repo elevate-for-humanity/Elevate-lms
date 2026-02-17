@@ -80,7 +80,7 @@ export function StreakTracker({
   return (
     <div className="bg-slate-800 rounded-lg p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className={`p-3 rounded-full ${streakActive ? "bg-orange-500" : "bg-slate-700"}`}>
+        <div className={`p-3 rounded-full ${streakActive ? "bg-brand-orange-500" : "bg-slate-700"}`}>
           <Flame className={`w-6 h-6 ${streakActive ? "text-white" : "text-slate-500"}`} />
         </div>
         <div>
@@ -114,7 +114,7 @@ export function StreakTracker({
                 key={index}
                 className={`flex-1 h-12 rounded-lg flex items-center justify-center ${
                   day.active
-                    ? "bg-orange-500 text-white"
+                    ? "bg-brand-orange-500 text-white"
                     : "bg-slate-900 text-black"
                 }`}
               >
@@ -128,8 +128,8 @@ export function StreakTracker({
       )}
 
       {/* Motivation Message */}
-      <div className="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-lg">
-        <p className="text-sm text-orange-400">
+      <div className="mt-6 p-4 bg-brand-orange-500/10 border border-brand-orange-500/20 rounded-lg">
+        <p className="text-sm text-brand-orange-400">
           {streakActive
             ? currentStreak >= 7
               ? "🔥 Amazing! Keep the momentum going!"

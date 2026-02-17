@@ -135,17 +135,17 @@ export default function OnboardingPage() {
 
       <main className="px-4 py-6 space-y-4">
         {allComplete ? (
-          <div className="bg-green-500/20 border border-green-500/30 rounded-xl p-6 text-center">
-            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="bg-brand-green-500/20 border border-brand-green-500/30 rounded-xl p-6 text-center">
+            <div className="w-16 h-16 bg-brand-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <Sparkles className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-xl font-bold text-white mb-2">You're All Set!</h2>
-            <p className="text-green-200 mb-4">
+            <p className="text-brand-green-200 mb-4">
               You've completed all onboarding steps. You're ready to start your apprenticeship journey!
             </p>
             <Link 
               href="/pwa/barber"
-              className="inline-block bg-green-500 text-white font-bold px-6 py-3 rounded-xl"
+              className="inline-block bg-brand-green-500 text-white font-bold px-6 py-3 rounded-xl"
             >
               Go to Dashboard
             </Link>
@@ -198,7 +198,7 @@ export default function OnboardingPage() {
                   >
                     <div className="flex items-center gap-4">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        step.completed ? 'bg-green-500' : 'bg-slate-700'
+                        step.completed ? 'bg-brand-green-500' : 'bg-slate-700'
                       }`}>
                         {step.completed ? (
                           <span className="text-slate-400 flex-shrink-0">•</span>

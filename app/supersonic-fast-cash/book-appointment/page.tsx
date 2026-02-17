@@ -239,7 +239,7 @@ export default function BookAppointment() {
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                     step >= s
-                      ? 'bg-green-600 text-white'
+                      ? 'bg-brand-green-600 text-white'
                       : 'bg-gray-300 text-black'
                   }`}
                 >
@@ -248,7 +248,7 @@ export default function BookAppointment() {
                 {s < 4 && (
                   <div
                     className={`h-1 flex-1 ${
-                      step > s ? 'bg-green-600' : 'bg-gray-300'
+                      step > s ? 'bg-brand-green-600' : 'bg-gray-300'
                     }`}
                   />
                 )}
@@ -280,13 +280,13 @@ export default function BookAppointment() {
                   }}
                   className={`text-left p-6 rounded-lg border-2 transition ${
                     appointmentData.serviceType === service.id
-                      ? 'border-green-600 bg-green-50'
-                      : 'border-gray-300 hover:border-green-400'
+                      ? 'border-brand-green-600 bg-brand-green-50'
+                      : 'border-gray-300 hover:border-brand-green-400'
                   }`}
                 >
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-xl font-bold">{service.name}</h3>
-                    <span className="text-2xl font-bold text-green-600">
+                    <span className="text-2xl font-bold text-brand-green-600">
                       ${service.price}
                     </span>
                   </div>
@@ -372,7 +372,7 @@ export default function BookAppointment() {
                       }
                       className={`w-full text-left p-4 rounded border-2 ${
                         appointmentData.location === loc.id
-                          ? 'border-green-600 bg-green-50'
+                          ? 'border-brand-green-600 bg-brand-green-50'
                           : 'border-gray-300'
                       }`}
                     >
@@ -393,7 +393,7 @@ export default function BookAppointment() {
               <button
                 onClick={() => setStep(3)}
                 disabled={!appointmentData.appointmentType}
-                className="flex-1 bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="flex-1 bg-brand-green-600 text-white py-4 rounded-lg font-bold hover:bg-brand-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 Continue
               </button>
@@ -451,8 +451,8 @@ export default function BookAppointment() {
                         }
                         className={`px-4 py-3 rounded-lg border-2 font-semibold text-sm ${
                           appointmentData.time === time
-                            ? 'border-green-600 bg-green-50'
-                            : 'border-gray-300 hover:border-green-400'
+                            ? 'border-brand-green-600 bg-brand-green-50'
+                            : 'border-gray-300 hover:border-brand-green-400'
                         }`}
                       >
                         {time}
@@ -464,8 +464,8 @@ export default function BookAppointment() {
             </div>
 
             {appointmentData.date && appointmentData.time && (
-              <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
-                <p className="font-bold text-green-900">
+              <div className="mt-6 bg-brand-green-50 border border-brand-green-200 rounded-lg p-4">
+                <p className="font-bold text-brand-green-900">
                   Selected:{' '}
                   {new Date(appointmentData.date).toLocaleDateString('en-US', {
                     weekday: 'long',
@@ -487,7 +487,7 @@ export default function BookAppointment() {
               <button
                 onClick={() => setStep(4)}
                 disabled={!appointmentData.date || !appointmentData.time}
-                className="flex-1 bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="flex-1 bg-brand-green-600 text-white py-4 rounded-lg font-bold hover:bg-brand-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 Continue
               </button>
@@ -719,7 +719,7 @@ export default function BookAppointment() {
                     }
                   </p>
                 )}
-                <p className="text-2xl font-bold text-green-600 mt-4">
+                <p className="text-2xl font-bold text-brand-green-600 mt-4">
                   Total: $
                   {
                     serviceTypes.find(
@@ -745,7 +745,7 @@ export default function BookAppointment() {
                   !appointmentData.email ||
                   !appointmentData.phone
                 }
-                className="flex-1 bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 bg-brand-green-600 text-white py-4 rounded-lg font-bold hover:bg-brand-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <CreditCard className="w-5 h-5" />
                 Pay & Book Appointment

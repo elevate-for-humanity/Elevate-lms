@@ -51,7 +51,7 @@ export function LessonProgressIndicator({ completed, current }: LessonProgressIn
 
   if (current) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-emerald-500 bg-red-50">
+      <div className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-emerald-500 bg-brand-red-50">
         <div className="w-2 h-2 rounded-full bg-brand-orange-500" />
       </div>
     );

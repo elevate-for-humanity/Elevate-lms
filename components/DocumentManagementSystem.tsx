@@ -67,7 +67,7 @@ export function DocumentManagementSystem() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Document Management</h1>
-          <p className="text-red-100">Organize and version control your files</p>
+          <p className="text-brand-red-100">Organize and version control your files</p>
         </div>
       </div>
 
@@ -86,7 +86,7 @@ export function DocumentManagementSystem() {
                     key={doc.id}
                     onClick={() => setSelectedDoc(doc)}
                     className={`p-4 rounded-lg cursor-pointer transition-colors ${
-                      selectedDoc?.id === doc.id ? 'bg-red-50 border-2 border-red-600' : 'bg-gray-50 hover:bg-gray-100'
+                      selectedDoc?.id === doc.id ? 'bg-brand-red-50 border-2 border-brand-red-600' : 'bg-gray-50 hover:bg-gray-100'
                     }`}
                   >
                     <div className="flex items-start justify-between">

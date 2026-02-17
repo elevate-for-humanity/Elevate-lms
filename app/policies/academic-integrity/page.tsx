@@ -92,7 +92,7 @@ export default function AcademicIntegrityPage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Second Offense</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Failure of the course</li>
@@ -102,7 +102,7 @@ export default function AcademicIntegrityPage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Third Offense or Severe Violations</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Dismissal from the program</li>

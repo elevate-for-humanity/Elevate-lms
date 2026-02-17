@@ -117,7 +117,7 @@ export default function IPLAExamSignup() {
                 </li>
               </ul>
             </div>
-            <div className="bg-green-50 rounded-lg p-6">
+            <div className="bg-brand-green-50 rounded-lg p-6">
               <h3 className="font-bold text-lg mb-3">Exam Details</h3>
               <ul className="space-y-2 text-black">
                 <li>
@@ -247,8 +247,8 @@ export default function IPLAExamSignup() {
                     disabled={!selectedDate}
                     className={`w-full px-4 py-3 rounded-lg border-2 text-left font-semibold transition ${
                       selectedTime === time
-                        ? 'border-green-600 bg-green-50 text-green-900'
-                        : 'border-gray-300 hover:border-green-400 disabled:opacity-50 disabled:cursor-not-allowed'
+                        ? 'border-brand-green-600 bg-brand-green-50 text-brand-green-900'
+                        : 'border-gray-300 hover:border-brand-green-400 disabled:opacity-50 disabled:cursor-not-allowed'
                     }`}
                   >
                     {time}
@@ -296,7 +296,7 @@ export default function IPLAExamSignup() {
               !selectedTime ||
               loading
             }
-            className="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+            className="w-full bg-brand-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-brand-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
           >
             {loading ? 'Processing...' : 'Pay $150 & Schedule Exam'}
           </button>

@@ -282,7 +282,7 @@ export default function CommissionsPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-brand-green-600">
               ${totals.commissions.toLocaleString()}
             </div>
           </CardContent>
@@ -343,7 +343,7 @@ export default function CommissionsPage() {
                       </div>
                       <div className="text-center">
                         <p className="text-sm text-muted-foreground">Commission</p>
-                        <p className="font-medium text-green-600">
+                        <p className="font-medium text-brand-green-600">
                           ${preparer.total_commission.toLocaleString()}
                         </p>
                       </div>
@@ -381,7 +381,7 @@ export default function CommissionsPage() {
                               <td className="py-2 text-right">
                                 ${ret.client_fee?.toLocaleString()}
                               </td>
-                              <td className="py-2 text-right text-green-600">
+                              <td className="py-2 text-right text-brand-green-600">
                                 ${ret.preparer_commission?.toLocaleString()}
                               </td>
                             </tr>

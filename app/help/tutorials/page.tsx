@@ -367,9 +367,9 @@ export default async function TutorialsPage() {
             {tutorials.map((tutorial) => {
               const colorClasses: Record<string, string> = {
                 blue: 'bg-brand-blue-100 text-brand-blue-600',
-                green: 'bg-green-100 text-green-600',
+                green: 'bg-brand-green-100 text-brand-green-600',
                 blue: 'bg-brand-blue-100 text-brand-blue-600',
-                orange: 'bg-orange-100 text-orange-600',
+                orange: 'bg-brand-orange-100 text-brand-orange-600',
               };
 
               return (

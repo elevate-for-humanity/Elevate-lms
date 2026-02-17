@@ -83,7 +83,7 @@ export default function RefundTrackerPage() {
       case 'accepted':
         return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'action_required':
-        return <AlertCircle className="w-12 h-12 text-red-200" />;
+        return <AlertCircle className="w-12 h-12 text-brand-red-200" />;
       default:
         return <Clock className="w-12 h-12 text-gray-200" />;
     }
@@ -92,9 +92,9 @@ export default function RefundTrackerPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'accepted':
-        return 'bg-green-600';
+        return 'bg-brand-green-600';
       case 'action_required':
-        return 'bg-red-600';
+        return 'bg-brand-red-600';
       case 'submitted':
         return 'bg-brand-blue-700';
       default:
@@ -110,7 +110,7 @@ export default function RefundTrackerPage() {
 <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-brand-green-100 text-brand-green-700 px-4 py-2 rounded-full mb-4">
             <Search className="w-4 h-4" />
             <span className="text-sm font-semibold">IRS Refund Tracker</span>
           </div>
@@ -141,7 +141,7 @@ export default function RefundTrackerPage() {
                   onChange={(e) => setTrackingCode(e.target.value.toUpperCase())}
                   placeholder="SFC-1234567890-ABCD"
                   maxLength={40}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none font-mono"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-green-500 focus:outline-none font-mono"
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Enter the tracking code provided when your return was filed
@@ -149,10 +149,10 @@ export default function RefundTrackerPage() {
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <div className="bg-brand-red-50 border border-brand-red-200 rounded-xl p-4">
                   <div className="flex gap-2">
-                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                    <p className="text-sm text-red-700">{error}</p>
+                    <AlertCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0" />
+                    <p className="text-sm text-brand-red-700">{error}</p>
                   </div>
                 </div>
               )}
@@ -160,7 +160,7 @@ export default function RefundTrackerPage() {
               <button
                 onClick={trackRefund}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-green-600 text-white rounded-xl font-bold text-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-brand-green-600 text-white rounded-xl font-bold text-lg hover:bg-brand-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -262,10 +262,10 @@ export default function RefundTrackerPage() {
               <div className="space-y-6">
                 <div className="flex gap-4">
                   <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-brand-green-600 rounded-full flex items-center justify-center">
                       <span className="text-slate-400 flex-shrink-0">•</span>
                     </div>
-                    <div className="w-0.5 h-full bg-green-600 mt-2"></div>
+                    <div className="w-0.5 h-full bg-brand-green-600 mt-2"></div>
                   </div>
                   <div className="flex-1 pb-6">
                     <h4 className="font-semibold mb-1">Return Received</h4>
@@ -282,7 +282,7 @@ export default function RefundTrackerPage() {
                       className={`w-10 h-10 rounded-full flex items-center justify-center ${
                         refundStatus.status === 'approved' ||
                         refundStatus.status === 'sent'
-                          ? 'bg-green-600'
+                          ? 'bg-brand-green-600'
                           : 'bg-gray-300'
                       }`}
                     >
@@ -291,7 +291,7 @@ export default function RefundTrackerPage() {
                     <div
                       className={`w-0.5 h-full mt-2 ${
                         refundStatus.status === 'sent'
-                          ? 'bg-green-600'
+                          ? 'bg-brand-green-600'
                           : 'bg-gray-300'
                       }`}
                     ></div>
@@ -315,7 +315,7 @@ export default function RefundTrackerPage() {
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center ${
                         refundStatus.status === 'sent'
-                          ? 'bg-green-600'
+                          ? 'bg-brand-green-600'
                           : 'bg-gray-300'
                       }`}
                     >

@@ -72,7 +72,7 @@ export function ProgressDashboard({ userId }: { userId: string }) {
       value: `${data.overall_progress}%`,
       icon: TrendingUp,
       color: 'text-brand-orange-600',
-      bgColor: 'bg-red-50',
+      bgColor: 'bg-brand-red-50',
     },
     {
       label: 'Courses Completed',
@@ -92,15 +92,15 @@ export function ProgressDashboard({ userId }: { userId: string }) {
       label: 'Quiz Average',
       value: `${data.quiz_average}%`,
       icon: Target,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
+      color: 'text-brand-orange-600',
+      bgColor: 'bg-brand-orange-50',
     },
     {
       label: 'Assignments',
       value: `${data.assignments_completed}/${data.assignments_total}`,
       icon: CheckCircle,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
+      color: 'text-brand-green-600',
+      bgColor: 'bg-brand-green-50',
     },
     {
       label: 'Certificates',

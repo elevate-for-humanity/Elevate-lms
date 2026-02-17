@@ -80,7 +80,7 @@ export default async function PartnerHoursPage() {
           </div>
           <Link
             href="/partner/hours/pending"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600"
           >
             <AlertCircle className="w-4 h-4" />
             Review Pending ({pendingCount || 0})
@@ -103,7 +103,7 @@ export default async function PartnerHoursPage() {
 
           <div className="bg-white rounded-xl border p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
@@ -115,8 +115,8 @@ export default async function PartnerHoursPage() {
 
           <div className="bg-white rounded-xl border p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                <XCircle className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
+                <XCircle className="w-5 h-5 text-brand-red-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{rejectedCount || 0}</p>
@@ -141,10 +141,10 @@ export default async function PartnerHoursPage() {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link href="/partner/hours/pending" className="block">
-            <div className="bg-white rounded-xl border p-6 hover:border-orange-300 hover:shadow-md transition">
+            <div className="bg-white rounded-xl border p-6 hover:border-brand-orange-300 hover:shadow-md transition">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <AlertCircle className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6 text-brand-orange-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Review Pending Hours</h3>
@@ -152,8 +152,8 @@ export default async function PartnerHoursPage() {
                 </div>
               </div>
               {(pendingCount || 0) > 0 && (
-                <div className="mt-4 p-3 bg-orange-50 rounded-lg">
-                  <p className="text-sm text-orange-800">
+                <div className="mt-4 p-3 bg-brand-orange-50 rounded-lg">
+                  <p className="text-sm text-brand-orange-800">
                     <strong>{pendingCount}</strong> hours entries awaiting your review
                   </p>
                 </div>

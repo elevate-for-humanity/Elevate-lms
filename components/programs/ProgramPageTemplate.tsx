@@ -157,7 +157,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-block bg-green-100 text-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
+            <span className="inline-block bg-brand-green-100 text-brand-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Your Journey
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -170,7 +170,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
           
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Step 1: Apply Online */}
-            <div className="relative bg-gradient-to-br from-blue-50 to-white rounded-2xl p-8 border border-brand-blue-100 shadow-sm">
+            <div className="relative bg-gradient-to-br from-brand-blue-50 to-white rounded-2xl p-8 border border-brand-blue-100 shadow-sm">
               <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 1
               </div>
@@ -244,8 +244,8 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
             </div>
 
             {/* Step 3: Start Working */}
-            <div className="relative bg-gradient-to-br from-green-50 to-white rounded-2xl p-8 border border-green-100 shadow-sm">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-green-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+            <div className="relative bg-gradient-to-br from-brand-green-50 to-white rounded-2xl p-8 border border-brand-green-100 shadow-sm">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-green-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 3
               </div>
               <div className="pt-4">
@@ -271,8 +271,8 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                     <span className="text-gray-700">90-day post-employment support</span>
                   </li>
                 </ul>
-                <div className="mt-6 pt-6 border-t border-green-100">
-                  <div className="flex items-center gap-2 text-green-600">
+                <div className="mt-6 pt-6 border-t border-brand-green-100">
+                  <div className="flex items-center gap-2 text-brand-green-600">
                     <DollarSign className="w-4 h-4" />
                     <span className="text-sm font-medium">Average starting salary: {program.salary}</span>
                   </div>
@@ -424,7 +424,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
             </Link>
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center px-8 py-4 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-green-600 text-white font-semibold rounded-full hover:bg-brand-green-700 transition-colors"
             >
               Apply Now
             </Link>

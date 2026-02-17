@@ -109,20 +109,20 @@ export default function HowItWorksPage() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
             Tax Prep Made Simple
           </h1>
-          <p className="text-xl md:text-2xl text-orange-100 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-brand-orange-100 mb-8 max-w-3xl mx-auto">
             Get your taxes done in 4 easy steps. Walk in, upload online, or schedule an appointment. 
             Same-day refund advances available.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/apply"
-              className="inline-flex items-center gap-2 bg-white text-orange-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-orange-50 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-brand-orange-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-brand-orange-50 transition-colors"
             >
               Start Your Return <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/supersonic-fast-cash/locations"
-              className="inline-flex items-center gap-2 bg-orange-500 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-orange-400 transition-colors border-2 border-white/30"
+              className="inline-flex items-center gap-2 bg-brand-orange-500 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-brand-orange-400 transition-colors border-2 border-white/30"
             >
               Find a Location
             </Link>
@@ -151,11 +151,11 @@ export default function HowItWorksPage() {
                 {/* Step Content */}
                 <div className="flex-1">
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center">
-                      <step.icon className="w-8 h-8 text-orange-600" />
+                    <div className="w-16 h-16 bg-brand-orange-100 rounded-2xl flex items-center justify-center">
+                      <step.icon className="w-8 h-8 text-brand-orange-600" />
                     </div>
                     <div>
-                      <span className="text-orange-600 font-bold text-sm">STEP {step.number}</span>
+                      <span className="text-brand-orange-600 font-bold text-sm">STEP {step.number}</span>
                       <h3 className="text-2xl font-bold text-gray-900">{step.title}</h3>
                     </div>
                   </div>
@@ -189,8 +189,8 @@ export default function HowItWorksPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
               <div key={index} className="bg-white rounded-xl p-6 shadow-sm">
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 bg-brand-orange-100 rounded-xl flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-brand-orange-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{feature.title}</h3>
                 <p className="text-gray-600 text-sm">{feature.description}</p>
@@ -211,7 +211,7 @@ export default function HowItWorksPage() {
               <h2 className="text-3xl md:text-4xl font-black mb-6">
                 Get Up to $7,000 Today
               </h2>
-              <p className="text-green-100 text-lg mb-6">
+              <p className="text-brand-green-100 text-lg mb-6">
                 Don't wait weeks for the IRS. With our Refund Advance program, you can get 
                 cash in hand the same day you file. No credit check required.
               </p>
@@ -235,16 +235,16 @@ export default function HowItWorksPage() {
               </ul>
               <Link
                 href="/supersonic-fast-cash/services/refund-advance"
-                className="inline-flex items-center gap-2 bg-white text-green-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-green-50 transition-colors"
+                className="inline-flex items-center gap-2 bg-white text-brand-green-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-brand-green-50 transition-colors"
               >
                 Learn About Refund Advance <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
             <div className="text-center">
               <div className="inline-block bg-white/10 rounded-3xl p-8">
-                <DollarSign className="w-24 h-24 text-green-300 mx-auto mb-4" />
+                <DollarSign className="w-24 h-24 text-brand-green-300 mx-auto mb-4" />
                 <div className="text-6xl font-black">$7,000</div>
-                <div className="text-green-200 text-xl">Maximum Advance</div>
+                <div className="text-brand-green-200 text-xl">Maximum Advance</div>
               </div>
             </div>
           </div>
@@ -263,7 +263,7 @@ export default function HowItWorksPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/apply"
-              className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-colors"
+              className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-colors"
             >
               Start Your Return <ArrowRight className="w-5 h-5" />
             </Link>

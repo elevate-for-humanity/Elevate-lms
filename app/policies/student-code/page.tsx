@@ -40,7 +40,7 @@ export default function StudentCodePage() {
                 </p>
               </div>
 
-              <div className="bg-green-50 rounded-lg p-6 border-2 border-green-200">
+              <div className="bg-brand-green-50 rounded-lg p-6 border-2 border-brand-green-200">
                 <h3 className="text-xl font-bold text-black mb-3">Integrity</h3>
                 <p className="text-black">
                   Act honestly and ethically in all academic and personal conduct.
@@ -54,7 +54,7 @@ export default function StudentCodePage() {
                 </p>
               </div>
 
-              <div className="bg-orange-50 rounded-lg p-6 border-2 border-orange-200">
+              <div className="bg-brand-orange-50 rounded-lg p-6 border-2 border-brand-orange-200">
                 <h3 className="text-xl font-bold text-black mb-3">Professionalism</h3>
                 <p className="text-black">
                   Conduct yourself in a manner appropriate for future career success.
@@ -64,7 +64,7 @@ export default function StudentCodePage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Expected Behaviors</h2>
             
-            <div className="bg-green-50 rounded-xl p-6 border-2 border-green-200 mb-6">
+            <div className="bg-brand-green-50 rounded-xl p-6 border-2 border-brand-green-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Students Are Expected To:</h3>
               <ul className="list-disc pl-6 text-black space-y-2">
                 <li><strong>Attend Regularly:</strong> Maintain required attendance and arrive on time</li>
@@ -82,7 +82,7 @@ export default function StudentCodePage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Prohibited Conduct</h2>
             
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Harassment and Discrimination</h3>
               <p className="text-black mb-2">Strictly prohibited:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -95,7 +95,7 @@ export default function StudentCodePage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Violence and Safety Violations</h3>
               <p className="text-black mb-2">Zero tolerance for:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -108,7 +108,7 @@ export default function StudentCodePage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Substance Abuse</h3>
               <p className="text-black mb-2">Prohibited:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -196,7 +196,7 @@ export default function StudentCodePage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     2
                   </div>
                   <div>
@@ -220,7 +220,7 @@ export default function StudentCodePage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     4
                   </div>
                   <div>
@@ -232,7 +232,7 @@ export default function StudentCodePage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     5
                   </div>
                   <div>
@@ -258,7 +258,7 @@ export default function StudentCodePage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Moderate Violations</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Disciplinary probation</li>
@@ -269,7 +269,7 @@ export default function StudentCodePage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Severe Violations</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Dismissal from program</li>

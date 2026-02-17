@@ -64,14 +64,14 @@ export function ProgressTracker({
               key={milestone.id}
               className={`flex items-start gap-3 p-3 rounded-lg border ${
                 milestone.completed
-                  ? 'bg-green-50 border-green-200'
+                  ? 'bg-brand-green-50 border-brand-green-200'
                   : 'bg-slate-50 border-slate-200'
               }`}
             >
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                   milestone.completed
-                    ? 'bg-green-500 text-white'
+                    ? 'bg-brand-green-500 text-white'
                     : 'bg-slate-300 text-black'
                 }`}
               >
@@ -98,7 +98,7 @@ export function ProgressTracker({
       {/* Achievements */}
       <div className="pt-4 border-t">
         <div className="flex items-center gap-2 text-sm text-black">
-          <TrendingUp className="w-4 h-4 text-green-600" />
+          <TrendingUp className="w-4 h-4 text-brand-green-600" />
           <span>Keep going! Complete all milestones to complete your training.</span>
         </div>
       </div>
@@ -179,7 +179,7 @@ export function Leaderboard() {
 export function AchievementBadges({ badges }: { badges: string[] }) {
   const badgeIcons: Record<string, { icon: any; color: string; label: string }> = {
     'first-day': { icon: Star, color: 'bg-brand-blue-500', label: 'First Day Complete' },
-    'week-one': { icon: Target, color: 'bg-green-500', label: 'Week 1 Champion' },
+    'week-one': { icon: Target, color: 'bg-brand-green-500', label: 'Week 1 Champion' },
     'perfect-attendance': { icon: Award, color: 'bg-purple-500', label: 'Perfect Attendance' },
     'skills-master': { icon: Trophy, color: 'bg-yellow-500', label: 'Skills Master' },
     'mentor': { icon: TrendingUp, color: 'bg-indigo-500', label: 'Peer Mentor' },

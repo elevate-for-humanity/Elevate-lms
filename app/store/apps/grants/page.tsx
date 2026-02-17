@@ -54,7 +54,7 @@ export default function GrantsAppPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">FUNDING</span>
+                <span className="bg-brand-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">FUNDING</span>
                 <div className="flex items-center gap-1">
                   {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
                   <span className="text-sm ml-1">4.8 (89 reviews)</span>
@@ -63,13 +63,13 @@ export default function GrantsAppPage() {
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 Grants Discovery & Management App
               </h1>
-              <p className="text-xl text-green-100 mb-8">
+              <p className="text-xl text-brand-green-100 mb-8">
                 Find the right grants faster with AI-powered matching. Track applications, manage deadlines, and streamline compliance reporting.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/store/cart?add=grants-org"
-                  className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
+                  className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
                 >
                   <ShoppingCart className="w-5 h-5" />
                   Add to Cart - $199/mo
@@ -120,8 +120,8 @@ export default function GrantsAppPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((f, i) => (
               <div key={i} className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-                  <f.icon className="w-7 h-7 text-green-600" />
+                <div className="w-14 h-14 bg-brand-green-100 rounded-xl flex items-center justify-center mb-4">
+                  <f.icon className="w-7 h-7 text-brand-green-600" />
                 </div>
                 <h3 className="font-bold text-lg mb-2">{f.title}</h3>
                 <p className="text-gray-600">{f.desc}</p>
@@ -132,7 +132,7 @@ export default function GrantsAppPage() {
       </section>
 
       {/* Demo Video Section */}
-      <section className="py-16 px-4 bg-green-50">
+      <section className="py-16 px-4 bg-brand-green-50">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-6">See How It Works</h2>
           <p className="text-gray-600 mb-8">Watch a complete walkthrough of the grants discovery and management process</p>
@@ -157,18 +157,18 @@ export default function GrantsAppPage() {
           <p className="text-gray-600 text-center mb-12">Flexible plans for organizations of all sizes</p>
           <div className="grid md:grid-cols-3 gap-8">
             {pricing.map((plan, i) => (
-              <div key={i} className={`rounded-2xl p-8 ${plan.popular ? 'bg-green-600 text-white ring-4 ring-green-300' : 'bg-white border border-gray-200'}`}>
-                {plan.popular && <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">MOST POPULAR</span>}
+              <div key={i} className={`rounded-2xl p-8 ${plan.popular ? 'bg-brand-green-600 text-white ring-4 ring-brand-green-300' : 'bg-white border border-gray-200'}`}>
+                {plan.popular && <span className="bg-brand-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">MOST POPULAR</span>}
                 <h3 className={`text-2xl font-bold mt-4 ${plan.popular ? 'text-slate-900' : 'text-gray-900'}`}>{plan.name}</h3>
                 <div className="mt-4 mb-6">
                   <span className="text-4xl font-bold">${plan.price}</span>
-                  <span className={plan.popular ? 'text-green-100' : 'text-gray-500'}>{plan.period}</span>
+                  <span className={plan.popular ? 'text-brand-green-100' : 'text-gray-500'}>{plan.period}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((f, j) => (
                     <li key={j} className="flex items-center gap-2">
-                      <Check className={`w-5 h-5 ${plan.popular ? 'text-green-200' : 'text-green-500'}`} />
-                      <span className={plan.popular ? 'text-green-100' : 'text-gray-600'}>{f}</span>
+                      <Check className={`w-5 h-5 ${plan.popular ? 'text-brand-green-200' : 'text-brand-green-500'}`} />
+                      <span className={plan.popular ? 'text-brand-green-100' : 'text-gray-600'}>{f}</span>
                     </li>
                   ))}
                 </ul>
@@ -176,8 +176,8 @@ export default function GrantsAppPage() {
                   href={`/store/cart?add=grants-${plan.name.toLowerCase()}`}
                   className={`block w-full text-center py-3 rounded-lg font-bold transition-colors ${
                     plan.popular 
-                      ? 'bg-white text-green-600 hover:bg-gray-100' 
-                      : 'bg-green-600 text-white hover:bg-green-700'
+                      ? 'bg-white text-brand-green-600 hover:bg-gray-100' 
+                      : 'bg-brand-green-600 text-white hover:bg-brand-green-700'
                   }`}
                 >
                   <ShoppingCart className="w-4 h-4 inline mr-2" />
@@ -195,7 +195,7 @@ export default function GrantsAppPage() {
           <h2 className="text-3xl font-bold mb-4">Start Finding Grants Today</h2>
           <p className="text-gray-300 mb-8">14-day free trial. Card required, not charged until trial ends.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/store/cart?add=grants-org" className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-bold">
+            <Link href="/store/cart?add=grants-org" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold">
               Start Free Trial
             </Link>
             <Link href="/contact" className="border border-slate-300 hover:bg-slate-50 text-slate-900 px-8 py-4 rounded-lg font-bold">

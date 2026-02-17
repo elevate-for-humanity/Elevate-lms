@@ -326,7 +326,7 @@ export default function PayoutsPage() {
             <CardTitle className="text-sm font-medium">Pending Payouts</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">${totals.pending.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-brand-orange-600">${totals.pending.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">Awaiting payment</p>
           </CardContent>
         </Card>
@@ -335,7 +335,7 @@ export default function PayoutsPage() {
             <CardTitle className="text-sm font-medium">Paid to Date</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">${totals.paid.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-brand-green-600">${totals.paid.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">Total paid out</p>
           </CardContent>
         </Card>
@@ -417,13 +417,13 @@ export default function PayoutsPage() {
                     </div>
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground">Pending</p>
-                      <p className="font-medium text-orange-600">
+                      <p className="font-medium text-brand-orange-600">
                         ${summary.pending_payout.toLocaleString()}
                       </p>
                     </div>
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground">Paid</p>
-                      <p className="font-medium text-green-600">
+                      <p className="font-medium text-brand-green-600">
                         ${summary.paid_to_date.toLocaleString()}
                       </p>
                     </div>

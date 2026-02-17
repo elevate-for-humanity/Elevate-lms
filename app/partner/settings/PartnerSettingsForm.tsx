@@ -133,7 +133,7 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left ${
-                activeTab === tab.id ? 'bg-orange-50 text-orange-600' : 'hover:bg-gray-50'
+                activeTab === tab.id ? 'bg-brand-orange-50 text-brand-orange-600' : 'hover:bg-gray-50'
               }`}>
               <tab.icon className="w-5 h-5" />
               <span className="text-sm font-medium">{tab.name}</span>
@@ -146,7 +146,7 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
       <div className="md:col-span-3">
         {message && (
           <div className={`mb-4 p-4 rounded-lg ${
-            message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+            message.type === 'success' ? 'bg-brand-green-50 text-brand-green-700 border border-brand-green-200' : 'bg-brand-red-50 text-brand-red-700 border border-brand-red-200'
           }`}>
             {message.text}
           </div>
@@ -161,7 +161,7 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                   <input type="text" value={profileData.fullName} 
                     onChange={e => setProfileData({ ...profileData, fullName: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -173,11 +173,11 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
                   <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                   <input type="tel" value={profileData.phone}
                     onChange={e => setProfileData({ ...profileData, phone: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
                 </div>
               </div>
               <button onClick={handleSaveProfile} disabled={isSaving}
-                className="flex items-center gap-2 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50">
+                className="flex items-center gap-2 px-6 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600 disabled:opacity-50">
                 <Save className="w-4 h-4" />
                 {isSaving ? 'Saving...' : 'Save Profile'}
               </button>
@@ -192,7 +192,7 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
                   <label className="block text-sm font-medium text-gray-700 mb-1">Organization Name</label>
                   <input type="text" value={orgData.name}
                     onChange={e => setOrgData({ ...orgData, name: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
                 </div>
                 {programHolder && (
                   <>
@@ -200,49 +200,49 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
                       <label className="block text-sm font-medium text-gray-700 mb-1">Contact Name</label>
                       <input type="text" value={orgData.contactName}
                         onChange={e => setOrgData({ ...orgData, contactName: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Contact Email</label>
                       <input type="email" value={orgData.contactEmail}
                         onChange={e => setOrgData({ ...orgData, contactEmail: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Contact Phone</label>
                       <input type="tel" value={orgData.contactPhone}
                         onChange={e => setOrgData({ ...orgData, contactPhone: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
                       <input type="url" value={orgData.website}
                         onChange={e => setOrgData({ ...orgData, website: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
                     </div>
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                       <input type="text" value={orgData.address}
                         onChange={e => setOrgData({ ...orgData, address: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
                       <input type="text" value={orgData.city}
                         onChange={e => setOrgData({ ...orgData, city: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
                       <input type="text" value={orgData.state}
                         onChange={e => setOrgData({ ...orgData, state: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
                       <input type="text" value={orgData.zipCode}
                         onChange={e => setOrgData({ ...orgData, zipCode: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
                     </div>
                   </>
                 )}
@@ -251,12 +251,12 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
                     <label className="block text-sm font-medium text-gray-700 mb-1">Territory</label>
                     <input type="text" value={orgData.territory}
                       onChange={e => setOrgData({ ...orgData, territory: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500" />
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-orange-500" />
                   </div>
                 )}
               </div>
               <button onClick={handleSaveOrganization} disabled={isSaving}
-                className="flex items-center gap-2 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50">
+                className="flex items-center gap-2 px-6 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600 disabled:opacity-50">
                 <Save className="w-4 h-4" />
                 {isSaving ? 'Saving...' : 'Save Organization'}
               </button>
@@ -277,7 +277,7 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
                     <input type="checkbox" 
                       checked={notifications[item.key as keyof typeof notifications]}
                       onChange={e => setNotifications({ ...notifications, [item.key]: e.target.checked })}
-                      className="mt-1 w-5 h-5 rounded text-orange-500" />
+                      className="mt-1 w-5 h-5 rounded text-brand-orange-500" />
                     <div>
                       <p className="font-medium">{item.label}</p>
                       <p className="text-sm text-gray-500">{item.desc}</p>
@@ -285,7 +285,7 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
                   </label>
                 ))}
               </div>
-              <button className="flex items-center gap-2 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+              <button className="flex items-center gap-2 px-6 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
                 <Save className="w-4 h-4" /> Save Preferences
               </button>
             </div>
@@ -305,7 +305,7 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
                     <input type="password" placeholder="Confirm new password" 
                       className="w-full px-3 py-2 border rounded-lg" />
                   </div>
-                  <button className="mt-3 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                  <button className="mt-3 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
                     Update Password
                   </button>
                 </div>

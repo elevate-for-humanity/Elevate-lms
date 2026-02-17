@@ -99,7 +99,7 @@ export default async function BulkCertificationsPage() {
               </select>
             </div>
             <div className="flex gap-2">
-              <button className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+              <button className="bg-brand-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-green-700">
                 Approve Selected
               </button>
               <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-blue-700">
@@ -118,13 +118,13 @@ export default async function BulkCertificationsPage() {
             <p className="text-sm text-yellow-800">Pending Review</p>
             <p className="text-2xl font-bold text-yellow-900">{pendingCount || 0}</p>
           </div>
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <p className="text-sm text-green-800">Approved Today</p>
-            <p className="text-2xl font-bold text-green-900">0</p>
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4">
+            <p className="text-sm text-brand-green-800">Approved Today</p>
+            <p className="text-2xl font-bold text-brand-green-900">0</p>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-sm text-red-800">Expiring Soon</p>
-            <p className="text-2xl font-bold text-red-900">0</p>
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4">
+            <p className="text-sm text-brand-red-800">Expiring Soon</p>
+            <p className="text-2xl font-bold text-brand-red-900">0</p>
           </div>
           <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
             <p className="text-sm text-brand-blue-800">Total Active</p>
@@ -184,8 +184,8 @@ export default async function BulkCertificationsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex gap-2">
-                          <button className="text-green-600 hover:text-green-800 text-sm">Approve</button>
-                          <button className="text-red-600 hover:text-red-800 text-sm">Reject</button>
+                          <button className="text-brand-green-600 hover:text-brand-green-800 text-sm">Approve</button>
+                          <button className="text-brand-red-600 hover:text-brand-red-800 text-sm">Reject</button>
                         </div>
                       </td>
                     </tr>

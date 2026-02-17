@@ -104,7 +104,7 @@ export default function GradebookClient({ initialData }: Props) {
             </p>
           </div>
           {saving && (
-            <span className="rounded-full bg-red-50 px-3 py-2 text-[11px] font-semibold text-red-700">
+            <span className="rounded-full bg-brand-red-50 px-3 py-2 text-[11px] font-semibold text-brand-red-700">
               Saving…
             </span>
           )}
@@ -165,7 +165,7 @@ export default function GradebookClient({ initialData }: Props) {
                     {gradeItems.map((gi) => (
                       <td key={gi.id} className="px-3 py-2 align-middle">
                         <input
-                          className="w-16 rounded-lg border border-slate-200 px-2 py-2 text-right text-xs focus:border-orange-500 focus:outline-none"
+                          className="w-16 rounded-lg border border-slate-200 px-2 py-2 text-right text-xs focus:border-brand-orange-500 focus:outline-none"
                           defaultValue={getGradeValue(gi, s.enrollmentId)}
                           onBlur={(e) =>
                             handleChange(

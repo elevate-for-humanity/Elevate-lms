@@ -48,7 +48,7 @@ export default function EmployerWorkforceAnalytics() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Workforce Analytics</h1>
-          <p className="text-red-100">Data-driven insights for strategic workforce planning</p>
+          <p className="text-brand-red-100">Data-driven insights for strategic workforce planning</p>
         </div>
       </div>
 
@@ -71,31 +71,31 @@ export default function EmployerWorkforceAnalytics() {
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Total Hires</h3>
             <p className="text-3xl font-bold text-brand-orange-600">{metrics.totalHires}</p>
-            <p className="text-sm text-green-600">↑ 15% from last period</p>
+            <p className="text-sm text-brand-green-600">↑ 15% from last period</p>
           </Card>
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Active Positions</h3>
-            <p className="text-3xl font-bold text-orange-500">{metrics.activePositions}</p>
+            <p className="text-3xl font-bold text-brand-orange-500">{metrics.activePositions}</p>
             <p className="text-sm text-black">Across all departments</p>
           </Card>
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Avg Time to Hire</h3>
             <p className="text-3xl font-bold text-brand-blue-600">{metrics.avgTimeToHire} days</p>
-            <p className="text-sm text-green-600">↓ 8% improvement</p>
+            <p className="text-sm text-brand-green-600">↓ 8% improvement</p>
           </Card>
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Retention Rate</h3>
-            <p className="text-3xl font-bold text-green-600">{metrics.retentionRate}%</p>
-            <p className="text-sm text-green-600">↑ 3% from last year</p>
+            <p className="text-3xl font-bold text-brand-green-600">{metrics.retentionRate}%</p>
+            <p className="text-sm text-brand-green-600">↑ 3% from last year</p>
           </Card>
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Training Completion</h3>
             <p className="text-3xl font-bold text-purple-600">{metrics.trainingCompletion}%</p>
-            <p className="text-sm text-green-600">Above target</p>
+            <p className="text-sm text-brand-green-600">Above target</p>
           </Card>
 
           <Card className="p-6">
@@ -151,7 +151,7 @@ export default function EmployerWorkforceAnalytics() {
                     <div className="flex-1">
                       <div className="bg-gray-200 rounded-full h-2">
                         <div
-                          className="bg-green-600 h-2 rounded-full"
+                          className="bg-brand-green-600 h-2 rounded-full"
                           style={{ width: `${skill.supply}%` }}
                         />
                       </div>
@@ -185,7 +185,7 @@ export default function EmployerWorkforceAnalytics() {
                     <td className="py-3 px-4 font-medium">{dept.name}</td>
                     <td className="py-3 px-4">{dept.headcount}</td>
                     <td className="py-3 px-4">
-                      <span className="px-2 py-2 bg-orange-100 text-orange-700 text-xs rounded">
+                      <span className="px-2 py-2 bg-brand-orange-100 text-brand-orange-700 text-xs rounded">
                         {dept.openings} open
                       </span>
                     </td>

@@ -29,9 +29,9 @@ export default function DemoCompliancePage() {
               <tr key={i} className="border-b last:border-0 hover:bg-gray-50">
                 <td className="px-5 py-3 font-medium text-gray-900">{c.area}</td>
                 <td className="px-5 py-3">
-                  {c.status === 'pass' && <span className="flex items-center gap-1.5 text-green-600 text-xs font-semibold"><span className="text-slate-400 flex-shrink-0">•</span> Pass</span>}
+                  {c.status === 'pass' && <span className="flex items-center gap-1.5 text-brand-green-600 text-xs font-semibold"><span className="text-slate-400 flex-shrink-0">•</span> Pass</span>}
                   {c.status === 'warning' && <span className="flex items-center gap-1.5 text-amber-600 text-xs font-semibold"><AlertTriangle className="w-4 h-4" /> Attention</span>}
-                  {c.status === 'fail' && <span className="flex items-center gap-1.5 text-red-600 text-xs font-semibold"><XCircle className="w-4 h-4" /> Action Required</span>}
+                  {c.status === 'fail' && <span className="flex items-center gap-1.5 text-brand-red-600 text-xs font-semibold"><XCircle className="w-4 h-4" /> Action Required</span>}
                 </td>
                 <td className="px-5 py-3 text-gray-600 text-xs">{c.detail}</td>
               </tr>

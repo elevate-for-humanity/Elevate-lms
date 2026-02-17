@@ -132,7 +132,7 @@ export default function OnboardingAgreementsPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-4 border-brand-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-600">Loading agreements...</p>
         </div>
       </div>
@@ -144,8 +144,8 @@ export default function OnboardingAgreementsPage() {
       <div className="min-h-screen bg-slate-50 py-12">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-green-600" />
+            <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Check className="w-8 h-8 text-brand-green-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">
               All Agreements Signed
@@ -155,7 +155,7 @@ export default function OnboardingAgreementsPage() {
             </p>
             <Link
               href="/student-portal/onboarding"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-brand-blue-700 transition-colors"
             >
               Continue Onboarding
               <ChevronRight className="w-5 h-5" />
@@ -194,9 +194,9 @@ export default function OnboardingAgreementsPage() {
                 key={agreement.type}
                 className={`flex-1 h-2 rounded-full ${
                   signedAgreements.has(agreement.type)
-                    ? 'bg-green-500'
+                    ? 'bg-brand-green-500'
                     : index === currentAgreementIndex
-                    ? 'bg-blue-500'
+                    ? 'bg-brand-blue-500'
                     : 'bg-slate-200'
                 }`}
               />
@@ -218,9 +218,9 @@ export default function OnboardingAgreementsPage() {
                 disabled={isSigned}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
                   isSigned
-                    ? 'bg-green-100 text-green-700'
+                    ? 'bg-brand-green-100 text-brand-green-700'
                     : isCurrent
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'bg-white text-slate-600 hover:bg-slate-100'
                 }`}
               >
@@ -240,10 +240,10 @@ export default function OnboardingAgreementsPage() {
           {/* Agreement Header */}
           <div className="bg-slate-50 border-b border-slate-200 p-6">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 {(() => {
                   const Icon = currentAgreement.icon;
-                  return <Icon className="w-6 h-6 text-blue-600" />;
+                  return <Icon className="w-6 h-6 text-brand-blue-600" />;
                 })()}
               </div>
               <div>
@@ -307,7 +307,7 @@ export default function OnboardingAgreementsPage() {
               <Link
                 href={currentAgreement.documentUrl}
                 target="_blank"
-                className="inline-flex items-center gap-1 text-blue-600 hover:underline mt-4 text-sm"
+                className="inline-flex items-center gap-1 text-brand-blue-600 hover:underline mt-4 text-sm"
               >
                 View Full Document
                 <ChevronRight className="w-4 h-4" />

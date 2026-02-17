@@ -73,7 +73,7 @@ export default function PathwayDisclosure({
           
           {/* Stage 2 */}
           <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
-            <div className="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold text-sm mb-3">2</div>
+            <div className="w-8 h-8 bg-brand-green-100 text-brand-green-600 rounded-full flex items-center justify-center font-bold text-sm mb-3">2</div>
             <h3 className="font-semibold text-slate-900 text-sm mb-1">Training & OJT</h3>
             <p className="text-xs text-slate-600">
               Complete occupational training with structured on-the-job learning.

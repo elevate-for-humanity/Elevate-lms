@@ -92,7 +92,7 @@ export default async function SupportPage() {
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium">{ticket.subject}</span>
                         <span className={`text-xs px-2 py-1 rounded-full ${
-                          ticket.status === 'open' ? 'bg-green-100 text-green-700' :
+                          ticket.status === 'open' ? 'bg-brand-green-100 text-brand-green-700' :
                           ticket.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                           'bg-gray-100 text-gray-700'
                         }`}>

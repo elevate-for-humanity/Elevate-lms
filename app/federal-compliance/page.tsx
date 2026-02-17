@@ -143,8 +143,8 @@ export default function FederalCompliancePage() {
           {/* ADA Compliance */}
           <div className="mb-16">
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Users className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Users className="w-6 h-6 text-brand-green-600" />
               </div>
               <div>
                 <h2 className="text-3xl font-bold text-black mb-2">
@@ -191,8 +191,8 @@ export default function FederalCompliancePage() {
           {/* Equal Opportunity */}
           <div className="mb-16">
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Scale className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Scale className="w-6 h-6 text-brand-orange-600" />
               </div>
               <div>
                 <h2 className="text-3xl font-bold text-black mb-2">

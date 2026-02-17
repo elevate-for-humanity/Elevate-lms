@@ -60,7 +60,7 @@ export default async function PartnerLearningPage({ params }: Props) {
   const getStatusInfo = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'completed':
-        return { icon: Circle, color: 'text-green-600 bg-green-50', label: 'Completed' };
+        return { icon: Circle, color: 'text-brand-green-600 bg-brand-green-50', label: 'Completed' };
       case 'active':
       case 'enrolled':
       case 'in_progress':

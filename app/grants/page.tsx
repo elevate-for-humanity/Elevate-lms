@@ -30,7 +30,7 @@ export default function GrantsPage() {
           priority
         />
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <span className="inline-block bg-green-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
+          <span className="inline-block bg-brand-green-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
             No Loans — No Repayment
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
@@ -120,8 +120,8 @@ export default function GrantsPage() {
             {/* Workforce Ready Grant */}
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
               <div className="flex flex-col md:flex-row md:items-start gap-6">
-                <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Building2 className="w-8 h-8 text-green-600" />
+                <div className="w-16 h-16 bg-brand-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-8 h-8 text-brand-green-600" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">Workforce Ready Grant (Indiana)</h3>
@@ -149,8 +149,8 @@ export default function GrantsPage() {
             {/* SNAP E&T */}
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
               <div className="flex flex-col md:flex-row md:items-start gap-6">
-                <div className="w-16 h-16 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-8 h-8 text-orange-600" />
+                <div className="w-16 h-16 bg-brand-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-8 h-8 text-brand-orange-600" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">SNAP Employment & Training</h3>

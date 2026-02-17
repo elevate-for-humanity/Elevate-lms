@@ -48,11 +48,11 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 const DEFAULT_DASHBOARDS: Dashboard[] = [
-  { id: '1', name: 'Admin', href: '/admin/dashboard', icon: 'Shield', description: 'System management', color: 'text-red-600', roles: ['admin', 'super_admin'], order_index: 1 },
+  { id: '1', name: 'Admin', href: '/admin/dashboard', icon: 'Shield', description: 'System management', color: 'text-brand-red-600', roles: ['admin', 'super_admin'], order_index: 1 },
   { id: '2', name: 'Student', href: '/lms/dashboard', icon: 'GraduationCap', description: 'Learning portal', color: 'text-brand-blue-600', roles: ['student', 'user'], order_index: 2 },
-  { id: '3', name: 'Staff', href: '/staff-portal/dashboard', icon: 'Users', description: 'Support operations', color: 'text-green-600', roles: ['staff', 'admin'], order_index: 3 },
+  { id: '3', name: 'Staff', href: '/staff-portal/dashboard', icon: 'Users', description: 'Support operations', color: 'text-brand-green-600', roles: ['staff', 'admin'], order_index: 3 },
   { id: '4', name: 'Program Holder', href: '/program-holder/dashboard', icon: 'Building2', description: 'Training providers', color: 'text-purple-600', roles: ['program_holder', 'admin'], order_index: 4 },
-  { id: '5', name: 'Employer', href: '/employer/dashboard', icon: 'Briefcase', description: 'Hiring portal', color: 'text-orange-600', roles: ['employer'], order_index: 5 },
+  { id: '5', name: 'Employer', href: '/employer/dashboard', icon: 'Briefcase', description: 'Hiring portal', color: 'text-brand-orange-600', roles: ['employer'], order_index: 5 },
   { id: '6', name: 'Instructor', href: '/instructor/dashboard', icon: 'BookOpen', description: 'Teaching tools', color: 'text-indigo-600', roles: ['instructor', 'admin'], order_index: 6 },
   { id: '7', name: 'Creator', href: '/creator/dashboard', icon: 'Palette', description: 'Community courses', color: 'text-pink-600', roles: ['creator', 'user'], order_index: 7 },
   { id: '8', name: 'AI Studio', href: '/ai-studio', icon: 'Sparkles', description: 'AI video & media', color: 'text-purple-600', roles: ['user'], order_index: 8 },

@@ -98,12 +98,12 @@ export default async function DrugTestingTrainingPage() {
                         <h3 className="text-lg font-semibold text-gray-900 flex-1">{course.name}</h3>
                         <div className="flex items-center gap-2">
                           {course.new && (
-                            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full flex items-center gap-1">
+                            <span className="px-2 py-1 bg-brand-green-100 text-brand-green-700 text-xs font-medium rounded-full flex items-center gap-1">
                               <Sparkles className="w-3 h-3" /> NEW
                             </span>
                           )}
                           {course.popular && (
-                            <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full flex items-center gap-1">
+                            <span className="px-2 py-1 bg-brand-orange-100 text-brand-orange-700 text-xs font-medium rounded-full flex items-center gap-1">
                               <Star className="w-3 h-3" /> Popular
                             </span>
                           )}
@@ -158,8 +158,8 @@ export default async function DrugTestingTrainingPage() {
               <p className="text-sm text-gray-600">All courses meet DOT regulatory requirements</p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Award className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Award className="w-6 h-6 text-brand-green-600" />
               </div>
               <h3 className="font-semibold mb-2">Instant Certification</h3>
               <p className="text-sm text-gray-600">Download your certificate immediately upon completion</p>
@@ -172,8 +172,8 @@ export default async function DrugTestingTrainingPage() {
               <p className="text-sm text-gray-600">Complete training on your schedule, 24/7 access</p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Users className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Users className="w-6 h-6 text-brand-orange-600" />
               </div>
               <h3 className="font-semibold mb-2">Group Discounts</h3>
               <p className="text-sm text-gray-600">Volume pricing available for organizations</p>

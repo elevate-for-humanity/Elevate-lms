@@ -111,8 +111,8 @@ export default function GrantProgramsPage() {
             </div>
           </div>
 
-          <div className="bg-green-50 rounded-lg p-6">
-            <h3 className="text-lg font-bold mb-3 text-green-900">
+          <div className="bg-brand-green-50 rounded-lg p-6">
+            <h3 className="text-lg font-bold mb-3 text-brand-green-900">
               What's Covered?
             </h3>
             <ul className="space-y-2">
@@ -205,8 +205,8 @@ export default function GrantProgramsPage() {
                     )}
                   </div>
 
-                  <div className="bg-green-50 rounded p-3 mb-4">
-                    <p className="text-sm font-semibold text-green-900 mb-1">
+                  <div className="bg-brand-green-50 rounded p-3 mb-4">
+                    <p className="text-sm font-semibold text-brand-green-900 mb-1">
                       • 100% FREE with:
                     </p>
                     <ul className="text-xs text-black space-y-1">

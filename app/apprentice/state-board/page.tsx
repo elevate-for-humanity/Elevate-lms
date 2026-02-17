@@ -91,14 +91,14 @@ export default async function StateBoardExamPage() {
 
         {/* Readiness Status */}
         {isReady ? (
-          <div className="bg-green-500 rounded-2xl p-6 text-white">
+          <div className="bg-brand-green-500 rounded-2xl p-6 text-white">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
                 <h2 className="text-2xl font-bold">You're Ready!</h2>
-                <p className="text-green-100">
+                <p className="text-brand-green-100">
                   All requirements complete. You can now schedule your state board exam.
                 </p>
               </div>
@@ -142,7 +142,7 @@ export default async function StateBoardExamPage() {
                 </div>
               </div>
               {hoursComplete ? (
-                <span className="px-3 py-2 bg-green-100 text-green-700 text-sm font-semibold rounded-full">
+                <span className="px-3 py-2 bg-brand-green-100 text-brand-green-700 text-sm font-semibold rounded-full">
                   Complete
                 </span>
               ) : (
@@ -168,7 +168,7 @@ export default async function StateBoardExamPage() {
                 </div>
               </div>
               {miladyComplete ? (
-                <span className="px-3 py-2 bg-green-100 text-green-700 text-sm font-semibold rounded-full">
+                <span className="px-3 py-2 bg-brand-green-100 text-brand-green-700 text-sm font-semibold rounded-full">
                   Complete
                 </span>
               ) : (
@@ -205,7 +205,7 @@ export default async function StateBoardExamPage() {
             </div>
 
             {/* Exam Fee */}
-            <div className="p-4 flex items-center justify-between bg-green-50">
+            <div className="p-4 flex items-center justify-between bg-brand-green-50">
               <div className="flex items-center gap-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
@@ -215,7 +215,7 @@ export default async function StateBoardExamPage() {
                   </div>
                 </div>
               </div>
-              <span className="px-3 py-2 bg-green-100 text-green-700 text-sm font-semibold rounded-full">
+              <span className="px-3 py-2 bg-brand-green-100 text-brand-green-700 text-sm font-semibold rounded-full">
                 Paid
               </span>
             </div>
@@ -224,9 +224,9 @@ export default async function StateBoardExamPage() {
 
         {/* Exam Scheduling Section */}
         {isReady ? (
-          <div className="bg-white rounded-xl border-2 border-green-200 overflow-hidden">
-            <div className="p-4 border-b border-green-200 bg-green-50">
-              <h3 className="font-bold text-green-800 flex items-center gap-2">
+          <div className="bg-white rounded-xl border-2 border-brand-green-200 overflow-hidden">
+            <div className="p-4 border-b border-brand-green-200 bg-brand-green-50">
+              <h3 className="font-bold text-brand-green-800 flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
                 Schedule Your Exam
               </h3>
@@ -290,7 +290,7 @@ export default async function StateBoardExamPage() {
                   </div>
                   <div>
                     <span className="text-slate-500">Exam Fee:</span>
-                    <span className="ml-2 text-green-600 font-semibold">Included in tuition</span>
+                    <span className="ml-2 text-brand-green-600 font-semibold">Included in tuition</span>
                   </div>
                 </div>
               </div>

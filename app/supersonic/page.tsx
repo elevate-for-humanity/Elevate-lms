@@ -65,14 +65,14 @@ export default function SupersonicPage() {
         />
         <div className="relative max-w-7xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Zap className="w-10 h-10 text-red-500" />
-            <span className="text-red-500 font-bold text-xl">SUPERSONIC</span>
+            <Zap className="w-10 h-10 text-brand-red-500" />
+            <span className="text-brand-red-500 font-bold text-xl">SUPERSONIC</span>
           </div>
           <h1 className="text-5xl font-bold text-white mb-6">Accelerate Your Career</h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
             Our intensive fast-track programs get you certified and job-ready in half the time.
           </p>
-          <Link href="/supersonic/apply" className="inline-flex items-center gap-2 bg-red-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-red-700 transition-colors">
+          <Link href="/supersonic/apply" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-red-700 transition-colors">
             Apply Now <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
@@ -101,7 +101,7 @@ export default function SupersonicPage() {
                   <h3 className="text-xl font-bold text-white">{program.name}</h3>
                   <p className="text-brand-blue-400 font-semibold">{program.duration} intensive</p>
                 </div>
-                <span className="text-2xl font-bold text-red-500">{program.price}</span>
+                <span className="text-2xl font-bold text-brand-red-500">{program.price}</span>
               </div>
               <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
                 <TrendingUp className="w-4 h-4" />

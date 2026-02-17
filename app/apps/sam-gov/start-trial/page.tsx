@@ -107,7 +107,7 @@ export default async function StartTrialPage() {
 
         <div className="bg-white rounded-2xl p-8 shadow-2xl">
           <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 bg-brand-green-100 text-brand-green-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
               <Clock className="w-4 h-4" />
               14-Day Free Trial
             </div>
@@ -118,7 +118,7 @@ export default async function StartTrialPage() {
           <ul className="space-y-3 mb-8">
             {features.map((feature, i) => (
               <li key={i} className="flex items-center gap-3">
-                <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                <Check className="w-5 h-5 text-brand-green-500 flex-shrink-0" />
                 <span className="text-gray-700">{feature}</span>
               </li>
             ))}

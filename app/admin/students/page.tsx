@@ -127,7 +127,7 @@ export default async function StudentsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/admin/enrollments"
-              className="bg-brand-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               View Enrollments
             </Link>
@@ -249,7 +249,7 @@ export default async function StudentsPage() {
                                         key={idx}
                                         className={`text-xs px-2 py-2 rounded ${
                                           enrollment.status === 'active'
-                                            ? 'bg-brand-green-100 text-green-700'
+                                            ? 'bg-brand-green-100 text-brand-green-700'
                                             : enrollment.status === 'completed'
                                               ? 'bg-brand-blue-100 text-brand-blue-700'
                                               : 'bg-gray-100 text-black'

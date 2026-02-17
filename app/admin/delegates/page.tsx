@@ -61,7 +61,7 @@ export default async function DelegatesPage() {
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-800 rounded-full text-xs">{delegate.role || 'delegate'}</span>
-                    <button className="text-red-600 hover:text-red-800 text-sm">Remove</button>
+                    <button className="text-brand-red-600 hover:text-brand-red-800 text-sm">Remove</button>
                   </div>
                 </div>
               ))

@@ -128,8 +128,8 @@ export default async function CRMHubPage() {
             className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Target className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <Target className="w-6 h-6 text-brand-green-600" />
               </div>
               <span className="text-2xl font-bold text-black">
                 {activeLeads || 0}
@@ -194,7 +194,7 @@ export default async function CRMHubPage() {
           >
             <DollarSign className="w-8 h-8 mb-4" />
             <h3 className="text-xl font-bold mb-2">Create Deal</h3>
-            <p className="text-green-100 text-sm">
+            <p className="text-brand-green-100 text-sm">
               Track new sales opportunity
             </p>
           </Link>
@@ -275,7 +275,7 @@ export default async function CRMHubPage() {
                 <h2 className="text-xl font-bold text-black">Open Deals</h2>
                 <p className="text-sm text-black mt-1">
                   Pipeline Value:{' '}
-                  <span className="font-bold text-green-600">
+                  <span className="font-bold text-brand-green-600">
                     ${pipelineValue.toLocaleString()}
                   </span>
                 </p>
@@ -295,8 +295,8 @@ export default async function CRMHubPage() {
                     key={deal.id}
                     className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg"
                   >
-                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <DollarSign className="w-5 h-5 text-green-600" />
+                    <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <DollarSign className="w-5 h-5 text-brand-green-600" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-black truncate">

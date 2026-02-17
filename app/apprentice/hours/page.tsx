@@ -102,8 +102,8 @@ export default async function ApprenticeHoursPage() {
           </div>
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-brand-green-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{approvedHours}</p>
@@ -158,9 +158,9 @@ export default async function ApprenticeHoursPage() {
                     <span className="font-semibold text-gray-900">{log.hours} hrs</span>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       log.status === 'approved' 
-                        ? 'bg-green-100 text-green-700'
+                        ? 'bg-brand-green-100 text-brand-green-700'
                         : log.status === 'rejected'
-                        ? 'bg-red-100 text-red-700'
+                        ? 'bg-brand-red-100 text-brand-red-700'
                         : 'bg-yellow-100 text-yellow-700'
                     }`}>
                       {log.status || 'Pending'}

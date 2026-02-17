@@ -81,7 +81,7 @@ export function PageTemplate({
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{title}</h1>
             <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">{description}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href={ctaPrimaryHref} className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors">{ctaPrimaryText}</Link>
+              <Link href={ctaPrimaryHref} className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors">{ctaPrimaryText}</Link>
               <Link href={ctaSecondaryHref} className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors">{ctaSecondaryText}</Link>
             </div>
           </div>

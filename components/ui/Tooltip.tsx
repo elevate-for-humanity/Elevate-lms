@@ -230,7 +230,7 @@ export function FormField({
           className="block text-sm font-medium text-black"
         >
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-brand-red-500 ml-1">*</span>}
         </label>
         {tooltipContent && <Tooltip content={tooltipContent} />}
       </div>
@@ -241,12 +241,12 @@ export function FormField({
         required={required}
         placeholder={placeholder}
         className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue-500 ${
-          error ? 'border-red-500' : 'border-gray-300'
+          error ? 'border-brand-red-500' : 'border-gray-300'
         }`}
         aria-describedby={error ? `${name}-error` : undefined}
       />
       {error && (
-        <p id={`${name}-error`} className="mt-1 text-sm text-red-600">
+        <p id={`${name}-error`} className="mt-1 text-sm text-brand-red-600">
           {error}
         </p>
       )}

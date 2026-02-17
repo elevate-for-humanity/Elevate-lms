@@ -166,7 +166,7 @@ export default async function AnalyticsPage() {
 
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
@@ -190,8 +190,8 @@ export default async function AnalyticsPage() {
 
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-5 h-5 text-orange-600" />
+              <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                <Clock className="w-5 h-5 text-brand-orange-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.totalHours}h</div>
@@ -237,7 +237,7 @@ export default async function AnalyticsPage() {
             {/* Course Progress */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-green-600" />
+                <TrendingUp className="w-5 h-5 text-brand-green-600" />
                 Course Progress
               </h2>
               {courseProgress.length > 0 ? (
@@ -248,7 +248,7 @@ export default async function AnalyticsPage() {
                         <h3 className="font-medium text-slate-900">{course.course_name}</h3>
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
                           course.status === 'completed'
-                            ? 'bg-green-100 text-green-700'
+                            ? 'bg-brand-green-100 text-brand-green-700'
                             : 'bg-brand-blue-100 text-brand-blue-700'
                         }`}>
                           {course.status === 'completed' ? 'Completed' : 'In Progress'}
@@ -259,7 +259,7 @@ export default async function AnalyticsPage() {
                           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full ${
-                                course.progress === 100 ? 'bg-green-500' : 'bg-brand-blue-500'
+                                course.progress === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'
                               }`}
                               style={{ width: `${course.progress}%` }}
                             />
@@ -364,7 +364,7 @@ export default async function AnalyticsPage() {
                   href="/lms/grades"
                   className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition"
                 >
-                  <Award className="w-4 h-4 text-green-600" />
+                  <Award className="w-4 h-4 text-brand-green-600" />
                   <span className="text-slate-700">View Grades</span>
                 </Link>
                 <Link

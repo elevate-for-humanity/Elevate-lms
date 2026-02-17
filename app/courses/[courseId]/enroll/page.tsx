@@ -76,7 +76,7 @@ export default function CourseEnrollPage({
             
             <div className="space-y-6">
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <div className="flex-shrink-0 w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <div>
@@ -126,9 +126,9 @@ export default function CourseEnrollPage({
           </div>
 
           {/* Right Column - Checkout */}
-          <div className="bg-white rounded-2xl border-2 border-orange-500 p-8">
+          <div className="bg-white rounded-2xl border-2 border-brand-orange-500 p-8">
             <div className="text-center mb-6">
-              <div className="inline-block px-4 py-2 bg-orange-100 text-orange-700 rounded-full text-sm font-bold mb-4">
+              <div className="inline-block px-4 py-2 bg-brand-orange-100 text-brand-orange-700 rounded-full text-sm font-bold mb-4">
                 ⚡ Instant Enrollment
               </div>
               <h2 className="text-3xl font-black text-black mb-2">
@@ -140,15 +140,15 @@ export default function CourseEnrollPage({
             </div>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-800">{error}</p>
+              <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg">
+                <p className="text-sm text-brand-red-800">{error}</p>
               </div>
             )}
 
             <button
               onClick={handleEnrollNow}
               disabled={loading}
-              className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white px-8 py-4 rounded-xl text-lg font-bold transition-colors flex items-center justify-center gap-3"
+              className="w-full bg-brand-orange-500 hover:bg-brand-orange-600 disabled:bg-gray-400 text-white px-8 py-4 rounded-xl text-lg font-bold transition-colors flex items-center justify-center gap-3"
             >
               {loading ? (
                 <>
@@ -243,7 +243,7 @@ export default function CourseEnrollPage({
           <p className="text-black mb-2">Have questions?</p>
           <a
             href="/support"
-            className="text-xl font-bold text-orange-600 hover:text-orange-700"
+            className="text-xl font-bold text-brand-orange-600 hover:text-brand-orange-700"
           >
             Call support center
           </a>

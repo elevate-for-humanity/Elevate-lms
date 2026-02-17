@@ -55,7 +55,7 @@ export function FileUpload({ label, accept = '*', maxSize = 10, onUpload }: File
       <label className="block text-sm font-medium text-black">{label}</label>
 
       {!file ? (
-        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-orange-500 hover:bg-gray-50 transition-colors">
+        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-brand-orange-500 hover:bg-gray-50 transition-colors">
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
             <Upload className="h-11 w-11 text-slate-400 mb-2" />
             <p className="text-sm text-black">

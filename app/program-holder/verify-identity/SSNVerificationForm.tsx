@@ -117,20 +117,20 @@ export default function SSNVerificationForm({
         <div
           className={`mb-6 p-4 rounded-lg border-l-4 ${
             result.verified
-              ? 'bg-green-50 border-green-400'
-              : 'bg-red-50 border-red-400'
+              ? 'bg-brand-green-50 border-brand-green-400'
+              : 'bg-brand-red-50 border-brand-red-400'
           }`}
         >
           <div className="flex items-start gap-3">
             {result.verified ? (
               <span className="text-slate-400 flex-shrink-0">•</span>
             ) : (
-              <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="text-brand-red-600 flex-shrink-0 mt-0.5" />
             )}
             <div>
               <p
                 className={`font-semibold ${
-                  result.verified ? 'text-green-900' : 'text-red-900'
+                  result.verified ? 'text-brand-green-900' : 'text-brand-red-900'
                 }`}
               >
                 {result.verified
@@ -139,7 +139,7 @@ export default function SSNVerificationForm({
               </p>
               <p
                 className={`text-sm mt-1 ${
-                  result.verified ? 'text-green-800' : 'text-red-800'
+                  result.verified ? 'text-brand-green-800' : 'text-brand-red-800'
                 }`}
               >
                 {result.message}
@@ -152,7 +152,7 @@ export default function SSNVerificationForm({
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-black mb-2">
-            Social Security Number <span className="text-red-600">*</span>
+            Social Security Number <span className="text-brand-red-600">*</span>
           </label>
           <input
             type="text"
@@ -177,7 +177,7 @@ export default function SSNVerificationForm({
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-black mb-2">
-              First Name <span className="text-red-600">*</span>
+              First Name <span className="text-brand-red-600">*</span>
             </label>
             <input
               type="text"
@@ -193,7 +193,7 @@ export default function SSNVerificationForm({
 
           <div>
             <label className="block text-sm font-medium text-black mb-2">
-              Last Name <span className="text-red-600">*</span>
+              Last Name <span className="text-brand-red-600">*</span>
             </label>
             <input
               type="text"
@@ -210,7 +210,7 @@ export default function SSNVerificationForm({
 
         <div>
           <label className="block text-sm font-medium text-black mb-2">
-            Date of Birth <span className="text-red-600">*</span>
+            Date of Birth <span className="text-brand-red-600">*</span>
           </label>
           <input
             type="date"

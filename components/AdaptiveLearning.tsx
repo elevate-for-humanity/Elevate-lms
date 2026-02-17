@@ -69,11 +69,11 @@ export function AdaptiveLearning({
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'beginner':
-        return 'bg-green-100 text-green-800';
+        return 'bg-brand-green-100 text-brand-green-800';
       case 'intermediate':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-brand-orange-100 text-brand-orange-800';
       case 'advanced':
-        return 'bg-red-100 text-red-800';
+        return 'bg-brand-red-100 text-brand-red-800';
       default:
         return 'bg-gray-100 text-black';
     }
@@ -98,11 +98,11 @@ export function AdaptiveLearning({
               <div className="text-sm text-black">Skill Level</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-orange-600">{completedTopics.length}</div>
+              <div className="text-3xl font-bold text-brand-orange-600">{completedTopics.length}</div>
               <div className="text-sm text-black">Topics Mastered</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-600">
+              <div className="text-3xl font-bold text-brand-green-600">
                 {learningStyle === 'visual' ? '👁️' : learningStyle === 'auditory' ? '👂' : '✋'}
               </div>
               <div className="text-sm text-black">Learning Style</div>
@@ -115,7 +115,7 @@ export function AdaptiveLearning({
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <Lightbulb className="text-orange-600" size={24} />
+            <Lightbulb className="text-brand-orange-600" size={24} />
             <CardTitle>Recommended for You</CardTitle>
           </div>
         </CardHeader>
@@ -124,7 +124,7 @@ export function AdaptiveLearning({
             {recommendations.map((path) => (
               <div
                 key={path.id}
-                className="border-2 border-gray-200 rounded-lg p-4 hover:border-red-600 transition"
+                className="border-2 border-gray-200 rounded-lg p-4 hover:border-brand-red-600 transition"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div>
@@ -166,7 +166,7 @@ export function AdaptiveLearning({
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <TrendingUp className="text-green-600" size={24} />
+            <TrendingUp className="text-brand-green-600" size={24} />
             <CardTitle>Your Progress Trends</CardTitle>
           </div>
         </CardHeader>
@@ -175,20 +175,20 @@ export function AdaptiveLearning({
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-semibold">Quiz Performance</span>
-                <span className="text-sm text-green-600">↑ 15%</span>
+                <span className="text-sm text-brand-green-600">↑ 15%</span>
               </div>
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-green-600" style={{ width: '85%' }} />
+                <div className="h-full bg-brand-green-600" style={{ width: '85%' }} />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-semibold">Assignment Completion</span>
-                <span className="text-sm text-green-600">↑ 8%</span>
+                <span className="text-sm text-brand-green-600">↑ 8%</span>
               </div>
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-orange-600" style={{ width: '92%' }} />
+                <div className="h-full bg-brand-orange-600" style={{ width: '92%' }} />
               </div>
             </div>
 

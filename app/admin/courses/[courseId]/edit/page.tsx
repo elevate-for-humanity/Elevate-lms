@@ -60,11 +60,11 @@ export default async function EditCoursePage({
         <nav className="text-sm mb-6">
           <ol className="flex items-center space-x-2 text-gray-500">
             <li>
-              <Link href="/admin" className="hover:text-blue-600">Admin</Link>
+              <Link href="/admin" className="hover:text-brand-blue-600">Admin</Link>
             </li>
             <li>/</li>
             <li>
-              <Link href="/admin/courses" className="hover:text-blue-600">Courses</Link>
+              <Link href="/admin/courses" className="hover:text-brand-blue-600">Courses</Link>
             </li>
             <li>/</li>
             <li className="text-gray-900 font-medium">Edit</li>

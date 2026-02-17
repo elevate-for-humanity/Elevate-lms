@@ -40,7 +40,7 @@ export function HowItWorksAndPlatform() {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
           {/* Steps */}
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-300">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-orange-300">
               How it works
             </h2>
             <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-50">
@@ -76,7 +76,7 @@ export function HowItWorksAndPlatform() {
 
           {/* Platform */}
           <div className="rounded-3xl bg-slate-900/80 p-5 ring-1 ring-slate-800">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-orange-300">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-brand-orange-300">
               The Elevate platform
             </h3>
             <p className="mt-2 text-lg font-semibold text-slate-50">

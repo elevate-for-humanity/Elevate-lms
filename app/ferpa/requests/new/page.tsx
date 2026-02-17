@@ -131,8 +131,8 @@ export default function NewFerpaRequestPage() {
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="flex items-center gap-2 text-red-800">
+          <div className="mb-6 bg-brand-red-50 border border-brand-red-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 text-brand-red-800">
               <AlertCircle className="w-5 h-5" />
               <p>{error}</p>
             </div>
@@ -181,7 +181,7 @@ export default function NewFerpaRequestPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="requester_name" className="block text-sm font-medium text-gray-700 mb-1">
-                    Full Name <span className="text-red-500">*</span>
+                    Full Name <span className="text-brand-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -194,7 +194,7 @@ export default function NewFerpaRequestPage() {
                 </div>
                 <div>
                   <label htmlFor="requester_relationship" className="block text-sm font-medium text-gray-700 mb-1">
-                    Relationship to Student <span className="text-red-500">*</span>
+                    Relationship to Student <span className="text-brand-red-500">*</span>
                   </label>
                   <select
                     id="requester_relationship"
@@ -213,7 +213,7 @@ export default function NewFerpaRequestPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="requester_email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email <span className="text-red-500">*</span>
+                    Email <span className="text-brand-red-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -249,7 +249,7 @@ export default function NewFerpaRequestPage() {
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="student_name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Student Name <span className="text-red-500">*</span>
+                  Student Name <span className="text-brand-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -310,7 +310,7 @@ export default function NewFerpaRequestPage() {
             <div className="space-y-4">
               <div>
                 <label htmlFor="purpose" className="block text-sm font-medium text-gray-700 mb-1">
-                  Explain the purpose for this records request <span className="text-red-500">*</span>
+                  Explain the purpose for this records request <span className="text-brand-red-500">*</span>
                 </label>
                 <textarea
                   id="purpose"

@@ -251,7 +251,7 @@ export default function PreparerDetailPage() {
             <CardTitle className="text-sm font-medium">Accepted</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{acceptedReturns}</div>
+            <div className="text-2xl font-bold text-brand-green-600">{acceptedReturns}</div>
           </CardContent>
         </Card>
         <Card>
@@ -267,7 +267,7 @@ export default function PreparerDetailPage() {
             <CardTitle className="text-sm font-medium">Total Commission</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">${totalCommission.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-brand-green-600">${totalCommission.toLocaleString()}</div>
           </CardContent>
         </Card>
       </div>
@@ -505,7 +505,7 @@ export default function PreparerDetailPage() {
                         </Badge>
                         <div className="text-right">
                           <p className="font-medium">${ret.client_fee?.toLocaleString()}</p>
-                          <p className="text-sm text-green-600">+${ret.preparer_commission?.toLocaleString()}</p>
+                          <p className="text-sm text-brand-green-600">+${ret.preparer_commission?.toLocaleString()}</p>
                         </div>
                       </div>
                     </div>

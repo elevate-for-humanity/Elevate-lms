@@ -89,33 +89,33 @@ export default async function ArchitecturePage() {
             </ul>
           </div>
 
-          <div className="bg-green-50 border border-green-200 rounded-xl p-8">
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-8">
             <h2 className="text-2xl font-bold mb-4 text-black">
               Compliance & Reporting
             </h2>
             <ul className="space-y-3 text-black">
               <li className="flex items-start gap-3">
-                <span className="text-green-600 font-bold">•</span>
+                <span className="text-brand-green-600 font-bold">•</span>
                 <span>
                   <strong>RAPIDS integration</strong> - DOL apprenticeship
                   tracking
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-green-600 font-bold">•</span>
+                <span className="text-brand-green-600 font-bold">•</span>
                 <span>
                   <strong>ETPL reporting</strong> - Automated state compliance
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-green-600 font-bold">•</span>
+                <span className="text-brand-green-600 font-bold">•</span>
                 <span>
                   <strong>Workforce dashboards</strong> - Real-time outcome
                   tracking
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-green-600 font-bold">•</span>
+                <span className="text-brand-green-600 font-bold">•</span>
                 <span>
                   <strong>Audit logs</strong> - Complete activity history
                 </span>

@@ -41,7 +41,7 @@ export default function CommunityGuidelinesPage() {
                 </p>
               </div>
 
-              <div className="bg-green-50 rounded-lg p-6 border-2 border-green-200">
+              <div className="bg-brand-green-50 rounded-lg p-6 border-2 border-brand-green-200">
                 <h3 className="text-xl font-bold text-black mb-3">Inclusivity</h3>
                 <p className="text-black">
                   Welcome and support all members. Create an environment where everyone feels valued, 
@@ -57,7 +57,7 @@ export default function CommunityGuidelinesPage() {
                 </p>
               </div>
 
-              <div className="bg-orange-50 rounded-lg p-6 border-2 border-orange-200">
+              <div className="bg-brand-orange-50 rounded-lg p-6 border-2 border-brand-orange-200">
                 <h3 className="text-xl font-bold text-black mb-3">Professionalism</h3>
                 <p className="text-black">
                   Maintain professional conduct in all interactions. Communicate thoughtfully and 
@@ -68,7 +68,7 @@ export default function CommunityGuidelinesPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Expected Behaviors</h2>
             
-            <div className="bg-green-50 rounded-xl p-6 border-2 border-green-200 mb-6">
+            <div className="bg-brand-green-50 rounded-xl p-6 border-2 border-brand-green-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Do:</h3>
               <ul className="list-disc pl-6 text-black space-y-2">
                 <li><strong>Be Respectful:</strong> Use kind and considerate language in all communications</li>
@@ -86,7 +86,7 @@ export default function CommunityGuidelinesPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Prohibited Behaviors</h2>
             
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Harassment and Discrimination</h3>
               <p className="text-black mb-2">Absolutely prohibited:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -99,7 +99,7 @@ export default function CommunityGuidelinesPage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Disruptive Behavior</h3>
               <p className="text-black mb-2">Do not:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -174,7 +174,7 @@ export default function CommunityGuidelinesPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     2
                   </div>
                   <div>
@@ -200,7 +200,7 @@ export default function CommunityGuidelinesPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     4
                   </div>
                   <div>
@@ -226,7 +226,7 @@ export default function CommunityGuidelinesPage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Moderate Violations</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Temporary suspension from community platforms (1-30 days)</li>
@@ -237,7 +237,7 @@ export default function CommunityGuidelinesPage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-2">Severe Violations</h3>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Permanent ban from community platforms</li>

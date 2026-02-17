@@ -38,11 +38,11 @@ export default async function CreateGroupPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-2xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-          <Link href="/" className="hover:text-orange-600">Home</Link>
+          <Link href="/" className="hover:text-brand-orange-600">Home</Link>
           <ChevronRight className="w-4 h-4" />
-          <Link href="/community" className="hover:text-orange-600">Community</Link>
+          <Link href="/community" className="hover:text-brand-orange-600">Community</Link>
           <ChevronRight className="w-4 h-4" />
-          <Link href="/community/discussions/study-groups" className="hover:text-orange-600">Study Groups</Link>
+          <Link href="/community/discussions/study-groups" className="hover:text-brand-orange-600">Study Groups</Link>
           <ChevronRight className="w-4 h-4" />
           <span className="text-gray-900">Create</span>
         </nav>

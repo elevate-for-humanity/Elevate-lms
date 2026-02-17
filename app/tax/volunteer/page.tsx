@@ -31,7 +31,7 @@ export default function VolunteerPage() {
               </p>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <Heart className="w-6 h-6 text-red-600 mt-1 flex-shrink-0" />
+                  <Heart className="w-6 h-6 text-brand-red-600 mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold mb-1">Give Back</h3>
                     <p className="text-black">Help families keep more of their refund</p>
@@ -45,14 +45,14 @@ export default function VolunteerPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Users className="w-6 h-6 text-green-600 mt-1 flex-shrink-0" />
+                  <Users className="w-6 h-6 text-brand-green-600 mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold mb-1">Meet People</h3>
                     <p className="text-black">Connect with community members</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Award className="w-6 h-6 text-orange-600 mt-1 flex-shrink-0" />
+                  <Award className="w-6 h-6 text-brand-orange-600 mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold mb-1">Get Certified</h3>
                     <p className="text-black">Earn IRS certification</p>
@@ -98,7 +98,7 @@ export default function VolunteerPage() {
             <div className="text-center">
               <Link
                 href="/tax/rise-up-foundation/training"
-                className="inline-block bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+                className="inline-block bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
               >
                 Learn About Training
               </Link>

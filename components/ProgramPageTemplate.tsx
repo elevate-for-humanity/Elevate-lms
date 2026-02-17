@@ -75,7 +75,7 @@ export default function ProgramPageTemplate({
 
         <div className="relative container mx-auto px-4 py-20">
           <div className="max-w-3xl text-white">
-            <p className="text-sm font-bold uppercase tracking-wide text-orange-400 mb-4">
+            <p className="text-sm font-bold uppercase tracking-wide text-brand-orange-400 mb-4">
               {heroSubtitle}
             </p>
             <h1 className="text-5xl md:text-6xl font-bold mb-6 drop-shadow-2xl">
@@ -87,7 +87,7 @@ export default function ProgramPageTemplate({
             <div className="flex flex-wrap gap-4">
               <Link
                 href={heroCTA1Link}
-                className="px-8 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition text-lg shadow-2xl"
+                className="px-8 py-4 bg-brand-orange-600 text-white font-bold rounded-full hover:bg-brand-orange-700 transition text-lg shadow-2xl"
               >
                 {heroCTA1Text}
               </Link>
@@ -121,15 +121,15 @@ d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
 
             {/* Format */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-brand-green-600" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
 d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
               <h3 className="text-lg font-bold text-black mb-2">Learning Format</h3>
-              <p className="text-xl font-semibold text-green-600">{format}</p>
+              <p className="text-xl font-semibold text-brand-green-600">{format}</p>
             </div>
 
             {/* Jobs */}
@@ -164,7 +164,7 @@ d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-
                   key={index}
                   className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm"
                 >
-                  <svg className="w-6 h-6 text-green-600 flex-shrink-0" fill="none" stroke="currentColor"
+                  <svg className="w-6 h-6 text-brand-green-600 flex-shrink-0" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -191,7 +191,7 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 className="bg-slate-50 rounded-2xl p-8 shadow-lg hover:shadow-xl transition border border-slate-200"
               >
                 {highlight.icon && (
-                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-6">
+                  <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mb-6">
                     <span className="text-3xl">{highlight.icon}</span>
                   </div>
                 )}
@@ -224,7 +224,7 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   key={index}
                   className="flex items-start gap-6 bg-white rounded-xl p-6 shadow-md"
                 >
-                  <div className="flex-shrink-0 w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     {index + 1}
                   </div>
                   <div className="flex-1">
@@ -239,18 +239,18 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 Ready to Take the First Step?
               </h3>
               <p className="text-black mb-6">
-                Call us at <a href="/support" className="text-orange-600 font-bold hover:underline">support center</a> or apply online to get started today.
+                Call us at <a href="/support" className="text-brand-orange-600 font-bold hover:underline">support center</a> or apply online to get started today.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link
                   href="/apply"
-                  className="px-8 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition text-lg"
+                  className="px-8 py-4 bg-brand-orange-600 text-white font-bold rounded-full hover:bg-brand-orange-700 transition text-lg"
                 >
                   Apply Now
                 </Link>
                 <a
                   href="/support"
-                  className="px-8 py-4 border-2 border-orange-600 text-orange-600 font-bold rounded-full hover:bg-orange-50 transition text-lg"
+                  className="px-8 py-4 border-2 border-brand-orange-600 text-brand-orange-600 font-bold rounded-full hover:bg-brand-orange-50 transition text-lg"
                 >
                   Call Us
                 </a>
@@ -284,13 +284,13 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 <div className="flex flex-wrap gap-4">
                   <Link
                     href={ctaButtonLink}
-                    className="px-8 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition text-lg"
+                    className="px-8 py-4 bg-brand-orange-600 text-white font-bold rounded-full hover:bg-brand-orange-700 transition text-lg"
                   >
                     {ctaButtonText}
                   </Link>
                   <a
                     href="/support"
-                    className="px-8 py-4 border-2 border-orange-600 text-orange-600 font-bold rounded-full hover:bg-orange-50 transition text-lg"
+                    className="px-8 py-4 border-2 border-brand-orange-600 text-brand-orange-600 font-bold rounded-full hover:bg-brand-orange-50 transition text-lg"
                   >
                     Call support center
                   </a>

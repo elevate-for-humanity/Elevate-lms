@@ -142,8 +142,8 @@ export default function BillingSettingsPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Billing & Payments</h1>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-red-700">{error}</p>
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6">
+            <p className="text-brand-red-700">{error}</p>
           </div>
         )}
 
@@ -154,8 +154,8 @@ export default function BillingSettingsPage() {
               <h2 className="text-lg font-semibold text-gray-900">Account Balance</h2>
               <p className="text-3xl font-bold text-gray-900 mt-2">${balance.toFixed(2)}</p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center">
+              <DollarSign className="w-6 h-6 text-brand-green-600" />
             </div>
           </div>
         </div>
@@ -192,7 +192,7 @@ export default function BillingSettingsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {method.is_default && (
-                      <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                      <span className="px-2 py-1 bg-brand-green-100 text-brand-green-700 text-xs rounded-full">
                         Default
                       </span>
                     )}
@@ -230,10 +230,10 @@ export default function BillingSettingsPage() {
                   <div className="flex items-center gap-4">
                     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
                       invoice.status === 'paid'
-                        ? 'bg-green-100 text-green-700'
+                        ? 'bg-brand-green-100 text-brand-green-700'
                         : invoice.status === 'pending'
                         ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-red-100 text-red-700'
+                        : 'bg-brand-red-100 text-brand-red-700'
                     }`}>
                       {invoice.status === 'paid' && <span className="text-slate-400 flex-shrink-0">•</span>}
                       {invoice.status === 'failed' && <AlertCircle className="w-3 h-3" />}

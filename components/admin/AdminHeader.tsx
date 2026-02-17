@@ -105,7 +105,7 @@ const isPreview = isNetlify
 
 function getEnvBadge(): { label: string; color: string } {
   if (isProd) {
-    return { label: 'PRODUCTION', color: 'bg-red-100 text-red-800 border-red-200' };
+    return { label: 'PRODUCTION', color: 'bg-brand-red-100 text-brand-red-800 border-brand-red-200' };
   }
   if (isPreview) {
     return { label: 'PREVIEW', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
@@ -211,7 +211,7 @@ export default function AdminHeader() {
           <button
             onClick={handleDeploy}
             disabled={deploying}
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-green-800 rounded-md text-sm font-medium transition-colors"
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-brand-green-600 hover:bg-brand-green-700 disabled:bg-brand-green-800 rounded-md text-sm font-medium transition-colors"
           >
             {deploying ? (
               <RefreshCw className="w-4 h-4 animate-spin" />
@@ -292,7 +292,7 @@ export default function AdminHeader() {
             <button
               onClick={handleDeploy}
               disabled={deploying}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 rounded-md text-sm font-medium mt-4"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-brand-green-600 hover:bg-brand-green-700 rounded-md text-sm font-medium mt-4"
             >
               {deploying ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Rocket className="w-4 h-4" />}
               {deploying ? 'Deploying...' : 'Deploy to Production'}

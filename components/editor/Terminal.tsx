@@ -93,7 +93,7 @@ export default function Terminal({ onCommand, sessionId }: TerminalProps) {
   };
 
   return (
-    <div className="h-full bg-black text-green-400 font-mono text-sm flex flex-col">
+    <div className="h-full bg-black text-brand-green-400 font-mono text-sm flex flex-col">
       <div className="p-2 border-b border-gray-700 bg-gray-900">
         <h3 className="font-semibold text-xs text-gray-400">Terminal</h3>
       </div>
@@ -102,7 +102,7 @@ export default function Terminal({ onCommand, sessionId }: TerminalProps) {
         {history.map((entry, index) => (
           <div
             key={index}
-            className={entry.type === 'input' ? 'text-white' : 'text-green-400'}
+            className={entry.type === 'input' ? 'text-white' : 'text-brand-green-400'}
           >
             {entry.text.split('\n').map((line, i) => (
               <div key={i}>{line}</div>

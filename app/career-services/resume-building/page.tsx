@@ -90,7 +90,7 @@ export default function ResumeBuildingPage() {
           </p>
           <Link
             href="/career-services/contact"
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center"
+            className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center"
           >
             Schedule Resume Review <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
@@ -106,30 +106,30 @@ export default function ResumeBuildingPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-gray-50 rounded-xl p-8 text-center hover:shadow-lg transition">
-              <FileText className="w-12 h-12 text-green-600 mx-auto mb-4" />
+              <FileText className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">Resume Review</h3>
               <p className="text-gray-600 mb-4">
                 Get expert feedback on your existing resume with specific suggestions for improvement.
               </p>
-              <p className="text-green-600 font-bold">Free for participants</p>
+              <p className="text-brand-green-600 font-bold">Free for participants</p>
             </div>
 
-            <div className="bg-green-50 rounded-xl p-8 text-center border-2 border-green-200 hover:shadow-lg transition">
-              <Sparkles className="w-12 h-12 text-green-600 mx-auto mb-4" />
+            <div className="bg-brand-green-50 rounded-xl p-8 text-center border-2 border-brand-green-200 hover:shadow-lg transition">
+              <Sparkles className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">Resume Writing</h3>
               <p className="text-gray-600 mb-4">
                 Work one-on-one with a career coach to create a professional resume from scratch.
               </p>
-              <p className="text-green-600 font-bold">Most Popular</p>
+              <p className="text-brand-green-600 font-bold">Most Popular</p>
             </div>
 
             <div className="bg-gray-50 rounded-xl p-8 text-center hover:shadow-lg transition">
-              <Target className="w-12 h-12 text-green-600 mx-auto mb-4" />
+              <Target className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">ATS Optimization</h3>
               <p className="text-gray-600 mb-4">
                 Ensure your resume passes Applicant Tracking Systems and reaches human reviewers.
               </p>
-              <p className="text-green-600 font-bold">Included with all services</p>
+              <p className="text-brand-green-600 font-bold">Included with all services</p>
             </div>
           </div>
         </div>
@@ -178,7 +178,7 @@ export default function ResumeBuildingPage() {
             {actionVerbs.map((verb, index) => (
               <span
                 key={index}
-                className="bg-green-100 text-green-800 px-4 py-2 rounded-full font-medium"
+                className="bg-brand-green-100 text-brand-green-800 px-4 py-2 rounded-full font-medium"
               >
                 {verb}
               </span>
@@ -195,9 +195,9 @@ export default function ResumeBuildingPage() {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg p-6 border-l-4 border-red-500">
+            <div className="bg-white rounded-lg p-6 border-l-4 border-brand-red-500">
               <div className="flex items-start">
-                <AlertCircle className="w-6 h-6 text-red-500 mr-3 flex-shrink-0" />
+                <AlertCircle className="w-6 h-6 text-brand-red-500 mr-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">Typos and Grammar Errors</h3>
                   <p className="text-gray-600 text-sm">Always proofread multiple times and have someone else review it.</p>
@@ -205,9 +205,9 @@ export default function ResumeBuildingPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 border-l-4 border-red-500">
+            <div className="bg-white rounded-lg p-6 border-l-4 border-brand-red-500">
               <div className="flex items-start">
-                <AlertCircle className="w-6 h-6 text-red-500 mr-3 flex-shrink-0" />
+                <AlertCircle className="w-6 h-6 text-brand-red-500 mr-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">Generic Objectives</h3>
                   <p className="text-gray-600 text-sm">Replace with a tailored professional summary that shows your value.</p>
@@ -215,9 +215,9 @@ export default function ResumeBuildingPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 border-l-4 border-red-500">
+            <div className="bg-white rounded-lg p-6 border-l-4 border-brand-red-500">
               <div className="flex items-start">
-                <AlertCircle className="w-6 h-6 text-red-500 mr-3 flex-shrink-0" />
+                <AlertCircle className="w-6 h-6 text-brand-red-500 mr-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">Listing Duties Instead of Achievements</h3>
                   <p className="text-gray-600 text-sm">Focus on what you accomplished, not just what you were responsible for.</p>
@@ -225,9 +225,9 @@ export default function ResumeBuildingPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 border-l-4 border-red-500">
+            <div className="bg-white rounded-lg p-6 border-l-4 border-brand-red-500">
               <div className="flex items-start">
-                <AlertCircle className="w-6 h-6 text-red-500 mr-3 flex-shrink-0" />
+                <AlertCircle className="w-6 h-6 text-brand-red-500 mr-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">Too Long or Too Short</h3>
                   <p className="text-gray-600 text-sm">Keep it to 1-2 pages. Be concise but include all relevant information.</p>
@@ -235,9 +235,9 @@ export default function ResumeBuildingPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 border-l-4 border-red-500">
+            <div className="bg-white rounded-lg p-6 border-l-4 border-brand-red-500">
               <div className="flex items-start">
-                <AlertCircle className="w-6 h-6 text-red-500 mr-3 flex-shrink-0" />
+                <AlertCircle className="w-6 h-6 text-brand-red-500 mr-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">Unprofessional Email Address</h3>
                   <p className="text-gray-600 text-sm">Use a simple email format like firstname.lastname@email.com.</p>
@@ -245,9 +245,9 @@ export default function ResumeBuildingPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 border-l-4 border-red-500">
+            <div className="bg-white rounded-lg p-6 border-l-4 border-brand-red-500">
               <div className="flex items-start">
-                <AlertCircle className="w-6 h-6 text-red-500 mr-3 flex-shrink-0" />
+                <AlertCircle className="w-6 h-6 text-brand-red-500 mr-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">Not Tailoring to the Job</h3>
                   <p className="text-gray-600 text-sm">Customize your resume for each application using keywords from the job posting.</p>
@@ -279,24 +279,24 @@ export default function ResumeBuildingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-green-700 text-white">
+      <section className="py-16 bg-brand-green-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Ready to Build Your Resume?
           </h2>
-          <p className="text-xl mb-8 text-green-100">
+          <p className="text-xl mb-8 text-brand-green-100">
             Work with our career coaches to create a resume that gets results.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="bg-white hover:bg-gray-100 text-green-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
+              className="bg-white hover:bg-gray-100 text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               Get Started <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link
               href="/career-services"
-              className="bg-green-600 hover:bg-green-500 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all border-2 border-white"
+              className="bg-brand-green-600 hover:bg-brand-green-500 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all border-2 border-white"
             >
               View All Career Services
             </Link>

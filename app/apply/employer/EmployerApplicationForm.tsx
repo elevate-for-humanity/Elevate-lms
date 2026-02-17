@@ -49,7 +49,7 @@ export default function EmployerApplicationForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm" role="alert">
+        <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-800 text-sm" role="alert">
           {error}
         </div>
       )}
@@ -72,7 +72,7 @@ export default function EmployerApplicationForm() {
               id="companyName"
               name="companyName"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
             />
           </div>
 
@@ -88,7 +88,7 @@ export default function EmployerApplicationForm() {
                 id="industry"
                 name="industry"
                 required
-                className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
               >
                 <option value="">Select industry</option>
                 <option value="healthcare">Healthcare</option>
@@ -112,7 +112,7 @@ export default function EmployerApplicationForm() {
                 id="companySize"
                 name="companySize"
                 required
-                className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
               >
                 <option value="">Select size</option>
                 <option value="1-10">1-10 employees</option>
@@ -136,7 +136,7 @@ export default function EmployerApplicationForm() {
               id="website"
               name="website"
               placeholder="https://"
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -160,7 +160,7 @@ export default function EmployerApplicationForm() {
               id="firstName"
               name="firstName"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
             />
           </div>
 
@@ -176,7 +176,7 @@ export default function EmployerApplicationForm() {
               id="lastName"
               name="lastName"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
             />
           </div>
 
@@ -192,7 +192,7 @@ export default function EmployerApplicationForm() {
               id="email"
               name="email"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
             />
           </div>
 
@@ -208,7 +208,7 @@ export default function EmployerApplicationForm() {
               id="phone"
               name="phone"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -229,7 +229,7 @@ export default function EmployerApplicationForm() {
               id="hiringNeeds"
               name="hiringNeeds"
               rows={4}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
               placeholder="Tell us about the positions you're looking to fill..."
             />
           </div>
@@ -245,7 +245,7 @@ export default function EmployerApplicationForm() {
               type="text"
               id="positionsAvailable"
               name="positionsAvailable"
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
               placeholder="e.g., 5-10 positions"
             />
           </div>
@@ -256,7 +256,7 @@ export default function EmployerApplicationForm() {
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 min-h-[48px] px-6 py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 min-h-[48px] px-6 py-3 bg-brand-orange-600 text-white font-bold rounded-lg hover:bg-brand-orange-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? 'Submitting...' : 'Submit Application'}
         </button>

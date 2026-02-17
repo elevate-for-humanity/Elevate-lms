@@ -36,7 +36,7 @@ export default async function SuccessPage() {
               <div key={story.id} className="p-4 hover:bg-gray-50">
                 <div className="flex justify-between items-start">
                   <div><p className="font-medium">{story.title || story.participant_name}</p><p className="text-sm text-gray-500 mt-1 line-clamp-2">{story.summary || story.content}</p></div>
-                  <span className={`px-2 py-1 rounded-full text-xs ${story.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>{story.status || 'draft'}</span>
+                  <span className={`px-2 py-1 rounded-full text-xs ${story.status === 'published' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-gray-100 text-gray-600'}`}>{story.status || 'draft'}</span>
                 </div>
               </div>
             )) : <div className="p-8 text-center text-gray-500">No success stories yet</div>}

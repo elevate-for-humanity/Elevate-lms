@@ -139,7 +139,7 @@ export default function CNAProgramPage() {
                   <Clock className="w-4 h-4 text-pink-300" />6-8 Weeks
                 </span>
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <DollarSign className="w-4 h-4 text-green-400" />$1,200 Tuition
+                  <DollarSign className="w-4 h-4 text-brand-green-400" />$1,200 Tuition
                 </span>
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
                   <HeartPulse className="w-4 h-4 text-pink-300" />Pathway to Nursing
@@ -208,7 +208,7 @@ export default function CNAProgramPage() {
       <section id="curriculum" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-block bg-green-100 text-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">Training Program</span>
+            <span className="inline-block bg-brand-green-100 text-brand-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">Training Program</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">8-Week CNA Curriculum</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">State-approved training with clinical experience. Graduate ready for the Indiana CNA exam.</p>
           </div>
@@ -227,7 +227,7 @@ export default function CNAProgramPage() {
                     <div className="grid md:grid-cols-2 gap-4 mb-4">
                       {module.topics.map((topic, i) => (
                         <div key={i} className="flex items-center gap-2">
-                          <Circle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                          <Circle className="w-5 h-5 text-brand-green-500 flex-shrink-0" />
                           <span className="text-gray-700">{topic}</span>
                         </div>
                       ))}

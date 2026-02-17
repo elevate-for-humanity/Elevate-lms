@@ -14,7 +14,7 @@ export function SupersonicFooter() {
           <div>
             <div className="text-xl font-bold mb-4">
               <span className="text-white">Supersonic</span>
-              <span className="text-red-500"> Fast Cash</span>
+              <span className="text-brand-red-500"> Fast Cash</span>
               <span className="text-white text-sm font-normal ml-1">LLC</span>
             </div>
             <p className="text-gray-400 text-sm">

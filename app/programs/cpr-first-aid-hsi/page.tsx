@@ -117,7 +117,7 @@ export default function CPRFirstAidPage() {
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
               <Heart className="w-4 h-4" /> HSI Certified Training
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
@@ -127,7 +127,7 @@ export default function CPRFirstAidPage() {
               Get certified in one day. Learn life-saving skills that could help you save a coworker, family member, or stranger.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/inquiry?program=cpr-first-aid-hsi" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
+              <Link href="/inquiry?program=cpr-first-aid-hsi" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
                 Schedule a Class <ArrowRight className="w-5 h-5" />
               </Link>
               <a href="/support" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
@@ -146,7 +146,7 @@ export default function CPRFirstAidPage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <Clock className="w-8 h-8 text-red-400 mx-auto mb-2" />
+              <Clock className="w-8 h-8 text-brand-red-400 mx-auto mb-2" />
               <div className="text-2xl font-bold text-white">3-5 Hours</div>
               <div className="text-slate-400 text-sm">Class Length</div>
             </div>
@@ -161,7 +161,7 @@ export default function CPRFirstAidPage() {
               <div className="text-slate-400 text-sm">Certified Provider</div>
             </div>
             <div>
-              <Users className="w-8 h-8 text-green-400 mx-auto mb-2" />
+              <Users className="w-8 h-8 text-brand-green-400 mx-auto mb-2" />
               <div className="text-2xl font-bold text-white">On-Site</div>
               <div className="text-slate-400 text-sm">Group Training</div>
             </div>
@@ -177,7 +177,7 @@ export default function CPRFirstAidPage() {
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-6">Why CPR Training Matters</h2>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-brand-red-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold">1</span>
                   </div>
                   <div>
@@ -186,7 +186,7 @@ export default function CPRFirstAidPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-brand-red-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold">2</span>
                   </div>
                   <div>
@@ -195,7 +195,7 @@ export default function CPRFirstAidPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-brand-red-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold">3</span>
                   </div>
                   <div>
@@ -234,11 +234,11 @@ export default function CPRFirstAidPage() {
                     <p className="text-slate-600 text-sm">{course.desc}</p>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-red-600">{course.price}</div>
+                    <div className="text-2xl font-bold text-brand-red-600">{course.price}</div>
                     <div className="text-slate-500 text-sm">{course.duration}</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-green-600 mb-4">
+                <div className="flex items-center gap-2 text-sm text-brand-green-600 mb-4">
                   <Award className="w-4 h-4" />
                   <span>{course.certification}</span>
                 </div>
@@ -269,8 +269,8 @@ export default function CPRFirstAidPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {whoNeeds.map((item, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex items-start gap-4">
-                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <item.icon className="w-6 h-6 text-red-600" />
+                <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <item.icon className="w-6 h-6 text-brand-red-600" />
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900">{item.title}</h3>
@@ -325,7 +325,7 @@ export default function CPRFirstAidPage() {
               { num: 4, title: 'Certify', desc: 'Pass skills check, get your card' },
             ].map((step, i) => (
               <div key={i} className="text-center">
-                <div className="w-14 h-14 bg-red-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                <div className="w-14 h-14 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                   {step.num}
                 </div>
                 <h3 className="font-bold text-slate-900 mb-2">{step.title}</h3>
@@ -346,7 +346,7 @@ export default function CPRFirstAidPage() {
             Classes available weekly. Group training by appointment.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/inquiry?program=cpr-first-aid-hsi" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/inquiry?program=cpr-first-aid-hsi" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Schedule a Class <ArrowRight className="w-5 h-5" />
             </Link>
             <a href="/support" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">

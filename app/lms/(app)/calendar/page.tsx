@@ -200,9 +200,9 @@ export default async function CalendarPage() {
                                 key={i}
                                 className={`text-xs px-2 py-1 rounded truncate ${
                                   event.event_type === 'class' ? 'bg-brand-blue-100 text-brand-blue-700' :
-                                  event.event_type === 'assignment' ? 'bg-orange-100 text-orange-700' :
-                                  event.event_type === 'exam' ? 'bg-red-100 text-red-700' :
-                                  'bg-green-100 text-green-700'
+                                  event.event_type === 'assignment' ? 'bg-brand-orange-100 text-brand-orange-700' :
+                                  event.event_type === 'exam' ? 'bg-brand-red-100 text-brand-red-700' :
+                                  'bg-brand-green-100 text-brand-green-700'
                                 }`}
                               >
                                 {event.title}
@@ -226,15 +226,15 @@ export default async function CalendarPage() {
                 <span className="text-slate-600">Classes</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-orange-500"></div>
+                <div className="w-3 h-3 rounded bg-brand-orange-500"></div>
                 <span className="text-slate-600">Assignments</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-red-500"></div>
+                <div className="w-3 h-3 rounded bg-brand-red-500"></div>
                 <span className="text-slate-600">Exams</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-green-500"></div>
+                <div className="w-3 h-3 rounded bg-brand-green-500"></div>
                 <span className="text-slate-600">Events</span>
               </div>
             </div>
@@ -276,7 +276,7 @@ export default async function CalendarPage() {
 
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-orange-600" />
+                <BookOpen className="w-5 h-5 text-brand-orange-600" />
                 Upcoming Assignments
               </h3>
               
@@ -286,7 +286,7 @@ export default async function CalendarPage() {
                     <Link key={i} href={`/lms/assignments/${assignment.id}`} className="block p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
                       <div className="font-medium text-slate-900 truncate">{assignment.title}</div>
                       <div className="text-sm text-slate-600">{assignment.courses?.title}</div>
-                      <div className="text-sm text-orange-600 font-medium mt-1">Due: {formatDate(assignment.due_date)}</div>
+                      <div className="text-sm text-brand-orange-600 font-medium mt-1">Due: {formatDate(assignment.due_date)}</div>
                     </Link>
                   ))}
                 </div>

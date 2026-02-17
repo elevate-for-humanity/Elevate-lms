@@ -105,14 +105,14 @@ export default async function StartPage() {
 
   const colorClasses: Record<string, string> = {
     blue: 'bg-brand-blue-50 border-brand-blue-200 hover:border-brand-blue-400',
-    green: 'bg-green-50 border-green-200 hover:border-green-400',
+    green: 'bg-brand-green-50 border-brand-green-200 hover:border-brand-green-400',
     blue: 'bg-brand-blue-50 border-brand-blue-200 hover:border-brand-blue-400',
     amber: 'bg-amber-50 border-amber-200 hover:border-amber-400',
   };
 
   const iconColorClasses: Record<string, string> = {
     blue: 'text-brand-blue-600',
-    green: 'text-green-600',
+    green: 'text-brand-green-600',
     blue: 'text-brand-blue-600',
     amber: 'text-amber-600',
   };

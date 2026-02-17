@@ -88,10 +88,10 @@ export default function BuyerProtectionPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero */}
-        <div className="bg-green-600 rounded-2xl p-8 text-white text-center mb-12">
+        <div className="bg-brand-green-600 rounded-2xl p-8 text-white text-center mb-12">
           <Shield className="w-16 h-16 mx-auto mb-4" />
           <h2 className="text-3xl font-bold mb-2">Your Purchase is Protected</h2>
-          <p className="text-green-100 max-w-xl mx-auto">
+          <p className="text-brand-green-100 max-w-xl mx-auto">
             We stand behind every purchase on our marketplace with comprehensive buyer protection.
           </p>
         </div>
@@ -102,8 +102,8 @@ export default function BuyerProtectionPage() {
             const Icon = protection.icon;
             return (
               <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                  <Icon className="w-6 h-6 text-green-600" />
+                <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+                  <Icon className="w-6 h-6 text-brand-green-600" />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">{protection.title}</h3>
                 <p className="text-sm text-gray-600">{protection.description}</p>

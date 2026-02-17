@@ -37,7 +37,7 @@ export default function AIJobMatchPage() {
       </div>
 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-900 rounded-full text-sm font-bold mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-orange-100 text-brand-orange-900 rounded-full text-sm font-bold mb-6">
             <Briefcase className="w-4 h-4" />
             AI Job Matcher
           </div>
@@ -57,14 +57,14 @@ export default function AIJobMatchPage() {
             value={skills}
             onChange={(e) => setSkills(e.target.value)}
             placeholder="e.g., CNA certification, customer service, Microsoft Office, bilingual Spanish..."
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent mb-4"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-600 focus:border-transparent mb-4"
             rows={4}
           />
 
           <button
             onClick={handleMatch}
             disabled={loading || !skills.trim()}
-            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold py-4 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
@@ -89,7 +89,7 @@ export default function AIJobMatchPage() {
                 </h3>
                 <p className="text-black mb-4">{match.description}</p>
                 <div className="flex items-center gap-4">
-                  <span className="px-3 py-2 bg-orange-100 text-orange-700 text-sm font-semibold rounded">
+                  <span className="px-3 py-2 bg-brand-orange-100 text-brand-orange-700 text-sm font-semibold rounded">
                     {match.matchScore}% Match
                   </span>
                   <span className="text-sm text-black">

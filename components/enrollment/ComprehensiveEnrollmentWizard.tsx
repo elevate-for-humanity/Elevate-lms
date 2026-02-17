@@ -393,7 +393,7 @@ export default function ComprehensiveEnrollmentWizard({
                 <div key={step.id} className="flex items-center">
                   <div className="flex flex-col items-center">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      currentStep > step.id ? 'bg-green-600 text-white' :
+                      currentStep > step.id ? 'bg-brand-green-600 text-white' :
                       currentStep === step.id ? 'bg-brand-blue-600 text-white' :
                       'bg-gray-200 text-gray-500'
                     }`}>
@@ -409,7 +409,7 @@ export default function ComprehensiveEnrollmentWizard({
                   </div>
                   {idx < STEPS.length - 1 && (
                     <div className={`w-12 h-1 mx-2 ${
-                      currentStep > step.id ? 'bg-green-600' : 'bg-gray-200'
+                      currentStep > step.id ? 'bg-brand-green-600' : 'bg-gray-200'
                     }`} />
                   )}
                 </div>
@@ -654,12 +654,12 @@ export default function ComprehensiveEnrollmentWizard({
 
           {/* Error Message */}
           {error && (
-            <div className="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="mt-6 bg-brand-red-50 border border-brand-red-200 rounded-lg p-4">
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-5 h-5 text-brand-orange-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-semibold text-red-900">Error</p>
-                  <p className="text-sm text-red-700 mt-1">{error}</p>
+                  <p className="font-semibold text-brand-red-900">Error</p>
+                  <p className="text-sm text-brand-red-700 mt-1">{error}</p>
                 </div>
               </div>
             </div>
@@ -697,7 +697,7 @@ export default function ComprehensiveEnrollmentWizard({
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-8 py-3 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {loading ? (
                 <>

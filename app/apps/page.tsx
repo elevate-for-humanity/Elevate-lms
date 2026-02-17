@@ -45,7 +45,7 @@ const apps = [
 
 const colorClasses = {
   blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600', border: 'border-brand-blue-200' },
-  green: { bg: 'bg-green-100', text: 'text-green-600', border: 'border-green-200' },
+  green: { bg: 'bg-brand-green-100', text: 'text-brand-green-600', border: 'border-brand-green-200' },
   blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600', border: 'border-brand-blue-200' },
 };
 

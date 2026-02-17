@@ -43,7 +43,7 @@ export default async function LearningHubPage() {
         ]}
       />
       {/* Hero */}
-      <section className="bg-green-600 text-white py-20">
+      <section className="bg-brand-green-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <GraduationCap className="w-20 h-20 mx-auto mb-6" />
           <h1 className="text-5xl font-bold mb-6">Learning Hub</h1>
@@ -52,7 +52,7 @@ export default async function LearningHubPage() {
           </p>
           <Link
             href="/lms/dashboard"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-green-600 rounded-lg font-bold hover:bg-gray-100"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-green-600 rounded-lg font-bold hover:bg-gray-100"
           >
             Go to Dashboard
             <ArrowRight className="w-5 h-5" />
@@ -66,7 +66,7 @@ export default async function LearningHubPage() {
           <h2 className="text-3xl font-bold text-center mb-12">Learning Resources</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <ResourceCard
-              icon={<BookOpen className="w-12 h-12 text-green-600" />}
+              icon={<BookOpen className="w-12 h-12 text-brand-green-600" />}
               title="Lessons"
               description="Browse and access all course lessons"
               href="/lessons"
@@ -87,14 +87,14 @@ export default async function LearningHubPage() {
               count="200+ workbooks"
             />
             <ResourceCard
-              icon={<Compass className="w-12 h-12 text-orange-600" />}
+              icon={<Compass className="w-12 h-12 text-brand-orange-600" />}
               title="Orientation"
               description="New student orientation and onboarding"
               href="/orientation"
               count="Get started"
             />
             <ResourceCard
-              icon={<BookMarked className="w-12 h-12 text-red-600" />}
+              icon={<BookMarked className="w-12 h-12 text-brand-red-600" />}
               title="Student Handbook"
               description="Policies, procedures, and resources"
               href="/student-handbook"
@@ -129,13 +129,13 @@ export default async function LearningHubPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-green-600 text-white text-center">
+      <section className="py-16 bg-brand-green-600 text-white text-center">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Learning?</h2>
           <p className="text-xl mb-8">Access all your courses and resources in one place</p>
           <Link
             href="/lms/dashboard"
-            className="inline-block px-8 py-4 bg-white text-green-600 rounded-lg font-bold hover:bg-gray-100"
+            className="inline-block px-8 py-4 bg-white text-brand-green-600 rounded-lg font-bold hover:bg-gray-100"
           >
             Go to My Dashboard
           </Link>

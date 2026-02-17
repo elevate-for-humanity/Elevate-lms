@@ -318,7 +318,7 @@ export default function CapitalReadinessGuidePage() {
           
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-xl p-6">
-              <div className="w-12 h-12 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center font-bold mb-4">1</div>
+              <div className="w-12 h-12 bg-brand-red-500/20 text-brand-red-400 rounded-full flex items-center justify-center font-bold mb-4">1</div>
               <h3 className="text-xl font-bold mb-2">Informal</h3>
               <p className="text-slate-600">Founder-led. Reactive. Memory-based.</p>
             </div>
@@ -328,7 +328,7 @@ export default function CapitalReadinessGuidePage() {
               <p className="text-slate-600">Systems exist. Processes written. Time-dependent.</p>
             </div>
             <div className="bg-white rounded-xl p-6">
-              <div className="w-12 h-12 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center font-bold mb-4">3</div>
+              <div className="w-12 h-12 bg-brand-green-500/20 text-brand-green-400 rounded-full flex items-center justify-center font-bold mb-4">3</div>
               <h3 className="text-xl font-bold mb-2">Institutional</h3>
               <p className="text-slate-600">Systems run without personalities. Trust compounds.</p>
             </div>

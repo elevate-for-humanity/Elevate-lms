@@ -238,8 +238,8 @@ export default function SmartUploadPage() {
           onClick={handleClick}
           className={`border-3 border-dashed rounded-2xl p-12 text-center cursor-pointer transition ${
             isDragActive
-              ? 'border-green-500 bg-green-50'
-              : 'border-gray-300 hover:border-green-400 bg-white'
+              ? 'border-brand-green-500 bg-brand-green-50'
+              : 'border-gray-300 hover:border-brand-green-400 bg-white'
           }`}
         >
           <input
@@ -251,8 +251,8 @@ export default function SmartUploadPage() {
             className="hidden"
           />
           <div className="flex flex-col items-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-              <Upload className="w-10 h-10 text-green-600" />
+            <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mb-6">
+              <Upload className="w-10 h-10 text-brand-green-600" />
             </div>
             <h3 className="text-2xl font-bold mb-2">
               {isDragActive ? 'Drop files here' : 'Upload Tax Documents'}
@@ -361,13 +361,13 @@ export default function SmartUploadPage() {
                           </span>
                         )}
                         {file.status === 'completed' && (
-                          <span className="flex items-center gap-2 px-3 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                          <span className="flex items-center gap-2 px-3 py-2 bg-brand-green-100 text-brand-green-700 rounded-full text-sm font-semibold">
                             <span className="text-slate-400 flex-shrink-0">•</span>
                             Completed
                           </span>
                         )}
                         {file.status === 'error' && (
-                          <span className="flex items-center gap-2 px-3 py-2 bg-red-100 text-red-700 rounded-full text-sm font-semibold">
+                          <span className="flex items-center gap-2 px-3 py-2 bg-brand-red-100 text-brand-red-700 rounded-full text-sm font-semibold">
                             <AlertCircle className="w-4 h-4" />
                             Error
                           </span>
@@ -383,13 +383,13 @@ export default function SmartUploadPage() {
 
                     {/* Extracted Data */}
                     {file.extractedData && (
-                      <div className="bg-green-50 rounded-xl p-6 border-2 border-green-200">
+                      <div className="bg-brand-green-50 rounded-xl p-6 border-2 border-brand-green-200">
                         <div className="flex items-center justify-between mb-4">
                           <h4 className="font-bold text-lg">
                             Extracted Data (
                             {file.extractedData.documentType.toUpperCase()})
                           </h4>
-                          <span className="text-sm text-green-700 font-semibold">
+                          <span className="text-sm text-brand-green-700 font-semibold">
                             {(file.extractedData.confidence * 100).toFixed(0)}%
                             Confidence
                           </span>
@@ -421,7 +421,7 @@ export default function SmartUploadPage() {
                               <label className="text-xs font-medium text-black">
                                 Wages (Box 1)
                               </label>
-                              <p className="font-semibold text-green-700 text-lg">
+                              <p className="font-semibold text-brand-green-700 text-lg">
                                 {formatCurrency(file.extractedData.data.wages)}
                               </p>
                             </div>
@@ -431,7 +431,7 @@ export default function SmartUploadPage() {
                               <label className="text-xs font-medium text-black">
                                 Federal Withholding (Box 2)
                               </label>
-                              <p className="font-semibold text-green-700 text-lg">
+                              <p className="font-semibold text-brand-green-700 text-lg">
                                 {formatCurrency(
                                   file.extractedData.data.federalWithholding
                                 )}
@@ -476,8 +476,8 @@ export default function SmartUploadPage() {
                           )}
                         </div>
 
-                        <div className="mt-4 pt-4 border-t border-green-200">
-                          <p className="text-sm text-green-700 font-semibold">
+                        <div className="mt-4 pt-4 border-t border-brand-green-200">
+                          <p className="text-sm text-brand-green-700 font-semibold">
                             • Data automatically added to your tax return
                           </p>
                         </div>
@@ -486,10 +486,10 @@ export default function SmartUploadPage() {
 
                     {/* Error Message */}
                     {file.error && (
-                      <div className="bg-red-50 rounded-xl p-4 border-2 border-red-200">
+                      <div className="bg-brand-red-50 rounded-xl p-4 border-2 border-brand-red-200">
                         <div className="flex gap-2">
-                          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                          <p className="text-sm text-red-700">{file.error}</p>
+                          <AlertCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0" />
+                          <p className="text-sm text-brand-red-700">{file.error}</p>
                         </div>
                       </div>
                     )}
@@ -506,13 +506,13 @@ export default function SmartUploadPage() {
             <h3 className="text-2xl font-bold mb-3">
               Ready to File Your Return?
             </h3>
-            <p className="text-green-100 mb-6">
+            <p className="text-brand-green-100 mb-6">
               All your data has been extracted and saved. Continue to complete
               your tax return.
             </p>
             <a
               href="/supersonic-fast-cash/diy/interview"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-green-600 rounded-xl font-bold hover:bg-green-50 transition"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-green-600 rounded-xl font-bold hover:bg-brand-green-50 transition"
             >
               Continue to Tax Interview →
             </a>

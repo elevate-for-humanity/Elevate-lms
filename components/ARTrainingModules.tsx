@@ -127,7 +127,7 @@ export function ARTrainingModules() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">AR Training Modules</h1>
-          <p className="text-red-100">Immersive hands-on learning with augmented reality</p>
+          <p className="text-brand-red-100">Immersive hands-on learning with augmented reality</p>
         </div>
       </div>
 
@@ -143,15 +143,15 @@ export function ARTrainingModules() {
               </p>
               <div className="flex gap-4 text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">•</span>
+                  <span className="text-brand-green-600">•</span>
                   <span>Works on mobile & tablet</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">•</span>
+                  <span className="text-brand-green-600">•</span>
                   <span>No special equipment needed</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">•</span>
+                  <span className="text-brand-green-600">•</span>
                   <span>Track your progress</span>
                 </div>
               </div>
@@ -168,7 +168,7 @@ export function ARTrainingModules() {
                   <div className="text-center mb-4">
                     <div className="text-6xl mb-3 text-4xl md:text-5xl lg:text-6xl">{module.thumbnail}</div>
                     <h3 className="text-xl font-bold mb-2">{module.title}</h3>
-                    <span className="px-3 py-2 bg-orange-100 text-orange-700 text-xs rounded">
+                    <span className="px-3 py-2 bg-brand-orange-100 text-brand-orange-700 text-xs rounded">
                       {module.category}
                     </span>
                   </div>
@@ -180,7 +180,7 @@ export function ARTrainingModules() {
                     <span className={`px-2 py-0.5 rounded text-xs ${
                       module.difficulty === 'beginner' ? 'bg-brand-blue-100 text-brand-blue-700' :
                       module.difficulty === 'intermediate' ? 'bg-purple-100 text-purple-700' :
-                      'bg-red-100 text-red-700'
+                      'bg-brand-red-100 text-brand-red-700'
                     }`}>
                       {module.difficulty}
                     </span>
@@ -191,7 +191,7 @@ export function ARTrainingModules() {
                     <ul className="space-y-1">
                       {module.features.slice(0, 3).map((feature, idx) => (
                         <li key={idx} className="text-xs text-black flex items-start">
-                          <span className="text-green-500 mr-1">•</span>
+                          <span className="text-brand-green-500 mr-1">•</span>
                           {feature}
                         </li>
                       ))}
@@ -304,7 +304,7 @@ export function ARTrainingModules() {
                     <ul className="space-y-2">
                       {selectedModuleData.features.map((feature, idx) => (
                         <li key={idx} className="text-sm text-black flex items-start">
-                          <span className="text-green-500 mr-2">•</span>
+                          <span className="text-brand-green-500 mr-2">•</span>
                           {feature}
                         </li>
                       ))}

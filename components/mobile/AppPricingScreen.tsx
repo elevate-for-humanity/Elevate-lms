@@ -34,11 +34,11 @@ export function AppPricingScreen() {
             <div
               key={product.id}
               className={`bg-white rounded-xl shadow-lg p-6 ${
-                product.recommended ? 'ring-2 ring-orange-500' : ''
+                product.recommended ? 'ring-2 ring-brand-orange-500' : ''
               }`}
             >
               {product.recommended && (
-                <div className="bg-orange-500 text-white px-3 py-2 rounded-full text-xs font-bold inline-block mb-3">
+                <div className="bg-brand-orange-500 text-white px-3 py-2 rounded-full text-xs font-bold inline-block mb-3">
                   Recommended
                 </div>
               )}
@@ -65,7 +65,7 @@ export function AppPricingScreen() {
               <ul className="space-y-2 mb-4">
                 {product.features.slice(0, 4).map((feature, idx) => (
                   <li key={idx} className="flex items-start gap-2 text-sm">
-                    <Check className="text-green-600 flex-shrink-0 mt-0.5" size={16} />
+                    <Check className="text-brand-green-600 flex-shrink-0 mt-0.5" size={16} />
                     <span className="text-black">{feature}</span>
                   </li>
                 ))}
@@ -85,7 +85,7 @@ export function AppPricingScreen() {
               {(product.tier === 'student' || product.tier === 'career') && (
                 <Link
                   href="/apply"
-                  className="block w-full text-center bg-orange-500 text-white px-4 py-3 rounded-lg font-bold hover:bg-orange-600 transition"
+                  className="block w-full text-center bg-brand-orange-500 text-white px-4 py-3 rounded-lg font-bold hover:bg-brand-orange-600 transition"
                 >
                   Get Started
                 </Link>
@@ -118,7 +118,7 @@ export function AppPricingScreen() {
         <div className="text-center mt-6">
           <Link
             href="/contact"
-            className="text-orange-600 font-semibold hover:text-orange-700"
+            className="text-brand-orange-600 font-semibold hover:text-brand-orange-700"
           >
             Questions? Contact Support
           </Link>

@@ -93,7 +93,7 @@ export default function ApprenticeshipsPage() {
         <Image src="/images/skilled-trades-vibrant.jpg" alt="Apprenticeship training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 bg-brand-green-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
               <Zap className="w-4 h-4" /> USDOL Registered Programs
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
@@ -119,9 +119,9 @@ export default function ApprenticeshipsPage() {
             {benefits.map((b, i) => (
               <div key={i} className="flex items-center gap-3 justify-center">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                  b.color === 'green' ? 'bg-green-500' : 
+                  b.color === 'green' ? 'bg-brand-green-500' : 
                   b.color === 'blue' ? 'bg-brand-blue-500' : 
-                  b.color === 'blue' ? 'bg-brand-blue-500' : 'bg-orange-500'
+                  b.color === 'blue' ? 'bg-brand-blue-500' : 'bg-brand-orange-500'
                 }`}>
                   <b.icon className="w-6 h-6 text-white" />
                 </div>
@@ -197,7 +197,7 @@ export default function ApprenticeshipsPage() {
                       <span className="flex items-center gap-1 text-slate-500">
                         <Clock className="w-4 h-4" /> {prog.duration}
                       </span>
-                      <span className="flex items-center gap-1 text-green-600 font-semibold">
+                      <span className="flex items-center gap-1 text-brand-green-600 font-semibold">
                         <DollarSign className="w-4 h-4" /> {prog.wage}
                       </span>
                     </div>
@@ -256,7 +256,7 @@ export default function ApprenticeshipsPage() {
             ))}
           </div>
           
-          <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
+          <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
             Check Eligibility <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

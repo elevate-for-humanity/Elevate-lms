@@ -44,7 +44,7 @@ export default function StoreDigitalPage() {
               <span className="text-slate-300">AI-Powered Tools & Resources</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-              Digital Resources <span className="text-blue-300">For Training Providers</span>
+              Digital Resources <span className="text-brand-blue-300">For Training Providers</span>
             </h1>
             <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">
               Everything you need to start, grow, and scale your workforce training business. AI assistants, compliance tools, marketing templates, and business guides.
@@ -157,7 +157,7 @@ export default function StoreDigitalPage() {
                   <ul className="space-y-2 mb-4">
                     {product.features.slice(0, 3).map((feature, idx) => (
                       <li key={idx} className="flex items-center gap-2 text-sm text-slate-700">
-                        <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                        <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0" />
                         {feature}
                       </li>
                     ))}
@@ -212,7 +212,7 @@ export default function StoreDigitalPage() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-12">
-            <Building2 className="w-8 h-8 text-blue-600" />
+            <Building2 className="w-8 h-8 text-brand-blue-600" />
             <h2 className="text-3xl font-black text-slate-900">Platform Add-Ons</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -230,17 +230,17 @@ export default function StoreDigitalPage() {
                     className="object-cover"
                   />
                   <div className="absolute bottom-4 left-4">
-                    <span className="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full">
+                    <span className="px-3 py-1 bg-brand-blue-600 text-white text-xs font-bold rounded-full">
                       {product.priceDisplay}
                     </span>
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
                     {product.name}
                   </h3>
                   <p className="text-slate-600 text-sm mb-4">{product.description}</p>
-                  <div className="flex items-center gap-2 text-blue-600 font-semibold">
+                  <div className="flex items-center gap-2 text-brand-blue-600 font-semibold">
                     Learn More <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>

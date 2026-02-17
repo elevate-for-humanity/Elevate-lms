@@ -40,7 +40,7 @@ export default async function WorkflowsPage() {
               <div key={i} className="p-4 hover:bg-gray-50">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-medium">{wf.name}</h3>
-                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">{wf.status}</span>
+                  <span className="px-2 py-1 bg-brand-green-100 text-brand-green-800 rounded-full text-xs">{wf.status}</span>
                 </div>
                 <p className="text-sm text-gray-500"><strong>Trigger:</strong> {wf.triggers}</p>
                 <p className="text-sm text-gray-500"><strong>Actions:</strong> {wf.actions}</p>

@@ -110,7 +110,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
                 </div>
                 {isSubmitted ? (
                   isGraded ? (
-                    <span className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    <span className="flex items-center gap-1 px-3 py-1 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium">
                       <span className="text-slate-400 flex-shrink-0">•</span>
                       Graded
                     </span>
@@ -121,7 +121,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
                     </span>
                   )
                 ) : isOverdue ? (
-                  <span className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                  <span className="flex items-center gap-1 px-3 py-1 bg-brand-red-100 text-brand-red-800 rounded-full text-sm font-medium">
                     <AlertCircle className="w-4 h-4" />
                     Overdue
                   </span>
@@ -137,7 +137,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
               {assignment.due_date && (
                 <div className={`flex items-center gap-2 p-3 rounded-lg mb-4 ${
                   isOverdue && !isSubmitted
-                    ? 'bg-red-50 text-red-800'
+                    ? 'bg-brand-red-50 text-brand-red-800'
                     : 'bg-slate-50 text-slate-700'
                 }`}>
                   <Calendar className="w-5 h-5" />
@@ -228,18 +228,18 @@ export default async function AssignmentDetailPage({ params }: Props) {
 
                   {/* Grade */}
                   {isGraded && (
-                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm text-green-700">Grade</p>
-                          <p className="text-2xl font-bold text-green-800">
+                          <p className="text-sm text-brand-green-700">Grade</p>
+                          <p className="text-2xl font-bold text-brand-green-800">
                             {submission.grade}/{assignment.max_points || 100}
                           </p>
                         </div>
                         {submission.feedback && (
                           <div className="flex-1 ml-6">
-                            <p className="text-sm text-green-700">Feedback</p>
-                            <p className="text-green-800">{submission.feedback}</p>
+                            <p className="text-sm text-brand-green-700">Feedback</p>
+                            <p className="text-brand-green-800">{submission.feedback}</p>
                           </div>
                         )}
                       </div>

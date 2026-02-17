@@ -112,7 +112,7 @@ export default function HomePage() {
 
       {/* ===== 3-CARD VALUE PROPS ===== */}
       <InView animation="fade-up">
-      <section className="py-10 sm:py-14">
+      <section aria-label="Career opportunities" className="py-10 sm:py-14">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {[
@@ -133,7 +133,7 @@ export default function HomePage() {
                 <div className="pt-4">
                   <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">{card.title}</h3>
                   <p className="text-base text-slate-700 mb-3">{card.desc}</p>
-                  <span className="inline-block bg-red-600 text-white font-semibold text-sm px-5 py-2.5 rounded-lg group-hover:bg-red-700 transition-colors">Learn More</span>
+                  <span className="inline-block bg-brand-red-600 text-white font-semibold text-sm px-5 py-2.5 rounded-lg group-hover:bg-brand-red-700 transition-colors">Learn More</span>
                 </div>
               </Link>
             ))}
@@ -144,7 +144,7 @@ export default function HomePage() {
 
       {/* ===== PROGRAMS ===== */}
       <InView animation="fade-up">
-      <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
+      <section aria-label="Programs and pathways" className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-10">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">Programs & Pathways</h2>
@@ -174,7 +174,7 @@ export default function HomePage() {
           </div>
 
           <div className="text-center mt-8">
-            <Link href="/programs" className="inline-block bg-red-600 hover:bg-red-700 text-white text-lg font-bold px-10 py-4 rounded-lg transition-colors">
+            <Link href="/programs" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-10 py-4 rounded-lg transition-colors">
               View All Programs
             </Link>
           </div>
@@ -184,10 +184,10 @@ export default function HomePage() {
 
       {/* ===== FIND YOUR PATH QUIZ ===== */}
       <InView animation="fade-up">
-      <section id="find-your-path" className="py-16 sm:py-20 bg-gradient-to-b from-slate-50 to-white border-t border-slate-100">
+      <section id="find-your-path" aria-label="Find your path" className="py-16 sm:py-20 bg-gradient-to-b from-slate-50 to-white border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-10">
-            <p className="text-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Interactive Guide</p>
+            <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Interactive Guide</p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
               Find your path in 30 seconds
             </h2>
@@ -204,7 +204,7 @@ export default function HomePage() {
 
       {/* ===== HOW IT WORKS ===== */}
       <InView animation="fade-up">
-      <section className="py-16 sm:py-20">
+      <section aria-label="How it works" className="py-10 sm:py-14">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">How It Works</h2>
@@ -228,7 +228,7 @@ export default function HomePage() {
                 />
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{step.title}</h3>
                 <p className="text-slate-700 text-base mb-4">{step.desc}</p>
-                <Link href={step.href} className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
+                <Link href={step.href} className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
                   Learn More
                 </Link>
               </div>
@@ -240,7 +240,7 @@ export default function HomePage() {
 
       {/* ===== FUNDING ===== */}
       <InView animation="fade-up">
-      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
+      <section aria-label="Funding options" className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <Image
             src="/images/hero-banner-new.jpg"
@@ -250,7 +250,7 @@ export default function HomePage() {
             sizes="(max-width: 768px) 100vw, 960px"
             className="w-full h-auto rounded-lg mb-10"
           />
-          <p className="text-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Funding Available</p>
+          <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Funding Available</p>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">100% Tuition-Free Programs</h2>
           <p className="text-lg text-slate-700 mb-8">
             Most programs are fully funded through WIOA, WRG, and JRI. No tuition, no fees, no debt.
@@ -270,7 +270,7 @@ export default function HomePage() {
                   <Link
                     href={item.href}
                     {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                    className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors"
+                    className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors"
                   >
                     Learn More
                   </Link>
@@ -279,10 +279,10 @@ export default function HomePage() {
             ))}
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/wioa-eligibility" className="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors text-center">
+            <Link href="/wioa-eligibility" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors text-center">
               Check Eligibility
             </Link>
-            <Link href="/funding" className="border-2 border-red-600 text-red-600 font-bold px-8 py-4 rounded-lg hover:bg-red-50 transition-colors text-center">
+            <Link href="/funding" className="border-2 border-brand-red-600 text-brand-red-600 font-bold px-8 py-4 rounded-lg hover:bg-brand-red-50 transition-colors text-center">
               All Funding Options
             </Link>
           </div>
@@ -292,7 +292,7 @@ export default function HomePage() {
 
       {/* ===== PARTNERS ===== */}
       <InView animation="fade">
-      <section className="py-16 sm:py-20 border-t border-slate-100">
+      <section aria-label="Approved training partners" className="py-10 sm:py-14 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-10">Approved Training Provider</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
@@ -319,7 +319,7 @@ export default function HomePage() {
 
       {/* ===== EMPLOYERS ===== */}
       <InView animation="fade-up">
-      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
+      <section aria-label="Employer partnerships" className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <Image
             src="/images/efh-building-tech-hero.jpg"
@@ -329,7 +329,7 @@ export default function HomePage() {
             sizes="(max-width: 768px) 100vw, 960px"
             className="w-full h-auto rounded-lg mb-10"
           />
-          <p className="text-red-600 font-bold text-sm mb-2 uppercase tracking-wide">For Employers</p>
+          <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">For Employers</p>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Hire Our Skilled Graduates</h2>
           <p className="text-lg text-slate-700 mb-8">
             Our candidates come out of our programs credentialed and ready to work. Access tax credits and funding.
@@ -348,7 +348,7 @@ export default function HomePage() {
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-lg mb-1">{item.label}</h3>
                   <p className="text-slate-600 text-sm mb-4">{item.desc}</p>
-                  <Link href={item.href} className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
+                  <Link href={item.href} className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
                     Learn More
                   </Link>
                 </div>
@@ -356,7 +356,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/employer" className="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors text-center">
+            <Link href="/employer" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors text-center">
               Employer Portal
             </Link>
             <Link href="/apply/program-holder" className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-8 py-4 rounded-lg transition-colors text-center">
@@ -369,7 +369,7 @@ export default function HomePage() {
 
       {/* ===== TESTIMONIALS ===== */}
       <InView animation="fade-up">
-      <section className="py-16 sm:py-20">
+      <section aria-label="Student testimonials" className="py-10 sm:py-14">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">What Our Students Say</h2>
@@ -395,7 +395,7 @@ export default function HomePage() {
 
       {/* ===== CTA ===== */}
       <InView animation="fade-up">
-      <section className="py-20 sm:py-28 bg-red-600 relative overflow-hidden">
+      <section aria-label="Get started" className="py-14 sm:py-20 bg-brand-red-600 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
         <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4">Ready to Change Your Life?</h2>
@@ -403,7 +403,7 @@ export default function HomePage() {
             Apply in minutes. Most students begin training within 2-4 weeks.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/apply/student" className="bg-white text-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors">
+            <Link href="/apply/student" className="bg-white text-brand-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors">
               Get Started Today
             </Link>
           </div>

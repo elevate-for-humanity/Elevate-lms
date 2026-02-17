@@ -63,7 +63,7 @@ export default async function TrainingPage() {
               </p>
               <Link
                 href="/supersonic-fast-cash/careers"
-                className="inline-block bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+                className="inline-block bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
               >
                 Learn More About Careers
               </Link>
@@ -72,19 +72,19 @@ export default async function TrainingPage() {
               <h3 className="text-xl font-semibold mb-4">Training Includes</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <BookOpen className="w-5 h-5 text-orange-600 mt-1 flex-shrink-0" />
+                  <BookOpen className="w-5 h-5 text-brand-orange-600 mt-1 flex-shrink-0" />
                   <span>Federal tax law and regulations</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Video className="w-5 h-5 text-orange-600 mt-1 flex-shrink-0" />
+                  <Video className="w-5 h-5 text-brand-orange-600 mt-1 flex-shrink-0" />
                   <span>Professional tax software training</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <FileText className="w-5 h-5 text-orange-600 mt-1 flex-shrink-0" />
+                  <FileText className="w-5 h-5 text-brand-orange-600 mt-1 flex-shrink-0" />
                   <span>Form preparation and filing</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <Award className="w-5 h-5 text-orange-600 mt-1 flex-shrink-0" />
+                  <Award className="w-5 h-5 text-brand-orange-600 mt-1 flex-shrink-0" />
                   <span>IRS certification preparation</span>
                 </li>
               </ul>

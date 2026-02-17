@@ -62,7 +62,7 @@ export default function SAPPolicyPage() {
             </div>
 
             {/* Quantitative - Pace */}
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+            <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-3">2. Quantitative Standard (Pace of Completion)</h3>
               <p className="text-gray-700 mb-4">
                 Students must successfully complete at least <strong>67%</strong> of all attempted coursework 
@@ -151,8 +151,8 @@ export default function SAPPolicyPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Academic Standing</h2>
           
           <div className="space-y-4">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-              <h3 className="font-bold text-green-800 mb-2">Good Standing</h3>
+            <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6">
+              <h3 className="font-bold text-brand-green-800 mb-2">Good Standing</h3>
               <p className="text-gray-700">
                 Students meeting all SAP requirements are in good standing and may continue 
                 in their program without restriction.
@@ -173,8 +173,8 @@ export default function SAPPolicyPage() {
               </ul>
             </div>
             
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
-              <h3 className="font-bold text-orange-800 mb-2">SAP Probation</h3>
+            <div className="bg-brand-orange-50 border border-brand-orange-200 rounded-lg p-6">
+              <h3 className="font-bold text-brand-orange-800 mb-2">SAP Probation</h3>
               <p className="text-gray-700 mb-3">
                 Students who fail to meet SAP after the warning period and have successfully 
                 appealed may be placed on SAP Probation. During probation:
@@ -187,8 +187,8 @@ export default function SAPPolicyPage() {
               </ul>
             </div>
             
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-              <h3 className="font-bold text-red-800 mb-2">Academic Dismissal</h3>
+            <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-6">
+              <h3 className="font-bold text-brand-red-800 mb-2">Academic Dismissal</h3>
               <p className="text-gray-700">
                 Students who fail to meet SAP after the warning period (without successful appeal) 
                 or who fail to meet probation requirements will be academically dismissed from 
@@ -294,10 +294,10 @@ export default function SAPPolicyPage() {
             Questions about SAP? Contact Student Services at Visit Support Center or info@elevateforhumanity.org
           </p>
           <div className="flex flex-wrap gap-4 text-sm">
-            <Link href="/disclosures" className="text-orange-600 hover:underline">Student Disclosures</Link>
-            <Link href="/attendance-policy" className="text-orange-600 hover:underline">Attendance Policy</Link>
-            <Link href="/refund-policy" className="text-orange-600 hover:underline">Refund Policy</Link>
-            <Link href="/grievance" className="text-orange-600 hover:underline">Grievance Policy</Link>
+            <Link href="/disclosures" className="text-brand-orange-600 hover:underline">Student Disclosures</Link>
+            <Link href="/attendance-policy" className="text-brand-orange-600 hover:underline">Attendance Policy</Link>
+            <Link href="/refund-policy" className="text-brand-orange-600 hover:underline">Refund Policy</Link>
+            <Link href="/grievance" className="text-brand-orange-600 hover:underline">Grievance Policy</Link>
           </div>
         </div>
       {/* CTA Section */}

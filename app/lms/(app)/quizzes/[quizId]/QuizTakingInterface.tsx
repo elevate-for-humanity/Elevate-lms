@@ -143,7 +143,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
             <div className="flex items-center gap-4">
               {timeRemaining !== null && (
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-lg font-mono text-lg ${
-                  timeRemaining < 60 ? 'bg-red-100 text-red-700' : 
+                  timeRemaining < 60 ? 'bg-brand-red-100 text-brand-red-700' : 
                   timeRemaining < 300 ? 'bg-yellow-100 text-yellow-700' : 
                   'bg-slate-100 text-slate-700'
                 }`}>
@@ -281,7 +281,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
                         isCurrent
                           ? 'bg-brand-blue-600 text-white'
                           : isAnswered
-                          ? 'bg-green-100 text-green-700'
+                          ? 'bg-brand-green-100 text-brand-green-700'
                           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       }`}
                     >
@@ -296,7 +296,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
               
               <div className="mt-4 pt-4 border-t border-slate-200 space-y-2 text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="w-4 h-4 bg-green-100 rounded" />
+                  <span className="w-4 h-4 bg-brand-green-100 rounded" />
                   <span className="text-slate-600">Answered</span>
                 </div>
                 <div className="flex items-center gap-2">

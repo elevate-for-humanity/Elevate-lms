@@ -96,7 +96,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
                 onClick={markComplete}
                 className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 ${
                   completedModules.includes(currentModule?.id)
-                    ? 'bg-green-600 text-white'
+                    ? 'bg-brand-green-600 text-white'
                     : 'bg-gray-700 text-white hover:bg-gray-600'
                 }`}
               >
@@ -128,7 +128,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
           </div>
           <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-green-500 transition-all"
+              className="h-full bg-brand-green-500 transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>

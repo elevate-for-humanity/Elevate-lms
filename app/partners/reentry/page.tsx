@@ -14,7 +14,7 @@ export default function ReentryPartnerPage() {
       hero: {
         image: '/images/heroes-hq/jri-hero.jpg',
         tag: 'Reentry Programs',
-        tagColor: 'text-green-300',
+        tagColor: 'text-brand-green-300',
         title: 'Reentry Workforce Partnership',
         subtitle: 'Help justice-involved individuals build careers through funded training, certifications, and employment support.',
       },
@@ -53,7 +53,7 @@ export default function ReentryPartnerPage() {
         primaryHref: '/contact',
         secondaryLabel: 'JRI Funding Info',
         secondaryHref: '/funding/jri',
-        bgColor: 'bg-green-700',
+        bgColor: 'bg-brand-green-700',
       },
     }} />
   );

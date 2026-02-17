@@ -71,14 +71,14 @@ export default function ProgramHolderStudentsPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2">
                         <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full ${student.progress === 100 ? 'bg-green-500' : 'bg-brand-blue-500'}`} style={{ width: `${student.progress}%` }}></div>
+                          <div className={`h-full rounded-full ${student.progress === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'}`} style={{ width: `${student.progress}%` }}></div>
                         </div>
                         <span className="text-sm text-gray-600">{student.progress}%</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-gray-600">{student.enrolled}</td>
                     <td className="px-6 py-4 text-center">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${student.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-brand-blue-100 text-brand-blue-700'}`}>
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${student.status === 'completed' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-brand-blue-100 text-brand-blue-700'}`}>
                         {student.status}
                       </span>
                     </td>

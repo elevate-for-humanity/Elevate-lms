@@ -103,7 +103,7 @@ export default async function CandidatesPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="flex items-center gap-3">
-              <Award className="w-8 h-8 text-green-600" />
+              <Award className="w-8 h-8 text-brand-green-600" />
               <div>
                 <div className="text-2xl font-bold">0</div>
                 <div className="text-sm text-gray-600">Certified</div>

@@ -291,7 +291,7 @@ export default function AutomationPage() {
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             workflow.status === 'active'
-                              ? 'bg-brand-green-100 text-green-800'
+                              ? 'bg-brand-green-100 text-brand-green-800'
                               : workflow.status === 'paused'
                                 ? 'bg-yellow-100 text-yellow-800'
                                 : 'bg-gray-100 text-black'
@@ -336,7 +336,7 @@ export default function AutomationPage() {
                         className={`p-2 rounded-lg transition-colors ${
                           workflow.status === 'active'
                             ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                            : 'bg-brand-green-100 text-green-700 hover:bg-green-200'
+                            : 'bg-brand-green-100 text-brand-green-700 hover:bg-brand-green-200'
                         }`}
                         title={
                           workflow.status === 'active' ? 'Pause' : 'Activate'
@@ -363,7 +363,7 @@ export default function AutomationPage() {
 
                       <button
                         onClick={() => deleteWorkflow(workflow.id)}
-                        className="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                        className="p-2 bg-brand-red-100 text-brand-red-700 rounded-lg hover:bg-brand-red-200 transition-colors"
                         title="Delete"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -455,7 +455,7 @@ function WorkflowTemplate({
 }: WorkflowTemplateProps) {
   const colorClasses = {
     blue: 'bg-brand-blue-50 text-brand-blue-600 hover:bg-gray-100',
-    orange: 'bg-orange-50 text-brand-orange-600 hover:bg-orange-100',
+    orange: 'bg-brand-orange-50 text-brand-orange-600 hover:bg-brand-orange-100',
     blue: 'bg-brand-blue-50 text-brand-blue-600 hover:bg-brand-blue-100',
   };
 

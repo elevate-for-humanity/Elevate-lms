@@ -192,7 +192,7 @@ export default function GuidedTour({ tourId, onComplete, onSkip, autoStart = fal
         {/* Spotlight border */}
         {targetRect && (
           <div
-            className="absolute border-2 border-orange-500 rounded-xl pointer-events-none animate-pulse"
+            className="absolute border-2 border-brand-orange-500 rounded-xl pointer-events-none animate-pulse"
             style={{
               top: targetRect.top - 8,
               left: targetRect.left - 8,
@@ -248,9 +248,9 @@ export default function GuidedTour({ tourId, onComplete, onSkip, autoStart = fal
               key={index}
               className={`w-2 h-2 rounded-full transition-all ${
                 index === currentStep
-                  ? 'bg-orange-500 w-4'
+                  ? 'bg-brand-orange-500 w-4'
                   : index < currentStep
-                  ? 'bg-green-500'
+                  ? 'bg-brand-green-500'
                   : 'bg-gray-300'
               }`}
             />
@@ -281,7 +281,7 @@ export default function GuidedTour({ tourId, onComplete, onSkip, autoStart = fal
           </div>
           <button
             onClick={nextStep}
-            className="flex items-center gap-1 px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-700 transition"
+            className="flex items-center gap-1 px-4 py-2 bg-brand-orange-600 text-white rounded-lg text-sm font-medium hover:bg-brand-orange-700 transition"
           >
             {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
             {currentStep < steps.length - 1 && <ChevronRight className="w-4 h-4" />}

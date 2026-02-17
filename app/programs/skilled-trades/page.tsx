@@ -34,7 +34,7 @@ export default function SkilledTradesPage() {
         <Image src="/images/programs-hq/skilled-trades-hero.jpg" alt="Skilled Trades Training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
-            <span className="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Funding Available</span>
+            <span className="inline-block bg-brand-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Funding Available</span>
             <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Skilled Trades</h1>
             <p className="text-sm sm:text-lg text-white/90 max-w-xl">
               HVAC, Electrical, Welding, Plumbing, and CDL. Hands-on training with real job placement assistance.
@@ -102,7 +102,7 @@ export default function SkilledTradesPage() {
               <div className="space-y-2">
                 {['Safety protocols and OSHA standards', 'Tool operation and equipment handling', 'Blueprint reading and technical drawings', 'Code compliance and inspection procedures', 'Troubleshooting and diagnostics', 'Customer service and job site professionalism'].map((item) => (
                   <div key={item} className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-orange-500 rounded-full flex-shrink-0" />
+                    <span className="w-1.5 h-1.5 bg-brand-orange-500 rounded-full flex-shrink-0" />
                     <span className="text-slate-700 text-sm">{item}</span>
                   </div>
                 ))}
@@ -126,7 +126,7 @@ export default function SkilledTradesPage() {
             ].map((c) => (
               <div key={c.title} className="bg-slate-50 rounded-xl border border-slate-200 p-4">
                 <h3 className="font-bold text-slate-900 text-sm">{c.title}</h3>
-                <div className="text-orange-500 font-bold text-sm">{c.salary}</div>
+                <div className="text-brand-orange-500 font-bold text-sm">{c.salary}</div>
               </div>
             ))}
           </div>
@@ -144,7 +144,7 @@ export default function SkilledTradesPage() {
               { step: '4', title: 'Get Certified & Hired', desc: 'Earn your industry certification and connect with employers.' },
             ].map((s) => (
               <div key={s.step} className="flex items-start gap-4 bg-white rounded-lg p-4">
-                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
+                <div className="w-8 h-8 bg-brand-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-sm">{s.title}</h3>
                   <p className="text-slate-600 text-sm">{s.desc}</p>
@@ -155,12 +155,12 @@ export default function SkilledTradesPage() {
         </div>
       </section>
 
-      <section className="py-8 sm:py-14 bg-orange-500">
+      <section className="py-8 sm:py-14 bg-brand-orange-500">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Trades Career</h2>
           <p className="text-white/90 mb-6 text-sm">High demand, strong pay. Apply today.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=skilled-trades" className="bg-white text-orange-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-orange-50 transition-colors text-center">
+            <Link href="/apply?program=skilled-trades" className="bg-white text-brand-orange-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-orange-50 transition-colors text-center">
               Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
             <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

@@ -168,11 +168,11 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
           {sections.map((section, idx) => (
             <button key={section.id} onClick={() => setActiveSection(section.id)}
               className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left ${
-                activeSection === section.id ? 'bg-orange-50 text-orange-600' : 'hover:bg-gray-50'
+                activeSection === section.id ? 'bg-brand-orange-50 text-brand-orange-600' : 'hover:bg-gray-50'
               }`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                completedSections.includes(section.id) ? 'bg-green-500 text-white' :
-                activeSection === section.id ? 'bg-orange-500 text-white' : 'bg-gray-200'
+                completedSections.includes(section.id) ? 'bg-brand-green-500 text-white' :
+                activeSection === section.id ? 'bg-brand-orange-500 text-white' : 'bg-gray-200'
               }`}>
                 {completedSections.includes(section.id) 
                   ? <span className="text-slate-400 flex-shrink-0">•</span> 
@@ -194,7 +194,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
       <div className="md:col-span-3">
         {message && (
           <div className={`mb-4 p-3 rounded-lg text-sm ${
-            message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+            message.type === 'success' ? 'bg-brand-green-50 text-brand-green-700' : 'bg-brand-red-50 text-brand-red-700'
           }`}>
             {message.text}
           </div>
@@ -287,7 +287,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
               <h2 className="text-xl font-semibold">Deductions</h2>
               <div className="space-y-4">
                 <label className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer ${
-                  formData.deductionType === 'standard' ? 'border-orange-500 bg-orange-50' : 'hover:bg-gray-50'
+                  formData.deductionType === 'standard' ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:bg-gray-50'
                 }`}>
                   <input type="radio" name="deduction" value="standard"
                     checked={formData.deductionType === 'standard'}
@@ -298,7 +298,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
                   </div>
                 </label>
                 <label className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer ${
-                  formData.deductionType === 'itemized' ? 'border-orange-500 bg-orange-50' : 'hover:bg-gray-50'
+                  formData.deductionType === 'itemized' ? 'border-brand-orange-500 bg-brand-orange-50' : 'hover:bg-gray-50'
                 }`}>
                   <input type="radio" name="deduction" value="itemized"
                     checked={formData.deductionType === 'itemized'}
@@ -337,12 +337,12 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
           {activeSection === 'review' && (
             <div className="space-y-6">
               <h2 className="text-xl font-semibold">Review & File</h2>
-              <div className={`rounded-lg p-6 text-center ${estimatedRefund >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-                <DollarSign className={`w-12 h-12 mx-auto mb-2 ${estimatedRefund >= 0 ? 'text-green-500' : 'text-red-500'}`} />
+              <div className={`rounded-lg p-6 text-center ${estimatedRefund >= 0 ? 'bg-brand-green-50' : 'bg-brand-red-50'}`}>
+                <DollarSign className={`w-12 h-12 mx-auto mb-2 ${estimatedRefund >= 0 ? 'text-brand-green-500' : 'text-brand-red-500'}`} />
                 <p className="text-sm text-gray-600 mb-1">
                   {estimatedRefund >= 0 ? 'Estimated Refund' : 'Estimated Amount Owed'}
                 </p>
-                <p className={`text-4xl font-bold ${estimatedRefund >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                <p className={`text-4xl font-bold ${estimatedRefund >= 0 ? 'text-brand-green-700' : 'text-brand-red-700'}`}>
                   ${Math.abs(estimatedRefund).toLocaleString()}
                 </p>
               </div>
@@ -353,7 +353,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
                     {completedSections.includes(section.id) ? (
                       <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
-                      <span className="text-sm text-orange-600">Incomplete</span>
+                      <span className="text-sm text-brand-orange-600">Incomplete</span>
                     )}
                   </div>
                 ))}
@@ -364,7 +364,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
           <div className="flex justify-end mt-6 pt-4 border-t">
             <button onClick={() => activeSection === 'review' ? handleSubmit() : markComplete(activeSection)}
               disabled={isSaving}
-              className="flex items-center gap-2 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50">
+              className="flex items-center gap-2 px-6 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600 disabled:opacity-50">
               {activeSection === 'review' ? 'File My Return' : 'Save & Continue'}
               <ArrowRight className="w-4 h-4" />
             </button>

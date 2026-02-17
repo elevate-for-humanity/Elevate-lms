@@ -118,7 +118,7 @@ export default function VoiceoverPlayer({
         {!isPlaying && hasPlayed && (
           <button
             onClick={playVoiceover}
-            className="p-3 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600 transition-all"
+            className="p-3 bg-brand-orange-500 text-white rounded-full shadow-lg hover:bg-brand-orange-600 transition-all"
             title="Replay voiceover"
             aria-label="Replay voiceover"
           >

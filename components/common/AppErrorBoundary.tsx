@@ -24,7 +24,7 @@ export class AppErrorBoundary extends React.Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="mx-auto max-w-xl rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-800">
+        <div className="mx-auto max-w-xl rounded-xl border border-brand-red-100 bg-brand-red-50 p-4 text-sm text-brand-red-800">
           <h2 className="font-semibold">Something went wrong.</h2>
           <p className="mt-1">
             Please refresh the page. If this keeps happening, contact support or your case manager.

@@ -78,7 +78,7 @@ export default async function CertificateViewPage({ params }: Props) {
 <div className="max-w-4xl mx-auto px-4">
         {/* Verification Badge */}
         <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-full">
+          <div className="flex items-center gap-2 px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full">
             <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="font-semibold">Verified Certificate</span>
           </div>

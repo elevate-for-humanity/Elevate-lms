@@ -128,7 +128,7 @@ export function UniversalCoursePlayer({
                     <button
                       onClick={handleCompletion}
                       disabled={loading}
-                      className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                      className="px-4 py-2 bg-brand-green-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-green-700 transition-colors disabled:opacity-50"
                     >
                       {loading ? 'Processing...' : '• Mark as Complete'}
                     </button>
@@ -164,7 +164,7 @@ export function UniversalCoursePlayer({
                   <button
                     onClick={handleCompletion}
                     disabled={loading}
-                    className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                    className="px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 transition-colors disabled:opacity-50"
                   >
                     {loading ? 'Processing...' : '• I\'ve Completed the Course'}
                   </button>
@@ -188,20 +188,20 @@ export function UniversalCoursePlayer({
 
       {/* Completion Banner */}
       {completed && (
-        <div className="bg-green-600 text-white px-6 py-4 shadow-lg">
+        <div className="bg-brand-green-600 text-white px-6 py-4 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-semibold">Course Complete!</div>
-                <div className="text-sm text-green-100">
+                <div className="text-sm text-brand-green-100">
                   Your Elevate For Humanity certificate is being generated and will be emailed to you shortly
                 </div>
               </div>
             </div>
             <button
               onClick={() => router.push('/student/courses')}
-              className="px-6 py-2 bg-white text-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors"
+              className="px-6 py-2 bg-white text-brand-green-600 font-semibold rounded-lg hover:bg-brand-green-50 transition-colors"
             >
               Continue Learning
             </button>

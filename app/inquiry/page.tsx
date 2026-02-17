@@ -99,14 +99,14 @@ function InquiryForm() {
         </p>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg">
-            <p className="text-red-800 font-semibold">{error}</p>
+          <div className="mb-6 p-4 bg-brand-red-50 border-2 border-brand-red-200 rounded-lg">
+            <p className="text-brand-red-800 font-semibold">{error}</p>
           </div>
         )}
 
         {success && (
-          <div className="mb-6 p-4 bg-green-50 border-2 border-green-200 rounded-lg">
-            <p className="text-green-800 font-semibold">• Application submitted successfully! Redirecting...</p>
+          <div className="mb-6 p-4 bg-brand-green-50 border-2 border-brand-green-200 rounded-lg">
+            <p className="text-brand-green-800 font-semibold">• Application submitted successfully! Redirecting...</p>
           </div>
         )}
 
@@ -119,7 +119,7 @@ function InquiryForm() {
               htmlFor="name"
               className="block text-sm font-medium text-black mb-2"
             >
-              Full Name <span className="text-red-600">*</span>
+              Full Name <span className="text-brand-red-600">*</span>
             </label>
             <input
               required
@@ -135,7 +135,7 @@ function InquiryForm() {
               htmlFor="email"
               className="block text-sm font-medium text-black mb-2"
             >
-              Email <span className="text-red-600">*</span>
+              Email <span className="text-brand-red-600">*</span>
             </label>
             <input
               required
@@ -152,7 +152,7 @@ function InquiryForm() {
               htmlFor="phone"
               className="block text-sm font-medium text-black mb-2"
             >
-              Phone <span className="text-red-600">*</span>
+              Phone <span className="text-brand-red-600">*</span>
             </label>
             <input
               required
@@ -168,7 +168,7 @@ function InquiryForm() {
               htmlFor="program"
               className="block text-sm font-medium text-black mb-2"
             >
-              Program <span className="text-red-600">*</span>
+              Program <span className="text-brand-red-600">*</span>
             </label>
             <select
               required
@@ -195,7 +195,7 @@ function InquiryForm() {
               htmlFor="funding"
               className="block text-sm font-medium text-black mb-2"
             >
-              Funding <span className="text-red-600">*</span>
+              Funding <span className="text-brand-red-600">*</span>
             </label>
             <select
               required

@@ -291,7 +291,7 @@ export default function TakeQuizPage({
               className="bg-white rounded-xl border border-slate-200 p-6"
             >
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                <div className="flex-shrink-0 w-8 h-8 bg-brand-orange-100 rounded-full flex items-center justify-center">
                   <span className="text-sm font-bold text-brand-orange-600">
                     {index + 1}
                   </span>
@@ -312,8 +312,8 @@ export default function TakeQuizPage({
                           w-full text-left p-4 rounded-lg border-2 transition-all
                           ${
                             answers[question.id] === optionIndex
-                              ? 'border-orange-500 bg-orange-50'
-                              : 'border-slate-200 hover:border-orange-300 hover:bg-slate-50'
+                              ? 'border-brand-orange-500 bg-brand-orange-50'
+                              : 'border-slate-200 hover:border-brand-orange-300 hover:bg-slate-50'
                           }
                         `}
                         >
@@ -323,7 +323,7 @@ export default function TakeQuizPage({
                             w-5 h-5 rounded-full border-2 flex items-center justify-center
                             ${
                               answers[question.id] === optionIndex
-                                ? 'border-orange-500 bg-brand-orange-600'
+                                ? 'border-brand-orange-500 bg-brand-orange-600'
                                 : 'border-slate-300'
                             }
                           `}

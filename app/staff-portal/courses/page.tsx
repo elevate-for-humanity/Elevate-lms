@@ -101,7 +101,7 @@ export default async function StaffCoursesPage() {
                       <td className="p-4 text-gray-600">{course.duration ? `${course.duration} weeks` : '-'}</td>
                       <td className="p-4">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          course.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                          course.status === 'Active' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-gray-100 text-gray-700'
                         }`}>{course.status}</span>
                       </td>
                       <td className="p-4">

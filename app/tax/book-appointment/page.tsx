@@ -93,7 +93,7 @@ export default function BookAppointmentPage() {
           </p>
 
           {status === 'success' ? (
-            <div className="rounded-2xl border-2 border-green-200 bg-green-50 p-8 text-center">
+            <div className="rounded-2xl border-2 border-brand-green-200 bg-brand-green-50 p-8 text-center">
               <div className="w-16 h-16 rounded-full bg-brand-green-100 flex items-center justify-center mx-auto mb-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
@@ -313,8 +313,8 @@ export default function BookAppointmentPage() {
               </div>
 
               {status === 'error' && (
-                <div className="rounded-lg bg-red-50 border border-red-200 p-4">
-                  <p className="text-red-800 text-sm">
+                <div className="rounded-lg bg-brand-red-50 border border-brand-red-200 p-4">
+                  <p className="text-brand-red-800 text-sm">
                     Something went wrong. Please try again or contact us at
                     support center.
                   </p>

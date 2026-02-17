@@ -22,7 +22,7 @@ export default function TermsOfServicePage() {
 
       <section className="bg-slate-900 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <FileText className="w-16 h-16 mx-auto mb-4 text-blue-400" />
+          <FileText className="w-16 h-16 mx-auto mb-4 text-brand-blue-400" />
           <h1 className="text-4xl font-bold mb-4">Terms of Service</h1>
           <p className="text-xl text-slate-300">
             Please read these terms carefully before using our services.
@@ -115,7 +115,7 @@ export default function TermsOfServicePage() {
               <p className="text-slate-700">
                 <strong>2Exclusive LLC-S</strong><br />
                 d/b/a Elevate for Humanity Career &amp; Technical Institute<br />
-                Email: <a href="mailto:legal@elevateforhumanity.org" className="text-blue-600 hover:underline">legal@elevateforhumanity.org</a><br />
+                Email: <a href="mailto:legal@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">legal@elevateforhumanity.org</a><br />
                 Phone: (317) 314-3757
               </p>
             </div>
@@ -125,8 +125,8 @@ export default function TermsOfServicePage() {
         <div className="border-t pt-8 mt-8">
           <h3 className="font-bold text-slate-900 mb-4">Related Policies</h3>
           <div className="flex flex-wrap gap-4">
-            <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link>
-            <Link href="/accessibility" className="text-blue-600 hover:underline">Accessibility</Link>
+            <Link href="/privacy-policy" className="text-brand-blue-600 hover:underline">Privacy Policy</Link>
+            <Link href="/accessibility" className="text-brand-blue-600 hover:underline">Accessibility</Link>
           </div>
         </div>
       </div>

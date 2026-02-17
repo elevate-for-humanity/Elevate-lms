@@ -233,7 +233,7 @@ export default async function AgenciesPage() {
                   <h3 className="font-bold text-lg mb-2">{study.title}</h3>
                   <p className="text-gray-600 mb-4">{study.summary}</p>
                   {study.results && (
-                    <div className="text-green-600 font-medium">{study.results}</div>
+                    <div className="text-brand-green-600 font-medium">{study.results}</div>
                   )}
                 </div>
               ))}

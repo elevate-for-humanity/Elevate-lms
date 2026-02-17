@@ -50,25 +50,25 @@ export function TrialBanner({
   });
 
   const bannerColor = isExpired
-    ? 'bg-red-50 border-red-200'
+    ? 'bg-brand-red-50 border-brand-red-200'
     : isExpiringSoon
     ? 'bg-amber-50 border-amber-200'
     : 'bg-brand-blue-50 border-brand-blue-200';
 
   const textColor = isExpired
-    ? 'text-red-900'
+    ? 'text-brand-red-900'
     : isExpiringSoon
     ? 'text-amber-900'
     : 'text-brand-blue-900';
 
   const accentColor = isExpired
-    ? 'text-red-600'
+    ? 'text-brand-red-600'
     : isExpiringSoon
     ? 'text-amber-600'
     : 'text-brand-blue-600';
 
   const buttonColor = isExpired
-    ? 'bg-red-600 hover:bg-red-700'
+    ? 'bg-brand-red-600 hover:bg-brand-red-700'
     : isExpiringSoon
     ? 'bg-amber-600 hover:bg-amber-700'
     : 'bg-brand-blue-600 hover:bg-brand-blue-700';
@@ -147,7 +147,7 @@ export function TrialBanner({
                   <div
                     key={step.id}
                     className={`flex items-start gap-2 p-2 rounded-lg ${
-                      isComplete ? 'bg-green-100/50' : 'bg-white/50'
+                      isComplete ? 'bg-brand-green-100/50' : 'bg-white/50'
                     }`}
                   >
                     {isComplete ? (
@@ -156,7 +156,7 @@ export function TrialBanner({
                       <Circle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
                     )}
                     <div>
-                      <p className={`text-sm font-medium ${isComplete ? 'text-green-800' : textColor}`}>
+                      <p className={`text-sm font-medium ${isComplete ? 'text-brand-green-800' : textColor}`}>
                         {step.label}
                       </p>
                       <p className="text-xs text-slate-600">{step.description}</p>
@@ -202,7 +202,7 @@ export function TrialBadge({
   const isExpired = daysRemaining <= 0;
 
   const badgeColor = isExpired
-    ? 'bg-red-100 text-red-800 border-red-200'
+    ? 'bg-brand-red-100 text-brand-red-800 border-brand-red-200'
     : isExpiringSoon
     ? 'bg-amber-100 text-amber-800 border-amber-200'
     : 'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-200';

@@ -51,7 +51,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <span className="inline-flex items-center rounded-full bg-orange-500 px-3 py-2 text-xs font-bold text-white animate-pulse">
+              <span className="inline-flex items-center rounded-full bg-brand-orange-500 px-3 py-2 text-xs font-bold text-white animate-pulse">
                 🔥 NOW ENROLLING
               </span>
               <p className="text-white font-semibold text-sm sm:text-base">
@@ -60,7 +60,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
             </div>
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-orange-600 hover:bg-orange-50 transition-all shadow-lg hover:scale-105 whitespace-nowrap"
+              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-brand-orange-600 hover:bg-brand-orange-50 transition-all shadow-lg hover:scale-105 whitespace-nowrap"
             >
               Apply Now →
             </Link>
@@ -82,7 +82,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
         <div className="relative h-full flex items-center">
           <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2 text-sm font-bold text-white mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full bg-brand-orange-500 px-4 py-2 text-sm font-bold text-white mb-6">
                 <Award size={16} />
                 <span>100% FREE Training</span>
               </div>
@@ -119,7 +119,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/apply"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 text-white font-semibold rounded hover:bg-orange-600 transition-colors shadow-lg"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-500 text-white font-semibold rounded hover:bg-brand-orange-600 transition-colors shadow-lg"
                 >
                   Apply Now
                   <ArrowRight size={20} className="ml-2" />
@@ -178,7 +178,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                 key={index}
                 className="flex items-start gap-4 p-6 bg-slate-50 rounded-xl border border-slate-200"
               >
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-brand-red-100 flex items-center justify-center">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <div>
@@ -282,7 +282,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                 </div>
               </div>
 
-              <div className="mt-8 p-4 bg-red-50 rounded-xl border border-red-200">
+              <div className="mt-8 p-4 bg-brand-red-50 rounded-xl border border-brand-red-200">
                 <div className="flex items-center gap-3 mb-2">
                   <Award size={20} className="text-brand-orange-600" />
                   <span className="font-bold text-black">
@@ -309,7 +309,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
 
           <div className="grid gap-8 md:grid-cols-3">
             <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200">
-              <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-xl bg-brand-red-100 flex items-center justify-center mb-4">
                 <Clock size={24} className="text-brand-orange-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-2">
@@ -387,21 +387,21 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <h2 className="text-4xl md:text-5xl font-bold mb-6">
                 Ready to Start Your {program.name} Career?
               </h2>
-              <p className="text-xl mb-8 text-orange-50">
+              <p className="text-xl mb-8 text-brand-orange-50">
                 Join our next cohort and begin your journey. 100% funded
                 training with no cost to you.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/apply"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-orange-600 font-bold rounded-lg hover:bg-orange-50 transition-colors shadow-lg"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-lg hover:bg-brand-orange-50 transition-colors shadow-lg"
                 >
                   Apply Now
                   <ArrowRight size={20} className="ml-2" />
                 </Link>
                 <Link
                   href="/programs"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-orange-700 text-white font-semibold rounded-lg hover:bg-orange-800 transition-colors shadow-lg"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-700 text-white font-semibold rounded-lg hover:bg-brand-orange-800 transition-colors shadow-lg"
                 >
                   View Programs
                 </Link>

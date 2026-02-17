@@ -29,7 +29,7 @@ export default async function LicensePage() {
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Current License</h2>
-            <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Active</span>
+            <span className="px-3 py-1 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium">Active</span>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div><p className="text-sm text-gray-500">License Type</p><p className="font-medium">Enterprise</p></div>

@@ -15,16 +15,16 @@ export const metadata: Metadata = {
 // Status badge component
 function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { bg: string; text: string; icon: typeof CheckCircle }> = {
-    active: { bg: 'bg-green-100', text: 'text-green-700', icon: CheckCircle },
+    active: { bg: 'bg-brand-green-100', text: 'text-brand-green-700', icon: CheckCircle },
     completed: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700', icon: CheckCircle },
     pending: { bg: 'bg-amber-100', text: 'text-amber-700', icon: Clock },
-    eligible: { bg: 'bg-green-100', text: 'text-green-700', icon: CheckCircle },
-    ineligible: { bg: 'bg-red-100', text: 'text-red-700', icon: XCircle },
+    eligible: { bg: 'bg-brand-green-100', text: 'text-brand-green-700', icon: CheckCircle },
+    ineligible: { bg: 'bg-brand-red-100', text: 'text-brand-red-700', icon: XCircle },
     enrolled_pending_approval: { bg: 'bg-amber-100', text: 'text-amber-700', icon: Clock },
-    paused: { bg: 'bg-red-100', text: 'text-red-700', icon: AlertCircle },
+    paused: { bg: 'bg-brand-red-100', text: 'text-brand-red-700', icon: AlertCircle },
     withdrawn: { bg: 'bg-slate-100', text: 'text-slate-700', icon: XCircle },
-    approved: { bg: 'bg-green-100', text: 'text-green-700', icon: CheckCircle },
-    rejected: { bg: 'bg-red-100', text: 'text-red-700', icon: XCircle },
+    approved: { bg: 'bg-brand-green-100', text: 'text-brand-green-700', icon: CheckCircle },
+    rejected: { bg: 'bg-brand-red-100', text: 'text-brand-red-700', icon: XCircle },
   };
 
   const c = config[status] || { bg: 'bg-slate-100', text: 'text-slate-700', icon: Clock };
@@ -132,7 +132,7 @@ export default async function CaseFilePage({ params }: { params: Promise<{ id: s
                   <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-xs">Disability</span>
                 )}
                 {caseFile.profile.demographics?.publicAssistance && (
-                  <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs">Public Assistance</span>
+                  <span className="bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded text-xs">Public Assistance</span>
                 )}
               </div>
             </div>
@@ -234,7 +234,7 @@ export default async function CaseFilePage({ params }: { params: Promise<{ id: s
                   </div>
                   <div className="flex items-center gap-2">
                     {cred.verified && (
-                      <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs flex items-center gap-1">
+                      <span className="bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded text-xs flex items-center gap-1">
                         <span className="text-slate-400 flex-shrink-0">•</span> Verified
                       </span>
                     )}

@@ -104,7 +104,7 @@ export default function Header() {
           </Link>
           <Link
             href="/programs"
-            className="border border-blue-600 text-blue-600 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-colors"
+            className="border border-brand-blue-600 text-brand-blue-600 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-50 transition-colors"
           >
             View Programs
           </Link>

@@ -32,7 +32,7 @@ export default function RevocationPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Grounds for Revocation</h2>
             
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Fraud or Misrepresentation</h3>
               <p className="text-black mb-2">Credentials may be revoked if obtained through:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -45,7 +45,7 @@ export default function RevocationPage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border-l-4 border-orange-400 p-6 mb-6">
+            <div className="bg-brand-orange-50 border-l-4 border-brand-orange-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Academic Dishonesty</h3>
               <p className="text-black mb-2">Discovered after credential issuance:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -99,7 +99,7 @@ export default function RevocationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     2
                   </div>
                   <div>
@@ -131,7 +131,7 @@ export default function RevocationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     4
                   </div>
                   <div>
@@ -149,7 +149,7 @@ export default function RevocationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     5
                   </div>
                   <div>
@@ -183,7 +183,7 @@ export default function RevocationPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Consequences of Revocation</h2>
             
-            <div className="bg-red-50 rounded-xl p-6 border-2 border-red-200 mb-6">
+            <div className="bg-brand-red-50 rounded-xl p-6 border-2 border-brand-red-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">When Credential is Revoked:</h3>
               <ul className="list-disc pl-6 text-black space-y-2">
                 <li><strong>Credential Invalidated:</strong> No longer valid for employment or professional purposes</li>

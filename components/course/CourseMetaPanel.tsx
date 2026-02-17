@@ -34,7 +34,7 @@ export function CourseMetaPanel({
       {/* Top badges / rating */}
       <div className="flex flex-wrap items-center gap-3 text-xs">
         {course.difficulty && (
-          <span className="rounded-full bg-red-50 px-3 py-2 font-semibold text-red-700">
+          <span className="rounded-full bg-brand-red-50 px-3 py-2 font-semibold text-brand-red-700">
             {course.difficulty}
           </span>
         )}

@@ -48,8 +48,8 @@ export function CalendarIntegration() {
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'class': return 'bg-brand-blue-100 text-brand-blue-700';
-      case 'meeting': return 'bg-green-100 text-green-700';
-      case 'deadline': return 'bg-red-100 text-red-700';
+      case 'meeting': return 'bg-brand-green-100 text-brand-green-700';
+      case 'deadline': return 'bg-brand-red-100 text-brand-red-700';
       default: return 'bg-purple-100 text-purple-700';
     }
   };
@@ -59,7 +59,7 @@ export function CalendarIntegration() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Calendar</h1>
-          <p className="text-red-100">Manage your schedule and events</p>
+          <p className="text-brand-red-100">Manage your schedule and events</p>
         </div>
       </div>
 
@@ -93,7 +93,7 @@ export function CalendarIntegration() {
                       className={`aspect-square flex items-center justify-center rounded-lg cursor-pointer ${
                         day > 0 && day <= 29
                           ? hasEvent
-                            ? 'bg-red-100 text-red-700 font-bold'
+                            ? 'bg-brand-red-100 text-brand-red-700 font-bold'
                             : 'bg-white hover:bg-gray-50'
                           : 'bg-gray-50 text-gray-400'
                       }`}
@@ -146,7 +146,7 @@ export function CalendarIntegration() {
                   <span>Classes</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-green-500 rounded" />
+                  <div className="w-3 h-3 bg-brand-green-500 rounded" />
                   <span>Meetings</span>
                 </div>
                 <div className="flex items-center gap-2">

@@ -224,11 +224,11 @@ export default async function CashAdvancesAdminPage() {
                       <span
                         className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           app.status === 'approved'
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-green-100 text-brand-green-800'
                             : app.status === 'pending'
-                              ? 'bg-orange-100 text-orange-800'
+                              ? 'bg-brand-orange-100 text-brand-orange-800'
                               : app.status === 'denied'
-                                ? 'bg-red-100 text-red-800'
+                                ? 'bg-brand-red-100 text-brand-red-800'
                                 : app.status === 'funded'
                                   ? 'bg-brand-blue-100 text-brand-blue-800'
                                   : 'bg-slate-100 text-black'
@@ -249,10 +249,10 @@ export default async function CashAdvancesAdminPage() {
                       </Link>
                       {app.status === 'pending' && (
                         <>
-                          <button className="text-brand-green-600 hover:text-green-900 mr-4" aria-label="Action button">
+                          <button className="text-brand-green-600 hover:text-brand-green-900 mr-4" aria-label="Action button">
                             Approve
                           </button>
-                          <button className="text-brand-orange-600 hover:text-red-900" aria-label="Action button">
+                          <button className="text-brand-orange-600 hover:text-brand-red-900" aria-label="Action button">
                             Deny
                           </button>
                         </>
@@ -318,19 +318,19 @@ export default async function CashAdvancesAdminPage() {
           <h4 className="font-semibold mb-3">Setup Requirements:</h4>
           <div className="grid md:grid-cols-2 gap-3">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full" />
+              <div className="w-2 h-2 bg-brand-green-400 rounded-full" />
               <span className="text-sm">EPS Financial API Credentials</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full" />
+              <div className="w-2 h-2 bg-brand-green-400 rounded-full" />
               <span className="text-sm">EPS Merchant/Office ID</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full" />
+              <div className="w-2 h-2 bg-brand-green-400 rounded-full" />
               <span className="text-sm">Pathward Bank Integration</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full" />
+              <div className="w-2 h-2 bg-brand-green-400 rounded-full" />
               <span className="text-sm">FasterMoney® Visa® Card Setup</span>
             </div>
           </div>

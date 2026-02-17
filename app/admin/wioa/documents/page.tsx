@@ -118,9 +118,9 @@ export default async function WIOADocumentsPage() {
                           {new Date(doc.created_at).toLocaleDateString()}
                         </div>
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          doc.status === 'verified' ? 'bg-green-100 text-green-700' :
+                          doc.status === 'verified' ? 'bg-brand-green-100 text-brand-green-700' :
                           doc.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-red-100 text-red-700'
+                          'bg-brand-red-100 text-brand-red-700'
                         }`}>
                           {doc.status || 'pending'}
                         </span>
@@ -132,7 +132,7 @@ export default async function WIOADocumentsPage() {
                             <Download className="w-4 h-4 text-gray-500" />
                           </button>
                           <button className="p-2 hover:bg-gray-100 rounded-lg" title="Delete">
-                            <Trash2 className="w-4 h-4 text-red-500" />
+                            <Trash2 className="w-4 h-4 text-brand-red-500" />
                           </button>
                         </div>
                       </div>

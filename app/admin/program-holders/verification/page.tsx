@@ -114,11 +114,11 @@ export default async function ProgramHolderVerificationPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-black">Pending Review</p>
-                <p className="text-3xl font-bold text-orange-600">
+                <p className="text-3xl font-bold text-brand-orange-600">
                   {holdersWithDocs.length}
                 </p>
               </div>
-              <Clock className="w-12 h-12 text-orange-600" />
+              <Clock className="w-12 h-12 text-brand-orange-600" />
             </div>
           </div>
 
@@ -126,7 +126,7 @@ export default async function ProgramHolderVerificationPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-black">Verified Today</p>
-                <p className="text-3xl font-bold text-green-600">
+                <p className="text-3xl font-bold text-brand-green-600">
                   {
                     recentlyVerified?.filter(
                       (h) =>
@@ -145,7 +145,7 @@ export default async function ProgramHolderVerificationPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-black">Rejected</p>
-                <p className="text-3xl font-bold text-red-600">
+                <p className="text-3xl font-bold text-brand-red-600">
                   {
                     recentlyVerified?.filter(
                       (h) => h.verification_status === 'rejected'
@@ -153,7 +153,7 @@ export default async function ProgramHolderVerificationPage() {
                   }
                 </p>
               </div>
-              <XCircle className="w-12 h-12 text-red-600" />
+              <XCircle className="w-12 h-12 text-brand-red-600" />
             </div>
           </div>
         </div>
@@ -191,7 +191,7 @@ export default async function ProgramHolderVerificationPage() {
                         {new Date(holder.created_at).toLocaleDateString()}
                       </p>
                     </div>
-                    <span className="px-3 py-2 bg-orange-100 text-orange-800 text-sm font-medium rounded-full">
+                    <span className="px-3 py-2 bg-brand-orange-100 text-brand-orange-800 text-sm font-medium rounded-full">
                       Pending Review
                     </span>
                   </div>
@@ -326,8 +326,8 @@ export default async function ProgramHolderVerificationPage() {
                     <span
                       className={`px-3 py-2 text-sm font-medium rounded-full ${
                         holder.verification_status === 'verified'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
+                          ? 'bg-brand-green-100 text-brand-green-800'
+                          : 'bg-brand-red-100 text-brand-red-800'
                       }`}
                     >
                       {holder.verification_status === 'verified'

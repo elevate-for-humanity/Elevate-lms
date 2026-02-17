@@ -27,10 +27,10 @@ export default async function OperationsPage() {
           <p className="text-gray-600 mt-2">Monitor daily operations and activities</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active Sessions</h3><p className="text-3xl font-bold text-green-600 mt-2">47</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active Sessions</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">47</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Tasks Today</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">23</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Pending Actions</h3><p className="text-3xl font-bold text-yellow-600 mt-2">8</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">System Status</h3><p className="text-xl font-bold text-green-600 mt-2">Healthy</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">System Status</h3><p className="text-xl font-bold text-brand-green-600 mt-2">Healthy</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6"><h2 className="text-lg font-semibold mb-4">Recent Activity</h2><p className="text-gray-500">System activity and operations log</p></div>
       </div>

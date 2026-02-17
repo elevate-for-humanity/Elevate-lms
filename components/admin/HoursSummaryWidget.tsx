@@ -51,7 +51,7 @@ export default function HoursSummaryWidget({
           />
           {/* Earned Hours (Green) */}
           <div
-            className="absolute h-full bg-green-500 transition-all"
+            className="absolute h-full bg-brand-green-500 transition-all"
             style={{
               left: `${transferredPercent}%`,
               width: `${earnedPercent}%`
@@ -71,7 +71,7 @@ export default function HoursSummaryWidget({
             <span className="text-slate-400">Transferred</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-500 rounded" />
+            <div className="w-3 h-3 bg-brand-green-500 rounded" />
             <span className="text-slate-400">Earned at EFH</span>
           </div>
           <div className="flex items-center gap-2">
@@ -110,30 +110,30 @@ export default function HoursSummaryWidget({
         </div>
 
         {/* Earned */}
-        <div className="text-center p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-          <div className="text-3xl font-bold text-green-400 mb-1">
+        <div className="text-center p-4 bg-brand-green-500/10 border border-brand-green-500/30 rounded-lg">
+          <div className="text-3xl font-bold text-brand-green-400 mb-1">
             {earned.toLocaleString()}
           </div>
           <div className="text-xs text-slate-400 uppercase tracking-wide">
             Earned
           </div>
           {earnedPercent > 0 && (
-            <div className="text-xs text-green-400 mt-1">
+            <div className="text-xs text-brand-green-400 mt-1">
               {earnedPercent.toFixed(1)}%
             </div>
           )}
         </div>
 
         {/* Remaining */}
-        <div className="text-center p-4 bg-orange-500/10 border border-orange-500/30 rounded-lg">
-          <div className="text-3xl font-bold text-orange-400 mb-1">
+        <div className="text-center p-4 bg-brand-orange-500/10 border border-brand-orange-500/30 rounded-lg">
+          <div className="text-3xl font-bold text-brand-orange-400 mb-1">
             {remaining.toLocaleString()}
           </div>
           <div className="text-xs text-slate-400 uppercase tracking-wide">
             Remaining
           </div>
           {remaining > 0 && (
-            <div className="text-xs text-orange-400 mt-1">
+            <div className="text-xs text-brand-orange-400 mt-1">
               {((remaining / required) * 100).toFixed(1)}%
             </div>
           )}
@@ -145,8 +145,8 @@ export default function HoursSummaryWidget({
       <div className="mt-6 p-4 bg-slate-800/30 rounded-lg border border-slate-600">
         {remaining <= 0 ? (
           <div className="text-center">
-            <div className="text-green-400 text-2xl mb-2">🎉</div>
-            <div className="text-green-400 font-semibold">
+            <div className="text-brand-green-400 text-2xl mb-2">🎉</div>
+            <div className="text-brand-green-400 font-semibold">
               All required hours completed!
             </div>
             <div className="text-slate-400 text-sm mt-1">
@@ -191,13 +191,13 @@ export default function HoursSummaryWidget({
             <span>− Transferred Hours:</span>
             <span className="font-mono">−{transferred}</span>
           </div>
-          <div className="flex justify-between text-green-400">
+          <div className="flex justify-between text-brand-green-400">
             <span>− Earned at EFH:</span>
             <span className="font-mono">−{earned}</span>
           </div>
           <div className="border-t border-slate-600 pt-2 flex justify-between font-semibold">
             <span className="text-slate-300">= Remaining Hours:</span>
-            <span className="text-orange-400 font-mono">{remaining}</span>
+            <span className="text-brand-orange-400 font-mono">{remaining}</span>
           </div>
         </div>
       </details>

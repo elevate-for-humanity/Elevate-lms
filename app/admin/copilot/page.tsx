@@ -113,7 +113,7 @@ export default async function CopilotPage() {
               </span>
             </div>
             <p className="text-3xl font-bold text-gray-900 mt-2">2,847</p>
-            <p className="text-sm text-green-600 mt-1">+12% this week</p>
+            <p className="text-sm text-brand-green-600 mt-1">+12% this week</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -132,7 +132,7 @@ export default async function CopilotPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-500">Satisfaction Rate</h3>
-              <span className="text-green-600 bg-green-100 p-2 rounded-lg">
+              <span className="text-brand-green-600 bg-brand-green-100 p-2 rounded-lg">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -145,7 +145,7 @@ export default async function CopilotPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-500">API Usage</h3>
-              <span className="text-orange-600 bg-orange-100 p-2 rounded-lg">
+              <span className="text-brand-orange-600 bg-brand-orange-100 p-2 rounded-lg">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -167,9 +167,9 @@ export default async function CopilotPage() {
               <div key={feature.name} className="p-4 flex items-center justify-between hover:bg-gray-50">
                 <div className="flex items-center gap-4">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    feature.status === 'active' ? 'bg-green-100' : 'bg-gray-100'
+                    feature.status === 'active' ? 'bg-brand-green-100' : 'bg-gray-100'
                   }`}>
-                    <svg className={`w-5 h-5 ${feature.status === 'active' ? 'text-green-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-5 h-5 ${feature.status === 'active' ? 'text-brand-green-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -182,7 +182,7 @@ export default async function CopilotPage() {
                   <div className="text-right">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       feature.status === 'active' 
-                        ? 'bg-green-100 text-green-800' 
+                        ? 'bg-brand-green-100 text-brand-green-800' 
                         : 'bg-gray-100 text-gray-600'
                     }`}>
                       {feature.status}

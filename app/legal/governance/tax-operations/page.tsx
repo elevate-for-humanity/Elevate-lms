@@ -35,12 +35,12 @@ export default function TaxOperationsPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8 flex items-center justify-between">
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-8 flex items-center justify-between">
           <div>
-            <p className="font-medium text-red-900">Official Tax Operations Document</p>
-            <p className="text-sm text-red-700">Authoritative reference for Supersonic Fast Cash tax services and refund advances.</p>
+            <p className="font-medium text-brand-red-900">Official Tax Operations Document</p>
+            <p className="text-sm text-brand-red-700">Authoritative reference for Supersonic Fast Cash tax services and refund advances.</p>
           </div>
-          <a href="/docs/Tax_Preparation_Refund_Advance_Operations.pdf" download className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+          <a href="/docs/Tax_Preparation_Refund_Advance_Operations.pdf" download className="flex items-center gap-2 px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700">
             <Download className="w-4 h-4" /> PDF
           </a>
         </div>
@@ -48,21 +48,21 @@ export default function TaxOperationsPage() {
         <nav className="bg-gray-50 rounded-lg p-6 mb-10">
           <h2 className="font-semibold mb-4">Contents</h2>
           <ol className="space-y-2 text-sm">
-            <li><a href="#purpose" className="text-red-600 hover:underline">1. Purpose & Scope</a></li>
-            <li><a href="#services" className="text-red-600 hover:underline">2. Services Offered</a></li>
-            <li><a href="#compliance" className="text-red-600 hover:underline">3. IRS Compliance</a></li>
-            <li><a href="#refund-advance" className="text-red-600 hover:underline">4. Refund Advance Program</a></li>
-            <li><a href="#fees" className="text-red-600 hover:underline">5. Fee Structure & Disclosures</a></li>
-            <li><a href="#data-security" className="text-red-600 hover:underline">6. Data Security & Privacy</a></li>
-            <li><a href="#quality" className="text-red-600 hover:underline">7. Quality Assurance</a></li>
-            <li><a href="#responsibilities" className="text-red-600 hover:underline">8. Roles & Responsibilities</a></li>
-            <li><a href="#versioning" className="text-red-600 hover:underline">9. Versioning & Review</a></li>
+            <li><a href="#purpose" className="text-brand-red-600 hover:underline">1. Purpose & Scope</a></li>
+            <li><a href="#services" className="text-brand-red-600 hover:underline">2. Services Offered</a></li>
+            <li><a href="#compliance" className="text-brand-red-600 hover:underline">3. IRS Compliance</a></li>
+            <li><a href="#refund-advance" className="text-brand-red-600 hover:underline">4. Refund Advance Program</a></li>
+            <li><a href="#fees" className="text-brand-red-600 hover:underline">5. Fee Structure & Disclosures</a></li>
+            <li><a href="#data-security" className="text-brand-red-600 hover:underline">6. Data Security & Privacy</a></li>
+            <li><a href="#quality" className="text-brand-red-600 hover:underline">7. Quality Assurance</a></li>
+            <li><a href="#responsibilities" className="text-brand-red-600 hover:underline">8. Roles & Responsibilities</a></li>
+            <li><a href="#versioning" className="text-brand-red-600 hover:underline">9. Versioning & Review</a></li>
           </ol>
         </nav>
 
         <section id="purpose" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Calculator className="w-6 h-6 text-red-600" />
+            <Calculator className="w-6 h-6 text-brand-red-600" />
             1. Purpose & Scope
           </h2>
           <h3 className="text-lg font-semibold mt-6 mb-3">1.1 Purpose</h3>
@@ -83,7 +83,7 @@ export default function TaxOperationsPage() {
 
         <section id="services" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <FileText className="w-6 h-6 text-red-600" />
+            <FileText className="w-6 h-6 text-brand-red-600" />
             2. Services Offered
           </h2>
           
@@ -116,7 +116,7 @@ export default function TaxOperationsPage() {
 
         <section id="compliance" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Shield className="w-6 h-6 text-red-600" />
+            <Shield className="w-6 h-6 text-brand-red-600" />
             3. IRS Compliance
           </h2>
           
@@ -150,7 +150,7 @@ export default function TaxOperationsPage() {
 
         <section id="refund-advance" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <DollarSign className="w-6 h-6 text-red-600" />
+            <DollarSign className="w-6 h-6 text-brand-red-600" />
             4. Refund Advance Program
           </h2>
           
@@ -192,7 +192,7 @@ export default function TaxOperationsPage() {
 
         <section id="fees" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <FileText className="w-6 h-6 text-red-600" />
+            <FileText className="w-6 h-6 text-brand-red-600" />
             5. Fee Structure & Disclosures
           </h2>
           
@@ -230,7 +230,7 @@ export default function TaxOperationsPage() {
 
         <section id="data-security" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Shield className="w-6 h-6 text-red-600" />
+            <Shield className="w-6 h-6 text-brand-red-600" />
             6. Data Security & Privacy
           </h2>
           
@@ -263,7 +263,7 @@ export default function TaxOperationsPage() {
 
         <section id="quality" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <AlertTriangle className="w-6 h-6 text-red-600" />
+            <AlertTriangle className="w-6 h-6 text-brand-red-600" />
             7. Quality Assurance
           </h2>
           
@@ -291,7 +291,7 @@ export default function TaxOperationsPage() {
 
         <section id="responsibilities" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Users className="w-6 h-6 text-red-600" />
+            <Users className="w-6 h-6 text-brand-red-600" />
             8. Roles & Responsibilities
           </h2>
           <table className="w-full border-collapse border">

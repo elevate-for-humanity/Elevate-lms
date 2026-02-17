@@ -214,13 +214,13 @@ export default function FreeTaxHelpPage() {
         <div className="mt-8 flex flex-wrap gap-4">
           <a
             href="/support"
-            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
+            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-brand-green-700 transition"
           >
             Call support center
           </a>
           <Link
             href="/tax/rise-up-foundation/documents"
-            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-green-50 transition"
+            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-brand-green-50 transition"
           >
             View Document Checklist
           </Link>

@@ -34,7 +34,7 @@ export default async function ProfilePage() {
           </div>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div className="p-4 bg-gray-50 rounded-lg"><p className="text-2xl font-bold text-brand-blue-600">{completedCourses || 0}</p><p className="text-sm text-gray-500">Courses Completed</p></div>
-            <div className="p-4 bg-gray-50 rounded-lg"><p className="text-2xl font-bold text-green-600">{certificates || 0}</p><p className="text-sm text-gray-500">Certificates</p></div>
+            <div className="p-4 bg-gray-50 rounded-lg"><p className="text-2xl font-bold text-brand-green-600">{certificates || 0}</p><p className="text-sm text-gray-500">Certificates</p></div>
             <div className="p-4 bg-gray-50 rounded-lg"><p className="text-2xl font-bold text-brand-blue-600">0</p><p className="text-sm text-gray-500">Badges</p></div>
           </div>
         </div>

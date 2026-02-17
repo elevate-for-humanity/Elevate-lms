@@ -238,7 +238,7 @@ export default function ProgramFinder() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-100 text-brand-green-700 rounded-full text-sm font-semibold mb-4">
               <span className="text-slate-400 flex-shrink-0">•</span>
               Your Personalized Results
             </div>
@@ -273,7 +273,7 @@ export default function ProgramFinder() {
                               {program.name}
                             </h3>
                             {index === 0 && (
-                              <span className="px-3 py-2 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                              <span className="px-3 py-2 bg-brand-green-100 text-brand-green-700 rounded-full text-xs font-semibold">
                                 BEST MATCH
                               </span>
                             )}
@@ -300,14 +300,14 @@ export default function ProgramFinder() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 text-black">
-                        <DollarSign className="w-5 h-5 text-green-600" />
+                        <DollarSign className="w-5 h-5 text-brand-green-600" />
                         <div>
                           <div className="text-xs text-slate-700 font-medium">Salary Range</div>
                           <div className="font-semibold">{program.salary}</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 text-black">
-                        <TrendingUp className="w-5 h-5 text-blue-600" />
+                        <TrendingUp className="w-5 h-5 text-brand-blue-600" />
                         <div>
                           <div className="text-xs text-slate-700 font-medium">Job Demand</div>
                           <div className="font-semibold">{program.demand}</div>

@@ -95,16 +95,16 @@ export function BeautyEnrollmentAcknowledgment({
         onClick={handleToggle}
         className={`w-full flex items-start gap-3 p-4 rounded-lg border-2 transition-all ${
           isChecked 
-            ? 'bg-green-50 border-green-500' 
+            ? 'bg-brand-green-50 border-brand-green-500' 
             : 'bg-white border-slate-300 hover:border-amber-400'
         }`}
       >
         {isChecked ? (
-          <CheckSquare className="w-6 h-6 text-green-600 flex-shrink-0" />
+          <CheckSquare className="w-6 h-6 text-brand-green-600 flex-shrink-0" />
         ) : (
           <Square className="w-6 h-6 text-slate-400 flex-shrink-0" />
         )}
-        <span className={`text-left text-sm ${isChecked ? 'text-green-800' : 'text-slate-700'}`}>
+        <span className={`text-left text-sm ${isChecked ? 'text-brand-green-800' : 'text-slate-700'}`}>
           <strong>I understand</strong> this program provides apprenticeship sponsorship, oversight, and related instruction only 
           and does not replace {schoolName} or grant state licensure hours. I acknowledge that the program fee of ${fee.toLocaleString()} 
           applies regardless of any transferred hours.

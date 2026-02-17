@@ -162,7 +162,7 @@ export default async function InterviewsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        interview.status === 'Confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                        interview.status === 'Confirmed' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-yellow-100 text-yellow-700'
                       }`}>
                         {interview.status}
                       </span>
@@ -210,7 +210,7 @@ export default async function InterviewsPage() {
                       <p className="text-gray-500 text-sm">{interview.date}</p>
                     </div>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      interview.outcome === 'Offered' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                      interview.outcome === 'Offered' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-brand-red-100 text-brand-red-700'
                     }`}>
                       {interview.outcome}
                     </span>

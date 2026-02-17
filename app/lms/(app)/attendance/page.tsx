@@ -51,7 +51,7 @@ export default async function AttendancePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h3 className="text-sm font-medium text-gray-500">Total Hours Logged</h3>
-            <p className="text-3xl font-bold text-green-600 mt-2">{totalHoursLogged.toFixed(1)}</p>
+            <p className="text-3xl font-bold text-brand-green-600 mt-2">{totalHoursLogged.toFixed(1)}</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h3 className="text-sm font-medium text-gray-500">Verified Sessions</h3>
@@ -78,7 +78,7 @@ export default async function AttendancePage() {
                 </div>
                 <div className="flex items-center gap-2">
                   {record.verified ? (
-                    <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Verified</span>
+                    <span className="px-2 py-1 rounded-full text-xs bg-brand-green-100 text-brand-green-800">Verified</span>
                   ) : (
                     <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">Pending</span>
                   )}

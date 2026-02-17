@@ -18,7 +18,7 @@ export default function LMSPortalPublicPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-900 to-blue-700 text-white py-16 md:py-24">
+      <section className="bg-gradient-to-br from-brand-blue-900 to-brand-blue-700 text-white py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <BookOpen className="w-16 h-16 mx-auto mb-6 text-brand-blue-300" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Learning Management System</h1>
@@ -57,7 +57,7 @@ export default function LMSPortalPublicPage() {
               <p className="text-slate-600">Learn at your own pace with professional video lessons and interactive content.</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">
-              <BarChart3 className="w-10 h-10 text-green-600 mb-4" />
+              <BarChart3 className="w-10 h-10 text-brand-green-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Progress Tracking</h3>
               <p className="text-slate-600">Monitor your progress, see completion rates, and stay on track with your goals.</p>
             </div>

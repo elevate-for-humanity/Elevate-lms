@@ -112,7 +112,7 @@ export default function VideoManagerPage() {
                 <strong>3. Use in your pages</strong> - Add to hero sections
                 like this:
               </p>
-              <pre className="bg-slate-800 text-green-400 p-4 rounded-lg overflow-x-auto text-sm mt-2">
+              <pre className="bg-slate-800 text-brand-green-400 p-4 rounded-lg overflow-x-auto text-sm mt-2">
                 {`<video
   autoPlay
   loop

@@ -82,7 +82,7 @@ export default function PartnerSupportPage() {
         {/* Common Issues */}
         <div className="bg-white rounded-xl shadow-sm p-6 border mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <AlertCircle className="w-6 h-6 text-orange-600" />
+            <AlertCircle className="w-6 h-6 text-brand-orange-600" />
             <h2 className="text-lg font-bold text-gray-900">Common Issues & Solutions</h2>
           </div>
           <div className="space-y-4">

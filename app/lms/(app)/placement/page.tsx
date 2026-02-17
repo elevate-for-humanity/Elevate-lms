@@ -124,7 +124,7 @@ export default async function PlacementPage() {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h3 className="font-semibold mb-4">Your Placement Status</h3>
               {placements.map((placement: any) => (
-                <div key={placement.id} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                <div key={placement.id} className="flex items-center gap-3 p-3 bg-brand-green-50 rounded-lg">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                   <div>
                     <p className="font-medium">{placement.company}</p>

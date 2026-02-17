@@ -131,8 +131,8 @@ export default function EnrollPage({
   if (error && !course) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-sm border border-red-200 p-8 text-center">
-          <div className="text-red-600 text-5xl mb-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-sm border border-brand-red-200 p-8 text-center">
+          <div className="text-brand-red-600 text-5xl mb-4">
             <AlertTriangle className="w-5 h-5 inline-block" />
           </div>
           <h1 className="text-2xl font-bold text-black mb-2">
@@ -273,8 +273,8 @@ export default function EnrollPage({
 
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <p className="text-red-800 text-sm">{error}</p>
+              <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6">
+                <p className="text-brand-red-800 text-sm">{error}</p>
               </div>
             )}
 

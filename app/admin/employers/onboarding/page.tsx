@@ -24,8 +24,8 @@ export default async function EmployerOnboardingReview() {
   const statusColors: Record<string, string> = {
     submitted: 'bg-yellow-100 text-yellow-800',
     reviewed: 'bg-brand-blue-100 text-brand-blue-800',
-    approved: 'bg-green-100 text-green-800',
-    rejected: 'bg-red-100 text-red-800',
+    approved: 'bg-brand-green-100 text-brand-green-800',
+    rejected: 'bg-brand-red-100 text-brand-red-800',
   };
 
   const statusIcons: Record<string, any> = {

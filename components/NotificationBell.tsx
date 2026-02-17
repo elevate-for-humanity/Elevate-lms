@@ -93,7 +93,7 @@ export default function NotificationBell() {
       >
         <Bell className="w-6 h-6 text-black" />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-600 rounded-full">
+          <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-brand-red-600 rounded-full">
             {unreadCount}
           </span>
         )}
@@ -112,7 +112,7 @@ export default function NotificationBell() {
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
-                    className="text-xs text-orange-600 hover:text-orange-700 font-semibold"
+                    className="text-xs text-brand-orange-600 hover:text-brand-orange-700 font-semibold"
                   >
                     Mark all read
                   </button>
@@ -138,7 +138,7 @@ export default function NotificationBell() {
                     <div
                       key={notification.id}
                       className={`p-4 hover:bg-slate-50 transition-colors ${
-                        !notification.read ? 'bg-orange-50' : ''
+                        !notification.read ? 'bg-brand-orange-50' : ''
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -168,7 +168,7 @@ export default function NotificationBell() {
                       {notification.link && (
                         <a
                           href={notification.link}
-                          className="inline-block mt-2 text-xs text-orange-600 hover:text-orange-700 font-semibold"
+                          className="inline-block mt-2 text-xs text-brand-orange-600 hover:text-brand-orange-700 font-semibold"
                           onClick={() => setIsOpen(false)}
                         >
                           View Details →

@@ -31,7 +31,7 @@ export default function ChangelogPage() {
           {releases.map((release, i) => (
             <div key={i} className="bg-white rounded-xl shadow-sm border p-6">
               <div className="flex items-center gap-3 mb-4">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${release.type === 'feature' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${release.type === 'feature' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                   {release.type === 'feature' ? 'New Features' : 'Bug Fixes'}
                 </span>
                 <div className="flex items-center gap-2 text-gray-500">

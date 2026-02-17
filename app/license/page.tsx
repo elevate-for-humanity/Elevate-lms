@@ -102,7 +102,7 @@ export default async function LicensePage() {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6">
             <Link
               href={ROUTES.schedule}
-              className="inline-flex items-center justify-center gap-2 bg-orange-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-orange-700 transition text-sm sm:text-lg"
+              className="inline-flex items-center justify-center gap-2 bg-brand-orange-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-brand-orange-700 transition text-sm sm:text-lg"
             >
               <Calendar className="w-5 h-5" />
               Schedule Demo
@@ -131,7 +131,7 @@ export default async function LicensePage() {
               const Icon = feature.icon;
               return (
                 <div key={index} className="bg-gray-50 rounded-xl p-6">
-                  <Icon className="w-10 h-10 text-orange-600 mb-4" />
+                  <Icon className="w-10 h-10 text-brand-orange-600 mb-4" />
                   <h3 className="font-bold text-lg mb-2">{feature.title}</h3>
                   <p className="text-gray-600">{feature.description}</p>
                 </div>
@@ -187,16 +187,16 @@ export default async function LicensePage() {
               <div 
                 key={index} 
                 className={`bg-white rounded-xl p-8 shadow-sm border-2 ${
-                  tier.popular ? 'border-orange-500' : 'border-transparent'
+                  tier.popular ? 'border-brand-orange-500' : 'border-transparent'
                 }`}
               >
                 {tier.popular && (
-                  <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                  <span className="bg-brand-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                     Most Popular
                   </span>
                 )}
                 <h3 className="text-2xl font-bold mt-4">{tier.name}</h3>
-                <div className="text-3xl font-bold text-orange-600 my-4">
+                <div className="text-3xl font-bold text-brand-orange-600 my-4">
                   ${tier.price?.toLocaleString()}<span className="text-lg text-gray-500">/year</span>
                 </div>
                 <p className="text-gray-600 mb-6">{tier.description}</p>
@@ -212,7 +212,7 @@ export default async function LicensePage() {
                   href={ROUTES.schedule}
                   className={`block text-center py-3 rounded-lg font-semibold transition ${
                     tier.popular 
-                      ? 'bg-orange-600 text-white hover:bg-orange-700' 
+                      ? 'bg-brand-orange-600 text-white hover:bg-brand-orange-700' 
                       : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                   }`}
                 >
@@ -242,7 +242,7 @@ export default async function LicensePage() {
           <div className="mt-8 text-center">
             <Link
               href="/policies"
-              className="text-orange-600 hover:text-orange-800 font-medium"
+              className="text-brand-orange-600 hover:text-brand-orange-800 font-medium"
             >
               View All Policies →
             </Link>
@@ -287,24 +287,24 @@ export default async function LicensePage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-orange-600">
+      <section className="py-16 bg-brand-orange-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Improve Your Workforce Programs?
           </h2>
-          <p className="text-orange-100 mb-8">
+          <p className="text-brand-orange-100 mb-8">
             Schedule a demo to see how the Elevate platform can work for your organization.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href={ROUTES.schedule}
-              className="bg-white text-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="bg-white text-brand-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Schedule Demo
             </Link>
             <Link
               href="/contact"
-              className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-orange-700 transition"
+              className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-orange-700 transition"
             >
               Contact Sales
             </Link>

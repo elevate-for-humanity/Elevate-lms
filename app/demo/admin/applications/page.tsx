@@ -40,7 +40,7 @@ export default function DemoApplicationsPage() {
     <DemoPageShell title="Applications" description="Review and process incoming student applications." portal="admin">
       {/* Toast */}
       {toast && (
-        <div className="fixed top-20 right-4 z-50 bg-green-600 text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium animate-fade-in-up">
+        <div className="fixed top-20 right-4 z-50 bg-brand-green-600 text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium animate-fade-in-up">
           {toast}
         </div>
       )}
@@ -54,7 +54,7 @@ export default function DemoApplicationsPage() {
             placeholder="Search by name or program..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+            className="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500 outline-none"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -62,7 +62,7 @@ export default function DemoApplicationsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="border rounded-lg px-3 py-2.5 text-sm bg-white focus:ring-2 focus:ring-red-500 outline-none"
+            className="border rounded-lg px-3 py-2.5 text-sm bg-white focus:ring-2 focus:ring-brand-red-500 outline-none"
           >
             <option value="all">All Statuses</option>
             <option value="pending">Pending</option>
@@ -92,7 +92,7 @@ export default function DemoApplicationsPage() {
               </div>
               <div className="flex items-center gap-3 ml-4">
                 <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                  s.status === 'pending' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'
+                  s.status === 'pending' ? 'bg-amber-100 text-amber-800' : 'bg-brand-green-100 text-brand-green-800'
                 }`}>
                   {s.status === 'pending' ? 'Needs Review' : 'Enrolled'}
                 </span>
@@ -115,13 +115,13 @@ export default function DemoApplicationsPage() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Documents</p>
-                    <p className={`text-sm font-medium ${s.documents === 'Complete' ? 'text-green-700' : s.documents === 'Missing ID' ? 'text-red-700' : 'text-amber-700'}`}>
+                    <p className={`text-sm font-medium ${s.documents === 'Complete' ? 'text-brand-green-700' : s.documents === 'Missing ID' ? 'text-brand-red-700' : 'text-amber-700'}`}>
                       {s.documents}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Eligibility</p>
-                    <p className={`text-sm font-medium ${s.eligibility === 'Verified' ? 'text-green-700' : 'text-amber-700'}`}>
+                    <p className={`text-sm font-medium ${s.eligibility === 'Verified' ? 'text-brand-green-700' : 'text-amber-700'}`}>
                       {s.eligibility}
                     </p>
                   </div>
@@ -137,13 +137,13 @@ export default function DemoApplicationsPage() {
                 <div className="flex gap-2 pt-2 border-t">
                   <button
                     onClick={() => handleAction(s.id, 'approved', s.full_name)}
-                    className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
+                    className="inline-flex items-center gap-1.5 bg-brand-green-600 hover:bg-brand-green-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
                   >
                     <span className="text-slate-400 flex-shrink-0">•</span> Approve & Enroll
                   </button>
                   <button
                     onClick={() => handleAction(s.id, 'rejected', s.full_name)}
-                    className="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
+                    className="inline-flex items-center gap-1.5 bg-brand-red-600 hover:bg-brand-red-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
                   >
                     <XCircle className="w-3.5 h-3.5" /> Deny
                   </button>

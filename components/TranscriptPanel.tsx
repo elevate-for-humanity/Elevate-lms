@@ -152,7 +152,7 @@ export function TranscriptPanel({
                     ref={isActive ? activeSegmentRef : null}
                     className={`group cursor-pointer p-3 rounded-lg transition ${
                       isActive
-                        ? 'bg-red-50 border border-red-200'
+                        ? 'bg-brand-red-50 border border-brand-red-200'
                         : 'hover:bg-slate-50'
                     }`}
                     onClick={() => onSeek && onSeek(segment.timestamp)}

@@ -42,7 +42,7 @@ export default async function DIYStartPage() {
           <h2 className="text-2xl font-bold mb-6">Let's Get Started</h2>
           
           <div className="space-y-6 mb-8">
-            <div className="border-l-4 border-orange-600 pl-4">
+            <div className="border-l-4 border-brand-orange-600 pl-4">
               <h3 className="font-semibold text-lg mb-2">Step 1: Gather Your Documents</h3>
               <ul className="list-disc list-inside text-black space-y-1">
                 <li>W-2 forms from all employers</li>
@@ -53,7 +53,7 @@ export default async function DIYStartPage() {
               </ul>
             </div>
 
-            <div className="border-l-4 border-orange-600 pl-4">
+            <div className="border-l-4 border-brand-orange-600 pl-4">
               <h3 className="font-semibold text-lg mb-2">Step 2: Choose Your Filing Method</h3>
               <div className="grid md:grid-cols-2 gap-4 mt-4">
                 <div className="border rounded-lg p-4">
@@ -61,7 +61,7 @@ export default async function DIYStartPage() {
                   <p className="text-sm text-black mb-3">File yourself with our guided software</p>
                   <Link
                     href="/supersonic-fast-cash/diy/interview"
-                    className="inline-block bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded text-sm font-semibold transition-colors"
+                    className="inline-block bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-4 py-2 rounded text-sm font-semibold transition-colors"
                   >
                     Start Filing
                   </Link>
@@ -79,7 +79,7 @@ export default async function DIYStartPage() {
               </div>
             </div>
 
-            <div className="border-l-4 border-orange-600 pl-4">
+            <div className="border-l-4 border-brand-orange-600 pl-4">
               <h3 className="font-semibold text-lg mb-2">Step 3: Review & Submit</h3>
               <p className="text-black">
                 We'll review your return for accuracy and help you get the maximum refund you deserve.
@@ -87,14 +87,14 @@ export default async function DIYStartPage() {
             </div>
           </div>
 
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
+          <div className="bg-brand-orange-50 border border-brand-orange-200 rounded-lg p-6">
             <h3 className="font-semibold mb-2">Need Help?</h3>
             <p className="text-black mb-4">
               Our tax professionals are available to answer questions and help you file.
             </p>
             <Link
               href="/contact"
-              className="inline-block text-orange-600 hover:text-orange-700 font-semibold"
+              className="inline-block text-brand-orange-600 hover:text-brand-orange-700 font-semibold"
             >
               Contact Support →
             </Link>

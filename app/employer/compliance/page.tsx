@@ -118,7 +118,7 @@ export default async function EmployerCompliancePage() {
                   </div>
                   <h3 className="font-bold text-gray-900">{area.title}</h3>
                 </div>
-                <span className="text-xs font-medium px-2 py-1 bg-green-100 text-green-700 rounded-full">{area.status}</span>
+                <span className="text-xs font-medium px-2 py-1 bg-brand-green-100 text-brand-green-700 rounded-full">{area.status}</span>
               </div>
               <p className="text-gray-600 text-sm mb-4">{area.description}</p>
               <div className="flex flex-wrap gap-2">
@@ -136,13 +136,13 @@ export default async function EmployerCompliancePage() {
           {/* Upcoming Deadlines */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-orange-600" /> Upcoming Deadlines
+              <Clock className="w-5 h-5 text-brand-orange-600" /> Upcoming Deadlines
             </h2>
             <div className="space-y-3">
               {upcomingDeadlines.map((item, i) => (
                 <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <AlertCircle className={`w-4 h-4 ${item.priority === 'high' ? 'text-red-500' : 'text-yellow-500'}`} />
+                    <AlertCircle className={`w-4 h-4 ${item.priority === 'high' ? 'text-brand-red-500' : 'text-yellow-500'}`} />
                     <div>
                       <p className="text-sm font-medium text-gray-900">{item.title}</p>
                       <p className="text-xs text-gray-500">{item.date}</p>

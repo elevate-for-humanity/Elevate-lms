@@ -54,7 +54,7 @@ export default function StudentSupportPage() {
         </div>
       </div>
 
-      <div className="relative bg-green-800 text-white py-16">
+      <div className="relative bg-brand-green-800 text-white py-16">
         <Image
           src="/images/heroes/learners.jpg"
           alt="Student Support"
@@ -64,7 +64,7 @@ export default function StudentSupportPage() {
         />
         <div className="relative max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-4">Student Support Services</h1>
-          <p className="text-xl text-green-100 max-w-2xl">
+          <p className="text-xl text-brand-green-100 max-w-2xl">
             We&apos;re here to help you succeed. Access resources and support throughout your educational journey.
           </p>
         </div>
@@ -74,8 +74,8 @@ export default function StudentSupportPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {services.map((service, index) => (
             <Link key={index} href={service.link} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <service.icon className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+                <service.icon className="w-6 h-6 text-brand-green-600" />
               </div>
               <h2 className="text-lg font-semibold text-gray-900 mb-2">{service.title}</h2>
               <p className="text-gray-600">{service.description}</p>
@@ -87,7 +87,7 @@ export default function StudentSupportPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Support</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-              <Phone className="w-8 h-8 text-green-600" />
+              <Phone className="w-8 h-8 text-brand-green-600" />
               <div>
                 <p className="font-medium text-gray-900">Phone Support</p>
                 <p className="text-gray-600">1-800-ELEVATE</p>
@@ -95,19 +95,19 @@ export default function StudentSupportPage() {
               </div>
             </div>
             <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-              <MessageSquare className="w-8 h-8 text-green-600" />
+              <MessageSquare className="w-8 h-8 text-brand-green-600" />
               <div>
                 <p className="font-medium text-gray-900">Live Chat</p>
                 <p className="text-gray-600">Available 24/7</p>
-                <Link href="/chat" className="text-sm text-green-600 hover:underline">Start Chat</Link>
+                <Link href="/chat" className="text-sm text-brand-green-600 hover:underline">Start Chat</Link>
               </div>
             </div>
             <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-              <Calendar className="w-8 h-8 text-green-600" />
+              <Calendar className="w-8 h-8 text-brand-green-600" />
               <div>
                 <p className="font-medium text-gray-900">Schedule Meeting</p>
                 <p className="text-gray-600">Book an appointment</p>
-                <Link href="/student-support/schedule" className="text-sm text-green-600 hover:underline">Book Now</Link>
+                <Link href="/student-support/schedule" className="text-sm text-brand-green-600 hover:underline">Book Now</Link>
               </div>
             </div>
           </div>

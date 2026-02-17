@@ -185,9 +185,9 @@ export default function QuestionManagerClient({ quiz, initialQuestions, quizId, 
 
       {/* Error Display */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
           {error}
-          <button onClick={() => setError(null)} className="ml-4 text-red-500 hover:text-red-700">Dismiss</button>
+          <button onClick={() => setError(null)} className="ml-4 text-brand-red-500 hover:text-brand-red-700">Dismiss</button>
         </div>
       )}
 
@@ -198,7 +198,7 @@ export default function QuestionManagerClient({ quiz, initialQuestions, quizId, 
           <p className="text-sm text-gray-500">Questions</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
-          <p className="text-2xl font-bold text-green-600">{quiz?.passing_score || 70}%</p>
+          <p className="text-2xl font-bold text-brand-green-600">{quiz?.passing_score || 70}%</p>
           <p className="text-sm text-gray-500">Passing Score</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
@@ -228,7 +228,7 @@ export default function QuestionManagerClient({ quiz, initialQuestions, quizId, 
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => openEditModal(question)} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">Edit</button>
-                  <button onClick={() => handleDelete(question.id)} className="text-red-600 hover:text-red-800 text-sm">Delete</button>
+                  <button onClick={() => handleDelete(question.id)} className="text-brand-red-600 hover:text-brand-red-800 text-sm">Delete</button>
                 </div>
               </div>
               
@@ -239,13 +239,13 @@ export default function QuestionManagerClient({ quiz, initialQuestions, quizId, 
                       key={optIndex} 
                       className={`p-2 rounded border text-sm ${
                         option === question.correct_answer 
-                          ? 'bg-green-50 border-green-200 text-green-800' 
+                          ? 'bg-brand-green-50 border-brand-green-200 text-brand-green-800' 
                           : 'bg-gray-50 border-gray-200'
                       }`}
                     >
                       {option}
                       {option === question.correct_answer && (
-                        <span className="ml-2 text-green-600">✓ Correct</span>
+                        <span className="ml-2 text-brand-green-600">✓ Correct</span>
                       )}
                     </div>
                   ))}
@@ -253,7 +253,7 @@ export default function QuestionManagerClient({ quiz, initialQuestions, quizId, 
               )}
 
               {question.question_type === 'short_answer' && (
-                <div className="ml-11 p-2 rounded border text-sm bg-green-50 border-green-200 text-green-800">
+                <div className="ml-11 p-2 rounded border text-sm bg-brand-green-50 border-brand-green-200 text-brand-green-800">
                   Answer: {question.correct_answer}
                 </div>
               )}

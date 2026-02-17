@@ -289,7 +289,7 @@ export default function DIYTaxesPage() {
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center font-bold ${
                       currentStep >= step.id
-                        ? 'bg-green-600 text-white'
+                        ? 'bg-brand-green-600 text-white'
                         : 'bg-gray-300 text-black'
                     }`}
                   >
@@ -304,7 +304,7 @@ export default function DIYTaxesPage() {
                 {index < STEPS.length - 1 && (
                   <div
                     className={`h-1 flex-1 ${
-                      currentStep > step.id ? 'bg-green-600' : 'bg-gray-300'
+                      currentStep > step.id ? 'bg-brand-green-600' : 'bg-gray-300'
                     }`}
                   />
                 )}
@@ -313,9 +313,9 @@ export default function DIYTaxesPage() {
           </div>
 
           {/* Estimated Refund */}
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4 text-center">
             <div className="text-sm text-black mb-1">Estimated Refund</div>
-            <div className="text-3xl font-bold text-green-600">
+            <div className="text-3xl font-bold text-brand-green-600">
               {calculating
                 ? 'Calculating...'
                 : `$${estimatedRefund.toLocaleString()}`}
@@ -527,15 +527,15 @@ export default function DIYTaxesPage() {
                     }
                     className={`w-full text-left p-6 rounded-lg border-2 transition-all ${
                       taxReturn.filingStatus === status.value
-                        ? 'border-green-600 bg-green-50'
-                        : 'border-gray-300 hover:border-green-400'
+                        ? 'border-brand-green-600 bg-brand-green-50'
+                        : 'border-gray-300 hover:border-brand-green-400'
                     }`}
                   >
                     <div className="flex items-start gap-3">
                       <div
                         className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 ${
                           taxReturn.filingStatus === status.value
-                            ? 'border-green-600 bg-green-600'
+                            ? 'border-brand-green-600 bg-brand-green-600'
                             : 'border-gray-400'
                         }`}
                       >
@@ -640,7 +640,7 @@ export default function DIYTaxesPage() {
                   <h3 className="font-bold text-lg">Dependents</h3>
                   <button
                     onClick={addDependent}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700"
+                    className="bg-brand-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-brand-green-700"
                   >
                     + Add Dependent
                   </button>
@@ -749,7 +749,7 @@ export default function DIYTaxesPage() {
                   <h3 className="font-bold text-lg">W-2 Wages</h3>
                   <button
                     onClick={addW2}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700"
+                    className="bg-brand-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-brand-green-700"
                   >
                     + Add W-2
                   </button>
@@ -864,15 +864,15 @@ export default function DIYTaxesPage() {
                   }
                   className={`w-full text-left p-6 rounded-lg border-2 transition-all ${
                     taxReturn.deductionType === 'standard'
-                      ? 'border-green-600 bg-green-50'
-                      : 'border-gray-300 hover:border-green-400'
+                      ? 'border-brand-green-600 bg-brand-green-50'
+                      : 'border-gray-300 hover:border-brand-green-400'
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     <div
                       className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 ${
                         taxReturn.deductionType === 'standard'
-                          ? 'border-green-600 bg-green-600'
+                          ? 'border-brand-green-600 bg-brand-green-600'
                           : 'border-gray-400'
                       }`}
                     >
@@ -898,15 +898,15 @@ export default function DIYTaxesPage() {
                   }
                   className={`w-full text-left p-6 rounded-lg border-2 transition-all ${
                     taxReturn.deductionType === 'itemized'
-                      ? 'border-green-600 bg-green-50'
-                      : 'border-gray-300 hover:border-green-400'
+                      ? 'border-brand-green-600 bg-brand-green-50'
+                      : 'border-gray-300 hover:border-brand-green-400'
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     <div
                       className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 ${
                         taxReturn.deductionType === 'itemized'
-                          ? 'border-green-600 bg-green-600'
+                          ? 'border-brand-green-600 bg-brand-green-600'
                           : 'border-gray-400'
                       }`}
                     >
@@ -1055,7 +1055,7 @@ export default function DIYTaxesPage() {
                         <span className="font-semibold">
                           Total Itemized Deductions:
                         </span>
-                        <span className="text-2xl font-bold text-green-600">
+                        <span className="text-2xl font-bold text-brand-green-600">
                           $
                           {(
                             taxReturn.itemizedDeductions.mortgageInterest +
@@ -1108,7 +1108,7 @@ export default function DIYTaxesPage() {
                         your {taxReturn.dependents.length} dependent(s).
                       </div>
                       {taxReturn.hasChildTaxCredit && (
-                        <div className="mt-3 text-green-600 font-semibold">
+                        <div className="mt-3 text-brand-green-600 font-semibold">
                           Estimated Credit: $
                           {Math.min(
                             taxReturn.dependents.length * 2000,
@@ -1143,7 +1143,7 @@ export default function DIYTaxesPage() {
                         on income and number of children.
                       </div>
                       {taxReturn.hasEITC && (
-                        <div className="mt-3 text-green-600 font-semibold">
+                        <div className="mt-3 text-brand-green-600 font-semibold">
                           We'll calculate your exact EITC amount based on your
                           income.
                         </div>
@@ -1173,7 +1173,7 @@ export default function DIYTaxesPage() {
                         Learning Credit (up to $2,000) for college expenses.
                       </div>
                       {taxReturn.hasEducationCredits && (
-                        <div className="mt-3 text-green-600 font-semibold">
+                        <div className="mt-3 text-brand-green-600 font-semibold">
                           You may qualify for up to $2,500 in education credits.
                         </div>
                       )}
@@ -1182,11 +1182,11 @@ export default function DIYTaxesPage() {
                 </div>
               </div>
 
-              <div className="mt-8 bg-green-50 border border-green-200 rounded-lg p-6">
+              <div className="mt-8 bg-brand-green-50 border border-brand-green-200 rounded-lg p-6">
                 <h3 className="font-bold text-lg mb-2">
                   Estimated Total Credits
                 </h3>
-                <div className="text-3xl font-bold text-green-600">
+                <div className="text-3xl font-bold text-brand-green-600">
                   $
                   {(
                     (taxReturn.hasChildTaxCredit
@@ -1411,7 +1411,7 @@ export default function DIYTaxesPage() {
                       }
                     }
                   }}
-                  className="w-full bg-green-600 text-white py-6 rounded-lg font-bold text-xl hover:bg-green-700"
+                  className="w-full bg-brand-green-600 text-white py-6 rounded-lg font-bold text-xl hover:bg-brand-green-700"
                 >
                   File My Tax Return Now
                 </button>
@@ -1448,7 +1448,7 @@ export default function DIYTaxesPage() {
           {currentStep < STEPS.length && (
             <button
               onClick={nextStep}
-              className="flex-1 bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700 flex items-center justify-center gap-2"
+              className="flex-1 bg-brand-green-600 text-white py-4 rounded-lg font-bold hover:bg-brand-green-700 flex items-center justify-center gap-2"
             >
               Next
               <ChevronRight className="w-5 h-5" />

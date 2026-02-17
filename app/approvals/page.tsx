@@ -165,7 +165,7 @@ export default function ApprovalsPage() {
 
           <div className="space-y-8">
             {/* DOL Apprenticeship */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-red-600">
+            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-red-600">
               <div className="flex items-start gap-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
@@ -186,7 +186,7 @@ export default function ApprovalsPage() {
             </div>
 
             {/* SAM.gov */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-red-600">
+            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-red-600">
               <div className="flex items-start gap-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>

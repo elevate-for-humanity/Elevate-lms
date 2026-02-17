@@ -60,10 +60,10 @@ export default function AboutPage() {
       </section>
 
       {/* MISSION */}
-      <section id="mission" className="py-10 sm:py-12 md:py-16 bg-red-600">
+      <section id="mission" className="py-10 sm:py-12 md:py-16 bg-brand-red-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6">Our Mission</h2>
-          <p className="text-base sm:text-lg md:text-xl text-red-100 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-brand-red-100 leading-relaxed">
             To create pathways out of poverty and into prosperity by providing free, high-quality
             career training to justice-involved individuals, low-income families, veterans, and
             anyone facing barriers to employment.
@@ -140,7 +140,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <div className="font-bold text-slate-900">U.S. Department of Labor</div>
-                <div className="text-red-600 text-sm">Registered Apprenticeship Sponsor</div>
+                <div className="text-brand-red-600 text-sm">Registered Apprenticeship Sponsor</div>
               </div>
             </div>
 
@@ -150,7 +150,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <div className="font-bold text-slate-900">Indiana DWD</div>
-                <div className="text-red-600 text-sm">Approved Training Provider</div>
+                <div className="text-brand-red-600 text-sm">Approved Training Provider</div>
               </div>
             </div>
 
@@ -160,7 +160,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <div className="font-bold text-slate-900">WorkOne</div>
-                <div className="text-red-600 text-sm">Workforce Partner</div>
+                <div className="text-brand-red-600 text-sm">Workforce Partner</div>
               </div>
             </div>
 
@@ -170,7 +170,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <div className="font-bold text-slate-900">Next Level Jobs</div>
-                <div className="text-red-600 text-sm">Workforce Ready Grant Provider</div>
+                <div className="text-brand-red-600 text-sm">Workforce Ready Grant Provider</div>
               </div>
             </div>
 
@@ -180,7 +180,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <div className="font-bold text-slate-900">WIOA</div>
-                <div className="text-red-600 text-sm">Eligible Training Provider</div>
+                <div className="text-brand-red-600 text-sm">Eligible Training Provider</div>
               </div>
             </div>
 
@@ -190,7 +190,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <div className="font-bold text-slate-900">JRI</div>
-                <div className="text-red-600 text-sm">Approved Provider</div>
+                <div className="text-brand-red-600 text-sm">Approved Provider</div>
               </div>
             </div>
 
@@ -200,7 +200,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <div className="font-bold text-slate-900">EmployIndy</div>
-                <div className="text-red-600 text-sm">Workforce Partner</div>
+                <div className="text-brand-red-600 text-sm">Workforce Partner</div>
               </div>
             </div>
 
@@ -210,7 +210,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <div className="font-bold text-slate-900">Indiana State Board</div>
-                <div className="text-red-600 text-sm">Cosmetology &amp; Barber Examiners</div>
+                <div className="text-brand-red-600 text-sm">Cosmetology &amp; Barber Examiners</div>
               </div>
             </div>
           </div>
@@ -243,7 +243,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="font-bold text-slate-900 text-base sm:text-lg">{member.name}</h3>
                 <p className="text-slate-600 text-sm mt-1 leading-snug">{member.title}</p>
-                <span className="inline-flex items-center gap-1 text-red-600 text-sm font-semibold mt-2 group-hover:gap-2 transition-all">
+                <span className="inline-flex items-center gap-1 text-brand-red-600 text-sm font-semibold mt-2 group-hover:gap-2 transition-all">
                   View Bio <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </Link>
@@ -260,30 +260,30 @@ export default function AboutPage() {
             <Link href="/store/guides/capital-readiness" className="bg-slate-50 rounded-xl p-6 shadow-sm hover:shadow-md transition border border-slate-200">
               <h3 className="font-semibold text-lg mb-2">Capital Readiness Guide</h3>
               <p className="text-slate-600 text-sm mb-3">Build institutional trust and funding readiness for workforce-aligned organizations.</p>
-              <span className="text-red-600 text-sm font-medium">Get the guide →</span>
+              <span className="text-brand-red-600 text-sm font-medium">Get the guide →</span>
             </Link>
             <Link href="/partner" className="bg-slate-50 rounded-xl p-6 shadow-sm hover:shadow-md transition border border-slate-200">
               <h3 className="font-semibold text-lg mb-2">Partner With Us</h3>
               <p className="text-slate-600 text-sm mb-3">Become a training provider, employer partner, or community organization.</p>
-              <span className="text-red-600 text-sm font-medium">Learn more →</span>
+              <span className="text-brand-red-600 text-sm font-medium">Learn more →</span>
             </Link>
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-20 bg-red-600">
+      <section className="py-16 sm:py-20 bg-brand-red-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Questions? Contact Us
           </h2>
-          <p className="text-red-100 text-lg mb-8">
+          <p className="text-brand-red-100 text-lg mb-8">
             Training may be free for eligible Indiana residents.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/programs"
-              className="inline-flex items-center bg-white text-red-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-red-50 transition"
+              className="inline-flex items-center bg-white text-brand-red-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-50 transition"
             >
               Explore Programs
             </Link>

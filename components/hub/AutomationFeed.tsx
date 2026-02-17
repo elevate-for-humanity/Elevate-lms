@@ -34,9 +34,9 @@ const eventIcons: Record<string, any> = {
 };
 
 const statusColors: Record<string, string> = {
-  success: 'bg-green-100 text-green-700',
+  success: 'bg-brand-green-100 text-brand-green-700',
   pending: 'bg-yellow-100 text-yellow-700',
-  failed: 'bg-red-100 text-red-700',
+  failed: 'bg-brand-red-100 text-brand-red-700',
 };
 
 export default function AutomationFeed({ limit = 20 }: { limit?: number }) {

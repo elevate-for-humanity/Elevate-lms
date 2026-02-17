@@ -28,7 +28,7 @@ export default function AnalyticsDashboard() {
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+      <div className="rounded-lg border border-brand-red-200 bg-brand-red-50 p-4">
         <p className="text-sm text-brand-orange-600">Failed to load analytics</p>
       </div>
     );
@@ -51,7 +51,7 @@ export default function AnalyticsDashboard() {
 
         <div className="rounded-lg border bg-white p-4 shadow-sm">
           <p className="text-sm text-slate-500 mb-1">Completions Today</p>
-          <p className="text-3xl font-semibold text-green-600">{data.completionsToday}</p>
+          <p className="text-3xl font-semibold text-brand-green-600">{data.completionsToday}</p>
           <p className="text-xs text-slate-400 mt-1">Since midnight</p>
         </div>
 

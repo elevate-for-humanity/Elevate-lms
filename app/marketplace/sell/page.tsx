@@ -201,13 +201,13 @@ export default async function SellOnMarketplacePage() {
         </div>
 
         {/* Revenue Split */}
-        <div className="bg-green-50 rounded-2xl p-8 mb-16">
+        <div className="bg-brand-green-50 rounded-2xl p-8 mb-16">
           <div className="max-w-2xl mx-auto text-center">
-            <DollarSign className="w-12 h-12 text-green-600 mx-auto mb-4" />
+            <DollarSign className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Competitive Revenue Share</h2>
             <div className="flex items-center justify-center gap-8 mb-6">
               <div>
-                <p className="text-5xl font-bold text-green-600">70%</p>
+                <p className="text-5xl font-bold text-brand-green-600">70%</p>
                 <p className="text-gray-600">You Keep</p>
               </div>
               <div className="text-4xl text-gray-300">/</div>

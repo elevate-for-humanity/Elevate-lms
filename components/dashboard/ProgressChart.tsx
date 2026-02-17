@@ -2,9 +2,9 @@
 
 export function ProgressChart() {
   const courses = [
-    { name: 'Barber', progress: 100, color: 'bg-green-500' },
+    { name: 'Barber', progress: 100, color: 'bg-brand-green-500' },
     { name: 'CNA', progress: 65, color: 'bg-brand-blue-500' },
-    { name: 'HVAC', progress: 23, color: 'bg-orange-500' },
+    { name: 'HVAC', progress: 23, color: 'bg-brand-orange-500' },
   ];
 
   return (
@@ -39,11 +39,11 @@ export function ProgressChart() {
             <div className="text-xs text-black">Active Courses</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-green-600">1</div>
+            <div className="text-2xl font-bold text-brand-green-600">1</div>
             <div className="text-xs text-black">Completed</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-orange-600">63%</div>
+            <div className="text-2xl font-bold text-brand-orange-600">63%</div>
             <div className="text-xs text-black">Avg Progress</div>
           </div>
         </div>

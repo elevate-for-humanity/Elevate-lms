@@ -107,7 +107,7 @@ export default async function AcademicIntegrityPage() {
 
           <div className="space-y-6">
             {/* Plagiarism */}
-            <div className="border-l-4 border-red-500 pl-6">
+            <div className="border-l-4 border-brand-red-500 pl-6">
               <h3 className="text-base sm:text-lg font-bold text-black mb-3 flex items-center gap-2">
                 <AlertTriangle className="w-6 h-6 text-brand-orange-600" />
                 Plagiarism
@@ -116,11 +116,11 @@ export default async function AcademicIntegrityPage() {
                 Using someone else's words, ideas, or work without proper
                 attribution.
               </p>
-              <div className="bg-red-50 rounded-lg p-4">
-                <p className="font-semibold text-red-900 mb-2">
+              <div className="bg-brand-red-50 rounded-lg p-4">
+                <p className="font-semibold text-brand-red-900 mb-2">
                   Examples of Plagiarism:
                 </p>
-                <ul className="space-y-2 text-red-800 text-sm">
+                <ul className="space-y-2 text-brand-red-800 text-sm">
                   <li>
                     • Copying text from websites, books, or articles without
                     citation
@@ -140,7 +140,7 @@ export default async function AcademicIntegrityPage() {
             </div>
 
             {/* Cheating */}
-            <div className="border-l-4 border-orange-500 pl-6">
+            <div className="border-l-4 border-brand-orange-500 pl-6">
               <h3 className="text-base sm:text-lg font-bold text-black mb-3 flex items-center gap-2">
                 <AlertTriangle className="w-6 h-6 text-brand-orange-600" />
                 Cheating
@@ -148,11 +148,11 @@ export default async function AcademicIntegrityPage() {
               <p className="text-black mb-3">
                 Using unauthorized materials or assistance during assessments.
               </p>
-              <div className="bg-orange-50 rounded-lg p-4">
-                <p className="font-semibold text-orange-900 mb-2">
+              <div className="bg-brand-orange-50 rounded-lg p-4">
+                <p className="font-semibold text-brand-orange-900 mb-2">
                   Examples of Cheating:
                 </p>
-                <ul className="space-y-2 text-orange-800 text-sm">
+                <ul className="space-y-2 text-brand-orange-800 text-sm">
                   <li>
                     • Using notes, books, or devices during closed-book exams
                   </li>
@@ -263,14 +263,14 @@ export default async function AcademicIntegrityPage() {
               </ul>
             </div>
 
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 sm:p-6">
-              <h3 className="font-bold text-orange-900 mb-2 flex items-center gap-2">
-                <span className="bg-orange-200 text-orange-900 px-3 py-2 rounded-full text-sm">
+            <div className="bg-brand-orange-50 border border-brand-orange-200 rounded-lg p-4 sm:p-6">
+              <h3 className="font-bold text-brand-orange-900 mb-2 flex items-center gap-2">
+                <span className="bg-brand-orange-200 text-brand-orange-900 px-3 py-2 rounded-full text-sm">
                   2nd Offense
                 </span>
                 Second Violation
               </h3>
-              <ul className="space-y-2 text-orange-800 text-sm ml-6">
+              <ul className="space-y-2 text-brand-orange-800 text-sm ml-6">
                 <li>• Failure (F) in the course</li>
                 <li>• Academic probation for one full term</li>
                 <li>• Meeting with Dean of Students</li>
@@ -282,14 +282,14 @@ export default async function AcademicIntegrityPage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 sm:p-6">
-              <h3 className="font-bold text-red-900 mb-2 flex items-center gap-2">
-                <span className="bg-red-200 text-red-900 px-3 py-2 rounded-full text-sm">
+            <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 sm:p-6">
+              <h3 className="font-bold text-brand-red-900 mb-2 flex items-center gap-2">
+                <span className="bg-brand-red-200 text-brand-red-900 px-3 py-2 rounded-full text-sm">
                   3rd Offense
                 </span>
                 Third Violation or Severe Cases
               </h3>
-              <ul className="space-y-2 text-red-800 text-sm ml-6">
+              <ul className="space-y-2 text-brand-red-800 text-sm ml-6">
                 <li>• Dismissal from the program</li>
                 <li>• Permanent notation on transcript</li>
                 <li>• No refund of tuition or fees</li>
@@ -316,12 +316,12 @@ export default async function AcademicIntegrityPage() {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-4 sm:p-6">
-            <div className="bg-green-50 rounded-lg p-4 sm:p-6">
-              <h3 className="font-bold text-green-900 mb-4 flex items-center gap-2">
+            <div className="bg-brand-green-50 rounded-lg p-4 sm:p-6">
+              <h3 className="font-bold text-brand-green-900 mb-4 flex items-center gap-2">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 Do's
               </h3>
-              <ul className="space-y-2 text-green-800 text-sm">
+              <ul className="space-y-2 text-brand-green-800 text-sm">
                 <li>• Always cite your sources properly</li>
                 <li>• Use quotation marks for direct quotes</li>
                 <li>• Ask instructors if collaboration is allowed</li>
@@ -335,12 +335,12 @@ export default async function AcademicIntegrityPage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 rounded-lg p-4 sm:p-6">
-              <h3 className="font-bold text-red-900 mb-4 flex items-center gap-2">
+            <div className="bg-brand-red-50 rounded-lg p-4 sm:p-6">
+              <h3 className="font-bold text-brand-red-900 mb-4 flex items-center gap-2">
                 <AlertTriangle className="w-6 h-6 text-brand-orange-600" />
                 Don'ts
               </h3>
-              <ul className="space-y-2 text-red-800 text-sm">
+              <ul className="space-y-2 text-brand-red-800 text-sm">
                 <li>✗ Don't copy from any source without citation</li>
                 <li>✗ Don't share your work with other students</li>
                 <li>✗ Don't use unauthorized materials during exams</li>

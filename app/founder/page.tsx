@@ -209,8 +209,8 @@ export default function FounderPage() {
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-brand-green-600" />
               </div>
               <h3 className="font-bold text-slate-900 mb-2">Holistic Support</h3>
               <p className="text-slate-600 text-sm">
@@ -227,8 +227,8 @@ export default function FounderPage() {
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <Briefcase className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center mb-4">
+                <Briefcase className="w-6 h-6 text-brand-orange-600" />
               </div>
               <h3 className="font-bold text-slate-900 mb-2">Systems Building</h3>
               <p className="text-slate-600 text-sm">
@@ -255,7 +255,7 @@ export default function FounderPage() {
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-3">{org.name}</h3>
                 <p className="text-slate-600 text-sm mb-4">{org.desc}</p>
-                <div className="flex items-center gap-2 text-green-600 text-sm font-semibold">
+                <div className="flex items-center gap-2 text-brand-green-600 text-sm font-semibold">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                   {org.status}
                 </div>
@@ -283,7 +283,7 @@ export default function FounderPage() {
             </Link>
             <Link
               href="/apply"
-              className="inline-flex items-center bg-orange-500 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-orange-600 transition"
+              className="inline-flex items-center bg-brand-orange-500 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-brand-orange-600 transition"
             >
               Apply Now <ArrowRight className="w-5 h-5 ml-2" />
             </Link>

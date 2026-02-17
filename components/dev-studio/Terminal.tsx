@@ -21,7 +21,7 @@ export default function Terminal({ output, onClear }: TerminalProps) {
   }, [output]);
 
   return (
-    <div className="h-full flex flex-col bg-black text-green-400 font-mono text-sm">
+    <div className="h-full flex flex-col bg-black text-brand-green-400 font-mono text-sm">
       {/* Terminal Header */}
       <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-700">
         <div className="flex items-center gap-2">

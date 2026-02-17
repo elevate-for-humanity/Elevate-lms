@@ -116,12 +116,12 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
           <p className="text-sm text-gray-500">Present</p>
         </div>
         <div className="bg-white rounded-lg p-4 border">
-          <XCircle className="w-6 h-6 text-red-500 mb-1" />
+          <XCircle className="w-6 h-6 text-brand-red-500 mb-1" />
           <p className="text-2xl font-bold">{absentCount}</p>
           <p className="text-sm text-gray-500">Absent</p>
         </div>
         <div className="bg-white rounded-lg p-4 border">
-          <Clock className="w-6 h-6 text-orange-500 mb-1" />
+          <Clock className="w-6 h-6 text-brand-orange-500 mb-1" />
           <p className="text-2xl font-bold">{markedCount}/{students.length}</p>
           <p className="text-sm text-gray-500">Marked</p>
         </div>
@@ -129,7 +129,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
 
       {message && (
         <div className={`mb-4 p-4 rounded-lg ${
-          message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+          message.type === 'success' ? 'bg-brand-green-50 text-brand-green-700 border border-brand-green-200' : 'bg-brand-red-50 text-brand-red-700 border border-brand-red-200'
         }`}>
           {message.text}
         </div>
@@ -154,7 +154,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
               Mark All Present
             </button>
             <button onClick={handleSave} disabled={isSaving}
-              className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50">
+              className="flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600 disabled:opacity-50">
               <Save className="w-4 h-4" />
               {isSaving ? 'Saving...' : 'Save Attendance'}
             </button>
@@ -186,8 +186,8 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
                       <button onClick={() => setStatus(student.id, 'present')}
                         className={`px-3 py-1.5 rounded text-sm ${
                           attendance[student.id] === 'present' 
-                            ? 'bg-green-500 text-white' 
-                            : 'bg-gray-100 hover:bg-green-100'
+                            ? 'bg-brand-green-500 text-white' 
+                            : 'bg-gray-100 hover:bg-brand-green-100'
                         }`}>
                         Present
                       </button>
@@ -202,8 +202,8 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
                       <button onClick={() => setStatus(student.id, 'absent')}
                         className={`px-3 py-1.5 rounded text-sm ${
                           attendance[student.id] === 'absent' 
-                            ? 'bg-red-500 text-white' 
-                            : 'bg-gray-100 hover:bg-red-100'
+                            ? 'bg-brand-red-500 text-white' 
+                            : 'bg-gray-100 hover:bg-brand-red-100'
                         }`}>
                         Absent
                       </button>

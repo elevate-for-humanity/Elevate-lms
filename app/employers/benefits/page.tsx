@@ -39,17 +39,17 @@ export default async function EmployerBenefitsPage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Employers", href: "/employers" }, { label: "Benefits" }]} />
       </div>
-<div className="bg-orange-600 text-white py-12">
+<div className="bg-brand-orange-600 text-white py-12">
         <div className="container mx-auto px-4">
           <Link
             href="/employers"
-            className="inline-flex items-center text-orange-100 hover:text-white mb-6"
+            className="inline-flex items-center text-brand-orange-100 hover:text-white mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Employers
           </Link>
           <h1 className="text-4xl font-bold mb-4">Employer Benefits</h1>
-          <p className="text-xl text-orange-100 max-w-3xl">
+          <p className="text-xl text-brand-orange-100 max-w-3xl">
             Discover why hundreds of employers trust Elevate for Humanity to
             help them build skilled, reliable workforces.
           </p>
@@ -110,19 +110,19 @@ export default async function EmployerBenefitsPage() {
             <h2 className="text-2xl font-bold mb-4">Success Metrics</h2>
             <div className="grid md:grid-cols-3 gap-6 text-center">
               <div>
-                <div className="text-4xl font-bold text-orange-600 mb-2">
+                <div className="text-4xl font-bold text-brand-orange-600 mb-2">
                   90%
                 </div>
                 <p className="text-black">Placement Success Rate</p>
               </div>
               <div>
-                <div className="text-4xl font-bold text-orange-600 mb-2">
+                <div className="text-4xl font-bold text-brand-orange-600 mb-2">
                   85%
                 </div>
                 <p className="text-black">1-Year Retention Rate</p>
               </div>
               <div>
-                <div className="text-4xl font-bold text-orange-600 mb-2">
+                <div className="text-4xl font-bold text-brand-orange-600 mb-2">
                   500+
                 </div>
                 <p className="text-black">Employer Partners</p>
@@ -130,7 +130,7 @@ export default async function EmployerBenefitsPage() {
             </div>
           </section>
 
-          <section className="bg-orange-50 border border-orange-200 rounded-lg p-8 text-center">
+          <section className="bg-brand-orange-50 border border-brand-orange-200 rounded-lg p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">
               Ready to Partner With Us?
             </h2>

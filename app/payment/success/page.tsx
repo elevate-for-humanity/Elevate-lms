@@ -45,9 +45,9 @@ export default async function PaymentSuccessPage() {
             been processed successfully.
           </p>
 
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
-            <h2 className="font-bold text-green-900 mb-2">What's Next?</h2>
-            <ul className="text-left text-green-800 space-y-2">
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6 mb-8">
+            <h2 className="font-bold text-brand-green-900 mb-2">What's Next?</h2>
+            <ul className="text-left text-brand-green-800 space-y-2">
               <li>
                 <span className="text-slate-400 flex-shrink-0">•</span> Check your
                 email for enrollment confirmation

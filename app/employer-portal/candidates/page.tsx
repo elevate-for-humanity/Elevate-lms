@@ -65,7 +65,7 @@ export default async function CandidatesPage() {
     <div className="min-h-screen bg-gray-50">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Candidates" }]} />
 {/* Hero */}
-      <section className="relative bg-green-800 text-white py-16">
+      <section className="relative bg-brand-green-800 text-white py-16">
         <div className="absolute inset-0">
           <Image
             src="/images/hub/employer.jpg"
@@ -76,11 +76,11 @@ export default async function CandidatesPage() {
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-4">
-            <Users className="w-8 h-8 text-green-200" />
-            <span className="text-green-200 font-medium">Candidate Pool</span>
+            <Users className="w-8 h-8 text-brand-green-200" />
+            <span className="text-brand-green-200 font-medium">Candidate Pool</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold mb-4">Find Qualified Candidates</h1>
-          <p className="text-green-100 text-lg max-w-2xl">
+          <p className="text-brand-green-100 text-lg max-w-2xl">
             Browse our pool of trained and certified candidates ready to join your team.
           </p>
         </div>
@@ -95,11 +95,11 @@ export default async function CandidatesPage() {
               <input
                 type="text"
                 placeholder="Search by name, skill, or location..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green-500"
               />
             </div>
             <div className="flex gap-3">
-              <select className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+              <select className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green-500">
                 <option>All Programs</option>
                 <option>CNA Training</option>
                 <option>Barber Apprenticeship</option>
@@ -117,7 +117,7 @@ export default async function CandidatesPage() {
               <button
                 key={index}
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-                  index === 0 ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  index === 0 ? 'bg-brand-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 {filter}
@@ -154,12 +154,12 @@ export default async function CandidatesPage() {
                           className="object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-green-500 flex items-center justify-center text-white text-xl font-bold">
+                        <div className="w-full h-full bg-brand-green-500 flex items-center justify-center text-white text-xl font-bold">
                           {candidate.name.charAt(0)}
                         </div>
                       )}
                       {candidate.available && (
-                        <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+                        <div className="absolute bottom-0 right-0 w-4 h-4 bg-brand-green-500 rounded-full border-2 border-white" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -200,7 +200,7 @@ export default async function CandidatesPage() {
                   <div className="mt-6 flex gap-3">
                     <Link
                       href={`/employer-portal/candidates/${candidate.id}`}
-                      className="flex-1 px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors text-center"
+                      className="flex-1 px-4 py-2 bg-brand-green-600 text-white font-medium rounded-lg hover:bg-brand-green-700 transition-colors text-center"
                     >
                       View Profile
                     </Link>

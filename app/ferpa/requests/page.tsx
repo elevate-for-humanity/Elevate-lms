@@ -55,9 +55,9 @@ const REQUEST_TYPE_LABELS: Record<string, string> = {
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock }> = {
   pending: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
   under_review: { label: 'Under Review', color: 'bg-brand-blue-100 text-brand-blue-800', icon: AlertCircle },
-  approved: { label: 'Approved', color: 'bg-green-100 text-green-800', icon: CheckCircle },
-  partially_approved: { label: 'Partially Approved', color: 'bg-orange-100 text-orange-800', icon: AlertCircle },
-  denied: { label: 'Denied', color: 'bg-red-100 text-red-800', icon: XCircle },
+  approved: { label: 'Approved', color: 'bg-brand-green-100 text-brand-green-800', icon: CheckCircle },
+  partially_approved: { label: 'Partially Approved', color: 'bg-brand-orange-100 text-brand-orange-800', icon: AlertCircle },
+  denied: { label: 'Denied', color: 'bg-brand-red-100 text-brand-red-800', icon: XCircle },
   completed: { label: 'Completed', color: 'bg-gray-100 text-gray-800', icon: CheckCircle },
   cancelled: { label: 'Cancelled', color: 'bg-gray-100 text-gray-500', icon: XCircle },
 };
@@ -181,8 +181,8 @@ export default async function FerpaRequestsPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                <XCircle className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
+                <XCircle className="w-5 h-5 text-brand-red-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{overdueCount}</p>
@@ -192,7 +192,7 @@ export default async function FerpaRequestsPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
@@ -225,9 +225,9 @@ export default async function FerpaRequestsPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4">
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          overdue ? 'bg-red-100' : 'bg-gray-100'
+                          overdue ? 'bg-brand-red-100' : 'bg-gray-100'
                         }`}>
-                          <FileText className={`w-5 h-5 ${overdue ? 'text-red-600' : 'text-gray-500'}`} />
+                          <FileText className={`w-5 h-5 ${overdue ? 'text-brand-red-600' : 'text-gray-500'}`} />
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
@@ -235,7 +235,7 @@ export default async function FerpaRequestsPage() {
                               {REQUEST_TYPE_LABELS[request.request_type] || request.request_type}
                             </h3>
                             {overdue && (
-                              <span className="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded">
+                              <span className="px-2 py-0.5 text-xs font-medium bg-brand-red-100 text-brand-red-700 rounded">
                                 OVERDUE
                               </span>
                             )}
@@ -252,7 +252,7 @@ export default async function FerpaRequestsPage() {
                           <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                             <span>Created: {formatDate(request.created_at)}</span>
                             {request.due_date && (
-                              <span className={overdue ? 'text-red-600 font-medium' : ''}>
+                              <span className={overdue ? 'text-brand-red-600 font-medium' : ''}>
                                 Due: {formatDate(request.due_date)}
                               </span>
                             )}

@@ -16,9 +16,9 @@ export const dynamic = 'force-dynamic';
 
 const categories = [
   { name: 'Enrollment', slug: 'Enrollment', color: 'bg-brand-blue-100 text-brand-blue-600' },
-  { name: 'Programs', slug: 'Programs', color: 'bg-green-100 text-green-600' },
+  { name: 'Programs', slug: 'Programs', color: 'bg-brand-green-100 text-brand-green-600' },
   { name: 'Financial Aid', slug: 'Financial Aid', color: 'bg-brand-blue-100 text-brand-blue-600' },
-  { name: 'Account', slug: 'Account', color: 'bg-orange-100 text-orange-600' },
+  { name: 'Account', slug: 'Account', color: 'bg-brand-orange-100 text-brand-orange-600' },
   { name: 'Career Services', slug: 'Career Services', color: 'bg-teal-100 text-teal-600' },
   { name: 'General', slug: 'General', color: 'bg-gray-100 text-gray-600' },
 ];

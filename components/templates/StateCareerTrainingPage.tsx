@@ -29,14 +29,14 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <div className="flex items-center gap-2 text-green-300 mb-4 justify-center">
+            <div className="flex items-center gap-2 text-brand-green-300 mb-4 justify-center">
               <MapPin className="w-5 h-5" />
               <span className="text-sm font-medium uppercase tracking-wider">Serving All of {state.name}</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{state.careerTraining.headline}</h1>
             <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">{state.careerTraining.description}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/programs" className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-lg font-bold transition-colors">
+              <Link href="/programs" className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-500 hover:bg-brand-orange-600 text-white rounded-lg text-lg font-bold transition-colors">
                 Explore Programs <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
               <Link href="/how-it-works" className="inline-flex items-center justify-center px-8 py-4 bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 rounded-lg text-lg font-bold transition-colors">
@@ -97,7 +97,7 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
               <Link
                 key={s.slug}
                 href={`/career-training-${s.slug}`}
-                className="p-4 bg-gray-50 rounded-lg hover:bg-green-50 transition-colors text-center"
+                className="p-4 bg-gray-50 rounded-lg hover:bg-brand-green-50 transition-colors text-center"
               >
                 <span className="font-medium text-gray-900">{s.name}</span>
               </Link>
@@ -107,17 +107,17 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-green-600">
+      <section className="py-16 bg-brand-green-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Start Your Career Journey?
           </h2>
-          <p className="text-green-100 mb-8">
+          <p className="text-brand-green-100 mb-8">
             Many programs are free for qualifying {state.demonym}. Check your eligibility today.
           </p>
           <Link
             href="/eligibility"
-            className="inline-flex items-center px-8 py-4 bg-white text-green-600 rounded-lg text-lg font-bold hover:bg-gray-100 transition-colors"
+            className="inline-flex items-center px-8 py-4 bg-white text-brand-green-600 rounded-lg text-lg font-bold hover:bg-gray-100 transition-colors"
           >
             Check Eligibility <ArrowRight className="ml-2 w-5 h-5" />
           </Link>

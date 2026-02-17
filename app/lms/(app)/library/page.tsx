@@ -112,11 +112,11 @@ export default async function LibraryPage() {
   const getFileColor = (type: string) => {
     switch (type) {
       case 'video':
-        return 'bg-red-100 text-red-600';
+        return 'bg-brand-red-100 text-brand-red-600';
       case 'document':
         return 'bg-brand-blue-100 text-brand-blue-600';
       case 'link':
-        return 'bg-green-100 text-green-600';
+        return 'bg-brand-green-100 text-brand-green-600';
       default:
         return 'bg-slate-100 text-slate-600';
     }

@@ -102,7 +102,7 @@ export default async function AdminMarketingPage() {
               <div>
                 <p className="text-sm text-gray-500">Total Leads</p>
                 <p className="text-3xl font-bold text-gray-900 mt-1">{totalLeads || 0}</p>
-                <p className="text-sm text-green-600 mt-1">+{newLeadsThisMonth || 0} this month</p>
+                <p className="text-sm text-brand-green-600 mt-1">+{newLeadsThisMonth || 0} this month</p>
               </div>
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                 <Users className="w-6 h-6 text-brand-blue-600" />
@@ -116,8 +116,8 @@ export default async function AdminMarketingPage() {
                 <p className="text-3xl font-bold text-gray-900 mt-1">{totalCampaigns}</p>
                 <p className="text-sm text-gray-500 mt-1">{activeCampaigns} active</p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Mail className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <Mail className="w-6 h-6 text-brand-green-600" />
               </div>
             </div>
           </div>
@@ -140,8 +140,8 @@ export default async function AdminMarketingPage() {
                 <p className="text-3xl font-bold text-gray-900 mt-1">{activeCampaigns}</p>
                 <p className="text-sm text-gray-500 mt-1">running now</p>
               </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-brand-orange-600" />
               </div>
             </div>
           </div>
@@ -176,7 +176,7 @@ export default async function AdminMarketingPage() {
                         </div>
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           campaign.status === 'active' 
-                            ? 'bg-green-100 text-green-800'
+                            ? 'bg-brand-green-100 text-brand-green-800'
                             : campaign.status === 'completed'
                             ? 'bg-gray-100 text-gray-800'
                             : 'bg-yellow-100 text-yellow-800'
@@ -212,8 +212,8 @@ export default async function AdminMarketingPage() {
                   href="/admin/leads"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Users className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                    <Users className="w-5 h-5 text-brand-green-600" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">View Leads</p>

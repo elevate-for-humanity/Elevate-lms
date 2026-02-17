@@ -286,11 +286,11 @@ export default function DiscussionForums() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Error Message */}
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center justify-between">
+            <div className="mb-4 bg-brand-red-50 border border-brand-red-200 text-brand-red-800 px-4 py-3 rounded-lg flex items-center justify-between">
               <span>{error}</span>
               <button
                 onClick={() => setError(null)}
-                className="text-red-600 hover:text-red-800"
+                className="text-brand-red-600 hover:text-brand-red-800"
               >
                 ×
               </button>
@@ -299,11 +299,11 @@ export default function DiscussionForums() {
 
           {/* Success Message */}
           {successMessage && (
-            <div className="mb-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center justify-between">
+            <div className="mb-4 bg-brand-green-50 border border-brand-green-200 text-brand-green-800 px-4 py-3 rounded-lg flex items-center justify-between">
               <span>{successMessage}</span>
               <button
                 onClick={() => setSuccessMessage(null)}
-                className="text-green-600 hover:text-green-800"
+                className="text-brand-green-600 hover:text-brand-green-800"
               >
                 ×
               </button>

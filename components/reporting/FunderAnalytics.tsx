@@ -38,9 +38,9 @@ const funderDescriptions: Record<string, string> = {
 
 const funderColors: Record<string, string> = {
   WIOA: 'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-300',
-  WRG: 'bg-green-100 text-green-800 border-green-300',
+  WRG: 'bg-brand-green-100 text-brand-green-800 border-brand-green-300',
   JRI: 'bg-purple-100 text-purple-800 border-purple-300',
-  SEAL: 'bg-orange-100 text-orange-800 border-orange-300',
+  SEAL: 'bg-brand-orange-100 text-brand-orange-800 border-brand-orange-300',
   Apprenticeship: 'bg-indigo-100 text-indigo-800 border-indigo-300',
   Other: 'bg-gray-100 text-black border-gray-300',
 };

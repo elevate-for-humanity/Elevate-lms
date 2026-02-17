@@ -138,7 +138,7 @@ export default async function AccountPage() {
           <form action="/api/auth/signout" method="POST">
             <button
               type="submit"
-              className="flex items-center gap-2 text-red-600 hover:text-red-700 font-medium"
+              className="flex items-center gap-2 text-brand-red-600 hover:text-brand-red-700 font-medium"
             >
               <LogOut className="w-5 h-5" />
               Sign Out

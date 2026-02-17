@@ -203,7 +203,7 @@ export default async function DrugTestingTrainingPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <GraduationCap className="w-8 h-8 text-brand-orange-600" />
               </div>
               <h3 className="font-bold mb-2">Self-Paced</h3>

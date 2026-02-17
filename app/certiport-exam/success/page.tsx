@@ -24,7 +24,7 @@ function SuccessContent() {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4">
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
 
@@ -33,7 +33,7 @@ function SuccessContent() {
           </h1>
 
           {examName && (
-            <p className="text-blue-600 font-semibold mb-4">{examName}</p>
+            <p className="text-brand-blue-600 font-semibold mb-4">{examName}</p>
           )}
 
           <p className="text-slate-600 mb-8">
@@ -51,18 +51,18 @@ function SuccessContent() {
                 { icon: MapPin, text: 'Schedule your exam at the Elevate testing center' },
               ].map((step, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <step.icon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <step.icon className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-slate-700">{step.text}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left mb-6">
-            <h3 className="font-semibold text-blue-900 flex items-center gap-2 mb-2">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-4 text-left mb-6">
+            <h3 className="font-semibold text-brand-blue-900 flex items-center gap-2 mb-2">
               <MapPin className="w-4 h-4" /> Testing Center
             </h3>
-            <p className="text-blue-800 text-sm">
+            <p className="text-brand-blue-800 text-sm">
               Elevate for Humanity Career & Technical Institute<br />
               7009 E 56th St, Suite F<br />
               Indianapolis, IN 46226
@@ -71,7 +71,7 @@ function SuccessContent() {
 
           <Link
             href="/certiport-exam"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+            className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 font-medium"
           >
             Check Voucher Status
             <ArrowRight className="w-4 h-4" />

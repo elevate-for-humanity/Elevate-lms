@@ -73,19 +73,19 @@ export function ElevateChatWidget() {
               </p>
               <ul className="text-xs text-black space-y-2 mb-4">
                 <li className="flex items-start gap-2">
-                  <span className="text-orange-500">•</span>
+                  <span className="text-brand-orange-500">•</span>
                   <span>Finding 100% FREE training programs</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-orange-500">•</span>
+                  <span className="text-brand-orange-500">•</span>
                   <span>Checking your funding eligibility (WIOA, WRG)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-orange-500">•</span>
+                  <span className="text-brand-orange-500">•</span>
                   <span>Starting your application</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-orange-500">•</span>
+                  <span className="text-brand-orange-500">•</span>
                   <span>Answering questions about programs</span>
                 </li>
               </ul>
@@ -112,7 +112,7 @@ export function ElevateChatWidget() {
         >
           <MessageCircle size={28} className="group-hover:scale-110 transition-transform" />
           {!hasInteracted && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full animate-pulse" />
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-orange-500 rounded-full animate-pulse" />
           )}
         </button>
       )}

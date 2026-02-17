@@ -38,7 +38,7 @@ export default function StudentEngagementAnalytics() {
       <div className="   text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">Student Engagement Analytics</h1>
-          <p className="text-red-100">Monitor and improve student participation</p>
+          <p className="text-brand-red-100">Monitor and improve student participation</p>
         </div>
       </div>
 
@@ -60,13 +60,13 @@ export default function StudentEngagementAnalytics() {
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Active Students</h3>
             <p className="text-3xl font-bold text-brand-orange-600">{metrics.activeStudents.toLocaleString()}</p>
-            <p className="text-sm text-green-600">↑ 8% from last period</p>
+            <p className="text-sm text-brand-green-600">↑ 8% from last period</p>
           </Card>
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Engagement Rate</h3>
-            <p className="text-3xl font-bold text-orange-500">{metrics.engagementRate}%</p>
-            <p className="text-sm text-green-600">↑ 3% improvement</p>
+            <p className="text-3xl font-bold text-brand-orange-500">{metrics.engagementRate}%</p>
+            <p className="text-sm text-brand-green-600">↑ 3% improvement</p>
           </Card>
 
           <Card className="p-6">
@@ -77,8 +77,8 @@ export default function StudentEngagementAnalytics() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Completion Rate</h3>
-            <p className="text-3xl font-bold text-green-600">{metrics.completionRate}%</p>
-            <p className="text-sm text-green-600">Above target</p>
+            <p className="text-3xl font-bold text-brand-green-600">{metrics.completionRate}%</p>
+            <p className="text-sm text-brand-green-600">Above target</p>
           </Card>
 
           <Card className="p-6 bg-yellow-50">
@@ -87,10 +87,10 @@ export default function StudentEngagementAnalytics() {
             <p className="text-sm text-yellow-700">Need intervention</p>
           </Card>
 
-          <Card className="p-6 bg-green-50">
+          <Card className="p-6 bg-brand-green-50">
             <h3 className="text-sm text-black mb-2">High Performers</h3>
-            <p className="text-3xl font-bold text-green-600">{metrics.highPerformers}</p>
-            <p className="text-sm text-green-700">Top 10%</p>
+            <p className="text-3xl font-bold text-brand-green-600">{metrics.highPerformers}</p>
+            <p className="text-sm text-brand-green-700">Top 10%</p>
           </Card>
         </div>
 

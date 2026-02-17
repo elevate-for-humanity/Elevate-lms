@@ -223,7 +223,7 @@ export function SponsorshipAcknowledgment({
             disabled={saving}
             className={`w-full text-left p-4 rounded-lg border-2 transition-all disabled:opacity-50 ${
               acknowledgments[item.key]
-                ? 'border-green-500 bg-green-50'
+                ? 'border-brand-green-500 bg-brand-green-50'
                 : 'border-slate-300 bg-white hover:border-slate-400'
             }`}
           >
@@ -235,11 +235,11 @@ export function SponsorshipAcknowledgment({
               )}
               <div className="flex-1 min-w-0">
                 <div className={`font-medium mb-1 flex items-center gap-2 ${
-                  acknowledgments[item.key] ? 'text-green-900' : 'text-gray-900'
+                  acknowledgments[item.key] ? 'text-brand-green-900' : 'text-gray-900'
                 }`}>
                   {item.label}
                   {item.required && (
-                    <span className="text-xs text-red-500">*</span>
+                    <span className="text-xs text-brand-red-500">*</span>
                   )}
                 </div>
                 <div className="text-sm text-gray-600">{item.description}</div>
@@ -264,9 +264,9 @@ export function SponsorshipAcknowledgment({
       )}
 
       {allRequiredAcknowledged && (
-        <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <div className="flex items-start gap-3 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg">
           <span className="text-slate-400 flex-shrink-0">•</span>
-          <div className="flex-1 text-sm text-green-800">
+          <div className="flex-1 text-sm text-brand-green-800">
             <strong>All acknowledgments complete.</strong> You may now proceed
             to digital signature.
           </div>

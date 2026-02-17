@@ -188,7 +188,7 @@ export default async function IndustriesPage() {
                           key={program}
                           className="text-sm text-black flex items-center gap-2"
                         >
-                          <span className="text-green-600">•</span>
+                          <span className="text-brand-green-600">•</span>
                           {program}
                         </li>
                       ))}
@@ -218,7 +218,7 @@ export default async function IndustriesPage() {
           </p>
           <Link
             href="/apply"
-            className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl text-lg font-bold transition-colors"
+            className="inline-flex items-center gap-2 bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-xl text-lg font-bold transition-colors"
           >
             Apply Now - It's Free
             <ArrowRight className="h-5 w-5" />

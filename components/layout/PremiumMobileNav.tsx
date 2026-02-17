@@ -82,7 +82,7 @@ export function PremiumMobileNav() {
                       className={clsx(
                         'flex items-center gap-3 py-3 px-4 rounded-lg text-sm font-medium transition touch-manipulation',
                         isActive
-                          ? 'bg-orange-50 text-brand-orange-600'
+                          ? 'bg-brand-orange-50 text-brand-orange-600'
                           : 'text-black hover:bg-slate-50'
                       )}
                     >

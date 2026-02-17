@@ -190,8 +190,8 @@ export default function OrgInvitesPage() {
       </div>
 
       {error && (
-        <div className="mt-4 rounded-md bg-red-50 p-4">
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="mt-4 rounded-md bg-brand-red-50 p-4">
+          <p className="text-sm text-brand-red-800">{error}</p>
         </div>
       )}
 
@@ -315,9 +315,9 @@ export default function OrgInvitesPage() {
                           <span
                             className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
                               invite.status === 'accepted'
-                                ? 'bg-brand-green-100 text-green-800'
+                                ? 'bg-brand-green-100 text-brand-green-800'
                                 : invite.status === 'expired'
-                                  ? 'bg-red-100 text-red-800'
+                                  ? 'bg-brand-red-100 text-brand-red-800'
                                   : 'bg-yellow-100 text-yellow-800'
                             }`}
                           >
@@ -341,7 +341,7 @@ export default function OrgInvitesPage() {
                               </button>
                               <button
                                 onClick={() => revokeInvite(invite.id)}
-                                className="text-brand-orange-600 hover:text-red-900"
+                                className="text-brand-orange-600 hover:text-brand-red-900"
                               >
                                 Revoke
                               </button>

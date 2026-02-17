@@ -82,7 +82,7 @@ export default async function ManageCoursesPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className={`px-2 py-1 rounded-full text-xs ${course.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>
+                    <span className={`px-2 py-1 rounded-full text-xs ${course.status === 'published' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-gray-100 text-gray-600'}`}>
                       {course.status || 'draft'}
                     </span>
                     <Link href={`/admin/courses/${course.id}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">Edit</Link>

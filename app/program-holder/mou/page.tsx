@@ -30,7 +30,7 @@ export default async function ProgramHolderMOUPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold">Agreement Status</h2>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${mou.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>{mou.status || 'Pending'}</span>
+              <span className={`px-3 py-1 rounded-full text-sm font-medium ${mou.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-yellow-100 text-yellow-800'}`}>{mou.status || 'Pending'}</span>
             </div>
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div><p className="text-sm text-gray-500">Effective Date</p><p className="font-medium">{mou.effective_date ? new Date(mou.effective_date).toLocaleDateString() : 'N/A'}</p></div>

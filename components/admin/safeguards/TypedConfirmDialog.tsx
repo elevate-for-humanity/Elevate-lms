@@ -55,7 +55,7 @@ export function TypedConfirmDialog({
         type="button"
         onClick={() => setOpen(true)}
         className={`rounded-lg border px-3 py-2 text-sm font-semibold ${
-          isDanger ? "border-red-200 text-red-800 hover:border-red-300" : "border-gray-200 text-gray-900 hover:border-gray-300"
+          isDanger ? "border-brand-red-200 text-brand-red-800 hover:border-brand-red-300" : "border-gray-200 text-gray-900 hover:border-gray-300"
         }`}
       >
         {confirmButtonText}
@@ -106,7 +106,7 @@ export function TypedConfirmDialog({
                   onClick={run}
                   disabled={!canConfirm || busy}
                   className={`rounded-lg px-3 py-2 text-sm font-semibold text-white ${
-                    !canConfirm || busy ? "bg-gray-400" : isDanger ? "bg-red-700 hover:bg-red-800" : "bg-gray-900 hover:bg-black"
+                    !canConfirm || busy ? "bg-gray-400" : isDanger ? "bg-brand-red-700 hover:bg-brand-red-800" : "bg-gray-900 hover:bg-black"
                   }`}
                 >
                   {busy ? "Working…" : "Confirm"}

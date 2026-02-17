@@ -37,7 +37,7 @@ export default function DemoApprenticeshipsPage() {
                 </div>
               </div>
               <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                <div className="h-full bg-brand-green-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
               </div>
             </div>
           );

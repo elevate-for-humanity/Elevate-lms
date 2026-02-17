@@ -187,9 +187,9 @@ export default async function TaxFilingApplicationsPage() {
                         <span
                           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             item.status === 'completed'
-                              ? 'bg-brand-green-100 text-green-800'
+                              ? 'bg-brand-green-100 text-brand-green-800'
                               : item.status === 'pending'
-                                ? 'bg-orange-100 text-orange-800'
+                                ? 'bg-brand-orange-100 text-brand-orange-800'
                                 : 'bg-brand-blue-100 text-brand-blue-800'
                           }`}
                         >

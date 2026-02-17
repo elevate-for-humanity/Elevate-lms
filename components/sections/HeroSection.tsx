@@ -19,9 +19,9 @@ interface HeroSectionProps {
 }
 
 const badgeColors = {
-  green: 'bg-green-500',
+  green: 'bg-brand-green-500',
   blue: 'bg-brand-blue-500',
-  orange: 'bg-orange-500',
+  orange: 'bg-brand-orange-500',
   purple: 'bg-purple-500',
 };
 
@@ -59,7 +59,7 @@ export function HeroSection({
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href={primaryCTA.href}
-            className="px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition-all text-center"
+            className="px-8 py-4 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold rounded-lg transition-all text-center"
           >
             {primaryCTA.text}
           </Link>

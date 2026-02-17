@@ -103,7 +103,7 @@ export function StateAwareDashboard({
                 key={index}
                 className={`rounded-lg p-4 flex items-start gap-4 ${
                   alert.type === 'error'
-                    ? 'bg-red-50 border-2 border-red-600'
+                    ? 'bg-brand-red-50 border-2 border-brand-red-600'
                     : alert.type === 'warning'
                       ? 'bg-yellow-50 border-2 border-yellow-600'
                       : 'bg-brand-blue-50 border-2 border-brand-blue-600'
@@ -112,7 +112,7 @@ export function StateAwareDashboard({
                 <AlertCircle
                   className={`h-10 w-10 flex-shrink-0 mt-0.5 ${
                     alert.type === 'error'
-                      ? 'text-red-600'
+                      ? 'text-brand-red-600'
                       : alert.type === 'warning'
                         ? 'text-yellow-600'
                         : 'text-brand-blue-600'
@@ -122,7 +122,7 @@ export function StateAwareDashboard({
                   <p
                     className={`font-semibold ${
                       alert.type === 'error'
-                        ? 'text-red-900'
+                        ? 'text-brand-red-900'
                         : alert.type === 'warning'
                           ? 'text-yellow-900'
                           : 'text-brand-blue-900'
@@ -136,7 +136,7 @@ export function StateAwareDashboard({
                     href={alert.actionHref}
                     className={`flex-shrink-0 px-4 py-2 rounded-lg font-semibold transition ${
                       alert.type === 'error'
-                        ? 'bg-red-600 text-white hover:bg-red-700'
+                        ? 'bg-brand-red-600 text-white hover:bg-brand-red-700'
                         : alert.type === 'warning'
                           ? 'bg-yellow-600 text-white hover:bg-yellow-700'
                           : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
@@ -245,7 +245,7 @@ export function ProgressIndicator({ steps }: ProgressIndicatorProps) {
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
                 step.status === 'completed'
-                  ? 'bg-green-600 text-white'
+                  ? 'bg-brand-green-600 text-white'
                   : step.status === 'current'
                     ? 'bg-brand-blue-600 text-white'
                     : 'bg-slate-200 text-slate-500'
@@ -263,7 +263,7 @@ export function ProgressIndicator({ steps }: ProgressIndicatorProps) {
               <div
                 className={`font-semibold ${
                   step.status === 'completed'
-                    ? 'text-green-900'
+                    ? 'text-brand-green-900'
                     : step.status === 'current'
                       ? 'text-brand-blue-900'
                       : 'text-slate-500'

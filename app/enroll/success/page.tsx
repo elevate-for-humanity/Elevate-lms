@@ -89,7 +89,7 @@ export default async function EnrollSuccessPage() {
       <div className="max-w-2xl w-full">
         {/* Success Icon */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-green-600 rounded-full mb-6 animate-bounce">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-600 rounded-full mb-6 animate-bounce">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-4xl font-bold text-black mb-4">
@@ -149,7 +149,7 @@ export default async function EnrollSuccessPage() {
         <div className="mb-6">
           <Link
             href="/student-portal/onboarding"
-            className="block w-full bg-green-600 text-white px-6 py-4 rounded-lg font-bold text-center text-lg hover:bg-green-700 transition"
+            className="block w-full bg-brand-green-600 text-white px-6 py-4 rounded-lg font-bold text-center text-lg hover:bg-brand-green-700 transition"
           >
             <ArrowRight className="w-5 h-5 inline-block mr-2" />
             Start Onboarding Now
@@ -157,12 +157,12 @@ export default async function EnrollSuccessPage() {
         </div>
 
         {/* Email Confirmation Notice */}
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+        <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4 mb-6">
           <div className="flex items-start gap-3">
-            <Mail className="w-5 h-5 text-green-600 mt-0.5" />
+            <Mail className="w-5 h-5 text-brand-green-600 mt-0.5" />
             <div>
-              <p className="font-medium text-green-900">Check Your Email</p>
-              <p className="text-sm text-green-700">
+              <p className="font-medium text-brand-green-900">Check Your Email</p>
+              <p className="text-sm text-brand-green-700">
                 We&apos;ve sent a welcome letter to your email with important information about your program, 
                 next steps, and how to get started.
               </p>

@@ -13,7 +13,7 @@ export function SuccessStrip({ stories }: SuccessStripProps) {
       <div className="mx-auto max-w-6xl px-3 py-5 text-white md:px-4">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-orange-400">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-orange-400">
               Real People, Real Outcomes
             </p>
             <h2 className="text-base font-bold md:text-lg">
@@ -43,7 +43,7 @@ export function SuccessStrip({ stories }: SuccessStripProps) {
               </div>
               <div className="flex flex-1 flex-col px-3 py-2 text-[11px]">
                 <p className="font-semibold text-slate-100">{story.name}</p>
-                <p className="mt-0.5 text-[11px] text-green-300">
+                <p className="mt-0.5 text-[11px] text-brand-green-300">
                   {story.outcome}
                 </p>
                 <p className="mt-1 text-[11px] text-slate-300">

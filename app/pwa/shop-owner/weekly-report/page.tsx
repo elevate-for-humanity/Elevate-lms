@@ -81,9 +81,9 @@ export default function ShopWeeklyReportPage() {
   if (!report) return null;
 
   const statusConfig = {
-    compliant: { bg: 'bg-green-500/20', border: 'border-green-500/30', text: 'text-green-400', label: 'Compliant' },
+    compliant: { bg: 'bg-brand-green-500/20', border: 'border-brand-green-500/30', text: 'text-brand-green-400', label: 'Compliant' },
     warning: { bg: 'bg-amber-500/20', border: 'border-amber-500/30', text: 'text-amber-400', label: 'Warning' },
-    'non-compliant': { bg: 'bg-red-500/20', border: 'border-red-500/30', text: 'text-red-400', label: 'Non-Compliant' },
+    'non-compliant': { bg: 'bg-brand-red-500/20', border: 'border-brand-red-500/30', text: 'text-brand-red-400', label: 'Non-Compliant' },
   };
 
   const status = statusConfig[report.complianceStatus];
@@ -154,7 +154,7 @@ export default function ShopWeeklyReportPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <div className="w-3 h-3 rounded-full bg-brand-green-500" />
                 <span className="text-slate-300">Approved</span>
               </div>
               <span className="text-white font-medium">{report.totalApproved} hrs</span>
@@ -175,7 +175,7 @@ export default function ShopWeeklyReportPage() {
           {/* Visual Bar */}
           <div className="mt-4 h-4 bg-slate-700 rounded-full overflow-hidden flex">
             <div 
-              className="bg-green-500 h-full"
+              className="bg-brand-green-500 h-full"
               style={{ width: `${(report.totalApproved / report.totalHours) * 100}%` }}
             />
             <div 
@@ -224,7 +224,7 @@ export default function ShopWeeklyReportPage() {
                   <div className="px-4 pb-4 bg-slate-700/30">
                     <div className="grid grid-cols-2 gap-3 mb-3">
                       <div className="bg-slate-800 rounded-lg p-3 text-center">
-                        <p className="text-green-400 font-bold">{apprentice.hoursApproved}</p>
+                        <p className="text-brand-green-400 font-bold">{apprentice.hoursApproved}</p>
                         <p className="text-slate-500 text-xs">Approved</p>
                       </div>
                       <div className="bg-slate-800 rounded-lg p-3 text-center">

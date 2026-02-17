@@ -275,7 +275,7 @@ export default function AdminImportPage() {
             <div className="flex flex-wrap gap-2 mb-6">
               <span className="text-sm text-gray-500">Required fields:</span>
               {activeTabData.requiredFields.map(field => (
-                <span key={field} className="px-2 py-1 bg-red-50 text-red-700 text-xs font-medium rounded">
+                <span key={field} className="px-2 py-1 bg-brand-red-50 text-brand-red-700 text-xs font-medium rounded">
                   {field}
                 </span>
               ))}
@@ -324,7 +324,7 @@ export default function AdminImportPage() {
                 {/* File Info */}
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <FileText className="w-8 h-8 text-green-600" />
+                    <FileText className="w-8 h-8 text-brand-green-600" />
                     <div>
                       <p className="font-medium text-gray-900">{file.name}</p>
                       <p className="text-sm text-gray-500">
@@ -342,12 +342,12 @@ export default function AdminImportPage() {
 
                 {/* Errors */}
                 {preview?.errors && preview.errors.length > 0 && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg">
                     <div className="flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                      <AlertCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-medium text-red-800">Validation Errors</p>
-                        <ul className="mt-1 text-sm text-red-700 list-disc list-inside">
+                        <p className="font-medium text-brand-red-800">Validation Errors</p>
+                        <ul className="mt-1 text-sm text-brand-red-700 list-disc list-inside">
                           {preview.errors.map((error, idx) => (
                             <li key={idx}>{error}</li>
                           ))}
@@ -398,7 +398,7 @@ export default function AdminImportPage() {
                                 >
                                   {header}
                                   {activeTabData.requiredFields.includes(header) && (
-                                    <span className="text-red-500 ml-1">*</span>
+                                    <span className="text-brand-red-500 ml-1">*</span>
                                   )}
                                 </th>
                               ))}
@@ -454,7 +454,7 @@ export default function AdminImportPage() {
             {importResult && (
               <div className="space-y-6">
                 <div className={`p-6 rounded-xl ${
-                  importResult.failed === 0 ? 'bg-green-50' : 'bg-yellow-50'
+                  importResult.failed === 0 ? 'bg-brand-green-50' : 'bg-yellow-50'
                 }`}>
                   <div className="flex items-start gap-4">
                     {importResult.failed === 0 ? (
@@ -464,24 +464,24 @@ export default function AdminImportPage() {
                     )}
                     <div>
                       <h3 className={`text-lg font-bold ${
-                        importResult.failed === 0 ? 'text-green-800' : 'text-yellow-800'
+                        importResult.failed === 0 ? 'text-brand-green-800' : 'text-yellow-800'
                       }`}>
                         Import Complete
                       </h3>
                       <div className="mt-2 flex gap-6">
                         <div>
-                          <span className="text-2xl font-bold text-green-600">{importResult.success}</span>
+                          <span className="text-2xl font-bold text-brand-green-600">{importResult.success}</span>
                           <span className="text-gray-600 ml-2">records imported</span>
                         </div>
                         {importResult.failed > 0 && (
                           <div>
-                            <span className="text-2xl font-bold text-red-600">{importResult.failed}</span>
+                            <span className="text-2xl font-bold text-brand-red-600">{importResult.failed}</span>
                             <span className="text-gray-600 ml-2">failed</span>
                           </div>
                         )}
                       </div>
                       {importResult.errors.length > 0 && (
-                        <ul className="mt-4 text-sm text-red-700 list-disc list-inside">
+                        <ul className="mt-4 text-sm text-brand-red-700 list-disc list-inside">
                           {importResult.errors.slice(0, 5).map((error, idx) => (
                             <li key={idx}>{error}</li>
                           ))}

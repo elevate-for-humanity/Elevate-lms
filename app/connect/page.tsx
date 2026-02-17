@@ -301,7 +301,7 @@ export default function ConnectPage() {
         {step === 'setup' && integration && (
           <div className="space-y-8">
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 rounded-full text-sm font-medium mb-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-500/20 text-brand-green-400 rounded-full text-sm font-medium mb-4">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 Integration Ready!
               </div>
@@ -327,7 +327,7 @@ export default function ConnectPage() {
                       onClick={() => copyToClipboard(integration.siteId, 'siteId')}
                       className="px-3 bg-white/10 rounded-r-lg hover:bg-white/20"
                     >
-                      {copied === 'siteId' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
+                      {copied === 'siteId' ? <Check className="w-4 h-4 text-brand-green-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
                     </button>
                   </div>
                 </div>
@@ -341,7 +341,7 @@ export default function ConnectPage() {
                       onClick={() => copyToClipboard(integration.apiKey, 'apiKey')}
                       className="px-3 bg-white/10 rounded-r-lg hover:bg-white/20"
                     >
-                      {copied === 'apiKey' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
+                      {copied === 'apiKey' ? <Check className="w-4 h-4 text-brand-green-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
                     </button>
                   </div>
                 </div>
@@ -359,12 +359,12 @@ export default function ConnectPage() {
                   onClick={() => copyToClipboard(integration.embedScript, 'embed')}
                   className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-lg text-sm text-slate-300 hover:bg-white/20"
                 >
-                  {copied === 'embed' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                  {copied === 'embed' ? <Check className="w-4 h-4 text-brand-green-400" /> : <Copy className="w-4 h-4" />}
                   Copy
                 </button>
               </div>
               <pre className="bg-slate-700 rounded-lg p-4 overflow-x-auto">
-                <code className="text-green-400 text-sm font-mono whitespace-pre">
+                <code className="text-brand-green-400 text-sm font-mono whitespace-pre">
                   {integration.embedScript}
                 </code>
               </pre>
@@ -396,7 +396,7 @@ export default function ConnectPage() {
                         onClick={() => copyToClipboard(comp.embedCode, `comp-${idx}`)}
                         className="text-slate-400 hover:text-white"
                       >
-                        {copied === `comp-${idx}` ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                        {copied === `comp-${idx}` ? <Check className="w-4 h-4 text-brand-green-400" /> : <Copy className="w-4 h-4" />}
                       </button>
                     </div>
                     <p className="text-slate-400 text-sm mb-2">{comp.description}</p>
@@ -444,7 +444,7 @@ export default function ConnectPage() {
                   href="/store"
                   className="flex items-center gap-3 p-4 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
                 >
-                  <CreditCard className="w-8 h-8 text-green-400" />
+                  <CreditCard className="w-8 h-8 text-brand-green-400" />
                   <div>
                     <p className="text-white font-medium">Upgrade Plan</p>
                     <p className="text-slate-400 text-sm">Unlock all features</p>

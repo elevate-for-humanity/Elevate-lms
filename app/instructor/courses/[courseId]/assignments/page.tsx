@@ -119,7 +119,7 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
                           {assignment.title}
                         </h2>
                         {needsGrading > 0 && (
-                          <span className="bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-1 rounded-full">
+                          <span className="bg-brand-orange-100 text-brand-orange-700 text-xs font-semibold px-2 py-1 rounded-full">
                             {needsGrading} to grade
                           </span>
                         )}
@@ -145,7 +145,7 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
                           {totalGraded} graded
                         </span>
                         {assignment.due_date && (
-                          <span className={`flex items-center gap-1 ${isPastDue ? 'text-red-500' : ''}`}>
+                          <span className={`flex items-center gap-1 ${isPastDue ? 'text-brand-red-500' : ''}`}>
                             <Clock className="w-4 h-4" />
                             Due {new Date(assignment.due_date).toLocaleDateString()}
                           </span>
@@ -155,7 +155,7 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
 
                     <Link
                       href={`/instructor/courses/${courseId}/assignments/${assignment.id}/grade`}
-                      className="flex items-center gap-2 bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 text-sm font-medium whitespace-nowrap"
+                      className="flex items-center gap-2 bg-brand-orange-600 text-white px-4 py-2 rounded-lg hover:bg-brand-orange-700 text-sm font-medium whitespace-nowrap"
                     >
                       SpeedGrader
                       <ChevronRight className="w-4 h-4" />

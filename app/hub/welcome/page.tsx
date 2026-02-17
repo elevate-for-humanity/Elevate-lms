@@ -110,7 +110,7 @@ export default async function HubWelcomePage() {
               Track your enrollment, monitor progress, connect with peers, and see exactly what the system is doing to help you succeed. The Hub is your personalized dashboard for career success.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/login?redirect=/hub" className="inline-flex items-center gap-2 px-8 py-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors text-lg">
+              <Link href="/login?redirect=/hub" className="inline-flex items-center gap-2 px-8 py-4 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 transition-colors text-lg">
                 Sign In to Your Hub
                 <ArrowRight className="w-5 h-5" />
               </Link>
@@ -200,7 +200,7 @@ export default async function HubWelcomePage() {
                 </div>
                 <div className="p-5">
                   <p className="text-slate-600 text-sm">{page.description}</p>
-                  <div className="mt-4 flex items-center text-green-600 font-medium text-sm group-hover:text-green-700">
+                  <div className="mt-4 flex items-center text-brand-green-600 font-medium text-sm group-hover:text-brand-green-700">
                     Explore
                     <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -236,7 +236,7 @@ export default async function HubWelcomePage() {
                   <p className="text-slate-300 mb-4 italic">"{story.quote}"</p>
                   <div>
                     <p className="font-semibold text-white">{story.name}</p>
-                    <p className="text-sm text-green-400">{story.program}</p>
+                    <p className="text-sm text-brand-green-400">{story.program}</p>
                   </div>
                 </div>
               </div>
@@ -254,7 +254,7 @@ export default async function HubWelcomePage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="relative">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold">1</div>
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold">1</div>
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
@@ -270,7 +270,7 @@ export default async function HubWelcomePage() {
             </div>
 
             <div className="relative">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold">2</div>
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold">2</div>
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
@@ -286,7 +286,7 @@ export default async function HubWelcomePage() {
             </div>
 
             <div className="relative">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold">3</div>
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold">3</div>
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
@@ -305,23 +305,23 @@ export default async function HubWelcomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-green-900">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-brand-green-900">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">Questions? Contact Us</h2>
-          <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-brand-green-100 mb-8 max-w-2xl mx-auto">
             Use the Hub to track your progress and achieve your career goals.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/login?redirect=/hub"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-green-700 font-semibold rounded-lg hover:bg-green-50 transition-colors text-lg"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-green-700 font-semibold rounded-lg hover:bg-brand-green-50 transition-colors text-lg"
             >
               Sign In
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/programs"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-green-700 text-white font-semibold rounded-lg hover:bg-green-800 transition-colors text-lg border border-green-600"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-brand-green-700 text-white font-semibold rounded-lg hover:bg-brand-green-800 transition-colors text-lg border border-brand-green-600"
             >
               Browse Programs
             </Link>

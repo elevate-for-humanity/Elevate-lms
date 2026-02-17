@@ -72,7 +72,7 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
         href={shareLinks.whatsapp}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-green-500 text-white hover:bg-green-600 transition"
+        className="w-10 h-10 flex items-center justify-center rounded-full bg-brand-green-500 text-white hover:bg-brand-green-600 transition"
         aria-label="Share on WhatsApp"
       >
         <MessageCircle className="w-5 h-5" />
@@ -89,7 +89,7 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
       <button
         onClick={copyToClipboard}
         className={`w-10 h-10 flex items-center justify-center rounded-full transition ${
-          copied ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+          copied ? 'bg-brand-green-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
         }`}
         aria-label="Copy link"
       >
@@ -97,7 +97,7 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
       </button>
       
       {copied && (
-        <span className="text-sm text-green-600 font-medium">Copied!</span>
+        <span className="text-sm text-brand-green-600 font-medium">Copied!</span>
       )}
     </div>
   );

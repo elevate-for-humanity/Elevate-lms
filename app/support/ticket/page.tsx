@@ -74,7 +74,7 @@ function SubmitTicketContent() {
       <div className="min-h-screen bg-gray-50 py-16">
         <div className="max-w-2xl mx-auto px-6">
           <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <h1 className="text-3xl font-bold text-black mb-4">Ticket Submitted!</h1>
@@ -122,9 +122,9 @@ function SubmitTicketContent() {
           </p>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-red-700">{error}</p>
+            <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
+              <p className="text-brand-red-700">{error}</p>
             </div>
           )}
 
@@ -132,7 +132,7 @@ function SubmitTicketContent() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-black mb-2">
-                  Full Name <span className="text-red-500">*</span>
+                  Full Name <span className="text-brand-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -145,7 +145,7 @@ function SubmitTicketContent() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-black mb-2">
-                  Email Address <span className="text-red-500">*</span>
+                  Email Address <span className="text-brand-red-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -173,7 +173,7 @@ function SubmitTicketContent() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-black mb-2">
-                  Category <span className="text-red-500">*</span>
+                  Category <span className="text-brand-red-500">*</span>
                 </label>
                 <select
                   required
@@ -192,7 +192,7 @@ function SubmitTicketContent() {
 
             <div>
               <label className="block text-sm font-medium text-black mb-2">
-                Priority <span className="text-red-500">*</span>
+                Priority <span className="text-brand-red-500">*</span>
               </label>
               <select
                 required
@@ -210,7 +210,7 @@ function SubmitTicketContent() {
 
             <div>
               <label className="block text-sm font-medium text-black mb-2">
-                Subject <span className="text-red-500">*</span>
+                Subject <span className="text-brand-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -225,7 +225,7 @@ function SubmitTicketContent() {
 
             <div>
               <label className="block text-sm font-medium text-black mb-2">
-                Description <span className="text-red-500">*</span>
+                Description <span className="text-brand-red-500">*</span>
               </label>
               <textarea
                 required

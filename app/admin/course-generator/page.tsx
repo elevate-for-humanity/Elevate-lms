@@ -126,29 +126,29 @@ Include Assignments: ${formData.includeAssignments}
         </div>
 
         {success && (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-6 mb-8">
             <div className="flex items-start gap-4">
               <span className="text-slate-400 flex-shrink-0">•</span>
               <div className="flex-1">
-                <h2 className="text-xl font-semibold text-green-900 mb-2">Course Generated Successfully!</h2>
-                <p className="text-green-700 mb-4">{success.outline.title}</p>
+                <h2 className="text-xl font-semibold text-brand-green-900 mb-2">Course Generated Successfully!</h2>
+                <p className="text-brand-green-700 mb-4">{success.outline.title}</p>
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   <div className="bg-white rounded-lg p-3 text-center">
-                    <BookOpen className="w-5 h-5 text-green-600 mx-auto mb-1" />
+                    <BookOpen className="w-5 h-5 text-brand-green-600 mx-auto mb-1" />
                     <p className="text-sm font-medium">{success.outline.modules.length} Modules</p>
                   </div>
                   <div className="bg-white rounded-lg p-3 text-center">
-                    <FileText className="w-5 h-5 text-green-600 mx-auto mb-1" />
+                    <FileText className="w-5 h-5 text-brand-green-600 mx-auto mb-1" />
                     <p className="text-sm font-medium">{success.outline.modules.reduce((sum, m) => sum + m.lessons.length, 0)} Lessons</p>
                   </div>
                   <div className="bg-white rounded-lg p-3 text-center">
-                    <Clock className="w-5 h-5 text-green-600 mx-auto mb-1" />
+                    <Clock className="w-5 h-5 text-brand-green-600 mx-auto mb-1" />
                     <p className="text-sm font-medium">{success.outline.estimatedDuration}h Duration</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={() => router.push(`/admin/courses/${success.courseId}`)} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">View Course</button>
-                  <button onClick={() => router.push(`/admin/courses/${success.courseId}/edit`)} className="px-4 py-2 bg-white border border-green-300 text-green-700 rounded-lg hover:bg-green-50">Edit Course</button>
+                  <button onClick={() => router.push(`/admin/courses/${success.courseId}`)} className="px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700">View Course</button>
+                  <button onClick={() => router.push(`/admin/courses/${success.courseId}/edit`)} className="px-4 py-2 bg-white border border-brand-green-300 text-brand-green-700 rounded-lg hover:bg-brand-green-50">Edit Course</button>
                   <button onClick={() => setSuccess(null)} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Generate Another</button>
                 </div>
               </div>
@@ -157,9 +157,9 @@ Include Assignments: ${formData.includeAssignments}
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-8 flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600" />
-            <p className="text-red-700">{error}</p>
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-xl p-4 mb-8 flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-brand-red-600" />
+            <p className="text-brand-red-700">{error}</p>
           </div>
         )}
 

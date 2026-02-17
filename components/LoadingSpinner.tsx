@@ -6,7 +6,7 @@ export function LoadingSpinner({ size = 'md', className = '' }: { size?: 'sm' | 
   };
 
   return (
-    <div className={`inline-block ${sizeClasses[size]} border-red-600 border-t-transparent rounded-full animate-spin ${className}`} role="status" aria-label="Loading">
+    <div className={`inline-block ${sizeClasses[size]} border-brand-red-600 border-t-transparent rounded-full animate-spin ${className}`} role="status" aria-label="Loading">
       <span className="sr-only">Loading...</span>
     </div>
   );

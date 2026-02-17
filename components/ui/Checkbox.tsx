@@ -33,7 +33,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             className={`
               relative flex items-center justify-center w-5 h-5 border-2 rounded
               transition-all duration-200 cursor-pointer
-              ${error ? 'border-red-500' : 'border-slate-300'}
+              ${error ? 'border-brand-red-500' : 'border-slate-300'}
               peer-checked:bg-brand-orange-600 peer-checked:border-brand-blue-600
               peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-brand-blue-500
               peer-disabled:opacity-50 peer-disabled:cursor-not-allowed
@@ -51,7 +51,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
                 className="text-sm font-medium text-black cursor-pointer"
               >
                 {label}
-                {props.required && <span className="text-red-500 ml-1">*</span>}
+                {props.required && <span className="text-brand-red-500 ml-1">*</span>}
               </label>
             )}
             {helperText && !error && (

@@ -169,9 +169,9 @@ export default function AgreementSigningForm({
   return (
     <div className="max-w-2xl mx-auto">
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-red-700">{error}</p>
+        <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
+          <p className="text-brand-red-700">{error}</p>
         </div>
       )}
 
@@ -192,7 +192,7 @@ export default function AgreementSigningForm({
                   key={agreement.type}
                   className={`flex items-center justify-between p-4 rounded-lg border-2 transition ${
                     isReviewed
-                      ? 'bg-green-50 border-green-200'
+                      ? 'bg-brand-green-50 border-brand-green-200'
                       : 'bg-gray-50 border-gray-200'
                   }`}
                 >
@@ -249,7 +249,7 @@ export default function AgreementSigningForm({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Legal Name <span className="text-red-500">*</span>
+                Full Legal Name <span className="text-brand-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -263,7 +263,7 @@ export default function AgreementSigningForm({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address <span className="text-red-500">*</span>
+                Email Address <span className="text-brand-red-500">*</span>
               </label>
               <input
                 type="email"
@@ -324,7 +324,7 @@ export default function AgreementSigningForm({
           {signatureMethod === 'typed' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Type Your Signature <span className="text-red-500">*</span>
+                Type Your Signature <span className="text-brand-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -351,7 +351,7 @@ export default function AgreementSigningForm({
           {signatureMethod === 'drawn' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Draw Your Signature <span className="text-red-500">*</span>
+                Draw Your Signature <span className="text-brand-red-500">*</span>
               </label>
               <SignatureCanvas
                 onSignatureChange={setDrawnSignature}
@@ -406,7 +406,7 @@ export default function AgreementSigningForm({
             <button
               onClick={handleSubmit}
               disabled={!canSubmit() || submitting}
-              className="flex-1 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+              className="flex-1 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
             >
               {submitting ? 'Processing...' : 'Sign Agreements'}
             </button>

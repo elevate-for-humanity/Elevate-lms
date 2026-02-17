@@ -58,8 +58,8 @@ export default function AnnouncementsList() {
 
   if (error) {
     return (
-      <div className="bg-red-50 rounded-xl p-6 border border-red-200">
-        <div className="flex items-center gap-3 text-red-700">
+      <div className="bg-brand-red-50 rounded-xl p-6 border border-brand-red-200">
+        <div className="flex items-center gap-3 text-brand-red-700">
           <AlertCircle className="w-5 h-5" />
           <p>Unable to load announcements. Please try again later.</p>
         </div>
@@ -108,11 +108,11 @@ export default function AnnouncementsList() {
     switch (severity) {
       case 'important':
       case 'urgent':
-        return 'border-l-red-600';
+        return 'border-l-brand-red-600';
       case 'event':
-        return 'border-l-green-600';
+        return 'border-l-brand-green-600';
       default:
-        return 'border-l-blue-600';
+        return 'border-l-brand-blue-600';
     }
   };
 
@@ -120,9 +120,9 @@ export default function AnnouncementsList() {
     switch (severity) {
       case 'important':
       case 'urgent':
-        return 'bg-red-100 text-red-700';
+        return 'bg-brand-red-100 text-brand-red-700';
       case 'event':
-        return 'bg-green-100 text-green-700';
+        return 'bg-brand-green-100 text-brand-green-700';
       default:
         return 'bg-brand-blue-100 text-brand-blue-700';
     }

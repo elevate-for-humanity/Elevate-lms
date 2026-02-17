@@ -40,9 +40,9 @@ export default async function TaxSelfPrepStartPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-5xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-          <Link href="/" className="hover:text-orange-600">Home</Link>
+          <Link href="/" className="hover:text-brand-orange-600">Home</Link>
           <ChevronRight className="w-4 h-4" />
-          <Link href="/tax-self-prep" className="hover:text-orange-600">Self-Prep</Link>
+          <Link href="/tax-self-prep" className="hover:text-brand-orange-600">Self-Prep</Link>
           <ChevronRight className="w-4 h-4" />
           <span className="text-gray-900">Start Filing</span>
         </nav>

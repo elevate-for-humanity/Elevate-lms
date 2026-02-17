@@ -167,7 +167,7 @@ export function StudyGroups() {
                 <input
                   type="text"
                   placeholder="Enter group name"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-red-500"
                 />
               </div>
 
@@ -175,14 +175,14 @@ export function StudyGroups() {
                 <label className="block text-sm font-semibold mb-2">Description</label>
                 <textarea
                   placeholder="What's this group about?"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-red-500"
                   rows={3}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold mb-2">Course</label>
-                <select className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
+                <select className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-red-500">
                   <option>Select a course</option>
                   <option>Certified Nursing Assistant</option>
                   <option>HVAC Technician</option>

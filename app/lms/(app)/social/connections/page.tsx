@@ -77,7 +77,7 @@ export default async function ConnectionsPage() {
       </div>
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+      <div className="bg-gradient-to-r from-brand-blue-600 to-indigo-600 text-white">
         <div className="max-w-6xl mx-auto px-4 py-12">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -85,7 +85,7 @@ export default async function ConnectionsPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold">Find Connections</h1>
-              <p className="text-blue-100 mt-1">
+              <p className="text-brand-blue-100 mt-1">
                 Connect with fellow learners and grow your network
               </p>
             </div>
@@ -100,7 +100,7 @@ export default async function ConnectionsPage() {
                 placeholder="Search by name, program, or skills..."
                 className="w-full pl-12 pr-4 py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50"
               />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <button className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
                 Search
               </button>
             </div>
@@ -132,7 +132,7 @@ export default async function ConnectionsPage() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <button className="p-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
                       <CheckCircle className="w-5 h-5" />
                     </button>
                     <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200">
@@ -157,7 +157,7 @@ export default async function ConnectionsPage() {
           {connections.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
               {connections.map((conn: any, i: number) => (
-                <div key={i} className="border rounded-xl p-4 hover:border-blue-300 transition-colors">
+                <div key={i} className="border rounded-xl p-4 hover:border-brand-blue-300 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
                       {conn.profiles?.avatar_url ? (
@@ -201,7 +201,7 @@ export default async function ConnectionsPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
             {suggestions.length > 0 ? (
               suggestions.map((person: any) => (
-                <div key={person.id} className="border rounded-xl p-4 hover:border-blue-300 transition-colors">
+                <div key={person.id} className="border rounded-xl p-4 hover:border-brand-blue-300 transition-colors">
                   <div className="flex items-start gap-3">
                     <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
                       {person.avatar_url ? (
@@ -215,7 +215,7 @@ export default async function ConnectionsPage() {
                       <div className="text-sm text-gray-500 truncate">{person.headline || person.role || 'Student'}</div>
                     </div>
                   </div>
-                  <button className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium flex items-center justify-center gap-2">
+                  <button className="w-full mt-4 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 text-sm font-medium flex items-center justify-center gap-2">
                     <UserPlus className="w-4 h-4" />
                     Connect
                   </button>

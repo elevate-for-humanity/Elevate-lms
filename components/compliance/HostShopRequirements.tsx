@@ -109,7 +109,7 @@ export function HostShopRequirements({
       <div className="mx-auto max-w-4xl px-6">
         {/* Multi-Region Requirements Callout */}
         {showMultiRegion && (
-          <div className="mb-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white">
+          <div className="mb-8 bg-gradient-to-r from-purple-600 to-brand-blue-600 rounded-2xl p-6 text-white">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Globe className="w-6 h-6 text-white" />
@@ -221,13 +221,13 @@ export function HostShopRequirements({
         {showApprovalProcess && (
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <h3 className="text-lg font-bold text-black mb-6 flex items-center gap-2">
-              <ClipboardCheck className="w-5 h-5 text-green-600" />
+              <ClipboardCheck className="w-5 h-5 text-brand-green-600" />
               Shop Approval Process
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
               {APPROVAL_STEPS.map((step) => (
                 <div key={step.step} className="flex items-start gap-4">
-                  <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                  <div className="w-8 h-8 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                     {step.step}
                   </div>
                   <div>

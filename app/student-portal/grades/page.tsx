@@ -89,11 +89,11 @@ export default async function StudentPortalGradesPage() {
   const getGradeColor = (grade: string | null) => {
     if (!grade) return 'text-gray-600';
     const g = grade.toUpperCase();
-    if (g.startsWith('A')) return 'text-green-600';
+    if (g.startsWith('A')) return 'text-brand-green-600';
     if (g.startsWith('B')) return 'text-brand-blue-600';
     if (g.startsWith('C')) return 'text-yellow-600';
-    if (g.startsWith('D')) return 'text-orange-600';
-    return 'text-red-600';
+    if (g.startsWith('D')) return 'text-brand-orange-600';
+    return 'text-brand-red-600';
   };
 
   return (
@@ -116,9 +116,9 @@ export default async function StudentPortalGradesPage() {
             <p className="text-3xl font-bold text-brand-blue-600">{completedCourses.length}</p>
           </div>
           <div className="bg-white rounded-xl border p-6 text-center">
-            <BookOpen className="w-8 h-8 text-green-600 mx-auto mb-2" />
+            <BookOpen className="w-8 h-8 text-brand-green-600 mx-auto mb-2" />
             <p className="text-sm text-gray-600 mb-1">Assignments Graded</p>
-            <p className="text-3xl font-bold text-green-600">{gradesList.length}</p>
+            <p className="text-3xl font-bold text-brand-green-600">{gradesList.length}</p>
           </div>
           <div className="bg-white rounded-xl border p-6 text-center">
             <Award className="w-8 h-8 text-purple-600 mx-auto mb-2" />
@@ -155,7 +155,7 @@ export default async function StudentPortalGradesPage() {
                     ) : (
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                         enrollment.status === 'completed' 
-                          ? 'bg-green-100 text-green-700'
+                          ? 'bg-brand-green-100 text-brand-green-700'
                           : 'bg-brand-blue-100 text-brand-blue-700'
                       }`}>
                         {enrollment.status === 'completed' ? 'Completed' : 'In Progress'}
@@ -185,7 +185,7 @@ export default async function StudentPortalGradesPage() {
                     ) : (
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                         enrollment.status === 'completed' 
-                          ? 'bg-green-100 text-green-700'
+                          ? 'bg-brand-green-100 text-brand-green-700'
                           : 'bg-brand-blue-100 text-brand-blue-700'
                       }`}>
                         {enrollment.status === 'completed' ? 'Completed' : 'In Progress'}

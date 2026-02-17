@@ -169,7 +169,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                   className="w-8 h-8 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                   {userInitials}
                 </div>
               )}
@@ -202,7 +202,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
               <input
                 type="text"
                 placeholder="Search courses, lessons, certificates..."
-                className="w-full pl-10 pr-4 py-3 bg-white border-0 rounded-lg focus:ring-2 focus:ring-red-500"
+                className="w-full pl-10 pr-4 py-3 bg-white border-0 rounded-lg focus:ring-2 focus:ring-brand-red-500"
                 autoFocus
               />
             </div>
@@ -245,7 +245,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold">
                     {userInitials}
                   </div>
                 )}
@@ -274,7 +274,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                 </Link>
                 <Link
                   href="/api/auth/signout"
-                  className="flex items-center gap-3 px-4 py-2 text-red-300 hover:bg-red-500/20 rounded-lg"
+                  className="flex items-center gap-3 px-4 py-2 text-brand-red-300 hover:bg-brand-red-500/20 rounded-lg"
                 >
                   <LogOut className="w-5 h-5" />
                   Sign Out

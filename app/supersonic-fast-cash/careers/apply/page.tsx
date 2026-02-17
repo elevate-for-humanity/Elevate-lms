@@ -50,12 +50,12 @@ export default function CareersApplyPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="max-w-md mx-auto px-6 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h1>
           <p className="text-gray-600 mb-6">Thank you for applying. We will contact you within 48 hours.</p>
-          <Link href="/supersonic-fast-cash/careers" className="text-orange-600 hover:underline">
+          <Link href="/supersonic-fast-cash/careers" className="text-brand-orange-600 hover:underline">
             Back to Careers
           </Link>
         </div>
@@ -89,7 +89,7 @@ export default function CareersApplyPage() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                 />
               </div>
 
@@ -102,7 +102,7 @@ export default function CareersApplyPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                 />
               </div>
 
@@ -115,7 +115,7 @@ export default function CareersApplyPage() {
                   required
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                 />
               </div>
 
@@ -127,7 +127,7 @@ export default function CareersApplyPage() {
                   required
                   value={formData.position}
                   onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                 >
                   <option value="">Select a position</option>
                   <option value="tax-preparer">Tax Preparer</option>
@@ -145,7 +145,7 @@ export default function CareersApplyPage() {
                   type="text"
                   value={formData.experience}
                   onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                 />
               </div>
 
@@ -157,12 +157,12 @@ export default function CareersApplyPage() {
                   rows={4}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                 />
               </div>
 
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
                   {error}
                 </div>
               )}
@@ -171,7 +171,7 @@ export default function CareersApplyPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Submitting...' : 'Submit Application'}
                 </button>

@@ -143,8 +143,8 @@ export default async function GovernmentPage() {
                 />
               </div>
               <div className="p-8">
-                <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-white">
-                  <Users className="w-7 h-7 text-green-600" />
+                <div className="w-14 h-14 bg-brand-green-100 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-white">
+                  <Users className="w-7 h-7 text-brand-green-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">State Agencies</h3>
                 <p className="text-gray-600 mb-4">
@@ -331,10 +331,10 @@ export default async function GovernmentPage() {
                   <div>
                     <div className="flex justify-between mb-2">
                       <span className="font-medium text-gray-700">Credential Attainment</span>
-                      <span className="font-bold text-green-600">92%</span>
+                      <span className="font-bold text-brand-green-600">92%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-green-600 h-3 rounded-full" style={{ width: '92%' }} />
+                      <div className="bg-brand-green-600 h-3 rounded-full" style={{ width: '92%' }} />
                     </div>
                   </div>
                   <div>
@@ -349,10 +349,10 @@ export default async function GovernmentPage() {
                   <div>
                     <div className="flex justify-between mb-2">
                       <span className="font-medium text-gray-700">Median Wage Increase</span>
-                      <span className="font-bold text-orange-600">34%</span>
+                      <span className="font-bold text-brand-orange-600">34%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-orange-600 h-3 rounded-full" style={{ width: '34%' }} />
+                      <div className="bg-brand-orange-600 h-3 rounded-full" style={{ width: '34%' }} />
                     </div>
                   </div>
                 </div>
@@ -411,8 +411,8 @@ export default async function GovernmentPage() {
                 />
               </div>
               <div className="p-6 text-center">
-                <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
-                  <Target className="w-7 h-7 text-green-600" />
+                <div className="w-14 h-14 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
+                  <Target className="w-7 h-7 text-brand-green-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Priority Populations</h3>
                 <p className="text-sm text-gray-600">
@@ -453,8 +453,8 @@ export default async function GovernmentPage() {
                 />
               </div>
               <div className="p-6 text-center">
-                <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
-                  <BarChart3 className="w-7 h-7 text-orange-600" />
+                <div className="w-14 h-14 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
+                  <BarChart3 className="w-7 h-7 text-brand-orange-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Transparent Reporting</h3>
                 <p className="text-sm text-gray-600">

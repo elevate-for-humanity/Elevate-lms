@@ -93,7 +93,7 @@ export default async function QuizzesPage() {
     }
     
     if (bestAttempt.score >= (quiz.passing_score || 70)) {
-      return { status: 'passed', label: 'Passed', color: 'bg-green-100 text-green-700' };
+      return { status: 'passed', label: 'Passed', color: 'bg-brand-green-100 text-brand-green-700' };
     }
     
     return { status: 'attempted', label: 'Attempted', color: 'bg-yellow-100 text-yellow-700' };
@@ -143,8 +143,8 @@ export default async function QuizzesPage() {
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <Trophy className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-brand-green-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.passed}</div>
@@ -154,8 +154,8 @@ export default async function QuizzesPage() {
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <AlertCircle className="w-5 h-5 text-orange-600" />
+              <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                <AlertCircle className="w-5 h-5 text-brand-orange-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.avgScore}%</div>

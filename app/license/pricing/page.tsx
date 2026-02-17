@@ -82,7 +82,7 @@ export default async function PricingPage() {
                 key={tier.id || index}
                 className={`rounded-2xl p-8 ${
                   tier.featured 
-                    ? 'bg-orange-600 text-white relative' 
+                    ? 'bg-brand-orange-600 text-white relative' 
                     : tier.id === 'enterprise' 
                       ? 'bg-slate-900 text-white' 
                       : 'bg-white border-2 border-slate-200'
@@ -102,19 +102,19 @@ export default async function PricingPage() {
                   <span className="text-4xl font-bold">
                     ${tier.price?.toLocaleString()}
                   </span>
-                  <span className={tier.featured ? 'text-orange-100' : 'text-slate-500'}>
+                  <span className={tier.featured ? 'text-brand-orange-100' : 'text-slate-500'}>
                     /year
                   </span>
                 </div>
                 
-                <p className={`mb-6 ${tier.featured ? 'text-orange-100' : 'text-slate-600'}`}>
+                <p className={`mb-6 ${tier.featured ? 'text-brand-orange-100' : 'text-slate-600'}`}>
                   {tier.description}
                 </p>
                 
                 <ul className="space-y-3 mb-8">
                   {tier.features?.map((feature: string, i: number) => (
                     <li key={i} className="flex items-start gap-2">
-                      <span className={`flex-shrink-0 ${tier.featured ? 'text-orange-200' : 'text-slate-400'}`}>•</span>
+                      <span className={`flex-shrink-0 ${tier.featured ? 'text-brand-orange-200' : 'text-slate-400'}`}>•</span>
                       <span className={tier.featured ? 'text-white' : ''}>{feature}</span>
                     </li>
                   ))}
@@ -124,9 +124,9 @@ export default async function PricingPage() {
                   href={ROUTES.schedule}
                   className={`block text-center py-3 rounded-lg font-semibold transition ${
                     tier.featured 
-                      ? 'bg-white text-orange-600 hover:bg-orange-50' 
+                      ? 'bg-white text-brand-orange-600 hover:bg-brand-orange-50' 
                       : tier.id === 'enterprise'
-                        ? 'bg-orange-600 text-white hover:bg-orange-700'
+                        ? 'bg-brand-orange-600 text-white hover:bg-brand-orange-700'
                         : 'bg-slate-900 text-white hover:bg-slate-800'
                   }`}
                 >
@@ -175,25 +175,25 @@ export default async function PricingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-orange-600">
+      <section className="py-16 bg-brand-orange-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-orange-100 mb-8">
+          <p className="text-brand-orange-100 mb-8">
             Schedule a demo to see the platform in action.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href={ROUTES.schedule}
-              className="inline-flex items-center justify-center gap-2 bg-white text-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-orange-50 transition"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-brand-orange-50 transition"
             >
               <Calendar className="w-5 h-5" />
               Schedule Demo
             </Link>
             <Link
               href="/contact"
-              className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-orange-700 transition"
+              className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-orange-700 transition"
             >
               Contact Sales
             </Link>

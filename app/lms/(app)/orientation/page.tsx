@@ -45,14 +45,14 @@ export default async function OrientationPage() {
 
         {/* Completion Status */}
         {isCompleted && (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-6 mb-8">
             <div className="flex items-center gap-3">
               <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
-                <h3 className="font-bold text-green-900 mb-1">
+                <h3 className="font-bold text-brand-green-900 mb-1">
                   Orientation Completed
                 </h3>
-                <p className="text-sm text-green-700">
+                <p className="text-sm text-brand-green-700">
                   You've completed your orientation. You can now proceed to
                   verify your eligibility and enroll in programs.
                 </p>

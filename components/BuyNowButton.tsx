@@ -59,7 +59,7 @@ export function BuyNowButton({
         {!showOptions ? (
           <button
             onClick={() => setShowOptions(true)}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-green-600 px-8 py-4 text-base font-bold text-white shadow-lg hover:bg-green-700 transition-all hover:scale-105"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-brand-green-600 px-8 py-4 text-base font-bold text-white shadow-lg hover:bg-brand-green-700 transition-all hover:scale-105"
           >
             <ShoppingCart size={20} />
             Buy Now - ${price}
@@ -70,7 +70,7 @@ export function BuyNowButton({
             <button
               onClick={() => handleCheckout('full')}
               disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-green-600 px-6 py-3 text-sm font-bold text-white shadow-lg hover:bg-green-700 transition-all disabled:opacity-50"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-brand-green-600 px-6 py-3 text-sm font-bold text-white shadow-lg hover:bg-brand-green-700 transition-all disabled:opacity-50"
             >
               <ShoppingCart size={18} />
               {loading ? 'Processing...' : `Pay in Full - $${price}`}
@@ -102,7 +102,7 @@ export function BuyNowButton({
     <button
       onClick={() => handleCheckout('full')}
       disabled={loading}
-      className={`inline-flex items-center justify-center gap-2 rounded-full bg-green-600 px-8 py-4 text-base font-bold text-white shadow-lg hover:bg-green-700 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-full bg-brand-green-600 px-8 py-4 text-base font-bold text-white shadow-lg hover:bg-brand-green-700 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
       <ShoppingCart size={20} />
       {loading ? 'Processing...' : `Buy Now - $${price}`}

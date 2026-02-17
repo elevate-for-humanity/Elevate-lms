@@ -14,9 +14,9 @@ const PATHWAY_CONFIG = {
     label: 'Workforce-Funded',
     shortLabel: 'Workforce',
     icon: Users,
-    bgColor: 'bg-green-100',
-    textColor: 'text-green-700',
-    borderColor: 'border-green-200',
+    bgColor: 'bg-brand-green-100',
+    textColor: 'text-brand-green-700',
+    borderColor: 'border-brand-green-200',
   },
   employer_sponsored: {
     label: 'Employer-Sponsored',
@@ -122,7 +122,7 @@ export function FundingPathwayCard({
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Down Payment</span>
-            <span className={paymentStatus.downPaymentPaid ? 'text-green-600' : 'text-amber-600'}>
+            <span className={paymentStatus.downPaymentPaid ? 'text-brand-green-600' : 'text-amber-600'}>
               {paymentStatus.downPaymentPaid ? 'Paid' : 'Due'}
             </span>
           </div>
@@ -163,11 +163,11 @@ interface EnrollmentStatusBadgeProps {
 export function EnrollmentStatusBadge({ status, pathway }: EnrollmentStatusBadgeProps) {
   const statusConfig: Record<string, { bg: string; text: string }> = {
     pending: { bg: 'bg-yellow-100', text: 'text-yellow-700' },
-    active: { bg: 'bg-green-100', text: 'text-green-700' },
-    paused: { bg: 'bg-orange-100', text: 'text-orange-700' },
+    active: { bg: 'bg-brand-green-100', text: 'text-brand-green-700' },
+    paused: { bg: 'bg-brand-orange-100', text: 'text-brand-orange-700' },
     completed: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700' },
     cancelled: { bg: 'bg-gray-100', text: 'text-gray-600' },
-    withdrawn: { bg: 'bg-red-100', text: 'text-red-700' },
+    withdrawn: { bg: 'bg-brand-red-100', text: 'text-brand-red-700' },
   };
 
   const config = statusConfig[status] || statusConfig.pending;

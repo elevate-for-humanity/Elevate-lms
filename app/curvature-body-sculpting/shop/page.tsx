@@ -631,7 +631,7 @@ export default function CurvatureShopPage() {
                           disabled={isInCart(product.id) || addingToCart === product.id}
                           className={`flex items-center gap-1 px-4 py-2 rounded-lg font-medium transition ${
                             isInCart(product.id)
-                              ? 'bg-green-100 text-green-700'
+                              ? 'bg-brand-green-100 text-brand-green-700'
                               : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
                           }`}
                         >

@@ -80,7 +80,7 @@ export default async function ThankyouPage() {
       {/* Success Message */}
       <section className="py-20 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -89,9 +89,9 @@ export default async function ThankyouPage() {
           <p className="text-xl text-gray-600 mb-8">
             Your submission has been received. We're excited to help you start your career journey!
           </p>
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-left">
-            <h2 className="font-semibold text-green-800 mb-2">What happens next?</h2>
-            <p className="text-green-700">
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-6 text-left">
+            <h2 className="font-semibold text-brand-green-800 mb-2">What happens next?</h2>
+            <p className="text-brand-green-700">
               A member of our enrollment team will contact you within 1-2 business days 
               to discuss your eligibility and next steps.
             </p>

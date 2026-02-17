@@ -149,7 +149,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
                 </li>
               </ul>
 
-              <button className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold transition-colors mb-3">
+              <button className="w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white py-3 rounded-lg font-semibold transition-colors mb-3">
                 Enroll Now
               </button>
               
@@ -220,14 +220,14 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
       </section>
 
       {/* Certification */}
-      <section className="py-12 bg-green-50">
+      <section className="py-12 bg-brand-green-50">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <Award className="w-16 h-16 mx-auto mb-4 text-green-600" />
+          <Award className="w-16 h-16 mx-auto mb-4 text-brand-green-600" />
           <h2 className="text-2xl font-bold mb-2">Earn Your Certificate</h2>
           <p className="text-gray-600 mb-4">
             Complete all lessons and pass the final assessment to earn your
           </p>
-          <p className="text-xl font-semibold text-green-700">
+          <p className="text-xl font-semibold text-brand-green-700">
             {course.certification_name}
           </p>
         </div>
@@ -243,7 +243,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/careers"
-              className="inline-block bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+              className="inline-block bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Apply to Join Our Team
             </Link>

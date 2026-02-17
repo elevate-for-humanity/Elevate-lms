@@ -285,7 +285,7 @@ export default function SocialMediaPage() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           campaign.status === 'active'
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-green-100 text-brand-green-800'
                             : campaign.status === 'paused'
                               ? 'bg-yellow-100 text-yellow-800'
                               : 'bg-gray-100 text-black'
@@ -350,7 +350,7 @@ export default function SocialMediaPage() {
                       className={`p-2 rounded-lg transition-colors ${
                         campaign.status === 'active'
                           ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                          : 'bg-brand-green-100 text-green-700 hover:bg-green-200'
+                          : 'bg-brand-green-100 text-brand-green-700 hover:bg-brand-green-200'
                       }`}
                       title={
                         campaign.status === 'active' ? 'Pause' : 'Activate'
@@ -383,7 +383,7 @@ export default function SocialMediaPage() {
                           );
                         }
                       }}
-                      className="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                      className="p-2 bg-brand-red-100 text-brand-red-700 rounded-lg hover:bg-brand-red-200 transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -506,7 +506,7 @@ function PlatformCard({
       <div className="flex items-center justify-between mb-3">
         <Icon className={`w-8 h-8 text-${color}-600`} />
         {connected && (
-          <span className="inline-flex items-center px-2 py-2 rounded-full text-xs font-medium bg-brand-green-100 text-green-800">
+          <span className="inline-flex items-center px-2 py-2 rounded-full text-xs font-medium bg-brand-green-100 text-brand-green-800">
             ● Connected
           </span>
         )}
@@ -525,7 +525,7 @@ interface ScheduleSlotProps {
 
 function ScheduleSlot({ time, status, campaign }: ScheduleSlotProps) {
   const statusColors = {
-    completed: 'bg-brand-green-100 text-green-800',
+    completed: 'bg-brand-green-100 text-brand-green-800',
     upcoming: 'bg-brand-blue-100 text-brand-blue-800',
     scheduled: 'bg-gray-100 text-black',
   };

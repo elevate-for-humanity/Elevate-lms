@@ -54,26 +54,26 @@ export default function ApplicationStatusPage() {
     switch (status) {
       case 'approved':
         return {
-          icon: <Circle className="w-12 h-12 text-green-500" />,
+          icon: <Circle className="w-12 h-12 text-brand-green-500" />,
           title: 'Approved!',
-          color: 'bg-green-50 border-green-200',
-          textColor: 'text-green-800',
+          color: 'bg-brand-green-50 border-brand-green-200',
+          textColor: 'text-brand-green-800',
           message: 'Congratulations! Your application has been approved. Check your email for next steps.',
         };
       case 'rejected':
         return {
-          icon: <XCircle className="w-12 h-12 text-red-500" />,
+          icon: <XCircle className="w-12 h-12 text-brand-red-500" />,
           title: 'Not Approved',
-          color: 'bg-red-50 border-red-200',
-          textColor: 'text-red-800',
+          color: 'bg-brand-red-50 border-brand-red-200',
+          textColor: 'text-brand-red-800',
           message: 'Unfortunately, your application was not approved at this time. Please contact us for more information.',
         };
       case 'contacted':
         return {
-          icon: <Phone className="w-12 h-12 text-blue-500" />,
+          icon: <Phone className="w-12 h-12 text-brand-blue-500" />,
           title: 'In Review',
-          color: 'bg-blue-50 border-blue-200',
-          textColor: 'text-blue-800',
+          color: 'bg-brand-blue-50 border-brand-blue-200',
+          textColor: 'text-brand-blue-800',
           message: 'We\'ve reached out to you. Please check your email and phone for messages from our team.',
         };
       default:
@@ -133,8 +133,8 @@ export default function ApplicationStatusPage() {
         </form>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-red-800">{error}</p>
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6">
+            <p className="text-brand-red-800">{error}</p>
           </div>
         )}
 

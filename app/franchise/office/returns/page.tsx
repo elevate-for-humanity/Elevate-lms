@@ -206,19 +206,19 @@ export default function ReturnsPage() {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-orange-600">{stats.pending}</div>
+            <div className="text-2xl font-bold text-brand-orange-600">{stats.pending}</div>
             <p className="text-xs text-muted-foreground">Pending</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-green-600">{stats.accepted}</div>
+            <div className="text-2xl font-bold text-brand-green-600">{stats.accepted}</div>
             <p className="text-xs text-muted-foreground">Accepted</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
+            <div className="text-2xl font-bold text-brand-red-600">{stats.rejected}</div>
             <p className="text-xs text-muted-foreground">Rejected</p>
           </CardContent>
         </Card>

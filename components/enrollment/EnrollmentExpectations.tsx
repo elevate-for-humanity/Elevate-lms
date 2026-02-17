@@ -104,7 +104,7 @@ interface TimelineStepProps {
 
 function TimelineStep({ icon, title, description, status }: TimelineStepProps) {
   const statusColors = {
-    complete: 'bg-green-100 text-green-600 border-green-200',
+    complete: 'bg-brand-green-100 text-brand-green-600 border-brand-green-200',
     current: 'bg-brand-blue-100 text-brand-blue-600 border-brand-blue-200',
     pending: 'bg-slate-100 text-slate-400 border-slate-200',
   };

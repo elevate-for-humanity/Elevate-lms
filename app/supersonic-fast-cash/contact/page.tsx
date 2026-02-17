@@ -81,8 +81,8 @@ export default function ContactPage() {
           </div>
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center hover:border-brand-blue-600 transition">
-            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Mail className="w-8 h-8 text-orange-600" />
+            <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 text-brand-orange-600" />
             </div>
             <h3 className="text-xl font-bold text-black mb-3">Email</h3>
             <a href="mailto:Supersonicfastcashllc@gmail.com" className="text-brand-blue-600 hover:text-brand-blue-800 font-semibold break-all">
@@ -92,8 +92,8 @@ export default function ContactPage() {
           </div>
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center hover:border-brand-blue-600 transition">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MapPin className="w-8 h-8 text-green-600" />
+            <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MapPin className="w-8 h-8 text-brand-green-600" />
             </div>
             <h3 className="text-xl font-bold text-black mb-3">Location</h3>
             <p className="text-gray-700 font-semibold">Indianapolis, IN</p>
@@ -155,7 +155,7 @@ export default function ContactPage() {
 
             {success ? (
               <div className="text-center py-12">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h3>
@@ -264,7 +264,7 @@ export default function ContactPage() {
                 </div>
 
                 {error && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                  <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-700">
                     {error}
                   </div>
                 )}
@@ -272,7 +272,7 @@ export default function ContactPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-orange-500 text-white font-bold py-4 px-8 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-brand-orange-500 text-white font-bold py-4 px-8 rounded-lg hover:bg-brand-orange-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>

@@ -83,7 +83,7 @@ export function QuizSystem({
       <div className="bg-white rounded-lg p-8">
         <div className="text-center mb-8">
           <div
-            className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 ${passed ? 'bg-green-100' : 'bg-red-100'}`}
+            className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 ${passed ? 'bg-brand-green-100' : 'bg-brand-red-100'}`}
           >
             {passed ? (
               <span className="text-slate-400 flex-shrink-0">•</span>
@@ -115,7 +115,7 @@ export function QuizSystem({
             return (
               <div
                 key={question.id}
-                className={`p-4 rounded-lg border-2 ${isCorrect ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}
+                className={`p-4 rounded-lg border-2 ${isCorrect ? 'border-brand-green-200 bg-brand-green-50' : 'border-brand-red-200 bg-brand-red-50'}`}
               >
                 <div className="flex items-start gap-3 mb-3">
                   {isCorrect ? (
@@ -132,8 +132,8 @@ export function QuizSystem({
                       <span
                         className={
                           isCorrect
-                            ? 'text-green-700 font-semibold'
-                            : 'text-red-700 font-semibold'
+                            ? 'text-brand-green-700 font-semibold'
+                            : 'text-brand-red-700 font-semibold'
                         }
                       >
                         {question.options[userAnswer]}
@@ -142,7 +142,7 @@ export function QuizSystem({
                     {!isCorrect && (
                       <p className="text-sm text-black">
                         Correct answer:{' '}
-                        <span className="text-green-700 font-semibold">
+                        <span className="text-brand-green-700 font-semibold">
                           {question.options[question.correctAnswer]}
                         </span>
                       </p>
@@ -169,7 +169,7 @@ export function QuizSystem({
           {passed && (
             <button
               onClick={() => (window.location.href = '/lms/courses')}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition"
+              className="flex-1 bg-brand-green-600 hover:bg-brand-green-700 text-white py-3 rounded-lg font-semibold transition"
             >
               Continue to Next Lesson
             </button>
@@ -253,7 +253,7 @@ export function QuizSystem({
           <button
             onClick={submitQuiz}
             disabled={!allAnswered}
-            className="px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed bg-green-600 hover:bg-green-700 text-white"
+            className="px-6 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed bg-brand-green-600 hover:bg-brand-green-700 text-white"
           >
             Submit Quiz
           </button>

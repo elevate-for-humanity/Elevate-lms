@@ -106,23 +106,23 @@ export function LicenseBanner({ license, onDismiss }: LicenseBannerProps) {
   // Suspended/Canceled Banner
   if (license.status === 'suspended' || license.status === 'canceled') {
     return (
-      <div className="bg-red-50 border-b border-red-200">
+      <div className="bg-brand-red-50 border-b border-brand-red-200">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
+              <AlertTriangle className="w-5 h-5 text-brand-red-600" />
               <div>
-                <span className="font-semibold text-red-900">
+                <span className="font-semibold text-brand-red-900">
                   {license.status === 'suspended' ? 'License Suspended' : 'License Canceled'}
                 </span>
-                <span className="text-red-700 ml-2">
+                <span className="text-brand-red-700 ml-2">
                   Administrative actions are disabled.
                 </span>
               </div>
             </div>
             <Link
               href="/store"
-              className="bg-red-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition-colors"
+              className="bg-brand-red-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-brand-red-700 transition-colors"
             >
               Reactivate License
             </Link>
@@ -163,7 +163,7 @@ export function LicenseBadge({ status, trialEndsAt }: { status: LicenseStatus; t
 
   if (status === 'suspended' || status === 'canceled') {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+      <span className="inline-flex items-center gap-1 px-2 py-1 bg-brand-red-100 text-brand-red-700 text-xs font-medium rounded-full">
         <AlertTriangle className="w-3 h-3" />
         {status === 'suspended' ? 'Suspended' : 'Canceled'}
       </span>
@@ -182,8 +182,8 @@ export function TrialExpiredModal({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl max-w-md w-full p-8">
         <div className="text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <AlertTriangle className="w-8 h-8 text-red-600" />
+          <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <AlertTriangle className="w-8 h-8 text-brand-red-600" />
           </div>
           <h2 className="text-2xl font-black text-gray-900 mb-4">
             Trial Period Ended

@@ -55,8 +55,8 @@ export default async function PartnerStudentsPage() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-xl shadow-sm border p-5 flex items-center gap-4">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <Users className="w-5 h-5 text-blue-600" />
+            <div className="p-3 bg-brand-blue-100 rounded-lg">
+              <Users className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div>
               <p className="text-2xl font-bold">{totalStudents}</p>
@@ -64,8 +64,8 @@ export default async function PartnerStudentsPage() {
             </div>
           </div>
           <div className="bg-white rounded-xl shadow-sm border p-5 flex items-center gap-4">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <BookOpen className="w-5 h-5 text-green-600" />
+            <div className="p-3 bg-brand-green-100 rounded-lg">
+              <BookOpen className="w-5 h-5 text-brand-green-600" />
             </div>
             <div>
               <p className="text-2xl font-bold">{withCourses}</p>
@@ -73,8 +73,8 @@ export default async function PartnerStudentsPage() {
             </div>
           </div>
           <div className="bg-white rounded-xl shadow-sm border p-5 flex items-center gap-4">
-            <div className="p-3 bg-orange-100 rounded-lg">
-              <Award className="w-5 h-5 text-orange-600" />
+            <div className="p-3 bg-brand-orange-100 rounded-lg">
+              <Award className="w-5 h-5 text-brand-orange-600" />
             </div>
             <div>
               <p className="text-2xl font-bold">{completed}</p>
@@ -149,9 +149,9 @@ export default async function PartnerStudentsPage() {
                           <div
                             className={`h-1.5 rounded-full ${
                               student.overall_progress === 100
-                                ? 'bg-green-500'
+                                ? 'bg-brand-green-500'
                                 : student.overall_progress > 0
-                                  ? 'bg-blue-600'
+                                  ? 'bg-brand-blue-600'
                                   : 'bg-gray-300'
                             }`}
                             style={{
@@ -166,7 +166,7 @@ export default async function PartnerStudentsPage() {
                     </td>
                     <td className="px-4 py-3 text-sm">
                       {student.certificate_count > 0 ? (
-                        <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 px-2 py-0.5 rounded text-xs font-medium">
+                        <span className="inline-flex items-center gap-1 text-brand-green-700 bg-brand-green-50 px-2 py-0.5 rounded text-xs font-medium">
                           <Award className="w-3 h-3" />
                           {student.certificate_count}
                         </span>
@@ -178,9 +178,9 @@ export default async function PartnerStudentsPage() {
                       <span
                         className={`px-2 py-0.5 rounded text-xs font-medium ${
                           student.placement_status === 'active'
-                            ? 'bg-green-50 text-green-700'
+                            ? 'bg-brand-green-50 text-brand-green-700'
                             : student.placement_status === 'completed'
-                              ? 'bg-blue-50 text-blue-700'
+                              ? 'bg-brand-blue-50 text-brand-blue-700'
                               : 'bg-gray-100 text-gray-600'
                         }`}
                       >

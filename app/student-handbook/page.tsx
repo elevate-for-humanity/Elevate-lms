@@ -182,9 +182,9 @@ export default async function StudentHandbookPage() {
               All students are expected to conduct themselves professionally and respectfully. 
               This includes treating fellow students, instructors, and staff with dignity and respect.
             </p>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <h3 className="font-medium text-red-800 mb-2">Prohibited Conduct</h3>
-              <ul className="text-sm text-red-700 space-y-1">
+            <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4">
+              <h3 className="font-medium text-brand-red-800 mb-2">Prohibited Conduct</h3>
+              <ul className="text-sm text-brand-red-700 space-y-1">
                 <li>• Harassment or discrimination of any kind</li>
                 <li>• Academic dishonesty or cheating</li>
                 <li>• Possession of weapons or illegal substances</li>
@@ -254,8 +254,8 @@ export default async function StudentHandbookPage() {
         )}
 
         {acknowledgment && (
-          <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-6">
-            <p className="text-green-700">
+          <div className="mt-8 bg-brand-green-50 border border-brand-green-200 rounded-xl p-6">
+            <p className="text-brand-green-700">
               • You acknowledged this handbook on {new Date(acknowledgment.acknowledged_at).toLocaleDateString()}
             </p>
           </div>

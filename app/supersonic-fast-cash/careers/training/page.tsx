@@ -383,7 +383,7 @@ export default function TrainingPage() {
                     (window.location.href =
                       '/supersonic-fast-cash/careers/apply')
                   }
-                  className="w-full mt-4 bg-white text-green-600 py-3 px-6 rounded-lg font-bold hover:bg-gray-100"
+                  className="w-full mt-4 bg-white text-brand-green-600 py-3 px-6 rounded-lg font-bold hover:bg-gray-100"
                 >
                   Apply Now (Get FREE Training)
                 </button>
@@ -436,7 +436,7 @@ export default function TrainingPage() {
                   <p className="mb-3">Have an employee access key?</p>
                   <button
                     onClick={() => setShowAccessKeyModal(true)}
-                    className="bg-white text-green-600 py-2 px-6 rounded-lg font-bold hover:bg-gray-100"
+                    className="bg-white text-brand-green-600 py-2 px-6 rounded-lg font-bold hover:bg-gray-100"
                   >
                     Enter Access Key
                   </button>
@@ -447,7 +447,7 @@ export default function TrainingPage() {
                     onClick={() =>
                       (window.location.href = '/supersonic-fast-cash/tools')
                     }
-                    className="bg-white text-green-600 py-2 px-6 rounded-lg font-bold hover:bg-gray-100"
+                    className="bg-white text-brand-green-600 py-2 px-6 rounded-lg font-bold hover:bg-gray-100"
                   >
                     View Software Options
                   </button>
@@ -459,7 +459,7 @@ export default function TrainingPage() {
                       (window.location.href =
                         '/supersonic-fast-cash/careers/competency-test')
                     }
-                    className="bg-white text-green-600 py-2 px-6 rounded-lg font-bold hover:bg-gray-100"
+                    className="bg-white text-brand-green-600 py-2 px-6 rounded-lg font-bold hover:bg-gray-100"
                   >
                     Take Competency Test →
                   </button>
@@ -597,7 +597,7 @@ export default function TrainingPage() {
 
                   <div className="mb-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <Award className="w-5 h-5 text-green-600" />
+                      <Award className="w-5 h-5 text-brand-green-600" />
                       <span className="font-semibold text-sm">
                         Certification:
                       </span>
@@ -612,16 +612,16 @@ export default function TrainingPage() {
                       <div>
                         {isEmployee ? (
                           <div>
-                            <span className="text-3xl font-bold text-green-600">
+                            <span className="text-3xl font-bold text-brand-green-600">
                               FREE
                             </span>
-                            <div className="text-sm text-green-600 font-semibold">
+                            <div className="text-sm text-brand-green-600 font-semibold">
                               Employee Access
                             </div>
                           </div>
                         ) : (
                           <>
-                            <span className="text-3xl font-bold text-green-600">
+                            <span className="text-3xl font-bold text-brand-green-600">
                               ${module.price}
                             </span>
                             <div className="text-sm text-black">
@@ -634,7 +634,7 @@ export default function TrainingPage() {
                   </div>
 
                   {isEmployee && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3 text-sm text-green-700">
+                    <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-3 mb-3 text-sm text-brand-green-700">
                       • You have employee access to this course
                     </div>
                   )}
@@ -653,7 +653,7 @@ export default function TrainingPage() {
                         prerequisiteMet && handleEnroll(module.id, isEmployee)
                       }
                       disabled={!prerequisiteMet}
-                      className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      className="w-full bg-brand-green-600 text-white py-3 rounded-lg font-bold hover:bg-brand-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
                       {prerequisiteMet
                         ? isEmployee
@@ -740,7 +740,7 @@ export default function TrainingPage() {
                 <button
                   onClick={handleAccessKeySubmit}
                   disabled={!accessKey || !employeeEmail}
-                  className="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="flex-1 bg-brand-green-600 text-white py-3 rounded-lg font-bold hover:bg-brand-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   Validate Key
                 </button>
@@ -765,7 +765,7 @@ export default function TrainingPage() {
               <div className="p-8">
                 <div className="grid md:grid-cols-3 gap-4 mb-6">
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <Clock className="w-8 h-8 mx-auto mb-2 text-green-600" />
+                    <Clock className="w-8 h-8 mx-auto mb-2 text-brand-green-600" />
                     <div className="font-bold">
                       {selectedModuleData.duration}
                     </div>
@@ -797,9 +797,9 @@ export default function TrainingPage() {
                   </ul>
                 </div>
 
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4 mb-6">
                   <div className="flex items-center gap-2 mb-2">
-                    <Award className="w-5 h-5 text-green-600" />
+                    <Award className="w-5 h-5 text-brand-green-600" />
                     <strong>Certification:</strong>
                   </div>
                   <p className="text-sm">{selectedModuleData.certification}</p>
@@ -817,7 +817,7 @@ export default function TrainingPage() {
                       handleEnroll(selectedModuleData.id);
                       setSelectedModule(null);
                     }}
-                    className="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700"
+                    className="flex-1 bg-brand-green-600 text-white py-3 rounded-lg font-bold hover:bg-brand-green-700"
                   >
                     Enroll for ${selectedModuleData.price}
                   </button>

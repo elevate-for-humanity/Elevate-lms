@@ -102,8 +102,8 @@ export default function PurchaseLicensePage() {
                     key={license.id}
                     className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
                       selectedLicense === license.id
-                        ? 'border-orange-600 bg-orange-50'
-                        : 'border-gray-200 hover:border-orange-300'
+                        ? 'border-brand-orange-600 bg-brand-orange-50'
+                        : 'border-gray-200 hover:border-brand-orange-300'
                     }`}
                     onClick={() => setSelectedLicense(license.id)}
                   >
@@ -124,7 +124,7 @@ export default function PurchaseLicensePage() {
                           {license.description}
                         </p>
                         <div className="flex items-center gap-4 text-sm">
-                          <span className="text-orange-600 font-semibold">
+                          <span className="text-brand-orange-600 font-semibold">
                             ${license.price.toLocaleString()}
                           </span>
                           <span className="text-black">
@@ -173,7 +173,7 @@ export default function PurchaseLicensePage() {
                         max="100"
                         value={quantity}
                         onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                       />
                     </div>
 
@@ -184,7 +184,7 @@ export default function PurchaseLicensePage() {
                       </div>
                       <div className="flex justify-between font-bold text-lg">
                         <span>Total</span>
-                        <span className="text-orange-600">
+                        <span className="text-brand-orange-600">
                           ${total.toLocaleString()}
                         </span>
                       </div>

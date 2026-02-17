@@ -131,7 +131,7 @@ export default function DataSettingsPage() {
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" defaultChecked className="sr-only peer" />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
               </label>
             </div>
             <div className="px-6 py-4 flex items-center justify-between">
@@ -141,7 +141,7 @@ export default function DataSettingsPage() {
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" defaultChecked className="sr-only peer" />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
               </label>
             </div>
             <div className="px-6 py-4 flex items-center justify-between">
@@ -151,7 +151,7 @@ export default function DataSettingsPage() {
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" defaultChecked className="sr-only peer" />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
               </label>
             </div>
             <div className="px-6 py-4 flex items-center justify-between">
@@ -161,7 +161,7 @@ export default function DataSettingsPage() {
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" className="sr-only peer" />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
               </label>
             </div>
           </div>
@@ -170,8 +170,8 @@ export default function DataSettingsPage() {
         {/* Data Retention */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Database className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Database className="w-6 h-6 text-brand-green-600" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Data Retention</h2>
@@ -179,7 +179,7 @@ export default function DataSettingsPage() {
                 Your education records are retained in accordance with FERPA regulations and 
                 accreditation requirements. Transcripts and certificates are kept permanently.
               </p>
-              <div className="flex items-center gap-2 text-sm text-green-600">
+              <div className="flex items-center gap-2 text-sm text-brand-green-600">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Your data is securely stored and encrypted</span>
               </div>
@@ -218,28 +218,28 @@ export default function DataSettingsPage() {
         </div>
 
         {/* Delete Account */}
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6">
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded-xl p-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Trash2 className="w-6 h-6 text-red-600" />
+            <div className="w-12 h-12 bg-brand-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Trash2 className="w-6 h-6 text-brand-red-600" />
             </div>
             <div className="flex-1">
-              <h2 className="text-lg font-semibold text-red-800">Delete Account</h2>
-              <p className="text-red-700 mt-1 mb-4">
+              <h2 className="text-lg font-semibold text-brand-red-800">Delete Account</h2>
+              <p className="text-brand-red-700 mt-1 mb-4">
                 Permanently delete your account and all associated data. This action cannot be undone.
                 Note: Some records may be retained for legal and accreditation purposes.
               </p>
               {!showDeleteConfirm ? (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete My Account
                 </button>
               ) : (
-                <div className="bg-white rounded-lg p-4 border border-red-200">
-                  <div className="flex items-center gap-2 text-red-800 mb-3">
+                <div className="bg-white rounded-lg p-4 border border-brand-red-200">
+                  <div className="flex items-center gap-2 text-brand-red-800 mb-3">
                     <AlertTriangle className="w-5 h-5" />
                     <span className="font-medium">This action is irreversible</span>
                   </div>
@@ -257,7 +257,7 @@ export default function DataSettingsPage() {
                     <button
                       onClick={handleDeleteAccount}
                       disabled={deleteConfirmText !== 'DELETE'}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Confirm Delete
                     </button>

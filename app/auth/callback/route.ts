@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
@@ -34,7 +35,7 @@ export async function GET(request: Request) {
         await supabase.rpc('claim_applications_for_current_user');
       } catch (claimError) {
         // Don't block redirect if claim fails
-        console.warn('Failed to claim applications:', claimError);
+        logger.warn('Failed to claim applications:', claimError);
       }
 
       return NextResponse.redirect(new URL(next, requestUrl.origin));

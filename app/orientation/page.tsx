@@ -164,18 +164,18 @@ export default async function OrientationPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-red-600">
+      <section className="py-16 bg-brand-red-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-red-100 text-lg mb-8">
+          <p className="text-brand-red-100 text-lg mb-8">
             Apply online, then schedule your orientation above. Training may be free for eligible Indiana residents.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/apply/student"
-              className="bg-white text-red-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-red-50 transition"
+              className="bg-white text-brand-red-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-50 transition"
             >
               Apply Now
             </Link>

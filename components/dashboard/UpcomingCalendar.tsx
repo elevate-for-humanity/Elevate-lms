@@ -42,7 +42,7 @@ export function UpcomingCalendar() {
         {events.map((event) => (
           <div
             key={event.id}
-            className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-red-300 transition-colors"
+            className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-brand-red-300 transition-colors"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1">
@@ -68,7 +68,7 @@ export function UpcomingCalendar() {
           </div>
         ))}
       </div>
-      <button className="w-full mt-4 text-center text-sm font-medium text-brand-orange-600 hover:text-red-700">
+      <button className="w-full mt-4 text-center text-sm font-medium text-brand-orange-600 hover:text-brand-red-700">
         View Full Calendar →
       </button>
     </div>

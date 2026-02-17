@@ -34,8 +34,8 @@ export const Toast: React.FC<ToastProps> = ({
   };
 
   const styles = {
-    success: 'bg-green-50 text-green-800 border-green-200',
-    error: 'bg-red-50 text-red-800 border-red-200',
+    success: 'bg-brand-green-50 text-brand-green-800 border-brand-green-200',
+    error: 'bg-brand-red-50 text-brand-red-800 border-brand-red-200',
     warning: 'bg-yellow-50 text-yellow-800 border-yellow-200',
     info: 'bg-brand-blue-50 text-brand-blue-800 border-brand-blue-200',
   };

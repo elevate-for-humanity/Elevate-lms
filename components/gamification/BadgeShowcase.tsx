@@ -90,7 +90,7 @@ export function BadgeShowcase({ userId, badges: initialBadges, limit = 6 }: Badg
       {earnedBadges.length > 0 && (
         <div>
           <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <Award className="w-6 h-6 text-orange-400" />
+            <Award className="w-6 h-6 text-brand-orange-400" />
             Your Badges ({earnedBadges.length})
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -137,7 +137,7 @@ export function BadgeShowcase({ userId, badges: initialBadges, limit = 6 }: Badg
                   <div className="mt-2">
                     <div className="w-full bg-slate-700 rounded-full h-2">
                       <div
-                        className="bg-orange-500 rounded-full h-2 transition-all"
+                        className="bg-brand-orange-500 rounded-full h-2 transition-all"
                         style={{
                           width: `${(badge.progress / badge.progress_max) * 100}%`,
                         }}

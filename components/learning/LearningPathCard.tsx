@@ -29,11 +29,11 @@ export function LearningPathCard({
   const getDifficultyColor = () => {
     switch (difficulty) {
       case "beginner":
-        return "text-green-400 bg-green-500/20";
+        return "text-brand-green-400 bg-brand-green-500/20";
       case "intermediate":
         return "text-yellow-400 bg-yellow-500/20";
       case "advanced":
-        return "text-red-400 bg-brand-orange-500/20";
+        return "text-brand-red-400 bg-brand-orange-500/20";
     }
   };
 
@@ -82,7 +82,7 @@ export function LearningPathCard({
           </div>
           <div className="w-full bg-slate-700 rounded-full h-2">
             <div
-              className="bg-orange-500 rounded-full h-2 transition-all"
+              className="bg-brand-orange-500 rounded-full h-2 transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -90,7 +90,7 @@ export function LearningPathCard({
       )}
 
       {!enrolled && (
-        <button className="w-full mt-2 px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2">
+        <button className="w-full mt-2 px-4 py-2 bg-brand-orange-500 text-white rounded-lg font-semibold hover:bg-brand-orange-600 transition-colors flex items-center justify-center gap-2">
           <TrendingUp className="w-4 h-4" />
           Start Learning Path
         </button>

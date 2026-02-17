@@ -24,7 +24,7 @@ const iconMap: Record<string, typeof Zap> = {
 
 const statusColors: Record<string, { bg: string; text: string }> = {
   'Integration-ready': { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700' },
-  'Included': { bg: 'bg-green-100', text: 'text-green-700' },
+  'Included': { bg: 'bg-brand-green-100', text: 'text-brand-green-700' },
   'Configurable': { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700' },
 };
 
@@ -138,7 +138,7 @@ export default async function IntegrationsPage() {
                     'Employer partner records',
                   ].map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3 text-sm">
-                      <ArrowRight className="w-4 h-4 text-green-600" />
+                      <ArrowRight className="w-4 h-4 text-brand-green-600" />
                       <span className="text-slate-700">{item}</span>
                     </div>
                   ))}
@@ -180,7 +180,7 @@ export default async function IntegrationsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href={ROUTES.schedule}
-              className="inline-flex items-center justify-center gap-2 bg-orange-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-orange-700 transition"
+              className="inline-flex items-center justify-center gap-2 bg-brand-orange-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-orange-700 transition"
             >
               <Calendar className="w-5 h-5" />
               Schedule a Demo

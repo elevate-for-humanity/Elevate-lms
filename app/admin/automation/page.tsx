@@ -146,11 +146,11 @@ export default async function AutomationLogPage() {
                   <div key={log.id} className="p-4 hover:bg-gray-50">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${log.status === 'sent' ? 'bg-green-100' : log.status === 'failed' ? 'bg-red-100' : 'bg-yellow-100'}`}>
+                        <div className={`p-2 rounded-lg ${log.status === 'sent' ? 'bg-brand-green-100' : log.status === 'failed' ? 'bg-brand-red-100' : 'bg-yellow-100'}`}>
                           {log.status === 'sent' ? (
                             <span className="text-slate-400 flex-shrink-0">•</span>
                           ) : log.status === 'failed' ? (
-                            <XCircle className="w-4 h-4 text-red-600" />
+                            <XCircle className="w-4 h-4 text-brand-red-600" />
                           ) : (
                             <Clock className="w-4 h-4 text-yellow-600" />
                           )}
@@ -181,7 +181,7 @@ export default async function AutomationLogPage() {
           <div className="bg-white rounded-xl shadow-sm">
             <div className="p-4 border-b flex items-center justify-between">
               <h2 className="font-bold text-gray-900 flex items-center gap-2">
-                <Users className="w-5 h-5 text-green-500" />
+                <Users className="w-5 h-5 text-brand-green-500" />
                 Enrollment Automations
               </h2>
               <span className="text-sm text-gray-500">{recentEnrollments?.length || 0} recent</span>
@@ -192,7 +192,7 @@ export default async function AutomationLogPage() {
                   <div key={enrollment.id} className="p-4 hover:bg-gray-50">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-green-100">
+                        <div className="p-2 rounded-lg bg-brand-green-100">
                           <span className="text-slate-400 flex-shrink-0">•</span>
                         </div>
                         <div>
@@ -228,7 +228,7 @@ export default async function AutomationLogPage() {
             <div className="p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-medium text-gray-900">Nudge Emails</span>
-                <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">Active</span>
+                <span className="text-xs px-2 py-1 bg-brand-green-100 text-brand-green-700 rounded">Active</span>
               </div>
               <p className="text-sm text-gray-600">Sends inactivity reminders</p>
               <p className="text-xs text-gray-400 mt-1">Runs daily at 9:00 AM</p>
@@ -236,7 +236,7 @@ export default async function AutomationLogPage() {
             <div className="p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-medium text-gray-900">Missed Check-ins</span>
-                <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">Active</span>
+                <span className="text-xs px-2 py-1 bg-brand-green-100 text-brand-green-700 rounded">Active</span>
               </div>
               <p className="text-sm text-gray-600">Alerts for missed OJT check-ins</p>
               <p className="text-xs text-gray-400 mt-1">Runs daily at 6:00 PM</p>
@@ -244,7 +244,7 @@ export default async function AutomationLogPage() {
             <div className="p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-medium text-gray-900">End of Day Summary</span>
-                <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">Active</span>
+                <span className="text-xs px-2 py-1 bg-brand-green-100 text-brand-green-700 rounded">Active</span>
               </div>
               <p className="text-sm text-gray-600">Daily progress summaries</p>
               <p className="text-xs text-gray-400 mt-1">Runs daily at 8:00 PM</p>

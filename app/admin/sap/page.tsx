@@ -177,13 +177,13 @@ export default async function SAPMonitoringPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'good':
-        return 'bg-brand-green-100 text-green-800 border-green-200';
+        return 'bg-brand-green-100 text-brand-green-800 border-brand-green-200';
       case 'warning':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'probation':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
+        return 'bg-brand-orange-100 text-brand-orange-800 border-brand-orange-200';
       case 'suspension':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-brand-red-100 text-brand-red-800 border-brand-red-200';
       default:
         return 'bg-gray-100 text-black border-gray-200';
     }
@@ -484,19 +484,19 @@ export default async function SAPMonitoringPage() {
 
         {/* Action Items */}
         {warnings + probation + suspension > 0 && (
-          <div className="mt-8 bg-orange-50 border border-orange-200 rounded-xl p-6">
+          <div className="mt-8 bg-brand-orange-50 border border-brand-orange-200 rounded-xl p-6">
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-6 h-6 text-brand-orange-600 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold text-orange-900 mb-2">
+                <h3 className="text-lg font-semibold text-brand-orange-900 mb-2">
                   Action Required: {warnings + probation + suspension} Students
                   Need Intervention
                 </h3>
-                <p className="text-orange-800 mb-4">
+                <p className="text-brand-orange-800 mb-4">
                   Students not meeting SAP requirements need immediate attention
                   to prevent dismissal.
                 </p>
-                <ul className="space-y-2 text-orange-800 text-sm">
+                <ul className="space-y-2 text-brand-orange-800 text-sm">
                   {warnings > 0 && (
                     <li>
                       • {warnings} students on warning - schedule academic

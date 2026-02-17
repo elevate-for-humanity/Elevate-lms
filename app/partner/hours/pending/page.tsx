@@ -220,7 +220,7 @@ export default function PartnerHoursPendingPage() {
             <button
               onClick={handleBulkApprove}
               disabled={processing === 'bulk'}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 disabled:opacity-50"
             >
               <span className="text-slate-400 flex-shrink-0">•</span>
               {processing === 'bulk' ? 'Processing...' : 'Approve All'}
@@ -229,16 +229,16 @@ export default function PartnerHoursPendingPage() {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600" />
-            <p className="text-red-800">{error}</p>
+          <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-brand-red-600" />
+            <p className="text-brand-red-800">{error}</p>
           </div>
         )}
 
         {success && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
+          <div className="mb-6 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg flex items-center gap-3">
             <span className="text-slate-400 flex-shrink-0">•</span>
-            <p className="text-green-800">{success}</p>
+            <p className="text-brand-green-800">{success}</p>
           </div>
         )}
 
@@ -321,7 +321,7 @@ export default function PartnerHoursPendingPage() {
                     <button
                       onClick={() => handleReject(hour.id)}
                       disabled={processing === hour.id}
-                      className="inline-flex items-center gap-1 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
+                      className="inline-flex items-center gap-1 px-3 py-2 text-brand-red-600 hover:bg-brand-red-50 rounded-lg disabled:opacity-50"
                     >
                       <XCircle className="w-4 h-4" />
                       Reject
@@ -329,7 +329,7 @@ export default function PartnerHoursPendingPage() {
                     <button
                       onClick={() => handleApprove(hour.id)}
                       disabled={processing === hour.id}
-                      className="inline-flex items-center gap-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                      className="inline-flex items-center gap-1 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 disabled:opacity-50"
                     >
                       <span className="text-slate-400 flex-shrink-0">•</span>
                       {processing === hour.id ? 'Processing...' : 'Approve'}

@@ -27,10 +27,10 @@ export default async function ImpactPage() {
           <p className="text-gray-600 mt-2">Measure program impact on participants and community</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Lives Impacted</h3><p className="text-3xl font-bold text-green-600 mt-2">2,847</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Lives Impacted</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">2,847</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Jobs Created</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">1,234</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Wage Increase</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">$12.5M</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Certifications</h3><p className="text-3xl font-bold text-orange-600 mt-2">3,456</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Certifications</h3><p className="text-3xl font-bold text-brand-orange-600 mt-2">3,456</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6"><h2 className="text-lg font-semibold mb-4">Impact Stories</h2><p className="text-gray-500">Success stories and community impact</p></div>
       </div>

@@ -71,7 +71,7 @@ export default async function MeetingsPage() {
       </div>
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-green-600 to-teal-600 text-white">
+      <div className="bg-gradient-to-r from-brand-green-600 to-teal-600 text-white">
         <div className="max-w-6xl mx-auto px-4 py-12">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -79,13 +79,13 @@ export default async function MeetingsPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold">Video Meetings</h1>
-              <p className="text-green-100 mt-1">
+              <p className="text-brand-green-100 mt-1">
                 Schedule and join virtual study sessions
               </p>
             </div>
           </div>
           <div className="flex gap-4 mt-6">
-            <button className="flex items-center gap-2 px-6 py-3 bg-white text-green-700 rounded-lg hover:bg-green-50 font-medium">
+            <button className="flex items-center gap-2 px-6 py-3 bg-white text-brand-green-700 rounded-lg hover:bg-brand-green-50 font-medium">
               <Plus className="w-5 h-5" />
               Schedule Meeting
             </button>
@@ -105,7 +105,7 @@ export default async function MeetingsPage() {
             <div className="bg-white rounded-xl shadow-sm border">
               <div className="p-6 border-b flex items-center justify-between">
                 <h2 className="font-semibold text-gray-900">Upcoming Meetings</h2>
-                <Link href="/lms/collaborate/calendar" className="text-green-600 hover:text-green-700 text-sm font-medium">
+                <Link href="/lms/collaborate/calendar" className="text-brand-green-600 hover:text-brand-green-700 text-sm font-medium">
                   View Calendar
                 </Link>
               </div>
@@ -116,8 +116,8 @@ export default async function MeetingsPage() {
                     <div key={meeting.id} className="p-6 hover:bg-gray-50">
                       <div className="flex items-start justify-between">
                         <div className="flex gap-4">
-                          <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <Video className="w-6 h-6 text-green-600" />
+                          <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <Video className="w-6 h-6 text-brand-green-600" />
                           </div>
                           <div>
                             <h3 className="font-semibold text-gray-900">{meeting.title}</h3>
@@ -134,7 +134,7 @@ export default async function MeetingsPage() {
                             </div>
                           </div>
                         </div>
-                        <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">
+                        <button className="px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 text-sm font-medium">
                           Join
                         </button>
                       </div>
@@ -148,7 +148,7 @@ export default async function MeetingsPage() {
                   <p className="text-gray-600 mb-6">
                     Schedule a study session with your classmates or join an existing one.
                   </p>
-                  <button className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">
+                  <button className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 font-medium">
                     <Plus className="w-5 h-5" />
                     Schedule Your First Meeting
                   </button>
@@ -174,8 +174,8 @@ export default async function MeetingsPage() {
               <h3 className="font-semibold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 text-left">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Plus className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                    <Plus className="w-5 h-5 text-brand-green-600" />
                   </div>
                   <div>
                     <div className="font-medium text-gray-900">New Meeting</div>
@@ -183,8 +183,8 @@ export default async function MeetingsPage() {
                   </div>
                 </button>
                 <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 text-left">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <ExternalLink className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                    <ExternalLink className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <div>
                     <div className="font-medium text-gray-900">Join with Code</div>
@@ -204,23 +204,23 @@ export default async function MeetingsPage() {
             </div>
 
             {/* Meeting Tips */}
-            <div className="bg-green-50 rounded-xl p-6">
+            <div className="bg-brand-green-50 rounded-xl p-6">
               <h3 className="font-semibold text-gray-900 mb-3">Meeting Tips</h3>
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-0.5">•</span>
+                  <span className="text-brand-green-600 mt-0.5">•</span>
                   Test your audio and video before joining
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-0.5">•</span>
+                  <span className="text-brand-green-600 mt-0.5">•</span>
                   Find a quiet space with good lighting
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-0.5">•</span>
+                  <span className="text-brand-green-600 mt-0.5">•</span>
                   Have your study materials ready
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-0.5">•</span>
+                  <span className="text-brand-green-600 mt-0.5">•</span>
                   Use screen share to collaborate on notes
                 </li>
               </ul>

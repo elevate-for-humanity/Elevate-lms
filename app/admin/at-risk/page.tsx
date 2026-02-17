@@ -166,10 +166,10 @@ export default async function AtRiskStudentsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <AlertCircle className="w-8 h-8 text-red-600" />
+              <AlertCircle className="w-8 h-8 text-brand-red-600" />
               <div>
                 <div className="text-sm text-black">At-Risk Students</div>
-                <div className="text-3xl font-bold text-red-600">
+                <div className="text-3xl font-bold text-brand-red-600">
                   {atRiskStudents?.length || 0}
                 </div>
               </div>
@@ -215,7 +215,7 @@ export default async function AtRiskStudentsPage() {
         {/* At-Risk Students List */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <h2 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
-            <AlertCircle className="w-6 h-6 text-red-600" />
+            <AlertCircle className="w-6 h-6 text-brand-red-600" />
             Critical: At-Risk Students
           </h2>
 
@@ -231,7 +231,7 @@ export default async function AtRiskStudentsPage() {
                 return (
                   <div
                     key={risk.id}
-                    className="p-4 bg-red-50 border-l-4 border-red-500 rounded"
+                    className="p-4 bg-brand-red-50 border-l-4 border-brand-red-500 rounded"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -239,7 +239,7 @@ export default async function AtRiskStudentsPage() {
                           <h3 className="font-bold text-black text-lg">
                             {student?.first_name} {student?.last_name}
                           </h3>
-                          <span className="px-2 py-2 bg-red-100 text-red-700 text-xs font-semibold rounded">
+                          <span className="px-2 py-2 bg-brand-red-100 text-brand-red-700 text-xs font-semibold rounded">
                             {risk.overdue_count} OVERDUE
                           </span>
                         </div>
@@ -284,7 +284,7 @@ export default async function AtRiskStudentsPage() {
                             <span className="text-black">
                               Days Inactive:
                             </span>
-                            <span className="ml-2 font-medium text-red-600">
+                            <span className="ml-2 font-medium text-brand-red-600">
                               {risk.days_since_activity}
                             </span>
                           </div>
@@ -300,7 +300,7 @@ export default async function AtRiskStudentsPage() {
                         {student?.phone && (
                           <a
                             href={`tel:${student.phone}`}
-                            className="px-4 py-2 bg-brand-green-600 text-white rounded-lg font-semibold hover:bg-green-700 text-center"
+                            className="px-4 py-2 bg-brand-green-600 text-white rounded-lg font-semibold hover:bg-brand-green-700 text-center"
                           >
                             Call Student
                           </a>
@@ -400,13 +400,13 @@ export default async function AtRiskStudentsPage() {
                       </td>
                       <td className="py-3 px-4 text-center">
                         <span
-                          className={`font-bold ${program.completionRate < 50 ? 'text-red-600' : 'text-yellow-600'}`}
+                          className={`font-bold ${program.completionRate < 50 ? 'text-brand-red-600' : 'text-yellow-600'}`}
                         >
                           {program.completionRate}%
                         </span>
                       </td>
                       <td className="py-3 px-4 text-center">
-                        <span className="font-bold text-red-600">
+                        <span className="font-bold text-brand-red-600">
                           {program.dropoutRate}%
                         </span>
                       </td>

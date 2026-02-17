@@ -77,7 +77,7 @@ export default function BarberReportsPage() {
           </div>
           <div className="bg-slate-800 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="w-5 h-5 text-green-400" />
+              <TrendingUp className="w-5 h-5 text-brand-green-400" />
               <span className="text-slate-400 text-sm">This Month</span>
             </div>
             <p className="text-3xl font-bold text-white">{summary.thisMonth}</p>
@@ -110,7 +110,7 @@ export default function BarberReportsPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-slate-400">Approved</span>
-              <span className="text-green-400 font-medium">{summary.approved} hrs</span>
+              <span className="text-brand-green-400 font-medium">{summary.approved} hrs</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-slate-400">Pending Approval</span>

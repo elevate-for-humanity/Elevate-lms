@@ -136,8 +136,8 @@ export default function CreateCoursePage() {
           {message && (
             <div className={`mb-6 p-4 rounded-lg flex items-start gap-3 ${
               message.includes('Error')
-                ? 'bg-red-50 text-red-800'
-                : 'bg-green-50 text-green-800'
+                ? 'bg-brand-red-50 text-brand-red-800'
+                : 'bg-brand-green-50 text-brand-green-800'
             }`}>
               {message.includes('Error') ? (
                 <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />

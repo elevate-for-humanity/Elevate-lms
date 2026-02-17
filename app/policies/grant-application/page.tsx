@@ -43,7 +43,7 @@ export default function GrantApplicationPage() {
                 </ul>
               </div>
 
-              <div className="bg-green-50 rounded-lg p-6 border-2 border-green-200">
+              <div className="bg-brand-green-50 rounded-lg p-6 border-2 border-brand-green-200">
                 <h3 className="text-xl font-bold text-black mb-3">State Grants</h3>
                 <ul className="list-disc pl-6 text-black space-y-1">
                   <li>State education departments</li>
@@ -63,7 +63,7 @@ export default function GrantApplicationPage() {
                 </ul>
               </div>
 
-              <div className="bg-orange-50 rounded-lg p-6 border-2 border-orange-200">
+              <div className="bg-brand-orange-50 rounded-lg p-6 border-2 border-brand-orange-200">
                 <h3 className="text-xl font-bold text-black mb-3">Corporate Grants</h3>
                 <ul className="list-disc pl-6 text-black space-y-1">
                   <li>Corporate giving programs</li>
@@ -92,7 +92,7 @@ export default function GrantApplicationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     2
                   </div>
                   <div>
@@ -118,7 +118,7 @@ export default function GrantApplicationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     4
                   </div>
                   <div>
@@ -131,7 +131,7 @@ export default function GrantApplicationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     5
                   </div>
                   <div>

@@ -223,7 +223,7 @@ export default function ApplyFormClient() {
             or fill out the quick inquiry form below.
           </p>
 
-          <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-6 mb-8">
+          <div className="bg-brand-orange-50 border-2 border-brand-orange-200 rounded-xl p-6 mb-8">
             <p className="text-black font-semibold mb-3">
               Ready to apply? Complete our full application form:
             </p>
@@ -294,7 +294,7 @@ export default function ApplyFormClient() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                   placeholder="Your name"
                 />
               </div>
@@ -314,7 +314,7 @@ export default function ApplyFormClient() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                   placeholder="your.email@gmail.com"
                 />
               </div>
@@ -334,7 +334,7 @@ export default function ApplyFormClient() {
                   onChange={(e) =>
                     setFormData({ ...formData, phone: e.target.value })
                   }
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                   placeholder="Get Help Online"
                 />
               </div>
@@ -362,7 +362,7 @@ export default function ApplyFormClient() {
                       setShopData((prev) => ({ ...prev, programTrack: 'nail-technician' }));
                     }
                   }}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                 >
                   <option value="">Select a program...</option>
                   <optgroup label="Beauty Industry Apprenticeships">
@@ -415,7 +415,7 @@ export default function ApplyFormClient() {
                   onChange={(e) =>
                     setFormData({ ...formData, message: e.target.value })
                   }
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
                   placeholder="Tell us about your goals and any questions you have..."
                 />
               </div>
@@ -430,8 +430,8 @@ export default function ApplyFormClient() {
               />
 
               {status === 'error' && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg" role="alert">
-                  <p className="text-red-800">
+                <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg" role="alert">
+                  <p className="text-brand-red-800">
                     Something went wrong. Please try again or contact us at
                     support center.
                   </p>

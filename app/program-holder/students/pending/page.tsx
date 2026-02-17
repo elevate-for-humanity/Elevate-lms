@@ -238,7 +238,7 @@ export default async function PendingStudentsPage() {
                               <button className="px-3 py-2 bg-brand-green-600 hover:bg-brand-green-700 text-white text-sm font-medium rounded transition-colors" aria-label="Action button">
                                 Accept
                               </button>
-                              <button className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded transition-colors" aria-label="Action button">
+                              <button className="px-3 py-2 bg-brand-red-600 hover:bg-brand-red-700 text-white text-sm font-medium rounded transition-colors" aria-label="Action button">
                                 Decline
                               </button>
                             </div>

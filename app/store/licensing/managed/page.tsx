@@ -89,14 +89,14 @@ export default function ManagedPlatformPage() {
       <section className="relative py-20 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-red-600/10 border border-red-600/20 rounded-full px-4 py-2 mb-6">
-              <Shield className="w-4 h-4 text-red-400" />
-              <span className="text-red-600 text-sm font-medium">Managed Enterprise LMS</span>
+            <div className="inline-flex items-center gap-2 bg-brand-red-600/10 border border-brand-red-600/20 rounded-full px-4 py-2 mb-6">
+              <Shield className="w-4 h-4 text-brand-red-400" />
+              <span className="text-brand-red-600 text-sm font-medium">Managed Enterprise LMS</span>
             </div>
             
             <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
               Your Platform.<br />
-              <span className="text-red-400">Our Infrastructure.</span>
+              <span className="text-brand-red-400">Our Infrastructure.</span>
             </h1>
             
             <p className="text-xl text-slate-700 mb-4">
@@ -109,7 +109,7 @@ export default function ManagedPlatformPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="#plans"
-                className="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-lg transition"
+                className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg transition"
               >
                 View Plans & Pricing
               </Link>
@@ -150,7 +150,7 @@ export default function ManagedPlatformPage() {
               { icon: Headphones, title: 'Our Support', desc: 'Dedicated support team. We keep it running so you can focus on training.' },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-                <item.icon className="w-10 h-10 text-red-600 mb-4" />
+                <item.icon className="w-10 h-10 text-brand-red-600 mb-4" />
                 <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
                 <p className="text-slate-600 text-sm">{item.desc}</p>
               </div>
@@ -182,7 +182,7 @@ export default function ManagedPlatformPage() {
             
             <div className="grid md:grid-cols-2 gap-8 mb-6">
               <div>
-                <h4 className="text-green-400 font-semibold mb-3 flex items-center gap-2">
+                <h4 className="text-brand-green-400 font-semibold mb-3 flex items-center gap-2">
                   <Check className="w-5 h-5" />
                   What You Get
                 </h4>
@@ -198,7 +198,7 @@ export default function ManagedPlatformPage() {
                 </ul>
               </div>
               <div>
-                <h4 className="text-red-400 font-semibold mb-3 flex items-center gap-2">
+                <h4 className="text-brand-red-400 font-semibold mb-3 flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5" />
                   What This is NOT
                 </h4>
@@ -238,11 +238,11 @@ export default function ManagedPlatformPage() {
               <div
                 key={plan.id}
                 className={`relative bg-white rounded-2xl p-8 border ${
-                  plan.popular ? 'border-red-600' : 'border-slate-200'
+                  plan.popular ? 'border-brand-red-600' : 'border-slate-200'
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white text-sm font-bold px-4 py-1 rounded-full">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-red-600 text-white text-sm font-bold px-4 py-1 rounded-full">
                     Most Popular
                   </div>
                 )}
@@ -261,7 +261,7 @@ export default function ManagedPlatformPage() {
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3 text-slate-700 text-sm">
-                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <Check className="w-5 h-5 text-brand-green-500 flex-shrink-0 mt-0.5" />
                       {feature}
                     </li>
                   ))}
@@ -271,7 +271,7 @@ export default function ManagedPlatformPage() {
                   href={plan.href}
                   className={`block text-center py-3 px-6 rounded-lg font-bold transition ${
                     plan.popular
-                      ? 'bg-red-600 hover:bg-red-700 text-white'
+                      ? 'bg-brand-red-600 hover:bg-brand-red-700 text-white'
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-900'
                   }`}
                 >
@@ -305,7 +305,7 @@ export default function ManagedPlatformPage() {
               <div key={addon.name} className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">{addon.name}</h3>
                 <p className="text-slate-600 text-sm mb-4">{addon.desc}</p>
-                <p className="text-red-600 font-semibold">{addon.price}</p>
+                <p className="text-brand-red-600 font-semibold">{addon.price}</p>
               </div>
             ))}
           </div>
@@ -318,7 +318,7 @@ export default function ManagedPlatformPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-red-600">
+      <section className="py-20 bg-brand-red-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Launch Your Platform?</h2>
           <p className="text-slate-900/80 mb-8">
@@ -326,7 +326,7 @@ export default function ManagedPlatformPage() {
           </p>
           <Link
             href="#plans"
-            className="inline-flex items-center gap-2 bg-white text-red-600 font-bold px-8 py-4 rounded-lg hover:bg-slate-50 transition"
+            className="inline-flex items-center gap-2 bg-white text-brand-red-600 font-bold px-8 py-4 rounded-lg hover:bg-slate-50 transition"
           >
             Choose a Plan
             <ArrowRight className="w-5 h-5" />

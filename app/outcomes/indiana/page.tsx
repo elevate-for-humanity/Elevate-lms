@@ -161,7 +161,7 @@ export default function IndianaOutcomesPage() {
                     <td className="py-3 px-4 text-right text-slate-700">{row.enrolled}</td>
                     <td className="py-3 px-4 text-right text-slate-700">{row.completed}</td>
                     <td className="py-3 px-4 text-right text-slate-700">{row.employed}</td>
-                    <td className="py-3 px-4 text-right font-medium text-green-700">{row.avgWage}</td>
+                    <td className="py-3 px-4 text-right font-medium text-brand-green-700">{row.avgWage}</td>
                     <td className="py-3 pl-4 text-slate-600 text-sm">{row.region}</td>
                   </tr>
                 ))}

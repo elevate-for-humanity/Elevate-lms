@@ -32,15 +32,15 @@ interface Props {
 
 const industryColors: Record<string, string> = {
   Healthcare: 'bg-brand-blue-100 text-brand-blue-700',
-  HVAC: 'bg-orange-100 text-orange-700',
+  HVAC: 'bg-brand-orange-100 text-brand-orange-700',
   Beauty: 'bg-pink-100 text-pink-700',
-  Transportation: 'bg-green-100 text-green-700',
+  Transportation: 'bg-brand-green-100 text-brand-green-700',
   Technology: 'bg-purple-100 text-purple-700',
   Retail: 'bg-yellow-100 text-yellow-700',
   Manufacturing: 'bg-gray-100 text-gray-700',
   Pharmaceutical: 'bg-teal-100 text-teal-700',
   Hospitality: 'bg-indigo-100 text-indigo-700',
-  'Food Service': 'bg-red-100 text-red-700',
+  'Food Service': 'bg-brand-red-100 text-brand-red-700',
   Finance: 'bg-emerald-100 text-emerald-700',
   Logistics: 'bg-cyan-100 text-cyan-700',
   'Medical Devices': 'bg-violet-100 text-violet-700',
@@ -256,7 +256,7 @@ export default function EmployerPartners({
               <div className="text-gray-700 font-semibold">Employer Partners</div>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">{stats.placementRate}%</div>
+              <div className="text-4xl font-bold text-brand-green-600 mb-2">{stats.placementRate}%</div>
               <div className="text-gray-700 font-semibold">Placement Rate</div>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
@@ -264,7 +264,7 @@ export default function EmployerPartners({
               <div className="text-gray-700 font-semibold">Graduates Hired</div>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <div className="text-4xl font-bold text-orange-600 mb-2">${(stats.avgSalary / 1000).toFixed(0)}K</div>
+              <div className="text-4xl font-bold text-brand-orange-600 mb-2">${(stats.avgSalary / 1000).toFixed(0)}K</div>
               <div className="text-gray-700 font-semibold">Avg. Starting Salary</div>
             </div>
           </div>
@@ -294,7 +294,7 @@ export default function EmployerPartners({
                 {partner.hiring_rate && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Hiring Rate:</span>
-                    <span className="font-bold text-green-600">{partner.hiring_rate}%</span>
+                    <span className="font-bold text-brand-green-600">{partner.hiring_rate}%</span>
                   </div>
                 )}
               </div>
@@ -311,7 +311,7 @@ export default function EmployerPartners({
                 className="flex-shrink-0 w-64 bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-brand-green-600 rounded-lg flex items-center justify-center">
                     {partner.logo_url ? (
                       <Image src={partner.logo_url} alt={partner.name} width={32} height={32} className="rounded" />
                     ) : (
@@ -326,7 +326,7 @@ export default function EmployerPartners({
                 {partner.hiring_rate && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Hiring Rate:</span>
-                    <span className="font-bold text-green-600">{partner.hiring_rate}%</span>
+                    <span className="font-bold text-brand-green-600">{partner.hiring_rate}%</span>
                   </div>
                 )}
               </div>
@@ -353,7 +353,7 @@ export default function EmployerPartners({
 
         {/* CTA */}
         {showCTA && (
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-12 text-center text-white">
+          <div className="bg-gradient-to-r from-brand-blue-600 to-indigo-700 rounded-2xl p-12 text-center text-white">
             <Building2 className="w-16 h-16 mx-auto mb-6 opacity-90" />
             <h3 className="text-3xl font-bold mb-4">Partner With Us</h3>
             <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">

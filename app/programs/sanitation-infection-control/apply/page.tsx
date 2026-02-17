@@ -22,7 +22,7 @@ export default function ApplyPage() {
             ]}
             className="text-white/80 mb-4"
           />
-          <span className="inline-block px-3 py-1 bg-green-500 text-white text-sm font-semibold rounded-full mb-3">
+          <span className="inline-block px-3 py-1 bg-brand-green-500 text-white text-sm font-semibold rounded-full mb-3">
             DOL REGISTERED APPRENTICESHIP
           </span>
           <h1 className="text-3xl md:text-4xl font-bold text-white">Apply for Sanitation & Infection Control Apprenticeship</h1>
@@ -43,7 +43,7 @@ export default function ApplyPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Calendar className="w-6 h-6 text-green-600" />
+              <Calendar className="w-6 h-6 text-brand-green-600" />
               <div>
                 <p className="text-sm text-slate-600">Start Dates</p>
                 <p className="font-bold text-slate-900">Quarterly</p>
@@ -98,8 +98,8 @@ export default function ApplyPage() {
               'Hands-on experience in real facilities',
               'Job placement assistance',
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 bg-green-50 p-3 rounded-lg">
-                <span className="text-green-600 font-bold">•</span>
+              <div key={i} className="flex items-center gap-3 bg-brand-green-50 p-3 rounded-lg">
+                <span className="text-brand-green-600 font-bold">•</span>
                 <span className="text-slate-700">{item}</span>
               </div>
             ))}
@@ -154,17 +154,17 @@ export default function ApplyPage() {
           </div>
 
           {/* Option 2: Start Enrollment */}
-          <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-2xl p-8 text-center text-white">
+          <div className="bg-gradient-to-br from-brand-green-600 to-brand-green-700 rounded-2xl p-8 text-center text-white">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <ArrowRight className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold mb-2">Ready to Enroll?</h3>
-            <p className="text-green-100 mb-6">
+            <p className="text-brand-green-100 mb-6">
               Start your enrollment application now. We'll review your eligibility and contact you within 2-3 business days.
             </p>
             <Link
               href="/apply/student?program=sanitation-infection-control"
-              className="inline-flex items-center justify-center w-full px-6 py-4 bg-white text-green-700 font-bold rounded-full hover:bg-green-50 transition"
+              className="inline-flex items-center justify-center w-full px-6 py-4 bg-white text-brand-green-700 font-bold rounded-full hover:bg-brand-green-50 transition"
             >
               Start Enrollment
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -176,8 +176,8 @@ export default function ApplyPage() {
         <div className="bg-slate-900 text-white rounded-xl p-6 text-center">
           <p className="mb-2">Questions about the program?</p>
           <p className="text-lg">
-            Call <a href="/support" className="text-green-400 font-bold hover:underline">Get Help Online</a> or email{' '}
-            <a href="mailto:info@elevateforhumanity.org" className="text-green-400 font-bold hover:underline">info@elevateforhumanity.org</a>
+            Call <a href="/support" className="text-brand-green-400 font-bold hover:underline">Get Help Online</a> or email{' '}
+            <a href="mailto:info@elevateforhumanity.org" className="text-brand-green-400 font-bold hover:underline">info@elevateforhumanity.org</a>
           </p>
         </div>
 

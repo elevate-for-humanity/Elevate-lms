@@ -139,7 +139,7 @@ export function AutoFlowCharts() {
               <div className="flex-1">
                 <div className="w-full bg-brand-border rounded-full h-4">
                   <div
-                    className="bg-green-500 h-4 rounded-full transition-all duration-500"
+                    className="bg-brand-green-500 h-4 rounded-full transition-all duration-500"
                     style={{ width: `${program.rate}%` }}
                   />
                 </div>
@@ -203,7 +203,7 @@ export function AutoFlowCharts() {
               <div
                 className={`h-3 rounded-full transition-all duration-500 ${
                   risk.risk === 'Low Risk'
-                    ? 'bg-green-500'
+                    ? 'bg-brand-green-500'
                     : risk.risk === 'Medium Risk'
                       ? 'bg-yellow-500'
                       : 'bg-brand-orange-500'

@@ -222,7 +222,7 @@ export default function ProgramFinderQuiz() {
           </button>
           <Link
             href="/programs"
-            className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors"
+            className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors"
           >
             Browse all programs <ArrowRight className="w-4 h-4" />
           </Link>

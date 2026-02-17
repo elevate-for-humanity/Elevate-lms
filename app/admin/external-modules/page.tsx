@@ -124,7 +124,7 @@ export default function ExternalModulesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/admin/external-modules/approvals"
-              className="bg-brand-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Pending Approvals ({pendingApprovals.length})
             </Link>
@@ -214,7 +214,7 @@ export default function ExternalModulesPage() {
               {pendingApprovals.map((module) => (
                 <div
                   key={module.id}
-                  className="p-4 border rounded-lg bg-orange-50"
+                  className="p-4 border rounded-lg bg-brand-orange-50"
                 >
                   <div className="flex justify-between items-start">
                     <div>
@@ -230,7 +230,7 @@ export default function ExternalModulesPage() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => approveModule(module.id)}
-                        className="bg-brand-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                        className="bg-brand-green-600 hover:bg-brand-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
                       >
                         Approve
                       </button>

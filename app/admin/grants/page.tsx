@@ -42,13 +42,13 @@ export default async function GrantsPage() {
 
   const stats = [
     { label: 'Open Opportunities', value: openGrants.toString(), icon: FileText, color: 'text-brand-blue-600', bgColor: 'bg-brand-blue-100' },
-    { label: 'Available Funding', value: `$${(totalFunding / 1000).toFixed(0)}K`, icon: DollarSign, color: 'text-green-600', bgColor: 'bg-green-100' },
+    { label: 'Available Funding', value: `$${(totalFunding / 1000).toFixed(0)}K`, icon: DollarSign, color: 'text-brand-green-600', bgColor: 'bg-brand-green-100' },
     { label: 'Pending Applications', value: pendingApps.toString(), icon: Clock, color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
     { label: 'Awarded This Year', value: `$${approvedAmount.toLocaleString()}`, icon: Circle, color: 'text-brand-blue-600', bgColor: 'bg-brand-blue-100' },
   ];
 
   const statusColors: Record<string, string> = {
-    open: 'bg-green-100 text-green-700',
+    open: 'bg-brand-green-100 text-brand-green-700',
     closed: 'bg-gray-100 text-gray-600',
     upcoming: 'bg-brand-blue-100 text-brand-blue-700',
   };
@@ -117,7 +117,7 @@ export default async function GrantsPage() {
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{grant.funder}</p>
                     <div className="flex items-center gap-4 text-sm">
-                      <span className="text-green-600 font-medium">
+                      <span className="text-brand-green-600 font-medium">
                         ${(grant.amount_min / 1000).toFixed(0)}K - ${(grant.amount_max / 1000).toFixed(0)}K
                       </span>
                       {grant.deadline && (
@@ -162,8 +162,8 @@ export default async function GrantsPage() {
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-medium text-gray-900">Application #{app.id.slice(0, 8)}</h3>
                       <span className={`px-2 py-1 text-xs rounded-full ${
-                        app.status === 'approved' ? 'bg-green-100 text-green-700' :
-                        app.status === 'denied' ? 'bg-red-100 text-red-700' :
+                        app.status === 'approved' ? 'bg-brand-green-100 text-brand-green-700' :
+                        app.status === 'denied' ? 'bg-brand-red-100 text-brand-red-700' :
                         app.status === 'under_review' ? 'bg-yellow-100 text-yellow-700' :
                         'bg-brand-blue-100 text-brand-blue-700'
                       }`}>
@@ -177,7 +177,7 @@ export default async function GrantsPage() {
                         </span>
                       )}
                       {app.amount_awarded && (
-                        <span className="text-green-600 font-medium">
+                        <span className="text-brand-green-600 font-medium">
                           Awarded: ${parseFloat(app.amount_awarded).toLocaleString()}
                         </span>
                       )}

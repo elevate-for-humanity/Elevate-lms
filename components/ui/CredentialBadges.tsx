@@ -144,7 +144,7 @@ export function CredentialBadgeStrip({ className = '' }: { className?: string })
         </span>
         <span className="text-gray-300">|</span>
         <span className="inline-flex items-center gap-1 text-gray-700">
-          <Award className="w-4 h-4 text-green-600" />
+          <Award className="w-4 h-4 text-brand-green-600" />
           ETPL
         </span>
         <span className="text-gray-300">|</span>

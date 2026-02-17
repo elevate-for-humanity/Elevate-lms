@@ -29,7 +29,7 @@ export default async function PlacementsPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Hires</h3><p className="text-3xl font-bold text-green-600 mt-2">{count || 0}</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Hires</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">{count || 0}</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">This Month</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">5</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Retention Rate</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">92%</p></div>
         </div>
@@ -39,7 +39,7 @@ export default async function PlacementsPage() {
             {placements && placements.length > 0 ? placements.map((p: any) => (
               <div key={p.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                 <div><p className="font-medium">{p.profiles?.full_name || 'Employee'}</p><p className="text-sm text-gray-500">{p.job_title} • Started {p.placement_date ? new Date(p.placement_date).toLocaleDateString() : 'N/A'}</p></div>
-                <span className={`px-2 py-1 rounded-full text-xs ${p.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>{p.status || 'active'}</span>
+                <span className={`px-2 py-1 rounded-full text-xs ${p.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-gray-100 text-gray-600'}`}>{p.status || 'active'}</span>
               </div>
             )) : <div className="p-8 text-center text-gray-500">No placements recorded</div>}
           </div>

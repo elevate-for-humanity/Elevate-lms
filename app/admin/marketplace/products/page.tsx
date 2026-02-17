@@ -164,13 +164,13 @@ export default async function AdminProductsPage() {
           </h2>
           <div className="space-y-4">
             {rejectedProducts.map((product) => (
-              <div key={product.id} className="border rounded-lg p-4 bg-red-50">
+              <div key={product.id} className="border rounded-lg p-4 bg-brand-red-50">
                 <h3 className="font-semibold">{product.title}</h3>
                 <p className="text-sm text-black">
                   by {product.creator?.display_name || 'Unknown'}
                 </p>
                 {product.rejection_reason && (
-                  <p className="text-sm text-red-700 mt-2">
+                  <p className="text-sm text-brand-red-700 mt-2">
                     Reason: {product.rejection_reason}
                   </p>
                 )}

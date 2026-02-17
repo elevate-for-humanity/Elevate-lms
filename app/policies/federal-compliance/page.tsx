@@ -146,10 +146,10 @@ export default function FederalCompliancePage() {
         </section>
 
         {/* ADA Section */}
-        <section className="mb-12 bg-green-50 rounded-2xl p-8 border-2 border-green-200">
+        <section className="mb-12 bg-brand-green-50 rounded-2xl p-8 border-2 border-brand-green-200">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center">
-              <Accessibility className="w-7 h-7 text-green-600" />
+            <div className="w-14 h-14 bg-brand-green-100 rounded-xl flex items-center justify-center">
+              <Accessibility className="w-7 h-7 text-brand-green-600" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900">ADA & Section 504 Compliance</h2>
@@ -181,16 +181,16 @@ export default function FederalCompliancePage() {
             </p>
           </div>
           
-          <Link href="/accessibility" className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">
+          <Link href="/accessibility" className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 transition">
             View Accessibility Statement <ArrowRight className="w-5 h-5" />
           </Link>
         </section>
 
         {/* WIOA Section */}
-        <section className="mb-12 bg-orange-50 rounded-2xl p-8 border-2 border-orange-200">
+        <section className="mb-12 bg-brand-orange-50 rounded-2xl p-8 border-2 border-brand-orange-200">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center">
-              <Users className="w-7 h-7 text-orange-600" />
+            <div className="w-14 h-14 bg-brand-orange-100 rounded-xl flex items-center justify-center">
+              <Users className="w-7 h-7 text-brand-orange-600" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900">WIOA Compliance</h2>
@@ -219,7 +219,7 @@ export default function FederalCompliancePage() {
             </p>
           </div>
           
-          <Link href="/policies/wioa" className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition">
+          <Link href="/policies/wioa" className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-brand-orange-600 text-white font-semibold rounded-lg hover:bg-brand-orange-700 transition">
             View Complete WIOA Policy <ArrowRight className="w-5 h-5" />
           </Link>
         </section>
@@ -237,7 +237,7 @@ export default function FederalCompliancePage() {
                 <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> info@elevateforhumanity.org</p>
                 <p className="flex items-center gap-2"><Phone className="w-4 h-4" /> (317) 314-3757</p>
               </div>
-              <Link href="/policies/grievance" className="inline-block mt-4 text-orange-400 hover:text-orange-300">
+              <Link href="/policies/grievance" className="inline-block mt-4 text-brand-orange-400 hover:text-brand-orange-300">
                 View Grievance Procedure →
               </Link>
             </div>

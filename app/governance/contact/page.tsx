@@ -145,14 +145,14 @@ export default function GovernanceContactPage() {
         </section>
 
         {/* Emergency Contact */}
-        <section className="mb-12 bg-red-50 rounded-xl p-6 border border-red-200">
+        <section className="mb-12 bg-brand-red-50 rounded-xl p-6 border border-brand-red-200">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Security Incidents</h2>
           <p className="text-slate-700 mb-4">
             If you need to report a security incident or vulnerability:
           </p>
           <a 
             href="mailto:info@elevateforhumanity.org"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-red-600 text-white rounded-lg font-medium hover:bg-brand-red-700 transition-colors"
           >
             <Shield className="w-4 h-4" />
             info@elevateforhumanity.org

@@ -66,7 +66,7 @@ function CourseCard({ course }: { course: Course }) {
             {course.course_name}
           </h3>
           {course.program_type && (
-            <span className="rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-orange-600">
+            <span className="rounded-full bg-brand-orange-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-brand-orange-600">
               {course.program_type}
             </span>
           )}

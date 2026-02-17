@@ -76,7 +76,7 @@ export default async function PeerReviewPage() {
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
@@ -133,7 +133,7 @@ export default async function PeerReviewPage() {
           <div className="bg-white rounded-xl shadow-sm border">
             <div className="p-6 border-b">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-green-600" />
+                <FileText className="w-5 h-5 text-brand-green-600" />
                 My Submissions
               </h2>
             </div>

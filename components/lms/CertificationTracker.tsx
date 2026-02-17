@@ -99,7 +99,7 @@ export function CertificationTracker({ programId, userId }: CertificationTracker
 
   const getStatusColor = (status: Certification['status']) => {
     switch (status) {
-      case 'completed': return 'text-green-600 bg-green-50 border-green-200';
+      case 'completed': return 'text-brand-green-600 bg-brand-green-50 border-brand-green-200';
       case 'pending_review': return 'text-amber-600 bg-amber-50 border-amber-200';
       case 'in_progress': return 'text-brand-blue-600 bg-brand-blue-50 border-brand-blue-200';
       default: return 'text-slate-500 bg-slate-50 border-slate-200';
@@ -169,7 +169,7 @@ export function CertificationTracker({ programId, userId }: CertificationTracker
         {/* Progress Bar */}
         <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
           <div 
-            className="h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-500"
+            className="h-full bg-gradient-to-r from-brand-blue-500 to-brand-green-500 transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -232,21 +232,21 @@ export function CertificationTracker({ programId, userId }: CertificationTracker
 
                 {/* Completion Details */}
                 {cert.status === 'completed' && (
-                  <div className="bg-green-50 rounded-lg p-4 space-y-2">
+                  <div className="bg-brand-green-50 rounded-lg p-4 space-y-2">
                     {cert.completedAt && (
-                      <p className="text-sm text-green-800 flex items-center gap-2">
+                      <p className="text-sm text-brand-green-800 flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
                         Completed: {new Date(cert.completedAt).toLocaleDateString()}
                       </p>
                     )}
                     {cert.expiresAt && (
-                      <p className="text-sm text-green-800 flex items-center gap-2">
+                      <p className="text-sm text-brand-green-800 flex items-center gap-2">
                         <Clock className="w-4 h-4" />
                         Expires: {new Date(cert.expiresAt).toLocaleDateString()}
                       </p>
                     )}
                     {cert.credentialNumber && (
-                      <p className="text-sm text-green-800 flex items-center gap-2">
+                      <p className="text-sm text-brand-green-800 flex items-center gap-2">
                         <Award className="w-4 h-4" />
                         Credential #: {cert.credentialNumber}
                       </p>
@@ -256,7 +256,7 @@ export function CertificationTracker({ programId, userId }: CertificationTracker
                         href={cert.certificateUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-green-700 hover:text-green-800 text-sm font-medium"
+                        className="inline-flex items-center gap-2 text-brand-green-700 hover:text-brand-green-800 text-sm font-medium"
                       >
                         <FileText className="w-4 h-4" />
                         View Certificate
@@ -305,14 +305,14 @@ export function CertificationTracker({ programId, userId }: CertificationTracker
 
       {/* Completion Message */}
       {progressPercent === 100 && (
-        <div className="p-6 bg-green-50 border-t border-green-200">
+        <div className="p-6 bg-brand-green-50 border-t border-brand-green-200">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-              <Award className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center">
+              <Award className="w-6 h-6 text-brand-green-600" />
             </div>
             <div>
-              <h3 className="font-bold text-green-900">Congratulations!</h3>
-              <p className="text-sm text-green-700">You've completed all required certifications for this program.</p>
+              <h3 className="font-bold text-brand-green-900">Congratulations!</h3>
+              <p className="text-sm text-brand-green-700">You've completed all required certifications for this program.</p>
             </div>
           </div>
         </div>

@@ -366,9 +366,9 @@ export default function BarberApprenticeshipApplyPage() {
               </div>
 
               {/* Payment Options */}
-              <div className="bg-green-500/20 rounded-xl p-4 mt-4">
+              <div className="bg-brand-green-500/20 rounded-xl p-4 mt-4">
                 <div className="text-center">
-                  <div className="text-green-200 text-xs uppercase mb-1">Payment Options</div>
+                  <div className="text-brand-green-200 text-xs uppercase mb-1">Payment Options</div>
                   <div className="text-sm text-white mt-2 space-y-1">
                     <p><strong>Pay in Full:</strong> Card or Bank</p>
                     <p><strong>Affirm/Klarna:</strong> Split into payments</p>
@@ -397,16 +397,16 @@ export default function BarberApprenticeshipApplyPage() {
             {error && (
               <div className={`mb-6 p-4 rounded-lg border ${
                 errorSeverity === 'critical' 
-                  ? 'bg-red-50 border-red-200' 
+                  ? 'bg-brand-red-50 border-brand-red-200' 
                   : 'bg-amber-50 border-amber-200'
               }`}>
                 <p className={`font-medium ${
-                  errorSeverity === 'critical' ? 'text-red-800' : 'text-amber-800'
+                  errorSeverity === 'critical' ? 'text-brand-red-800' : 'text-amber-800'
                 }`}>{error}</p>
                 {errorSeverity === 'critical' && (
                   <a 
                     href="/support" 
-                    className="inline-block mt-2 text-red-600 font-medium hover:underline"
+                    className="inline-block mt-2 text-brand-red-600 font-medium hover:underline"
                   >
                     Need help? Call Get Help Online
                   </a>
@@ -567,7 +567,7 @@ export default function BarberApprenticeshipApplyPage() {
                     onClick={() => setPaymentOption('full')}
                     className={`w-full p-4 rounded-xl border-2 mb-3 text-left transition ${
                       paymentOption === 'full' 
-                        ? 'border-green-600 bg-green-50' 
+                        ? 'border-brand-green-600 bg-brand-green-50' 
                         : 'border-gray-300 bg-white hover:border-gray-400'
                     }`}
                   >
@@ -577,7 +577,7 @@ export default function BarberApprenticeshipApplyPage() {
                         <p className="text-black text-sm">One-time payment - 5% discount</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-green-600 text-xl">${Math.round(PRICING.fullPrice * 0.95).toLocaleString()}</p>
+                        <p className="font-bold text-brand-green-600 text-xl">${Math.round(PRICING.fullPrice * 0.95).toLocaleString()}</p>
                         <p className="text-xs text-black line-through">${PRICING.fullPrice.toLocaleString()}</p>
                       </div>
                     </div>
@@ -589,7 +589,7 @@ export default function BarberApprenticeshipApplyPage() {
                     onClick={() => setPaymentOption('weekly')}
                     className={`w-full p-4 rounded-xl border-2 mb-3 text-left transition ${
                       paymentOption === 'weekly' 
-                        ? 'border-brand-orange-600 bg-orange-50' 
+                        ? 'border-brand-orange-600 bg-brand-orange-50' 
                         : 'border-gray-300 bg-white hover:border-gray-400'
                     }`}
                   >
@@ -777,8 +777,8 @@ export default function BarberApprenticeshipApplyPage() {
                       <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 rounded-full text-xs font-bold">Zip</span>
                     </div>
                     <div className="flex flex-wrap gap-2 justify-center">
-                      <span className="px-3 py-1 bg-green-500 text-white rounded-full text-xs font-bold">Cash App</span>
-                      <span className="px-3 py-1 bg-orange-400 text-white rounded-full text-xs font-bold">Amazon Pay</span>
+                      <span className="px-3 py-1 bg-brand-green-500 text-white rounded-full text-xs font-bold">Cash App</span>
+                      <span className="px-3 py-1 bg-brand-orange-400 text-white rounded-full text-xs font-bold">Amazon Pay</span>
                       <span className="px-3 py-1 bg-brand-blue-600 text-white rounded-full text-xs font-bold">Bank (ACH)</span>
                     </div>
                     <p className="text-xs text-gray-600 mt-3 text-center">

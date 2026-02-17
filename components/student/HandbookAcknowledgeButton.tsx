@@ -67,7 +67,7 @@ export function HandbookAcknowledgeButton({ userId }: { userId: string }) {
     <button
       onClick={handleAcknowledge}
       disabled={loading}
-      className="px-6 py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+      className="px-6 py-3 bg-brand-orange-600 text-white font-bold rounded-lg hover:bg-brand-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
     >
       <span className="text-slate-400 flex-shrink-0">•</span>
       {loading ? 'Processing...' : 'I Acknowledge'}

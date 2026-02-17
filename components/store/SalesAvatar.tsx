@@ -128,7 +128,7 @@ export default function SalesAvatar({
     return (
       <button
         onClick={handleReopen}
-        className={`fixed ${position === 'bottom-left' ? 'left-4' : 'right-4'} bottom-4 z-50 flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 rounded-full shadow-lg transition-all hover:scale-105`}
+        className={`fixed ${position === 'bottom-left' ? 'left-4' : 'right-4'} bottom-4 z-50 flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-4 py-3 rounded-full shadow-lg transition-all hover:scale-105`}
       >
         <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white">
           <Image src={avatarImage} alt={avatarName} width={32} height={32} className="object-cover" />
@@ -147,11 +147,11 @@ export default function SalesAvatar({
         <div className="flex gap-4">
           <div className="flex-shrink-0">
             <div className="relative">
-              <div className="w-16 h-16 rounded-full overflow-hidden border-3 border-orange-500">
+              <div className="w-16 h-16 rounded-full overflow-hidden border-3 border-brand-orange-500">
                 <Image src={avatarImage} alt={avatarName} width={64} height={64} className="object-cover" />
               </div>
               {isTyping && (
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-slate-900 flex items-center justify-center">
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-brand-green-500 rounded-full border-2 border-slate-900 flex items-center justify-center">
                   <div className="flex gap-0.5">
                     <span className="w-1 h-1 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-1 h-1 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -167,7 +167,7 @@ export default function SalesAvatar({
             <div className="bg-white/10 rounded-xl rounded-tl-none p-4 mb-3">
               <p className="text-white leading-relaxed">
                 {displayedText}
-                {isTyping && <span className="inline-block w-2 h-4 bg-orange-500 ml-1 animate-pulse" />}
+                {isTyping && <span className="inline-block w-2 h-4 bg-brand-orange-500 ml-1 animate-pulse" />}
               </p>
             </div>
 
@@ -176,7 +176,7 @@ export default function SalesAvatar({
                 {currentMessage.action.href ? (
                   <Link
                     href={currentMessage.action.href}
-                    className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition"
+                    className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-4 py-2 rounded-lg font-medium transition"
                   >
                     {currentMessage.action.label}
                     <ChevronRight className="w-4 h-4" />
@@ -184,7 +184,7 @@ export default function SalesAvatar({
                 ) : (
                   <button
                     onClick={currentMessage.action.onClick}
-                    className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition"
+                    className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-4 py-2 rounded-lg font-medium transition"
                   >
                     {currentMessage.action.label}
                   </button>
@@ -195,7 +195,7 @@ export default function SalesAvatar({
             {!isTyping && hasMoreMessages && (
               <button
                 onClick={handleNext}
-                className="text-sm text-orange-400 hover:text-orange-300 font-medium"
+                className="text-sm text-brand-orange-400 hover:text-brand-orange-300 font-medium"
               >
                 Tell me more →
               </button>
@@ -213,7 +213,7 @@ export default function SalesAvatar({
         {/* Header */}
         <div className="bg-slate-900 text-white p-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-orange-500">
+            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-brand-orange-500">
               <Image src={avatarImage} alt={avatarName} width={40} height={40} className="object-cover" />
             </div>
             <div>
@@ -241,7 +241,7 @@ export default function SalesAvatar({
         <div className="p-4">
           {/* Message type badge */}
           {currentMessage?.type === 'upsell' && (
-            <div className="flex items-center gap-1 text-orange-600 text-xs font-medium mb-2">
+            <div className="flex items-center gap-1 text-brand-orange-600 text-xs font-medium mb-2">
               <Sparkles className="w-3 h-3" />
               Recommendation
             </div>
@@ -249,7 +249,7 @@ export default function SalesAvatar({
           
           <p className="text-gray-800 leading-relaxed min-h-[60px]">
             {displayedText}
-            {isTyping && <span className="inline-block w-2 h-4 bg-orange-500 ml-1 animate-pulse" />}
+            {isTyping && <span className="inline-block w-2 h-4 bg-brand-orange-500 ml-1 animate-pulse" />}
           </p>
 
           {/* Action button */}
@@ -258,7 +258,7 @@ export default function SalesAvatar({
               {currentMessage.action.href ? (
                 <Link
                   href={currentMessage.action.href}
-                  className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition"
+                  className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition"
                 >
                   {currentMessage.action.label}
                   <ChevronRight className="w-4 h-4" />
@@ -266,7 +266,7 @@ export default function SalesAvatar({
               ) : (
                 <button
                   onClick={currentMessage.action.onClick}
-                  className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition"
+                  className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition"
                 >
                   {currentMessage.action.label}
                 </button>
@@ -282,7 +282,7 @@ export default function SalesAvatar({
               <div
                 key={index}
                 className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentMessageIndex ? 'bg-orange-500 w-4' : index < currentMessageIndex ? 'bg-green-500' : 'bg-gray-300'
+                  index === currentMessageIndex ? 'bg-brand-orange-500 w-4' : index < currentMessageIndex ? 'bg-brand-green-500' : 'bg-gray-300'
                 }`}
               />
             ))}
@@ -291,7 +291,7 @@ export default function SalesAvatar({
           {!isTyping && hasMoreMessages && (
             <button
               onClick={handleNext}
-              className="text-sm text-orange-600 hover:text-orange-700 font-medium flex items-center gap-1"
+              className="text-sm text-brand-orange-600 hover:text-brand-orange-700 font-medium flex items-center gap-1"
             >
               Next
               <ChevronRight className="w-4 h-4" />

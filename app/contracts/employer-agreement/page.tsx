@@ -15,7 +15,7 @@ export default function EmployerAgreementPage() {
         <div className="bg-white rounded-xl shadow-sm border">
           <div className="p-6 border-b flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Briefcase className="w-8 h-8 text-orange-600" />
+              <Briefcase className="w-8 h-8 text-brand-orange-600" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Employer Partnership Agreement</h1>
                 <p className="text-gray-600">Hiring and OJT partnership terms</p>

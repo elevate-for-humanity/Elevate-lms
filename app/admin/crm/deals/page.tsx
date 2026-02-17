@@ -32,8 +32,8 @@ export default async function DealsPage() {
   const pipelineStages = [
     { name: 'Discovery', deals: 0, value: '$0', color: 'bg-brand-blue-500' },
     { name: 'Proposal', deals: 0, value: '$0', color: 'bg-brand-blue-500' },
-    { name: 'Negotiation', deals: 0, value: '$0', color: 'bg-orange-500' },
-    { name: 'Closed Won', deals: 0, value: '$0', color: 'bg-green-500' },
+    { name: 'Negotiation', deals: 0, value: '$0', color: 'bg-brand-orange-500' },
+    { name: 'Closed Won', deals: 0, value: '$0', color: 'bg-brand-green-500' },
   ];
 
   // Deals will be loaded from database when CRM module is configured
@@ -43,8 +43,8 @@ export default async function DealsPage() {
     switch (stage) {
       case 'Discovery': return 'bg-brand-blue-100 text-brand-blue-700 border-brand-blue-200';
       case 'Proposal': return 'bg-brand-blue-100 text-brand-blue-700 border-brand-blue-200';
-      case 'Negotiation': return 'bg-orange-100 text-orange-700 border-orange-200';
-      case 'Closed Won': return 'bg-green-100 text-green-700 border-green-200';
+      case 'Negotiation': return 'bg-brand-orange-100 text-brand-orange-700 border-brand-orange-200';
+      case 'Closed Won': return 'bg-brand-green-100 text-brand-green-700 border-brand-green-200';
       default: return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
@@ -57,14 +57,14 @@ export default async function DealsPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <DollarSign className="w-8 h-8 text-green-600" />
+                <DollarSign className="w-8 h-8 text-brand-green-600" />
                 <h1 className="text-3xl font-bold text-gray-900">Deals</h1>
               </div>
               <p className="text-gray-600">Track and manage your sales opportunities</p>
             </div>
             <Link
               href="/admin/crm/deals/new"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 transition-colors"
             >
               <Plus className="w-5 h-5" />
               New Deal
@@ -101,7 +101,7 @@ export default async function DealsPage() {
               <input
                 type="text"
                 placeholder="Search deals..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-green-500"
               />
             </div>
             <div className="flex gap-3">
@@ -131,7 +131,7 @@ export default async function DealsPage() {
                 <DollarSign className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No deals yet</h3>
                 <p className="text-gray-500 mb-6">Create your first deal to start tracking your sales pipeline.</p>
-                <button className="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors inline-flex items-center gap-2">
+                <button className="px-6 py-3 bg-brand-green-600 text-white font-medium rounded-lg hover:bg-brand-green-700 transition-colors inline-flex items-center gap-2">
                   <Plus className="w-4 h-4" /> Add Deal
                 </button>
               </div>
@@ -163,7 +163,7 @@ export default async function DealsPage() {
                     <div className="flex items-center gap-2 mt-1">
                       <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
                         <div 
-                          className={`h-full rounded-full ${deal.probability === 100 ? 'bg-green-500' : 'bg-brand-blue-500'}`}
+                          className={`h-full rounded-full ${deal.probability === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'}`}
                           style={{ width: `${deal.probability}%` }}
                         />
                       </div>
@@ -174,7 +174,7 @@ export default async function DealsPage() {
                 <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
                   <Link
                     href={`/admin/crm/deals/${deal.id}`}
-                    className="px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+                    className="px-4 py-2 bg-brand-green-600 text-white font-medium rounded-lg hover:bg-brand-green-700 transition-colors"
                   >
                     View Deal
                   </Link>

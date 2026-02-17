@@ -44,13 +44,13 @@ export default function FranchisePage() {
       <section className="bg-white text-white py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-4xl">
-            <div className="inline-block bg-yellow-400 text-orange-900 px-6 py-3 rounded-full font-bold text-sm mb-6">
+            <div className="inline-block bg-yellow-400 text-brand-orange-900 px-6 py-3 rounded-full font-bold text-sm mb-6">
               FRANCHISE OPPORTUNITY
             </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
               Own Your Own Training Center
             </h1>
-            <p className="text-2xl text-orange-100 mb-8">
+            <p className="text-2xl text-brand-orange-100 mb-8">
               Turn-key workforce development franchise. DOL-approved programs,
               proven curriculum, full support. Start earning $100k-$500k+ per
               year.
@@ -58,7 +58,7 @@ export default function FranchisePage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="#packages"
-                className="inline-block px-8 py-4 bg-yellow-400 text-orange-900 font-bold rounded-lg hover:bg-yellow-300 transition text-lg text-center"
+                className="inline-block px-8 py-4 bg-yellow-400 text-brand-orange-900 font-bold rounded-lg hover:bg-yellow-300 transition text-lg text-center"
               >
                 View Franchise Packages
               </Link>
@@ -87,8 +87,8 @@ export default function FranchisePage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <Award className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mb-4">
+                <Award className="w-8 h-8 text-brand-green-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">DOL-Approved Programs</h3>
               <p className="text-black">
@@ -120,8 +120,8 @@ export default function FranchisePage() {
             </div>
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
-                <Briefcase className="w-8 h-8 text-orange-600" />
+              <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mb-4">
+                <Briefcase className="w-8 h-8 text-brand-orange-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">Complete Curriculum</h3>
               <p className="text-black">
@@ -131,7 +131,7 @@ export default function FranchisePage() {
             </div>
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mb-4">
                 <Users className="w-8 h-8 text-brand-orange-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">Marketing Support</h3>
@@ -142,8 +142,8 @@ export default function FranchisePage() {
             </div>
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <Home className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mb-4">
+                <Home className="w-8 h-8 text-brand-green-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">Home-Based Option</h3>
               <p className="text-black">
@@ -170,7 +170,7 @@ export default function FranchisePage() {
             <div className="bg-white border-2 border-gray-300 rounded-xl p-8">
               <h3 className="text-2xl font-bold mb-4">Starter Package</h3>
               <div className="mb-6">
-                <div className="text-4xl font-bold text-green-600 mb-2">
+                <div className="text-4xl font-bold text-brand-green-600 mb-2">
                   $15,000
                 </div>
                 <p className="text-sm text-black">One-time franchise fee</p>
@@ -181,31 +181,31 @@ export default function FranchisePage() {
                 <p className="font-bold mb-3">What's Included:</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">
                       3 training programs of your choice
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">
                       Complete curriculum & materials
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Use of DOL/DWD approvals</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Basic website template</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">2-week training</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Email support</span>
                   </li>
                 </ul>
@@ -219,7 +219,7 @@ export default function FranchisePage() {
               </Link>
 
               <div className="mt-4 text-center">
-                <p className="text-sm font-bold text-green-600">
+                <p className="text-sm font-bold text-brand-green-600">
                   Payment Plans Available
                 </p>
                 <p className="text-xs text-black">
@@ -415,7 +415,7 @@ export default function FranchisePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Revenue Potential</h2>
-            <p className="text-xl text-green-100">
+            <p className="text-xl text-brand-green-100">
               Real numbers from successful franchisees
             </p>
           </div>
@@ -470,13 +470,13 @@ export default function FranchisePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/franchise/apply"
-              className="inline-block px-10 py-5 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition text-lg"
+              className="inline-block px-10 py-5 bg-brand-orange-600 text-white font-bold rounded-lg hover:bg-brand-orange-700 transition text-lg"
             >
               Request Franchise Information
             </Link>
             <a
               href="/support"
-              className="inline-block px-10 py-5 bg-white border-2 border-orange-600 text-orange-600 font-bold rounded-lg hover:bg-orange-50 transition text-lg"
+              className="inline-block px-10 py-5 bg-white border-2 border-brand-orange-600 text-brand-orange-600 font-bold rounded-lg hover:bg-brand-orange-50 transition text-lg"
             >
               Call support center
             </a>
@@ -485,7 +485,7 @@ export default function FranchisePage() {
             Email:{' '}
             <a
               href="mailto:info@elevateforhumanity.org"
-              className="text-orange-600 font-bold underline"
+              className="text-brand-orange-600 font-bold underline"
             >
               info@elevateforhumanity.org
             </a>

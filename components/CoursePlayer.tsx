@@ -40,7 +40,7 @@ export function CoursePlayer({ courseTitle, lessons }: CoursePlayerProps) {
   return (
     <div className="grid gap-4 md:grid-cols-[minmax(0,2fr),minmax(0,1fr)]">
       <div className="rounded-xl border border-slate-800 bg-slate-950 p-3">
-        <p className="text-[10px] uppercase tracking-wide text-orange-400">
+        <p className="text-[10px] uppercase tracking-wide text-brand-orange-400">
           Course
         </p>
         <h1 className="mt-1 text-[13px] font-semibold text-white">
@@ -91,7 +91,7 @@ export function CoursePlayer({ courseTitle, lessons }: CoursePlayerProps) {
                     href={activeLesson.contentUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[11px] text-orange-300 underline underline-offset-2"
+                    className="text-[11px] text-brand-orange-300 underline underline-offset-2"
                   >
                     Open linked resource
                   </a>

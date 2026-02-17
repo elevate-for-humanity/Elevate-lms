@@ -470,7 +470,7 @@ export default function CompetencyTest() {
                   alert('Please enter your name and email');
                 }
               }}
-              className="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-700"
+              className="w-full bg-brand-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-brand-green-700"
             >
               Start Test
             </button>
@@ -490,14 +490,14 @@ export default function CompetencyTest() {
               {passed ? (
                 <span className="text-slate-400 flex-shrink-0">•</span>
               ) : (
-                <XCircle className="w-20 h-20 text-red-600 mx-auto mb-4" />
+                <XCircle className="w-20 h-20 text-brand-red-600 mx-auto mb-4" />
               )}
               <h1 className="text-3xl font-bold mb-2">
                 {passed ? 'Congratulations!' : 'Test Not Passed'}
               </h1>
               <p className="text-xl text-black">
                 Your Score:{' '}
-                <strong className={passed ? 'text-green-600' : 'text-red-600'}>
+                <strong className={passed ? 'text-brand-green-600' : 'text-brand-red-600'}>
                   {score}%
                 </strong>
               </p>
@@ -508,7 +508,7 @@ export default function CompetencyTest() {
             </div>
 
             {passed ? (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+              <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6 mb-6">
                 <h2 className="font-bold text-lg mb-3">Next Steps:</h2>
                 <ol className="list-decimal pl-6 space-y-2 text-sm">
                   <li>
@@ -524,7 +524,7 @@ export default function CompetencyTest() {
                 </ol>
               </div>
             ) : (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+              <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-6 mb-6">
                 <h2 className="font-bold text-lg mb-3">What's Next:</h2>
                 <p className="text-sm mb-3">
                   You need a score of 80% or higher to pass. You may retake the
@@ -565,8 +565,8 @@ export default function CompetencyTest() {
                       <span
                         className={
                           categoryScore >= 80
-                            ? 'text-green-600 font-semibold'
-                            : 'text-red-600'
+                            ? 'text-brand-green-600 font-semibold'
+                            : 'text-brand-red-600'
                         }
                       >
                         {categoryCorrect}/{categoryQuestions.length} (
@@ -607,7 +607,7 @@ export default function CompetencyTest() {
             <Clock className="w-5 h-5 text-black" />
             <span className="font-semibold">Time Remaining:</span>
             <span
-              className={`font-bold ${timeRemaining < 300 ? 'text-red-600' : 'text-green-600'}`}
+              className={`font-bold ${timeRemaining < 300 ? 'text-brand-red-600' : 'text-brand-green-600'}`}
             >
               {formatTime(timeRemaining)}
             </span>
@@ -620,7 +620,7 @@ export default function CompetencyTest() {
         {/* Progress Bar */}
         <div className="bg-gray-200 rounded-full h-2 mb-6">
           <div
-            className="bg-green-600 h-2 rounded-full transition-all"
+            className="bg-brand-green-600 h-2 rounded-full transition-all"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -637,15 +637,15 @@ export default function CompetencyTest() {
                 onClick={() => handleAnswer(index)}
                 className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                   answers[currentQuestion] === index
-                    ? 'border-green-600 bg-green-50'
-                    : 'border-gray-300 hover:border-green-400'
+                    ? 'border-brand-green-600 bg-brand-green-50'
+                    : 'border-gray-300 hover:border-brand-green-400'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                       answers[currentQuestion] === index
-                        ? 'border-green-600 bg-green-600'
+                        ? 'border-brand-green-600 bg-brand-green-600'
                         : 'border-gray-400'
                     }`}
                   >
@@ -674,7 +674,7 @@ export default function CompetencyTest() {
             {currentQuestion < COMPETENCY_QUESTIONS.length - 1 ? (
               <button
                 onClick={() => setCurrentQuestion(currentQuestion + 1)}
-                className="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700"
+                className="flex-1 bg-brand-green-600 text-white py-3 rounded-lg font-bold hover:bg-brand-green-700"
               >
                 Next
               </button>
@@ -700,9 +700,9 @@ export default function CompetencyTest() {
                   onClick={() => setCurrentQuestion(index)}
                   className={`w-10 h-10 rounded-lg font-bold text-sm ${
                     index === currentQuestion
-                      ? 'bg-green-600 text-white'
+                      ? 'bg-brand-green-600 text-white'
                       : answers[index] !== -1
-                        ? 'bg-green-100 text-green-700 border border-green-300'
+                        ? 'bg-brand-green-100 text-brand-green-700 border border-brand-green-300'
                         : 'bg-gray-100 text-black border border-gray-300'
                   }`}
                 >

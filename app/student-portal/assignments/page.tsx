@@ -58,14 +58,14 @@ export default async function AssignmentsPage() {
     const isOverdue = new Date(dueDate) < new Date() && status === 'pending';
     
     if (isOverdue) {
-      return { label: 'Overdue', color: 'bg-red-100 text-red-700', icon: AlertCircle };
+      return { label: 'Overdue', color: 'bg-brand-red-100 text-brand-red-700', icon: AlertCircle };
     }
     
     switch (status) {
       case 'submitted':
-        return { label: 'Submitted', color: 'bg-blue-100 text-blue-700', icon: Clock };
+        return { label: 'Submitted', color: 'bg-brand-blue-100 text-brand-blue-700', icon: Clock };
       case 'graded':
-        return { label: 'Graded', color: 'bg-green-100 text-green-700', icon: CheckCircle };
+        return { label: 'Graded', color: 'bg-brand-green-100 text-brand-green-700', icon: CheckCircle };
       default:
         return { label: 'Pending', color: 'bg-yellow-100 text-yellow-700', icon: Clock };
     }
@@ -94,11 +94,11 @@ export default async function AssignmentsPage() {
             <p className="text-sm text-gray-500">Pending</p>
           </div>
           <div className="bg-white rounded-xl p-4 border">
-            <p className="text-2xl font-bold text-blue-600">{submittedCount}</p>
+            <p className="text-2xl font-bold text-brand-blue-600">{submittedCount}</p>
             <p className="text-sm text-gray-500">Submitted</p>
           </div>
           <div className="bg-white rounded-xl p-4 border">
-            <p className="text-2xl font-bold text-green-600">{gradedCount}</p>
+            <p className="text-2xl font-bold text-brand-green-600">{gradedCount}</p>
             <p className="text-sm text-gray-500">Graded</p>
           </div>
         </div>
@@ -141,7 +141,7 @@ export default async function AssignmentsPage() {
                       {assignment.status === 'pending' && (
                         <Link
                           href={`/student-portal/assignments/${assignment.id}`}
-                          className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                          className="px-3 py-1 bg-brand-blue-600 text-white text-sm rounded-lg hover:bg-brand-blue-700"
                         >
                           Submit
                         </Link>
@@ -157,7 +157,7 @@ export default async function AssignmentsPage() {
             <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">No assignments</h2>
             <p className="text-gray-600 mb-6">You don't have any assignments yet.</p>
-            <Link href="/lms/courses" className="text-blue-600 hover:underline">
+            <Link href="/lms/courses" className="text-brand-blue-600 hover:underline">
               View your courses
             </Link>
           </div>

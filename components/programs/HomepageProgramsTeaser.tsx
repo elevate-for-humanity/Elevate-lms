@@ -67,7 +67,7 @@ export function HomepageProgramsTeaser() {
                 </h3>
                 <p className="mt-1 text-xs text-black">{program.description}</p>
                 <div className="mt-3">
-                  <span className="text-xs font-semibold text-orange-600 group-hover:underline">
+                  <span className="text-xs font-semibold text-brand-orange-600 group-hover:underline">
                     Learn more →
                   </span>
                 </div>

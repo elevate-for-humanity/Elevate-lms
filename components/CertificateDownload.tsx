@@ -309,8 +309,8 @@ export default function CertificateDownload({
 
   if (error || !certificate) {
     return (
-      <div className="bg-red-50 rounded-xl p-6 border border-red-200">
-        <p className="text-red-700">{error || 'Certificate not found'}</p>
+      <div className="bg-brand-red-50 rounded-xl p-6 border border-brand-red-200">
+        <p className="text-brand-red-700">{error || 'Certificate not found'}</p>
       </div>
     );
   }
@@ -318,7 +318,7 @@ export default function CertificateDownload({
   return (
     <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+      <div className="p-6 border-b bg-gradient-to-r from-brand-blue-50 to-indigo-50">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-gray-900">{certificate.credential_type}</h2>
@@ -336,7 +336,7 @@ export default function CertificateDownload({
             <button
               onClick={downloadPNG}
               disabled={downloading}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 disabled:opacity-50 text-sm font-medium"
             >
               <Download className="w-4 h-4" />
               PNG
@@ -381,7 +381,7 @@ export default function CertificateDownload({
             </p>
             
             <p className="text-lg text-gray-600 mb-2">has successfully completed</p>
-            <p className="text-2xl md:text-3xl font-bold text-green-600 mb-4">
+            <p className="text-2xl md:text-3xl font-bold text-brand-green-600 mb-4">
               {certificate.program_name}
             </p>
             

@@ -82,7 +82,7 @@ export default function AdvisingPage() {
         </header>
 
         {isSubmitted ? (
-          <section className="rounded-2xl bg-green-50 p-8 shadow-sm ring-1 ring-green-200 text-center">
+          <section className="rounded-2xl bg-brand-green-50 p-8 shadow-sm ring-1 ring-brand-green-200 text-center">
             <div className="w-16 h-16 bg-brand-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-slate-400 flex-shrink-0">•</span>
             </div>

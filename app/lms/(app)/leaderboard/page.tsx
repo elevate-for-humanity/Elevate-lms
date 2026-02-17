@@ -155,7 +155,7 @@ export default async function LeaderboardPage() {
   const getRankBg = (rank: number) => {
     if (rank === 1) return 'bg-yellow-50 border-yellow-200';
     if (rank === 2) return 'bg-slate-50 border-gray-200';
-    if (rank === 3) return 'bg-orange-50 border-amber-200';
+    if (rank === 3) return 'bg-brand-orange-50 border-amber-200';
     return 'bg-white border-slate-200';
   };
 
@@ -317,8 +317,8 @@ export default async function LeaderboardPage() {
           <h3 className="font-bold text-slate-900 mb-4">How to Earn Points</h3>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-brand-green-600" />
               </div>
               <div>
                 <div className="font-semibold text-slate-900">+100</div>

@@ -15,7 +15,7 @@ export default function DemoIncentivesPage() {
     <DemoPageShell title="Incentives" description="OJT reimbursements, WOTC tax credits, and hiring incentives." portal="employer">
       <div className="grid sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl border p-4">
-          <div className="flex items-center gap-2 mb-1"><DollarSign className="w-4 h-4 text-green-600" /><span className="text-xs text-gray-500">Total Earned</span></div>
+          <div className="flex items-center gap-2 mb-1"><DollarSign className="w-4 h-4 text-brand-green-600" /><span className="text-xs text-gray-500">Total Earned</span></div>
           <div className="text-2xl font-bold text-gray-900">$18,425</div>
         </div>
         <div className="bg-white rounded-xl border p-4">
@@ -46,7 +46,7 @@ export default function DemoIncentivesPage() {
                 <td className="px-5 py-3 font-semibold text-gray-900">{inc.amount}</td>
                 <td className="px-5 py-3">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                    inc.status === 'Paid' ? 'bg-green-100 text-green-800' :
+                    inc.status === 'Paid' ? 'bg-brand-green-100 text-brand-green-800' :
                     inc.status === 'Approved' ? 'bg-brand-blue-100 text-brand-blue-800' :
                     'bg-amber-100 text-amber-800'
                   }`}>{inc.status}</span>

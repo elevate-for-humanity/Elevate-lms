@@ -77,7 +77,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
           {settingsSections.map(section => (
             <button key={section.id} onClick={() => setActiveSection(section.id)}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left ${
-                activeSection === section.id ? 'bg-orange-50 text-orange-600' : 'hover:bg-gray-50'
+                activeSection === section.id ? 'bg-brand-orange-50 text-brand-orange-600' : 'hover:bg-gray-50'
               }`}>
               <section.icon className="w-5 h-5" />
               <span className="text-sm font-medium">{section.name}</span>
@@ -85,7 +85,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
           ))}
           <hr className="my-2" />
           <button onClick={handleSignOut}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left text-red-600 hover:bg-red-50">
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left text-brand-red-600 hover:bg-brand-red-50">
             <LogOut className="w-5 h-5" />
             <span className="text-sm font-medium">Sign Out</span>
           </button>
@@ -95,7 +95,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
       <div className="md:col-span-3">
         {message && (
           <div className={`mb-4 p-4 rounded-lg ${
-            message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+            message.type === 'success' ? 'bg-brand-green-50 text-brand-green-700 border border-brand-green-200' : 'bg-brand-red-50 text-brand-red-700 border border-brand-red-200'
           }`}>
             {message.text}
           </div>
@@ -106,8 +106,8 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
             <div className="space-y-6">
               <h2 className="text-xl font-semibold">Profile Settings</h2>
               <div className="flex items-center gap-4">
-                <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center">
-                  <User className="w-10 h-10 text-orange-600" />
+                <div className="w-20 h-20 bg-brand-orange-100 rounded-full flex items-center justify-center">
+                  <User className="w-10 h-10 text-brand-orange-600" />
                 </div>
                 <button className="px-4 py-2 border rounded-lg hover:bg-gray-50">Change Photo</button>
               </div>
@@ -143,7 +143,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
                 </div>
               </div>
               <button onClick={handleSaveProfile} disabled={isSaving}
-                className="flex items-center gap-2 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50">
+                className="flex items-center gap-2 px-6 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600 disabled:opacity-50">
                 <Save className="w-4 h-4" />
                 {isSaving ? 'Saving...' : 'Save Changes'}
               </button>
@@ -156,10 +156,10 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
               {['Email notifications', 'Push notifications', 'Course updates', 'Marketing emails', 'Weekly digest'].map(item => (
                 <label key={item} className="flex items-center justify-between py-3 border-b">
                   <span>{item}</span>
-                  <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-orange-500" />
+                  <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-brand-orange-500" />
                 </label>
               ))}
-              <button className="flex items-center gap-2 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+              <button className="flex items-center gap-2 px-6 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
                 <Save className="w-4 h-4" /> Save Preferences
               </button>
             </div>
@@ -174,7 +174,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
                   <input type="password" placeholder="Current password" className="w-full px-3 py-2 border rounded-lg" />
                   <input type="password" placeholder="New password" className="w-full px-3 py-2 border rounded-lg" />
                   <input type="password" placeholder="Confirm new password" className="w-full px-3 py-2 border rounded-lg" />
-                  <button className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+                  <button className="px-4 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
                     Update Password
                   </button>
                 </div>
@@ -191,7 +191,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
             <div className="space-y-6">
               <h2 className="text-xl font-semibold">Billing & Payments</h2>
               <div className="bg-gray-50 rounded-lg p-4">
-                <p className="font-medium">Current Plan: <span className="text-orange-600">{profile?.role === 'student' ? 'Student' : 'Pro'}</span></p>
+                <p className="font-medium">Current Plan: <span className="text-brand-orange-600">{profile?.role === 'student' ? 'Student' : 'Pro'}</span></p>
               </div>
               <div>
                 <h3 className="font-medium mb-2">Payment Method</h3>
@@ -237,7 +237,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
                     <div className="flex gap-4">
                       {['Light', 'Dark', 'System'].map(theme => (
                         <label key={theme} className="flex items-center gap-2 cursor-pointer">
-                          <input type="radio" name="theme" defaultChecked={theme === 'Light'} className="w-4 h-4 text-orange-500" />
+                          <input type="radio" name="theme" defaultChecked={theme === 'Light'} className="w-4 h-4 text-brand-orange-500" />
                           <span>{theme}</span>
                         </label>
                       ))}
@@ -251,13 +251,13 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
                   {['Profile visibility', 'Show activity status', 'Allow analytics'].map(item => (
                     <label key={item} className="flex items-center justify-between py-3 border-b">
                       <span>{item}</span>
-                      <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-orange-500" />
+                      <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-brand-orange-500" />
                     </label>
                   ))}
                 </div>
               )}
 
-              <button className="flex items-center gap-2 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+              <button className="flex items-center gap-2 px-6 py-2 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600">
                 <Save className="w-4 h-4" /> Save Settings
               </button>
             </div>

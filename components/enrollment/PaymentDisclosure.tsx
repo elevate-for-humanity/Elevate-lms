@@ -44,7 +44,7 @@ export function PaymentDisclosure({
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-6 max-w-2xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <FileText className="w-8 h-8 text-orange-600" />
+        <FileText className="w-8 h-8 text-brand-orange-600" />
         <div>
           <h2 className="text-xl font-bold text-slate-900">Payment Plan Disclosure</h2>
           <p className="text-sm text-slate-500">Please review and acknowledge all terms</p>
@@ -88,7 +88,7 @@ export function PaymentDisclosure({
             type="checkbox"
             checked={acknowledged.totalCost}
             onChange={(e) => setAcknowledged(prev => ({ ...prev, totalCost: e.target.checked }))}
-            className="mt-1 w-5 h-5 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+            className="mt-1 w-5 h-5 rounded border-slate-300 text-brand-orange-600 focus:ring-brand-orange-500"
           />
           <div>
             <p className="font-medium text-slate-900">I understand the total cost</p>
@@ -106,7 +106,7 @@ export function PaymentDisclosure({
             type="checkbox"
             checked={acknowledged.autopayRequired}
             onChange={(e) => setAcknowledged(prev => ({ ...prev, autopayRequired: e.target.checked }))}
-            className="mt-1 w-5 h-5 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+            className="mt-1 w-5 h-5 rounded border-slate-300 text-brand-orange-600 focus:ring-brand-orange-500"
           />
           <div>
             <p className="font-medium text-slate-900">I agree to automatic payments</p>
@@ -124,7 +124,7 @@ export function PaymentDisclosure({
             type="checkbox"
             checked={acknowledged.missedPaymentConsequences}
             onChange={(e) => setAcknowledged(prev => ({ ...prev, missedPaymentConsequences: e.target.checked }))}
-            className="mt-1 w-5 h-5 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+            className="mt-1 w-5 h-5 rounded border-slate-300 text-brand-orange-600 focus:ring-brand-orange-500"
           />
           <div>
             <p className="font-medium text-slate-900">I understand the consequences of missed payments</p>
@@ -144,7 +144,7 @@ export function PaymentDisclosure({
             type="checkbox"
             checked={acknowledged.credentialHold}
             onChange={(e) => setAcknowledged(prev => ({ ...prev, credentialHold: e.target.checked }))}
-            className="mt-1 w-5 h-5 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+            className="mt-1 w-5 h-5 rounded border-slate-300 text-brand-orange-600 focus:ring-brand-orange-500"
           />
           <div>
             <p className="font-medium text-slate-900">I understand credentials are held until paid in full</p>
@@ -162,7 +162,7 @@ export function PaymentDisclosure({
             type="checkbox"
             checked={acknowledged.refundPolicy}
             onChange={(e) => setAcknowledged(prev => ({ ...prev, refundPolicy: e.target.checked }))}
-            className="mt-1 w-5 h-5 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+            className="mt-1 w-5 h-5 rounded border-slate-300 text-brand-orange-600 focus:ring-brand-orange-500"
           />
           <div>
             <p className="font-medium text-slate-900">I understand the refund policy</p>
@@ -200,7 +200,7 @@ export function PaymentDisclosure({
           disabled={!allAcknowledged}
           className={`flex-1 px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
             allAcknowledged
-              ? 'bg-orange-600 text-white hover:bg-orange-700'
+              ? 'bg-brand-orange-600 text-white hover:bg-brand-orange-700'
               : 'bg-slate-200 text-slate-400 cursor-not-allowed'
           }`}
         >

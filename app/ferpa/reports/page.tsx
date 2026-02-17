@@ -140,7 +140,7 @@ export default async function FerpaReportsPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <p className="text-sm text-gray-500">Completed</p>
-            <p className="text-3xl font-bold text-green-600">{completedRequests || 0}</p>
+            <p className="text-3xl font-bold text-brand-green-600">{completedRequests || 0}</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <p className="text-sm text-gray-500">Audit Log Entries</p>
@@ -158,10 +158,10 @@ export default async function FerpaReportsPage() {
               const Icon = report.icon;
               const colorClasses: Record<string, string> = {
                 blue: 'bg-brand-blue-100 text-brand-blue-600',
-                green: 'bg-green-100 text-green-600',
+                green: 'bg-brand-green-100 text-brand-green-600',
                 blue: 'bg-brand-blue-100 text-brand-blue-600',
-                orange: 'bg-orange-100 text-orange-600',
-                red: 'bg-red-100 text-red-600',
+                orange: 'bg-brand-orange-100 text-brand-orange-600',
+                red: 'bg-brand-red-100 text-brand-red-600',
                 indigo: 'bg-indigo-100 text-indigo-600',
               };
 

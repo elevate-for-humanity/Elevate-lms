@@ -124,7 +124,7 @@ export function FlatFeePaymentCalculator({
 
   return (
     <div className="bg-white rounded-xl border-2 border-slate-200 shadow-lg overflow-hidden">
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-6 text-white">
+      <div className="bg-gradient-to-r from-purple-600 to-brand-blue-600 p-6 text-white">
         <h2 className="text-xl font-bold">{programName}</h2>
         <p className="text-purple-200 text-sm mt-1">DOL Registered Apprenticeship Sponsorship</p>
       </div>
@@ -167,7 +167,7 @@ export function FlatFeePaymentCalculator({
             />
           </div>
           {downPaymentNum > 0 && downPaymentNum < minDownPayment && (
-            <p className="text-red-600 text-sm mt-1">Minimum payment is ${minDownPayment}</p>
+            <p className="text-brand-red-600 text-sm mt-1">Minimum payment is ${minDownPayment}</p>
           )}
 
           <div className="flex flex-wrap gap-2 mt-3">
@@ -191,7 +191,7 @@ export function FlatFeePaymentCalculator({
             </button>
             <button
               onClick={() => handleQuickAmount(programFee)}
-              className="px-4 py-2 bg-green-100 hover:bg-green-200 rounded-lg text-sm font-semibold text-green-700 transition"
+              className="px-4 py-2 bg-brand-green-100 hover:bg-brand-green-200 rounded-lg text-sm font-semibold text-brand-green-700 transition"
             >
               Pay in Full (${programFee.toLocaleString()})
             </button>
@@ -207,7 +207,7 @@ export function FlatFeePaymentCalculator({
             </div>
             <div className="flex justify-between items-center mt-2">
               <span className="text-slate-600">Today&apos;s Payment</span>
-              <span className="font-semibold text-green-600">-${downPaymentNum.toLocaleString()}</span>
+              <span className="font-semibold text-brand-green-600">-${downPaymentNum.toLocaleString()}</span>
             </div>
             <div className="border-t border-slate-300 mt-3 pt-3 flex justify-between items-center">
               <span className="font-semibold text-slate-800">Remaining Balance</span>
@@ -249,10 +249,10 @@ export function FlatFeePaymentCalculator({
             </div>
           </div>
         ) : downPaymentNum >= programFee ? (
-          <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 text-center">
+          <div className="bg-brand-green-50 border-2 border-brand-green-200 rounded-lg p-4 text-center">
             <span className="text-slate-400 flex-shrink-0">•</span>
-            <div className="font-bold text-green-800">Paying in Full!</div>
-            <div className="text-sm text-green-700">No monthly payments required</div>
+            <div className="font-bold text-brand-green-800">Paying in Full!</div>
+            <div className="text-sm text-brand-green-700">No monthly payments required</div>
           </div>
         ) : null}
 

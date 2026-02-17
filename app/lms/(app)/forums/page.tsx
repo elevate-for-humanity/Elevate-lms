@@ -164,13 +164,13 @@ export default async function ForumsPage() {
                   <div className="flex items-start gap-4">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
                       category.color === 'blue' ? 'bg-brand-blue-100' :
-                      category.color === 'green' ? 'bg-green-100' :
-                      category.color === 'blue' ? 'bg-brand-blue-100' : 'bg-orange-100'
+                      category.color === 'green' ? 'bg-brand-green-100' :
+                      category.color === 'blue' ? 'bg-brand-blue-100' : 'bg-brand-orange-100'
                     }`}>
                       <category.icon className={`w-6 h-6 ${
                         category.color === 'blue' ? 'text-brand-blue-600' :
-                        category.color === 'green' ? 'text-green-600' :
-                        category.color === 'blue' ? 'text-brand-blue-600' : 'text-orange-600'
+                        category.color === 'green' ? 'text-brand-green-600' :
+                        category.color === 'blue' ? 'text-brand-blue-600' : 'text-brand-orange-600'
                       }`} />
                     </div>
                     <div className="flex-1">
@@ -247,7 +247,7 @@ export default async function ForumsPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Online Now</span>
-                  <span className="font-medium text-green-600">34</span>
+                  <span className="font-medium text-brand-green-600">34</span>
                 </div>
               </div>
             </div>

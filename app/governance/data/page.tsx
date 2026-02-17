@@ -204,21 +204,21 @@ export default function DataGovernancePage() {
                 <div className="font-medium text-slate-900">CSV Export</div>
                 <div className="text-slate-500 text-sm">Standard tabular format</div>
               </div>
-              <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs">Available</span>
+              <span className="bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded text-xs">Available</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
               <div>
                 <div className="font-medium text-slate-900">JSON Export</div>
                 <div className="text-slate-500 text-sm">Structured data format</div>
               </div>
-              <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs">Available</span>
+              <span className="bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded text-xs">Available</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
               <div>
                 <div className="font-medium text-slate-900">PIRL-Compatible Export</div>
                 <div className="text-slate-500 text-sm">WIOA performance reporting format</div>
               </div>
-              <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs">Available</span>
+              <span className="bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded text-xs">Available</span>
             </div>
           </div>
         </PolicySection>

@@ -163,7 +163,7 @@ export default async function NdsPage() {
               href="https://www.mydrugtest training.com/login"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white hover:bg-gray-100 text-red-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl flex items-center gap-2 justify-center"
+              className="bg-white hover:bg-gray-100 text-brand-red-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl flex items-center gap-2 justify-center"
             >
               Login to Training Portal
               <ExternalLink className="w-5 h-5" />
@@ -180,7 +180,7 @@ export default async function NdsPage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-brand-orange-600" />
               </div>
               <h3 className="text-lg font-semibold mb-2">DOT Required</h3>
@@ -220,7 +220,7 @@ export default async function NdsPage() {
 
           {courseCategories.map((category) => (
             <div key={category.name} className="mb-12">
-              <h3 className="text-lg md:text-lg font-bold mb-6 text-red-900">
+              <h3 className="text-lg md:text-lg font-bold mb-6 text-brand-red-900">
                 {category.name}
               </h3>
               <div className="grid md:grid-cols-2 gap-6">
@@ -301,7 +301,7 @@ export default async function NdsPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-red-900 text-white">
+      <section className="py-16 bg-brand-red-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
             Ready to Get DOT Certified?
@@ -319,7 +319,7 @@ export default async function NdsPage() {
             </Link>
             <Link
               href="/contact"
-              className="bg-white hover:bg-gray-100 text-red-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all"
+              className="bg-white hover:bg-gray-100 text-brand-red-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all"
             >
               Contact Us
             </Link>

@@ -177,8 +177,8 @@ export default async function StaffTrainingPage() {
           </h2>
 
           {modulesError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-800">
+            <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4">
+              <p className="text-brand-red-800">
                 Error loading modules: {modulesError.message}
               </p>
             </div>
@@ -209,7 +209,7 @@ export default async function StaffTrainingPage() {
                           {module.title}
                         </h3>
                         {module.required && (
-                          <span className="px-2 py-2 bg-red-100 text-red-700 text-xs font-medium rounded">
+                          <span className="px-2 py-2 bg-brand-red-100 text-brand-red-700 text-xs font-medium rounded">
                             Required
                           </span>
                         )}

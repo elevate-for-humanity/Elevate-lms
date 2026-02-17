@@ -93,7 +93,7 @@ export default function DataRetentionPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Financial Records Retention</h2>
             
-            <div className="bg-green-50 rounded-xl p-6 border-2 border-green-200 mb-6">
+            <div className="bg-brand-green-50 rounded-xl p-6 border-2 border-brand-green-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Financial Data</h3>
               <div className="space-y-4">
                 <div>
@@ -135,7 +135,7 @@ export default function DataRetentionPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Operational and Business Records</h2>
             
-            <div className="bg-orange-50 rounded-xl p-6 border-2 border-orange-200 mb-6">
+            <div className="bg-brand-orange-50 rounded-xl p-6 border-2 border-brand-orange-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Business Records</h3>
               <ul className="space-y-3 text-black">
                 <li><strong>Contracts and Agreements:</strong> 7 years after expiration</li>
@@ -187,7 +187,7 @@ export default function DataRetentionPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Legal and Compliance Records</h2>
             
-            <div className="bg-red-50 rounded-xl p-6 border-2 border-red-200 mb-6">
+            <div className="bg-brand-red-50 rounded-xl p-6 border-2 border-brand-red-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Legal Documents</h3>
               <ul className="space-y-3 text-black">
                 <li><strong>Litigation Files:</strong> Permanent (until statute of limitations expires + 7 years)</li>

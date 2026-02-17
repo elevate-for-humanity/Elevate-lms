@@ -42,7 +42,7 @@ export default function MissionPage() {
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
-            <Target className="w-16 h-16 text-orange-600 mx-auto mb-6" />
+            <Target className="w-16 h-16 text-brand-orange-600 mx-auto mb-6" />
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
               Mission Statement
             </h2>
@@ -64,7 +64,7 @@ export default function MissionPage() {
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-xl shadow-sm">
-              <Heart className="w-12 h-12 text-orange-600 mb-4" />
+              <Heart className="w-12 h-12 text-brand-orange-600 mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">Compassion</h3>
               <p className="text-gray-600">
                 We meet people where they are, understanding that everyone&apos;s journey is different. 
@@ -72,7 +72,7 @@ export default function MissionPage() {
               </p>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm">
-              <Users className="w-12 h-12 text-orange-600 mb-4" />
+              <Users className="w-12 h-12 text-brand-orange-600 mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">Community</h3>
               <p className="text-gray-600">
                 We build lasting relationships with students, employers, and community partners. 
@@ -80,7 +80,7 @@ export default function MissionPage() {
               </p>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm">
-              <GraduationCap className="w-12 h-12 text-orange-600 mb-4" />
+              <GraduationCap className="w-12 h-12 text-brand-orange-600 mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">Excellence</h3>
               <p className="text-gray-600">
                 We deliver industry-recognized training that prepares students for real careers. 
@@ -88,7 +88,7 @@ export default function MissionPage() {
               </p>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm">
-              <Briefcase className="w-12 h-12 text-orange-600 mb-4" />
+              <Briefcase className="w-12 h-12 text-brand-orange-600 mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">Opportunity</h3>
               <p className="text-gray-600">
                 We connect graduates with employers actively hiring in high-demand fields. 
@@ -96,7 +96,7 @@ export default function MissionPage() {
               </p>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm">
-              <HandHeart className="w-12 h-12 text-orange-600 mb-4" />
+              <HandHeart className="w-12 h-12 text-brand-orange-600 mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">Accessibility</h3>
               <p className="text-gray-600">
                 Funded training through WIOA, WRG, and JRI funding. No tuition, no fees, 
@@ -104,7 +104,7 @@ export default function MissionPage() {
               </p>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm">
-              <Target className="w-12 h-12 text-orange-600 mb-4" />
+              <Target className="w-12 h-12 text-brand-orange-600 mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">Impact</h3>
               <p className="text-gray-600">
                 We measure success by lives changed. Hundreds of Indiana residents trained, 
@@ -141,16 +141,16 @@ export default function MissionPage() {
                 and expand our programs to serve communities across the Midwest.
               </p>
               <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="bg-orange-50 p-4 rounded-lg">
-                  <div className="text-3xl font-bold text-orange-600">1,000+</div>
+                <div className="bg-brand-orange-50 p-4 rounded-lg">
+                  <div className="text-3xl font-bold text-brand-orange-600">1,000+</div>
                   <div className="text-sm text-gray-600">Students Trained</div>
                 </div>
-                <div className="bg-orange-50 p-4 rounded-lg">
-                  <div className="text-3xl font-bold text-orange-600">85%</div>
+                <div className="bg-brand-orange-50 p-4 rounded-lg">
+                  <div className="text-3xl font-bold text-brand-orange-600">85%</div>
                   <div className="text-sm text-gray-600">Job Placement</div>
                 </div>
-                <div className="bg-orange-50 p-4 rounded-lg">
-                  <div className="text-3xl font-bold text-orange-600">100%</div>
+                <div className="bg-brand-orange-50 p-4 rounded-lg">
+                  <div className="text-3xl font-bold text-brand-orange-600">100%</div>
                   <div className="text-sm text-gray-600">Free Training</div>
                 </div>
               </div>
@@ -160,25 +160,25 @@ export default function MissionPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-orange-600 text-white">
+      <section className="py-16 md:py-24 bg-brand-orange-600 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Join Our Mission
           </h2>
-          <p className="text-xl text-orange-100 mb-8">
+          <p className="text-xl text-brand-orange-100 mb-8">
             Whether you&apos;re looking to start a new career, hire skilled workers, or support 
             our community, there&apos;s a place for you at Elevate for Humanity.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="px-8 py-4 bg-white text-orange-600 font-bold rounded-full hover:bg-orange-50 transition-all"
+              className="px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-full hover:bg-brand-orange-50 transition-all"
             >
               Start Free Training
             </Link>
             <Link
               href="/employers"
-              className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-orange-600 transition-all"
+              className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-brand-orange-600 transition-all"
             >
               Partner With Us
             </Link>

@@ -160,7 +160,7 @@ export default function AvatarChatBar() {
   if (isExcluded || isDismissed) return null;
 
   return (
-    <div className="bg-gradient-to-r from-slate-50 to-blue-50 border-y border-slate-200">
+    <div className="bg-gradient-to-r from-slate-50 to-brand-blue-50 border-y border-slate-200">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
           {/* Avatar Video Section */}

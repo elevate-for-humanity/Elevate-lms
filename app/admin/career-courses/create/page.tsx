@@ -271,17 +271,17 @@ export default function CreateCourseContentPage() {
                   </div>
 
                   {selectedModule.video_url && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+                    <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4 flex items-center gap-3">
                       <span className="text-slate-400 flex-shrink-0">•</span>
                       <div className="flex-1">
-                        <p className="font-medium text-green-900">Video Generated</p>
-                        <p className="text-sm text-green-700">This module has a video ready.</p>
+                        <p className="font-medium text-brand-green-900">Video Generated</p>
+                        <p className="text-sm text-brand-green-700">This module has a video ready.</p>
                       </div>
                       <a
                         href={selectedModule.video_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-green-600 hover:text-green-700 font-medium"
+                        className="flex items-center gap-1 text-brand-green-600 hover:text-brand-green-700 font-medium"
                       >
                         <Eye className="w-4 h-4" />
                         Preview

@@ -47,7 +47,7 @@ export function ReportProduct({ productId }: { productId: string }) {
 
   if (sent) {
     return (
-      <div className="text-sm text-green-600">
+      <div className="text-sm text-brand-green-600">
         • Report submitted. Thank you.
       </div>
     );

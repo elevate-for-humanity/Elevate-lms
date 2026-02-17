@@ -43,7 +43,7 @@ export default function PayrollPage() {
               <p className="text-sm text-gray-600 mb-1">Pay Period</p>
               <p className="text-lg font-bold text-gray-900">Jan 16-31, 2026</p>
             </div>
-            <div className="bg-green-50 rounded-lg p-4">
+            <div className="bg-brand-green-50 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-1">Hours Worked</p>
               <p className="text-lg font-bold text-gray-900">72 hours</p>
             </div>
@@ -51,7 +51,7 @@ export default function PayrollPage() {
               <p className="text-sm text-gray-600 mb-1">Estimated Gross</p>
               <p className="text-lg font-bold text-gray-900">$2,450.00</p>
             </div>
-            <div className="bg-orange-50 rounded-lg p-4">
+            <div className="bg-brand-orange-50 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-1">Pay Date</p>
               <p className="text-lg font-bold text-gray-900">Feb 1, 2026</p>
             </div>
@@ -67,8 +67,8 @@ export default function PayrollPage() {
             {payStubs.map((stub) => (
               <div key={stub.id} className="p-6 flex items-center justify-between hover:bg-gray-50">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                    <DollarSign className="w-6 h-6 text-green-600" />
+                  <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mr-4">
+                    <DollarSign className="w-6 h-6 text-brand-green-600" />
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">{stub.period}</p>
@@ -80,7 +80,7 @@ export default function PayrollPage() {
                   <p className="font-bold text-gray-900">Net: ${stub.netPay.toFixed(2)}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded flex items-center">
+                  <span className="bg-brand-green-100 text-brand-green-700 text-xs font-medium px-2 py-1 rounded flex items-center">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                     {stub.status}
                   </span>

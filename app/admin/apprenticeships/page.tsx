@@ -183,7 +183,7 @@ export default function AdminApprenticeships() {
                   </div>
                   <button
                     onClick={() => approveHours(log.id)}
-                    className="bg-brand-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
+                    className="bg-brand-green-600 text-white px-6 py-2 rounded-lg hover:bg-brand-green-700"
                   >
                     Approve
                   </button>
@@ -300,7 +300,7 @@ export default function AdminApprenticeships() {
                         <span
                           className={`px-3 py-2 rounded-full text-xs font-semibold ${
                             apprenticeship.status === 'active'
-                              ? 'bg-brand-green-100 text-green-800'
+                              ? 'bg-brand-green-100 text-brand-green-800'
                               : apprenticeship.status === 'completed'
                                 ? 'bg-brand-blue-100 text-brand-blue-800'
                                 : 'bg-gray-100 text-black'

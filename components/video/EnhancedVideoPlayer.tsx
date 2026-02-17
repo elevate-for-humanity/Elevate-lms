@@ -117,7 +117,7 @@ export function EnhancedVideoPlayer(props: EnhancedVideoPlayerProps) {
       <div className="flex justify-between items-center text-xs text-slate-500">
         <span className="font-medium text-black">{props.title}</span>
         {completed ? (
-          <span className="text-green-600 font-semibold flex items-center gap-1">
+          <span className="text-brand-green-600 font-semibold flex items-center gap-1">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
@@ -127,7 +127,7 @@ export function EnhancedVideoPlayer(props: EnhancedVideoPlayerProps) {
           <button
             type="button"
             onClick={handleCompleted}
-            className="rounded-full border border-green-300 px-3 py-2 text-[11px] font-medium text-green-700 hover:bg-green-50 transition"
+            className="rounded-full border border-brand-green-300 px-3 py-2 text-[11px] font-medium text-brand-green-700 hover:bg-brand-green-50 transition"
           >
             Mark complete
           </button>

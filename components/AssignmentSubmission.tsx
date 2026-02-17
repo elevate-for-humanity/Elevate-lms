@@ -166,9 +166,9 @@ export function AssignmentSubmission({
 
   if (submitted) {
     return (
-      <Card className="border-2 border-green-600">
+      <Card className="border-2 border-brand-green-600">
         <CardContent className="p-12 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h2 className="text-3xl font-bold mb-4">Assignment Submitted!</h2>
@@ -193,7 +193,7 @@ export function AssignmentSubmission({
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 text-sm">
-            <AlertCircle size={16} className="text-orange-600" />
+            <AlertCircle size={16} className="text-brand-orange-600" />
             <span>Due: {new Date(dueDate).toLocaleString()}</span>
           </div>
         </CardContent>
@@ -213,8 +213,8 @@ export function AssignmentSubmission({
             onClick={() => fileInputRef.current?.click()}
             className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition ${
               isDragging
-                ? 'border-red-600 bg-red-50'
-                : 'border-gray-300 hover:border-red-600 hover:bg-gray-50'
+                ? 'border-brand-red-600 bg-brand-red-50'
+                : 'border-gray-300 hover:border-brand-red-600 hover:bg-gray-50'
             }`}
           >
             <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -256,7 +256,7 @@ export function AssignmentSubmission({
                   </div>
                   <button
                     onClick={() => removeFile(file.id)}
-                    className="p-2 text-brand-orange-600 hover:bg-red-50 rounded transition"
+                    className="p-2 text-brand-orange-600 hover:bg-brand-red-50 rounded transition"
                   >
                     <X size={18} />
                   </button>
@@ -277,7 +277,7 @@ export function AssignmentSubmission({
             value={comment}
             onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setComment(e.target.value)}
             placeholder="Add any notes or comments for your instructor..."
-            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500"
             rows={4}
           />
         </CardContent>

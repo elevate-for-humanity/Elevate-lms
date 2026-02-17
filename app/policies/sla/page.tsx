@@ -19,7 +19,7 @@ export default function SLAPage() {
         <article className="bg-white rounded-xl shadow-sm p-8 md:p-12 mt-6">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <Shield className="w-8 h-8 text-orange-600" />
+              <Shield className="w-8 h-8 text-brand-orange-600" />
               <h1 className="text-4xl font-bold text-black">Service Level Agreement</h1>
         </div>
         <p className="text-sm text-gray-600">Last Updated: January 24, 2026</p>
@@ -62,10 +62,10 @@ export default function SLAPage() {
         </ul>
 
         <h2 className="text-2xl font-bold text-black mt-8 mb-4">Service Credits</h2>
-        <div className="bg-green-50 rounded-lg p-6 border-2 border-green-200 mb-6">
+        <div className="bg-brand-green-50 rounded-lg p-6 border-2 border-brand-green-200 mb-6">
           <div className="flex items-center gap-3 mb-3">
-            <CreditCard className="w-6 h-6 text-green-600" />
-            <h3 className="text-xl font-bold text-green-800 m-0">Financially Backed SLA</h3>
+            <CreditCard className="w-6 h-6 text-brand-green-600" />
+            <h3 className="text-xl font-bold text-brand-green-800 m-0">Financially Backed SLA</h3>
           </div>
           <p className="text-black mb-4">
             If monthly platform availability falls below the uptime targets stated above, 
@@ -73,15 +73,15 @@ export default function SLAPage() {
           </p>
           
           <h4 className="font-bold text-black mb-3">Credit Schedule</h4>
-          <div className="bg-white rounded-lg overflow-hidden border border-green-200 mb-4">
+          <div className="bg-white rounded-lg overflow-hidden border border-brand-green-200 mb-4">
             <table className="w-full text-left">
-              <thead className="bg-green-100">
+              <thead className="bg-brand-green-100">
                 <tr>
                   <th className="px-4 py-3 font-semibold text-black">Monthly Availability</th>
                   <th className="px-4 py-3 font-semibold text-black">Service Credit</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-green-100">
+              <tbody className="divide-y divide-brand-green-100">
                 <tr>
                   <td className="px-4 py-3 text-black">Below 99.5%</td>
                   <td className="px-4 py-3 text-black font-semibold">5% credit</td>
@@ -139,12 +139,12 @@ export default function SLAPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               <tr>
-                <td className="px-4 py-3 text-black font-semibold text-red-600">Critical</td>
+                <td className="px-4 py-3 text-black font-semibold text-brand-red-600">Critical</td>
                 <td className="px-4 py-3 text-black">Platform down, data breach, security incident</td>
                 <td className="px-4 py-3 text-black">4 hours</td>
               </tr>
               <tr>
-                <td className="px-4 py-3 text-black font-semibold text-orange-600">High</td>
+                <td className="px-4 py-3 text-black font-semibold text-brand-orange-600">High</td>
                 <td className="px-4 py-3 text-black">Major feature unavailable, payment issues</td>
                 <td className="px-4 py-3 text-black">8 hours</td>
               </tr>
@@ -154,7 +154,7 @@ export default function SLAPage() {
                 <td className="px-4 py-3 text-black">24 hours</td>
               </tr>
               <tr>
-                <td className="px-4 py-3 text-black font-semibold text-green-600">Low</td>
+                <td className="px-4 py-3 text-black font-semibold text-brand-green-600">Low</td>
                 <td className="px-4 py-3 text-black">General questions, feature requests</td>
                 <td className="px-4 py-3 text-black">48 hours</td>
               </tr>

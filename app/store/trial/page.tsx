@@ -75,7 +75,7 @@ export default function TrialPage() {
 
         <section className="py-16 sm:py-20">
           <div className="max-w-2xl mx-auto px-4 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <h1 className="text-3xl font-black text-slate-900 mb-3">Your trial is live.</h1>
@@ -222,7 +222,7 @@ export default function TrialPage() {
             </div>
 
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800 space-y-3">
+              <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-sm text-brand-red-800 space-y-3">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                   <span>{error}</span>
@@ -235,7 +235,7 @@ export default function TrialPage() {
                   >
                     Try again
                   </button>
-                  <span className="text-red-600">|</span>
+                  <span className="text-brand-red-600">|</span>
                   <Link
                     href={`/contact?topic=support&reason=trial-create-failed${correlationId ? `&ref=${correlationId}` : ''}`}
                     className="text-sm font-medium text-brand-red-600 hover:underline"
@@ -244,7 +244,7 @@ export default function TrialPage() {
                   </Link>
                 </div>
                 {correlationId && (
-                  <p className="text-xs text-red-400 pl-6">Reference: {correlationId}</p>
+                  <p className="text-xs text-brand-red-400 pl-6">Reference: {correlationId}</p>
                 )}
               </div>
             )}

@@ -92,8 +92,8 @@ export default async function FerpaCompliancePage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                <Shield className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center">
+                <Shield className="w-8 h-8 text-brand-green-600" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">FERPA Compliant</h2>
@@ -122,7 +122,7 @@ export default async function FerpaCompliancePage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
@@ -179,7 +179,7 @@ export default async function FerpaCompliancePage() {
                   )}
                   <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
                     check.status === 'compliant' 
-                      ? 'bg-green-100 text-green-700' 
+                      ? 'bg-brand-green-100 text-brand-green-700' 
                       : 'bg-yellow-100 text-yellow-700'
                   }`}>
                     {check.status === 'compliant' ? 'Compliant' : 'Needs Review'}
@@ -198,7 +198,7 @@ export default async function FerpaCompliancePage() {
             <p className="text-sm text-gray-500">Complete required training</p>
           </Link>
           <Link href="/ferpa/documentation" className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
-            <FileText className="w-6 h-6 text-green-600 mb-2" />
+            <FileText className="w-6 h-6 text-brand-green-600 mb-2" />
             <h3 className="font-semibold text-gray-900">Policies & Forms</h3>
             <p className="text-sm text-gray-500">Access compliance documents</p>
           </Link>

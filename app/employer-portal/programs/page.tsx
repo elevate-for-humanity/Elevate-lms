@@ -94,7 +94,7 @@ export default function EmployerProgramsPage() {
                 <div className="md:w-2/3 p-8">
                   <div className="flex items-center gap-3 mb-4">
                     <h2 className="text-2xl font-bold text-gray-900">{program.name}</h2>
-                    <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                    <span className="px-3 py-1 bg-brand-green-100 text-brand-green-700 text-sm font-medium rounded-full">
                       {program.status}
                     </span>
                   </div>
@@ -103,7 +103,7 @@ export default function EmployerProgramsPage() {
                   <div className="flex items-center gap-8 mb-6">
                     <div>
                       <p className="text-sm text-gray-500">Potential Savings</p>
-                      <p className="text-xl font-bold text-green-600">{program.savings}</p>
+                      <p className="text-xl font-bold text-brand-green-600">{program.savings}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500 mb-2">Eligibility</p>

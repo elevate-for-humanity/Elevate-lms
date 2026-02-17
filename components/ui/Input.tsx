@@ -32,10 +32,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const baseStyles = 'px-4 py-2 border rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1';
 
     const stateStyles = error
-      ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+      ? 'border-brand-red-500 focus:border-brand-red-500 focus:ring-brand-red-500'
       : success
-      ? 'border-green-500 focus:border-green-500 focus:ring-green-500'
-      : 'border-slate-300 focus:border-orange-500 focus:ring-brand-blue-500';
+      ? 'border-brand-green-500 focus:border-brand-green-500 focus:ring-brand-green-500'
+      : 'border-slate-300 focus:border-brand-orange-500 focus:ring-brand-blue-500';
 
     const disabledStyles = props.disabled
       ? 'bg-slate-100 cursor-not-allowed opacity-60'
@@ -53,7 +53,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className="block text-sm font-semibold text-black mb-2"
           >
             {label}
-            {props.required && <span className="text-red-500 ml-1">*</span>}
+            {props.required && <span className="text-brand-red-500 ml-1">*</span>}
           </label>
         )}
 
@@ -78,13 +78,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
 
           {error && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-red-500">
               <AlertCircle className="h-5 w-5" />
             </div>
           )}
 
           {success && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-green-500">
               <Check className="h-5 w-5" />
             </div>
           )}
@@ -98,7 +98,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
 
         {success && (
-          <p className="mt-2 text-sm text-green-600 flex items-center gap-1">
+          <p className="mt-2 text-sm text-brand-green-600 flex items-center gap-1">
             <Check className="h-4 w-4" />
             {success}
           </p>

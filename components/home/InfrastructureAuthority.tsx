@@ -51,7 +51,7 @@ export default function InfrastructureAuthority() {
               </p>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-6 leading-tight">
                 Not a training center.<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue-600 to-brand-blue-800">
                   A workforce delivery system.
                 </span>
               </h2>
@@ -107,8 +107,8 @@ export default function InfrastructureAuthority() {
               return (
                 <ScrollReveal key={i} delay={i * 80} direction="right">
                   <div className="p-5 rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all bg-white group">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-blue-50 flex items-center justify-center mb-3 transition-colors">
-                      <Icon className="w-5 h-5 text-slate-600 group-hover:text-blue-600 transition-colors" />
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-brand-blue-50 flex items-center justify-center mb-3 transition-colors">
+                      <Icon className="w-5 h-5 text-slate-600 group-hover:text-brand-blue-600 transition-colors" />
                     </div>
                     <h3 className="font-bold text-slate-900 mb-1">{cap.title}</h3>
                     <p className="text-sm text-slate-500">{cap.desc}</p>

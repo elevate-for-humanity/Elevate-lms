@@ -38,7 +38,7 @@ export default function MobileAchievementCard({
         <div
           className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
             unlocked
-              ? 'bg-gradient-to-br from-yellow-400 to-orange-500'
+              ? 'bg-gradient-to-br from-yellow-400 to-brand-orange-500'
               : 'bg-gray-300'
           }`}
         >

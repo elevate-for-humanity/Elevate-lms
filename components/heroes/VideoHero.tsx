@@ -65,7 +65,7 @@ export function VideoHero({
               {primaryCTA && (
                 <Link
                   href={primaryCTA.href}
-                  className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 px-10 py-4 text-lg font-bold text-white shadow-2xl hover:from-orange-600 hover:to-orange-700 transition-all transform hover:scale-105"
+                  className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-brand-orange-500 to-brand-orange-600 px-10 py-4 text-lg font-bold text-white shadow-2xl hover:from-brand-orange-600 hover:to-brand-orange-700 transition-all transform hover:scale-105"
                 >
                   {primaryCTA.text}
                 </Link>

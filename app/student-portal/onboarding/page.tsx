@@ -182,7 +182,7 @@ export default function StudentOnboardingPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-4" />
+          <Loader2 className="w-8 h-8 text-brand-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-slate-600">Loading your onboarding progress...</p>
         </div>
       </div>
@@ -216,7 +216,7 @@ export default function StudentOnboardingPage() {
           </div>
           <div className="w-full bg-slate-200 rounded-full h-3">
             <div
-              className="bg-blue-600 h-3 rounded-full transition-all duration-500"
+              className="bg-brand-blue-600 h-3 rounded-full transition-all duration-500"
               style={{ width: `${(requiredComplete / requiredSteps) * 100}%` }}
             />
           </div>
@@ -251,9 +251,9 @@ export default function StudentOnboardingPage() {
                 href={step.href}
                 className={`block bg-white rounded-xl shadow-sm p-6 transition-all ${
                   isComplete
-                    ? 'border-2 border-green-500'
+                    ? 'border-2 border-brand-green-500'
                     : isNext
-                    ? 'border-2 border-blue-500 ring-2 ring-blue-100'
+                    ? 'border-2 border-brand-blue-500 ring-2 ring-brand-blue-100'
                     : 'border border-slate-200 hover:border-slate-300'
                 }`}
               >
@@ -262,18 +262,18 @@ export default function StudentOnboardingPage() {
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
                       isComplete
-                        ? 'bg-green-100'
+                        ? 'bg-brand-green-100'
                         : isNext
-                        ? 'bg-blue-100'
+                        ? 'bg-brand-blue-100'
                         : 'bg-slate-100'
                     }`}
                   >
                     {isComplete ? (
-                      <Check className="w-6 h-6 text-green-600" />
+                      <Check className="w-6 h-6 text-brand-green-600" />
                     ) : (
                       <Icon
                         className={`w-6 h-6 ${
-                          isNext ? 'text-blue-600' : 'text-slate-400'
+                          isNext ? 'text-brand-blue-600' : 'text-slate-400'
                         }`}
                       />
                     )}
@@ -285,21 +285,21 @@ export default function StudentOnboardingPage() {
                       <h3
                         className={`font-semibold ${
                           isComplete
-                            ? 'text-green-900'
+                            ? 'text-brand-green-900'
                             : isNext
-                            ? 'text-blue-900'
+                            ? 'text-brand-blue-900'
                             : 'text-slate-900'
                         }`}
                       >
                         {step.title}
                       </h3>
                       {step.required && (
-                        <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+                        <span className="text-xs bg-brand-red-100 text-brand-red-700 px-2 py-0.5 rounded-full">
                           Required
                         </span>
                       )}
                       {isComplete && (
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                        <span className="text-xs bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded-full">
                           Complete
                         </span>
                       )}
@@ -313,9 +313,9 @@ export default function StudentOnboardingPage() {
                   <ChevronRight
                     className={`w-5 h-5 flex-shrink-0 ${
                       isComplete
-                        ? 'text-green-400'
+                        ? 'text-brand-green-400'
                         : isNext
-                        ? 'text-blue-400'
+                        ? 'text-brand-blue-400'
                         : 'text-slate-300'
                     }`}
                   />
@@ -330,7 +330,7 @@ export default function StudentOnboardingPage() {
           <div className="mt-8 text-center">
             <Link
               href="/lms/dashboard"
-              className="inline-flex items-center gap-2 bg-green-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
+              className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-brand-green-700 transition-colors"
             >
               Continue to Dashboard
               <ChevronRight className="w-5 h-5" />
@@ -343,7 +343,7 @@ export default function StudentOnboardingPage() {
           <div className="mt-8 text-center">
             <Link
               href={nextStep.href}
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-brand-blue-700 transition-colors"
             >
               Continue: {nextStep.title}
               <ChevronRight className="w-5 h-5" />
@@ -355,7 +355,7 @@ export default function StudentOnboardingPage() {
         <div className="mt-8 text-center">
           <p className="text-sm text-slate-500">
             Need help?{' '}
-            <Link href="/support" className="text-blue-600 hover:underline">
+            <Link href="/support" className="text-brand-blue-600 hover:underline">
               Contact Support
             </Link>
           </p>

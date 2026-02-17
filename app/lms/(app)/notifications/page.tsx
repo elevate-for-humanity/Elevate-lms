@@ -79,11 +79,11 @@ export default async function NotificationsPage() {
   const getIconColor = (type: string) => {
     switch (type) {
       case 'course': return 'bg-brand-blue-100 text-brand-blue-600';
-      case 'assignment': return 'bg-orange-100 text-orange-600';
-      case 'grade': return 'bg-green-100 text-green-600';
+      case 'assignment': return 'bg-brand-orange-100 text-brand-orange-600';
+      case 'grade': return 'bg-brand-green-100 text-brand-green-600';
       case 'message': return 'bg-brand-blue-100 text-brand-blue-600';
-      case 'alert': return 'bg-red-100 text-red-600';
-      case 'success': return 'bg-green-100 text-green-600';
+      case 'alert': return 'bg-brand-red-100 text-brand-red-600';
+      case 'success': return 'bg-brand-green-100 text-brand-green-600';
       default: return 'bg-slate-100 text-slate-600';
     }
   };

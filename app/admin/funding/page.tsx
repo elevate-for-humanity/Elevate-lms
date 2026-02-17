@@ -27,10 +27,10 @@ export default async function FundingPage() {
           <p className="text-gray-600 mt-2">Track funding sources and allocations</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Funding</h3><p className="text-3xl font-bold text-green-600 mt-2">$3.2M</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Funding</h3><p className="text-3xl font-bold text-brand-green-600 mt-2">$3.2M</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Allocated</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">$2.8M</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Available</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">$400K</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active Grants</h3><p className="text-3xl font-bold text-orange-600 mt-2">12</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active Grants</h3><p className="text-3xl font-bold text-brand-orange-600 mt-2">12</p></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link href="/admin/grants/revenue" className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md"><h3 className="font-semibold mb-2">Grant Revenue</h3><p className="text-sm text-gray-500">Track grant income and disbursements</p></Link>

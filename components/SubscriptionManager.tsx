@@ -137,11 +137,11 @@ export function SubscriptionManager() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
+        return <Badge className="bg-brand-green-100 text-brand-green-800">Active</Badge>;
       case 'canceled':
-        return <Badge className="bg-red-100 text-red-800">Canceled</Badge>;
+        return <Badge className="bg-brand-red-100 text-brand-red-800">Canceled</Badge>;
       case 'past_due':
-        return <Badge className="bg-orange-100 text-orange-800">Past Due</Badge>;
+        return <Badge className="bg-brand-orange-100 text-brand-orange-800">Past Due</Badge>;
       default:
         return <Badge>Unknown</Badge>;
     }
@@ -178,13 +178,13 @@ export function SubscriptionManager() {
             </div>
 
             {currentSubscription.cancelAtPeriodEnd && (
-              <div className="flex items-start gap-3 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                <AlertCircle className="text-orange-600 flex-shrink-0 mt-0.5" size={20} />
+              <div className="flex items-start gap-3 p-4 bg-brand-orange-50 border border-brand-orange-200 rounded-lg">
+                <AlertCircle className="text-brand-orange-600 flex-shrink-0 mt-0.5" size={20} />
                 <div className="flex-1">
-                  <div className="font-semibold text-orange-900 mb-1">
+                  <div className="font-semibold text-brand-orange-900 mb-1">
                     Subscription Ending
                   </div>
-                  <div className="text-sm text-orange-800">
+                  <div className="text-sm text-brand-orange-800">
                     Your subscription will end on{' '}
                     {currentSubscription.currentPeriodEnd.toLocaleDateString()}. You&apos;ll
                     still have access until then.
@@ -201,7 +201,7 @@ export function SubscriptionManager() {
               {currentSubscription.cancelAtPeriodEnd ? (
                 <Button
                   onClick={handleReactivateSubscription}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  className="flex-1 bg-brand-green-600 hover:bg-brand-green-700"
                 >
                   Reactivate Subscription
                 </Button>
@@ -209,7 +209,7 @@ export function SubscriptionManager() {
                 <Button
                   onClick={handleCancelSubscription}
                   variant="outline"
-                  className="flex-1 text-brand-orange-600 border-red-600 hover:bg-red-50"
+                  className="flex-1 text-brand-orange-600 border-brand-red-600 hover:bg-brand-red-50"
                 >
                   Cancel Subscription
                 </Button>
@@ -227,7 +227,7 @@ export function SubscriptionManager() {
             <Card
               key={plan.id}
               className={`relative ${
-                plan.popular ? 'border-2 border-red-600 shadow-lg' : ''
+                plan.popular ? 'border-2 border-brand-red-600 shadow-lg' : ''
               }`}
             >
               {plan.popular && (
@@ -287,7 +287,7 @@ export function SubscriptionManager() {
                 className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-brand-green-100 rounded-full flex items-center justify-center">
                     <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>

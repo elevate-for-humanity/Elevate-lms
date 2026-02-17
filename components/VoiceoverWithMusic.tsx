@@ -93,7 +93,7 @@ export default function VoiceoverWithMusic({
         {/* Progress bar */}
         <div className="h-1 bg-gray-200">
           <div 
-            className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-100"
+            className="h-full bg-gradient-to-r from-brand-blue-500 to-brand-blue-600 transition-all duration-100"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -103,7 +103,7 @@ export default function VoiceoverWithMusic({
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
             {/* Left - Now playing */}
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/30">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-blue-500 to-brand-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand-blue-500/30">
                 <div className="flex items-end gap-0.5 h-4">
                   <span className="w-1 bg-white rounded-full animate-soundbar1" />
                   <span className="w-1 bg-white rounded-full animate-soundbar2" />
@@ -144,11 +144,11 @@ export default function VoiceoverWithMusic({
       >
         <div className="relative">
           {/* Pulse ring - more visible */}
-          <div className="absolute -inset-2 rounded-full bg-orange-500 animate-ping opacity-30" />
-          <div className="absolute -inset-1 rounded-full bg-orange-400 animate-pulse opacity-40" />
+          <div className="absolute -inset-2 rounded-full bg-brand-orange-500 animate-ping opacity-30" />
+          <div className="absolute -inset-1 rounded-full bg-brand-orange-400 animate-pulse opacity-40" />
           
           {/* Button - orange for visibility */}
-          <div className="relative flex items-center gap-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white pl-4 pr-6 py-4 rounded-full shadow-2xl shadow-orange-500/40 hover:shadow-orange-500/50 hover:scale-105 transition-all duration-200 border-2 border-white/20">
+          <div className="relative flex items-center gap-3 bg-gradient-to-r from-brand-orange-500 to-brand-orange-600 text-white pl-4 pr-6 py-4 rounded-full shadow-2xl shadow-brand-orange-500/40 hover:shadow-brand-orange-500/50 hover:scale-105 transition-all duration-200 border-2 border-white/20">
             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
               <svg className="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z"/>

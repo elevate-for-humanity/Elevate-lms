@@ -13,14 +13,14 @@ import {
 
 export function SupersonicHeader() {
   return (
-    <header className="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 text-white sticky top-0 z-50 shadow-2xl border-b-4 border-red-600">
+    <header className="bg-gradient-to-r from-brand-blue-950 via-brand-blue-900 to-brand-blue-950 text-white sticky top-0 z-50 shadow-2xl border-b-4 border-brand-red-600">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link
             href="/supersonic-fast-cash"
             className="flex items-center gap-3 group transition-transform hover:scale-105"
           >
-            <div className="w-14 h-14 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-red-500/50 transition-shadow">
+            <div className="w-14 h-14 bg-gradient-to-br from-brand-red-600 to-brand-red-700 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-brand-red-500/50 transition-shadow">
               <DollarSign className="w-9 h-9 text-white" />
             </div>
             <div className="text-2xl font-black uppercase tracking-tight">
@@ -30,14 +30,14 @@ export function SupersonicHeader() {
 
           <nav className="hidden md:flex items-center gap-8">
             <div className="relative group">
-              <button className="flex items-center gap-1 font-bold hover:text-red-400 transition-colors text-sm uppercase tracking-wide" aria-label="Action button">
+              <button className="flex items-center gap-1 font-bold hover:text-brand-red-400 transition-colors text-sm uppercase tracking-wide" aria-label="Action button">
                 Services{' '}
                 <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />
               </button>
               <div className="absolute top-full left-0 mt-2 bg-white text-black shadow-2xl rounded-xl p-2 hidden group-hover:block w-64 border border-gray-100">
                 <Link
                   href="/supersonic-fast-cash/apply"
-                  className="block px-4 py-3 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors font-semibold"
+                  className="block px-4 py-3 hover:bg-brand-red-50 hover:text-brand-red-600 rounded-lg transition-colors font-semibold"
                 >
                   💵 Tax Refund Advance
                 </Link>
@@ -51,7 +51,7 @@ export function SupersonicHeader() {
                 </Link>
                 <Link
                   href="/supersonic-fast-cash/diy-taxes"
-                  className="block px-4 py-3 hover:bg-green-50 hover:text-green-600 rounded-lg transition-colors font-semibold"
+                  className="block px-4 py-3 hover:bg-brand-green-50 hover:text-brand-green-600 rounded-lg transition-colors font-semibold"
                 >
                   <FileText className="w-5 h-5 inline-block" /> DIY Self-Prep
                 </Link>
@@ -65,7 +65,7 @@ export function SupersonicHeader() {
             </div>
 
             <div className="relative group">
-              <button className="flex items-center gap-1 font-bold hover:text-red-400 transition-colors text-sm uppercase tracking-wide" aria-label="Action button">
+              <button className="flex items-center gap-1 font-bold hover:text-brand-red-400 transition-colors text-sm uppercase tracking-wide" aria-label="Action button">
                 Tools{' '}
                 <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />
               </button>
@@ -78,7 +78,7 @@ export function SupersonicHeader() {
                 </Link>
                 <Link
                   href="/supersonic-fast-cash/tax-tools"
-                  className="block px-4 py-3 hover:bg-green-50 hover:text-green-600 rounded-lg transition-colors font-semibold"
+                  className="block px-4 py-3 hover:bg-brand-green-50 hover:text-brand-green-600 rounded-lg transition-colors font-semibold"
                 >
                   🛠️ Tax Tools
                 </Link>
@@ -105,13 +105,13 @@ export function SupersonicHeader() {
 
             <Link
               href="/supersonic-fast-cash/pricing"
-              className="font-bold hover:text-red-400 transition-colors text-sm uppercase tracking-wide"
+              className="font-bold hover:text-brand-red-400 transition-colors text-sm uppercase tracking-wide"
             >
               Pricing
             </Link>
             <Link
               href="/supersonic-fast-cash/locations"
-              className="font-bold hover:text-red-400 transition-colors text-sm uppercase tracking-wide"
+              className="font-bold hover:text-brand-red-400 transition-colors text-sm uppercase tracking-wide"
             >
               Locations
             </Link>
@@ -120,13 +120,13 @@ export function SupersonicHeader() {
           <div className="flex items-center gap-4">
             <a
               href="/support"
-              className="hidden sm:block font-bold text-lg hover:text-red-400 transition-colors"
+              className="hidden sm:block font-bold text-lg hover:text-brand-red-400 transition-colors"
             >
               <Phone className="w-5 h-5 inline-block" /> Get Help Online
             </a>
             <Link
               href="/supersonic-fast-cash/apply"
-              className="px-8 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-black rounded-xl hover:from-red-700 hover:to-red-800 uppercase shadow-lg hover:shadow-red-500/50 transition-all transform hover:scale-105"
+              className="px-8 py-3 bg-gradient-to-r from-brand-red-600 to-brand-red-700 text-white font-black rounded-xl hover:from-brand-red-700 hover:to-brand-red-800 uppercase shadow-lg hover:shadow-brand-red-500/50 transition-all transform hover:scale-105"
             >
               Apply Now
             </Link>

@@ -113,11 +113,11 @@ export default function DigitalBinder({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'complete':
-        return 'bg-green-100 text-green-800';
+        return 'bg-brand-green-100 text-brand-green-800';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'missing':
-        return 'bg-red-100 text-red-800';
+        return 'bg-brand-red-100 text-brand-red-800';
       default:
         return 'bg-gray-100 text-black';
     }
@@ -126,7 +126,7 @@ export default function DigitalBinder({
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'achievement':
-        return 'bg-green-100 text-green-800';
+        return 'bg-brand-green-100 text-brand-green-800';
       case 'concern':
         return 'bg-yellow-100 text-yellow-800';
       case 'progress':
@@ -307,7 +307,7 @@ export default function DigitalBinder({
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
-                  className="bg-green-600 h-2 rounded-full"
+                  className="bg-brand-green-600 h-2 rounded-full"
                   style={{ width: `${trackingData.attendanceRate}%` }}
                 />
               </div>

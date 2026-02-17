@@ -122,7 +122,7 @@ export default async function FAQPage() {
       <section className="py-8 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/wioa-eligibility" className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
+            <Link href="/wioa-eligibility" className="px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium hover:bg-brand-green-200 transition-colors">
               WIOA Eligibility
             </Link>
             <Link href="/funding" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
@@ -131,7 +131,7 @@ export default async function FAQPage() {
             <Link href="/programs" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               Training Programs
             </Link>
-            <Link href="/how-it-works" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
+            <Link href="/how-it-works" className="px-4 py-2 bg-brand-orange-100 text-brand-orange-800 rounded-full text-sm font-medium hover:bg-brand-orange-200 transition-colors">
               How It Works
             </Link>
             <Link href="/contact" className="px-4 py-2 bg-gray-100 text-gray-800 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
@@ -161,11 +161,11 @@ export default async function FAQPage() {
         <FAQSearch faqs={faqsToUse} />
 
         {/* Contact CTA */}
-        <div className="mt-12 bg-orange-50 rounded-xl p-8 text-center">
-          <MessageSquare className="w-12 h-12 text-orange-500 mx-auto mb-4" />
+        <div className="mt-12 bg-brand-orange-50 rounded-xl p-8 text-center">
+          <MessageSquare className="w-12 h-12 text-brand-orange-500 mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Still have questions?</h2>
           <p className="text-gray-600 mb-4">Our team is here to help you find the answers you need.</p>
-          <Link href="/contact" className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-600">
+          <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-orange-600">
             Contact Us
           </Link>
         </div>

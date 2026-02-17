@@ -22,8 +22,8 @@ export default function NewTaxFilingApplicationPage() {
         </Link>
 
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-            <FileText className="w-6 h-6 text-green-600" />
+          <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center">
+            <FileText className="w-6 h-6 text-brand-green-600" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">New Tax Filing Application</h1>

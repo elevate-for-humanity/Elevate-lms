@@ -66,16 +66,16 @@ export default function DirectDepositPage() {
       </section>
 
       {/* Key Benefits */}
-      <section className="py-12 bg-green-50">
+      <section className="py-12 bg-brand-green-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-6">
             <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-              <Zap className="w-10 h-10 text-green-600 mx-auto mb-3" />
+              <Zap className="w-10 h-10 text-brand-green-600 mx-auto mb-3" />
               <h3 className="font-bold text-gray-900 mb-2">Fastest Method</h3>
               <p className="text-sm text-gray-600">Get your refund 2-3 weeks faster than paper checks</p>
             </div>
             <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-              <Shield className="w-10 h-10 text-green-600 mx-auto mb-3" />
+              <Shield className="w-10 h-10 text-brand-green-600 mx-auto mb-3" />
               <h3 className="font-bold text-gray-900 mb-2">100% Secure</h3>
               <p className="text-sm text-gray-600">FDIC insured and encrypted transfers</p>
             </div>
@@ -85,7 +85,7 @@ export default function DirectDepositPage() {
               <p className="text-sm text-gray-600">Direct deposit is completely free</p>
             </div>
             <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-              <Clock className="w-10 h-10 text-green-600 mx-auto mb-3" />
+              <Clock className="w-10 h-10 text-brand-green-600 mx-auto mb-3" />
               <h3 className="font-bold text-gray-900 mb-2">Track Status</h3>
               <p className="text-sm text-gray-600">Monitor your refund in real-time</p>
             </div>
@@ -104,7 +104,7 @@ export default function DirectDepositPage() {
             <div>
               <div className="space-y-8">
                 <div className="flex items-start">
-                  <div className="w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                  <div className="w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                     1
                   </div>
                   <div className="ml-4">
@@ -117,7 +117,7 @@ export default function DirectDepositPage() {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                  <div className="w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                     2
                   </div>
                   <div className="ml-4">
@@ -130,7 +130,7 @@ export default function DirectDepositPage() {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                  <div className="w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                     3
                   </div>
                   <div className="ml-4">
@@ -148,14 +148,14 @@ export default function DirectDepositPage() {
               <h3 className="text-xl font-bold text-gray-900 mb-6">What You Need</h3>
               <ul className="space-y-4">
                 <li className="flex items-start">
-                  <Building className="w-6 h-6 text-green-600 mr-3 flex-shrink-0 mt-1" />
+                  <Building className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1" />
                   <div>
                     <p className="font-semibold text-gray-900">Bank Routing Number</p>
                     <p className="text-sm text-gray-600">9-digit number identifying your bank</p>
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <FileText className="w-6 h-6 text-green-600 mr-3 flex-shrink-0 mt-1" />
+                  <FileText className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1" />
                   <div>
                     <p className="font-semibold text-gray-900">Account Number</p>
                     <p className="text-sm text-gray-600">Your personal checking or savings account number</p>
@@ -192,7 +192,7 @@ export default function DirectDepositPage() {
 
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             <table className="w-full">
-              <thead className="bg-green-600 text-white">
+              <thead className="bg-brand-green-600 text-white">
                 <tr>
                   <th className="px-6 py-4 text-left">Filing Method</th>
                   <th className="px-6 py-4 text-left">Refund Method</th>
@@ -200,10 +200,10 @@ export default function DirectDepositPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                <tr className="bg-green-50">
+                <tr className="bg-brand-green-50">
                   <td className="px-6 py-4 font-medium">E-File</td>
                   <td className="px-6 py-4">Direct Deposit</td>
-                  <td className="px-6 py-4 text-green-600 font-bold">~21 days</td>
+                  <td className="px-6 py-4 text-brand-green-600 font-bold">~21 days</td>
                 </tr>
                 <tr>
                   <td className="px-6 py-4 font-medium">E-File</td>
@@ -247,7 +247,7 @@ export default function DirectDepositPage() {
                 <p className="text-sm text-gray-600">Checking Account</p>
               </div>
               <div className="bg-white rounded-lg p-4 text-center">
-                <p className="text-2xl font-bold text-green-600">30%</p>
+                <p className="text-2xl font-bold text-brand-green-600">30%</p>
                 <p className="text-sm text-gray-600">Savings Account</p>
               </div>
               <div className="bg-white rounded-lg p-4 text-center">
@@ -305,24 +305,24 @@ export default function DirectDepositPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-green-700 text-white">
+      <section className="py-16 bg-brand-green-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Ready to File Your Taxes?
           </h2>
-          <p className="text-xl mb-8 text-green-100">
+          <p className="text-xl mb-8 text-brand-green-100">
             Set up direct deposit and get your refund faster.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/tax"
-              className="bg-white hover:bg-gray-100 text-green-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
+              className="bg-white hover:bg-gray-100 text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               File Your Taxes <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link
               href="/banking"
-              className="bg-green-600 hover:bg-green-500 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all border-2 border-white"
+              className="bg-brand-green-600 hover:bg-brand-green-500 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all border-2 border-white"
             >
               View All Banking Options
             </Link>

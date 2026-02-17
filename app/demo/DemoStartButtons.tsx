@@ -71,7 +71,7 @@ export function DemoStartButtons() {
         <button
           onClick={handleReset}
           disabled={seeding || resetting}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-brand-red-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           <RefreshCw className={`w-4 h-4 ${resetting ? 'animate-spin' : ''}`} />
           {resetting ? 'Resetting...' : 'Reset Demo'}
@@ -81,8 +81,8 @@ export function DemoStartButtons() {
       {message && (
         <div className={`mt-4 p-3 rounded-lg text-sm ${
           message.type === 'success' 
-            ? 'bg-green-100 text-green-800' 
-            : 'bg-red-100 text-red-800'
+            ? 'bg-brand-green-100 text-brand-green-800' 
+            : 'bg-brand-red-100 text-brand-red-800'
         }`}>
           {message.text}
         </div>

@@ -106,8 +106,8 @@ export default async function WrgPage() {
             real jobs.
           </p>
 
-          <div className="bg-green-50 rounded-lg p-6">
-            <h3 className="text-lg font-bold mb-3 text-green-900">
+          <div className="bg-brand-green-50 rounded-lg p-6">
+            <h3 className="text-lg font-bold mb-3 text-brand-green-900">
               Who Qualifies?
             </h3>
             <ul className="space-y-3">
@@ -146,7 +146,7 @@ export default async function WrgPage() {
                 </span>
               </li>
             </ul>
-            <p className="mt-4 text-green-900 font-bold">
+            <p className="mt-4 text-brand-green-900 font-bold">
               That's it. No income limits. No age limits. No credit check.
             </p>
           </div>
@@ -161,8 +161,8 @@ export default async function WrgPage() {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-green-50 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-3 text-green-900">
+            <div className="bg-brand-green-50 rounded-lg p-6">
+              <h3 className="text-lg font-bold mb-3 text-brand-green-900">
                 • Tuition
               </h3>
               <p className="text-black">
@@ -171,8 +171,8 @@ export default async function WrgPage() {
               </p>
             </div>
 
-            <div className="bg-green-50 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-3 text-green-900">
+            <div className="bg-brand-green-50 rounded-lg p-6">
+              <h3 className="text-lg font-bold mb-3 text-brand-green-900">
                 • Books & Materials
               </h3>
               <p className="text-black">
@@ -180,8 +180,8 @@ export default async function WrgPage() {
               </p>
             </div>
 
-            <div className="bg-green-50 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-3 text-green-900">
+            <div className="bg-brand-green-50 rounded-lg p-6">
+              <h3 className="text-lg font-bold mb-3 text-brand-green-900">
                 • Certification Exams
               </h3>
               <p className="text-black">
@@ -189,8 +189,8 @@ export default async function WrgPage() {
               </p>
             </div>
 
-            <div className="bg-green-50 rounded-lg p-6">
-              <h3 className="text-lg font-bold mb-3 text-green-900">
+            <div className="bg-brand-green-50 rounded-lg p-6">
+              <h3 className="text-lg font-bold mb-3 text-brand-green-900">
                 • No Payback Required
               </h3>
               <p className="text-black">
@@ -281,7 +281,7 @@ export default async function WrgPage() {
           <div className="mt-8 text-center">
             <Link
               href="/programs"
-              className="inline-block px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-all"
+              className="inline-block px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition-all"
             >
               View All Programs
             </Link>

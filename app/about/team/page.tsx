@@ -141,7 +141,7 @@ export default async function TeamPage() {
                     <h2 className="text-2xl font-bold text-slate-900 mb-1">
                       {member.name}
                     </h2>
-                    <p className="text-lg text-blue-600 font-medium mb-4">
+                    <p className="text-lg text-brand-blue-600 font-medium mb-4">
                       {member.title}
                     </p>
                     {member.bio && (
@@ -155,7 +155,7 @@ export default async function TeamPage() {
                     )}
                     {member.email && (
                       <p className="mt-4">
-                        <a href={`mailto:${member.email}`} className="text-blue-600 hover:underline">
+                        <a href={`mailto:${member.email}`} className="text-brand-blue-600 hover:underline">
                           {member.email}
                         </a>
                       </p>
@@ -165,7 +165,7 @@ export default async function TeamPage() {
                         href={member.linkedin_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 mt-2 text-blue-600 hover:underline"
+                        className="inline-flex items-center gap-2 mt-2 text-brand-blue-600 hover:underline"
                       >
                         LinkedIn Profile
                       </a>
@@ -193,7 +193,7 @@ export default async function TeamPage() {
           </p>
           <Link
             href="/careers"
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
           >
             View Open Positions
           </Link>

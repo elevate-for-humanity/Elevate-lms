@@ -78,7 +78,7 @@ function CheckoutForm({
       <PaymentElement />
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded flex items-start gap-2">
+        <div className="bg-brand-red-50 border border-brand-red-200 text-brand-red-700 px-4 py-3 rounded flex items-start gap-2">
           <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
@@ -87,7 +87,7 @@ function CheckoutForm({
       <button
         type="submit"
         disabled={!stripe || processing}
-        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold py-4 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {processing ? (
           <>
@@ -355,7 +355,7 @@ export default function LicenseCheckoutPage() {
 
                   <button
                     type="submit"
-                    className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition"
+                    className="w-full bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold py-4 rounded-lg transition"
                   >
                     Continue to Payment
                   </button>

@@ -114,7 +114,7 @@ export default function ScheduleMeetingPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Meeting Scheduled!</h1>
@@ -231,12 +231,12 @@ export default function ScheduleMeetingPage() {
                   setMeetingType('phone');
                   setStep(2);
                 }}
-                className={`p-8 bg-white rounded-2xl border-2 hover:border-green-500 hover:shadow-lg transition text-left ${
-                  meetingType === 'phone' ? 'border-green-500 shadow-lg' : 'border-gray-200'
+                className={`p-8 bg-white rounded-2xl border-2 hover:border-brand-green-500 hover:shadow-lg transition text-left ${
+                  meetingType === 'phone' ? 'border-brand-green-500 shadow-lg' : 'border-gray-200'
                 }`}
               >
-                <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-                  <Phone className="w-7 h-7 text-green-600" />
+                <div className="w-14 h-14 bg-brand-green-100 rounded-xl flex items-center justify-center mb-4">
+                  <Phone className="w-7 h-7 text-brand-green-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Phone Call</h3>
                 <p className="text-gray-600 mb-4">
@@ -353,7 +353,7 @@ export default function ScheduleMeetingPage() {
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                     <User className="w-4 h-4 inline mr-2" />
-                    Full Name <span className="text-red-500">*</span>
+                    Full Name <span className="text-brand-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -369,7 +369,7 @@ export default function ScheduleMeetingPage() {
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                     <Mail className="w-4 h-4 inline mr-2" />
-                    Email <span className="text-red-500">*</span>
+                    Email <span className="text-brand-red-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -385,7 +385,7 @@ export default function ScheduleMeetingPage() {
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                     <Phone className="w-4 h-4 inline mr-2" />
-                    Phone Number <span className="text-red-500">*</span>
+                    Phone Number <span className="text-brand-red-500">*</span>
                   </label>
                   <input
                     type="tel"

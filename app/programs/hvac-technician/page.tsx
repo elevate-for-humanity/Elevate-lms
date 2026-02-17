@@ -120,7 +120,7 @@ export default function HVACTechnicianPage() {
               Master heating, ventilation, and air conditioning. High-demand career with excellent pay and year-round work.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/apply?program=hvac-technician" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
+              <Link href="/apply?program=hvac-technician" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
                 Apply Now <ArrowRight className="w-5 h-5" />
               </Link>
               <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
@@ -141,7 +141,7 @@ export default function HVACTechnicianPage() {
               <div className="text-slate-400 text-sm">Program Length</div>
             </div>
             <div>
-              <DollarSign className="w-8 h-8 text-green-400 mx-auto mb-2" />
+              <DollarSign className="w-8 h-8 text-brand-green-400 mx-auto mb-2" />
               <div className="text-2xl font-bold text-white">Funded</div>
               <div className="text-slate-400 text-sm">For Qualifying Students</div>
             </div>
@@ -215,20 +215,20 @@ export default function HVACTechnicianPage() {
       </section>
 
       {/* Career Opportunities */}
-      <section className="py-16 bg-red-600">
+      <section className="py-16 bg-brand-red-600">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-white">
               <h2 className="text-3xl md:text-4xl font-black mb-6">Career Opportunities</h2>
-              <p className="text-red-100 mb-8">
+              <p className="text-brand-red-100 mb-8">
                 HVAC technicians are in high demand across Indiana. Multiple career paths available.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {careers.map((career, i) => (
                   <div key={i} className="bg-white/10 rounded-xl p-4">
                     <h3 className="font-bold text-white">{career.title}</h3>
-                    <p className="text-red-200 text-sm">{career.salary}/year</p>
-                    <p className="text-red-300 text-xs mt-1">{career.growth}</p>
+                    <p className="text-brand-red-200 text-sm">{career.salary}/year</p>
+                    <p className="text-brand-red-300 text-xs mt-1">{career.growth}</p>
                   </div>
                 ))}
               </div>
@@ -260,7 +260,7 @@ export default function HVACTechnicianPage() {
             </p>
           </div>
           
-          <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
+          <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
             Check Your Eligibility <ArrowRight className="w-5 h-5" />
           </a>
         </div>
@@ -300,7 +300,7 @@ export default function HVACTechnicianPage() {
             Classes starting soon. Limited seats available.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/apply?program=hvac-technician" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/apply?program=hvac-technician" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
             <a href="/support" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">

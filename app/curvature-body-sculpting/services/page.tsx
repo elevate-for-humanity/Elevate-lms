@@ -135,7 +135,7 @@ const colorClasses: Record<string, { bg: string; light: string; text: string }> 
   pink: { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-600' },
   blue: { bg: 'bg-brand-blue-600', light: 'bg-brand-blue-50', text: 'text-brand-blue-600' },
   indigo: { bg: 'bg-indigo-600', light: 'bg-indigo-50', text: 'text-indigo-600' },
-  green: { bg: 'bg-green-600', light: 'bg-green-50', text: 'text-green-600' },
+  green: { bg: 'bg-brand-green-600', light: 'bg-brand-green-50', text: 'text-brand-green-600' },
   amber: { bg: 'bg-amber-600', light: 'bg-amber-50', text: 'text-amber-600' },
 };
 
@@ -254,7 +254,7 @@ export default function ServicesPage() {
                   <span className="text-3xl font-black text-gray-900">{pkg.price}</span>
                   <span className="text-gray-500 text-sm ml-2">for {pkg.sessions} sessions</span>
                 </div>
-                <p className="text-green-600 font-medium text-sm mb-6">{pkg.savings}</p>
+                <p className="text-brand-green-600 font-medium text-sm mb-6">{pkg.savings}</p>
                 <Link
                   href="/curvature-body-sculpting/book-appointment"
                   className={`block text-center py-3 rounded-lg font-bold transition ${

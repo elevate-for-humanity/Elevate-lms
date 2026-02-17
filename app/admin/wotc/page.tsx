@@ -70,7 +70,7 @@ export default async function WOTCAdminPage() {
             <div key={index} className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <stat.icon className={`w-8 h-8 text-${stat.color}-600`} />
-                <span className={`text-sm font-medium ${stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+                <span className={`text-sm font-medium ${stat.change.startsWith('+') ? 'text-brand-green-600' : 'text-brand-red-600'}`}>
                   {stat.change}
                 </span>
               </div>
@@ -152,15 +152,15 @@ export default async function WOTCAdminPage() {
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-semibold text-green-600">
+                    <td className="px-6 py-4 font-semibold text-brand-green-600">
                       {app.tax_credit_amount ? `$${parseFloat(app.tax_credit_amount).toLocaleString()}` : '--'}
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
-                        app.status === 'approved' ? 'bg-green-100 text-green-700' :
+                        app.status === 'approved' ? 'bg-brand-green-100 text-brand-green-700' :
                         app.status === 'pending_review' ? 'bg-yellow-100 text-yellow-700' :
                         app.status === 'submitted' ? 'bg-brand-blue-100 text-brand-blue-700' :
-                        app.status === 'denied' ? 'bg-red-100 text-red-700' :
+                        app.status === 'denied' ? 'bg-brand-red-100 text-brand-red-700' :
                         'bg-gray-100 text-gray-700'
                       }`}>
                         {app.status === 'approved' && <span className="text-slate-400 flex-shrink-0">•</span>}

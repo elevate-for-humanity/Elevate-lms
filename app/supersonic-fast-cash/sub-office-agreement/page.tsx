@@ -219,7 +219,7 @@ export default function SubOfficeAgreementPage() {
               <li>Advance "processing" or facilitation fees</li>
               <li>Off-platform payments or side agreements with clients</li>
             </ul>
-            <div className="bg-red-50 border-l-4 border-red-600 p-4 my-4">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-600 p-4 my-4">
               <p className="font-bold">Critical:</p>
               <p>
                 Any unauthorized fee activity constitutes a material breach and grounds for immediate termination.

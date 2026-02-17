@@ -80,7 +80,7 @@ export default function TestEnrollmentPage() {
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-700 p-3 rounded text-sm">
+            <div className="bg-brand-red-50 text-brand-red-700 p-3 rounded text-sm">
               {error}
             </div>
           )}

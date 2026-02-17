@@ -276,7 +276,7 @@ export default function DeviceCompatibility() {
                 {check.supported ? (
                   <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
-                  <XCircle size={20} className="text-red-500" />
+                  <XCircle size={20} className="text-brand-red-500" />
                 )}
               </div>
               <div className="flex-1">

@@ -22,9 +22,9 @@ export default async function SchedulePage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
           <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-            <Link href="/" className="hover:text-orange-600">Home</Link>
+            <Link href="/" className="hover:text-brand-orange-600">Home</Link>
             <ChevronRight className="w-4 h-4" />
-            <Link href="/student-support" className="hover:text-orange-600">Student Support</Link>
+            <Link href="/student-support" className="hover:text-brand-orange-600">Student Support</Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-gray-900">Schedule Appointment</span>
           </nav>
@@ -70,9 +70,9 @@ export default async function SchedulePage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-          <Link href="/" className="hover:text-orange-600">Home</Link>
+          <Link href="/" className="hover:text-brand-orange-600">Home</Link>
           <ChevronRight className="w-4 h-4" />
-          <Link href="/student-support" className="hover:text-orange-600">Student Support</Link>
+          <Link href="/student-support" className="hover:text-brand-orange-600">Student Support</Link>
           <ChevronRight className="w-4 h-4" />
           <span className="text-gray-900">Schedule Appointment</span>
         </nav>

@@ -135,8 +135,8 @@ export default async function TrainingPage() {
 
             {/* Module 2 */}
             <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-green-700">2</span>
+              <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold text-brand-green-700">2</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Student Management</h3>
               <p className="text-black mb-4">
@@ -171,8 +171,8 @@ export default async function TrainingPage() {
 
             {/* Module 4 */}
             <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-orange-700">4</span>
+              <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold text-brand-orange-700">4</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Document Management</h3>
               <p className="text-black mb-4">
@@ -189,8 +189,8 @@ export default async function TrainingPage() {
 
             {/* Module 5 */}
             <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-red-700">5</span>
+              <div className="w-12 h-12 bg-brand-red-100 rounded-lg flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold text-brand-red-700">5</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Support & Resources</h3>
               <p className="text-black mb-4">

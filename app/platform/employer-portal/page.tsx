@@ -69,12 +69,12 @@ export default function EmployerPortalPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-12 bg-orange-50">
+      <section className="py-12 bg-brand-orange-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((s, i) => (
               <div key={i} className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-orange-700">{s.value}</p>
+                <p className="text-3xl md:text-4xl font-bold text-brand-orange-700">{s.value}</p>
                 <p className="text-gray-600 text-sm mt-1">{s.label}</p>
               </div>
             ))}
@@ -94,8 +94,8 @@ export default function EmployerPortalPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((f, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                  <f.icon className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 bg-brand-orange-100 rounded-lg flex items-center justify-center mb-4">
+                  <f.icon className="w-6 h-6 text-brand-orange-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{f.title}</h3>
                 <p className="text-gray-600 text-sm">{f.description}</p>
@@ -115,7 +115,7 @@ export default function EmployerPortalPage() {
           <div className="grid md:grid-cols-4 gap-8">
             {howItWorks.map((item, i) => (
               <div key={i} className="text-center">
-                <div className="w-14 h-14 bg-orange-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                <div className="w-14 h-14 bg-brand-orange-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
                   {item.step}
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
@@ -156,12 +156,12 @@ export default function EmployerPortalPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-orange-600 text-white">
+      <section className="py-20 bg-brand-orange-600 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Start Hiring Today</h2>
-          <p className="text-orange-100 text-lg mb-8">Create your free employer account and connect with qualified candidates.</p>
+          <p className="text-brand-orange-100 text-lg mb-8">Create your free employer account and connect with qualified candidates.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/employer/register" className="px-8 py-4 bg-white text-orange-700 font-bold rounded-lg hover:bg-orange-50 transition inline-flex items-center gap-2">
+            <Link href="/employer/register" className="px-8 py-4 bg-white text-brand-orange-700 font-bold rounded-lg hover:bg-brand-orange-50 transition inline-flex items-center gap-2">
               Create Account <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/contact" className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition">

@@ -346,7 +346,7 @@ export default function AdvancedQuizBuilder() {
                           e.stopPropagation();
                           deleteQuestion(question.id);
                         }}
-                        className="p-1 hover:bg-red-100 rounded text-brand-orange-600"
+                        className="p-1 hover:bg-brand-red-100 rounded text-brand-orange-600"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -478,7 +478,7 @@ function QuestionEditor({
                       );
                       onUpdate({ options: newOptions });
                     }}
-                    className="p-2 text-brand-orange-600 hover:bg-red-50 rounded"
+                    className="p-2 text-brand-orange-600 hover:bg-brand-red-50 rounded"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -600,7 +600,7 @@ function QuestionEditor({
                       );
                       onUpdate({ matchingPairs: newPairs });
                     }}
-                    className="p-2 text-brand-orange-600 hover:bg-red-50 rounded"
+                    className="p-2 text-brand-orange-600 hover:bg-brand-red-50 rounded"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

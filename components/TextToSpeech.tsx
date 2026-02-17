@@ -160,7 +160,7 @@ export default function TextToSpeech({ text, autoPlay = false, className = '', c
       {isPlaying && (
         <button
           onClick={handlePause}
-          className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition-colors"
           title="Pause"
         >
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -173,7 +173,7 @@ export default function TextToSpeech({ text, autoPlay = false, className = '', c
       {isPaused && (
         <button
           onClick={handlePlay}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 transition-colors"
           title="Resume"
         >
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

@@ -123,7 +123,7 @@ export default function WeldingProgramPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-red-800 text-white overflow-hidden">
+      <section className="relative bg-brand-red-800 text-white overflow-hidden">
         <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
         
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32">
@@ -137,21 +137,21 @@ export default function WeldingProgramPage() {
               
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mt-6 mb-6 leading-tight">
                 Become a Certified
-                <span className="text-red-400"> Welder</span>
+                <span className="text-brand-red-400"> Welder</span>
               </h1>
               
-              <p className="text-xl text-red-100 mb-8 leading-relaxed">
+              <p className="text-xl text-brand-red-100 mb-8 leading-relaxed">
                 Master the art and science of welding. Learn MIG, TIG, Stick, and Flux-Core welding from industry professionals. 
                 Earn AWS certifications and join a trade with <strong className="text-white">unlimited earning potential.</strong>
               </p>
 
               <div className="flex flex-wrap gap-4 mb-10">
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <Clock className="w-4 h-4 text-red-400" />
+                  <Clock className="w-4 h-4 text-brand-red-400" />
                   12-16 Weeks
                 </span>
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <DollarSign className="w-4 h-4 text-green-400" />
+                  <DollarSign className="w-4 h-4 text-brand-green-400" />
                   $0 with WIOA Funding
                 </span>
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
@@ -163,7 +163,7 @@ export default function WeldingProgramPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/apply?program=welding"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white0 hover:bg-red-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-red-500/30"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-white0 hover:bg-brand-red-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-brand-red-500/30"
                 >
                   Check Your Eligibility
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -193,7 +193,7 @@ export default function WeldingProgramPage() {
                 transition={{ delay: index * 0.1 }}
                 className="text-center"
               >
-                <stat.icon className="w-8 h-8 text-red-600 mx-auto mb-2" />
+                <stat.icon className="w-8 h-8 text-brand-red-600 mx-auto mb-2" />
                 <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
                 <div className="text-sm text-gray-500">{stat.label}</div>
               </motion.div>
@@ -206,7 +206,7 @@ export default function WeldingProgramPage() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-block bg-red-100 text-red-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
+            <span className="inline-block bg-brand-red-100 text-brand-red-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Why Welding?
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -257,8 +257,8 @@ export default function WeldingProgramPage() {
                 transition={{ delay: index * 0.1 }}
                 className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4">
-                  <item.icon className="w-6 h-6 text-red-600" />
+                <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center mb-4">
+                  <item.icon className="w-6 h-6 text-brand-red-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
                 <p className="text-gray-600">{item.description}</p>
@@ -272,7 +272,7 @@ export default function WeldingProgramPage() {
       <section id="curriculum" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-block bg-green-100 text-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
+            <span className="inline-block bg-brand-green-100 text-brand-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Training Program
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -294,7 +294,7 @@ export default function WeldingProgramPage() {
               >
                 <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                   <div className="flex-shrink-0">
-                    <div className="w-20 h-20 bg-red-600 rounded-2xl flex items-center justify-center text-white">
+                    <div className="w-20 h-20 bg-brand-red-600 rounded-2xl flex items-center justify-center text-white">
                       <span className="text-sm font-bold">{module.week}</span>
                     </div>
                   </div>
@@ -309,8 +309,8 @@ export default function WeldingProgramPage() {
                       ))}
                     </div>
                     <div className="bg-white rounded-lg p-4 mt-4">
-                      <span className="text-sm font-semibold text-red-700">Milestone:</span>
-                      <span className="text-sm text-red-600 ml-2">{module.project}</span>
+                      <span className="text-sm font-semibold text-brand-red-700">Milestone:</span>
+                      <span className="text-sm text-brand-red-600 ml-2">{module.project}</span>
                     </div>
                   </div>
                 </div>
@@ -324,7 +324,7 @@ export default function WeldingProgramPage() {
       <section className="py-20 bg-slate-800 text-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-block bg-white/10 text-red-300 text-sm font-semibold px-4 py-1 rounded-full mb-4">
+            <span className="inline-block bg-white/10 text-brand-red-300 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Industry Credentials
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
@@ -415,25 +415,25 @@ export default function WeldingProgramPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-red-600 text-white">
+      <section className="py-20 bg-brand-red-600 text-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
             Ready to Strike Your First Arc?
           </h2>
-          <p className="text-xl text-red-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-brand-red-100 mb-8 max-w-2xl mx-auto">
             Join a trade that builds the world. Check your eligibility for free WIOA-funded welding training.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply?program=welding"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-red-600 font-semibold rounded-full hover:bg-white transition-all transform hover:scale-105 shadow-lg"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-red-600 font-semibold rounded-full hover:bg-white transition-all transform hover:scale-105 shadow-lg"
             >
               Register at Indiana Career Connect
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link
               href="/inquiry?program=welding"
-              className="inline-flex items-center justify-center px-8 py-4 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-full transition-all"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-red-700 hover:bg-brand-red-600 text-white font-semibold rounded-full transition-all"
             >
               <ArrowRight className="w-5 h-5 mr-2" />
               Get Free Info

@@ -89,7 +89,7 @@ export default async function StudentPortalSchedulePage() {
                     </div>
                   )}
                   <span className={`inline-block mt-3 px-3 py-1 rounded-full text-xs font-medium ${
-                    enrollment.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-brand-blue-100 text-brand-blue-700'
+                    enrollment.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-brand-blue-100 text-brand-blue-700'
                   }`}>
                     {enrollment.status}
                   </span>
@@ -131,7 +131,7 @@ export default async function StudentPortalSchedulePage() {
                   )}
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  apt.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                  apt.status === 'confirmed' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-yellow-100 text-yellow-700'
                 }`}>
                   {apt.status}
                 </span>

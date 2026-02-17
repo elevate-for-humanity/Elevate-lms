@@ -117,7 +117,7 @@ export default function LessonContent({
             <button
               onClick={handleMarkComplete}
               disabled={isCompleting}
-              className="px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50 transition"
+              className="px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 disabled:opacity-50 transition"
             >
               {isCompleting ? 'Marking Complete...' : 'Mark as Complete'}
             </button>

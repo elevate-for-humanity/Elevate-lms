@@ -225,18 +225,18 @@ export function AgreementSignature({
 
   if (success) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Check className="w-6 h-6 text-green-600" />
+      <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6 text-center">
+        <div className="w-12 h-12 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Check className="w-6 h-6 text-brand-green-600" />
         </div>
-        <h3 className="text-lg font-semibold text-green-900 mb-2">
+        <h3 className="text-lg font-semibold text-brand-green-900 mb-2">
           Agreement Signed Successfully
         </h3>
-        <p className="text-green-700">
+        <p className="text-brand-green-700">
           Your signature has been recorded. A copy has been saved to your account.
         </p>
         {redirectOnSuccess && (
-          <p className="text-sm text-green-600 mt-2">Redirecting...</p>
+          <p className="text-sm text-brand-green-600 mt-2">Redirecting...</p>
         )}
       </div>
     );
@@ -246,11 +246,11 @@ export function AgreementSignature({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-red-800 font-medium">Error</p>
-            <p className="text-red-700 text-sm">{error}</p>
+            <p className="text-brand-red-800 font-medium">Error</p>
+            <p className="text-brand-red-700 text-sm">{error}</p>
           </div>
         </div>
       )}
@@ -261,7 +261,7 @@ export function AgreementSignature({
         
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">
-            Full Legal Name <span className="text-red-500">*</span>
+            Full Legal Name <span className="text-brand-red-500">*</span>
           </label>
           <input
             type="text"
@@ -275,20 +275,20 @@ export function AgreementSignature({
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">
-            Email Address <span className="text-red-500">*</span>
+            Email Address <span className="text-brand-red-500">*</span>
           </label>
           <input
             type="email"
             value={signerEmail}
             onChange={(e) => setSignerEmail(e.target.value)}
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 ${
-              emailMismatch ? 'border-red-500 bg-red-50' : 'border-slate-300'
+              emailMismatch ? 'border-brand-red-500 bg-brand-red-50' : 'border-slate-300'
             }`}
             placeholder="Enter your email address"
             required
           />
           {emailMismatch && (
-            <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+            <p className="text-brand-red-600 text-sm mt-1 flex items-center gap-1">
               <AlertCircle className="w-4 h-4" />
               Email must match your account email ({user?.email})
             </p>
@@ -363,7 +363,7 @@ export function AgreementSignature({
         {signatureMethod === 'typed' && (
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Type Your Signature <span className="text-red-500">*</span>
+              Type Your Signature <span className="text-brand-red-500">*</span>
             </label>
             <input
               type="text"
@@ -380,7 +380,7 @@ export function AgreementSignature({
         {signatureMethod === 'drawn' && (
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Draw Your Signature <span className="text-red-500">*</span>
+              Draw Your Signature <span className="text-brand-red-500">*</span>
             </label>
             <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-white">
               <canvas
@@ -417,7 +417,7 @@ export function AgreementSignature({
             className="mt-1 w-4 h-4 text-brand-blue-600 border-slate-300 rounded focus:ring-brand-blue-500"
           />
           <span className="text-sm text-slate-700">
-            I understand and agree to the above statement <span className="text-red-500">*</span>
+            I understand and agree to the above statement <span className="text-brand-red-500">*</span>
           </span>
         </label>
       </div>
@@ -437,7 +437,7 @@ export function AgreementSignature({
               (view document)
             </a>
           )}
-          <span className="text-red-500"> *</span>
+          <span className="text-brand-red-500"> *</span>
         </span>
       </label>
 

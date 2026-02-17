@@ -141,39 +141,39 @@ function CheckInContent() {
   if (status === 'checked-in' && activeSession) {
     return (
       <div className="min-h-screen bg-slate-900">
-        <header className="bg-green-600 px-4 pt-12 pb-6 safe-area-inset-top">
+        <header className="bg-brand-green-600 px-4 pt-12 pb-6 safe-area-inset-top">
           <div className="flex items-center gap-4">
             <Link href="/pwa/barber" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
               <ArrowLeft className="w-5 h-5 text-white" />
             </Link>
             <div>
               <h1 className="text-xl font-bold text-white">Checked In</h1>
-              <p className="text-green-100 text-sm">Session active</p>
+              <p className="text-brand-green-100 text-sm">Session active</p>
             </div>
           </div>
         </header>
 
         <main className="px-4 py-6 space-y-6">
           {/* Active Session Card */}
-          <div className="bg-green-500 rounded-2xl p-6 text-center">
+          <div className="bg-brand-green-500 rounded-2xl p-6 text-center">
             <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">You're Checked In!</h2>
-            <div className="flex items-center justify-center gap-2 text-green-100 mb-4">
+            <div className="flex items-center justify-center gap-2 text-brand-green-100 mb-4">
               <MapPin className="w-4 h-4" />
               <span>{activeSession.shopName}</span>
             </div>
             
             {/* Timer */}
             <div className="bg-white/20 rounded-xl p-4 mb-4">
-              <p className="text-green-100 text-sm mb-1">Time Elapsed</p>
+              <p className="text-brand-green-100 text-sm mb-1">Time Elapsed</p>
               <p className="text-4xl font-mono font-bold text-white">
                 {formatElapsedTime(elapsedTime)}
               </p>
             </div>
 
-            <p className="text-green-100 text-sm">
+            <p className="text-brand-green-100 text-sm">
               Checked in at {new Date(activeSession.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
@@ -182,7 +182,7 @@ function CheckInContent() {
           <button
             onClick={handleCheckOut}
             disabled={status === 'checking'}
-            className="w-full flex items-center justify-center gap-2 bg-red-600 text-white font-bold py-4 rounded-xl hover:bg-red-700 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold py-4 rounded-xl hover:bg-brand-red-700 disabled:opacity-50"
           >
             {status === 'checking' ? (
               <>
@@ -198,9 +198,9 @@ function CheckInContent() {
           </button>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-              <p className="text-red-200 text-sm">{error}</p>
+            <div className="bg-brand-red-500/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
+              <p className="text-brand-red-200 text-sm">{error}</p>
             </div>
           )}
 
@@ -232,13 +232,13 @@ function CheckInContent() {
 
       <main className="px-4 py-6 space-y-6">
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <div className="bg-brand-red-500/10 border border-brand-red-500/30 rounded-xl p-4 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-red-200 text-sm">{error}</p>
+              <p className="text-brand-red-200 text-sm">{error}</p>
               <button 
                 onClick={() => { setError(null); setStatus('idle'); }}
-                className="text-red-400 text-sm underline mt-1"
+                className="text-brand-red-400 text-sm underline mt-1"
               >
                 Try again
               </button>

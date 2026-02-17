@@ -153,14 +153,14 @@ function CheckoutForm({ courseId, courseName, price, userId, onSuccess }: Checko
             </div>
           </div>
 
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-4 mb-6">
             <div className="flex items-start">
-              <svg className="w-5 h-5 text-green-600 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-brand-green-600 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <div>
-                <p className="font-semibold text-green-900">30-Day Money-Back Guarantee</p>
-                <p className="text-sm text-green-700">Not satisfied? Get a full refund within 30 days.</p>
+                <p className="font-semibold text-brand-green-900">30-Day Money-Back Guarantee</p>
+                <p className="text-sm text-brand-green-700">Not satisfied? Get a full refund within 30 days.</p>
               </div>
             </div>
           </div>
@@ -205,7 +205,7 @@ function CheckoutForm({ courseId, courseName, price, userId, onSuccess }: Checko
             </div>
 
             {error && (
-              <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+              <div className="mb-4 bg-brand-red-50 border border-brand-red-200 text-brand-red-700 px-4 py-3 rounded">
                 {error}
               </div>
             )}
@@ -259,8 +259,8 @@ fill="#0066B2"/>
       {/* Step 3: Confirmation */}
       {step === 3 && (
         <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+          <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-brand-green-600" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
           </div>

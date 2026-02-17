@@ -155,7 +155,7 @@ Notes: ${formData.get('notes') || 'None'}
 
             {submitted ? (
               <div className="text-center py-8">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Request Submitted!</h3>
@@ -173,7 +173,7 @@ Notes: ${formData.get('notes') || 'None'}
                 </p>
 
                 {error && (
-                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
+                  <div className="mb-4 p-3 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-center gap-2 text-brand-red-700 text-sm">
                     <AlertCircle className="w-4 h-4" />
                     {error}
                   </div>

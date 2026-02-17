@@ -32,9 +32,9 @@ const TYPE_ICONS = {
 
 const TYPE_COLORS = {
   program: 'text-brand-blue-600 bg-brand-blue-100',
-  course: 'text-green-600 bg-green-100',
+  course: 'text-brand-green-600 bg-brand-green-100',
   article: 'text-purple-600 bg-purple-100',
-  user: 'text-orange-600 bg-orange-100',
+  user: 'text-brand-orange-600 bg-brand-orange-100',
   page: 'text-gray-600 bg-gray-100',
 };
 

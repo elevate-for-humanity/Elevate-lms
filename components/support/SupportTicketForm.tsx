@@ -40,7 +40,7 @@ export function SupportTicketForm() {
         <input
           value={subject}
           onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setSubject(e.target.value)}
-          className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+          className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-orange-500 focus:ring-2 focus:ring-brand-orange-100"
           placeholder="Describe the issue"
           required
         />
@@ -52,7 +52,7 @@ export function SupportTicketForm() {
         <textarea
           value={message}
           onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setMessage(e.target.value)}
-          className="mt-1 h-24 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+          className="mt-1 h-24 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-orange-500 focus:ring-2 focus:ring-brand-orange-100"
           placeholder="Tell us what happened, steps to reproduce, and any error messages."
           required
         />
@@ -60,7 +60,7 @@ export function SupportTicketForm() {
       <button
         type="submit"
         disabled={status === 'submitting'}
-        className="w-full rounded-2xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 disabled:opacity-60"
+        className="w-full rounded-2xl bg-brand-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-orange-600 disabled:opacity-60"
       >
         {status === 'submitting' ? 'Sending…' : 'Submit Support Ticket'}
       </button>

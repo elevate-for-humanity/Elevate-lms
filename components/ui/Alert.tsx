@@ -26,18 +26,18 @@ export function Alert({ type, title, message, dismissible, onDismiss }: AlertPro
       iconColor: 'text-yellow-600',
     },
     success: {
-      bg: 'bg-green-50',
-      border: 'border-green-200',
-      text: 'text-green-900',
+      bg: 'bg-brand-green-50',
+      border: 'border-brand-green-200',
+      text: 'text-brand-green-900',
       icon: CheckCircle,
-      iconColor: 'text-green-600',
+      iconColor: 'text-brand-green-600',
     },
     error: {
-      bg: 'bg-red-50',
-      border: 'border-red-200',
-      text: 'text-red-900',
+      bg: 'bg-brand-red-50',
+      border: 'border-brand-red-200',
+      text: 'text-brand-red-900',
       icon: XCircle,
-      iconColor: 'text-red-600',
+      iconColor: 'text-brand-red-600',
     },
   };
 

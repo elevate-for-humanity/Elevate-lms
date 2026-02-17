@@ -119,7 +119,7 @@ export default function NewsletterSignup() {
           {message && (
             <div
               className={`mt-4 flex items-center justify-center gap-2 text-sm ${
-                status === 'success' ? 'text-green-100' : 'text-red-100'
+                status === 'success' ? 'text-brand-green-100' : 'text-brand-red-100'
               }`}
             >
               {status === 'success' ? (

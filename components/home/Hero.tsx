@@ -119,7 +119,7 @@ export function Hero() {
                   href="https://www.indianacareerconnect.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-brand-orange-600 underline hover:text-red-700 font-semibold"
+                  className="text-brand-orange-600 underline hover:text-brand-red-700 font-semibold"
                 >
                   www.IndianaCareerConnect.com
                 </a>

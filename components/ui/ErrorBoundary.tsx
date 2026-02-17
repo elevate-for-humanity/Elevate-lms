@@ -31,7 +31,7 @@ export function ErrorBoundaryUI({
     >
       <div className="text-center max-w-2xl">
         <div className="mb-8">
-          <AlertCircle className="h-20 w-20 text-red-500 mx-auto mb-6" aria-hidden="true" />
+          <AlertCircle className="h-20 w-20 text-brand-red-500 mx-auto mb-6" aria-hidden="true" />
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
             {title}
           </h1>
@@ -39,8 +39,8 @@ export function ErrorBoundaryUI({
             We encountered an unexpected error. Our team has been notified.
           </p>
           {error.message && process.env.NODE_ENV === 'development' && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-red-800 font-mono break-words">{error.message}</p>
+            <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6">
+              <p className="text-sm text-brand-red-800 font-mono break-words">{error.message}</p>
             </div>
           )}
         </div>

@@ -31,7 +31,7 @@ export function OfflineIndicator() {
   return (
     <div
       className={`fixed bottom-4 right-4 z-50 rounded-lg shadow-lg p-4 max-w-sm ${
-        isOnline ? 'bg-brand-blue-600' : 'bg-orange-600'
+        isOnline ? 'bg-brand-blue-600' : 'bg-brand-orange-600'
       } text-white`}
     >
       <div className="flex items-center gap-3">

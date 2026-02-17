@@ -247,7 +247,7 @@ export default function MicroProgramsPage() {
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Get Certified Fast</h2>
           <p className="text-white/90 mb-6 text-base">Same-day certifications available. Register today and start building your credentials.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=micro-programs" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-red-50 transition-colors text-center">
+            <Link href="/apply?program=micro-programs" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-red-50 transition-colors text-center">
               Register Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
             <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

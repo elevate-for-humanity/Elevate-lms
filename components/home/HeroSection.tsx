@@ -57,7 +57,7 @@ export default function HeroSection() {
           {/* Outcome-first headline */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-[1.05] mb-6">
             Train for a career<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-300 to-emerald-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue-400 via-brand-blue-300 to-emerald-400">
               that changes everything.
             </span>
           </h1>

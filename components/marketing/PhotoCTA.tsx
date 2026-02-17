@@ -45,7 +45,7 @@ export function PhotoCTA() {
 
           {/* Text + CTA */}
           <div>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-orange-600">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-brand-orange-600">
               Real spaces, real people
             </h2>
             <p className="mt-3 text-3xl font-semibold tracking-tight text-black">
@@ -60,13 +60,13 @@ export function PhotoCTA() {
             <div className="mt-6 space-y-3">
               <Link
                 href="/apply"
-                className="inline-flex w-full items-center justify-center rounded-full bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-md shadow-orange-200 transition hover:bg-orange-400"
+                className="inline-flex w-full items-center justify-center rounded-full bg-brand-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-md shadow-brand-orange-200 transition hover:bg-brand-orange-400"
               >
                 Start my Elevate journey
               </Link>
               <Link
                 href="/employers"
-                className="inline-flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-black shadow-sm hover:border-orange-300 hover:bg-orange-50"
+                className="inline-flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-black shadow-sm hover:border-brand-orange-300 hover:bg-brand-orange-50"
               >
                 I&apos;m an employer / court / partner
               </Link>

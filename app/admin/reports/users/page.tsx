@@ -39,10 +39,10 @@ export default async function UsersReportPage() {
   });
 
   const roleColors: Record<string, { bg: string; text: string; icon: typeof Users }> = {
-    super_admin: { bg: 'bg-red-100', text: 'text-red-700', icon: Shield },
+    super_admin: { bg: 'bg-brand-red-100', text: 'text-brand-red-700', icon: Shield },
     admin: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700', icon: Shield },
     instructor: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700', icon: GraduationCap },
-    student: { bg: 'bg-green-100', text: 'text-green-700', icon: Users },
+    student: { bg: 'bg-brand-green-100', text: 'text-brand-green-700', icon: Users },
     user: { bg: 'bg-gray-100', text: 'text-gray-700', icon: Users },
   };
 
@@ -82,8 +82,8 @@ export default async function UsersReportPage() {
           
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <UserPlus className="w-5 h-5 text-green-600" />
+              <div className="p-2 bg-brand-green-100 rounded-lg">
+                <UserPlus className="w-5 h-5 text-brand-green-600" />
               </div>
               <span className="text-sm text-gray-600">New This Month</span>
             </div>
@@ -104,8 +104,8 @@ export default async function UsersReportPage() {
           
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <GraduationCap className="w-5 h-5 text-orange-600" />
+              <div className="p-2 bg-brand-orange-100 rounded-lg">
+                <GraduationCap className="w-5 h-5 text-brand-orange-600" />
               </div>
               <span className="text-sm text-gray-600">Students</span>
             </div>

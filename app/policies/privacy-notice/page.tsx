@@ -497,15 +497,15 @@ export default function PrivacyNoticePage() {
         </div>
       </section>
 
-      <div className="bg-green-50 border-l-4 border-green-500 p-6 mt-8">
-        <p className="text-lg font-semibold text-green-900 mb-2">Questions About Your Privacy?</p>
-        <p className="text-green-800 mb-0">
+      <div className="bg-brand-green-50 border-l-4 border-brand-green-500 p-6 mt-8">
+        <p className="text-lg font-semibold text-brand-green-900 mb-2">Questions About Your Privacy?</p>
+        <p className="text-brand-green-800 mb-0">
           We're here to help. Contact our Privacy Office at{' '}
-          <a href="mailto:info@elevateforhumanity.org" className="text-green-900 font-semibold hover:underline">
+          <a href="mailto:info@elevateforhumanity.org" className="text-brand-green-900 font-semibold hover:underline">
             info@elevateforhumanity.org
           </a>{' '}
           or call{' '}
-          <a href="/support" className="text-green-900 font-semibold hover:underline">
+          <a href="/support" className="text-brand-green-900 font-semibold hover:underline">
             Get Help Online
           </a>.
         </p>

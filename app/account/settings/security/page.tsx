@@ -62,8 +62,8 @@ export default async function SecuritySettingsPage() {
           {/* Two-Factor Authentication */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Smartphone className="w-6 h-6 text-green-600" />
+              <div className="p-3 bg-brand-green-100 rounded-lg">
+                <Smartphone className="w-6 h-6 text-brand-green-600" />
               </div>
               <div className="flex-1">
                 <h2 className="text-lg font-semibold text-gray-900">Two-Factor Authentication</h2>
@@ -74,7 +74,7 @@ export default async function SecuritySettingsPage() {
                   <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
                     Not Enabled
                   </span>
-                  <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                  <button className="px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 transition">
                     Enable 2FA
                   </button>
                 </div>
@@ -99,12 +99,12 @@ export default async function SecuritySettingsPage() {
                       <p className="font-medium text-gray-900">Current Session</p>
                       <p className="text-sm text-gray-500">This device</p>
                     </div>
-                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                    <span className="px-3 py-1 bg-brand-green-100 text-brand-green-800 rounded-full text-sm">
                       Active
                     </span>
                   </div>
                 </div>
-                <button className="mt-4 px-4 py-2 text-red-600 hover:text-red-700 transition">
+                <button className="mt-4 px-4 py-2 text-brand-red-600 hover:text-brand-red-700 transition">
                   Sign Out All Other Sessions
                 </button>
               </div>

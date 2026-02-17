@@ -100,7 +100,7 @@ export default function CRMAppointmentsPage() {
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-medium text-gray-900">{apt.title}</h4>
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                        apt.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                        apt.status === 'confirmed' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-yellow-100 text-yellow-700'
                       }`}>
                         {apt.status}
                       </span>

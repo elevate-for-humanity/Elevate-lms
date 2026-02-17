@@ -40,7 +40,7 @@ export default function VerificationPage() {
                 </p>
               </div>
 
-              <div className="bg-green-50 rounded-lg p-6 border-2 border-green-200">
+              <div className="bg-brand-green-50 rounded-lg p-6 border-2 border-brand-green-200">
                 <h3 className="text-xl font-bold text-black mb-3">Eligibility Verification</h3>
                 <p className="text-black">
                   Confirming eligibility for programs, funding, and services.
@@ -54,7 +54,7 @@ export default function VerificationPage() {
                 </p>
               </div>
 
-              <div className="bg-orange-50 rounded-lg p-6 border-2 border-orange-200">
+              <div className="bg-brand-orange-50 rounded-lg p-6 border-2 border-brand-orange-200">
                 <h3 className="text-xl font-bold text-black mb-3">Employment Verification</h3>
                 <p className="text-black">
                   Confirming employment status for background checks and applications.
@@ -141,7 +141,7 @@ export default function VerificationPage() {
               </ol>
             </div>
 
-            <div className="bg-green-50 rounded-xl p-6 border-2 border-green-200 mb-6">
+            <div className="bg-brand-green-50 rounded-xl p-6 border-2 border-brand-green-200 mb-6">
               <h4 className="text-lg font-bold text-black mb-3">Contact Registrar</h4>
               <ul className="list-disc pl-6 text-black space-y-2">
                 <li><strong>Email:</strong> info@elevateforhumanity.org</li>
@@ -262,7 +262,7 @@ export default function VerificationPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Fraudulent Verification Requests</h2>
             
-            <div className="bg-red-50 border-l-4 border-red-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Warning Signs</h3>
               <p className="text-black mb-4">
                 We investigate requests that:

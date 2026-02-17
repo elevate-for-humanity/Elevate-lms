@@ -156,7 +156,7 @@ export default async function CalendarPage() {
                             <p className="text-sm text-gray-500">{assignment.course_title}</p>
                           </div>
                           <div className="text-right">
-                            <div className="text-sm font-medium text-orange-600">
+                            <div className="text-sm font-medium text-brand-orange-600">
                               {new Date(assignment.due_date).toLocaleDateString()}
                             </div>
                             <div className="text-xs text-gray-500">Due</div>

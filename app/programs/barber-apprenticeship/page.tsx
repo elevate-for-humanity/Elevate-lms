@@ -119,7 +119,7 @@ export default function BarberApprenticeshipPage() {
           <div className="text-center">
             <Link
               href="/partners/barbershop-apprenticeship"
-              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-lg font-bold px-8 py-4 rounded-lg transition-colors"
+              className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-8 py-4 rounded-lg transition-colors"
             >
               Learn More & Apply
             </Link>
@@ -175,7 +175,7 @@ export default function BarberApprenticeshipPage() {
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Barber Career</h2>
           <p className="text-white/90 mb-6 text-sm">Earn while you learn. JRI funding available for qualifying students.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply/intake?program=barbering" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-red-50 transition-colors text-center">
+            <Link href="/apply/intake?program=barbering" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-red-50 transition-colors text-center">
               Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
             <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

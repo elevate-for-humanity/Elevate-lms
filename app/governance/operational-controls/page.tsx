@@ -120,8 +120,8 @@ export default function OperationalControlsPage() {
         {/* Store Controls */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <ShoppingCart className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+              <ShoppingCart className="w-5 h-5 text-brand-green-600" />
             </div>
             <h2 className="text-2xl font-bold text-slate-900">Store Controls</h2>
           </div>
@@ -138,8 +138,8 @@ export default function OperationalControlsPage() {
         {/* Deployment Controls */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Code className="w-5 h-5 text-orange-600" />
+            <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+              <Code className="w-5 h-5 text-brand-orange-600" />
             </div>
             <h2 className="text-2xl font-bold text-slate-900">Deployment Controls</h2>
           </div>

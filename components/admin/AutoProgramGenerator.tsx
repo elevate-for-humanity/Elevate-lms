@@ -435,7 +435,7 @@ export function AutoProgramGenerator() {
             </div>
           </div>
           <div className="bg-white border rounded-lg p-4">
-            <div className="text-2xl font-bold text-orange-600">
+            <div className="text-2xl font-bold text-brand-orange-600">
               {nationalStats.totalStudents.toLocaleString()}
             </div>
             <div className="text-sm text-brand-text-muted">Total Students</div>
@@ -555,7 +555,7 @@ export function AutoProgramGenerator() {
                 {program.jobOutcomes.map((outcome, index) => (
                   <span
                     key={index}
-                    className="text-xs bg-brand-surface text-green-700 px-2 py-2 rounded"
+                    className="text-xs bg-brand-surface text-brand-green-700 px-2 py-2 rounded"
                   >
                     {outcome}
                   </span>
@@ -589,7 +589,7 @@ export function AutoProgramGenerator() {
               {program.deploymentStatus !== 'deployed_national' && (
                 <button
                   onClick={() => deployNationally(program.id)}
-                  className="text-sm bg-brand-surface text-green-700 px-4 py-2 rounded hover:bg-green-200"
+                  className="text-sm bg-brand-surface text-brand-green-700 px-4 py-2 rounded hover:bg-brand-green-200"
                 >
                   🚀 Deploy Nationally
                 </button>
@@ -597,7 +597,7 @@ export function AutoProgramGenerator() {
               <button className="text-sm bg-brand-surface text-purple-700 px-4 py-2 rounded hover:bg-purple-200">
                 🎓 Enroll Students
               </button>
-              <button className="text-sm bg-brand-surface text-orange-700 px-4 py-2 rounded hover:bg-orange-200">
+              <button className="text-sm bg-brand-surface text-brand-orange-700 px-4 py-2 rounded hover:bg-brand-orange-200">
                 📝 Customize Program
               </button>
             </div>

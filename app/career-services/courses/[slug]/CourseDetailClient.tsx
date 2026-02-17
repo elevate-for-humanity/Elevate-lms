@@ -119,7 +119,7 @@ export function CourseDetailClient({ course }: { course: Course }) {
                       setPromoApplied(null);
                       setPromoCode('');
                     }}
-                    className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                    className="px-4 py-2 text-brand-red-600 hover:bg-brand-red-50 rounded-lg"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -134,13 +134,13 @@ export function CourseDetailClient({ course }: { course: Course }) {
                 )}
               </div>
               {promoApplied && (
-                <span className="flex items-center gap-1 text-green-600 text-sm">
+                <span className="flex items-center gap-1 text-brand-green-600 text-sm">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                   {promoApplied.promo.description} - Save ${promoApplied.discountAmount.toFixed(2)}
                 </span>
               )}
               {promoError && (
-                <span className="text-red-600 text-sm">{promoError}</span>
+                <span className="text-brand-red-600 text-sm">{promoError}</span>
               )}
             </div>
 
@@ -185,7 +185,7 @@ export function CourseDetailClient({ course }: { course: Course }) {
                   <>
                     <span className="text-xl font-bold text-brand-blue-600">${finalPrice.toFixed(0)}</span>
                     <span className="text-gray-400 line-through">${Number(course.price).toFixed(0)}</span>
-                    <span className="text-green-600 text-sm">({promoApplied.promo.code} applied)</span>
+                    <span className="text-brand-green-600 text-sm">({promoApplied.promo.code} applied)</span>
                   </>
                 ) : (
                   <>

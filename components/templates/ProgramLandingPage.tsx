@@ -59,13 +59,13 @@ export default function ProgramLandingPage({
       <section className="border-b bg-slate-50">
         <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10 md:flex-row md:items-center">
           <div className="space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-orange-600">
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand-orange-600">
               {category}
             </p>
             <h1 className="text-2xl font-bold md:text-3xl">{title}</h1>
             <p className="text-sm text-black">{description}</p>
             <div className="flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full bg-orange-100 px-3 py-2 font-medium text-orange-800">
+              <span className="rounded-full bg-brand-orange-100 px-3 py-2 font-medium text-brand-orange-800">
                 {duration}
               </span>
               {fundingTags.map((tag, idx) => (
@@ -76,7 +76,7 @@ export default function ProgramLandingPage({
                   {tag}
                 </span>
               ))}
-              <span className="rounded-full bg-green-100 px-3 py-2 font-medium text-green-800">
+              <span className="rounded-full bg-brand-green-100 px-3 py-2 font-medium text-brand-green-800">
                 {format}
               </span>
             </div>

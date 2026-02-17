@@ -72,7 +72,7 @@ export default async function AdminVerificationReviewPage() {
       case 'pending':
         return <Clock className="w-5 h-5 text-yellow-600" />;
       case 'rejected':
-        return <XCircle className="w-5 h-5 text-red-600" />;
+        return <XCircle className="w-5 h-5 text-brand-red-600" />;
       default:
         return <Shield className="w-5 h-5 text-slate-400" />;
     }
@@ -80,9 +80,9 @@ export default async function AdminVerificationReviewPage() {
 
   const getStatusBadge = (status: string) => {
     const styles = {
-      approved: 'bg-green-100 text-green-800 border-green-300',
+      approved: 'bg-brand-green-100 text-brand-green-800 border-brand-green-300',
       pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-      rejected: 'bg-red-100 text-red-800 border-red-300',
+      rejected: 'bg-brand-red-100 text-brand-red-800 border-brand-red-300',
     };
     return (
       styles[status as keyof typeof styles] ||
@@ -149,7 +149,7 @@ export default async function AdminVerificationReviewPage() {
 
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-2">
-              <XCircle className="w-8 h-8 text-red-600" />
+              <XCircle className="w-8 h-8 text-brand-red-600" />
               <span className="text-3xl font-bold text-black">
                 {rejectedVerifications.length}
               </span>
@@ -232,7 +232,7 @@ export default async function AdminVerificationReviewPage() {
                       </p>
                       {verification.status === 'rejected' &&
                         verification.rejection_reason && (
-                          <p className="text-sm text-red-600 mt-1">
+                          <p className="text-sm text-brand-red-600 mt-1">
                             <strong>Reason:</strong>{' '}
                             {verification.rejection_reason}
                           </p>

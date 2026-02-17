@@ -216,9 +216,9 @@ export default function RefundAdvancePage() {
                   <span className="text-gray-600">Advance Fee</span>
                   <span className="font-bold text-gray-900">$0*</span>
                 </div>
-                <div className="flex justify-between items-center py-3 bg-green-50 px-4 rounded-lg">
+                <div className="flex justify-between items-center py-3 bg-brand-green-50 px-4 rounded-lg">
                   <span className="text-gray-900 font-semibold">Remaining Refund</span>
-                  <span className="font-bold text-green-600 text-xl">$2,500</span>
+                  <span className="font-bold text-brand-green-600 text-xl">$2,500</span>
                 </div>
               </div>
 
@@ -239,8 +239,8 @@ export default function RefundAdvancePage() {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-green-50 rounded-xl p-6 border border-green-200">
-              <h3 className="text-xl font-bold text-green-800 mb-4 flex items-center">
+            <div className="bg-brand-green-50 rounded-xl p-6 border border-brand-green-200">
+              <h3 className="text-xl font-bold text-brand-green-800 mb-4 flex items-center">
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 What You Need
               </h3>
@@ -264,26 +264,26 @@ export default function RefundAdvancePage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 rounded-xl p-6 border border-red-200">
-              <h3 className="text-xl font-bold text-red-800 mb-4 flex items-center">
+            <div className="bg-brand-red-50 rounded-xl p-6 border border-brand-red-200">
+              <h3 className="text-xl font-bold text-brand-red-800 mb-4 flex items-center">
                 <AlertCircle className="w-6 h-6 mr-2" />
                 May Not Qualify If
               </h3>
               <ul className="space-y-3">
                 <li className="flex items-start">
-                  <AlertCircle className="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="w-5 h-5 text-brand-red-600 mr-2 flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700">IRS owes you back taxes or child support</span>
                 </li>
                 <li className="flex items-start">
-                  <AlertCircle className="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="w-5 h-5 text-brand-red-600 mr-2 flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700">Previous refund advance was not repaid</span>
                 </li>
                 <li className="flex items-start">
-                  <AlertCircle className="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="w-5 h-5 text-brand-red-600 mr-2 flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700">Return requires additional IRS review</span>
                 </li>
                 <li className="flex items-start">
-                  <AlertCircle className="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="w-5 h-5 text-brand-red-600 mr-2 flex-shrink-0 mt-0.5" />
                   <span className="text-gray-700">Refund amount is uncertain</span>
                 </li>
               </ul>

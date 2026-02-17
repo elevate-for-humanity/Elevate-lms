@@ -40,9 +40,9 @@ export default async function ReportsPage() {
 
   const stats = [
     { label: 'Total Users', value: totalUsers || 0, icon: Users, color: 'text-brand-blue-600', bgColor: 'bg-brand-blue-100' },
-    { label: 'Active Courses', value: totalCourses || 0, icon: GraduationCap, color: 'text-green-600', bgColor: 'bg-green-100' },
+    { label: 'Active Courses', value: totalCourses || 0, icon: GraduationCap, color: 'text-brand-green-600', bgColor: 'bg-brand-green-100' },
     { label: 'Total Leads', value: totalLeads || 0, icon: TrendingUp, color: 'text-brand-blue-600', bgColor: 'bg-brand-blue-100' },
-    { label: 'Enrollments', value: totalEnrollments || 0, icon: FileText, color: 'text-orange-600', bgColor: 'bg-orange-100' },
+    { label: 'Enrollments', value: totalEnrollments || 0, icon: FileText, color: 'text-brand-orange-600', bgColor: 'bg-brand-orange-100' },
   ];
 
   const reportTypes = [
@@ -58,7 +58,7 @@ export default async function ReportsPage() {
       title: 'Lead Generation Report',
       description: 'Lead sources, conversion rates, and pipeline analysis',
       icon: TrendingUp,
-      color: 'bg-green-500',
+      color: 'bg-brand-green-500',
       href: '/admin/reports/leads',
       metrics: [`${recentLeads?.length || 0} new leads this month`],
     },
@@ -74,7 +74,7 @@ export default async function ReportsPage() {
       title: 'User Activity Report',
       description: 'User registrations, roles, and platform engagement',
       icon: Users,
-      color: 'bg-orange-500',
+      color: 'bg-brand-orange-500',
       href: '/admin/reports/users',
       metrics: [`${totalUsers || 0} total users`],
     },
@@ -151,7 +151,7 @@ export default async function ReportsPage() {
             
             <div className="p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-5 h-5 text-green-600" />
+                <TrendingUp className="w-5 h-5 text-brand-green-600" />
                 <span className="font-medium text-gray-900">Monthly Growth</span>
               </div>
               <p className="text-2xl font-bold text-gray-900">{recentLeads?.length || 0}</p>

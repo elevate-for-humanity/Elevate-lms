@@ -131,7 +131,7 @@ export default function AICareerCounseling() {
   // Intro Screen
   if (step === 'intro') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-gradient-to-br from-brand-blue-50 to-indigo-100">
         <div className="max-w-4xl mx-auto px-4 py-16">
           <div className="text-center mb-12">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-indigo-600 rounded-full mb-6">
@@ -152,12 +152,12 @@ export default function AICareerCounseling() {
               <p className="text-gray-600 text-sm">Get career recommendations tailored to your unique skills and interests.</p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <TrendingUp className="w-10 h-10 text-green-600 mb-4" />
+              <TrendingUp className="w-10 h-10 text-brand-green-600 mb-4" />
               <h3 className="font-bold text-lg mb-2">Salary Insights</h3>
               <p className="text-gray-600 text-sm">Learn about earning potential and job market trends in your field.</p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <GraduationCap className="w-10 h-10 text-orange-600 mb-4" />
+              <GraduationCap className="w-10 h-10 text-brand-orange-600 mb-4" />
               <h3 className="font-bold text-lg mb-2">Training Paths</h3>
               <p className="text-gray-600 text-sm">Discover FREE training programs to help you reach your career goals.</p>
             </div>
@@ -181,7 +181,7 @@ export default function AICareerCounseling() {
   // Profile Setup Screen
   if (step === 'profile') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12">
+      <div className="min-h-screen bg-gradient-to-br from-brand-blue-50 to-indigo-100 py-12">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Tell us about yourself</h2>

@@ -43,13 +43,13 @@ export default function NotificationsClient({ userId, initialNotifications, unre
       case 'message':
         return <MessageSquare className="w-5 h-5 text-brand-blue-500" />;
       case 'like':
-        return <Heart className="w-5 h-5 text-red-500" />;
+        return <Heart className="w-5 h-5 text-brand-red-500" />;
       case 'achievement':
         return <Award className="w-5 h-5 text-yellow-500" />;
       case 'event':
         return <Calendar className="w-5 h-5 text-brand-blue-500" />;
       case 'group':
-        return <Users className="w-5 h-5 text-green-500" />;
+        return <Users className="w-5 h-5 text-brand-green-500" />;
       case 'course':
         return <BookOpen className="w-5 h-5 text-indigo-500" />;
       default:
@@ -216,7 +216,7 @@ export default function NotificationsClient({ userId, initialNotifications, unre
                           )}
                           <button
                             onClick={() => deleteNotification(notification.id)}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                            className="p-2 text-gray-400 hover:text-brand-red-600 hover:bg-brand-red-50 rounded-lg"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />

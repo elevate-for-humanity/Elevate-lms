@@ -333,12 +333,12 @@ export default async function SystemStatusPage() {
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${dbConnected ? 'bg-green-100' : 'bg-red-100'}`}>
-                <Database className={`w-5 h-5 ${dbConnected ? 'text-green-600' : 'text-red-600'}`} />
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${dbConnected ? 'bg-brand-green-100' : 'bg-brand-red-100'}`}>
+                <Database className={`w-5 h-5 ${dbConnected ? 'text-brand-green-600' : 'text-brand-red-600'}`} />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Database</p>
-                <p className={`font-bold ${dbConnected ? 'text-green-600' : 'text-red-600'}`}>
+                <p className={`font-bold ${dbConnected ? 'text-brand-green-600' : 'text-brand-red-600'}`}>
                   {dbConnected ? 'Connected' : 'Disconnected'}
                 </p>
               </div>
@@ -371,12 +371,12 @@ export default async function SystemStatusPage() {
 
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <Zap className="w-5 h-5 text-brand-green-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Tables Verified</p>
-                <p className="font-bold text-green-600">{dbStatus.tables.length} / 5</p>
+                <p className="font-bold text-brand-green-600">{dbStatus.tables.length} / 5</p>
               </div>
             </div>
           </div>
@@ -391,9 +391,9 @@ export default async function SystemStatusPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h3 className="text-sm font-medium text-gray-500 mb-2">Primary Canonical Domain</h3>
-                <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
+                <div className="flex items-center gap-2 p-3 bg-brand-green-50 rounded-lg">
                   <span className="text-slate-400 flex-shrink-0">•</span>
-                  <span className="font-mono text-green-700">{canonicalConfig.primaryDomain}</span>
+                  <span className="font-mono text-brand-green-700">{canonicalConfig.primaryDomain}</span>
                 </div>
               </div>
               <div>
@@ -408,7 +408,7 @@ export default async function SystemStatusPage() {
               <h3 className="text-sm font-medium text-gray-500 mb-2">Redirect Domains (301 → .org)</h3>
               <div className="flex flex-wrap gap-2">
                 {canonicalConfig.redirectDomains.map(domain => (
-                  <span key={domain} className="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-sm">
+                  <span key={domain} className="px-3 py-1 bg-brand-orange-50 text-brand-orange-700 rounded-full text-sm">
                     {domain}
                   </span>
                 ))}
@@ -429,13 +429,13 @@ export default async function SystemStatusPage() {
                 <p className="text-sm text-gray-500 mt-1">Community learning system capabilities</p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                <span className="text-xs bg-brand-green-100 text-brand-green-700 px-2 py-1 rounded">
                   {creatorCapabilities.filter(c => c.status === 'active').length} Active
                 </span>
                 <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">
                   {creatorCapabilities.filter(c => c.status === 'partial').length} Partial
                 </span>
-                <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">
+                <span className="text-xs bg-brand-red-100 text-brand-red-700 px-2 py-1 rounded">
                   {creatorCapabilities.filter(c => c.status === 'missing').length} Missing
                 </span>
               </div>
@@ -463,9 +463,9 @@ export default async function SystemStatusPage() {
                     </td>
                     <td className="px-5 py-4">
                       <span className={`flex items-center gap-2 text-xs font-medium px-2 py-1 rounded w-fit ${
-                        cap.status === 'active' ? 'bg-green-100 text-green-700' :
+                        cap.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' :
                         cap.status === 'partial' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-red-100 text-red-700'
+                        'bg-brand-red-100 text-brand-red-700'
                       }`}>
                         {cap.status === 'active' ? <span className="text-slate-400 flex-shrink-0">•</span> :
                          cap.status === 'partial' ? <AlertTriangle className="w-3 h-3" /> :
@@ -496,7 +496,7 @@ export default async function SystemStatusPage() {
                 <span className="text-sm text-gray-600">Creator Spaces</span>
               </div>
               <div className="flex items-center gap-2 justify-center">
-                <MessageSquare className="w-4 h-4 text-green-600" />
+                <MessageSquare className="w-4 h-4 text-brand-green-600" />
                 <span className="text-sm text-gray-600">Community Threads</span>
               </div>
               <div className="flex items-center gap-2 justify-center">
@@ -504,7 +504,7 @@ export default async function SystemStatusPage() {
                 <span className="text-sm text-gray-600">Media Uploads</span>
               </div>
               <div className="flex items-center gap-2 justify-center">
-                <Shield className="w-4 h-4 text-orange-600" />
+                <Shield className="w-4 h-4 text-brand-orange-600" />
                 <span className="text-sm text-gray-600">Access Control</span>
               </div>
               <div className="flex items-center gap-2 justify-center">
@@ -524,15 +524,15 @@ export default async function SystemStatusPage() {
             <div className="grid md:grid-cols-5 gap-3">
               {['profiles', 'programs', 'student_enrollments', 'partner_lms_enrollments', 'achievements'].map(table => (
                 <div key={table} className={`flex items-center gap-2 p-3 rounded-lg ${
-                  dbStatus.tables.includes(table) ? 'bg-green-50' : 'bg-red-50'
+                  dbStatus.tables.includes(table) ? 'bg-brand-green-50' : 'bg-brand-red-50'
                 }`}>
                   {dbStatus.tables.includes(table) ? (
                     <span className="text-slate-400 flex-shrink-0">•</span>
                   ) : (
-                    <XCircle className="w-4 h-4 text-red-600" />
+                    <XCircle className="w-4 h-4 text-brand-red-600" />
                   )}
                   <span className={`text-sm font-medium ${
-                    dbStatus.tables.includes(table) ? 'text-green-700' : 'text-red-700'
+                    dbStatus.tables.includes(table) ? 'text-brand-green-700' : 'text-brand-red-700'
                   }`}>{table}</span>
                 </div>
               ))}
@@ -549,7 +549,7 @@ export default async function SystemStatusPage() {
             <div className="grid md:grid-cols-4 gap-3">
               {Object.entries(envStatus).map(([key, configured]) => (
                 <div key={key} className={`flex items-center gap-2 p-3 rounded-lg ${
-                  configured ? 'bg-green-50' : 'bg-yellow-50'
+                  configured ? 'bg-brand-green-50' : 'bg-yellow-50'
                 }`}>
                   {configured ? (
                     <span className="text-slate-400 flex-shrink-0">•</span>
@@ -557,7 +557,7 @@ export default async function SystemStatusPage() {
                     <AlertTriangle className="w-4 h-4 text-yellow-600" />
                   )}
                   <span className={`text-sm font-medium ${
-                    configured ? 'text-green-700' : 'text-yellow-700'
+                    configured ? 'text-brand-green-700' : 'text-yellow-700'
                   }`}>{key}</span>
                 </div>
               ))}
@@ -587,7 +587,7 @@ export default async function SystemStatusPage() {
                     <td className="px-5 py-4">
                       <span className="flex items-center gap-2">
                         <span className="text-slate-400 flex-shrink-0">•</span>
-                        <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-1 rounded">Active</span>
+                        <span className="text-xs font-medium text-brand-green-700 bg-brand-green-100 px-2 py-1 rounded">Active</span>
                       </span>
                     </td>
                     <td className="px-5 py-4">
@@ -597,10 +597,10 @@ export default async function SystemStatusPage() {
                     <td className="px-5 py-4">
                       <span className={`text-xs font-medium px-2 py-1 rounded ${
                         route.category === 'Public' ? 'bg-gray-100 text-gray-700' :
-                        route.category === 'Admin' ? 'bg-red-100 text-red-700' :
+                        route.category === 'Admin' ? 'bg-brand-red-100 text-brand-red-700' :
                         route.category === 'Student' ? 'bg-brand-blue-100 text-brand-blue-700' :
                         route.category === 'Partner' ? 'bg-brand-blue-100 text-brand-blue-700' :
-                        'bg-green-100 text-green-700'
+                        'bg-brand-green-100 text-brand-green-700'
                       }`}>{route.category}</span>
                     </td>
                     <td className="px-5 py-4">

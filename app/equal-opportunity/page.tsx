@@ -72,9 +72,9 @@ const policies = [
 
 const colorClasses: Record<string, { bg: string; border: string; icon: string }> = {
   blue: { bg: 'bg-brand-blue-50', border: 'border-brand-blue-200', icon: 'text-brand-blue-600' },
-  green: { bg: 'bg-green-50', border: 'border-green-200', icon: 'text-green-600' },
+  green: { bg: 'bg-brand-green-50', border: 'border-brand-green-200', icon: 'text-brand-green-600' },
   blue: { bg: 'bg-brand-blue-50', border: 'border-brand-blue-200', icon: 'text-brand-blue-600' },
-  orange: { bg: 'bg-orange-50', border: 'border-orange-200', icon: 'text-orange-600' },
+  orange: { bg: 'bg-brand-orange-50', border: 'border-brand-orange-200', icon: 'text-brand-orange-600' },
   rose: { bg: 'bg-rose-50', border: 'border-rose-200', icon: 'text-rose-600' },
   teal: { bg: 'bg-teal-50', border: 'border-teal-200', icon: 'text-teal-600' },
   indigo: { bg: 'bg-indigo-50', border: 'border-indigo-200', icon: 'text-indigo-600' },
@@ -85,7 +85,7 @@ export default function EqualOpportunityPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumbs */}
-      <div className="bg-brand-blue-900 border-b border-blue-800">
+      <div className="bg-brand-blue-900 border-b border-brand-blue-800">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Equal Opportunity' }]} />
         </div>
@@ -285,7 +285,7 @@ export default function EqualOpportunityPage() {
             </a>
             <Link
               href="/apply"
-              className="inline-flex items-center gap-2 bg-green-500 text-white px-8 py-4 rounded-lg font-bold hover:bg-green-600 transition"
+              className="inline-flex items-center gap-2 bg-brand-green-500 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-green-600 transition"
             >
               Apply for Training <ArrowRight className="w-5 h-5" />
             </Link>

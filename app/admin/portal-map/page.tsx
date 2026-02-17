@@ -687,7 +687,7 @@ export default function AdminPortalMapPage() {
     switch (status) {
       case 'active':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-2 text-xs font-medium text-green-700 bg-brand-green-100 rounded-full">
+          <span className="inline-flex items-center gap-1 px-2 py-2 text-xs font-medium text-brand-green-700 bg-brand-green-100 rounded-full">
             <span className="text-slate-400 flex-shrink-0">•</span>
             Active
           </span>

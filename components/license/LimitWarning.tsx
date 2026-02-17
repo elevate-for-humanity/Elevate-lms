@@ -33,16 +33,16 @@ export function LimitWarningBanner({
   };
 
   return (
-    <div className={`border-b ${isCritical ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}>
+    <div className={`border-b ${isCritical ? 'bg-brand-red-50 border-brand-red-200' : 'bg-amber-50 border-amber-200'}`}>
       <div className="max-w-7xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <TrendingUp className={`w-5 h-5 ${isCritical ? 'text-red-600' : 'text-amber-600'}`} />
+            <TrendingUp className={`w-5 h-5 ${isCritical ? 'text-brand-red-600' : 'text-amber-600'}`} />
             <div>
-              <span className={`font-semibold ${isCritical ? 'text-red-900' : 'text-amber-900'}`}>
+              <span className={`font-semibold ${isCritical ? 'text-brand-red-900' : 'text-amber-900'}`}>
                 {isCritical ? 'Almost at limit' : 'Approaching limit'}
               </span>
-              <span className={`ml-2 ${isCritical ? 'text-red-700' : 'text-amber-700'}`}>
+              <span className={`ml-2 ${isCritical ? 'text-brand-red-700' : 'text-amber-700'}`}>
                 {currentUsage} of {limit} {metricLabels[metric]} ({percentUsed}%)
               </span>
             </div>
@@ -51,7 +51,7 @@ export function LimitWarningBanner({
             href={upgrade.ctaHref}
             className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${
               isCritical
-                ? 'bg-red-600 text-white hover:bg-red-700'
+                ? 'bg-brand-red-600 text-white hover:bg-brand-red-700'
                 : 'bg-amber-600 text-white hover:bg-amber-700'
             }`}
           >
@@ -87,8 +87,8 @@ export function LimitReachedModal({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl max-w-md w-full p-8">
         <div className="text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Lock className="w-8 h-8 text-red-600" />
+          <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-8 h-8 text-brand-red-600" />
           </div>
           <h2 className="text-2xl font-black text-gray-900 mb-4">
             {message.title}
@@ -137,7 +137,7 @@ export function LimitReachedBanner({
   const upgrade = getUpgradePath(planId);
 
   return (
-    <div className="bg-red-600 text-white">
+    <div className="bg-brand-red-600 text-white">
       <div className="max-w-7xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -149,7 +149,7 @@ export function LimitReachedBanner({
           </div>
           <Link
             href={upgrade.ctaHref}
-            className="bg-white text-red-600 px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-red-50 transition-colors flex-shrink-0"
+            className="bg-white text-brand-red-600 px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-brand-red-50 transition-colors flex-shrink-0"
           >
             {message.cta}
           </Link>
@@ -195,14 +195,14 @@ export function UsageIndicator({
     <div className="p-3 bg-gray-50 rounded-lg">
       <div className="flex items-center justify-between mb-2">
         <span className="text-gray-700">{label}</span>
-        <span className={`font-medium ${isAtLimit ? 'text-red-600' : isCritical ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-gray-900'}`}>
+        <span className={`font-medium ${isAtLimit ? 'text-brand-red-600' : isCritical ? 'text-brand-red-600' : isWarning ? 'text-amber-600' : 'text-gray-900'}`}>
           {current} / {limit}
         </span>
       </div>
       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
         <div
           className={`h-full transition-all ${
-            isAtLimit ? 'bg-red-600' : isCritical ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-green-500'
+            isAtLimit ? 'bg-brand-red-600' : isCritical ? 'bg-brand-red-500' : isWarning ? 'bg-amber-500' : 'bg-brand-green-500'
           }`}
           style={{ width: `${Math.min(percent, 100)}%` }}
         />
@@ -210,7 +210,7 @@ export function UsageIndicator({
       {isAtLimit && showUpgrade && (
         <Link
           href={upgradeHref}
-          className="mt-2 text-sm text-red-600 font-medium hover:underline inline-flex items-center gap-1"
+          className="mt-2 text-sm text-brand-red-600 font-medium hover:underline inline-flex items-center gap-1"
         >
           Upgrade to add more <ArrowRight className="w-3 h-3" />
         </Link>

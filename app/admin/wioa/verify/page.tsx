@@ -19,7 +19,7 @@ export default async function WIOAVerifyPage({
 }) {
   const auth = await requireAdmin();
   if ('error' in auth) {
-    return <div className="p-8 text-center text-red-600">Access denied</div>;
+    return <div className="p-8 text-center text-brand-red-600">Access denied</div>;
   }
 
   const supabase = await createClient();
@@ -47,7 +47,7 @@ export default async function WIOAVerifyPage({
 
           {(!pending || pending.length === 0) ? (
             <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-              <CheckCircle className="w-12 h-12 mx-auto mb-3 text-green-400" />
+              <CheckCircle className="w-12 h-12 mx-auto mb-3 text-brand-green-400" />
               <p className="font-medium text-gray-900">All caught up</p>
               <p className="text-sm text-gray-500 mt-1">No pending verifications at this time.</p>
             </div>
@@ -129,7 +129,7 @@ export default async function WIOAVerifyPage({
             <form action={`/api/admin/wioa/verify`} method="POST">
               <input type="hidden" name="participantId" value={participant.id} />
               <input type="hidden" name="action" value="deny" />
-              <button type="submit" className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition flex items-center gap-2">
+              <button type="submit" className="px-4 py-2 border border-brand-red-300 text-brand-red-600 rounded-lg hover:bg-brand-red-50 transition flex items-center gap-2">
                 <XCircle className="w-4 h-4" />
                 Deny
               </button>
@@ -137,7 +137,7 @@ export default async function WIOAVerifyPage({
             <form action={`/api/admin/wioa/verify`} method="POST">
               <input type="hidden" name="participantId" value={participant.id} />
               <input type="hidden" name="action" value="approve" />
-              <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+              <button type="submit" className="px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 transition flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" />
                 Approve
               </button>
@@ -195,11 +195,11 @@ export default async function WIOAVerifyPage({
               <h2 className="text-lg font-bold text-gray-900 mb-4">Eligibility Status</h2>
               <div className="flex items-center gap-3 p-4 rounded-lg border">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  participant.eligibility_status === 'approved' ? 'bg-green-100' :
-                  participant.eligibility_status === 'denied' ? 'bg-red-100' : 'bg-yellow-100'
+                  participant.eligibility_status === 'approved' ? 'bg-brand-green-100' :
+                  participant.eligibility_status === 'denied' ? 'bg-brand-red-100' : 'bg-yellow-100'
                 }`}>
-                  {participant.eligibility_status === 'approved' && <CheckCircle className="w-5 h-5 text-green-600" />}
-                  {participant.eligibility_status === 'denied' && <XCircle className="w-5 h-5 text-red-600" />}
+                  {participant.eligibility_status === 'approved' && <CheckCircle className="w-5 h-5 text-brand-green-600" />}
+                  {participant.eligibility_status === 'denied' && <XCircle className="w-5 h-5 text-brand-red-600" />}
                   {!['approved', 'denied'].includes(participant.eligibility_status) && <AlertTriangle className="w-5 h-5 text-yellow-600" />}
                 </div>
                 <div>
@@ -231,7 +231,7 @@ export default async function WIOAVerifyPage({
                   {docs.map(doc => (
                     <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg">
                       <div className="flex items-center gap-3">
-                        <FileText className={`w-5 h-5 ${doc.file_url ? 'text-green-600' : 'text-red-500'}`} />
+                        <FileText className={`w-5 h-5 ${doc.file_url ? 'text-brand-green-600' : 'text-brand-red-500'}`} />
                         <div>
                           <p className="text-sm font-medium text-gray-900">{doc.title || doc.document_type}</p>
                           <p className="text-xs text-gray-500">
@@ -244,7 +244,7 @@ export default async function WIOAVerifyPage({
                           <Download className="w-4 h-4 text-gray-500" />
                         </a>
                       ) : (
-                        <span className="text-xs text-red-500 font-medium">Missing</span>
+                        <span className="text-xs text-brand-red-500 font-medium">Missing</span>
                       )}
                     </div>
                   ))}
@@ -278,7 +278,7 @@ export default async function WIOAVerifyPage({
                 </div>
                 {participant.enrollment_date && (
                   <div className="flex gap-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-1.5" />
+                    <div className="w-2 h-2 bg-brand-green-500 rounded-full mt-1.5" />
                     <div>
                       <p className="text-gray-900">Enrolled</p>
                       <p className="text-gray-500">{new Date(participant.enrollment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>

@@ -92,8 +92,8 @@ export default async function EventsPage() {
   const getEventTypeColor = (type: string) => {
     switch (type) {
       case 'workshop': return 'bg-brand-blue-500';
-      case 'networking': return 'bg-green-500';
-      case 'qa': return 'bg-orange-500';
+      case 'networking': return 'bg-brand-green-500';
+      case 'qa': return 'bg-brand-orange-500';
       case 'webinar': return 'bg-brand-blue-500';
       case 'panel': return 'bg-pink-500';
       case 'meetup': return 'bg-teal-500';
@@ -214,7 +214,7 @@ export default async function EventsPage() {
                         {eventTypeLabels[event.event_type] || event.event_type}
                       </span>
                       {isLive && (
-                        <span className="absolute top-3 right-3 px-3 py-1 bg-red-500 text-white rounded-full text-xs font-bold flex items-center gap-1">
+                        <span className="absolute top-3 right-3 px-3 py-1 bg-brand-red-500 text-white rounded-full text-xs font-bold flex items-center gap-1">
                           <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
                           LIVE
                         </span>

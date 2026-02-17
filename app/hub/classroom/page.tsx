@@ -48,7 +48,7 @@ export default async function ClassroomPage() {
           </div>
           <Link 
             href="/programs" 
-            className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
+            className="px-4 py-2 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700"
           >
             Browse Programs
           </Link>
@@ -80,7 +80,7 @@ export default async function ClassroomPage() {
                       </div>
                       <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-green-500 rounded-full"
+                          className="h-full bg-brand-green-500 rounded-full"
                           style={{ width: `${enrollment.progress || 0}%` }}
                         />
                       </div>
@@ -104,7 +104,7 @@ export default async function ClassroomPage() {
               <p className="text-slate-600 mb-6">Start your learning journey by enrolling in a program</p>
               <Link 
                 href="/programs" 
-                className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700"
               >
                 Browse Programs
                 <ChevronRight className="w-4 h-4" />
@@ -120,7 +120,7 @@ export default async function ClassroomPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {availableCourses.slice(0, 3).map((course: any) => (
                 <div key={course.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition">
-                  <div className="h-32 bg-green-500 flex items-center justify-center">
+                  <div className="h-32 bg-brand-green-500 flex items-center justify-center">
                     <Award className="w-12 h-12 text-white/50" />
                   </div>
                   <div className="p-6">
@@ -133,7 +133,7 @@ export default async function ClassroomPage() {
                       </span>
                       <Link
                         href={`/courses/${course.id}`}
-                        className="text-green-600 font-medium hover:text-green-700"
+                        className="text-brand-green-600 font-medium hover:text-brand-green-700"
                       >
                         Learn More
                       </Link>

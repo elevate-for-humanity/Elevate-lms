@@ -217,7 +217,7 @@ export default function ShopOwnerSettingsPage() {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-3 bg-red-500/10 border border-red-500/30 text-red-400 font-medium py-4 rounded-xl"
+          className="w-full flex items-center justify-center gap-3 bg-brand-red-500/10 border border-brand-red-500/30 text-brand-red-400 font-medium py-4 rounded-xl"
         >
           <LogOut className="w-5 h-5" />
           Sign Out

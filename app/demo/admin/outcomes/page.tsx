@@ -35,7 +35,7 @@ export default function DemoOutcomesPage() {
                 <td className="px-5 py-3 text-gray-600">{p.enrolled || p.students || 30}</td>
                 <td className="px-5 py-3 text-gray-600">{Math.round((p.enrolled || 30) * (p.completionRate || 75) / 100)}</td>
                 <td className="px-5 py-3">
-                  <span className="text-xs font-semibold text-green-700">{p.completionRate || 75}%</span>
+                  <span className="text-xs font-semibold text-brand-green-700">{p.completionRate || 75}%</span>
                 </td>
               </tr>
             ))}

@@ -165,7 +165,7 @@ Welcome to the Elevate for Humanity network!
   } catch (err: any) {
     // Error: $1
     return NextResponse.json(
-      { error: (err as Error).message || 'Application failed' },
+      { error: 'Application failed' },
       { status: 500 }
     );
   }

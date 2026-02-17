@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { auditPiiAccess } from '@/lib/auditLog';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -28,6 +29,15 @@ export async function POST(request: NextRequest) {
   }
 
   const { ssn, firstName, lastName, dateOfBirth } = await request.json();
+
+  // FERPA audit: log SSN verification access
+  await auditPiiAccess({
+    actor_user_id: user.id,
+    action: 'PII_VERIFY',
+    entity: 'ssn',
+    req: request,
+    metadata: { route: '/api/identity/verify-ssn' },
+  });
 
   // Validate required fields
   if (!ssn || !firstName || !lastName || !dateOfBirth) {

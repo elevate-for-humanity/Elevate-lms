@@ -3,11 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { clientService } from '@/lib/franchise/client-service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { auditPiiAccess } from '@/lib/auditLog';
 
 export async function GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+
+    await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/franchise/clients' } });
 
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

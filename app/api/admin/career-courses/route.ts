@@ -133,7 +133,7 @@ export async function POST(req: Request) {
           results.push({
             course: course.title,
             status: 'error',
-            error: stripeError.message,
+            error: 'Payment processing failed',
           });
         }
       }

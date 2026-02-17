@@ -81,7 +81,7 @@ export async function POST(req: Request) {
     .maybeSingle();
 
   if (profErr)
-    return NextResponse.json({ error: profErr.message }, { status: 500 });
+    return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
   if (!prof?.organization_id)
     return NextResponse.json(
       { error: 'No active organization found' },

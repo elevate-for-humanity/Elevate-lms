@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
   } catch (err: any) {
     // Error: $1
     return NextResponse.json(
-      { error: (err as Error).message || 'Failed to fetch incentives' },
+      { error: 'Failed to fetch incentives' },
       { status: 500 }
     );
   }
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     // Error: $1
     return NextResponse.json(
-      { error: (err as Error).message || 'Failed to create incentive' },
+      { error: 'Failed to create incentive' },
       { status: 500 }
     );
   }

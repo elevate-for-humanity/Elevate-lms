@@ -4,6 +4,7 @@ import { jotFormIntegration } from '@/lib/integrations/jotform';
 import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { Resend } from 'resend';
+import { auditPiiAccess } from '@/lib/auditLog';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -44,6 +45,8 @@ export async function POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+
+    await auditPiiAccess({ action: 'PII_ACCESS', entity: 'tax_return', req: request, metadata: { route: '/api/supersonic-fast-cash/jotform-webhook' } });
 
     // Verify source IP
     const forwardedFor = request.headers.get('x-forwarded-for');

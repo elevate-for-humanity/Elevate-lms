@@ -138,7 +138,7 @@ export async function POST(
           partnerId,
           status: 'approved_pending_user',
           message: 'Partner approved but user creation failed. Retry needed.',
-          error: createUserError.message,
+          error: 'User creation failed',
         }, { status: 207 }); // 207 Multi-Status
       }
 
@@ -173,7 +173,7 @@ export async function POST(
         partnerId,
         status: 'approved_pending_user',
         message: 'Partner approved but user linking failed. Retry needed.',
-        error: linkError.message,
+        error: 'Operation failed',
       }, { status: 207 });
     }
 

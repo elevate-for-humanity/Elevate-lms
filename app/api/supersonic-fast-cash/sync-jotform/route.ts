@@ -3,6 +3,7 @@ import { jotFormIntegration } from '@/lib/integrations/jotform';
 import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
 import { createClient } from '@supabase/supabase-js';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
+import { auditPiiAccess } from '@/lib/auditLog';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -30,6 +31,8 @@ export async function POST(request: NextRequest) {
     if (!authHeader || authHeader !== `Bearer ${supabaseServiceKey}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
+
+    await auditPiiAccess({ action: 'PII_ACCESS', entity: 'tax_return', req: request, metadata: { route: '/api/supersonic-fast-cash/sync-jotform' } });
 
     const body: SyncJotformBody = await request.json();
     const formId = body.formId || process.env.JOTFORM_FORM_ID;

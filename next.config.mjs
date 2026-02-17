@@ -524,8 +524,10 @@ const nextConfig = {
         key: 'Content-Security-Policy',
         value: [
           "default-src 'self'",
+          // 'unsafe-inline' kept as fallback for browsers that don't support 'strict-dynamic'.
+          // 'strict-dynamic' ignores 'unsafe-inline' in supporting browsers (CSP3).
           isProduction
-            ? "script-src 'self' 'unsafe-inline' https://connect.facebook.net https://js.stripe.com https://www.googletagmanager.com"
+            ? "script-src 'self' 'unsafe-inline' 'strict-dynamic' https://connect.facebook.net https://js.stripe.com https://www.googletagmanager.com"
             : "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://connect.facebook.net https://js.stripe.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
           "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev https://cms-artifacts.artlist.io",
@@ -534,11 +536,23 @@ const nextConfig = {
           "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://js.stripe.com https://us06web.zoom.us",
           "media-src 'self' data: blob: https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev https://cms-artifacts.artlist.io",
           "worker-src 'self' blob:",
+          "object-src 'none'",
           "base-uri 'self'",
           "form-action 'self' https://js.stripe.com",
           "frame-ancestors 'none'",
           "upgrade-insecure-requests",
+          // CSP violation reporting endpoint
+          "report-uri /api/csp-report",
+          "report-to csp-endpoint",
         ].join('; '),
+      },
+      {
+        key: 'Report-To',
+        value: JSON.stringify({
+          group: 'csp-endpoint',
+          max_age: 86400,
+          endpoints: [{ url: '/api/csp-report' }],
+        }),
       },
     ];
 

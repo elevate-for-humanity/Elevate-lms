@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { auditPiiAccess } from '@/lib/auditLog';
 
 /**
  * Supersonic Cash Advance Application API
@@ -17,6 +18,8 @@ export async function POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
+
+    await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/supersonic-cash/apply' } });
 
     const supabase = await createClient();
     const applicationData = await req.json();

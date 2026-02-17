@@ -159,7 +159,7 @@ export async function POST(req: Request) {
     .select('*')
     .single();
 
-  if (updErr) return jsonError(updErr.message, 500);
+  if (updErr) return jsonError('Update failed', 500);
 
   // Audit log: hours action
   const auditAction = action === 'APPROVE' ? AuditAction.HOURS_APPROVED 

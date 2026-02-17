@@ -59,7 +59,7 @@ const supabase = await createClient();
     .maybeSingle();
 
   if (profErr)
-    return NextResponse.json({ error: profErr.message }, { status: 500 });
+    return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
 
   const orgId = prof?.organization_id;
   if (!orgId)

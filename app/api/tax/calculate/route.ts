@@ -3,11 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calculateForm1040, getStandardDeduction } from '@/lib/tax-software/forms/form-1040';
 import { TaxReturn } from '@/lib/tax-software/types';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { auditPiiAccess } from '@/lib/auditLog';
 
 export async function POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
+
+    await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/tax/calculate' } });
 
     const body = await request.json();
     

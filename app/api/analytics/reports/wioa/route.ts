@@ -8,12 +8,16 @@ import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { auditPiiAccess } from '@/lib/auditLog';
 
 export async function GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-const supabase = createSupabaseClient();
+
+    await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/analytics/reports/wioa' } });
+
+    const supabase = createSupabaseClient();
   const session = await requireApiAuth();
   if (!session || !(session as any).isAdmin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

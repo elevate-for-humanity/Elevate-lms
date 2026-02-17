@@ -11,13 +11,26 @@
 import type { Handler } from "@netlify/functions";
 import { createClient } from "@supabase/supabase-js";
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Cache-Control": "no-store, no-cache, must-revalidate",
-  Pragma: "no-cache",
-};
+const ALLOWED_ORIGINS = [
+  "https://www.elevateforhumanity.org",
+  "https://elevateforhumanity.org",
+  "https://supersonicfastermoney.com",
+  "https://www.supersonicfastermoney.com",
+];
+
+function getCorsHeaders(origin?: string) {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Cache-Control": "no-store, no-cache, must-revalidate",
+    Pragma: "no-cache",
+    Vary: "Origin",
+  };
+}
+
+const CORS_HEADERS = getCorsHeaders();
 
 // In-memory rate limiting (per function instance)
 const ipLimits = new Map<string, { count: number; resetTime: number }>();
@@ -48,8 +61,11 @@ function notFound() {
 }
 
 export const handler: Handler = async (event) => {
+  const origin = event.headers?.origin || event.headers?.Origin;
+  const corsHeaders = getCorsHeaders(origin);
+
   if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 204, headers: CORS_HEADERS, body: "" };
+    return { statusCode: 204, headers: corsHeaders, body: "" };
   }
 
   if (event.httpMethod !== "POST") {

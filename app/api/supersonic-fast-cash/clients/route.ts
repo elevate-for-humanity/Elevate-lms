@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { auditPiiAccess } from '@/lib/auditLog';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,6 +18,8 @@ export async function GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+
+    await auditPiiAccess({ action: 'PII_ACCESS', entity: 'tax_return', req: request, metadata: { route: '/api/supersonic-fast-cash/clients', method: 'GET' } });
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 

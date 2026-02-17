@@ -208,7 +208,7 @@ export async function GET(req: NextRequest) {
   } catch (err: any) {
     // Error: $1
     return NextResponse.json(
-      { error: (err as Error).message || 'Failed to export students' },
+      { error: 'Failed to export students' },
       { status: 500 }
     );
   }

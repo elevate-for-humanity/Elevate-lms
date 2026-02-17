@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       if (!response.ok) {
         const error = await response.json();
         return NextResponse.json(
-          { error: error.error?.message || 'DALL-E API error' },
+          { error: 'DALL-E API error' },
           { status: 500 }
         );
       }
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       if (!response.ok) {
         const error = await response.json();
         return NextResponse.json(
-          { error: error.error?.message || 'OpenAI API error' },
+          { error: 'OpenAI API error' },
           { status: 500 }
         );
       }

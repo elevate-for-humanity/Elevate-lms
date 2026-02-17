@@ -98,7 +98,7 @@ export async function POST(
       err instanceof Error ? err : new Error(String(err))
     );
     return NextResponse.json(
-      { error: (err as Error).message || 'Failed to register' },
+      { error: 'Failed to register' },
       { status: 500 }
     );
   }

@@ -9,6 +9,7 @@ import { reconcileTrialOnboarding } from '@/lib/trial/reconcile-onboarding';
 import AdminHeader from '@/components/admin/AdminHeader';
 import { DemoTourProvider } from '@/components/demo/DemoTourProvider';
 import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
+import { SkipToContent } from '@/components/ui/SkipToContent';
 
 export const dynamic = 'force-dynamic';
 
@@ -111,15 +112,17 @@ export default async function AdminLayout({
   if (!context) {
     return (
       <DemoTourProvider>
+        <SkipToContent />
         <IdleTimeoutGuard />
         <AdminHeader />
-        <div className="pt-16">{children}</div>
+        <div id="main-content" className="pt-16">{children}</div>
       </DemoTourProvider>
     );
   }
 
   return (
     <DemoTourProvider>
+      <SkipToContent />
       <IdleTimeoutGuard />
       <AdminLicenseWrapper
         license={context.license}
@@ -127,7 +130,7 @@ export default async function AdminLayout({
         tenantId={context.tenantId}
       >
         <AdminHeader />
-        <div className="pt-16">{children}</div>
+        <div id="main-content" className="pt-16">{children}</div>
       </AdminLicenseWrapper>
     </DemoTourProvider>
   );

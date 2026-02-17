@@ -126,7 +126,7 @@ export async function POST(request: Request) {
       .single();
 
     if (reviewError) {
-      return NextResponse.json({ error: reviewError.message }, { status: 500 });
+      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
     }
 
     // Notify admin of new review

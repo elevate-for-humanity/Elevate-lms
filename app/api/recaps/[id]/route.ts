@@ -54,7 +54,7 @@ export async function GET(
       .single();
 
     if (recapErr) {
-      return NextResponse.json({ error: recapErr.message }, { status: 404 });
+      return NextResponse.json({ error: 'Operation failed' }, { status: 404 });
     }
 
     if (recap.organization_id !== profile.organization_id) {

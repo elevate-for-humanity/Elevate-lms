@@ -68,7 +68,7 @@ export const POST = withAuth(
     } catch (err: any) {
       logger.error(err);
       return NextResponse.json(
-        { error: err?.message ?? 'Unexpected error' },
+        { error: 'Unexpected error' },
         { status: 500 }
       );
     }

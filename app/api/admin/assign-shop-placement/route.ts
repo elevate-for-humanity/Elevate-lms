@@ -112,7 +112,7 @@ export async function POST(req: Request) {
     if (placementError) {
       // Error: $1
       return NextResponse.json(
-        { error: placementError.message },
+        { error: 'Placement failed' },
         { status: 500 }
       );
     }

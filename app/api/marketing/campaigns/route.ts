@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
       err instanceof Error ? err : new Error(String(err))
     );
     return NextResponse.json(
-      { error: (err as Error).message || 'Failed to fetch campaigns' },
+      { error: 'Failed to fetch campaigns' },
       { status: 500 }
     );
   }
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
       err instanceof Error ? err : new Error(String(err))
     );
     return NextResponse.json(
-      { error: (err as Error).message || 'Failed to create campaign' },
+      { error: 'Failed to create campaign' },
       { status: 500 }
     );
   }

@@ -130,7 +130,7 @@ ${transcript}
       .single();
 
     if (recapErr) {
-      return NextResponse.json({ error: recapErr.message }, { status: 500 });
+      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
     }
 
     // Insert action items

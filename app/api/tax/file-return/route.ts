@@ -13,6 +13,7 @@ import { TaxReturn } from '@/lib/tax-software/types';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { auditPiiAccess } from '@/lib/auditLog';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -29,6 +30,8 @@ const EFIN = '358459';
 export async function POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
+
+    await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/tax/file-return' } });
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
   

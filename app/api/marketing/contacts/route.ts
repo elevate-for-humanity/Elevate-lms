@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
       error instanceof Error ? error : new Error(String(error))
     );
     return NextResponse.json(
-      { error: error?.message || 'Failed to fetch contacts' },
+      { error: 'Failed to fetch contacts' },
       { status: 500 }
     );
   }
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
       error instanceof Error ? error : new Error(String(error))
     );
     return NextResponse.json(
-      { error: error?.message || 'Failed to create contact' },
+      { error: 'Failed to create contact' },
       { status: 500 }
     );
   }

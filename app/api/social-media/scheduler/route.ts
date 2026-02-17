@@ -226,7 +226,7 @@ async function postToFacebook(
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Facebook API error');
+      throw new Error('Facebook API error');
     }
 
     return { success: true, platform: 'facebook', postId: data.id };

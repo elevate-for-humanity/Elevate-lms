@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
   } catch (error) { 
     logger.error('Notification error:', error);
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: 'Operation failed' },
       { status: 500 }
     );
   }
@@ -119,7 +119,7 @@ export async function GET(req: NextRequest) {
   } catch (error) { 
     logger.error('Error fetching notifications:', error);
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: 'Operation failed' },
       { status: 500 }
     );
   }
@@ -153,7 +153,7 @@ export async function PATCH(req: NextRequest) {
   } catch (error) { 
     logger.error('Error updating notification:', error);
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: 'Operation failed' },
       { status: 500 }
     );
   }

@@ -48,7 +48,7 @@ const checks: Record<string, any> = {
       checks.checks.database = {
         connected: !error,
         status: error ? 'fail' : 'pass',
-        error: error ? 'check failed' : null,
+        error: error?.message || null,
       };
     } else {
       checks.checks.database = {

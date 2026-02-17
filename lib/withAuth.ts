@@ -23,15 +23,13 @@ export function withAuth(handler: Handler, options?: { roles?: Role[] }) {
     const supabase = await createClient();
 
     const {
-      data: { session },
+      data: { user },
       error,
-    } = await supabase.auth.getSession();
+    } = await supabase.auth.getUser();
 
-    if (error || !session) {
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const { user } = session;
 
     // Look up role from profiles
     const { data: profile, error: profileError } = await supabase

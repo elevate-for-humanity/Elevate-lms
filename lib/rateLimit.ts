@@ -1,8 +1,9 @@
 /**
  * Rate Limiting Utility
  *
- * Prevents mass scraping and abuse by limiting requests per IP
- * Uses in-memory storage (upgrade to Redis for production)
+ * @deprecated Use the Redis-based rate limiter in lib/rate-limit.ts instead.
+ * This in-memory implementation does NOT work in serverless/edge deployments
+ * because each invocation may get a fresh instance, resetting all counters.
  */
 
 interface RateLimitStore {

@@ -79,7 +79,7 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           from: 'Elevate <noreply@www.elevateforhumanity.org>',
-          to: '3177607908@txt.att.net',
+          to: process.env.ADMIN_SMS_GATEWAY || '',
           subject: 'Advising',
           text: `${name}\n${phone}\n${programInterest || 'General'}`,
         }),

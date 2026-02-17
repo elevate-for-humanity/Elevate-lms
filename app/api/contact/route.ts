@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
     // Rate limiting: 5 requests per minute per IP
     const identifier = getClientIdentifier(req.headers);
-    const rateLimitResult = rateLimit(identifier, RATE_LIMITS.CONTACT_FORM);
+    const rateLimitResult = await rateLimit(identifier, RATE_LIMITS.CONTACT_FORM);
 
     if (!rateLimitResult.ok) {
       return NextResponse.json(
@@ -197,7 +197,7 @@ async function sendEmailNotification(data: z.infer<typeof ContactSchema>) {
     // SMS alert via AT&T gateway
     await resend.emails.send({
       from: 'Elevate <noreply@www.elevateforhumanity.org>',
-      to: '3177607908@txt.att.net',
+      to: process.env.ADMIN_SMS_GATEWAY || '',
       subject: 'Contact',
       text: `${data.name}\n${data.email}\n${data.message.substring(0, 100)}`,
     });

@@ -7,13 +7,20 @@
 
 const crypto = require('crypto');
 
-// Require encryption key from environment
-if (!process.env.ENCRYPTION_KEY) {
-  console.error('ENCRYPTION_KEY environment variable is required');
-  process.exit(1);
+// Lazy-initialize the encryption key to avoid crashing the process at import time
+let _encryptionKey = null;
+
+function getEncryptionKey() {
+  if (!_encryptionKey) {
+    if (!process.env.ENCRYPTION_KEY) {
+      throw new Error('ENCRYPTION_KEY environment variable is required for encryption operations');
+    }
+    _encryptionKey = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
+  }
+  return _encryptionKey;
 }
 
-const ENCRYPTION_KEY = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
+const ENCRYPTION_KEY = null; // Use getEncryptionKey() instead
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
 const AUTH_TAG_LENGTH = 16;
@@ -28,7 +35,7 @@ function encrypt(text) {
 
   try {
     const iv = crypto.randomBytes(IV_LENGTH);
-    const cipher = crypto.createCipheriv(ALGORITHM, ENCRYPTION_KEY, iv);
+    const cipher = crypto.createCipheriv(ALGORITHM, getEncryptionKey(), iv);
 
     let encrypted = cipher.update(text, 'utf8', 'hex');
     encrypted += cipher.final('hex');
@@ -60,7 +67,7 @@ function decrypt(encryptedData) {
     const iv = Buffer.from(ivHex, 'hex');
     const authTag = Buffer.from(authTagHex, 'hex');
 
-    const decipher = crypto.createDecipheriv(ALGORITHM, ENCRYPTION_KEY, iv);
+    const decipher = crypto.createDecipheriv(ALGORITHM, getEncryptionKey(), iv);
     decipher.setAuthTag(authTag);
 
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');

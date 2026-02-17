@@ -1474,7 +1474,8 @@ export async function POST(request: NextRequest) {
           const { error } = await supabase.rpc('fail_stripe_payment', {
             p_enrollment_id: enrollmentId,
             p_stripe_event_id: event.id,
-            p_error_message: 'Payment failed',
+            p_error_message:
+              failedPayment.last_payment_error?.message || 'Payment failed',
           });
 
           if (error) {

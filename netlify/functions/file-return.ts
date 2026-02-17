@@ -44,7 +44,7 @@ export const handler: Handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
-      headers: CORS_HEADERS,
+      headers: corsHeaders,
       body: JSON.stringify({ error: "Method Not Allowed" }),
     };
   }
@@ -56,7 +56,7 @@ export const handler: Handler = async (event) => {
     if (!supabaseUrl || !serviceRoleKey) {
       return {
         statusCode: 500,
-        headers: CORS_HEADERS,
+        headers: corsHeaders,
         body: JSON.stringify({ error: "Server configuration error" }),
       };
     }
@@ -96,21 +96,21 @@ export const handler: Handler = async (event) => {
       console.error("Supabase insert error:", error.code);
       return {
         statusCode: 400,
-        headers: CORS_HEADERS,
+        headers: corsHeaders,
         body: JSON.stringify({ error: "Failed to create tax return" }),
       };
     }
 
     return {
       statusCode: 200,
-      headers: CORS_HEADERS,
+      headers: corsHeaders,
       body: JSON.stringify({ ok: true, ...data }),
     };
   } catch (e) {
     console.error("file-return function error");
     return {
       statusCode: 500,
-      headers: CORS_HEADERS,
+      headers: corsHeaders,
       body: JSON.stringify({ error: "Internal server error" }),
     };
   }

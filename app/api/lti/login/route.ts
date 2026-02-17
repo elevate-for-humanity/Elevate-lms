@@ -1,5 +1,6 @@
 export const runtime = 'edge';
 export const maxDuration = 60;
+// AUTH: Intentionally public — no authentication required
 
 // app/api/lti/login/route.ts
 import { NextResponse } from 'next/server';

@@ -12,11 +12,15 @@ import {
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 export async function GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
+
 const userToken = req.headers.get('x-gh-token');
   const repo = req.nextUrl.searchParams.get('repo');
   const path = req.nextUrl.searchParams.get('path');
@@ -89,6 +93,10 @@ export async function PUT(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
+
+
 const userToken = req.headers.get('x-gh-token');
 
   try {
@@ -161,7 +169,8 @@ const userToken = req.headers.get('x-gh-token');
         message: toErrorMessage(error),
         status: error.status,
       },
-      { status: error.status || 500 }
+      {
+ status: error.status || 500 }
     );
   }
 }
@@ -170,6 +179,9 @@ export async function DELETE(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
+
 const userToken = req.headers.get('x-gh-token');
 
   try {
@@ -215,7 +227,8 @@ const userToken = req.headers.get('x-gh-token');
         message: toErrorMessage(error),
         status: error.status,
       },
-      { status: error.status || 500 }
+      {
+ status: error.status || 500 }
     );
   }
 }
@@ -225,6 +238,9 @@ export async function PATCH(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
+
 const userToken = req.headers.get('x-gh-token');
 
   try {

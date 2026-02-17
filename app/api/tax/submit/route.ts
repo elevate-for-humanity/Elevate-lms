@@ -5,11 +5,15 @@ import { createMeFSubmission } from '@/lib/tax-software/mef/xml-generator';
 import { createTransmitter } from '@/lib/tax-software/mef/transmission';
 import { TaxReturn } from '@/lib/tax-software/types';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 export async function POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
+
+    const auth = await requireAuth(request);
+    if (auth.error) return auth.error;
 
     const body = await request.json();
     

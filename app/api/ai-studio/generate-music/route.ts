@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 /**
  * AI Music Generation API
@@ -19,6 +20,9 @@ export async function POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+
+    const auth = await requireAuth(request);
+    if (auth.error) return auth.error;
 
     const { prompt, duration = 60, style = 'upbeat' } = await request.json();
 

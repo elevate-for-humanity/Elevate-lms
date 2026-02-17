@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { getOpenAIClient } from '@/lib/openai-client';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 // System prompt for the AI receptionist
 const RECEPTIONIST_PROMPT = `You are the AI receptionist for Elevate for Humanity, a workforce development organization in Indiana.
@@ -40,6 +41,9 @@ export async function POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
 
     const { message, history } = await req.json();
 

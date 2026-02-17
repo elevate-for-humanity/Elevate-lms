@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+// AUTH: Intentionally public — no authentication required
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;

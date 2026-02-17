@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getPageGuide } from '@/lib/store/db';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 export async function GET(
   request: NextRequest,
@@ -10,6 +11,9 @@ export async function GET(
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+
+    const auth = await requireAuth(request);
+    if (auth.error) return auth.error;
 const { pageId } = await params;
 
   try {

@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getFeaturedForAudience } from '@/lib/store/db';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+// AUTH: Intentionally public — no authentication required
 
 export async function GET(request: NextRequest) {
   

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMarketingPageBySlug } from '@/lib/api/marketing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+// AUTH: Intentionally public — no authentication required
 
 /**
  * GET /api/marketing/[slug]

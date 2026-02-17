@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // eslint-disable-next-line react-hooks/rules-of-hooks
 import { useToken } from '@/lib/notifications';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+// AUTH: Intentionally public — no authentication required
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

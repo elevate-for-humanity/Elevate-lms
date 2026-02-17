@@ -5,10 +5,14 @@ export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
 import { toError, toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 export async function POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
+
 
   if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json(

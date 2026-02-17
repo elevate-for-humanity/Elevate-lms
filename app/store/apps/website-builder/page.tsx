@@ -195,7 +195,7 @@ export default function WebsiteBuilderAppPage() {
       <section className="py-16 px-4 bg-white text-slate-900">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Launch Your Training Website Today</h2>
-          <p className="text-gray-300 mb-8">14-day free trial. No credit card required.</p>
+          <p className="text-gray-300 mb-8">14-day free trial. Card required, not charged until trial ends.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/store/cart?add=website-pro" className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-bold">
               Start Free Trial

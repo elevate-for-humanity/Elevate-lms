@@ -13,7 +13,7 @@ import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { getRoutingRecommendations } from '@/lib/automation/shop-routing';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
-const ADMIN_SMS = '3177607908@txt.att.net'; // AT&T email-to-SMS gateway
+const ADMIN_SMS = process.env.ADMIN_SMS_GATEWAY || '';
 
 export const POST = withRateLimit(
   async (req: Request) => {
@@ -158,6 +158,23 @@ export const POST = withRateLimit(
         subject: 'New App',
         html: `${firstName} ${lastName}\n${program}\n${phone}`,
       });
+
+      // Trigger routing automation asynchronously (non-blocking)
+      // On error: creates review_queue item, never blocks user flow
+      if (application?.id) {
+        try {
+          fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/automation/routing`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ applicationId: application.id, program }),
+          }).catch((err) => {
+            console.error('[apply] Routing automation trigger failed (non-fatal):', err);
+          });
+        } catch (triggerError) {
+          // Never block user flow - log and continue
+          console.error('[apply] Routing automation trigger error (non-fatal):', triggerError);
+        }
+      }
 
       if (contentType?.includes('application/json')) {
         return NextResponse.json({ success: true });

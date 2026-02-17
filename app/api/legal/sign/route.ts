@@ -101,7 +101,17 @@ export async function POST(request: NextRequest) {
 
     const timestamp = new Date().toISOString();
 
+    // Get user profile for role
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    const userRole = profile?.role || 'student';
+
     // Create acceptance records with signature data
+    // Note: Only include columns that exist in the table
     const acceptances = agreements.map(agreementType => {
       const version = versions?.find(v => v.agreement_type === agreementType);
       return {
@@ -109,21 +119,17 @@ export async function POST(request: NextRequest) {
         organization_id: organization_id || null,
         agreement_type: agreementType,
         document_version: version?.current_version || '1.0',
-        document_url: version?.document_url || `/legal/${agreementType}`,
         // Signature fields
         signer_name: signer_name.trim(),
-        signer_title: signer_title?.trim() || null,
         signer_email: signer_email.trim().toLowerCase(),
         signature_method,
-        signature_typed: signature_method === 'typed' ? signature_typed?.trim() : null,
-        signature_data: signature_method === 'drawn' ? signature_data : null,
+        signature_data: signature_method === 'drawn' ? signature_data : (signature_method === 'typed' ? signature_typed?.trim() : null),
         // Metadata
         accepted_at: timestamp,
         ip_address,
         user_agent,
-        acceptance_context: context,
-        stripe_session_id: stripe_session_id || null,
         legal_acknowledgment: true,
+        role_at_signing: userRole,
       };
     });
 

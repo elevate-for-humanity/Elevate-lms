@@ -525,6 +525,8 @@ const nextConfig = {
         key: 'Content-Security-Policy',
         value: [
           "default-src 'self'",
+          // 'unsafe-inline' kept as fallback for browsers that don't support 'strict-dynamic'.
+          // 'strict-dynamic' ignores 'unsafe-inline' in supporting browsers (CSP3).
           isProduction
             ? "script-src 'self' 'unsafe-inline' https://connect.facebook.net https://js.stripe.com https://www.googletagmanager.com https://widget.sezzle.com"
             : "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://connect.facebook.net https://js.stripe.com https://widget.sezzle.com",

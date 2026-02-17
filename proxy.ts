@@ -144,11 +144,10 @@ export async function proxy(request: NextRequest) {
     // Protect /api/admin/*, /api/staff/*, /api/instructor/* at proxy level
     // Individual routes still have their own checks as defense-in-depth
     // ============================================
-    const isWebhookRoute = pathname.includes('/webhook');
     const PROTECTED_API_PREFIXES = ['/api/admin/', '/api/staff/', '/api/instructor/'];
     const isProtectedApi = PROTECTED_API_PREFIXES.some(prefix => pathname.startsWith(prefix));
 
-    if (isProtectedApi && !isWebhookRoute) {
+    if (isProtectedApi && !isWebhook) {
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -196,11 +195,13 @@ export async function proxy(request: NextRequest) {
     }
 
     // Non-protected API routes pass through
-    if (!isProtectedApi) {
+    if (pathname.startsWith('/api/') && !isProtectedApi) {
       return NextResponse.next();
     }
     // Protected API routes that passed auth check also pass through
-    return NextResponse.next();
+    if (isProtectedApi) {
+      return NextResponse.next();
+    }
   }
 
   // ============================================
@@ -378,6 +379,38 @@ export async function proxy(request: NextRequest) {
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl, { status: 307 });
   }
+
+  // ============================================
+  // SERVER-SIDE IDLE TIMEOUT (NIST 800-63B)
+  // Signs out users after 30 minutes of inactivity.
+  // Uses a cookie to track last activity timestamp.
+  // ============================================
+  const IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+  const ACTIVITY_COOKIE = 'efh_last_activity';
+  const now = Date.now();
+  const lastActivity = request.cookies.get(ACTIVITY_COOKIE)?.value;
+
+  if (lastActivity) {
+    const lastActivityTime = parseInt(lastActivity, 10);
+    if (!isNaN(lastActivityTime) && (now - lastActivityTime) > IDLE_TIMEOUT_MS) {
+      // Session expired due to inactivity — sign out and redirect
+      await supabase.auth.signOut();
+      const idleUrl = new URL('/login', request.url);
+      idleUrl.searchParams.set('reason', 'idle');
+      const idleResponse = NextResponse.redirect(idleUrl, { status: 307 });
+      idleResponse.cookies.delete(ACTIVITY_COOKIE);
+      return idleResponse;
+    }
+  }
+
+  // Update last activity timestamp
+  response.cookies.set(ACTIVITY_COOKIE, now.toString(), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: IDLE_TIMEOUT_MS / 1000,
+  });
 
   // Check if route is admin-only
   const isAdminOnlyRoute = ADMIN_ONLY_ROUTES.some((route) =>
@@ -577,35 +610,6 @@ export async function proxy(request: NextRequest) {
   }
   response.headers.set('x-user-id', user.id);
   response.headers.set('x-user-role', userRole);
-
-  // ============================================
-  // SERVER-SIDE IDLE TIMEOUT (NIST 800-63B)
-  // Signs out users after 30 minutes of inactivity.
-  // ============================================
-  const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
-  const ACTIVITY_COOKIE = 'efh_last_activity';
-  const now = Date.now();
-  const lastActivity = request.cookies.get(ACTIVITY_COOKIE)?.value;
-
-  if (lastActivity) {
-    const lastActivityTime = parseInt(lastActivity, 10);
-    if (!isNaN(lastActivityTime) && (now - lastActivityTime) > IDLE_TIMEOUT_MS) {
-      await supabase.auth.signOut();
-      const idleUrl = new URL('/login', request.url);
-      idleUrl.searchParams.set('reason', 'idle');
-      const idleResponse = NextResponse.redirect(idleUrl, { status: 307 });
-      idleResponse.cookies.delete(ACTIVITY_COOKIE);
-      return idleResponse;
-    }
-  }
-
-  response.cookies.set(ACTIVITY_COOKIE, now.toString(), {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: IDLE_TIMEOUT_MS / 1000,
-  });
 
   return response;
 }

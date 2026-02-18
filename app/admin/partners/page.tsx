@@ -164,7 +164,7 @@ export default async function PartnersPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Ready to Get Started?
+              Need Help?
             </h2>
             <p className="text-base md:text-lg text-brand-blue-100 mb-8">
               Manage platform tools and resources for Elevate for Humanity.

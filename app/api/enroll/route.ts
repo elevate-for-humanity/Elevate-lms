@@ -3,26 +3,27 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { completeEnrollment } from '@/lib/enrollment/complete-enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-interface EnrollRequestBody {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
-  programCode?: string;
-  courseId?: string;
-  fundingInterest?: string;
-  referralSource?: string;
-  notes?: string;
-}
+const enrollSchema = z.object({
+  firstName: z.string().min(1).max(100).trim(),
+  lastName: z.string().min(1).max(100).trim(),
+  email: z.string().email().toLowerCase(),
+  phone: z.string().regex(/^[\d\s\-()+ ]+$/).min(10).optional(),
+  programCode: z.string().max(100).optional(),
+  courseId: z.string().uuid().optional(),
+  fundingInterest: z.string().max(200).optional(),
+  referralSource: z.string().max(200).optional(),
+  notes: z.string().max(2000).optional(),
+});
 
 export async function POST(req: NextRequest) {
-    const rateLimited = await applyRateLimit(req, 'contact');
-    if (rateLimited) return rateLimited;
+  const rateLimited = await applyRateLimit(req, 'contact');
+  if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
 
@@ -32,12 +33,20 @@ export async function POST(req: NextRequest) {
     error: authError,
   } = await supabase.auth.getUser();
 
-  let body: EnrollRequestBody;
+  let rawBody: unknown;
   try {
-    body = (await req.json()) as EnrollRequestBody;
-  } catch (error) {
+    rawBody = await req.json();
+  } catch {
     return NextResponse.json(
       { ok: false, error: 'Invalid JSON payload.' },
+      { status: 400 }
+    );
+  }
+
+  const parsed = enrollSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { ok: false, error: 'Validation failed', details: parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`) },
       { status: 400 }
     );
   }
@@ -52,7 +61,7 @@ export async function POST(req: NextRequest) {
     fundingInterest,
     referralSource,
     notes,
-  } = body;
+  } = parsed.data;
 
   // If user is authenticated and enrolling in a course
   if (user && courseId) {

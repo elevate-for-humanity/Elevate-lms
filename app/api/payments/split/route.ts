@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { apiAuthGuard } from '@/lib/authGuards';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+
+const paymentSplitSchema = z.object({
+  enrollment_id: z.string().uuid(),
+  total_amount: z.number().positive(),
+  payment_method: z.enum(['stripe', 'affirm', 'sezzle', 'cash', 'check', 'funded']),
+  transaction_id: z.string().min(1),
+});
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -33,8 +41,15 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
 
   try {
-    const { enrollment_id, total_amount, payment_method, transaction_id } =
-      await request.json();
+    const body = await request.json();
+    const parsed = paymentSplitSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`) },
+        { status: 400 }
+      );
+    }
+    const { enrollment_id, total_amount, payment_method, transaction_id } = parsed.data;
 
     // Get enrollment details
     const { data: enrollment, error: enrollError } = await supabase

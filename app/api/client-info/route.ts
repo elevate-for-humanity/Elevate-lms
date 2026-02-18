@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Returns client information for audit trail purposes.
  * Used by compliance enforcement to capture IP address.
  */
 export async function GET(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
   const headersList = await headers();
   
   // Get IP from various headers (in order of preference)

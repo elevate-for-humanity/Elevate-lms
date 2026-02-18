@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 interface BlameInfo {
   sha: string;
@@ -130,12 +131,12 @@ export function BlameGutter({ repo, path, branch, token, lineCount, visible }: B
                   flex: 1,
                 }}>
                   {group.info.avatar && (
-                    <img 
+                    <Image 
                       src={group.info.avatar} 
                       alt={group.info.author || 'Author'} 
+                      width={14}
+                      height={14}
                       style={{ 
-                        width: 14, 
-                        height: 14, 
                         borderRadius: '50%', 
                         marginRight: 4,
                         verticalAlign: 'middle',

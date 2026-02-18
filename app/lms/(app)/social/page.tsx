@@ -7,6 +7,7 @@ import {
   Users, MessageSquare, Heart, Share2, Image as ImageIcon,
   Plus, Search, Bell, UserPlus, TrendingUp, Trophy, Flame, Award
 } from 'lucide-react';
+import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +65,7 @@ export default async function SocialPage() {
               <div className="px-4 pb-4">
                 <div className="w-16 h-16 bg-gray-200 rounded-full border-4 border-white -mt-8 flex items-center justify-center">
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt={profile?.full_name || 'Your profile'} className="w-full h-full rounded-full object-cover" />
+                    <Image src={profile.avatar_url} alt={profile?.full_name || 'Your profile'} width={48} height={48} className="w-full h-full rounded-full object-cover" />
                   ) : (
                     <Users className="w-8 h-8 text-gray-400" />
                   )}
@@ -115,7 +116,7 @@ export default async function SocialPage() {
               <div className="flex gap-4">
                 <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt={profile?.full_name || 'Your profile'} className="w-full h-full rounded-full object-cover" />
+                    <Image src={profile.avatar_url} alt={profile?.full_name || 'Your profile'} width={48} height={48} className="w-full h-full rounded-full object-cover" />
                   ) : (
                     <Users className="w-5 h-5 text-gray-400" />
                   )}

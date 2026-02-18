@@ -80,18 +80,18 @@ export default function DisableDevTools() {
     // Clear console and add warning
     const clearConsole = () => {
       console.clear();
-      // console.log(
+      /* console.log(
         '%c⚠️ Warning',
         'color: red; font-size: 24px; font-weight: bold;'
       );
-      // console.log(
+      console.log(
         '%cThis browser feature is intended for developers. If someone told you to copy-paste something here, it is a scam.',
         'color: red; font-size: 14px;'
       );
-      // console.log(
+      console.log(
         '%cElevate for Humanity - Empowering Communities Through Education',
         'color: #2563eb; font-size: 12px;'
-      );
+      ); */
     };
 
     // Detect devtools open (basic detection)

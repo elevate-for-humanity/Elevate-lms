@@ -12,6 +12,7 @@ import {
   Play, Phone, GraduationCap, Briefcase, Shield, MapPin,
   FileCheck, AlertTriangle, Fuel, Route
 } from 'lucide-react';
+import Image from 'next/image';
 
 export default function CDLProgramPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -118,7 +119,7 @@ export default function CDLProgramPage() {
       {/* Hero */}
       <section className="relative text-white overflow-hidden">
         <div className="absolute inset-0">
-          <img src="/images/cdl-vibrant.jpg" alt="CDL Training" className="w-full h-full object-cover" />
+          <Image src="/images/cdl-vibrant.jpg" alt="CDL Training" fill className="object-cover" />
           
         </div>
         

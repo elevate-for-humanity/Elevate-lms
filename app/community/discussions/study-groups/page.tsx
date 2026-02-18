@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Users, MessageSquare, ThumbsUp, Clock, User, Plus, Pin } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'Study Groups | Community | Elevate For Humanity',
@@ -79,7 +80,7 @@ export default async function StudyGroupsPage() {
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
                     {discussion.author?.avatar_url ? (
-                      <img src={discussion.author.avatar_url} alt="Author avatar" className="w-full h-full rounded-full object-cover" />
+                      <Image src={discussion.author.avatar_url} alt="Author avatar" width={40} height={40} className="w-full h-full rounded-full object-cover" />
                     ) : (
                       <User className="w-5 h-5 text-gray-400" />
                     )}

@@ -48,7 +48,7 @@ describe('FundingImpactPage', () => {
   it('displays success stories section', () => {
     render(<FundingImpactPage />);
     expect(screen.getByText('Real Stories, Real Impact')).toBeInTheDocument();
-    expect(screen.getByText('Marcus J.')).toBeInTheDocument();
+    expect(screen.getByText('Graduate J.')).toBeInTheDocument();
     expect(screen.getByText('Sarah T.')).toBeInTheDocument();
     expect(screen.getByText('David W.')).toBeInTheDocument();
   });

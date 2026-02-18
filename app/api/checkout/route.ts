@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { z } from 'zod';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -8,6 +9,15 @@ import { billingConfigs } from '../../../lms-data/billingConfig';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+
+const checkoutSchema = z.object({
+  programId: z.string().min(1),
+  planType: z.enum(['full', 'payment-plan']).optional(),
+  successUrl: z.string().url().optional(),
+  cancelUrl: z.string().url().optional(),
+  customerEmail: z.string().email().optional(),
+  metadata: z.record(z.string(), z.string()).optional(),
+});
 
 const stripe = getStripe();
 
@@ -27,21 +37,14 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { programId, planType, successUrl, cancelUrl, customerEmail, metadata } = body as {
-      programId: string;
-      planType?: 'full' | 'payment-plan';
-      successUrl?: string;
-      cancelUrl?: string;
-      customerEmail?: string;
-      metadata?: Record<string, string>;
-    };
-
-    if (!programId) {
+    const parsed = checkoutSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Missing programId in request body.' },
+        { error: 'Invalid request', details: parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`) },
         { status: 400 }
       );
     }
+    const { programId, planType, successUrl, cancelUrl, customerEmail, metadata } = parsed.data;
 
     const config = billingConfigs.find((c) => c.programId === programId);
     if (!config) {

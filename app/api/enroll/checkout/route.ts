@@ -25,6 +25,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+import { z } from 'zod';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
@@ -32,13 +33,13 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-interface CheckoutRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
-  programSlug: string;
-}
+const enrollCheckoutSchema = z.object({
+  firstName: z.string().min(1).max(100).trim(),
+  lastName: z.string().min(1).max(100).trim(),
+  email: z.string().email().toLowerCase(),
+  phone: z.string().regex(/^[\d\s\-()+ ]+$/).min(10).optional(),
+  programSlug: z.string().min(1).max(100),
+});
 
 export async function POST(req: Request) {
   try {
@@ -53,15 +54,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const body: CheckoutRequest = await req.json();
-    const { firstName, lastName, email, phone, programSlug } = body;
-
-    if (!firstName || !lastName || !email || !programSlug) {
+    const body = await req.json();
+    const parsed = enrollCheckoutSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Validation failed', details: parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`) },
         { status: 400 }
       );
     }
+    const { firstName, lastName, email, phone, programSlug } = parsed.data;
 
     const supabase = await createClient();
 

@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   ClipboardCheck, Users, Calendar, Clock, 
   CheckCircle, XCircle, AlertCircle, ArrowLeft, Save
@@ -149,9 +150,11 @@ export default async function TakeAttendancePage() {
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                         {student.profiles?.avatar_url ? (
-                          <img 
+                          <Image 
                             src={student.profiles.avatar_url} 
-                            alt="" 
+                            alt="Student photo"
+                            width={40}
+                            height={40}
                             className="w-full h-full rounded-full object-cover" 
                           />
                         ) : (

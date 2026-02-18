@@ -7,6 +7,7 @@ import {
   User, CreditCard, Key, Bell, Shield, FileText, 
   ChevronRight, Settings, LogOut
 } from 'lucide-react';
+import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
 
@@ -95,11 +96,7 @@ export default async function AccountPage() {
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center">
               {profile?.avatar_url ? (
-                <img 
-                  src={profile.avatar_url} 
-                  alt={profile.full_name || 'Profile'} 
-                  className="w-16 h-16 rounded-full object-cover"
-                />
+                <Image src={profile.avatar_url} alt={profile.full_name || 'Profile'} width={64} height={64} className="w-16 h-16 rounded-full object-cover" />
               ) : (
                 <User className="w-8 h-8 text-brand-blue-600" />
               )}

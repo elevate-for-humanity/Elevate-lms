@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { User, Video, Phone, MapPin } from 'lucide-react';
+import Image from 'next/image';
 
 interface Advisor {
   id: string;
@@ -130,7 +131,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
                 }`}>
                 <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mb-3">
                   {advisor.avatar_url ? (
-                    <img src={advisor.avatar_url} alt={advisor.full_name || 'Advisor'} className="w-full h-full rounded-full object-cover" />
+                    <Image src={advisor.avatar_url} alt={advisor.full_name || 'Advisor'} width={48} height={48} className="w-full h-full rounded-full object-cover" />
                   ) : (
                     <User className="w-6 h-6 text-gray-500" />
                   )}

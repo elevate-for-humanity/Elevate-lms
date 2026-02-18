@@ -420,7 +420,7 @@ export default async function CashAdvancesAdminPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-6">
-              Ready to Get Started?
+              Need Help?
             </h2>
             <p className="text-base md:text-lg mb-8 text-brand-blue-100">
               Call (317) 314-3757 or apply online for a better career today.

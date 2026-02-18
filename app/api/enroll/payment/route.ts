@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
@@ -5,6 +6,15 @@ import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { paymentRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+
+const enrollPaymentSchema = z.object({
+  amount: z.number().positive(),
+  program: z.string().min(1).max(100),
+  paymentType: z.enum(['full', 'deposit', 'payment-plan']).optional(),
+  description: z.string().max(500).optional(),
+  successUrl: z.string().url().optional(),
+  cancelUrl: z.string().url().optional(),
+});
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -45,8 +55,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const body = await req.json();
-    const { amount, program, paymentType, description, successUrl, cancelUrl } = body;
+    const rawBody = await req.json();
+    const parsed = enrollPaymentSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`) },
+        { status: 400 }
+      );
+    }
+    const { amount, program, paymentType, description, successUrl, cancelUrl } = parsed.data;
 
     if (!amount || !program || !successUrl || !cancelUrl) {
       return NextResponse.json(

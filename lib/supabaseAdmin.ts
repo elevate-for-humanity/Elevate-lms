@@ -1,3 +1,4 @@
+/** @deprecated Use canonical clients: @/lib/supabase/client, @/lib/supabase/server, @/lib/supabase/admin */
 // lib/supabaseAdmin.ts
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 

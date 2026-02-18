@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { Save, Loader2, Camera, User as UserIcon } from 'lucide-react';
+import Image from 'next/image';
 
 interface ProfileEditFormProps {
   user: User;
@@ -79,7 +80,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
           <div className="relative">
             <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
               {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt={`${profile.full_name || 'User'} profile photo`} className="w-full h-full object-cover" />
+                <Image src={profile.avatar_url} alt={`${profile.full_name || 'User'} profile photo`} width={96} height={96} className="w-full h-full object-cover" />
               ) : (
                 <UserIcon className="w-12 h-12 text-gray-400" />
               )}

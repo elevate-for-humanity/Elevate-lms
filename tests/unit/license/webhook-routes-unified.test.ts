@@ -134,12 +134,12 @@ describe('Simulated Webhook Events', () => {
 });
 
 describe('Route Identification Logging', () => {
-  it('/api/license/webhook logs with [webhook] prefix', () => {
+  it('/api/license/webhook logs with [license-webhook] prefix', () => {
     const filePath = path.join(process.cwd(), 'app/api/license/webhook/route.ts');
     const content = fs.readFileSync(filePath, 'utf-8');
     
-    // Uses [webhook] prefix for logging
-    expect(content).toContain('[webhook]');
+    // Uses [license-webhook] prefix for logging
+    expect(content).toContain('[license-webhook]');
   });
 
   it('/api/licenses/webhook logs with [/api/licenses/webhook] prefix', () => {

@@ -3,23 +3,22 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { parseBody } from '@/lib/api-helpers';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { apiAuthGuard } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-interface CustomerInfo {
-  email: string;
-  contactName: string;
-  organizationName: string;
-  phone?: string;
-}
-
-interface RequestBody {
-  productId: string;
-  customerInfo: CustomerInfo;
-}
+const licensePaymentSchema = z.object({
+  productId: z.string().min(1),
+  customerInfo: z.object({
+    email: z.string().email(),
+    contactName: z.string().min(1).max(200),
+    organizationName: z.string().min(1).max(200),
+    phone: z.string().regex(/^[\d\s\-()+ ]+$/).min(10).optional(),
+  }),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,15 +30,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: auth.error || 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await parseBody<RequestBody>(request);
-    const { productId, customerInfo } = body;
-
-    if (!productId || !customerInfo) {
+    const body = await parseBody<z.infer<typeof licensePaymentSchema>>(request);
+    const parsed = licensePaymentSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Invalid request', details: parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`) },
         { status: 400 }
       );
     }
+    const { productId, customerInfo } = parsed.data;
 
     // Get product details
     const products = await import('@/app/data/store-products');

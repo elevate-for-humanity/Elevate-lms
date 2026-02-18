@@ -15,7 +15,7 @@ describe('SiteHeader', () => {
     const visibleTextClasses = [
       'text-gray-900',
       'text-gray-700',
-      'text-blue-600',
+      'text-brand-blue-600',
     ];
 
     // Classes that would be invisible on white background
@@ -35,8 +35,8 @@ describe('SiteHeader', () => {
     // Check that the logo text uses visible color
     expect(headerSource).toContain('text-gray-900');
     
-    // Check that phone number uses visible color
-    expect(headerSource).toContain('text-gray-700 hover:text-blue-600');
+    // Check that phone number uses visible color (brand-blue-600 per brand token convention)
+    expect(headerSource).toContain('text-gray-700 hover:text-brand-blue-600');
     
     // Verify no conditional white text on elements that should always be visible
     // The pattern "? 'text-gray-" should not be followed by white text alternatives

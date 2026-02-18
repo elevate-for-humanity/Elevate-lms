@@ -16,6 +16,7 @@ import {
   FileText,
   Award,
 } from 'lucide-react';
+import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
 
@@ -117,7 +118,7 @@ export default async function EmployeeDetailPage({ params }: Props) {
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center">
               {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt={`${profile?.first_name} ${profile?.last_name}`} className="w-16 h-16 rounded-full object-cover" />
+                <Image src={profile.avatar_url} alt={`${profile?.first_name} ${profile?.last_name}`} width={64} height={64} className="w-16 h-16 rounded-full object-cover" />
               ) : (
                 <User className="w-8 h-8 text-brand-blue-600" />
               )}

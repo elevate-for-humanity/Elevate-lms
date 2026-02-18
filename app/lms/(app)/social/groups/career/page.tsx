@@ -8,6 +8,7 @@ import {
   FileText, Share2, Bell, Settings, Plus,
   ThumbsUp, MessageCircle, Bookmark
 } from 'lucide-react';
+import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
 
@@ -146,7 +147,7 @@ export default async function CareerGroupPage() {
               <div className="flex gap-4">
                 <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+                    <Image src={profile.avatar_url} alt={`${profile.full_name || "Member"} avatar`} width={48} height={48} className="w-full h-full rounded-full object-cover" />
                   ) : (
                     <Users className="w-5 h-5 text-gray-400" />
                   )}

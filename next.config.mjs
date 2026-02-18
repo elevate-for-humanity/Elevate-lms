@@ -185,6 +185,7 @@ const nextConfig = {
   },
 
   typescript: {
+    // OOMs during type-check on 4,450+ files in CI — keep enabled until project is split or memory increased
     ignoreBuildErrors: true,
   },
   // Removed staticPageGenerationTimeout - use route segment config instead
@@ -502,7 +503,7 @@ const nextConfig = {
       },
       {
         key: 'X-Frame-Options',
-        value: 'SAMEORIGIN',
+        value: 'DENY',
       },
       {
         key: 'X-Content-Type-Options',

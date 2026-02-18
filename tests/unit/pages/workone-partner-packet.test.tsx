@@ -91,17 +91,16 @@ describe('WorkOnePartnerPacketPage', () => {
 
   it('displays contact information', () => {
     render(<WorkOnePartnerPacketPage />);
-    expect(screen.getByText('(317) 314-3757')).toBeInTheDocument();
-    expect(screen.getByText('elevate4humanityedu@gmail.com')).toBeInTheDocument();
+    // Page uses contact form links instead of inline phone/email
+    const contactLinks = screen.getAllByRole('link', { name: /contact/i });
+    expect(contactLinks.length).toBeGreaterThan(0);
   });
 
   it('has correct contact links', () => {
     render(<WorkOnePartnerPacketPage />);
-    const phoneLink = screen.getByRole('link', { name: /317.*314.*3757/i });
-    expect(phoneLink).toHaveAttribute('href', 'tel:+13173143757');
-    
-    const emailLink = screen.getByRole('link', { name: /elevate4humanityedu@gmail/i });
-    expect(emailLink).toHaveAttribute('href', 'mailto:elevate4humanityedu@gmail.com');
+    const contactLinks = screen.getAllByRole('link', { name: /contact/i });
+    const hasContactHref = contactLinks.some(link => link.getAttribute('href') === '/contact');
+    expect(hasContactHref).toBe(true);
   });
 
   it('displays CTA section', () => {

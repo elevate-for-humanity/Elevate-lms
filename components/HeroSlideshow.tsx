@@ -151,9 +151,7 @@ export default function HeroSlideshow() {
               priority={index === 0}
               quality={100}
             />
-          ) : (
-            
-          )}
+          ) : null}
           <div className="relative h-full flex items-center">
             <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
               <div className="max-w-3xl">

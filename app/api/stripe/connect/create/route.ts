@@ -3,11 +3,16 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+import { z } from 'zod';
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+
+const connectCreateSchema = z.object({
+  employer_id: z.string().uuid(),
+});
 
 export async function POST(req: Request) {
   try {
@@ -18,7 +23,14 @@ export async function POST(req: Request) {
     if (auth instanceof NextResponse) return auth;
 
     const body = await req.json();
-    const { employer_id } = body;
+    const parsed = connectCreateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`) },
+        { status: 400 }
+      );
+    }
+    const { employer_id } = parsed.data;
 
     if (!process.env.STRIPE_SECRET_KEY) {
       return NextResponse.json(

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 // Using Node.js runtime for Resend compatibility
 export const maxDuration = 60;
 
+import { z } from 'zod';
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
@@ -15,12 +16,33 @@ import {
 import { checkRateLimit, verifyTurnstileToken } from '@/lib/turnstile';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+const enrollApplySchema = z.object({
+  firstName: z.string().min(1).max(100).trim(),
+  lastName: z.string().min(1).max(100).trim(),
+  email: z.string().email().toLowerCase(),
+  phone: z.string().regex(/^[\d\s\-()+ ]+$/).min(10).optional(),
+  preferredProgramId: z.string().min(1),
+  fundingInterest: z.string().max(200).optional(),
+  fundingSource: z.string().max(200).optional(),
+  referralSource: z.string().max(200).optional(),
+  notes: z.string().max(2000).optional(),
+  turnstileToken: z.string().optional(),
+});
+
 export async function POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
 
-    const body = await req.json().catch(() => ({}));
+    const rawBody = await req.json().catch(() => ({}));
+    const parsed = enrollApplySchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { message: `Validation failed: ${parsed.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', ')}` },
+        { status: 400 }
+      );
+    }
+    const body = parsed.data;
 
     // Rate limiting by email
     if (body.email) {
@@ -46,18 +68,6 @@ export async function POST(req: Request) {
           { status: 400 }
         );
       }
-    }
-
-    const required = ['firstName', 'lastName', 'email', 'preferredProgramId'];
-    const missing = required.filter((key) => !body[key]);
-
-    if (missing.length) {
-      return NextResponse.json(
-        {
-          message: `Missing required fields: ${missing.join(', ')}`,
-        },
-        { status: 400 }
-      );
     }
 
     const supabase = await createClient();

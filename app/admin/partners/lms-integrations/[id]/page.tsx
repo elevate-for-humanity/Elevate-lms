@@ -17,6 +17,7 @@ import {
   Trash2,
   ExternalLink,
 CheckCircle, } from 'lucide-react';
+import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
 
@@ -112,7 +113,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center">
               {provider.logo_url ? (
-                <img src={provider.logo_url} alt={`${provider.provider_name} logo`} className="w-12 h-12 object-contain" />
+                <Image src={provider.logo_url} alt={`${provider.provider_name} logo`} width={48} height={48} className="w-12 h-12 object-contain" />
               ) : (
                 <Globe className="w-8 h-8 text-brand-blue-600" />
               )}

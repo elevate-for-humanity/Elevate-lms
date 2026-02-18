@@ -3,6 +3,12 @@
 -- ============================================================================
 
 -- ============================================
+-- 0. ENSURE UNIQUE CONSTRAINTS EXIST (pre-existing tables may lack them)
+-- ============================================
+CREATE UNIQUE INDEX IF NOT EXISTS idx_grant_opportunities_external_id_unique ON grant_opportunities(external_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_site_settings_key_unique ON site_settings(key);
+
+-- ============================================
 -- 1. DELETE FAKE DONATIONS (all have @example.com or @company.com emails)
 -- ============================================
 DELETE FROM donations

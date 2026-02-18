@@ -1,24 +1,22 @@
--- ============================================================================
--- Cleanup fake/test data and seed tables with real operational data
--- ============================================================================
+-- Phase 5: Cleanup fake data and seed real operational data
+-- Safe to re-run. All inserts use ON CONFLICT DO NOTHING.
 
--- ============================================
--- 0. ENSURE UNIQUE CONSTRAINTS EXIST (pre-existing tables may lack them)
--- ============================================
+-- Ensure unique constraints exist for ON CONFLICT clauses
 CREATE UNIQUE INDEX IF NOT EXISTS idx_grant_opportunities_external_id_unique ON grant_opportunities(external_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_site_settings_key_unique ON site_settings(key);
 
--- ============================================
--- 1. DELETE FAKE DONATIONS (all have @example.com or @company.com emails)
--- ============================================
+-- Add missing columns to quiz_questions (pre-existing table has different schema)
+ALTER TABLE quiz_questions ADD COLUMN IF NOT EXISTS options JSONB DEFAULT '[]';
+ALTER TABLE quiz_questions ADD COLUMN IF NOT EXISTS correct_answer TEXT;
+ALTER TABLE quiz_questions ADD COLUMN IF NOT EXISTS sort_order INTEGER DEFAULT 0;
+
+-- Delete fake donations
 DELETE FROM donations
 WHERE donor_email LIKE '%@example.com'
    OR donor_email LIKE '%@company.com'
    OR donor_name IN ('John Smith', 'Jane Doe', 'Corporate Sponsor', 'Monthly Supporter', 'Anonymous');
 
--- ============================================
--- 2. DELETE TEST APPLICATIONS
--- ============================================
+-- Delete test applications
 DELETE FROM applications
 WHERE email LIKE '%@test.com'
    OR email LIKE '%@example.com'
@@ -31,9 +29,7 @@ WHERE email LIKE '%@test.com'
    OR (first_name = 'Launch' AND last_name = 'Test')
    OR (first_name = 'Verify' AND last_name = 'Test');
 
--- ============================================
--- 3. REPLACE GRANT OPPORTUNITIES with real data
--- ============================================
+-- Replace grant opportunities with real data
 DELETE FROM grant_opportunities
 WHERE external_id IN ('wig-2026', 'hti-2026', 'sef-2026', 'cdbg-2026', 'gjt-2026');
 
@@ -45,9 +41,7 @@ INSERT INTO grant_opportunities (external_id, title, description, funder, amount
   ('next-level-jobs', 'Next Level Jobs — Workforce Ready Grant', 'Indiana state program covering tuition and fees for high-demand certificate programs in healthcare, IT, advanced manufacturing, building/construction, and transportation/logistics.', 'Indiana Commission for Higher Education', 0, 8000, NULL, ARRAY['workforce','indiana','tuition'], 'open', 'https://www.in.gov/che/state-financial-aid/workforce-ready-grant/')
 ON CONFLICT (external_id) DO NOTHING;
 
--- ============================================
--- 4. SEED SITE_SETTINGS
--- ============================================
+-- Seed site_settings
 INSERT INTO site_settings (key, value) VALUES
   ('contact_info', '{"phone": "(317) 314-3757", "email": "info@elevateforhumanity.org", "address": "Indianapolis, IN", "hours": "Mon-Fri 9am-5pm EST"}'),
   ('enrollment_contact', '{"phone": "(317) 314-3757", "email": "enroll@elevateforhumanity.org", "name": "Enrollment Services"}'),
@@ -65,13 +59,7 @@ INSERT INTO site_settings (key, value) VALUES
   ('custom_styles', '{"primary_color": "#dc2626", "secondary_color": "#2563eb"}')
 ON CONFLICT (key) DO NOTHING;
 
--- ============================================
--- 5. SEED BADGES
--- ============================================
--- App reads icon_url and criteria but table has icon; add columns if missing
-ALTER TABLE badges ADD COLUMN IF NOT EXISTS icon_url TEXT;
-ALTER TABLE badges ADD COLUMN IF NOT EXISTS criteria JSONB DEFAULT '{}';
-
+-- Seed badges
 INSERT INTO badges (name, description, icon, icon_url, category, rarity, points, criteria) VALUES
   ('First Login', 'Logged into the platform for the first time', 'log-in', '/images/badges/first-login.svg', 'engagement', 'common', 10, '{"type": "login", "count": 1}'),
   ('Course Starter', 'Started your first course', 'book-open', '/images/badges/course-starter.svg', 'learning', 'common', 25, '{"type": "course_start", "count": 1}'),
@@ -85,14 +73,7 @@ INSERT INTO badges (name, description, icon, icon_url, category, rarity, points,
   ('Community Helper', 'Helped 5 peers in the discussion forums', 'users', '/images/badges/community.svg', 'engagement', 'uncommon', 100, '{"type": "forum_replies", "count": 5}')
 ON CONFLICT DO NOTHING;
 
--- ============================================
--- 6. SEED ANNOUNCEMENTS
--- ============================================
--- App queries severity/audience/expires_at but table may not have them
-ALTER TABLE announcements ADD COLUMN IF NOT EXISTS severity TEXT DEFAULT 'info';
-ALTER TABLE announcements ADD COLUMN IF NOT EXISTS audience TEXT DEFAULT 'all';
-ALTER TABLE announcements ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
-
+-- Seed announcements (posted_by = admin@elevateforhumanity.org)
 INSERT INTO announcements (title, body, posted_by, severity, audience, published, published_at, expires_at) VALUES
   ('Welcome to Elevate for Humanity', 'We are excited to have you on the platform. Explore our programs, check your eligibility, and start your career journey today.', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f', 'info', 'all', true, NOW(), NULL),
   ('Spring 2026 Enrollment Open', 'Enrollment is now open for Spring 2026 cohorts across all programs. Apply early — seats are limited and WIOA funding is first-come, first-served.', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f', 'info', 'all', true, NOW(), '2026-04-01T00:00:00Z'),
@@ -101,26 +82,17 @@ INSERT INTO announcements (title, body, posted_by, severity, audience, published
   ('Financial Aid Deadline Reminder', 'WIOA funding applications for the current quarter close at the end of this month. Submit your eligibility documents to your case manager.', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f', 'warning', 'student', true, NOW(), '2026-03-31T00:00:00Z')
 ON CONFLICT DO NOTHING;
 
--- ============================================
--- 7. SEED EVENTS
--- ============================================
--- App queries start_time/end_time but table has start_date; add columns if missing
-ALTER TABLE events ADD COLUMN IF NOT EXISTS start_time TIMESTAMPTZ;
-ALTER TABLE events ADD COLUMN IF NOT EXISTS end_time TIMESTAMPTZ;
-ALTER TABLE events ADD COLUMN IF NOT EXISTS location TEXT;
-
+-- Seed events
 INSERT INTO events (title, description, event_type, start_time, end_time, location) VALUES
   ('New Student Orientation', 'Required orientation for all new students. Learn about program expectations, campus resources, and meet your instructors.', 'orientation', NOW() + INTERVAL '7 days', NOW() + INTERVAL '7 days' + INTERVAL '2 hours', 'Indianapolis Campus — Room 101'),
   ('WIOA Eligibility Workshop', 'Free workshop to help you determine your eligibility for WIOA-funded training programs. Bring your ID and proof of income.', 'workshop', NOW() + INTERVAL '14 days', NOW() + INTERVAL '14 days' + INTERVAL '90 minutes', 'Indianapolis Campus — Room 205'),
-  ('Employer Meet & Greet', 'Network with hiring employers from healthcare, skilled trades, and technology sectors. Open to all current students and recent graduates.', 'career_fair', NOW() + INTERVAL '21 days', NOW() + INTERVAL '21 days' + INTERVAL '3 hours', 'Indianapolis Campus — Main Hall'),
+  ('Employer Meet and Greet', 'Network with hiring employers from healthcare, skilled trades, and technology sectors. Open to all current students and recent graduates.', 'career_fair', NOW() + INTERVAL '21 days', NOW() + INTERVAL '21 days' + INTERVAL '3 hours', 'Indianapolis Campus — Main Hall'),
   ('CNA Certification Exam Prep', 'Review session for students preparing for the Indiana CNA state exam. Covers clinical skills and written test strategies.', 'workshop', NOW() + INTERVAL '10 days', NOW() + INTERVAL '10 days' + INTERVAL '2 hours', 'Indianapolis Campus — Lab B'),
   ('Financial Literacy Seminar', 'Learn budgeting, credit building, and financial planning. Open to all students and community members.', 'seminar', NOW() + INTERVAL '28 days', NOW() + INTERVAL '28 days' + INTERVAL '90 minutes', 'Virtual — Zoom'),
   ('Spring Graduation Ceremony', 'Celebrate the achievements of our Spring 2026 graduates. Family and friends welcome.', 'graduation', NOW() + INTERVAL '90 days', NOW() + INTERVAL '90 days' + INTERVAL '3 hours', 'Indianapolis Campus — Auditorium')
 ON CONFLICT DO NOTHING;
 
--- ============================================
--- 8. SEED BLOG_POSTS
--- ============================================
+-- Seed blog_posts (author_id = admin@elevateforhumanity.org)
 INSERT INTO blog_posts (title, slug, content, excerpt, published, published_at, category, featured_image, author_id) VALUES
   ('How WIOA Funding Can Pay for Your Career Training',
    'wioa-funding-career-training',
@@ -149,15 +121,7 @@ INSERT INTO blog_posts (title, slug, content, excerpt, published, published_at, 
    true, NOW() - INTERVAL '45 days', 'apprenticeships', '/images/heroes-hq/jri-hero.jpg', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f')
 ON CONFLICT DO NOTHING;
 
--- ============================================
--- 9. SEED MOU_TEMPLATES
--- ============================================
--- App queries title/content/version/is_active but table has name/active
-ALTER TABLE mou_templates ADD COLUMN IF NOT EXISTS title TEXT;
-ALTER TABLE mou_templates ADD COLUMN IF NOT EXISTS content TEXT;
-ALTER TABLE mou_templates ADD COLUMN IF NOT EXISTS version TEXT DEFAULT '1.0';
-ALTER TABLE mou_templates ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
-
+-- Seed MOU template
 INSERT INTO mou_templates (name, title, content, version, is_active) VALUES
   ('program_holder_mou', 'Program Holder Memorandum of Understanding',
    'This Memorandum of Understanding ("MOU") is entered into between Elevate for Humanity Career & Technical Institute, operated by 2Exclusive LLC-S ("Elevate"), and the undersigned Program Holder ("Partner").
@@ -185,11 +149,7 @@ INSERT INTO mou_templates (name, title, content, version, is_active) VALUES
    '1.0', true)
 ON CONFLICT DO NOTHING;
 
--- notification_preferences: per-user rows created on first login, no seed needed
-
--- ============================================
--- 11. SEED SOCIAL_MEDIA_SETTINGS
--- ============================================
+-- Seed social media settings
 INSERT INTO social_media_settings (platform, handle, url, is_active) VALUES
   ('facebook', 'ElevateForHumanity', 'https://www.facebook.com/ElevateForHumanity', true),
   ('instagram', 'elevateforhumanity', 'https://www.instagram.com/elevateforhumanity', true),
@@ -197,36 +157,26 @@ INSERT INTO social_media_settings (platform, handle, url, is_active) VALUES
   ('youtube', 'ElevateForHumanity', 'https://www.youtube.com/@ElevateForHumanity', true)
 ON CONFLICT DO NOTHING;
 
--- ============================================
--- 12. SEED QUIZZES + QUESTIONS (CNA program sample)
--- ============================================
--- Add missing columns to quiz_questions (pre-existing table has different schema)
-ALTER TABLE quiz_questions ADD COLUMN IF NOT EXISTS options JSONB DEFAULT '[]';
-ALTER TABLE quiz_questions ADD COLUMN IF NOT EXISTS correct_answer TEXT;
-ALTER TABLE quiz_questions ADD COLUMN IF NOT EXISTS sort_order INTEGER DEFAULT 0;
-
--- Use a DO block to insert quizzes and reference their auto-generated IDs for questions
+-- Seed quizzes and questions
 DO $$
 DECLARE
   cna_quiz_id UUID;
   hvac_quiz_id UUID;
   workplace_quiz_id UUID;
 BEGIN
-  -- Only insert if no quizzes exist yet
   IF NOT EXISTS (SELECT 1 FROM quizzes LIMIT 1) THEN
     INSERT INTO quizzes (title, description, passing_score, time_limit_minutes, is_published)
     VALUES ('CNA Fundamentals Quiz', 'Test your knowledge of basic nursing assistant concepts, patient rights, and infection control.', 70, 30, true)
     RETURNING id INTO cna_quiz_id;
 
     INSERT INTO quizzes (title, description, passing_score, time_limit_minutes, is_published)
-    VALUES ('HVAC Safety & Tools Quiz', 'Assessment covering HVAC safety protocols, tool identification, and basic refrigeration principles.', 70, 25, true)
+    VALUES ('HVAC Safety and Tools Quiz', 'Assessment covering HVAC safety protocols, tool identification, and basic refrigeration principles.', 70, 25, true)
     RETURNING id INTO hvac_quiz_id;
 
     INSERT INTO quizzes (title, description, passing_score, time_limit_minutes, is_published)
     VALUES ('Workplace Readiness Assessment', 'Evaluate your understanding of professional communication, time management, and workplace expectations.', 80, 20, true)
     RETURNING id INTO workplace_quiz_id;
 
-    -- CNA Questions
     INSERT INTO quiz_questions (quiz_id, question_text, question_type, options, correct_answer, points, sort_order) VALUES
       (cna_quiz_id, 'What is the primary purpose of hand hygiene in healthcare settings?', 'multiple_choice', '["Prevent infection transmission", "Keep hands soft", "Meet dress code requirements", "Reduce workload"]', 'Prevent infection transmission', 10, 1),
       (cna_quiz_id, 'A patient has the right to refuse treatment. True or false?', 'true_false', '["True", "False"]', 'True', 10, 2),
@@ -234,14 +184,12 @@ BEGIN
       (cna_quiz_id, 'When should a CNA report a change in a patient condition?', 'multiple_choice', '["Immediately to the nurse", "At the end of the shift", "Only if the patient asks", "During the next team meeting"]', 'Immediately to the nurse', 10, 4),
       (cna_quiz_id, 'What does the abbreviation ADL stand for?', 'multiple_choice', '["Activities of Daily Living", "Advanced Drug List", "Acute Disease Level", "Assisted Device Logistics"]', 'Activities of Daily Living', 10, 5);
 
-    -- HVAC Questions
     INSERT INTO quiz_questions (quiz_id, question_text, question_type, options, correct_answer, points, sort_order) VALUES
       (hvac_quiz_id, 'What refrigerant is commonly used in residential air conditioning systems?', 'multiple_choice', '["R-410A", "R-12", "Ammonia", "Propane"]', 'R-410A', 10, 1),
       (hvac_quiz_id, 'Before working on any electrical component, you should first:', 'multiple_choice', '["Disconnect power and verify with a meter", "Wear rubber gloves only", "Ask a coworker to watch", "Check the thermostat"]', 'Disconnect power and verify with a meter', 10, 2),
       (hvac_quiz_id, 'What tool is used to measure refrigerant pressure?', 'multiple_choice', '["Manifold gauge set", "Multimeter", "Anemometer", "Hygrometer"]', 'Manifold gauge set', 10, 3),
       (hvac_quiz_id, 'EPA Section 608 certification is required to handle refrigerants. True or false?', 'true_false', '["True", "False"]', 'True', 10, 4);
 
-    -- Workplace Readiness Questions
     INSERT INTO quiz_questions (quiz_id, question_text, question_type, options, correct_answer, points, sort_order) VALUES
       (workplace_quiz_id, 'Which is the most professional way to handle a disagreement with a coworker?', 'multiple_choice', '["Discuss it privately and calmly", "Complain to other coworkers", "Ignore the person", "Send an angry email"]', 'Discuss it privately and calmly', 10, 1),
       (workplace_quiz_id, 'Arriving 5-10 minutes before your shift starts is considered:', 'multiple_choice', '["Professional and expected", "Optional", "Only for new employees", "Unnecessary"]', 'Professional and expected', 10, 2),
@@ -249,6 +197,8 @@ BEGIN
       (workplace_quiz_id, 'Dressing appropriately for your workplace shows:', 'multiple_choice', '["Professionalism and respect", "That you want a promotion", "You have extra money", "Nothing important"]', 'Professionalism and respect', 10, 4);
   END IF;
 END $$;
+
+-- Seed WIOA PIRL field mappings
 INSERT INTO wioa_pirl_mappings (schema_id, element, element_name, source_table, source_column, transform) VALUES
   ('ETA-9170-PY25', '100', 'Unique Individual Identifier', 'wioa_participants', 'id', 'uuid_to_12char'),
   ('ETA-9170-PY25', '101', 'Social Security Number', 'wioa_participant_records', 'ssn_last4', 'pad_ssn'),

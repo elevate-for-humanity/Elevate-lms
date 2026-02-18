@@ -1,0 +1,54 @@
+import React from 'react';
+import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
+import { SkipToContent } from '@/components/ui/SkipToContent';
+
+export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Staff Portal | Elevate for Humanity',
+    template: '%s | Staff Portal',
+  },
+  description: 'Manage students, track enrollments, and access administrative tools.',
+};
+
+const ALLOWED_ROLES = ['staff', 'admin', 'super_admin', 'advisor'];
+
+export default async function StaffPortalLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // Auth check — unauthenticated users see the page without staff chrome.
+  // proxy.ts handles redirect for protected sub-routes; this layout adds
+  // defense-in-depth by verifying role for authenticated users.
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    // Not logged in — render children (landing page is public, sub-pages
+    // are protected by proxy.ts which redirects to /login)
+    return <>{children}</>;
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile?.role || !ALLOWED_ROLES.includes(profile.role)) {
+    redirect('/unauthorized');
+  }
+
+  return (
+    <>
+      <SkipToContent />
+      <IdleTimeoutGuard />
+      <div id="main-content">{children}</div>
+    </>
+  );
+}

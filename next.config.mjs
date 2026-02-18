@@ -408,10 +408,15 @@ const nextConfig = {
       // /news/page.tsx exists (137 lines) — do not redirect away from it
       // { source: '/news/:path*', destination: '/blog/:path*', permanent: true },
       
-      // Old 404 URLs from Google - redirect to relevant pages
+      // Old 404 URLs from Google/Netlify logs - redirect to relevant pages
       { source: '/about/founder', destination: '/about/team', permanent: true },
       { source: '/etpl-programs', destination: '/pathways', permanent: true },
       { source: '/intake', destination: '/apply', permanent: true },
+      { source: '/home1', destination: '/', permanent: true },
+      { source: '/downloads', destination: '/resources', permanent: true },
+      { source: '/docs/students/certificates', destination: '/credentials', permanent: true },
+      { source: '/programs/food-handler', destination: '/programs', permanent: true },
+      { source: '/program-holder/portal/:path*', destination: '/program-holder/:path*', permanent: true },
 
       // ============================================
       // ENROLL / APPLY CONSOLIDATION

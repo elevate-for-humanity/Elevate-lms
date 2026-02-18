@@ -1,6 +1,45 @@
 -- ================================================================
--- PHASE 4: INDEXES
--- Run after Phase 1. All use IF NOT EXISTS — safe to re-run.
+-- PHASE 4: ADD MISSING COLUMNS + INDEXES
+-- Pre-existing tables have different schemas than Phase 1 definitions.
+-- Phase 1 CREATE TABLE IF NOT EXISTS was a no-op for these.
+-- ================================================================
+
+-- onboarding_progress: has (id, user_id, is_complete, completed_at, current_step, created_at, updated_at)
+ALTER TABLE onboarding_progress ADD COLUMN IF NOT EXISTS tenant_id UUID;
+ALTER TABLE onboarding_progress ADD COLUMN IF NOT EXISTS profile_completed BOOLEAN DEFAULT FALSE;
+ALTER TABLE onboarding_progress ADD COLUMN IF NOT EXISTS profile_completed_at TIMESTAMPTZ;
+ALTER TABLE onboarding_progress ADD COLUMN IF NOT EXISTS agreements_completed BOOLEAN DEFAULT FALSE;
+ALTER TABLE onboarding_progress ADD COLUMN IF NOT EXISTS agreements_completed_at TIMESTAMPTZ;
+ALTER TABLE onboarding_progress ADD COLUMN IF NOT EXISTS handbook_acknowledged BOOLEAN DEFAULT FALSE;
+ALTER TABLE onboarding_progress ADD COLUMN IF NOT EXISTS handbook_acknowledged_at TIMESTAMPTZ;
+ALTER TABLE onboarding_progress ADD COLUMN IF NOT EXISTS documents_uploaded BOOLEAN DEFAULT FALSE;
+ALTER TABLE onboarding_progress ADD COLUMN IF NOT EXISTS documents_uploaded_at TIMESTAMPTZ;
+ALTER TABLE onboarding_progress ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'not_started';
+
+-- automated_decisions: has (id, override_reason, input_snapshot, created_at)
+ALTER TABLE automated_decisions ADD COLUMN IF NOT EXISTS decision_type TEXT;
+ALTER TABLE automated_decisions ADD COLUMN IF NOT EXISTS entity_type TEXT;
+ALTER TABLE automated_decisions ADD COLUMN IF NOT EXISTS entity_id UUID;
+ALTER TABLE automated_decisions ADD COLUMN IF NOT EXISTS outcome TEXT;
+ALTER TABLE automated_decisions ADD COLUMN IF NOT EXISTS confidence DECIMAL(5,4);
+ALTER TABLE automated_decisions ADD COLUMN IF NOT EXISTS reasoning JSONB DEFAULT '{}';
+ALTER TABLE automated_decisions ADD COLUMN IF NOT EXISTS rules_applied JSONB DEFAULT '[]';
+ALTER TABLE automated_decisions ADD COLUMN IF NOT EXISTS override_by UUID;
+ALTER TABLE automated_decisions ADD COLUMN IF NOT EXISTS processing_time_ms INTEGER;
+
+-- review_queue: has (id, status, priority, assigned_to, created_at, updated_at)
+ALTER TABLE review_queue ADD COLUMN IF NOT EXISTS entity_type TEXT;
+ALTER TABLE review_queue ADD COLUMN IF NOT EXISTS entity_id UUID;
+ALTER TABLE review_queue ADD COLUMN IF NOT EXISTS review_type TEXT;
+ALTER TABLE review_queue ADD COLUMN IF NOT EXISTS ai_recommendation JSONB DEFAULT '{}';
+ALTER TABLE review_queue ADD COLUMN IF NOT EXISTS ai_confidence DECIMAL(5,4);
+ALTER TABLE review_queue ADD COLUMN IF NOT EXISTS human_decision TEXT;
+ALTER TABLE review_queue ADD COLUMN IF NOT EXISTS human_notes TEXT;
+ALTER TABLE review_queue ADD COLUMN IF NOT EXISTS decided_by UUID;
+ALTER TABLE review_queue ADD COLUMN IF NOT EXISTS decided_at TIMESTAMPTZ;
+
+-- ================================================================
+-- INDEXES
 -- ================================================================
 
 CREATE INDEX IF NOT EXISTS idx_laa_user_id ON license_agreement_acceptances(user_id);

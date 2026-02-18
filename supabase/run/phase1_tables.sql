@@ -489,9 +489,16 @@ CREATE TABLE IF NOT EXISTS wioa_pirl_export_issues (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Forum views (aliases for existing tables)
-CREATE OR REPLACE VIEW forum_threads AS SELECT * FROM forum_topics;
-CREATE OR REPLACE VIEW forum_posts AS SELECT * FROM forum_replies;
+-- Forum aliases: only create views if they don't already exist as tables
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = 'forum_threads') THEN
+    EXECUTE 'CREATE VIEW forum_threads AS SELECT * FROM forum_topics';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relname = 'forum_posts') THEN
+    EXECUTE 'CREATE VIEW forum_posts AS SELECT * FROM forum_replies';
+  END IF;
+END $$;
 
 -- Add missing columns to existing tables
 ALTER TABLE events ADD COLUMN IF NOT EXISTS start_time TIMESTAMPTZ;

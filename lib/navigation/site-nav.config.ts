@@ -592,6 +592,43 @@ export const footerNavigation = {
       { label: 'Drug Test Report', href: '/policies/dr-test-report' },
     ],
   },
+  account: {
+    title: 'Account',
+    links: [
+      { label: 'Access Paused', href: '/access-paused' },
+      { label: 'License Suspended', href: '/license-suspended' },
+      { label: 'Reset Password', href: '/auth/reset-password' },
+      { label: 'Verify Email', href: '/auth/verify-email' },
+      { label: 'Enterprise', href: '/enterprise' },
+      { label: 'Licensing', href: '/licensing' },
+      { label: 'Payment Cancel', href: '/payment/cancel' },
+      { label: 'Store Checkout Cancel', href: '/store/checkout/cancel' },
+      { label: 'Enrollment Confirmation', href: '/enroll/confirmation' },
+      { label: 'Marketplace Thank You', href: '/marketplace/thank-you' },
+    ],
+  },
+  demo: {
+    title: 'Live Demo',
+    links: [
+      { label: 'Admin Demo', href: '/demo/admin' },
+      { label: 'Employer Demo', href: '/demo/employer' },
+      { label: 'Learner Demo', href: '/demo/learner' },
+    ],
+  },
+  internal: {
+    title: 'Internal',
+    links: [
+      { label: 'Cache Diagnostic', href: '/cache-diagnostic' },
+      { label: 'Sentry Test', href: '/sentry-test' },
+      { label: 'Test Enrollment', href: '/test-enrollment' },
+      { label: 'Test Images', href: '/test-images' },
+      { label: 'ENV Config', href: '/docs/ENV_CONFIG.md' },
+      { label: 'Case Management Docs', href: '/docs/case-management' },
+      { label: 'Licensing Architecture', href: '/docs/licensing-architecture' },
+      { label: 'Program Holders Docs', href: '/docs/program-holders' },
+      { label: 'Reporting Docs', href: '/docs/reporting' },
+    ],
+  },
   programsAdmin: {
     title: 'Program Administration',
     links: [

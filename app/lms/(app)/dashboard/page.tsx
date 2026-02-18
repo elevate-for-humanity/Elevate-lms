@@ -75,9 +75,10 @@ export default async function StudentDashboardOrchestrated() {
     .order('created_at', { ascending: false });
 
   // Get regular enrollments (internal LMS courses)
+  // Query training_enrollments directly and join courses for display
   const { data: regularEnrollments } = await supabase
-    .from('enrollments')
-    .select('*, programs(*)')
+    .from('training_enrollments')
+    .select('*, course:training_courses(id, course_name, description, duration_hours, is_active)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 

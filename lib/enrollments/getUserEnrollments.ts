@@ -45,20 +45,32 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
 
   const results: NormalizedEnrollment[] = [];
 
-  // Query enrollments table (internal LMS)
+  // Query training_enrollments directly (bypasses VIEW permission issues)
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('training_enrollments')
     .select(`
       id, user_id, course_id, program_id, status, progress, created_at, updated_at,
-      programs (id, title, slug, delivery_mode),
-      courses (id, title)
+      course:training_courses (id, course_name, description)
     `)
     .eq('user_id', userId);
 
   if (enrollments) {
+    // Fetch programs separately if program_ids exist
+    const programIds = enrollments.map(e => e.program_id).filter(Boolean);
+    let programMap: Record<string, any> = {};
+    if (programIds.length > 0) {
+      const { data: programs } = await supabase
+        .from('programs')
+        .select('id, name, slug, delivery_mode')
+        .in('id', programIds);
+      if (programs) {
+        for (const p of programs) programMap[p.id] = p;
+      }
+    }
+
     for (const e of enrollments) {
-      const program = e.programs as any;
-      const course = e.courses as any;
+      const program = e.program_id ? programMap[e.program_id] : null;
+      const course = e.course as any;
       const { mode, inferred } = resolveDeliveryMode('enrollments', program);
       
       const enrollment: NormalizedEnrollment = {
@@ -67,9 +79,9 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
         user_key: e.user_id,
         program_id: e.program_id,
         program_slug: program?.slug || null,
-        program_title: program?.title || null,
+        program_title: program?.name || null,
         course_id: e.course_id,
-        course_title: course?.title || null,
+        course_title: course?.course_name || null,
         provider_id: null,
         provider_name: null,
         status: e.status || 'active',

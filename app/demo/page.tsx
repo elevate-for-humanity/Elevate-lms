@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 
 
 export default function DemoRedirect() {
-  redirect('/store/demo');
+  redirect('/demo/admin');
 }

@@ -40,13 +40,13 @@ export default async function InteractiveCoursesPage() {
 
   // Get all courses
   const { data: courses } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .order('created_at', { ascending: false });
 
   // Get student's enrollments
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('training_enrollments')
     .select('course_id, status, progress')
     .eq('user_id', user.id);
 

@@ -18,7 +18,7 @@ export async function generateMetadata({
   }
   
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('title, description')
     .eq('id', courseId)
     .single();
@@ -54,7 +54,7 @@ export default async function CourseDetailPage({
 
   // Fetch course details
   const { data: course, error } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('id', courseId)
     .single();
@@ -78,7 +78,7 @@ export default async function CourseDetailPage({
   let enrollment = null;
   if (user) {
     const { data }: any = await supabase
-      .from('enrollments')
+      .from('training_enrollments')
       .select('*')
       .eq('user_id', user.id)
       .eq('course_id', courseId)

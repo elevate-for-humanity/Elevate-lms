@@ -152,14 +152,13 @@ export async function POST(
     // 4) Create enrollment for this program
     const { data: enrollment, error: enrollError } =
       await supabaseAdmin
-        .from("enrollments")
+        .from("training_enrollments")
         .insert({
           user_id: userId,
           program_id,
           status: "active",
-          funding_type: funding_type || null,
-          source: source || app.source || "application",
-          started_at: new Date().toISOString(),
+          funding_source: funding_type || null,
+          enrolled_at: new Date().toISOString(),
         })
         .select("*")
         .maybeSingle();

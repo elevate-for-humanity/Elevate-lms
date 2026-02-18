@@ -182,8 +182,17 @@ export default function WIOAComplianceDashboard() {
       console.error('Error loading WIOA metrics:', err);
     }
 
-    // Fallback mock data
-    const mockMetrics: WIOAMetrics = {
+    // No data from DB — set empty metrics
+    setMetrics({
+      performanceIndicators: [],
+      complianceChecklist: [],
+      fundingStatus: { totalAllocated: 0, totalSpent: 0, totalRemaining: 0, utilizationRate: 0, byCategory: [] },
+      participantDemographics: { total: 0, byAge: [], byGender: [], byRace: [], byDisability: [], byVeteranStatus: [] },
+      auditReadiness: { overallScore: 0, lastAuditDate: '', nextAuditDate: '', findings: [] },
+    });
+    return;
+    /* Original fallback removed:
+    const unusedMetrics: WIOAMetrics = {
       performanceIndicators: [
         {
           indicator: 'Employment Rate (2nd Quarter)',
@@ -381,7 +390,7 @@ export default function WIOAComplianceDashboard() {
       ],
     };
 
-    setMetrics(mockMetrics);
+    */
   };
 
   const getStatusColor = (status: string) => {

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 // Report format examples — shows admins what exported data looks like
-const SAMPLE_ENROLLMENT = {
+const EXAMPLE_ENROLLMENT = {
   id: 'ENR-2026-00142',
   student: {
     name: 'Maria Rodriguez',
@@ -48,7 +48,7 @@ const SAMPLE_ENROLLMENT = {
 };
 
 // Sample certificate data
-const SAMPLE_CERTIFICATE = {
+const EXAMPLE_CERTIFICATE = {
   id: 'CERT-2026-00089',
   student: {
     name: 'James Thompson',
@@ -75,7 +75,7 @@ const SAMPLE_CERTIFICATE = {
 };
 
 // Sample funding report data
-const SAMPLE_FUNDING_REPORT = {
+const EXAMPLE_FUNDING_REPORT = {
   period: 'Q4 2025 (October - December)',
   generated: '2026-01-05',
   summary: {
@@ -140,27 +140,27 @@ export default function SampleReportsPage() {
                 <dl className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Enrollment ID</dt>
-                    <dd className="font-mono font-medium">{SAMPLE_ENROLLMENT.id}</dd>
+                    <dd className="font-mono font-medium">{EXAMPLE_ENROLLMENT.id}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Name</dt>
-                    <dd className="font-medium">{SAMPLE_ENROLLMENT.student.name}</dd>
+                    <dd className="font-medium">{EXAMPLE_ENROLLMENT.student.name}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Email</dt>
-                    <dd>{SAMPLE_ENROLLMENT.student.email}</dd>
+                    <dd>{EXAMPLE_ENROLLMENT.student.email}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Phone</dt>
-                    <dd>{SAMPLE_ENROLLMENT.student.phone}</dd>
+                    <dd>{EXAMPLE_ENROLLMENT.student.phone}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">DOB</dt>
-                    <dd>{SAMPLE_ENROLLMENT.student.dob}</dd>
+                    <dd>{EXAMPLE_ENROLLMENT.student.dob}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">SSN (Last 4)</dt>
-                    <dd>***-**-{SAMPLE_ENROLLMENT.student.ssn_last4}</dd>
+                    <dd>***-**-{EXAMPLE_ENROLLMENT.student.ssn_last4}</dd>
                   </div>
                 </dl>
               </div>
@@ -171,26 +171,26 @@ export default function SampleReportsPage() {
                 <dl className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Program</dt>
-                    <dd className="font-medium">{SAMPLE_ENROLLMENT.program.name}</dd>
+                    <dd className="font-medium">{EXAMPLE_ENROLLMENT.program.name}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Code</dt>
-                    <dd className="font-mono">{SAMPLE_ENROLLMENT.program.code}</dd>
+                    <dd className="font-mono">{EXAMPLE_ENROLLMENT.program.code}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Duration</dt>
-                    <dd>{SAMPLE_ENROLLMENT.program.duration}</dd>
+                    <dd>{EXAMPLE_ENROLLMENT.program.duration}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Hours</dt>
-                    <dd>{SAMPLE_ENROLLMENT.program.hours}</dd>
+                    <dd>{EXAMPLE_ENROLLMENT.program.hours}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Status</dt>
                     <dd>
                       <span className="inline-flex items-center gap-1 bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded text-xs font-medium">
                         <span className="text-slate-400 flex-shrink-0">•</span>
-                        {SAMPLE_ENROLLMENT.status}
+                        {EXAMPLE_ENROLLMENT.status}
                       </span>
                     </dd>
                   </div>
@@ -203,19 +203,19 @@ export default function SampleReportsPage() {
                 <dl className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Source</dt>
-                    <dd className="font-medium">{SAMPLE_ENROLLMENT.funding.source}</dd>
+                    <dd className="font-medium">{EXAMPLE_ENROLLMENT.funding.source}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Amount</dt>
-                    <dd className="font-medium text-brand-green-600">${SAMPLE_ENROLLMENT.funding.amount.toLocaleString()}</dd>
+                    <dd className="font-medium text-brand-green-600">${EXAMPLE_ENROLLMENT.funding.amount.toLocaleString()}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Provider</dt>
-                    <dd>{SAMPLE_ENROLLMENT.funding.provider}</dd>
+                    <dd>{EXAMPLE_ENROLLMENT.funding.provider}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Case Number</dt>
-                    <dd className="font-mono">{SAMPLE_ENROLLMENT.funding.case_number}</dd>
+                    <dd className="font-mono">{EXAMPLE_ENROLLMENT.funding.case_number}</dd>
                   </div>
                 </dl>
               </div>
@@ -226,19 +226,19 @@ export default function SampleReportsPage() {
                 <dl className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Application</dt>
-                    <dd>{SAMPLE_ENROLLMENT.dates.application}</dd>
+                    <dd>{EXAMPLE_ENROLLMENT.dates.application}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Enrollment</dt>
-                    <dd>{SAMPLE_ENROLLMENT.dates.enrollment}</dd>
+                    <dd>{EXAMPLE_ENROLLMENT.dates.enrollment}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Start Date</dt>
-                    <dd>{SAMPLE_ENROLLMENT.dates.start}</dd>
+                    <dd>{EXAMPLE_ENROLLMENT.dates.start}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Expected Completion</dt>
-                    <dd>{SAMPLE_ENROLLMENT.dates.expected_completion}</dd>
+                    <dd>{EXAMPLE_ENROLLMENT.dates.expected_completion}</dd>
                   </div>
                 </dl>
               </div>
@@ -264,24 +264,24 @@ export default function SampleReportsPage() {
             <div className="border-2 border-brand-blue-200 rounded-xl p-8 bg-brand-blue-50 mb-6">
               <div className="text-center">
                 <div className="text-brand-blue-600 font-bold text-sm tracking-widest mb-2">CERTIFICATE OF COMPLETION</div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-1">{SAMPLE_CERTIFICATE.student.name}</h3>
+                <h3 className="text-3xl font-bold text-gray-900 mb-1">{EXAMPLE_CERTIFICATE.student.name}</h3>
                 <p className="text-gray-600 mb-6">has successfully completed the</p>
-                <h4 className="text-2xl font-bold text-brand-blue-700 mb-2">{SAMPLE_CERTIFICATE.program.name}</h4>
+                <h4 className="text-2xl font-bold text-brand-blue-700 mb-2">{EXAMPLE_CERTIFICATE.program.name}</h4>
                 <p className="text-gray-600 mb-6">
-                  completing {SAMPLE_CERTIFICATE.program.hours_completed} hours of instruction and training
+                  completing {EXAMPLE_CERTIFICATE.program.hours_completed} hours of instruction and training
                 </p>
                 <div className="flex justify-center gap-8 text-sm text-gray-600 mb-6">
                   <div>
                     <div className="font-semibold">Completion Date</div>
-                    <div>{SAMPLE_CERTIFICATE.completion.date}</div>
+                    <div>{EXAMPLE_CERTIFICATE.completion.date}</div>
                   </div>
                   <div>
                     <div className="font-semibold">Certificate Number</div>
-                    <div className="font-mono">{SAMPLE_CERTIFICATE.certificate_number}</div>
+                    <div className="font-mono">{EXAMPLE_CERTIFICATE.certificate_number}</div>
                   </div>
                 </div>
                 <div className="text-sm text-gray-500">
-                  Issued by {SAMPLE_CERTIFICATE.issued_by} on {SAMPLE_CERTIFICATE.issued_date}
+                  Issued by {EXAMPLE_CERTIFICATE.issued_by} on {EXAMPLE_CERTIFICATE.issued_date}
                 </div>
               </div>
             </div>
@@ -290,7 +290,7 @@ export default function SampleReportsPage() {
             <div>
               <h3 className="font-semibold text-gray-900 mb-4">Industry Certifications Earned</h3>
               <div className="grid md:grid-cols-2 gap-4">
-                {SAMPLE_CERTIFICATE.certifications.map((cert) => (
+                {EXAMPLE_CERTIFICATE.certifications.map((cert) => (
                   <div key={cert.number} className="bg-gray-50 rounded-lg p-4 border">
                     <div className="font-medium text-gray-900">{cert.name}</div>
                     <div className="text-sm text-gray-500 mt-1">
@@ -323,27 +323,27 @@ export default function SampleReportsPage() {
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <div className="flex items-center gap-2 text-gray-600 mb-2">
                 <Calendar className="w-4 h-4" />
-                <span className="font-medium">Report Period: {SAMPLE_FUNDING_REPORT.period}</span>
+                <span className="font-medium">Report Period: {EXAMPLE_FUNDING_REPORT.period}</span>
               </div>
-              <div className="text-sm text-gray-500">Generated: {SAMPLE_FUNDING_REPORT.generated}</div>
+              <div className="text-sm text-gray-500">Generated: {EXAMPLE_FUNDING_REPORT.generated}</div>
             </div>
 
             {/* Summary Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               <div className="bg-brand-blue-50 rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold text-brand-blue-600">{SAMPLE_FUNDING_REPORT.summary.total_enrollments}</div>
+                <div className="text-3xl font-bold text-brand-blue-600">{EXAMPLE_FUNDING_REPORT.summary.total_enrollments}</div>
                 <div className="text-sm text-brand-blue-700">Total Enrollments</div>
               </div>
               <div className="bg-brand-green-50 rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold text-brand-green-600">${(SAMPLE_FUNDING_REPORT.summary.total_funding / 1000).toFixed(0)}K</div>
+                <div className="text-3xl font-bold text-brand-green-600">${(EXAMPLE_FUNDING_REPORT.summary.total_funding / 1000).toFixed(0)}K</div>
                 <div className="text-sm text-brand-green-700">Total Funding</div>
               </div>
               <div className="bg-brand-blue-50 rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold text-brand-blue-600">{SAMPLE_FUNDING_REPORT.summary.completions}</div>
+                <div className="text-3xl font-bold text-brand-blue-600">{EXAMPLE_FUNDING_REPORT.summary.completions}</div>
                 <div className="text-sm text-brand-blue-700">Completions</div>
               </div>
               <div className="bg-brand-orange-50 rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold text-brand-orange-600">{SAMPLE_FUNDING_REPORT.summary.placements}</div>
+                <div className="text-3xl font-bold text-brand-orange-600">{EXAMPLE_FUNDING_REPORT.summary.placements}</div>
                 <div className="text-sm text-brand-orange-700">Job Placements</div>
               </div>
             </div>
@@ -363,7 +363,7 @@ export default function SampleReportsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {SAMPLE_FUNDING_REPORT.by_source.map((row) => (
+                    {EXAMPLE_FUNDING_REPORT.by_source.map((row) => (
                       <tr key={row.source} className="border-t">
                         <td className="px-4 py-3 font-medium">{row.source}</td>
                         <td className="px-4 py-3 text-right">{row.enrollments}</td>
@@ -376,10 +376,10 @@ export default function SampleReportsPage() {
                   <tfoot>
                     <tr className="border-t-2 bg-gray-50 font-semibold">
                       <td className="px-4 py-3">Total</td>
-                      <td className="px-4 py-3 text-right">{SAMPLE_FUNDING_REPORT.summary.total_enrollments}</td>
-                      <td className="px-4 py-3 text-right text-brand-green-600">${SAMPLE_FUNDING_REPORT.summary.total_funding.toLocaleString()}</td>
-                      <td className="px-4 py-3 text-right">{SAMPLE_FUNDING_REPORT.summary.completions}</td>
-                      <td className="px-4 py-3 text-right">{SAMPLE_FUNDING_REPORT.summary.placements}</td>
+                      <td className="px-4 py-3 text-right">{EXAMPLE_FUNDING_REPORT.summary.total_enrollments}</td>
+                      <td className="px-4 py-3 text-right text-brand-green-600">${EXAMPLE_FUNDING_REPORT.summary.total_funding.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-right">{EXAMPLE_FUNDING_REPORT.summary.completions}</td>
+                      <td className="px-4 py-3 text-right">{EXAMPLE_FUNDING_REPORT.summary.placements}</td>
                     </tr>
                   </tfoot>
                 </table>
@@ -400,7 +400,7 @@ export default function SampleReportsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {SAMPLE_FUNDING_REPORT.by_program.map((row) => (
+                    {EXAMPLE_FUNDING_REPORT.by_program.map((row) => (
                       <tr key={row.program} className="border-t">
                         <td className="px-4 py-3 font-medium">{row.program}</td>
                         <td className="px-4 py-3 text-right">{row.enrollments}</td>

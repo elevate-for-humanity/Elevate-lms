@@ -98,29 +98,7 @@ export function RealTimeCollaboration({
     fetchRoomData();
   };
 
-  // Fallback mock users for demo
-  const displayUsers: CollaborationUser[] = activeUsers.length > 0 ? activeUsers : [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      avatar: '/media/avatars/avatar-1.jpg',
-      status: 'online',
-      currentPage: 'Lesson 3: Patient Care',
-    },
-    {
-      id: '2',
-      name: 'Michael Chen',
-      avatar: '/media/avatars/avatar-2.jpg',
-      status: 'online',
-      currentPage: 'Quiz: Safety Protocols',
-    },
-    {
-      id: '3',
-      name: 'Emily Rodriguez',
-      avatar: '/media/avatars/avatar-3.jpg',
-      status: 'away',
-    },
-  ];
+  const displayUsers: CollaborationUser[] = activeUsers;
 
   const getStatusColor = (status: string) => {
     switch (status) {

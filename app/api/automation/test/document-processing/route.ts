@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  * POST /api/automation/test/document-processing
  * 
  * Test endpoint for document processing automation.
- * Creates a mock document and runs it through the processing pipeline.
+ * Creates a test document and runs it through the processing pipeline.
  * 
  * FOR QA/DEMO PURPOSES ONLY - does not affect production data.
  */
@@ -40,61 +40,61 @@ export async function POST() {
       {
         name: 'Clean In-State Transcript',
         documentType: 'transcript',
-        mockExtractedData: {
+        testExtractedData: {
           school_name: 'Indiana School of Cosmetology',
           student_name: 'Test Student',
           hours_completed: 1500,
           completion_date: '2024-06-15',
           state: 'IN',
         },
-        mockConfidence: 0.92,
+        testConfidence: 0.92,
         expectedOutcome: 'auto_approved',
       },
       {
         name: 'Out-of-State Transcript',
         documentType: 'transcript',
-        mockExtractedData: {
+        testExtractedData: {
           school_name: 'California Beauty Academy',
           student_name: 'Test Student',
           hours_completed: 1200,
           completion_date: '2024-05-01',
           state: 'CA',
         },
-        mockConfidence: 0.88,
+        testConfidence: 0.88,
         expectedOutcome: 'routed_to_review',
       },
       {
         name: 'Low Confidence Document',
         documentType: 'transcript',
-        mockExtractedData: {
+        testExtractedData: {
           school_name: 'Unclear School Name',
           hours_completed: 800,
         },
-        mockConfidence: 0.65,
+        testConfidence: 0.65,
         expectedOutcome: 'routed_to_review',
       },
       {
         name: 'Valid License',
         documentType: 'license',
-        mockExtractedData: {
+        testExtractedData: {
           license_number: 'BC-12345',
           holder_name: 'Test Partner',
           expiration_date: '2026-12-31',
           state: 'IN',
         },
-        mockConfidence: 0.95,
+        testConfidence: 0.95,
         expectedOutcome: 'auto_approved',
       },
       {
         name: 'Expired License',
         documentType: 'license',
-        mockExtractedData: {
+        testExtractedData: {
           license_number: 'BC-99999',
           holder_name: 'Test Partner',
           expiration_date: '2023-01-01',
           state: 'IN',
         },
-        mockConfidence: 0.90,
+        testConfidence: 0.90,
         expectedOutcome: 'routed_to_review',
       },
     ];
@@ -129,9 +129,9 @@ export async function POST() {
       }
 
       // Simulate the processing result (in production, this would call processDocument)
-      const outcome = testCase.mockConfidence >= 0.85 && 
-                     !testCase.mockExtractedData.state?.match(/^(CA|TX|FL|NY)$/) &&
-                     !testCase.mockExtractedData.expiration_date?.match(/^202[0-3]/)
+      const outcome = testCase.testConfidence >= 0.85 && 
+                     !testCase.testExtractedData.state?.match(/^(CA|TX|FL|NY)$/) &&
+                     !testCase.testExtractedData.expiration_date?.match(/^202[0-3]/)
         ? 'auto_approved'
         : 'routed_to_review';
 
@@ -140,8 +140,8 @@ export async function POST() {
         .from('documents')
         .update({
           status: outcome === 'auto_approved' ? 'approved' : 'pending_review',
-          extracted_data: testCase.mockExtractedData,
-          ocr_confidence: testCase.mockConfidence,
+          extracted_data: testCase.testExtractedData,
+          ocr_confidence: testCase.testConfidence,
           verified_at: outcome === 'auto_approved' ? new Date().toISOString() : null,
           verified_by: outcome === 'auto_approved' ? 'system' : null,
           updated_at: new Date().toISOString(),
@@ -156,13 +156,13 @@ export async function POST() {
         outcome,
         actor: 'system',
         ruleset_version: '1.0.0-test',
-        confidence_score: testCase.mockConfidence,
+        confidence_score: testCase.testConfidence,
         reason_codes: outcome === 'auto_approved' 
           ? ['all_rules_passed', 'test_case'] 
-          : ['test_case', testCase.mockExtractedData.state === 'CA' ? 'out_of_state' : 'low_confidence'],
+          : ['test_case', testCase.testExtractedData.state === 'CA' ? 'out_of_state' : 'low_confidence'],
         input_snapshot: {
           test_case: testCase.name,
-          extracted_data: testCase.mockExtractedData,
+          extracted_data: testCase.testExtractedData,
         },
         processing_time_ms: Math.floor(Math.random() * 500) + 100,
         created_at: new Date().toISOString(),
@@ -176,9 +176,9 @@ export async function POST() {
           review_type: 'document_verification',
           priority: 5,
           status: 'pending',
-          extracted_data: testCase.mockExtractedData,
-          confidence_score: testCase.mockConfidence,
-          failed_rules: testCase.mockExtractedData.state === 'CA' 
+          extracted_data: testCase.testExtractedData,
+          confidence_score: testCase.testConfidence,
+          failed_rules: testCase.testExtractedData.state === 'CA' 
             ? ['Out-of-state transcript requires manual review']
             : ['OCR confidence below threshold'],
           system_recommendation: 'manual_review_required',
@@ -193,8 +193,8 @@ export async function POST() {
         expectedOutcome: testCase.expectedOutcome,
         actualOutcome: outcome,
         passed: outcome === testCase.expectedOutcome,
-        confidence: testCase.mockConfidence,
-        extractedFields: Object.keys(testCase.mockExtractedData),
+        confidence: testCase.testConfidence,
+        extractedFields: Object.keys(testCase.testExtractedData),
       });
     }
 

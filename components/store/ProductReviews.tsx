@@ -2,9 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client';
 
-import React, { useEffect } from 'react';
-
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 interface Review {
@@ -59,45 +57,26 @@ function useProductReviews(productId: string) {
   return reviews;
 }
 
-// Mock reviews - fallback
-const mockReviews: Review[] = [
-  {
-    id: '1',
-    author: 'Sarah Johnson',
-    rating: 5,
-    date: '2024-01-15',
-    title: 'Excellent study materials!',
-    content: 'These materials helped me pass my certification exam on the first try. The content is well-organized and easy to follow. Highly recommend!',
-    verified: true,
-    helpful: 24,
-  },
-  {
-    id: '2',
-    author: 'Michael Chen',
-    rating: 5,
-    date: '2024-01-10',
-    title: 'Worth every penny',
-    content: 'The practice questions were spot-on. I felt completely prepared for the exam. The video demonstrations were particularly helpful.',
-    verified: true,
-    helpful: 18,
-  },
-  {
-    id: '3',
-    author: 'Jessica Martinez',
-    rating: 4,
-    date: '2024-01-05',
-    title: 'Great resource',
-    content: 'Very comprehensive materials. Would have liked more practice exams, but overall excellent quality.',
-    verified: true,
-    helpful: 12,
-  },
-];
-
 export default function ProductReviews({ productId }: ProductReviewsProps) {
-  const [reviews] = useState<Review[]>(mockReviews);
+  const [reviews, setReviews] = useState<Review[]>([]);
+
+  useEffect(() => {
+    async function loadReviews() {
+      try {
+        const res = await fetch(`/api/store/reviews?product_id=${productId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setReviews(data.reviews || []);
+        }
+      } catch {
+        // leave empty
+      }
+    }
+    loadReviews();
+  }, [productId]);
   const [sortBy, setSortBy] = useState<'recent' | 'helpful'>('recent');
 
-  const averageRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+  const averageRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0;
   const ratingCounts = [5, 4, 3, 2, 1].map(rating =>
     reviews.filter(r => r.rating === rating).length
   );

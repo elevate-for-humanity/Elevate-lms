@@ -21,43 +21,8 @@ interface StudyGroup {
   avatar: string;
 }
 
-const MOCK_GROUPS: StudyGroup[] = [
-    {
-      id: '1',
-      name: 'CNA Study Squad',
-      description: 'Preparing for state certification exam together',
-      course: 'Certified Nursing Assistant',
-      members: 8,
-      maxMembers: 12,
-      privacy: 'public',
-      nextMeeting: '2024-03-20 at 7:00 PM',
-      avatar: '/media/groups/group-1.jpg',
-    },
-    {
-      id: '2',
-      name: 'HVAC Masters',
-      description: 'Advanced troubleshooting and real-world scenarios',
-      course: 'HVAC Technician',
-      members: 6,
-      maxMembers: 10,
-      privacy: 'public',
-      nextMeeting: '2024-03-21 at 6:30 PM',
-      avatar: '/media/groups/group-2.jpg',
-    },
-    {
-      id: '3',
-      name: 'Weekend Warriors',
-      description: 'Study group for working professionals',
-      course: 'Web Development',
-      members: 10,
-      maxMembers: 15,
-      privacy: 'private',
-      avatar: '/media/groups/group-3.jpg',
-    },
-  ];
-
 export function StudyGroups() {
-  const [groups, setGroups] = useState<StudyGroup[]>(MOCK_GROUPS);
+  const [groups, setGroups] = useState<StudyGroup[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const supabase = createClient();
 

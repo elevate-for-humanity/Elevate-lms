@@ -171,8 +171,39 @@ export function AutoAttritionTracker() {
       console.error('Error loading attrition data:', err);
     }
 
-    // Fallback mock data
-    const mockMetrics: AttritionMetrics = {
+    // No data from DB — query real enrollment counts
+    try {
+      const supabase = createClient();
+      const [totalRes, activeRes, droppedRes] = await Promise.all([
+        supabase.from('enrollments').select('id', { count: 'exact', head: true }),
+        supabase.from('enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+        supabase.from('enrollments').select('id', { count: 'exact', head: true }).eq('status', 'dropped'),
+      ]);
+      const total = totalRes.count ?? 0;
+      const active = activeRes.count ?? 0;
+      const dropped = droppedRes.count ?? 0;
+      const rate = total > 0 ? (dropped / total) * 100 : 0;
+      setMetrics({
+        overall: {
+          totalStudents: total,
+          activeStudents: active,
+          droppedStudents: dropped,
+          attritionRate: Math.round(rate * 100) / 100,
+          retentionRate: Math.round((100 - rate) * 100) / 100,
+          trend: 'stable',
+        },
+        byProgram: [],
+        byMonth: [],
+        riskFactors: [],
+      });
+      setAtRiskStudents([]);
+      setLastUpdate(new Date());
+    } catch {
+      // leave metrics null
+    }
+    return;
+    /* Original fallback removed:
+    const unusedMetrics: AttritionMetrics = {
       overall: {
         totalStudents: 156,
         activeStudents: 142,
@@ -367,9 +398,7 @@ export function AutoAttritionTracker() {
       },
     ];
 
-    setMetrics(mockMetrics);
-    setAtRiskStudents(mockAtRiskStudents);
-    setLastUpdate(new Date());
+    */
   };
 
   const getRiskColor = (riskLevel: string) => {

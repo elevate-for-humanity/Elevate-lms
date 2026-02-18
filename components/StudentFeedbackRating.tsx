@@ -17,37 +17,10 @@ interface Review {
   helpful: number;
 }
 
-const MOCK_REVIEWS: Review[] = [
-    {
-      id: '1',
-      studentName: 'Alex Chen',
-      rating: 5,
-      comment: 'Excellent course! The instructor explains complex concepts clearly and provides great examples.',
-      date: '2024-01-15',
-      helpful: 24,
-    },
-    {
-      id: '2',
-      studentName: 'Sarah Williams',
-      rating: 4,
-      comment: 'Very informative content. Would have liked more hands-on projects.',
-      date: '2024-01-14',
-      helpful: 18,
-    },
-    {
-      id: '3',
-      studentName: 'Graduate',
-      rating: 5,
-      comment: 'Best programming course I\'ve taken. The pace is perfect and assignments are challenging.',
-      date: '2024-01-13',
-      helpful: 32,
-    },
-  ];
-
 export function StudentFeedbackRating({ courseId }: { courseId?: string }) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
-  const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const supabase = createClient();
 

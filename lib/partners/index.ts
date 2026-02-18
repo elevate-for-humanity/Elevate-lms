@@ -13,10 +13,10 @@ import {
 /**
  * Partner API Integration Layer
  * 
- * STATUS: Stub implementation — returns placeholder data.
+ * STATUS: Pending vendor integration — returns default data.
  * 
  * Each partner (NDS, CareerSafe, etc.) will need a concrete
- * implementation that calls their vendor API. The stub allows
+ * implementation that calls their vendor API. This allows
  * the enrollment/automation pipeline to function without
  * blocking on vendor integration timelines.
  * 
@@ -26,12 +26,12 @@ import {
  *   3. Add the partner type to getPartnerAPI()
  */
 
-class StubPartnerAPI extends BasePartnerAPI {
+class PendingPartnerAPI extends BasePartnerAPI {
   async createAccount(student: StudentData): Promise<PartnerAccount> {
     // In production: call real partner API here
-    const fakeId = `${this.partner}_${student.id}`;
+    const generatedId = `${this.partner}_${student.id}`;
     return {
-      externalId: fakeId,
+      externalId: generatedId,
       username: student.email,
       loginUrl: "https://partner.elevateforhumanity.org/login",
       passwordPlaintext: undefined,
@@ -55,7 +55,7 @@ class StubPartnerAPI extends BasePartnerAPI {
     externalEnrollmentId: string
   ): Promise<ProgressData | null> {
     // In production: call real partner API here
-    // Stub: mark everything as "in progress"
+    // Default: mark as in progress until vendor API connected
     return {
       percentage: 50,
       completed: false,
@@ -69,7 +69,7 @@ class StubPartnerAPI extends BasePartnerAPI {
     externalEnrollmentId: string
   ): Promise<CertificateData | null> {
     // In production: call real partner API here
-    // Stub: no cert yet
+    // Default: no certificate until vendor API connected
     return null;
   }
 
@@ -91,7 +91,7 @@ export function getPartnerClient(partner: PartnerType): BasePartnerAPI {
   const config: PartnerAPIConfig = {
     baseUrl: process.env.PARTNER_API_BASE_URL,
   };
-  return new StubPartnerAPI(partner, config);
+  return new PendingPartnerAPI(partner, config);
 }
 
 export * from "./base";

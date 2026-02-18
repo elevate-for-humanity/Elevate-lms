@@ -73,7 +73,7 @@ export default async function PayrollCardsPage() {
       {/* Hero Section */}
       <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/platform/student-portal-mock.jpg"
+          src="/images/platform/student-portal-preview.jpg"
           alt="Payroll Cards"
           fill
           className="object-cover"

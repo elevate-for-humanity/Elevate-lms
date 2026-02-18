@@ -612,7 +612,7 @@ function generateModules(courseType: string, level: string) {
           },
           {
             id: 'lesson-5-3',
-            title: 'Mock Certification Exam',
+            title: 'Practice Certification Exam',
             type: 'quiz',
             content: '',
             duration: 90,

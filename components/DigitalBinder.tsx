@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
+import { createClient } from '@/lib/supabase/client';
 
 interface BinderDocument {
   id: string;
@@ -35,80 +36,42 @@ export default function DigitalBinder({
   const [activeTab, setActiveTab] = useState<'documents' | 'notes' | 'tracking'>('documents');
   const [newNote, setNewNote] = useState('');
 
-  // Mock data - would come from database
-  const documents: BinderDocument[] = [
-    {
-      id: '1',
-      title: 'Enrollment Application',
-      type: 'form',
-      date: '2024-11-01',
-      status: 'complete',
-      uploadedBy: 'Admin Staff',
-    },
-    {
-      id: '2',
-      title: 'WIOA Eligibility Form',
-      type: 'form',
-      date: '2024-11-01',
-      status: 'complete',
-      uploadedBy: 'Case Manager',
-    },
-    {
-      id: '3',
-      title: 'Student Handbook Acknowledgment',
-      type: 'handbook',
-      date: '2024-11-02',
-      status: 'complete',
-      uploadedBy: 'Student',
-    },
-    {
-      id: '4',
-      title: 'Background Check',
-      type: 'form',
-      date: '2024-11-05',
-      status: 'pending',
-    },
-    {
-      id: '5',
-      title: 'Mid-Program Assessment',
-      type: 'assessment',
-      date: '2024-11-15',
-      status: 'missing',
-    },
-  ];
+  const [documents, setDocuments] = useState<BinderDocument[]>([]);
+  const [notes, setNotes] = useState<BinderNote[]>([]);
+  const [trackingData, setTrackingData] = useState({
+    hoursCompleted: 0, hoursRequired: 0, attendanceRate: 0,
+    assignmentsCompleted: 0, assignmentsTotal: 0, currentGrade: 0,
+  });
 
-  const notes: BinderNote[] = [
-    {
-      id: '1',
-      date: '2024-11-20',
-      author: 'Instructor Smith',
-      note: 'Student showing excellent progress in hands-on skills. Completed fade technique ahead of schedule.',
-      category: 'achievement',
-    },
-    {
-      id: '2',
-      date: '2024-11-18',
-      author: 'Case Manager Jones',
-      note: 'Discussed transportation challenges. Connected student with bus pass program.',
-      category: 'concern',
-    },
-    {
-      id: '3',
-      date: '2024-11-15',
-      author: 'Instructor Smith',
-      note: 'Attendance has been consistent. Student is engaged and asks good questions.',
-      category: 'progress',
-    },
-  ];
+  useEffect(() => {
+    if (!studentId || studentId === 'student-123') return;
+    const supabase = createClient();
 
-  const trackingData = {
-    hoursCompleted: 487,
-    hoursRequired: 1500,
-    attendanceRate: 94,
-    assignmentsCompleted: 12,
-    assignmentsTotal: 15,
-    currentGrade: 87,
-  };
+    async function loadBinder() {
+      const [docsRes, notesRes, enrollRes] = await Promise.all([
+        supabase.from('documents').select('id, document_type, file_name, created_at, status, uploaded_by')
+          .eq('user_id', studentId).order('created_at', { ascending: false }),
+        supabase.from('case_notes').select('id, created_at, author_name, note, category')
+          .eq('student_id', studentId).order('created_at', { ascending: false }),
+        supabase.from('enrollments').select('progress, status')
+          .eq('user_id', studentId).eq('status', 'active').limit(1).maybeSingle(),
+      ]);
+
+      setDocuments((docsRes.data || []).map(d => ({
+        id: d.id, title: d.file_name || d.document_type, type: d.document_type || 'form',
+        date: d.created_at?.split('T')[0] || '', status: d.status || 'pending', uploadedBy: d.uploaded_by || '',
+      })));
+      setNotes((notesRes.data || []).map(n => ({
+        id: n.id, date: n.created_at?.split('T')[0] || '', author: n.author_name || '',
+        note: n.note || '', category: n.category || 'progress',
+      })));
+      if (enrollRes.data) {
+        setTrackingData(prev => ({ ...prev, hoursCompleted: enrollRes.data.progress || 0 }));
+      }
+    }
+
+    loadBinder();
+  }, [studentId]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

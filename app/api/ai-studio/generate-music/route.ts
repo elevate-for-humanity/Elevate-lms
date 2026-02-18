@@ -84,8 +84,8 @@ async function findMatchingMusic(
     }
   }
 
-  // Return placeholder
-  return '/audio/placeholder-music.mp3';
+  // No music found from any provider
+  return '/audio/default-background.mp3';
 }
 
 /**

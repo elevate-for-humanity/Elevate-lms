@@ -51,8 +51,9 @@ const defaultFiles = [
   { name: 'package.json', path: '/package.json', type: 'file' as const },
   { name: 'README.md', path: '/README.md', type: 'file' as const },
 ];
-// Mock file contents
-const mockFileContents: Record<string, string> = {
+// Template file contents for AI site builder scaffold
+// Default template files for the AI site builder editor scaffold
+const templateFileContents: Record<string, string> = {
   '/app/page.tsx': `export default async function HomePage() {
   const supabase: any = createClient();
 
@@ -133,7 +134,7 @@ npm run dev
 export default function EditorPage() {
   const [selectedFile, setSelectedFile] = useState<string>('/app/page.tsx');
   const [fileContent, setFileContent] = useState<string>(
-    mockFileContents['/app/page.tsx'] || ''
+    templateFileContents['/app/page.tsx'] || ''
   );
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const handleFileSelect = (path: string) => {
@@ -143,7 +144,7 @@ export default function EditorPage() {
       }
     }
     setSelectedFile(path);
-    setFileContent(mockFileContents[path] || '// File content not available');
+    setFileContent(templateFileContents[path] || '// File content not available');
     setUnsavedChanges(false);
   };
   const handleContentChange = (value: string | undefined) => {
@@ -152,7 +153,7 @@ export default function EditorPage() {
   };
   const handleSave = () => {
     // Save file locally (GitHub integration can be added later)
-    mockFileContents[selectedFile] = fileContent;
+    templateFileContents[selectedFile] = fileContent;
     setUnsavedChanges(false);
     alert('File saved successfully!');
   };

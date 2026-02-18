@@ -26,6 +26,7 @@ export function BlockchainCredentialVerification() {
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationResult, setVerificationResult] = useState<Credential | null>(null);
   const [activeTab, setActiveTab] = useState<'verify' | 'my-credentials'>('verify');
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const myCredentials: Credential[] = [
     {
@@ -70,23 +71,37 @@ export function BlockchainCredentialVerification() {
     },
   ];
 
-  const handleVerify = () => {
-    // Simulate verification
-    const mockCredential: Credential = {
-      id: 'verified-1',
-      type: 'certificate',
-      title: 'Full-Stack Web Development',
-      issuer: 'Elevate for Humanity',
-      issueDate: '2024-01-15',
-      blockchainHash: '0x7f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7c2c2eb7b11a91385',
-      verificationUrl: 'https://verify.elevateforhumanity.com/cert/abc123',
-      status: 'verified',
-      metadata: {
-        skills: ['React', 'Node.js', 'MongoDB', 'TypeScript'],
-        grade: 'A',
-      },
-    };
-    setVerificationResult(mockCredential);
+  const handleVerify = async () => {
+    if (!verificationCode.trim()) return;
+    setIsVerifying(true);
+    try {
+      const supabase = createClient();
+      const { data: cert } = await supabase
+        .from('certificates')
+        .select('id, certificate_number, course_id, issued_at, metadata, user_id')
+        .eq('certificate_number', verificationCode.trim())
+        .maybeSingle();
+
+      if (cert) {
+        setVerificationResult({
+          id: cert.id,
+          type: 'certificate',
+          title: cert.metadata?.course_name || 'Program Certificate',
+          issuer: 'Elevate for Humanity',
+          issueDate: cert.issued_at?.split('T')[0] || '',
+          blockchainHash: '',
+          verificationUrl: `https://elevateforhumanity.institute/verify/${cert.certificate_number}`,
+          status: 'verified',
+          metadata: cert.metadata || {},
+        });
+      } else {
+        setVerificationResult(null);
+      }
+    } catch {
+      setVerificationResult(null);
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   return (

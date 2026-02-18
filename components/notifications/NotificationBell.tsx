@@ -14,21 +14,10 @@ interface Notification {
   createdAt: string;
 }
 
-// Mock notifications for demo - in production, use useNotifications hook
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: '1',
-    title: 'Welcome!',
-    message: 'Thanks for joining Elevate for Humanity.',
-    read: false,
-    createdAt: new Date().toISOString(),
-  },
-];
-
 export function NotificationBell() {
   const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
 
@@ -47,15 +36,13 @@ export function NotificationBell() {
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (data && data.length > 0) {
-        setNotifications(data.map(n => ({
-          id: n.id,
-          title: n.title,
-          message: n.message,
-          read: n.read,
-          createdAt: n.created_at
-        })));
-      }
+      setNotifications((data || []).map(n => ({
+        id: n.id,
+        title: n.title,
+        message: n.message,
+        read: n.read,
+        createdAt: n.created_at
+      })));
     }
     loadNotifications();
   }, [supabase]);

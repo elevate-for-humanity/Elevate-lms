@@ -171,7 +171,7 @@ CREATE POLICY "Admins can view all MOUs" ON partner_mous
 -- ============================================
 DROP POLICY IF EXISTS "Apprentices can view own placements" ON apprentice_placements;
 CREATE POLICY "Apprentices can view own placements" ON apprentice_placements
-  FOR SELECT USING (apprentice_id = auth.uid());
+  FOR SELECT USING (student_id = auth.uid());
 
 DROP POLICY IF EXISTS "Partners can view their shop placements" ON apprentice_placements;
 CREATE POLICY "Partners can view their shop placements" ON apprentice_placements

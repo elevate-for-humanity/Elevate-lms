@@ -11,7 +11,7 @@
 3. **Enrollment pipeline** — application intake forms, WIOA/JRI/DOL eligibility checks, Stripe payment checkout, state machine for application lifecycle.
 4. **Multi-portal architecture** — Admin, Student, Instructor, Employer, Partner/School, Staff, Workforce Board portals with role-based access.
 5. **LMS with SCORM** — course builder, modules, quizzes/assessments, progress tracking, grades, SCORM 1.2/2004 player (Cloudflare Worker), certificate generation.
-6. **Credential issuance + verification** — certificate generation, public verify endpoint (`/verify/[certificateId]`), QR codes, bulk issuance, download API.
+6. **Credential issuance + verification** — certificate generation, public verify endpoint (`/verify/[certificateId]`), bulk issuance, download API. Revocation status checked on verify. Missing: admin revocation UI, QR codes, Open Badges standard.
 7. **Employer portal** — job postings, candidate pipeline, placements, apprenticeship weekly reports, hiring analytics, WOTC applications.
 8. **Payments + licensing** — Stripe checkout/webhooks, subscription management, license generation/validation, multi-tenant provisioning, franchise billing.
 9. **Messaging** — Resend email, Twilio SMS, notification outbox, templates, push subscriptions, live chat messages.
@@ -24,12 +24,12 @@
 | Capability | Elevate | Monster ETPL | Monster Works CM | Ringorang | Cloud SynApps | Parchment | Generic WL LMS |
 |---|---|---|---|---|---|---|---|
 | **Marketing site + SEO** | **Yes** | Partial | No | Partial | No | No | Partial |
-| **Program catalog + search** | **Yes** | **Yes** | No | Partial | Partial | No | Partial |
+| **Program catalog + search** | **Partial** | **Yes** | No | Partial | Partial | No | Partial |
 | **Eligibility / funding (WIOA/JRI)** | **Yes** | **Yes** | Partial | No | **Yes** | No | No |
 | **Enrollment + intake** | **Yes** | **Yes** | Partial | No | Partial | No | Partial |
 | **Case management** | **Partial** | Partial | **Yes** | No | **Yes** | No | No |
 | **LMS / content delivery** | **Yes** | No | No | Partial | No | No | **Yes** |
-| **Credential issuance + verify** | **Yes** | Partial | No | No | Partial | **Yes** | Partial |
+| **Credential issuance + verify** | **Partial** | Partial | No | No | Partial | **Yes** | Partial |
 | **Employer portal** | **Yes** | Partial | Partial | No | Partial | No | No |
 | **Partner/school portal (multi-tenant)** | **Yes** | Partial | No | **Yes** | Partial | Partial | **Yes** |
 | **Messaging (email/SMS/templates)** | **Yes** | **Yes** | **Yes** | Partial | Partial | Partial | Partial |
@@ -51,10 +51,11 @@
 - Compliance pages: `app/privacy-policy/`, `app/terms-of-service/`, `app/accessibility/`, `app/equal-opportunity/`, `app/grievance/`
 - 2,434 route entries at build time
 
-### Program catalog + search — Yes
-- Catalog: `app/programs/` (30+ program slugs: CDL, CNA, barber, HVAC, welding, cybersecurity, etc.)
-- Search: `app/search/page.tsx` with cards, funding tags
+### Program catalog + search — Partial
+- Catalog: `app/programs/` (28 static program directories + dynamic `[slug]` page)
+- Search: `app/search/page.tsx` — **static listing only**, no search input, no filter by category/funding/location, no query parameters
 - Program detail pages with curriculum, funding info, enrollment CTAs
+- **Missing:** interactive search with text input, faceted filtering (by category, funding type, location, duration), sort options, pagination
 
 ### Eligibility / funding — Yes
 - WIOA: `app/wioa-eligibility/` (main + low-income, public-assistance, veterans sub-pages)
@@ -87,13 +88,14 @@
 - Certificates: auto-generation on completion
 - DB: `career_courses`, `career_course_modules`, `content_versions`, `continuing_education_hours`
 
-### Credential issuance + verify — Yes
+### Credential issuance + verify — Partial
 - Issue: `app/api/certificates/issue/route.ts`, `app/api/credentials/issue/route.ts`
 - Verify: `app/verify/[certificateId]/page.tsx`, `app/api/certificates/verify/route.ts`, `app/api/credentials/verify/route.ts`
+- Revocation check: verify endpoint reads `revoked_at` / `revoked_reason` from DB — status IS checked
 - Bulk: `app/admin/certificates/bulk/page.tsx`, `app/admin/certifications/bulk/page.tsx`
 - Download: `app/api/certificates/download/route.ts`, `app/api/certificates/[certificateId]/download/route.ts`
 - DB: `certificate_downloads`
-- **Missing:** revocation list endpoint, credential wallet integration, Open Badges / CLR standard
+- **Missing:** admin UI/API to revoke credentials, QR code generation on certificates, Open Badges 3.0 / CLR standard, credential wallet integration
 
 ### Employer portal — Yes
 - Dashboard: `app/employer/dashboard/page.tsx`

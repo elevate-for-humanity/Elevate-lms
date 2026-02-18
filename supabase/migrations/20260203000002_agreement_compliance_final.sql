@@ -3,8 +3,8 @@
 -- Single source of truth for all agreement acceptances
 -- ============================================================================
 
--- Drop existing table if it exists (clean slate)
-DROP TABLE IF EXISTS license_agreement_acceptances CASCADE;
+-- NOTE: DO NOT drop license_agreement_acceptances — it has live data.
+-- The CREATE TABLE IF NOT EXISTS below is a no-op if the table already exists.
 
 -- Create the canonical agreement acceptances table
 CREATE TABLE IF NOT EXISTS license_agreement_acceptances (
@@ -47,25 +47,25 @@ CREATE TABLE IF NOT EXISTS license_agreement_acceptances (
 );
 
 -- Indexes for performance
-CREATE INDEX idx_laa_user_id ON license_agreement_acceptances(user_id);
-CREATE INDEX idx_laa_agreement_type ON license_agreement_acceptances(agreement_type);
-CREATE INDEX idx_laa_accepted_at ON license_agreement_acceptances(accepted_at);
+CREATE INDEX IF NOT EXISTS idx_laa_user_id ON license_agreement_acceptances(user_id);
+CREATE INDEX IF NOT EXISTS idx_laa_agreement_type ON license_agreement_acceptances(agreement_type);
+CREATE INDEX IF NOT EXISTS idx_laa_accepted_at ON license_agreement_acceptances(accepted_at);
 
 -- Enable RLS
 ALTER TABLE license_agreement_acceptances ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies
--- Users can view their own acceptances
+-- RLS Policies (drop first to avoid "already exists" errors)
+DROP POLICY IF EXISTS "Users can view own acceptances" ON license_agreement_acceptances;
 CREATE POLICY "Users can view own acceptances" 
   ON license_agreement_acceptances FOR SELECT 
   USING (auth.uid() = user_id);
 
--- Users can insert their own acceptances
+DROP POLICY IF EXISTS "Users can insert own acceptances" ON license_agreement_acceptances;
 CREATE POLICY "Users can insert own acceptances" 
   ON license_agreement_acceptances FOR INSERT 
   WITH CHECK (auth.uid() = user_id);
 
--- Staff/admin can view all acceptances
+DROP POLICY IF EXISTS "Staff can view all acceptances" ON license_agreement_acceptances;
 CREATE POLICY "Staff can view all acceptances" 
   ON license_agreement_acceptances FOR SELECT 
   USING (
@@ -76,12 +76,12 @@ CREATE POLICY "Staff can view all acceptances"
     )
   );
 
--- Prevent updates (immutability)
+DROP POLICY IF EXISTS "No updates allowed" ON license_agreement_acceptances;
 CREATE POLICY "No updates allowed" 
   ON license_agreement_acceptances FOR UPDATE 
   USING (false);
 
--- Prevent deletes (immutability)
+DROP POLICY IF EXISTS "No deletes allowed" ON license_agreement_acceptances;
 CREATE POLICY "No deletes allowed" 
   ON license_agreement_acceptances FOR DELETE 
   USING (false);
@@ -90,29 +90,38 @@ CREATE POLICY "No deletes allowed"
 -- Agreement Versions Table (tracks current versions)
 -- ============================================================================
 
+-- Safe: agreement_versions does not exist in live DB yet
 DROP TABLE IF EXISTS agreement_versions CASCADE;
 
 CREATE TABLE IF NOT EXISTS agreement_versions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  agreement_type TEXT NOT NULL UNIQUE,
+  agreement_type TEXT NOT NULL,
+  version TEXT NOT NULL DEFAULT '1.0',
   current_version TEXT NOT NULL DEFAULT '1.0',
+  is_current BOOLEAN NOT NULL DEFAULT TRUE,
   document_url TEXT NOT NULL,
+  document_hash TEXT,
   effective_date DATE NOT NULL DEFAULT CURRENT_DATE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  expiry_date DATE,
+  summary_of_changes TEXT,
+  requires_re_acceptance BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_by UUID REFERENCES auth.users(id),
+  UNIQUE(agreement_type, version)
 );
 
 -- Seed initial versions
-INSERT INTO agreement_versions (agreement_type, current_version, document_url) VALUES
-  ('enrollment', '1.0', '/legal/enrollment-agreement'),
-  ('handbook', '1.0', '/legal/student-handbook'),
-  ('data_sharing', '1.0', '/legal/data-sharing'),
-  ('program_holder_mou', '1.0', '/legal/program-holder-mou'),
-  ('employer_agreement', '1.0', '/legal/employer-agreement'),
-  ('staff_agreement', '1.0', '/legal/staff-agreement'),
-  ('mou', '1.0', '/legal/partner-mou'),
-  ('ferpa', '1.0', '/legal/ferpa-consent'),
-  ('participation', '1.0', '/legal/participation-agreement')
-ON CONFLICT (agreement_type) DO NOTHING;
+INSERT INTO agreement_versions (agreement_type, version, current_version, document_url) VALUES
+  ('enrollment', '1.0', '1.0', '/legal/enrollment-agreement'),
+  ('handbook', '1.0', '1.0', '/legal/student-handbook'),
+  ('data_sharing', '1.0', '1.0', '/legal/data-sharing'),
+  ('program_holder_mou', '1.0', '1.0', '/legal/program-holder-mou'),
+  ('employer_agreement', '1.0', '1.0', '/legal/employer-agreement'),
+  ('staff_agreement', '1.0', '1.0', '/legal/staff-agreement'),
+  ('mou', '1.0', '1.0', '/legal/partner-mou'),
+  ('ferpa', '1.0', '1.0', '/legal/ferpa-consent'),
+  ('participation', '1.0', '1.0', '/legal/participation-agreement')
+ON CONFLICT (agreement_type, version) DO NOTHING;
 
 -- Enable RLS
 ALTER TABLE agreement_versions ENABLE ROW LEVEL SECURITY;

@@ -22,10 +22,10 @@ CREATE TABLE IF NOT EXISTS automated_decisions (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_automated_decisions_entity ON automated_decisions(entity_type, entity_id);
-CREATE INDEX idx_automated_decisions_type ON automated_decisions(decision_type);
-CREATE INDEX idx_automated_decisions_outcome ON automated_decisions(outcome);
-CREATE INDEX idx_automated_decisions_created ON automated_decisions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_automated_decisions_entity ON automated_decisions(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_automated_decisions_type ON automated_decisions(decision_type);
+CREATE INDEX IF NOT EXISTS idx_automated_decisions_outcome ON automated_decisions(outcome);
+CREATE INDEX IF NOT EXISTS idx_automated_decisions_created ON automated_decisions(created_at DESC);
 
 COMMENT ON TABLE automated_decisions IS 'Immutable record of all automated decisions for audit and compliance';
 
@@ -60,10 +60,10 @@ CREATE TABLE IF NOT EXISTS review_queue (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_review_queue_status ON review_queue(status);
-CREATE INDEX idx_review_queue_priority ON review_queue(priority, created_at);
-CREATE INDEX idx_review_queue_entity ON review_queue(entity_type, entity_id);
-CREATE INDEX idx_review_queue_assigned ON review_queue(assigned_to) WHERE assigned_to IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_review_queue_status ON review_queue(status);
+CREATE INDEX IF NOT EXISTS idx_review_queue_priority ON review_queue(priority, created_at);
+CREATE INDEX IF NOT EXISTS idx_review_queue_entity ON review_queue(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_review_queue_assigned ON review_queue(assigned_to) WHERE assigned_to IS NOT NULL;
 
 COMMENT ON TABLE review_queue IS 'Queue of items requiring human review with context and recommendations';
 
@@ -82,9 +82,9 @@ CREATE TABLE IF NOT EXISTS shop_recommendations (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_shop_recommendations_app ON shop_recommendations(application_id);
-CREATE INDEX idx_shop_recommendations_shop ON shop_recommendations(shop_id);
-CREATE UNIQUE INDEX idx_shop_recommendations_unique ON shop_recommendations(application_id, shop_id);
+CREATE INDEX IF NOT EXISTS idx_shop_recommendations_app ON shop_recommendations(application_id);
+CREATE INDEX IF NOT EXISTS idx_shop_recommendations_shop ON shop_recommendations(shop_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_shop_recommendations_unique ON shop_recommendations(application_id, shop_id);
 
 COMMENT ON TABLE shop_recommendations IS 'Persisted shop routing recommendations for applications';
 
@@ -186,6 +186,7 @@ ALTER TABLE partners
 -- Automated decisions: read-only for admins
 ALTER TABLE automated_decisions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins can view automated decisions" ON automated_decisions;
 CREATE POLICY "Admins can view automated decisions" ON automated_decisions
   FOR SELECT
   USING (
@@ -196,6 +197,7 @@ CREATE POLICY "Admins can view automated decisions" ON automated_decisions
     )
   );
 
+DROP POLICY IF EXISTS "System can insert automated decisions" ON automated_decisions;
 CREATE POLICY "System can insert automated decisions" ON automated_decisions
   FOR INSERT
   WITH CHECK (true); -- Service role only
@@ -203,6 +205,7 @@ CREATE POLICY "System can insert automated decisions" ON automated_decisions
 -- Review queue: admins can view and update
 ALTER TABLE review_queue ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins can view review queue" ON review_queue;
 CREATE POLICY "Admins can view review queue" ON review_queue
   FOR SELECT
   USING (
@@ -213,6 +216,7 @@ CREATE POLICY "Admins can view review queue" ON review_queue
     )
   );
 
+DROP POLICY IF EXISTS "Admins can update review queue" ON review_queue;
 CREATE POLICY "Admins can update review queue" ON review_queue
   FOR UPDATE
   USING (
@@ -223,6 +227,7 @@ CREATE POLICY "Admins can update review queue" ON review_queue
     )
   );
 
+DROP POLICY IF EXISTS "System can insert review queue" ON review_queue;
 CREATE POLICY "System can insert review queue" ON review_queue
   FOR INSERT
   WITH CHECK (true); -- Service role only
@@ -230,6 +235,7 @@ CREATE POLICY "System can insert review queue" ON review_queue
 -- Shop recommendations: admins can view
 ALTER TABLE shop_recommendations ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins can view shop recommendations" ON shop_recommendations;
 CREATE POLICY "Admins can view shop recommendations" ON shop_recommendations
   FOR SELECT
   USING (
@@ -243,6 +249,7 @@ CREATE POLICY "Admins can view shop recommendations" ON shop_recommendations
 -- Partner documents: partners can view own, admins can view all
 ALTER TABLE partner_documents ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Partners can view own documents" ON partner_documents;
 CREATE POLICY "Partners can view own documents" ON partner_documents
   FOR SELECT
   USING (
@@ -251,6 +258,7 @@ CREATE POLICY "Partners can view own documents" ON partner_documents
     )
   );
 
+DROP POLICY IF EXISTS "Admins can view all partner documents" ON partner_documents;
 CREATE POLICY "Admins can view all partner documents" ON partner_documents
   FOR SELECT
   USING (
@@ -264,6 +272,7 @@ CREATE POLICY "Admins can view all partner documents" ON partner_documents
 -- Partner MOUs: partners can view own, admins can view all
 ALTER TABLE partner_mous ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Partners can view own MOUs" ON partner_mous;
 CREATE POLICY "Partners can view own MOUs" ON partner_mous
   FOR SELECT
   USING (
@@ -272,6 +281,7 @@ CREATE POLICY "Partners can view own MOUs" ON partner_mous
     )
   );
 
+DROP POLICY IF EXISTS "Admins can view all MOUs" ON partner_mous;
 CREATE POLICY "Admins can view all MOUs" ON partner_mous
   FOR SELECT
   USING (
@@ -285,10 +295,12 @@ CREATE POLICY "Admins can view all MOUs" ON partner_mous
 -- Apprentice placements
 ALTER TABLE apprentice_placements ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Apprentices can view own placements" ON apprentice_placements;
 CREATE POLICY "Apprentices can view own placements" ON apprentice_placements
   FOR SELECT
   USING (apprentice_id = auth.uid());
 
+DROP POLICY IF EXISTS "Partners can view their shop placements" ON apprentice_placements;
 CREATE POLICY "Partners can view their shop placements" ON apprentice_placements
   FOR SELECT
   USING (
@@ -297,6 +309,7 @@ CREATE POLICY "Partners can view their shop placements" ON apprentice_placements
     )
   );
 
+DROP POLICY IF EXISTS "Admins can view all placements" ON apprentice_placements;
 CREATE POLICY "Admins can view all placements" ON apprentice_placements
   FOR SELECT
   USING (

@@ -6,9 +6,10 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = { title: 'Help Article | Elevate LMS' };
 
-export default function HelpArticlePage({ params }: { params: { id: string } }) {
+export default async function HelpArticlePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const article = {
-    id: params.id,
+    id: id,
     title: 'How to enroll in a program',
     category: 'Getting Started',
     readTime: '5 min',

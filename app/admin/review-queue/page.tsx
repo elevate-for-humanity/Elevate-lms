@@ -36,8 +36,9 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
 export default async function ReviewQueuePage({
   searchParams,
 }: {
-  searchParams: { queue_type?: string; status?: string };
+  searchParams: Promise<{ queue_type?: string; status?: string }>;
 }) {
+  const { queue_type, status: statusParam } = await searchParams;
   const supabase = await createClient();
   if (!supabase) redirect('/login');
 
@@ -62,12 +63,12 @@ export default async function ReviewQueuePage({
     .order('priority', { ascending: true })
     .order('created_at', { ascending: true });
 
-  if (searchParams.queue_type) {
-    query = query.eq('queue_type', searchParams.queue_type);
+  if (queue_type) {
+    query = query.eq('queue_type', queue_type);
   }
 
-  if (searchParams.status) {
-    query = query.eq('status', searchParams.status);
+  if (statusParam) {
+    query = query.eq('status', statusParam);
   } else {
     query = query.in('status', ['open', 'in_progress']);
   }
@@ -99,7 +100,7 @@ export default async function ReviewQueuePage({
         <Link
           href="/admin/review-queue"
           className={`px-4 py-2 rounded-lg text-sm font-medium ${
-            !searchParams.queue_type
+            !queue_type
               ? 'bg-gray-900 text-white'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
@@ -111,7 +112,7 @@ export default async function ReviewQueuePage({
             key={type}
             href={`/admin/review-queue?queue_type=${type}`}
             className={`px-4 py-2 rounded-lg text-sm font-medium ${
-              searchParams.queue_type === type
+              queue_type === type
                 ? 'bg-gray-900 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}

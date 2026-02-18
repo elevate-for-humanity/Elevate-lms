@@ -11,9 +11,9 @@ import { logger } from '@/lib/logger';
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     token: string;
-  };
+  }>;
 }
 
 
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CredentialSharePage({ params }: PageProps) {
-  const { token } = params;
+  const { token } = await params;
 
   const supabase = await createServerSupabaseClient();
 

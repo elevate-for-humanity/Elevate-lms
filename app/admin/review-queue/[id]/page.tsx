@@ -26,8 +26,9 @@ export const dynamic = 'force-dynamic';
 export default async function ReviewDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const supabase = await createClient();
   if (!supabase) redirect('/login');
 
@@ -49,7 +50,7 @@ export default async function ReviewDetailPage({
   const { data: item, error } = await supabase
     .from('review_queue')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .single();
 
   if (error || !item) {

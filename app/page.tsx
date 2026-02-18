@@ -70,6 +70,7 @@ export default function HomePage() {
                 alt: 'Students in a hands-on training session',
                 label: 'I want to train',
                 desc: 'Browse programs in healthcare, trades, CDL, tech, and barbering. See schedules, requirements, and how to enroll.',
+                cta: 'Browse Programs',
               },
               {
                 href: '/funding',
@@ -77,6 +78,7 @@ export default function HomePage() {
                 alt: 'Workforce funding and financial aid',
                 label: 'I need funding',
                 desc: 'Many programs are available at no cost to eligible participants. Check eligibility for WIOA, Workforce Ready Grant, JRI, and other funding sources.',
+                cta: 'Check Eligibility',
               },
               {
                 href: '/employer',
@@ -84,6 +86,7 @@ export default function HomePage() {
                 alt: 'Employer reviewing candidate profiles',
                 label: 'I&apos;m an employer',
                 desc: 'Hire credentialed graduates, access WOTC tax credits up to $9,600/hire, and get OJT wage reimbursements.',
+                cta: 'Hire Graduates',
               },
               {
                 href: '/store',
@@ -91,19 +94,26 @@ export default function HomePage() {
                 alt: 'Training school using the Elevate platform',
                 label: 'I run a school',
                 desc: 'License the Elevate platform for your organization. White-label LMS with enrollment, compliance, and reporting.',
+                cta: 'Get Licensed',
               },
             ].map((item) => (
-              <Link
+              <div
                 key={item.href}
-                href={item.href}
-                className="flex flex-col items-center gap-3 p-5 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
+                className="flex flex-col items-center gap-3 p-5 bg-white rounded-xl shadow-sm border border-slate-200 text-center group"
               >
                 <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden">
                   <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
                 </div>
-                <span className="font-semibold text-lg text-slate-900 group-hover:text-brand-blue-600">{item.label}</span>
+                <span className="font-semibold text-lg text-slate-900">{item.label}</span>
                 <span className="text-sm text-slate-500">{item.desc}</span>
-              </Link>
+                <Link
+                  href={item.href}
+                  className="mt-2 inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-6 py-3 rounded-lg transition-colors w-full"
+                >
+                  {item.cta}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </Link>
+              </div>
             ))}
           </div>
         </div>

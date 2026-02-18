@@ -1,13 +1,14 @@
 import { redirect } from 'next/navigation';
 
-export default function CertVerifyRedirect({
+export default async function CertVerifyRedirect({
   searchParams,
 }: {
-  searchParams: { id?: string; code?: string };
+  searchParams: Promise<{ id?: string; code?: string }>;
 }) {
+  const { id, code } = await searchParams;
   const params = new URLSearchParams();
-  if (searchParams.id) params.set('id', searchParams.id);
-  if (searchParams.code) params.set('code', searchParams.code);
+  if (id) params.set('id', id);
+  if (code) params.set('code', code);
   
   const query = params.toString();
   redirect(query ? `/verify?${query}` : '/verify');

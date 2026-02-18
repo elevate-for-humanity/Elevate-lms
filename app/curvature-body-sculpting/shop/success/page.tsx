@@ -7,11 +7,12 @@ export const metadata: Metadata = {
   description: 'Thank you for your order from Meri-Go-Round Wellness Shop.',
 };
 
-export default function OrderSuccessPage({
+export default async function OrderSuccessPage({
   searchParams,
 }: {
-  searchParams: { session_id?: string };
+  searchParams: Promise<{ session_id?: string }>;
 }) {
+  const { session_id } = await searchParams;
   return (
     <div className="min-h-screen bg-pink-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">

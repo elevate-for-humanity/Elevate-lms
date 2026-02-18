@@ -5,8 +5,9 @@ import { createClient } from '@/lib/supabase/server';
 export async function generateMetadata({
   params,
 }: {
-  params: { courseId: string };
+  params: Promise<{ courseId: string }>;
 }): Promise<Metadata> {
+  const { courseId } = await params;
   const supabase = await createClient();
 
   if (!supabase) {
@@ -19,7 +20,7 @@ export async function generateMetadata({
   const { data: course } = await supabase
     .from('courses')
     .select('title, description')
-    .eq('id', params.courseId)
+    .eq('id', courseId)
     .single();
 
   if (!course) {
@@ -33,7 +34,7 @@ export async function generateMetadata({
     title: `${course.title} | Elevate for Humanity`,
     description: course.description || `Learn ${course.title} with Elevate for Humanity workforce training programs.`,
     alternates: {
-      canonical: `https://www.elevateforhumanity.org/courses/${params.courseId}`,
+      canonical: `https://www.elevateforhumanity.org/courses/${courseId}`,
     },
   };
 }
@@ -46,10 +47,10 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export default async function CourseDetailPage({
   params,
 }: {
-  params: { courseId: string };
+  params: Promise<{ courseId: string }>;
 }) {
+  const { courseId } = await params;
   const supabase = await createClient();
-  const { courseId } = params;
 
   // Fetch course details
   const { data: course, error } = await supabase

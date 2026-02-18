@@ -18,8 +18,9 @@ export const dynamic = 'force-dynamic';
 export default async function VerifyCertificatePage({
   params,
 }: {
-  params: { certificateId: string };
+  params: Promise<{ certificateId: string }>;
 }) {
+  const { certificateId } = await params;
   const supabase = await createClient();
 
   // Start to find certificate in multiple tables
@@ -33,7 +34,7 @@ export default async function VerifyCertificatePage({
   const { data: programCert } = await supabase
     .from('program_completion_certificates')
     .select('*, users(full_name, email)')
-    .eq('certificate_number', params.certificateId)
+    .eq('certificate_number', certificateId)
     .single();
 
   if (programCert) {
@@ -50,7 +51,7 @@ export default async function VerifyCertificatePage({
     const { data: partnerCert } = await supabase
       .from('partner_certificates')
       .select('*, users(full_name, email), partner_courses(course_name)')
-      .eq('certificate_number', params.certificateId)
+      .eq('certificate_number', certificateId)
       .single();
 
     if (partnerCert) {
@@ -68,7 +69,7 @@ export default async function VerifyCertificatePage({
     const { data: moduleCert } = await supabase
       .from('module_certificates')
       .select('*, users(full_name, email)')
-      .eq('certificate_number', params.certificateId)
+      .eq('certificate_number', certificateId)
       .single();
 
     if (moduleCert) {
@@ -179,7 +180,7 @@ export default async function VerifyCertificatePage({
                   <div>
                     <p className="text-sm text-gray-600">Certificate Number</p>
                     <p className="font-semibold text-lg">
-                      {params.certificateId}
+                      {certificateId}
                     </p>
                   </div>
                   <div>
@@ -221,7 +222,7 @@ export default async function VerifyCertificatePage({
                 <div className="inline-block p-4 bg-white border-2 border-gray-200 rounded-lg">
                   <Image
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                      `${process.env.NEXT_PUBLIC_SITE_URL || 'https://elevateforhumanity.com'}/verify/${params.certificateId}`
+                      `${process.env.NEXT_PUBLIC_SITE_URL || 'https://elevateforhumanity.com'}/verify/${certificateId}`
                     )}`}
                     alt="QR Code"
                     width={192}

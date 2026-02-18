@@ -118,8 +118,9 @@ function SuccessContent({
 export default async function CheckoutSuccessPage({
   searchParams,
 }: {
-  searchParams: { session_id?: string };
+  searchParams: Promise<{ session_id?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const supabase = await createClient();
 
   if (!supabase) {
@@ -138,7 +139,7 @@ export default async function CheckoutSuccessPage({
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <SuccessContent searchParams={searchParams} />
+      <SuccessContent searchParams={resolvedSearchParams} />
     </Suspense>
   );
 }

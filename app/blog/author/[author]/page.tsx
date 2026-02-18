@@ -9,9 +9,10 @@ import { notFound } from 'next/navigation';
 export async function generateMetadata({
   params,
 }: {
-  params: { author: string };
+  params: Promise<{ author: string }>;
 }): Promise<Metadata> {
-  const author = params.author.replace(/-/g, ' ');
+  const { author: authorSlug } = await params;
+  const author = authorSlug.replace(/-/g, ' ');
   return {
     title: `Articles by ${author} | Elevate For Humanity`,
     description: `Read articles written by ${author}`,
@@ -50,10 +51,11 @@ async function getAuthorPosts(author: string) {
 export default async function AuthorPage({
   params,
 }: {
-  params: { author: string };
+  params: Promise<{ author: string }>;
 }) {
-  const posts = await getAuthorPosts(params.author);
-  const authorName = params.author.replace(/-/g, ' ');
+  const { author } = await params;
+  const posts = await getAuthorPosts(author);
+  const authorName = author.replace(/-/g, ' ');
 
   if (posts.length === 0) {
     notFound();

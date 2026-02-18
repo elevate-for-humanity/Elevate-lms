@@ -23,8 +23,9 @@ interface CourseModule {
 export default async function ApprenticeCourseDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const supabase = await createClient();
 
   if (!supabase) {
@@ -65,14 +66,14 @@ export default async function ApprenticeCourseDetailPage({
   const { data: course } = await supabase
     .from('courses')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .single();
 
   // Get course modules
   const { data: modules } = await supabase
     .from('course_modules')
     .select('*')
-    .eq('course_id', params.id)
+    .eq('course_id', id)
     .order('order_index', { ascending: true });
 
   // Get user's progress on modules
@@ -80,14 +81,14 @@ export default async function ApprenticeCourseDetailPage({
     .from('module_progress')
     .select('module_id, completed_at')
     .eq('user_id', user.id)
-    .eq('course_id', params.id);
+    .eq('course_id', id);
 
   const completedModuleIds = new Set(progress?.map(p => p.module_id) || []);
 
   // If no course found, show default course structure
   const courseData = course || {
-    id: params.id,
-    name: params.id === '1' ? 'Barber Fundamentals' : `Course ${params.id}`,
+    id: id,
+    name: id === '1' ? 'Barber Fundamentals' : `Course ${id}`,
     description: 'Learn the foundational skills and knowledge required for your apprenticeship.',
   };
 
@@ -248,7 +249,7 @@ export default async function ApprenticeCourseDetailPage({
                         </span>
                       ) : isCurrent ? (
                         <Link
-                          href={`/apprentice/courses/${params.id}/modules/${module.id}`}
+                          href={`/apprentice/courses/${id}/modules/${module.id}`}
                           className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition"
                         >
                           <PlayCircle className="w-4 h-4" />

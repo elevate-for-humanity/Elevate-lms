@@ -20,8 +20,9 @@ export const dynamic = 'force-dynamic';
 export default async function StoreSuccessPage({
   searchParams,
 }: {
-  searchParams: { order_id?: string };
+  searchParams: Promise<{ order_id?: string }>;
 }) {
+  const { order_id } = await searchParams;
   const supabase = await createClient();
 
   if (!supabase) {
@@ -40,7 +41,7 @@ export default async function StoreSuccessPage({
     redirect('/login?redirect=/store');
   }
 
-  const orderId = searchParams.order_id;
+  const orderId = order_id;
 
   // Get order details
   let order = null;

@@ -18,6 +18,14 @@ import {
   Book,
   LifeBuoy,
   LayoutDashboard,
+  Bell,
+  Megaphone,
+  GraduationCap,
+  BookOpen,
+  PenTool,
+  AlertTriangle,
+  Clock,
+  HelpCircle,
 } from 'lucide-react';
 
 export default async function ProgramHolderLayout({
@@ -62,41 +70,22 @@ export default async function ProgramHolderLayout({
   }
 
   const navItems = [
-    {
-      href: '/program-holder/dashboard',
-      label: 'Dashboard',
-      icon: LayoutDashboard,
-    },
-    {
-      href: '/program-holder/verification',
-      label: 'Verification',
-      icon: Shield,
-    },
-    {
-      href: '/program-holder/students',
-      label: 'Students',
-      icon: Users,
-    },
-    {
-      href: '/program-holder/reports',
-      label: 'Reports',
-      icon: FileText,
-    },
-    {
-      href: '/program-holder/compliance',
-      label: 'Compliance',
-      icon: Shield,
-    },
-    {
-      href: '/program-holder/documentation',
-      label: 'Documentation',
-      icon: Book,
-    },
-    {
-      href: '/program-holder/support',
-      label: 'Support',
-      icon: LifeBuoy,
-    },
+    { href: '/program-holder/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/program-holder/verification', label: 'Verification', icon: Shield },
+    { href: '/program-holder/students', label: 'Students', icon: Users },
+    { href: '/program-holder/students/pending', label: 'Pending Students', icon: Clock },
+    { href: '/program-holder/students/at-risk', label: 'At-Risk Students', icon: AlertTriangle },
+    { href: '/program-holder/grades', label: 'Grades', icon: GraduationCap },
+    { href: '/program-holder/courses/create', label: 'Create Course', icon: BookOpen },
+    { href: '/program-holder/campaigns', label: 'Campaigns', icon: Megaphone },
+    { href: '/program-holder/notifications', label: 'Notifications', icon: Bell },
+    { href: '/program-holder/mou', label: 'MOU', icon: FileText },
+    { href: '/program-holder/sign-mou', label: 'Sign MOU', icon: PenTool },
+    { href: '/program-holder/how-to-use', label: 'How to Use', icon: HelpCircle },
+    { href: '/program-holder/reports', label: 'Reports', icon: FileText },
+    { href: '/program-holder/compliance', label: 'Compliance', icon: Shield },
+    { href: '/program-holder/documentation', label: 'Documentation', icon: Book },
+    { href: '/program-holder/support', label: 'Support', icon: LifeBuoy },
   ];
 
   return (

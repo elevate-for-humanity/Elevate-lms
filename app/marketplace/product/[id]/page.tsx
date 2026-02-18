@@ -17,8 +17,9 @@ import ProductCheckoutButton from './ProductCheckoutButton';
 export default async function ProductPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const supabase = await createClient();
 
   if (!supabase) {
@@ -40,7 +41,7 @@ export default async function ProductPage({
       creator:marketplace_creators(display_name, bio)
     `
     )
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('status', 'approved')
     .single();
 

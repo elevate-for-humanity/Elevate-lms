@@ -44,10 +44,32 @@ export default async function StaffPortalLayout({
     redirect('/unauthorized');
   }
 
+  const staffNavItems = [
+    { href: '/staff-portal/dashboard', label: 'Dashboard' },
+    { href: '/staff-portal/students', label: 'Students' },
+    { href: '/staff-portal/cases', label: 'Cases' },
+    { href: '/staff-portal/attendance/record', label: 'Attendance' },
+    { href: '/staff-portal/reports', label: 'Reports' },
+  ];
+
   return (
     <>
       <SkipToContent />
       <IdleTimeoutGuard />
+      <nav className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-14">
+            <div className="flex items-center gap-6">
+              <span className="text-lg font-bold text-brand-blue-700">Staff Portal</span>
+              <div className="hidden md:flex items-center gap-4">
+                {staffNavItems.map((item) => (
+                  <a key={item.href} href={item.href} className="text-sm text-gray-600 hover:text-brand-blue-700">{item.label}</a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
       <div id="main-content">{children}</div>
     </>
   );

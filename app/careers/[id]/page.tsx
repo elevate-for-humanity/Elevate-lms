@@ -1,11 +1,12 @@
 'use client';
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { useState } from 'react';
+import { use, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Upload, Briefcase, MapPin, Clock } from 'lucide-react';
 
-export default function CareerApplicationPage({ params }: { params: { id: string } }) {
+export default function CareerApplicationPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',

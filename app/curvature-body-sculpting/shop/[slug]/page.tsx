@@ -10,15 +10,16 @@ import { ShoppingCart, Truck, Shield, RotateCcw } from 'lucide-react';
 import AddToCartButton from './AddToCartButton';
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   const supabase = await createClient();
   const { data: product } = await supabase
     .from('products')
     .select('name, description')
-    .eq('slug', params.slug)
+    .eq('slug', slug)
     .single();
 
   if (!product) {
@@ -32,12 +33,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductDetailPage({ params }: Props) {
+  const { slug } = await params;
   const supabase = await createClient();
   
   const { data: product, error } = await supabase
     .from('products')
     .select('*')
-    .eq('slug', params.slug)
+    .eq('slug', slug)
     .single();
 
   if (error || !product) {

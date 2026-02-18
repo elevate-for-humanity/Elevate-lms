@@ -62,10 +62,15 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
       submenu: [
         { href: '/admin/students', label: 'All Students' },
         { href: '/admin/applicants', label: 'Applicants' },
+        { href: '/admin/applicants-live', label: 'Live Applicants' },
         { href: '/admin/applications', label: 'Applications' },
         { href: '/admin/enrollments', label: 'Enrollments' },
+        { href: '/admin/hsi-enrollments', label: 'HSI Enrollments' },
+        { href: '/admin/partner-enrollments', label: 'Partner Enrollments' },
         { href: '/admin/progress', label: 'Progress' },
         { href: '/admin/completions', label: 'Completions' },
+        { href: '/admin/intake', label: 'Intake' },
+        { href: '/admin/users/new', label: 'New User' },
       ],
     },
     {
@@ -73,7 +78,10 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
       icon: BookOpen,
       submenu: [
         { href: '/admin/courses', label: 'All Courses' },
+        { href: '/admin/courses/manage', label: 'Manage Courses' },
         { href: '/admin/course-builder', label: 'Course Builder' },
+        { href: '/admin/courses/builder', label: 'Visual Builder' },
+        { href: '/admin/courses/bulk-operations', label: 'Bulk Operations' },
         { href: '/admin/modules', label: 'Modules' },
         { href: '/admin/lessons', label: 'Lessons' },
         { href: '/admin/quizzes', label: 'Quizzes' },
@@ -87,10 +95,15 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
       icon: Award,
       submenu: [
         { href: '/admin/programs', label: 'All Programs' },
+        { href: '/admin/programs/catalog', label: 'Program Catalog' },
+        { href: '/admin/programs/builder', label: 'Program Builder' },
         { href: '/admin/program-generator', label: 'Program Generator' },
         { href: '/admin/apprenticeships', label: 'Apprenticeships' },
         { href: '/admin/certifications', label: 'Certifications' },
         { href: '/admin/certificates', label: 'Certificates' },
+        { href: '/admin/certificates/issue', label: 'Issue Certificate' },
+        { href: '/admin/certificates/bulk', label: 'Bulk Certificates' },
+        { href: '/admin/dashboard/etpl', label: 'ETPL Dashboard' },
       ],
     },
     {
@@ -101,6 +114,7 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
         { href: '/admin/employers', label: 'Employers' },
         { href: '/admin/delegates', label: 'Delegates' },
         { href: '/admin/partner-inquiries', label: 'Partner Inquiries' },
+        { href: '/admin/shops/geocoding', label: 'Shop Geocoding' },
       ],
     },
     {
@@ -109,6 +123,7 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
       submenu: [
         { href: '/admin/funding', label: 'Funding' },
         { href: '/admin/grants', label: 'Grants' },
+        { href: '/admin/grants/submissions', label: 'Grant Submissions' },
         { href: '/admin/payroll', label: 'Payroll' },
         { href: '/admin/tax-filing', label: 'Tax Filing' },
         { href: '/admin/incentives', label: 'Incentives' },
@@ -119,10 +134,27 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
       icon: Shield,
       submenu: [
         { href: '/admin/compliance', label: 'Compliance Dashboard' },
+        { href: '/admin/compliance-audit', label: 'Compliance Audit' },
+        { href: '/admin/compliance/agreements', label: 'Agreements' },
+        { href: '/admin/compliance/financial-assurance', label: 'Financial Assurance' },
         { href: '/admin/ferpa', label: 'FERPA' },
         { href: '/admin/sap', label: 'SAP' },
         { href: '/admin/reporting', label: 'Reports' },
         { href: '/admin/outcomes', label: 'Outcomes' },
+      ],
+    },
+    {
+      label: 'Reports',
+      icon: FileText,
+      submenu: [
+        { href: '/admin/reports/enrollment', label: 'Enrollment' },
+        { href: '/admin/reports/financial', label: 'Financial' },
+        { href: '/admin/reports/caseload', label: 'Caseload' },
+        { href: '/admin/reports/leads', label: 'Leads' },
+        { href: '/admin/reports/partners', label: 'Partners' },
+        { href: '/admin/reports/users', label: 'Users' },
+        { href: '/admin/reports/charts', label: 'Charts' },
+        { href: '/admin/reports/samples', label: 'Sample Reports' },
       ],
     },
     {
@@ -133,6 +165,16 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
         { href: '/admin/videos', label: 'Videos' },
         { href: '/admin/documents', label: 'Documents' },
         { href: '/admin/files', label: 'Files' },
+        { href: '/admin/import', label: 'Import Data' },
+      ],
+    },
+    {
+      label: 'HR',
+      icon: Users,
+      submenu: [
+        { href: '/admin/hr/payroll', label: 'Payroll' },
+        { href: '/admin/hr/leave', label: 'Leave Management' },
+        { href: '/admin/hr/time', label: 'Time Tracking' },
       ],
     },
     {
@@ -141,8 +183,14 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
       submenu: [
         { href: '/admin/advanced-tools', label: 'Advanced Tools' },
         { href: '/admin/integrations', label: 'Integrations' },
+        { href: '/admin/integrations/salesforce', label: 'Salesforce' },
         { href: '/admin/settings', label: 'Settings' },
         { href: '/admin/audit-logs', label: 'Audit Logs' },
+        { href: '/admin/activity', label: 'Activity Log' },
+        { href: '/admin/api-keys', label: 'API Keys' },
+        { href: '/admin/system-monitor', label: 'System Monitor' },
+        { href: '/admin/system-status', label: 'System Status' },
+        { href: '/admin/support', label: 'Support' },
       ],
     },
     {
@@ -153,6 +201,18 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
         { href: '/admin/ai-console', label: 'AI Console' },
         { href: '/admin/course-generator', label: 'Course Generator' },
         { href: '/admin/video-generator', label: 'Video Generator' },
+        { href: '/admin/automation', label: 'Automation' },
+        { href: '/admin/automation-qa', label: 'Automation QA' },
+      ],
+    },
+    {
+      label: 'Analytics',
+      icon: Code,
+      submenu: [
+        { href: '/admin/analytics', label: 'Overview' },
+        { href: '/admin/analytics/engagement', label: 'Engagement' },
+        { href: '/admin/analytics/learning', label: 'Learning' },
+        { href: '/admin/analytics/programs', label: 'Programs' },
       ],
     },
     {
@@ -164,6 +224,16 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
         { href: '/admin/crm/campaigns', label: 'Campaigns' },
         { href: '/admin/crm/deals', label: 'Deals' },
         { href: '/admin/crm/leads', label: 'Leads' },
+        { href: '/admin/leads/new', label: 'New Lead' },
+      ],
+    },
+    {
+      label: 'Marketplace',
+      icon: ShoppingCart,
+      submenu: [
+        { href: '/admin/marketplace/products', label: 'Products' },
+        { href: '/admin/marketplace/creators', label: 'Creators' },
+        { href: '/admin/marketplace/payouts', label: 'Payouts' },
       ],
     },
     {

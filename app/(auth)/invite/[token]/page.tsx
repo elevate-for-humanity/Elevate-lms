@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
@@ -16,8 +16,9 @@ interface InviteData {
 export default function AcceptInvitePage({
   params,
 }: {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }) {
+  const { token } = use(params);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(false);
@@ -26,7 +27,7 @@ export default function AcceptInvitePage({
 
   useEffect(() => {
     loadInvite();
-  }, [params.token]);
+  }, [token]);
 
   async function loadInvite() {
     try {
@@ -38,7 +39,7 @@ export default function AcceptInvitePage({
       }
 
       const { data, error } = await (supabase as any).rpc('get_org_invite_by_token', {
-        p_token: params.token,
+        p_token: token,
       });
 
       if (error || !data || data.length === 0) {
@@ -95,12 +96,12 @@ export default function AcceptInvitePage({
 
       if (!user) {
         // Redirect to login with return URL
-        router.push(`/login?redirect=/invite/${params.token}`);
+        router.push(`/login?redirect=/invite/${token}`);
         return;
       }
 
       // Accept invite via API
-      const response = await fetch(`/api/org/invite/${params.token}/accept`, {
+      const response = await fetch(`/api/org/invite/${token}/accept`, {
         method: 'POST',
       });
 

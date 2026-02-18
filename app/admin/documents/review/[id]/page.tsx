@@ -13,8 +13,9 @@ export const metadata: Metadata = {
 export default async function ReviewDocumentPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const supabase = await createClient();
 
   if (!supabase) {
@@ -59,7 +60,7 @@ export default async function ReviewDocumentPage({
       )
     `
     )
-    .eq('id', params.id)
+    .eq('id', id)
     .single();
 
   if (!document) {

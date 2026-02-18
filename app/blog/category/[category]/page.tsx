@@ -9,14 +9,15 @@ import { notFound } from 'next/navigation';
 export async function generateMetadata({
   params,
 }: {
-  params: { category: string };
+  params: Promise<{ category: string }>;
 }): Promise<Metadata> {
-  const category = params.category.replace(/-/g, ' ');
+  const { category: categorySlug } = await params;
+  const category = categorySlug.replace(/-/g, ' ');
   return {
     title: `${category} | Blog | Elevate For Humanity`,
     description: `Browse ${category} articles from Elevate For Humanity`,
     alternates: {
-      canonical: `https://www.elevateforhumanity.org/blog/category/${params.category}`,
+      canonical: `https://www.elevateforhumanity.org/blog/category/${categorySlug}`,
     },
   };
 }
@@ -71,11 +72,12 @@ async function getAllCategories() {
 export default async function CategoryPage({
   params,
 }: {
-  params: { category: string };
+  params: Promise<{ category: string }>;
 }) {
-  const posts = await getCategoryPosts(params.category);
+  const { category } = await params;
+  const posts = await getCategoryPosts(category);
   const allCategories = await getAllCategories();
-  const categoryName = params.category.replace(/-/g, ' ');
+  const categoryName = category.replace(/-/g, ' ');
 
   if (posts.length === 0) {
     notFound();

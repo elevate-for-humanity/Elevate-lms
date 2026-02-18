@@ -17,8 +17,9 @@ export const metadata: Metadata = {
 export default async function HSISuccessPage({
   searchParams,
 }: {
-  searchParams: { session_id?: string };
+  searchParams: Promise<{ session_id?: string }>;
 }) {
+  const { session_id } = await searchParams;
   const supabase = await createClient();
   let enrollment = null;
 
@@ -26,11 +27,11 @@ export default async function HSISuccessPage({
     await supabase.from('page_views').insert({ page: 'hsi_course_success' }).select();
     
     // Try to fetch enrollment details if session_id provided
-    if (searchParams.session_id) {
+    if (session_id) {
       const { data } = await supabase
         .from('hsi_enrollment_queue')
         .select('*, course:hsi_course_products(*)')
-        .eq('stripe_session_id', searchParams.session_id)
+        .eq('stripe_session_id', session_id)
         .single();
       enrollment = data;
     }

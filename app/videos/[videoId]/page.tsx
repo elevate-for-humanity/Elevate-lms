@@ -18,9 +18,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { videoId: string };
+  params: Promise<{ videoId: string }>;
 }): Promise<Metadata> {
-  const video = getVideoById(params.videoId);
+  const { videoId } = await params;
+  const video = getVideoById(videoId);
 
   if (!video) {
     return {
@@ -62,8 +63,9 @@ export async function generateMetadata({
 export default async function VideoWatchPage({
   params,
 }: {
-  params: { videoId: string };
+  params: Promise<{ videoId: string }>;
 }) {
+  const { videoId } = await params;
   const supabase = await createClient();
 
   if (!supabase) {
@@ -81,10 +83,10 @@ export default async function VideoWatchPage({
   const { data: dbVideo } = await supabase
     .from('videos')
     .select('*')
-    .eq('id', params.videoId)
+    .eq('id', videoId)
     .single();
 
-  const video = dbVideo || getVideoById(params.videoId);
+  const video = dbVideo || getVideoById(videoId);
 
   if (!video) {
     notFound();

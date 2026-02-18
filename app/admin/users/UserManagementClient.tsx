@@ -348,7 +348,7 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   disabled={!!editingUser}
                   className="w-full px-4 py-2 border rounded-lg disabled:bg-gray-100"
-                  placeholder="user@example.com"
+                  placeholder="user@elevateforhumanity.org"
                 />
                 {editingUser && <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>}
               </div>

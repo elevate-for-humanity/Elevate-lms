@@ -201,7 +201,7 @@ export default function BarberShopPartnerPage() {
                     name="email"
                     required
                     className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500"
-                    placeholder="shop@example.com"
+                    placeholder="shop@elevateforhumanity.org"
                   />
                 </div>
                 <div>

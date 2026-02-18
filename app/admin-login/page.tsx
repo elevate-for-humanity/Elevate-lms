@@ -19,7 +19,7 @@ export default function AdminLoginPage() {
           <form className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-              <input type="email" className="w-full border rounded-lg px-3 py-2" placeholder="admin@example.com" required />
+              <input type="email" className="w-full border rounded-lg px-3 py-2" placeholder="admin@elevateforhumanity.org" required />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>

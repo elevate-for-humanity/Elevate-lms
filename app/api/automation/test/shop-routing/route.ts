@@ -94,7 +94,7 @@ export async function POST() {
         .insert({
           name: `Test ${shop.name}`,
           owner_name: 'Test Owner',
-          email: `shop-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`,
+          email: `shop-${Date.now()}-${Math.random().toString(36).slice(2)}@test.elevateforhumanity.org`,
           phone: '555-0100',
           address_line1: '123 Test St',
           city: 'Indianapolis',

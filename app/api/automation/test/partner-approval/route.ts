@@ -75,7 +75,7 @@ export async function POST() {
         .insert({
           name: `Test Partner - ${testCase.name}`,
           owner_name: 'Test Owner',
-          email: `test-${Date.now()}@example.com`,
+          email: `test-${Date.now()}@test.elevateforhumanity.org`,
           phone: '555-0100',
           address_line1: '123 Test St',
           city: 'Indianapolis',
@@ -110,7 +110,7 @@ export async function POST() {
             partner_id: partner.id,
             document_type: docType,
             file_name: `${docType}_test.pdf`,
-            file_url: 'https://example.com/test.pdf',
+            file_url: 'https://elevateforhumanity.org/test.pdf',
             status: 'verified',
             verified_at: new Date().toISOString(),
             verified_by: 'system',

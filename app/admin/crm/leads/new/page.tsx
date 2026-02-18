@@ -87,7 +87,7 @@ export default async function NewLeadPage() {
                   name="email"
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-                  placeholder="jane@example.com"
+                  placeholder="jane@elevateforhumanity.org"
                 />
               </div>
               <div>

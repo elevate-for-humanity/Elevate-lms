@@ -25,7 +25,7 @@ class StubPartnerAPI extends BasePartnerAPI {
     return {
       externalId: fakeId,
       username: student.email,
-      loginUrl: "https://partner.example.com/login",
+      loginUrl: "https://partner.elevateforhumanity.org/login",
       passwordPlaintext: undefined,
     };
   }
@@ -39,7 +39,7 @@ class StubPartnerAPI extends BasePartnerAPI {
       externalEnrollmentId: `${this.partner}_${accountExternalId}_${courseExternalCode}`,
       courseId: courseExternalCode,
       courseName: `Course ${courseExternalCode}`,
-      accessUrl: "https://partner.example.com/course/launch",
+      accessUrl: "https://partner.elevateforhumanity.org/course/launch",
     };
   }
 
@@ -71,7 +71,7 @@ class StubPartnerAPI extends BasePartnerAPI {
     returnTo?: string;
   }): Promise<string> {
     // In production: generate real SSO link
-    return `https://partner.example.com/sso/launch?enrollment=${encodeURIComponent(
+    return `https://partner.elevateforhumanity.org/sso/launch?enrollment=${encodeURIComponent(
       params.externalEnrollmentId
     )}`;
   }

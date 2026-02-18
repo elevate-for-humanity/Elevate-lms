@@ -76,7 +76,7 @@ export async function getJobApplications(jobId: string): Promise<JobApplication[
     {
       id: '1',
       candidateName: 'Sarah Johnson',
-      candidateEmail: 'sarah.j@example.com',
+      candidateEmail: 'sarah.j@elevateforhumanity.org',
       position: 'HVAC Technician',
       appliedDate: '2024-02-15',
       status: 'new',

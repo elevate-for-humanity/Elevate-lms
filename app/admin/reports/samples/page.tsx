@@ -21,7 +21,7 @@ const SAMPLE_ENROLLMENT = {
   id: 'ENR-2026-00142',
   student: {
     name: 'Maria Rodriguez',
-    email: 'maria.r@example.com',
+    email: 'maria.r@elevateforhumanity.org',
     phone: '(317) 314-3757',
     dob: '1995-03-15',
     ssn_last4: '4521',

@@ -311,9 +311,9 @@ export async function importUsers(
  */
 export function generateCSVTemplate(): string {
   return `First Name,Last Name,Email,Role,Phone,Date of Birth,Student Number,Program ID,Cohort,Start Date,Funding Source
-Marcus,Johnson,marcus.j@example.com,student,(317) 314-3757,1990-01-15,STU001,barbering,2024-Spring,2024-01-15,WIOA
-Sarah,Williams,sarah.w@example.com,instructor,(317) 314-3757,,,,,
-James,Davis,james.d@example.com,case-manager,(317) 314-3757,,,,,`;
+Marcus,Johnson,marcus.j@elevateforhumanity.org,student,(317) 314-3757,1990-01-15,STU001,barbering,2024-Spring,2024-01-15,WIOA
+Sarah,Williams,sarah.w@elevateforhumanity.org,instructor,(317) 314-3757,,,,,
+James,Davis,james.d@elevateforhumanity.org,case-manager,(317) 314-3757,,,,,`;
 }
 
 /**

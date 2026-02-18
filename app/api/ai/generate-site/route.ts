@@ -153,7 +153,7 @@ Return ONLY valid JSON, no markdown.`;
       ],
       footer: {
         description: `${organizationName} provides quality training and education for career advancement.`,
-        contactEmail: 'info@example.com',
+        contactEmail: `info@${organizationName.toLowerCase().replace(/\s+/g, '')}.org`,
       },
       seo: siteConfig.seo || {
         title: `${organizationName} - Professional Training`,
@@ -225,11 +225,11 @@ function getDefaultConfig(name: string, type: string) {
     ],
     footer: {
       description: `${name} is dedicated to providing quality training and education.`,
-      contactEmail: 'info@example.com',
+      contactEmail: `info@${name.toLowerCase().replace(/\s+/g, '')}.org`,
     },
     seo: {
       title: `${name} - Professional Training Programs`,
-      description: `${name} offers comprehensive training programs for career advancement.`,
+      description: `${name} offers training programs for career advancement.`,
       keywords: ['training', 'education', 'professional development', 'certification'],
     },
   };

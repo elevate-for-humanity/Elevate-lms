@@ -8,7 +8,7 @@ import { EmailType } from './handlers/email-send';
  * ```
  * await enqueueEmail({
  *   emailType: 'license_activated',
- *   to: 'user@example.com',
+ *   to: 'user@elevateforhumanity.org',
  *   correlationId: paymentIntentId,
  *   tenantId: tenant.id,
  *   templateData: { plan: 'professional', tenantName: 'Acme Corp' }

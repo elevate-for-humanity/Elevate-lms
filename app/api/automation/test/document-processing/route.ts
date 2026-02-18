@@ -109,7 +109,7 @@ export async function POST() {
           user_id: user.id,
           document_type: testCase.documentType,
           file_name: `test_${testCase.name.toLowerCase().replace(/\s+/g, '_')}.pdf`,
-          file_url: 'https://example.com/test-document.pdf',
+          file_url: 'https://elevateforhumanity.org/test-document.pdf',
           file_size: 1024,
           mime_type: 'application/pdf',
           status: 'pending',

@@ -217,7 +217,7 @@ const courses = await ElevateLMS.getCourses();
 // Enroll student
 await ElevateLMS.enroll({
   courseId: 'course_123',
-  studentEmail: 'student@example.com'
+  studentEmail: 'student@elevateforhumanity.org'
 });
 
 // Track progress
@@ -299,7 +299,7 @@ ElevateLMS.render('#dashboard', {
       method: 'POST',
       endpoint: '/api/v1/enrollments',
       description: 'Enroll a student',
-      example: `curl -X POST -H "Authorization: Bearer ${apiKey}" -d '{"courseId":"123","email":"student@example.com"}' https://api.elevatelms.com/v1/enrollments`,
+      example: `curl -X POST -H "Authorization: Bearer ${apiKey}" -d '{"courseId":"123","email":"student@elevateforhumanity.org"}' https://api.elevatelms.com/v1/enrollments`,
     },
     {
       method: 'GET',

@@ -377,7 +377,7 @@ return NextResponse.json({
           students: {
             type: 'students',
             data: [
-              { email: 'john@example.com', first_name: 'John', last_name: 'Doe', phone: '555-1234' },
+              { email: 'john.doe@elevateforhumanity.org', first_name: 'John', last_name: 'Doe', phone: '317-314-3757' },
             ],
           },
           courses: {
@@ -389,7 +389,7 @@ return NextResponse.json({
           enrollments: {
             type: 'enrollments',
             data: [
-              { student_email: 'john@example.com', course_code: 'CNA101', status: 'active' },
+              { student_email: 'john.doe@elevateforhumanity.org', course_code: 'CNA101', status: 'active' },
             ],
           },
         },

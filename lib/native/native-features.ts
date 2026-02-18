@@ -124,7 +124,7 @@ export async function authenticateWithBiometrics(): Promise<boolean> {
       },
       user: {
         id: new Uint8Array(16),
-        name: 'user@example.com',
+        name: 'user@elevateforhumanity.org',
         displayName: 'User',
       },
       pubKeyCredParams: [

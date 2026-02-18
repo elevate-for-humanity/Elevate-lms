@@ -311,7 +311,7 @@ Return ONLY valid JSON.`;
       navigation: scrapedData.navigation.slice(0, 6),
       footer: {
         description: scrapedData.description.slice(0, 150),
-        contactEmail: scrapedData.contactInfo.email || 'info@example.com',
+        contactEmail: scrapedData.contactInfo.email || 'info@elevateforhumanity.org',
       },
       seo: {
         title: scrapedData.title,

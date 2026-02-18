@@ -256,7 +256,7 @@ export default function ShopOwnerRegisterPage() {
                 type="email"
                 value={shopData.email}
                 onChange={(e) => updateField('email', e.target.value)}
-                placeholder="shop@example.com"
+                placeholder="shop@elevateforhumanity.org"
                 className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>

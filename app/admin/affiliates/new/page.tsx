@@ -85,7 +85,7 @@ export default function NewAffiliatePage() {
                   <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="url"
-                    placeholder="https://example.com"
+                    placeholder="https://elevateforhumanity.org"
                     className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>

@@ -93,12 +93,12 @@ ALTER TABLE announcements ADD COLUMN IF NOT EXISTS severity TEXT DEFAULT 'info';
 ALTER TABLE announcements ADD COLUMN IF NOT EXISTS audience TEXT DEFAULT 'all';
 ALTER TABLE announcements ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
 
-INSERT INTO announcements (title, body, severity, audience, published, published_at, expires_at) VALUES
-  ('Welcome to Elevate for Humanity', 'We are excited to have you on the platform. Explore our programs, check your eligibility, and start your career journey today.', 'info', 'all', true, NOW(), NULL),
-  ('Spring 2026 Enrollment Open', 'Enrollment is now open for Spring 2026 cohorts across all programs. Apply early — seats are limited and WIOA funding is first-come, first-served.', 'info', 'all', true, NOW(), '2026-04-01T00:00:00Z'),
-  ('New: CDL Training Program', 'We have launched a new Commercial Driver License (CDL) training program. Class A CDL with job placement assistance. WIOA funding available for eligible participants.', 'info', 'all', true, NOW(), '2026-06-01T00:00:00Z'),
-  ('System Maintenance Notice', 'Scheduled maintenance window: Saturday 2am-4am EST. The platform may be briefly unavailable during this time.', 'warning', 'all', true, NOW(), '2026-03-01T00:00:00Z'),
-  ('Financial Aid Deadline Reminder', 'WIOA funding applications for the current quarter close at the end of this month. Submit your eligibility documents to your case manager.', 'warning', 'student', true, NOW(), '2026-03-31T00:00:00Z')
+INSERT INTO announcements (title, body, posted_by, severity, audience, published, published_at, expires_at) VALUES
+  ('Welcome to Elevate for Humanity', 'We are excited to have you on the platform. Explore our programs, check your eligibility, and start your career journey today.', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f', 'info', 'all', true, NOW(), NULL),
+  ('Spring 2026 Enrollment Open', 'Enrollment is now open for Spring 2026 cohorts across all programs. Apply early — seats are limited and WIOA funding is first-come, first-served.', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f', 'info', 'all', true, NOW(), '2026-04-01T00:00:00Z'),
+  ('New: CDL Training Program', 'We have launched a new Commercial Driver License (CDL) training program. Class A CDL with job placement assistance. WIOA funding available for eligible participants.', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f', 'info', 'all', true, NOW(), '2026-06-01T00:00:00Z'),
+  ('System Maintenance Notice', 'Scheduled maintenance window: Saturday 2am-4am EST. The platform may be briefly unavailable during this time.', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f', 'warning', 'all', true, NOW(), '2026-03-01T00:00:00Z'),
+  ('Financial Aid Deadline Reminder', 'WIOA funding applications for the current quarter close at the end of this month. Submit your eligibility documents to your case manager.', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f', 'warning', 'student', true, NOW(), '2026-03-31T00:00:00Z')
 ON CONFLICT DO NOTHING;
 
 -- ============================================
@@ -121,32 +121,32 @@ ON CONFLICT DO NOTHING;
 -- ============================================
 -- 8. SEED BLOG_POSTS
 -- ============================================
-INSERT INTO blog_posts (title, slug, content, excerpt, published, published_at, category, featured_image) VALUES
+INSERT INTO blog_posts (title, slug, content, excerpt, published, published_at, category, featured_image, author_id) VALUES
   ('How WIOA Funding Can Pay for Your Career Training',
    'wioa-funding-career-training',
    'The Workforce Innovation and Opportunity Act (WIOA) provides federal funding for job training programs. If you are unemployed, underemployed, or a dislocated worker, you may qualify for fully funded training in healthcare, skilled trades, technology, and more. Here is how to check your eligibility and apply through your local WorkOne office.',
    'Learn how WIOA funding can cover the full cost of career training programs in Indiana.',
-   true, NOW() - INTERVAL '7 days', 'funding', '/images/heroes-hq/funding-hero.jpg'),
+   true, NOW() - INTERVAL '7 days', 'funding', '/images/heroes-hq/funding-hero.jpg', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f'),
   ('5 In-Demand Careers You Can Start in 12 Weeks or Less',
    'in-demand-careers-12-weeks',
    'Short-term training programs can lead to well-paying careers faster than you think. CNA certification takes 4-8 weeks. HVAC technician training runs 8-12 weeks. Phlebotomy certification is 6-8 weeks. CDL training is 4-6 weeks. IT support certification is 8-12 weeks. All of these programs are available with WIOA funding for eligible participants.',
    'Discover career paths that start with short-term training and lead to immediate employment.',
-   true, NOW() - INTERVAL '14 days', 'programs', '/images/heroes-hq/programs-hero.jpg'),
+   true, NOW() - INTERVAL '14 days', 'programs', '/images/heroes-hq/programs-hero.jpg', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f'),
   ('What to Expect at Your First Day of Training',
    'first-day-training-guide',
    'Starting a new training program can feel overwhelming. Here is what to expect: orientation covers program rules, attendance policies, and campus resources. You will meet your instructors and classmates. Most programs begin with foundational coursework before moving to hands-on skills. Bring your ID, enrollment paperwork, and any required supplies listed in your welcome packet.',
    'A guide for new students starting their career training journey.',
-   true, NOW() - INTERVAL '21 days', 'student-life', '/images/heroes-hq/success-hero.jpg'),
+   true, NOW() - INTERVAL '21 days', 'student-life', '/images/heroes-hq/success-hero.jpg', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f'),
   ('Employer Spotlight: Why Companies Partner with Elevate',
    'employer-partnership-spotlight',
    'Our employer partners hire directly from our training programs because graduates arrive job-ready with industry credentials. Partners benefit from a pipeline of trained workers, reduced hiring costs, and access to WOTC tax credits. We currently partner with healthcare facilities, HVAC companies, trucking firms, and IT service providers across Indiana.',
    'How employer partnerships create direct pathways from training to employment.',
-   true, NOW() - INTERVAL '30 days', 'partnerships', '/images/heroes-hq/employer-hero.jpg'),
+   true, NOW() - INTERVAL '30 days', 'partnerships', '/images/heroes-hq/employer-hero.jpg', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f'),
   ('Understanding Registered Apprenticeships',
    'registered-apprenticeships-guide',
    'A Registered Apprenticeship is an employer-driven training model recognized by the U.S. Department of Labor. Apprentices earn while they learn, combining on-the-job training with classroom instruction. Elevate for Humanity is a DOL Registered Apprenticeship Sponsor offering programs in barbering and cosmetology with plans to expand into skilled trades.',
    'Everything you need to know about earning while you learn through registered apprenticeships.',
-   true, NOW() - INTERVAL '45 days', 'apprenticeships', '/images/heroes-hq/jri-hero.jpg')
+   true, NOW() - INTERVAL '45 days', 'apprenticeships', '/images/heroes-hq/jri-hero.jpg', 'bd5c4a5f-c00e-4056-9a82-4c29fc90140f')
 ON CONFLICT DO NOTHING;
 
 -- ============================================
@@ -200,12 +200,17 @@ ON CONFLICT DO NOTHING;
 -- ============================================
 -- 12. SEED QUIZZES + QUESTIONS (CNA program sample)
 -- ============================================
+-- Add missing columns to quiz_questions (pre-existing table has different schema)
+ALTER TABLE quiz_questions ADD COLUMN IF NOT EXISTS options JSONB DEFAULT '[]';
+ALTER TABLE quiz_questions ADD COLUMN IF NOT EXISTS correct_answer TEXT;
+ALTER TABLE quiz_questions ADD COLUMN IF NOT EXISTS sort_order INTEGER DEFAULT 0;
+
 -- Use a DO block to insert quizzes and reference their auto-generated IDs for questions
 DO $$
 DECLARE
-  cna_quiz_id INTEGER;
-  hvac_quiz_id INTEGER;
-  workplace_quiz_id INTEGER;
+  cna_quiz_id UUID;
+  hvac_quiz_id UUID;
+  workplace_quiz_id UUID;
 BEGIN
   -- Only insert if no quizzes exist yet
   IF NOT EXISTS (SELECT 1 FROM quizzes LIMIT 1) THEN

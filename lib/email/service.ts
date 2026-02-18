@@ -17,7 +17,7 @@ function getResend() {
   return resend;
 }
 
-const FROM_EMAIL = 'Elevate for Humanity <noreply@www.elevateforhumanity.org>';
+const FROM_EMAIL = 'Elevate for Humanity <noreply@elevateforhumanity.org>';
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
 export interface EmailOptions {

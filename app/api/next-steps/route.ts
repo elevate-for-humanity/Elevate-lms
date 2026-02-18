@@ -227,7 +227,7 @@ const supabase = await createClient();
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        to: '3177607908@txt.att.net',
+        to: process.env.ADMIN_SMS_GATEWAY || '',
         subject: 'Checklist',
         html: `${userEmail}\n${data.program_code || 'General'}\n${progress.percent}% done`,
       }),

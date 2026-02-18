@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
-const ADMIN_SMS = '3177607908@txt.att.net';
+const ADMIN_SMS = process.env.ADMIN_SMS_GATEWAY || '';
 
 export async function POST(req: Request) {
   try {

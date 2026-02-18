@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       // SMS alert via AT&T gateway
       await getResend().emails.send({
         from: process.env.EMAIL_FROM || 'noreply@www.elevateforhumanity.org',
-        to: '3177607908@txt.att.net',
+        to: process.env.ADMIN_SMS_GATEWAY || '',
         subject: 'Partner',
         text: `${data.fullName}\n${data.organization || ''}\n${data.relationshipType}`,
       });

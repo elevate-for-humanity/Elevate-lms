@@ -132,7 +132,7 @@ export async function POST(req: Request) {
         // SMS alert
         await resend.emails.send({
           from: 'Elevate <noreply@www.elevateforhumanity.org>',
-          to: '3177607908@txt.att.net',
+          to: process.env.ADMIN_SMS_GATEWAY || '',
           subject: 'Meeting',
           text: `${data.name}\n${data.meetingType}\n${dateStr} ${data.time}`,
         });

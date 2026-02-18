@@ -1,6 +1,11 @@
 -- Phase 5: Cleanup fake data and seed real operational data
 -- Safe to re-run. All inserts use ON CONFLICT DO NOTHING.
 
+-- Fix announcements CHECK constraint (may have stale definition)
+ALTER TABLE announcements DROP CONSTRAINT IF EXISTS announcements_audience_check;
+ALTER TABLE announcements ADD CONSTRAINT announcements_audience_check CHECK (audience IN ('all', 'student', 'staff', 'partner', 'admin'));
+ALTER TABLE announcements ALTER COLUMN audience SET DEFAULT 'all';
+
 -- Ensure unique constraints exist for ON CONFLICT clauses
 CREATE UNIQUE INDEX IF NOT EXISTS idx_grant_opportunities_external_id_unique ON grant_opportunities(external_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_site_settings_key_unique ON site_settings(key);

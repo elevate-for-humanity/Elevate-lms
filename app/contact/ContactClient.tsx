@@ -10,7 +10,7 @@ export default function ContactClient() {
       title: 'Students & Applicants',
       description:
         'Ready to start your career journey? Learn about programs, funding, and enrollment.',
-      image: '/images/efh/sections/staffing.jpg',
+      image: '/images/heroes-hq/success-hero.jpg',
       href: '/apply',
       icon: '<GraduationCap className="w-5 h-5 inline-block" />',
       color: ' ',
@@ -19,7 +19,7 @@ export default function ContactClient() {
       title: 'Training Providers',
       description:
         'Partner with us to deliver programs through our platform and expand your reach.',
-      image: '/images/heroes/training-provider-1.jpg',
+      image: '/images/programs-hq/training-classroom.jpg',
       href: '/platform',
       icon: '🏫',
       color: ' ',
@@ -28,7 +28,7 @@ export default function ContactClient() {
       title: 'Employers',
       description:
         'Build your talent pipeline and connect with skilled workers ready for employment.',
-      image: '/images/learners/reentry-coaching.jpg',
+      image: '/images/heroes-hq/employer-hero.jpg',
       href: '/employers',
       icon: '<Briefcase className="w-5 h-5 inline-block" />',
       color: ' ',
@@ -37,7 +37,7 @@ export default function ContactClient() {
       title: 'Workforce Boards',
       description:
         'Collaborate on workforce development initiatives and funding partnerships.',
-      image: '/images/facilities-new/facility-8.jpg',
+      image: '/images/heroes-hq/funding-hero.jpg',
       href: '/platform/workforce-boards',
       icon: '🤝',
       color: ' ',
@@ -46,7 +46,7 @@ export default function ContactClient() {
       title: 'Platform Licensing',
       description:
         'License our platform for your organization and deliver training at scale.',
-      image: '/images/learners/barrier-support.jpg',
+      image: '/images/programs-hq/technology-hero.jpg',
       href: '/platform/licensing',
       icon: '<Settings className="w-5 h-5 inline-block" />',
       color: ' ',
@@ -55,7 +55,7 @@ export default function ContactClient() {
       title: 'General Inquiry',
       description:
         'Have a question? Get in touch with our team for any other inquiries.',
-      image: '/images/facilities-new/facility-1.jpg',
+      image: '/images/heroes-hq/contact-hero.jpg',
       href: '/contact#contact-form',
       icon: '✉️',
       color: ' ',

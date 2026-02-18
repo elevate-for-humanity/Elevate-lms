@@ -68,7 +68,7 @@ export default async function StudentPortalPage() {
       description: 'Track your academic performance and completion status',
       href: '/student-portal/grades',
       color: 'blue',
-      image: '/images/healthcare/healthcare-programs-grid.jpg',
+      image: '/images/heroes/resource-5.jpg',
     },
     {
       icon: Users,
@@ -92,7 +92,7 @@ export default async function StudentPortalPage() {
       description: 'Transcripts, certificates, and important forms',
       href: '/lms/files',
       color: 'indigo',
-      image: '/images/business/tax-prep-certification.jpg',
+      image: '/images/heroes/testimonial-1.jpg',
     },
   ];
 

@@ -51,7 +51,7 @@ export default function ResetPasswordPage() {
       {/* Hero Banner */}
       <section className="relative h-[180px] w-full overflow-hidden">
         <Image
-          src="/images/hub/team.jpg"
+          src="/images/heroes/success-story-4.jpg"
           alt="Reset password"
           fill
           className="object-cover"

@@ -115,7 +115,7 @@ export default function StoreBuilderPage() {
 {/* Hero Section */}
       <section className="relative h-[300px] md:h-[380px] lg:h-[420px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/hub/feature-1.jpg"
+          src="/images/technology/hero-program-web-dev.jpg"
           alt="Clones"
           fill
           className="object-cover"
@@ -504,7 +504,7 @@ export default function StoreBuilderPage() {
                 </div>
                 <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/business/team-1.jpg"
+                    src="/images/technology/hero-program-it-support.jpg"
                     alt="Students learning"
                     fill
                     className="object-cover"

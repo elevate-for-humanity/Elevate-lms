@@ -14,7 +14,7 @@ export default function StructuredData() {
       width: 250,
       height: 250,
     },
-    image: 'https://www.elevateforhumanity.org/images/heroes/hero-homepage.jpg',
+    image: 'https://www.elevateforhumanity.org/images/heroes-hq/programs-hero.jpg',
     description:
       'Career training at no cost to eligible participants in Indianapolis. WIOA-funded programs in HVAC, healthcare, barbering, and trades. No tuition, no debt. Job placement assistance.',
     slogan: 'This Is Not Graduation. This Is Elevation.',

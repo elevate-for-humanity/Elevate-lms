@@ -172,7 +172,7 @@ export default async function ApplyPage({
           >
             <div className="relative h-[320px] sm:h-[360px]">
               <Image
-                src="/images/store/platform-hero.jpg"
+                src="/images/heroes/hero-students.jpg"
                 alt="Launch your own training program with Elevate"
                 fill
                 className="object-cover"

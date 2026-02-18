@@ -30,7 +30,7 @@ export default function K12Page() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/gallery/image5.jpg" alt="K-12 career pathways" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/programs-hero-vibrant.jpg" alt="K-12 career pathways" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

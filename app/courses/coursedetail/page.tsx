@@ -45,7 +45,7 @@ export default async function CoursedetailPage() {
 {/* Hero Section */}
       <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/business/team-2.jpg"
+          src="/images/programs-hq/training-classroom.jpg"
           alt="Coursedetail"
           fill
           className="object-cover"

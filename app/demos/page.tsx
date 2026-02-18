@@ -19,7 +19,7 @@ const demos = [
     title: 'LMS Platform Overview',
     description: 'See how students navigate courses, track progress, earn certificates, and interact with AI tutors.',
     duration: '15 min',
-    thumbnail: '/images/healthcare/healthcare-programs-grid.jpg',
+    thumbnail: '/images/heroes/training-provider-4.jpg',
     features: [
       'Student dashboard walkthrough',
       'Course enrollment and navigation',

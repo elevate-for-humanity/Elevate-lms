@@ -70,7 +70,7 @@ export default async function HubWelcomePage() {
     {
       title: 'Compliance Documentation',
       description: 'All your hours, credentials, and progress are documented automatically. Ready for audits, certifications, and employer verification.',
-      image: '/images/hero-new/hero-9.jpg',
+      image: '/images/heroes-hq/success-hero.jpg',
     },
   ];
 

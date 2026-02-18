@@ -25,7 +25,7 @@ const apprenticeships = [
     name: 'Barber Apprenticeship', 
     duration: '1,500 hours', 
     wage: 'Earn while learning',
-    image: '/images/beauty/program-barber-training.jpg',
+    image: '/images/beauty/hero-program-barber.jpg',
     href: '/programs/barber-apprenticeship',
     description: 'USDOL Registered program. Learn cutting, styling, and shaving in a licensed shop.'
   },

@@ -402,7 +402,7 @@ export default async function CashAdvancesAdminPage() {
               <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                 <Image
                   priority
-                  src="/images/business/team-3.jpg"
+                  src="/images/programs-hq/business-office.jpg"
                   alt="Students learning"
                   fill
                   className="object-cover"

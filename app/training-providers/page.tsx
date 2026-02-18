@@ -19,7 +19,7 @@ const benefits = [
   {
     title: 'Student Referrals',
     description: 'Receive pre-screened, WIOA-eligible students ready to enroll in your programs.',
-    image: '/images/healthcare/healthcare-programs-grid.jpg',
+    image: '/images/heroes/training-provider-2.jpg',
   },
   {
     title: 'ETPL Listing Support',
@@ -34,7 +34,7 @@ const benefits = [
   {
     title: 'Compliance Assistance',
     description: 'Support with WIOA reporting requirements and documentation.',
-    image: '/images/business/tax-prep-certification.jpg',
+    image: '/images/programs-hq/business-training.jpg',
   },
   {
     title: 'Employer Connections',
@@ -195,7 +195,7 @@ export default function TrainingProvidersPage() {
             
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/learners/barrier-support.jpg"
+                src="/images/heroes/workforce-partner-5.jpg"
                 alt="Training classroom"
                 fill
                 className="object-cover"

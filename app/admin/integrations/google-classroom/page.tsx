@@ -63,7 +63,7 @@ export default async function GoogleClassroomPage() {
       {/* Hero Section */}
       <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/hub/feature-1.jpg"
+          src="/images/technology/hero-program-cybersecurity.jpg"
           alt="Google Classroom"
           fill
           className="object-cover"

@@ -91,7 +91,7 @@ export default async function CertificatesPage() {
       {/* Hero Section */}
       <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/heroes/accessibility.jpg"
+          src="/images/hero/hero-certifications.jpg"
           alt="Certificates"
           fill
           className="object-cover"

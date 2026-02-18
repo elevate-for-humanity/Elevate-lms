@@ -55,7 +55,7 @@ export default async function AcademicIntegrityPage() {
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/facilities-new/facility-1.jpg"
+          src="/images/heroes/faq-section-2.jpg"
           alt="Academic Integrity"
           fill
           className="object-cover brightness-50"

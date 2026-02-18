@@ -68,7 +68,7 @@ export default async function CandidatesPage() {
       <section className="relative bg-brand-green-800 text-white py-16">
         <div className="absolute inset-0">
           <Image
-            src="/images/hub/employer.jpg"
+            src="/images/heroes/employer-partner-3.jpg"
             alt="Candidates"
             fill
             className="object-cover opacity-20"

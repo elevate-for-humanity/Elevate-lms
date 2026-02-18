@@ -91,7 +91,7 @@ export function Hero() {
         {/* RIGHT – IMAGE */}
         <div className="relative h-56 sm:h-72 lg:h-80 rounded-3xl overflow-hidden shadow-md">
           <Image
-            src="/images/programs-catalog-hero.jpg"
+            src="/images/programs-hero-new.jpg"
             alt="Elevate For Humanity - Healthcare Programs"
             fill
             priority

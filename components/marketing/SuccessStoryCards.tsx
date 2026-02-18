@@ -6,7 +6,7 @@ const stories = [
   {
     name: 'Graduate',
     program: 'Public Safety & Reentry Specialist',
-    image: '/images/learners/reentry-coaching.jpg',
+    image: '/images/heroes-hq/success-stories-hero.jpg',
     beforeJob: 'Unemployed after incarceration',
     afterJob: 'Reentry Specialist',
     salary: '$45,000/year',

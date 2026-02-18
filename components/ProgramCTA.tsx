@@ -25,7 +25,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                 <div className="flex items-start gap-3">
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/hero-training.jpg"
+                      src="/images/prog-hero-main.jpg"
                       alt="Free training"
                       fill
                       className="object-cover"

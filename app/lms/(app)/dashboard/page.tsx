@@ -203,7 +203,7 @@ export default async function StudentDashboardOrchestrated() {
       <div className="relative text-white mb-8 rounded-2xl overflow-hidden">
         <div className="relative h-[200px] md:h-[250px] overflow-hidden rounded-t-2xl">
           <Image
-            src="/images/heroes/hero-homepage.jpg"
+            src="/images/heroes-hq/success-hero.jpg"
             alt="Learning"
             fill
             className="object-cover"
@@ -423,7 +423,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="Certification Exam"
                     description="Schedule your final exam"
                     href="/lms/certification"
-                    image="/images/business/professional-1.jpg"
+                    image="/images/heroes/success-story-1.jpg"
                     badge="Ready"
                   />
                 )}

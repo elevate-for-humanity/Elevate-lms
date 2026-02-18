@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 const features = [
-  { title: 'Student Management', desc: 'View and manage student records and enrollments.', image: '/images/healthcare/healthcare-programs-grid.jpg' },
+  { title: 'Student Management', desc: 'View and manage student records and enrollments.', image: '/images/heroes/workforce-partner-2.jpg' },
   { title: 'Attendance', desc: 'Track and record student attendance.', image: '/images/hero-new/hero-8.jpg' },
   { title: 'Reports', desc: 'Generate and view performance reports.', image: '/images/business/tax-prep.jpg' },
   { title: 'Scheduling', desc: 'Manage class schedules and appointments.', image: '/images/healthcare/medical-assistant.jpg' },

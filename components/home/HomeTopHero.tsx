@@ -4,7 +4,7 @@ export function HomeTopHero() {
   return (
     <section className="relative w-full overflow-hidden">
       <Image
-        src="/images/heroes/hero-homepage.jpg"
+        src="/images/prog-hero-main.jpg"
         alt="Elevate for Humanity - Empowering Futures Through Innovation & Opportunity"
         width={1920}
         height={800}

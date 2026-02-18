@@ -17,7 +17,7 @@ const features = [
   {
     title: 'Participant Intake & Eligibility',
     description: 'Automated eligibility verification with document upload and digital signatures.',
-    image: '/images/business/tax-prep-certification.jpg',
+    image: '/images/heroes-hq/funding-hero.jpg',
     items: ['Digital intake forms', 'Eligibility checklist automation', 'Document management', 'E-signature integration'],
   },
   {
@@ -220,7 +220,7 @@ export default function WIOACompliancePage() {
           <div className="grid md:grid-cols-4 gap-8">
             {[
               { step: '1', title: 'Setup', desc: 'Configure your program and eligibility criteria', image: '/images/technology/hero-programs-technology.jpg' },
-              { step: '2', title: 'Enroll', desc: 'Participants complete digital intake forms', image: '/images/business/tax-prep-certification.jpg' },
+              { step: '2', title: 'Enroll', desc: 'Participants complete digital intake forms', image: '/images/heroes-hq/funding-hero.jpg' },
               { step: '3', title: 'Track', desc: 'Automatic performance metric tracking', image: '/images/team-hq/team-meeting.jpg' },
               { step: '4', title: 'Report', desc: 'Generate PIRL exports and quarterly reports', image: '/images/technology/hero-program-it-support.jpg' },
             ].map((item) => (
@@ -308,7 +308,7 @@ export default function WIOACompliancePage() {
               </div>
               <div className="relative h-64 rounded-xl overflow-hidden">
                 <Image
-                  src="/images/business/tax-prep-certification.jpg"
+                  src="/images/heroes-hq/funding-hero.jpg"
                   alt="WIOA Resources"
                   fill
                   className="object-cover"

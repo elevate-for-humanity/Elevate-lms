@@ -73,7 +73,7 @@ export default async function EmployersPlaybookPage() {
       {/* Hero Section */}
       <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/business/handshake-1.jpg"
+          src="/images/heroes/employer-partner-2.jpg"
           alt="Employers Playbook"
           fill
           className="object-cover"

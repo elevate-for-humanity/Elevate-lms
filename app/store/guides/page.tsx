@@ -32,7 +32,7 @@ const guides = [
     icon: Award,
     price: '$297',
     originalPrice: '$497',
-    image: '/images/store/grants-navigator.jpg',
+    image: '/images/heroes-hq/funding-hero.jpg',
     badge: 'Best Seller',
     features: [
       '150+ page comprehensive guide',
@@ -52,7 +52,7 @@ const guides = [
     icon: FileText,
     price: 'Included',
     originalPrice: null,
-    image: '/images/store/crm-hub.jpg',
+    image: '/images/programs-hq/business-office.jpg',
     badge: 'Included with License',
     features: [
       'License tier comparison',
@@ -85,7 +85,7 @@ export default function GuidesPage() {
       {/* Hero Section */}
       <section className="relative h-[50vh] min-h-[400px] flex items-center overflow-hidden">
         <Image
-          src="/images/store/platform-hero.jpg"
+          src="/images/heroes/blog-post-1.jpg"
           alt="Guides & Resources"
           fill
           className="object-cover"

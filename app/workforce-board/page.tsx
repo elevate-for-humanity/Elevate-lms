@@ -94,7 +94,7 @@ export default async function WorkforceBoardPage() {
       href: '/workforce-board/employment',
     },
     {
-      image: '/images/business/professional-1.jpg',
+      image: '/images/heroes/testimonial-1.jpg',
       title: 'Supportive Services',
       description: 'Review supportive services provided',
       href: '/workforce-board/supportive-services',

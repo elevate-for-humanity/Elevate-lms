@@ -70,7 +70,7 @@ export default async function NetworkingEventsPage() {
     {
       title: 'Employer Panels',
       description: 'Hear directly from hiring managers about what they look for in candidates.',
-      image: '/images/career-services/workshop.jpg',
+      image: '/images/career-services/resume-workshop.jpg',
     },
   ];
 
@@ -87,7 +87,7 @@ export default async function NetworkingEventsPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/career-services/networking-hero.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/career-services/interview-prep.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

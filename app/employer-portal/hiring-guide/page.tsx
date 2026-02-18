@@ -22,7 +22,7 @@ const steps = [
     number: 2,
     title: 'Review Candidates',
     description: 'Browse pre-screened candidates with verified WOTC eligibility. Each profile shows certifications, skills, and potential tax credits.',
-    image: '/images/community/community-hero.jpg',
+    image: '/images/heroes/success-story-2.jpg',
     tips: ['Check WOTC eligibility status', 'Review completed certifications', 'Look at work history'],
   },
   {
@@ -43,7 +43,7 @@ const steps = [
     number: 5,
     title: 'Onboard & Train',
     description: 'Use our onboarding checklists and training resources. Track progress and certifications in one place.',
-    image: '/images/community/community-hero.jpg',
+    image: '/images/programs-hq/students-learning.jpg',
     tips: ['Complete I-9 and W-4', 'Assign training modules', 'Set 90-day goals'],
   },
   {
@@ -68,7 +68,7 @@ export default function HiringGuidePage() {
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Hiring Guide" }]} />
 <div className="relative h-80 bg-brand-blue-800">
         <Image
-          src="/images/heroes-hq/career-services-hero.jpg"
+          src="/images/heroes/success-story-2.jpg"
           alt="Hiring guide"
           fill
           className="object-cover opacity-20"

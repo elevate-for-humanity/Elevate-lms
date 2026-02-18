@@ -65,7 +65,7 @@ export default async function JobPostingsPage() {
       views: 156,
       status: 'Active',
       posted: '2 weeks ago',
-      image: '/images/shop/safety-glasses.jpg',
+      image: '/images/programs-hq/hvac-technician.jpg',
     },
     {
       id: 4,

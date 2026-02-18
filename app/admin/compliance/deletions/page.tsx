@@ -63,7 +63,7 @@ export default async function DeletionsPage() {
       {/* Hero Section */}
       <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/certifications/cpr.jpg"
+          src="/images/heroes/workforce-partner-3.jpg"
           alt="Deletions"
           fill
           className="object-cover"

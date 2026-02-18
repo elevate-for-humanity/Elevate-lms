@@ -26,7 +26,7 @@ const addOns = [
     href: '/store/add-ons/community-hub',
     icon: Users,
     price: '$1,997',
-    image: '/images/store/community-hub.jpg',
+    image: '/images/programs-hq/students-learning.jpg',
     features: [
       'Discussion Forums with Categories',
       'Member Groups & Cohorts',
@@ -77,7 +77,7 @@ export default function AddOnsPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/store/platform-hero.jpg" alt="Platform Add-Ons" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/heroes/resource-5.jpg" alt="Platform Add-Ons" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

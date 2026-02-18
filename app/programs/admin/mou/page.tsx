@@ -65,7 +65,7 @@ export default async function MouPage() {
       {/* Hero Section */}
       <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/hero-training.jpg"
+          src="/images/heroes/workforce-partner-1.jpg"
           alt="Mou"
           fill sizes="100vw"
           className="object-cover"

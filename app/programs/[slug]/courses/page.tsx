@@ -128,7 +128,7 @@ export default function ProgramCoursesPage() {
                   '/images/programs-hq/technology-hero.jpg'
                 ],
                 'business': [
-                  '/images/business/professional-1.jpg',
+                  '/images/heroes-hq/career-services-hero.jpg',
                   '/images/programs/efh-business-startup-marketing-hero.jpg',
                   '/images/programs/efh-tax-office-startup-hero.jpg'
                 ],
@@ -172,7 +172,7 @@ export default function ProgramCoursesPage() {
                       sizes="(max-width: 768px) 100vw, 33vw"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = '/images/hero-training.jpg';
+                        target.src = '/images/heroes/training-provider-1.jpg';
                       }}
                     />
                     <div className="absolute top-4 right-4">

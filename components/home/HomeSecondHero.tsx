@@ -5,7 +5,7 @@ export function HomeSecondHero() {
     <section className="py-10">
       <div className="mx-auto max-w-5xl px-4">
         <Image
-          src="/images/programs-catalog-hero.jpg"
+          src="/images/programs-hero-vibrant.jpg"
           alt="Elevate for Humanity - Career & Technical Training, Hybrid Apprenticeships, Certifications & Digital Badges, Entrepreneurship & Workforce Startup"
           width={1920}
           height={1080}

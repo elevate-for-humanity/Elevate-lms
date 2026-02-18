@@ -32,7 +32,7 @@ export default function ApplyPage() {
             <div className="bg-white p-4 border-t"><p className="font-bold text-lg text-black">Cost</p><p className="text-black">Free with WIOA funding</p></div>
           </div>
           <div className="rounded-2xl overflow-hidden shadow-sm">
-            <Image src="/images/marketplace/plumbing.jpg" alt="Plumbing career" width={400} height={300} className="w-full h-48 object-cover" />
+            <Image src="/images/trades/program-plumbing-training.jpg" alt="Plumbing career" width={400} height={300} className="w-full h-48 object-cover" />
             <div className="bg-white p-4 border-t"><p className="font-bold text-lg text-black">Format</p><p className="text-black">Rolling enrollment</p></div>
           </div>
         </div>

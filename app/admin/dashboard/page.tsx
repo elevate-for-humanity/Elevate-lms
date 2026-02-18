@@ -571,7 +571,7 @@ export default async function AdminDashboardOrchestrated() {
           >
             <div className="relative h-32 overflow-hidden">
               <Image
-                src="/images/business/professional-1.jpg"
+                src="/images/heroes-hq/about-hero.jpg"
                 alt="Generate Reports"
                 fill
                 className="object-cover group-hover:scale-105 transition duration-300"

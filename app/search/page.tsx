@@ -176,7 +176,7 @@ export default function SearchPage() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-[260px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/cta-banner.jpg"
+                src="/images/heroes/testimonial-2.jpg"
                 alt="Workforce funding and financial aid"
                 fill
                 className="object-cover"

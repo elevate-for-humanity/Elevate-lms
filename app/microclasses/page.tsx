@@ -54,7 +54,7 @@ const microclasses = [
     price: 'Free with WIOA',
     certification: 'Forklift Operator Card',
     href: '/programs/forklift',
-    image: '/images/gallery/image2.jpg',
+    image: '/images/prog-hero-main.jpg',
   },
   {
     title: 'Bloodborne Pathogens',

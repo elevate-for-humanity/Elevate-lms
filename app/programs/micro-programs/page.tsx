@@ -105,7 +105,7 @@ export default function MicroProgramsPage() {
               {
                 name: 'OSHA 10/30',
                 href: '/programs/skilled-trades',
-                img: '/images/hero/training-providers-hero.jpg',
+                img: '/images/heroes/resource-3.jpg',
                 duration: '1–4 days',
                 desc: 'OSHA safety certification for construction and general industry. 10-hour and 30-hour courses available.',
               },

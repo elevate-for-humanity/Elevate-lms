@@ -77,8 +77,8 @@ export default function JRIPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {[
               { name: 'Healthcare', href: '/programs/healthcare', img: '/images/hero/hero-healthcare.jpg' },
-              { name: 'Skilled Trades', href: '/programs/skilled-trades', img: '/images/hero/training-providers-hero.jpg' },
-              { name: 'CDL Training', href: '/programs/cdl-training', img: '/images/hero-training.jpg' },
+              { name: 'Skilled Trades', href: '/programs/skilled-trades', img: '/images/hero/hero-community.jpg' },
+              { name: 'CDL Training', href: '/programs/cdl-training', img: '/images/hero/hero-community.jpg' },
               { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', img: '/images/barber-hero-new.jpg' },
               { name: 'Technology', href: '/programs/technology', img: '/images/hero/hero-tech-careers.jpg' },
               { name: 'Culinary', href: '/programs/culinary-apprenticeship', img: '/images/culinary/hero-program-culinary.jpg' },

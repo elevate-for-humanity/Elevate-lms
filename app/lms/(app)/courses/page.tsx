@@ -55,7 +55,7 @@ export default async function InteractiveCoursesPage() {
 
   // Category images mapping
   const categoryImages: Record<string, string> = {
-    healthcare: '/images/hero/training-providers-hero.jpg',
+    healthcare: '/images/programs-hq/healthcare-hero.jpg',
     trades: '/images/artlist/hero-training-2.jpg',
     technology: '/images/technology/hero-program-cybersecurity.jpg',
     business: '/hero-images/business-hero.jpg',

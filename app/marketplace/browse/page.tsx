@@ -121,7 +121,7 @@ export default async function MarketplaceBrowsePage() {
         ) : (
           <div className="bg-white rounded-xl border overflow-hidden">
             <div className="relative h-48">
-              <Image src="/images/healthcare/healthcare-programs-grid.jpg" alt="Browse marketplace" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/heroes/resource-1.jpg" alt="Browse marketplace" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-8 text-center">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">No Items Available</h2>

@@ -44,7 +44,7 @@ const demos = [
     id: 'workforce',
     title: 'Workforce Board View',
     icon: BarChart3,
-    image: '/images/hub/feature-1.jpg',
+    image: '/images/heroes/resource-4.jpg',
     alt: 'Workforce board staff reviewing program outcomes and funding data',
     href: '/demo/admin/wioa',
     description: 'Built for workforce boards and state agencies. WIOA eligibility, ITA tracking, PIRL reporting, and partner network management. The same admin dashboard, filtered for what matters to you.',

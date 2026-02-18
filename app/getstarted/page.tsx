@@ -213,7 +213,7 @@ export default function Page() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image priority
-                  src="/images/facilities-new/facility-1.jpg"
+                  src="/images/heroes/blog-post-5.jpg"
                   alt="Training Facility"
                   fill
           sizes="100vw"

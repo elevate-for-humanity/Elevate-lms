@@ -71,7 +71,7 @@ export default async function CurriculumPage() {
       {/* Hero Section */}
       <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/heroes/hero-homepage.jpg"
+          src="/images/heroes/training-provider-1.jpg"
           alt="Curriculum Management"
           fill
           className="object-cover"

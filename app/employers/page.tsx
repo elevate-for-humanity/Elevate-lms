@@ -26,14 +26,14 @@ export const metadata: Metadata = {
     description: 'Hire trained, certified candidates ready to work. Build apprenticeships, access talent pipelines, and grow your workforce.',
     url: 'https://www.elevateforhumanity.org/employers',
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/heroes-hq/employer-hero.jpg', width: 1200, height: 630, alt: 'Employer partnerships' }],
+    images: [{ url: '/images/heroes/workforce-partner-2.jpg', width: 1200, height: 630, alt: 'Employer partnerships' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'For Employers | Elevate for Humanity',
     description: 'Hire trained, certified candidates. Build apprenticeships and access talent pipelines.',
-    images: ['/images/heroes-hq/employer-hero.jpg'],
+    images: ['/images/heroes/workforce-partner-2.jpg'],
   },
 };
 
@@ -50,7 +50,7 @@ export default function EmployersPage() {
       {/* Hero with Image */}
       <section className="relative min-h-[550px] flex items-center overflow-hidden">
         <Image
-          src="/images/business/handshake-1.jpg"
+          src="/images/heroes/workforce-partner-2.jpg"
           alt="Partner with Elevate for Humanity"
           fill
           className="object-cover"
@@ -130,7 +130,7 @@ export default function EmployersPage() {
               {
                 title: 'Pre-Screened Talent',
                 description: 'Candidates have completed training and demonstrated commitment.',
-                image: '/images/healthcare/healthcare-programs-grid.jpg',
+                image: '/images/heroes/employer-partner-3.jpg',
               },
               {
                 title: 'Certified Skills',
@@ -140,7 +140,7 @@ export default function EmployersPage() {
               {
                 title: 'No Recruiting Fees',
                 description: 'Access our talent pipeline at no cost to your organization.',
-                image: '/images/business/handshake-1.jpg',
+                image: '/images/heroes/workforce-partner-2.jpg',
               },
               {
                 title: 'Faster Onboarding',

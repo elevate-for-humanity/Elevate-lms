@@ -162,7 +162,7 @@ export default function WIOAEligibilityPage() {
             {[
               { title: 'Workforce Ready Grant', desc: 'Indiana state grant for high-demand certifications. No income requirements.', href: '/funding', image: '/images/heroes/hero-state-funding.jpg' },
               { title: 'Justice Reinvestment (JRI)', desc: 'Funding for justice-involved individuals. Training, support, and job placement.', href: '/programs/jri', image: '/hero-images/jri-hero.jpg' },
-              { title: 'Payment Plans', desc: 'Flexible payments, Sezzle, and Affirm for programs not covered by grants.', href: '/apply', image: '/images/store/platform-hero.jpg' },
+              { title: 'Payment Plans', desc: 'Flexible payments, Sezzle, and Affirm for programs not covered by grants.', href: '/apply', image: '/images/heroes/faq-section-1.jpg' },
             ].map((item) => (
               <Link key={item.title} href={item.href} className="block rounded-2xl overflow-hidden border border-slate-200 bg-white hover:shadow-lg transition-shadow group">
                 <div className="relative h-[140px] sm:h-[160px]">

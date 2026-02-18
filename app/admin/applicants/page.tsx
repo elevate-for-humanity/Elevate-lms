@@ -102,7 +102,7 @@ export default async function ApplicantsPage() {
       {/* Hero Section */}
       <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/hub/feature-2.jpg"
+          src="/images/heroes/success-story-2.jpg"
           alt="Applicants"
           fill
           className="object-cover"

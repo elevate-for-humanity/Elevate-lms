@@ -139,7 +139,7 @@ export default function AnalyticsPage() {
         {/* Hero Section */}
         <section className="relative h-[300px] md:h-[380px] lg:h-[420px] flex items-center justify-center text-white overflow-hidden">
           <Image
-            src="/images/trades/program-construction-training.jpg"
+            src="/images/heroes/resource-1.jpg"
             alt="Analytics"
             fill
             className="object-cover"

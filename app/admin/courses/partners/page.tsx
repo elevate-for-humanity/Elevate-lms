@@ -24,7 +24,7 @@ const partners = [
   {
     id: 2,
     name: 'CompTIA',
-    logo: '/images/employers/employer-meeting.jpg',
+    logo: '/images/heroes/employer-partner-1.jpg',
     type: 'IT Certification',
     courses: 8,
     activeStudents: 189,
@@ -34,7 +34,7 @@ const partners = [
   {
     id: 3,
     name: 'Adobe',
-    logo: '/images/employers/employer-meeting.jpg',
+    logo: '/images/heroes/employer-partner-1.jpg',
     type: 'Creative Software',
     courses: 6,
     activeStudents: 156,

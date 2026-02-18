@@ -117,7 +117,7 @@ export default function DotTestingPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/learners/barrier-support.jpg" alt="DOT Drug Testing for Commercial Drivers" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/heroes/blog-post-4.jpg" alt="DOT Drug Testing for Commercial Drivers" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -302,7 +302,7 @@ export default function DotTestingPage() {
             </div>
             <div className="relative h-[350px] rounded-2xl overflow-hidden">
               <Image
-                src="/images/learners/reentry-coaching.jpg"
+                src="/images/heroes/success-story-1.jpg"
                 alt="DOT Random Testing Consortium"
                 fill
                 className="object-cover"

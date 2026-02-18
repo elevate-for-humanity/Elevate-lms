@@ -72,17 +72,17 @@ ON CONFLICT (key) DO NOTHING;
 ALTER TABLE badges ADD COLUMN IF NOT EXISTS icon_url TEXT;
 ALTER TABLE badges ADD COLUMN IF NOT EXISTS criteria JSONB DEFAULT '{}';
 
-INSERT INTO badges (name, description, icon, icon_url, points, criteria) VALUES
-  ('First Login', 'Logged into the platform for the first time', 'log-in', '/images/badges/first-login.svg', 10, '{"type": "login", "count": 1}'),
-  ('Course Starter', 'Started your first course', 'book-open', '/images/badges/course-starter.svg', 25, '{"type": "course_start", "count": 1}'),
-  ('Lesson Complete', 'Completed 10 lessons', 'check-circle', '/images/badges/lesson-complete.svg', 50, '{"type": "lesson_complete", "count": 10}'),
-  ('Quiz Master', 'Scored 90% or higher on a quiz', 'brain', '/images/badges/quiz-master.svg', 75, '{"type": "quiz_score", "min_score": 90}'),
-  ('Perfect Attendance', 'Attended every session for a full week', 'calendar-check', '/images/badges/attendance.svg', 100, '{"type": "attendance", "streak_days": 5}'),
-  ('Halfway There', 'Completed 50% of your program', 'trending-up', '/images/badges/halfway.svg', 150, '{"type": "program_progress", "percent": 50}'),
-  ('Program Graduate', 'Completed an entire training program', 'graduation-cap', '/images/badges/graduate.svg', 500, '{"type": "program_complete", "count": 1}'),
-  ('Certified', 'Earned an industry certification', 'award', '/images/badges/certified.svg', 750, '{"type": "certification", "count": 1}'),
-  ('Job Placed', 'Secured employment after training', 'briefcase', '/images/badges/job-placed.svg', 1000, '{"type": "employment", "count": 1}'),
-  ('Community Helper', 'Helped 5 peers in the discussion forums', 'users', '/images/badges/community.svg', 100, '{"type": "forum_replies", "count": 5}')
+INSERT INTO badges (name, description, icon, icon_url, category, rarity, points, criteria) VALUES
+  ('First Login', 'Logged into the platform for the first time', 'log-in', '/images/badges/first-login.svg', 'engagement', 'common', 10, '{"type": "login", "count": 1}'),
+  ('Course Starter', 'Started your first course', 'book-open', '/images/badges/course-starter.svg', 'learning', 'common', 25, '{"type": "course_start", "count": 1}'),
+  ('Lesson Complete', 'Completed 10 lessons', 'check-circle', '/images/badges/lesson-complete.svg', 'learning', 'uncommon', 50, '{"type": "lesson_complete", "count": 10}'),
+  ('Quiz Master', 'Scored 90% or higher on a quiz', 'brain', '/images/badges/quiz-master.svg', 'achievement', 'uncommon', 75, '{"type": "quiz_score", "min_score": 90}'),
+  ('Perfect Attendance', 'Attended every session for a full week', 'calendar-check', '/images/badges/attendance.svg', 'engagement', 'rare', 100, '{"type": "attendance", "streak_days": 5}'),
+  ('Halfway There', 'Completed 50% of your program', 'trending-up', '/images/badges/halfway.svg', 'milestone', 'rare', 150, '{"type": "program_progress", "percent": 50}'),
+  ('Program Graduate', 'Completed an entire training program', 'graduation-cap', '/images/badges/graduate.svg', 'milestone', 'epic', 500, '{"type": "program_complete", "count": 1}'),
+  ('Certified', 'Earned an industry certification', 'award', '/images/badges/certified.svg', 'credential', 'epic', 750, '{"type": "certification", "count": 1}'),
+  ('Job Placed', 'Secured employment after training', 'briefcase', '/images/badges/job-placed.svg', 'career', 'legendary', 1000, '{"type": "employment", "count": 1}'),
+  ('Community Helper', 'Helped 5 peers in the discussion forums', 'users', '/images/badges/community.svg', 'engagement', 'uncommon', 100, '{"type": "forum_replies", "count": 5}')
 ON CONFLICT DO NOTHING;
 
 -- ============================================

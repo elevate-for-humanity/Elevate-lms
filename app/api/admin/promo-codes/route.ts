@@ -1,37 +1,22 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
+import { apiRequireAdmin } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 
-async function guardAdmin() {
-  const supabase = await createClient();
-  if (!supabase) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-  return null;
-}
-
 // GET - Fetch all promo codes
 export async function GET(request: Request) {
-  
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-const denied = await guardAdmin();
-  if (denied) return denied;
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const auth = await apiRequireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const supabase = createAdminClient();
-
     if (!supabase) {
-      return NextResponse.json(
-        { error: 'Service temporarily unavailable.' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
     }
 
     const { data: promoCodes, error } = await supabase
@@ -44,27 +29,24 @@ const denied = await guardAdmin();
     }
 
     return NextResponse.json({ promoCodes });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch promo codes' }, { status: 500 });
   }
 }
 
 // POST - Create new promo code
 export async function POST(req: Request) {
-    const rateLimited = await applyRateLimit(req, 'api');
-    if (rateLimited) return rateLimited;
+  const rateLimited = await applyRateLimit(req, 'api');
+  if (rateLimited) return rateLimited;
 
-  const denied = await guardAdmin();
-  if (denied) return denied;
+  const auth = await apiRequireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await req.json();
     const supabase = createAdminClient();
-
     if (!supabase) {
-      return NextResponse.json(
-        { error: 'Service temporarily unavailable.' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
     }
 
     const { data, error } = await supabase
@@ -91,31 +73,27 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ promoCode: data });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to create promo code' }, { status: 500 });
   }
 }
 
 // PUT - Update promo code
 export async function PUT(req: Request) {
-  
-    const rateLimited = await applyRateLimit(req, 'api');
-    if (rateLimited) return rateLimited;
-const denied = await guardAdmin();
-  if (denied) return denied;
+  const rateLimited = await applyRateLimit(req, 'api');
+  if (rateLimited) return rateLimited;
+
+  const auth = await apiRequireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await req.json();
     const supabase = createAdminClient();
-
     if (!supabase) {
-      return NextResponse.json(
-        { error: 'Service temporarily unavailable.' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
     }
 
-    const updateData: any = {};
-    
+    const updateData: Record<string, unknown> = {};
     if (body.code !== undefined) updateData.code = body.code.toUpperCase().trim();
     if (body.description !== undefined) updateData.description = body.description;
     if (body.discount_type !== undefined) updateData.discount_type = body.discount_type;
@@ -125,7 +103,6 @@ const denied = await guardAdmin();
     if (body.valid_until !== undefined) updateData.valid_until = body.valid_until;
     if (body.applies_to !== undefined) updateData.applies_to = body.applies_to;
     if (body.is_active !== undefined) updateData.is_active = body.is_active;
-    
     updateData.updated_at = new Date().toISOString();
 
     const { data, error } = await supabase
@@ -140,33 +117,29 @@ const denied = await guardAdmin();
     }
 
     return NextResponse.json({ promoCode: data });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to update promo code' }, { status: 500 });
   }
 }
 
 // DELETE - Delete promo code
 export async function DELETE(req: Request) {
-  
-    const rateLimited = await applyRateLimit(req, 'api');
-    if (rateLimited) return rateLimited;
-const denied = await guardAdmin();
-  if (denied) return denied;
+  const rateLimited = await applyRateLimit(req, 'api');
+  if (rateLimited) return rateLimited;
+
+  const auth = await apiRequireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
-
     if (!id) {
       return NextResponse.json({ error: 'ID required' }, { status: 400 });
     }
 
     const supabase = createAdminClient();
-
     if (!supabase) {
-      return NextResponse.json(
-        { error: 'Service temporarily unavailable.' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
     }
 
     const { error } = await supabase
@@ -179,7 +152,7 @@ const denied = await guardAdmin();
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to delete promo code' }, { status: 500 });
   }
 }

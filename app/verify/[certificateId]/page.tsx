@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/verify/[certificateId]',
+    canonical: 'https://www.elevateforhumanity.org/verify',
   },
   title: 'Verify Certificate | Elevate For Humanity',
   description:
@@ -97,7 +97,7 @@ export default async function VerifyCertificatePage({
       <section className="relative h-[300px] md:h-[380px] lg:h-[420px] flex items-center justify-center text-white overflow-hidden">
         <Image
           src="/images/artlist/hero-training-1.jpg"
-          alt="[certificateId]"
+          alt="Certificate verification"
           fill
           className="object-cover"
           quality={100}
@@ -107,25 +107,11 @@ export default async function VerifyCertificatePage({
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 drop-shadow-2xl">
-            [certificateId]
+            Certificate Verification
           </h1>
           <p className="text-base md:text-lg mb-8 text-gray-100 drop-shadow-lg">
-            Transform your career with free training and industry certifications
+            Verify the authenticity of credentials issued by Elevate for Humanity
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
-            >
-              Get Started Free
-            </Link>
-            <Link
-              href="/programs"
-              className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
-            >
-              View Programs
-            </Link>
-          </div>
         </div>
       </section>
 

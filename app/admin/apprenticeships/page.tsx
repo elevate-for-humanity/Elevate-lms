@@ -99,7 +99,7 @@ export default function AdminApprenticeships() {
             Apprenticeships
           </h1>
           <p className="text-base md:text-lg mb-8 text-gray-100 drop-shadow-lg">
-            Transform your career with free training and industry certifications
+            Manage apprenticeship programs and placements
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -391,8 +391,7 @@ export default function AdminApprenticeships() {
                 Ready to Improve Your Career?
               </h2>
               <p className="text-base md:text-lg mb-8 text-brand-blue-100">
-                Explore training programs and earn industry certifications through Elevate for
-                free training programs.
+                Manage platform tools and resources for Elevate for Humanity.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link

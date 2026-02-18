@@ -120,11 +120,10 @@ export default function TakeQuizPage({
 
           <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 drop-shadow-2xl">
-              Take
+              Quiz
             </h1>
             <p className="text-base md:text-lg mb-8 text-gray-100 drop-shadow-lg">
-              Transform your career with free training and industry
-              certifications
+              Test your knowledge and track your progress
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

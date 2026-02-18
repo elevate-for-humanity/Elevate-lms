@@ -9,7 +9,9 @@
 
 DROP VIEW IF EXISTS sfc_tax_return_public_status;
 
-CREATE VIEW sfc_tax_return_public_status AS
+CREATE VIEW sfc_tax_return_public_status
+WITH (security_invoker = true)
+AS
 SELECT
   tracking_id,
 

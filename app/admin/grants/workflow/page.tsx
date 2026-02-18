@@ -92,9 +92,9 @@ export default async function GrantWorkflowPage() {
         />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Welcome</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">Grants</h1>
           <p className="text-base md:text-lg mb-8 text-gray-100">
-            Transform your career with free training
+            Review and manage grant applications
           </p>
         </div>
       </section>

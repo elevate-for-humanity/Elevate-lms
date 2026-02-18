@@ -106,8 +106,7 @@ export default function CourseLeaderboardPage() {
               Leaderboard
             </h1>
             <p className="text-base md:text-lg mb-8 text-gray-100 drop-shadow-lg">
-              Transform your career with free training and industry
-              certifications
+              See how you rank among your peers in this course
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

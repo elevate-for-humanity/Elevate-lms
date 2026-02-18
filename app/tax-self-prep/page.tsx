@@ -63,9 +63,9 @@ export default async function TaxSelfPrepPage() {
             />
 
             <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">Welcome</h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">Tax Self-Prep</h1>
               <p className="text-base md:text-lg mb-8 text-gray-100">
-                Transform your career with free training
+                Prepare your taxes online with guided, step-by-step filing
               </p>
             </div>
           </section>

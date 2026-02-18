@@ -107,8 +107,7 @@ export default function CourseDiscussionsPage() {
               Discussions
             </h1>
             <p className="text-base md:text-lg mb-8 text-gray-100 drop-shadow-lg">
-              Transform your career with free training and industry
-              certifications
+              Connect with classmates and instructors in course discussions
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

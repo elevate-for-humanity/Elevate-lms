@@ -84,7 +84,7 @@ export default async function PartnerCoursesPage() {
             Partners
           </h1>
           <p className="text-base md:text-lg mb-8 text-gray-100 drop-shadow-lg">
-            Transform your career with free training and industry certifications
+            Access partner-delivered courses and training programs
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

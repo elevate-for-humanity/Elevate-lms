@@ -171,8 +171,7 @@ export default async function DataProcessorPage() {
               Ready to Get Started?
             </h2>
             <p className="text-base md:text-lg text-brand-blue-100 mb-8">
-              Explore training programs and earn industry certifications through Elevate for
-              programs.
+              Manage platform tools and resources for Elevate for Humanity.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link

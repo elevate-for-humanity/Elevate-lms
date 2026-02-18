@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { apiAuthGuard } from '@/lib/authGuards';
+import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-import { createClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
-import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Program-specific vendor costs
-const VENDOR_COSTS = {
+const VENDOR_COSTS: Record<string, { vendor: string; cost: number }> = {
   'barber-apprenticeship': {
     vendor: 'milady',
     cost: 295,
@@ -21,8 +22,13 @@ const VENDOR_COSTS = {
 };
 
 export async function POST(request: NextRequest) {
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const auth = await apiAuthGuard({ requireAuth: true });
+  if (!auth.authorized) {
+    return NextResponse.json({ error: auth.error || 'Unauthorized' }, { status: 401 });
+  }
 
   const supabase = await createClient();
 

@@ -87,8 +87,8 @@ const templateFileContents: Record<string, string> = {
         />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Welcome</h1>
-          <p className="text-base md:text-lg mb-8 text-gray-100">Transform your career with free training</p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">Content Studio</h1>
+          <p className="text-base md:text-lg mb-8 text-gray-100">Create and manage content for your platform</p>
         </div>
       </section>
       <h1>Welcome to EFH</h1>
@@ -255,8 +255,7 @@ export default function EditorPage() {
                 Ready to Improve Your Career?
               </h2>
               <p className="text-base md:text-lg mb-8 text-brand-blue-100">
-                Explore training programs and earn industry certifications through Elevate for
-                free training programs.
+                Manage platform tools and resources for Elevate for Humanity.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link

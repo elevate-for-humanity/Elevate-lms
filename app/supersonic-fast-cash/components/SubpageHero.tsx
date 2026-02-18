@@ -8,15 +8,21 @@ interface SubpageHeroProps {
 
 export function SubpageHero({ title, description, badge }: SubpageHeroProps) {
   return (
-      {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image src="/images/business/tax-prep.jpg" alt="Supersonic Fast Cash" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
+            {badge && (
+              <span className="inline-block px-3 py-1 bg-brand-orange-600 text-white text-sm font-medium rounded-full mb-4">
+                {badge}
+              </span>
+            )}
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{title}</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">{description}</p>
+            {description && (
+              <p className="text-lg text-slate-300 max-w-3xl mx-auto">{description}</p>
+            )}
           </div>
         </div>
       </section>

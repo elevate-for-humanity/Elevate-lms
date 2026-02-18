@@ -6,12 +6,16 @@ export const maxDuration = 60;
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { apiRequireAdmin } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
+
+    const auth = await apiRequireAdmin();
+    if (auth instanceof NextResponse) return auth;
 
     const body = await req.json();
     const { employer_id } = body;

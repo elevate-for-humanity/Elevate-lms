@@ -31,10 +31,14 @@ describe('Top-risk routes have auth guards', () => {
     expect(src).toContain('await apiAuthGuard(');
   });
 
-  it('/api/store/create-payment-intent requires apiAuthGuard', () => {
+  it('/api/store/create-payment-intent requires auth', () => {
     const src = readRoute('app/api/store/create-payment-intent/route.ts');
-    expect(src).toContain("import { apiAuthGuard } from '@/lib/authGuards'");
-    expect(src).toContain('await apiAuthGuard(');
+    // Edge runtime uses requireAuth from lib/api/requireAuth
+    const hasApiAuthGuard = src.includes("import { apiAuthGuard } from '@/lib/authGuards'");
+    const hasRequireAuth = src.includes("import { requireAuth } from '@/lib/api/requireAuth'");
+    expect(hasApiAuthGuard || hasRequireAuth).toBe(true);
+    const hasGuardCall = src.includes('await apiAuthGuard(') || src.includes('await requireAuth(');
+    expect(hasGuardCall).toBe(true);
   });
 
   it('/api/stripe/connect/create requires apiRequireAdmin', () => {

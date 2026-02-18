@@ -100,7 +100,7 @@ export default async function AdminCoursesPage() {
             Courses
           </h1>
           <p className="text-base md:text-lg mb-8 text-gray-100 drop-shadow-lg">
-            Transform your career with free training and industry certifications
+            Manage course catalog and enrollments
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

@@ -51,6 +51,7 @@ const featuredGroups = [
     members: 145,
     icon: Globe,
     color: 'purple',
+    href: '/lms/social/groups/it',
   },
   {
     id: 'business',
@@ -59,6 +60,7 @@ const featuredGroups = [
     members: 112,
     icon: Briefcase,
     color: 'green',
+    href: '/lms/social/groups/business',
   },
   {
     id: 'education',
@@ -67,6 +69,7 @@ const featuredGroups = [
     members: 98,
     icon: GraduationCap,
     color: 'indigo',
+    href: '/lms/social/groups/education',
   },
 ];
 

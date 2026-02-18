@@ -3,10 +3,9 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import { 
-  Briefcase, Plus, Eye, Edit, Trash2, Users, Clock, 
-  MapPin, DollarSign, MoreVertical, Search, Filter, ArrowRight
+import {
+  Briefcase, Plus, Edit, Trash2, Users, Clock,
+  MapPin, DollarSign, MoreVertical, Search, Filter,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -30,61 +29,40 @@ export default async function JobPostingsPage() {
     redirect('/login?redirect=/employer-portal/jobs');
   }
 
-  const jobs = [
-    {
-      id: 1,
-      title: 'Certified Nursing Assistant (CNA)',
-      location: 'Indianapolis, IN',
-      type: 'Full-time',
-      salary: '$15-18/hr',
-      applications: 12,
-      views: 245,
-      status: 'Active',
-      posted: '5 days ago',
-      image: '/images/employers/partnership-hiring-event.jpg',
-    },
-    {
-      id: 2,
-      title: 'Licensed Barber',
-      location: 'Chicago, IL',
-      type: 'Full-time',
-      salary: '$40-60k/year',
-      applications: 8,
-      views: 189,
-      status: 'Active',
-      posted: '1 week ago',
-      image: '/images/misc/barber-hero.jpg',
-    },
-    {
-      id: 3,
-      title: 'HVAC Technician',
-      location: 'Detroit, MI',
-      type: 'Full-time',
-      salary: '$22-28/hr',
-      applications: 5,
-      views: 156,
-      status: 'Active',
-      posted: '2 weeks ago',
-      image: '/images/programs-hq/hvac-technician.jpg',
-    },
-    {
-      id: 4,
-      title: 'CDL Driver - Class A',
-      location: 'Columbus, OH',
-      type: 'Full-time',
-      salary: '$55-70k/year',
-      applications: 15,
-      views: 312,
-      status: 'Paused',
-      posted: '3 weeks ago',
-      image: '/images/misc/cdl-course.jpg',
-    },
-  ];
+  // Fetch real job postings for this employer
+  const { data: jobPostings } = await supabase
+    .from('job_postings')
+    .select('id, job_title, job_description, location, employment_type, salary_min, salary_max, status, positions_available, positions_filled, created_at')
+    .eq('employer_id', user.id)
+    .order('created_at', { ascending: false });
+
+  const jobs = (jobPostings || []).map(j => {
+    const salaryDisplay = j.salary_min && j.salary_max
+      ? `$${j.salary_min.toLocaleString()} - $${j.salary_max.toLocaleString()}`
+      : j.salary_min ? `From $${j.salary_min.toLocaleString()}` : 'Not specified';
+
+    const posted = new Date(j.created_at);
+    const daysAgo = Math.floor((Date.now() - posted.getTime()) / (1000 * 60 * 60 * 24));
+    const postedLabel = daysAgo === 0 ? 'Today' : daysAgo === 1 ? '1 day ago' : `${daysAgo} days ago`;
+
+    return {
+      id: j.id,
+      title: j.job_title,
+      location: j.location || 'Location not set',
+      type: j.employment_type || 'Full-time',
+      salary: salaryDisplay,
+      positions: j.positions_available || 0,
+      filled: j.positions_filled || 0,
+      status: j.status || 'draft',
+      posted: postedLabel,
+    };
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
-            <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Jobs" }]} />
-{/* Header */}
+      <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Jobs" }]} />
+
+      {/* Header */}
       <section className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -134,25 +112,19 @@ export default async function JobPostingsPage() {
       {/* Jobs List */}
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-4">
-            {jobs.map((job) => (
-              <div key={job.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
-                <div className="flex flex-col md:flex-row">
-                  <div className="relative w-full md:w-48 h-48 md:h-auto flex-shrink-0">
-                    <Image
-                      src={job.image}
-                      alt={job.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 p-6">
+          {jobs.length > 0 ? (
+            <div className="space-y-4">
+              {jobs.map((job) => (
+                <div key={job.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="p-6">
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="text-xl font-bold text-gray-900">{job.title}</h3>
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            job.status === 'Active' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-yellow-100 text-yellow-700'
+                            job.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' :
+                            job.status === 'paused' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-gray-100 text-gray-700'
                           }`}>
                             {job.status}
                           </span>
@@ -184,13 +156,12 @@ export default async function JobPostingsPage() {
                     <div className="flex items-center gap-6 mt-6">
                       <div className="flex items-center gap-2">
                         <Users className="w-5 h-5 text-brand-blue-600" />
-                        <span className="font-semibold text-gray-900">{job.applications}</span>
-                        <span className="text-gray-500">applications</span>
+                        <span className="font-semibold text-gray-900">{job.positions}</span>
+                        <span className="text-gray-500">positions</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Eye className="w-5 h-5 text-gray-400" />
-                        <span className="font-semibold text-gray-900">{job.views}</span>
-                        <span className="text-gray-500">views</span>
+                        <span className="font-semibold text-brand-green-600">{job.filled}</span>
+                        <span className="text-gray-500">filled</span>
                       </div>
                     </div>
 
@@ -208,18 +179,12 @@ export default async function JobPostingsPage() {
                         <Edit className="w-4 h-4" />
                         Edit
                       </Link>
-                      <button className="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
-                        <Trash2 className="w-4 h-4" />
-                        Delete
-                      </button>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {jobs.length === 0 && (
+              ))}
+            </div>
+          ) : (
             <div className="text-center py-16">
               <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No job postings yet</h3>

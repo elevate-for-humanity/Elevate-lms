@@ -1,16 +1,44 @@
-export const dynamic = 'force-dynamic';
-
 import { Metadata } from 'next';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Users, Search, Filter, Download, Mail, Eye } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-export const metadata: Metadata = { title: 'Students | Program Holder Portal' };
+export const metadata: Metadata = {
+  title: 'Students | Program Holder Portal',
+  robots: { index: false, follow: false },
+};
 
-export default function ProgramHolderStudentsPage() {
-  // Students are loaded from database via API
-  // This page shows enrolled students for the program holder's organization
-  const students: Array<{
+export const dynamic = 'force-dynamic';
+
+export default async function ProgramHolderStudentsPage() {
+  const supabase = await createClient();
+
+  if (!supabase) {
+    redirect('/login?redirect=/program-holder/students');
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login?redirect=/program-holder/students');
+  }
+
+  // Get programs owned by this user
+  const { data: myPrograms } = await supabase
+    .from('programs')
+    .select('id, name, title')
+    .eq('created_by', user.id);
+
+  const programIds = (myPrograms || []).map(p => p.id);
+  const programNames = (myPrograms || []).reduce<Record<string, string>>((acc, p) => {
+    acc[p.id] = p.name || p.title || 'Unknown Program';
+    return acc;
+  }, {});
+
+  // Get enrollments for those programs
+  let students: Array<{
     id: string;
     name: string;
     email: string;
@@ -18,16 +46,34 @@ export default function ProgramHolderStudentsPage() {
     progress: number;
     enrolled: string;
     status: string;
-  }> = []; // Populated from /api/program-holder/students
+  }> = [];
+
+  if (programIds.length > 0) {
+    const { data: enrollments } = await supabase
+      .from('student_enrollments')
+      .select('id, student_id, program_id, progress, status, created_at, profiles!student_enrollments_student_id_fkey(full_name, email)')
+      .in('program_id', programIds)
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    students = (enrollments || []).map((e: any) => ({
+      id: e.student_id,
+      name: e.profiles?.full_name || 'Unknown',
+      email: e.profiles?.email || '',
+      program: programNames[e.program_id] || 'Unknown Program',
+      progress: e.progress || 0,
+      enrolled: new Date(e.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: e.status || 'active',
+    }));
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Breadcrumbs
-        items={[
-          { label: 'Program Holder', href: '/program-holder/dashboard' },
-          { label: 'Students' },
-        ]}
-      />
+      <Breadcrumbs items={[
+        { label: 'Program Holder', href: '/program-holder/dashboard' },
+        { label: 'Students' },
+      ]} />
+
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Students</h1>
@@ -36,12 +82,6 @@ export default function ProgramHolderStudentsPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input type="text" placeholder="Search students..." className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg" />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-              <Filter className="w-5 h-5" /> Filter
-            </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
-              <Download className="w-5 h-5" /> Export
-            </button>
           </div>
         </div>
 
@@ -71,21 +111,26 @@ export default function ProgramHolderStudentsPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2">
                         <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full ${student.progress === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'}`} style={{ width: `${student.progress}%` }}></div>
+                          <div className={`h-full rounded-full ${student.progress === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'}`} style={{ width: `${student.progress}%` }} />
                         </div>
                         <span className="text-sm text-gray-600">{student.progress}%</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-gray-600">{student.enrolled}</td>
                     <td className="px-6 py-4 text-center">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${student.status === 'completed' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-brand-blue-100 text-brand-blue-700'}`}>
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        student.status === 'completed' ? 'bg-brand-green-100 text-brand-green-700' :
+                        student.status === 'active' ? 'bg-brand-blue-100 text-brand-blue-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
                         {student.status}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2">
-                        <button className="p-2 text-gray-600 hover:text-brand-blue-600 hover:bg-brand-blue-50 rounded"><Eye className="w-4 h-4" /></button>
-                        <button className="p-2 text-gray-600 hover:text-brand-blue-600 hover:bg-brand-blue-50 rounded"><Mail className="w-4 h-4" /></button>
+                        <Link href={`/program-holder/students/${student.id}`} className="p-2 text-gray-600 hover:text-brand-blue-600 hover:bg-brand-blue-50 rounded">
+                          <Eye className="w-4 h-4" />
+                        </Link>
                       </div>
                     </td>
                   </tr>

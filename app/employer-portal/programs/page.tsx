@@ -66,10 +66,10 @@ export default function EmployerProgramsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid md:grid-cols-4 gap-6 mb-12">
           {[
-            { icon: DollarSign, label: 'Total Savings Available', value: '$50,000+', color: 'green' },
-            { icon: Users, label: 'Eligible Candidates', value: '2,500+', color: 'blue' },
-            { icon: Award, label: 'Active Programs', value: '4', color: 'blue' },
-            { icon: Clock, label: 'Avg. Processing Time', value: '2-4 weeks', color: 'orange' },
+            { icon: DollarSign, label: 'WOTC Credit per Hire', value: 'Up to $9,600', color: 'brand-green' },
+            { icon: Users, label: 'OJT Wage Reimbursement', value: '50–75%', color: 'brand-blue' },
+            { icon: Award, label: 'Available Programs', value: '4', color: 'brand-blue' },
+            { icon: Clock, label: 'Avg. Processing Time', value: '2–4 weeks', color: 'brand-orange' },
           ].map((stat, index) => (
             <div key={index} className="bg-white rounded-xl p-6 shadow-sm">
               <stat.icon className={`w-8 h-8 text-${stat.color}-600 mb-3`} />

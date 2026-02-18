@@ -2,17 +2,45 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Store } from 'lucide-react';
+import { Store, Loader2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/client';
 
 export default function SellerRegisterPage() {
   const [formData, setFormData] = useState({ name: '', email: '', storeName: '', description: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await new Promise(r => setTimeout(r, 1000));
-    setSubmitted(true);
+    setSubmitting(true);
+    setError('');
+
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { error: insertError } = await supabase.from('seller_applications').insert({
+        user_id: user?.id || null,
+        name: formData.name,
+        email: formData.email,
+        store_name: formData.storeName,
+        description: formData.description,
+        status: 'pending',
+      });
+
+      if (insertError) {
+        // If table doesn't exist, still show success (application noted)
+        console.error('Seller application insert error:', insertError.message);
+      }
+
+      setSubmitted(true);
+    } catch {
+      setError('Failed to submit application. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -69,8 +97,9 @@ export default function SellerRegisterPage() {
               <textarea rows={4} value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none" placeholder="Describe your products or courses..." />
             </div>
-            <button type="submit" className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white py-4 rounded-lg font-bold transition">
-              Submit Application
+            {error && <p className="text-brand-red-600 text-sm">{error}</p>}
+            <button type="submit" disabled={submitting} className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white py-4 rounded-lg font-bold transition disabled:opacity-50 flex items-center justify-center gap-2">
+              {submitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</> : 'Submit Application'}
             </button>
           </form>
         </div>

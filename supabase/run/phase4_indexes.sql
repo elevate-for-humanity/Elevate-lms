@@ -6,10 +6,7 @@
 CREATE INDEX IF NOT EXISTS idx_laa_user_id ON license_agreement_acceptances(user_id);
 CREATE INDEX IF NOT EXISTS idx_laa_agreement_type ON license_agreement_acceptances(agreement_type);
 CREATE INDEX IF NOT EXISTS idx_laa_accepted_at ON license_agreement_acceptances(accepted_at);
-CREATE INDEX IF NOT EXISTS idx_laa_user ON license_agreement_acceptances(user_id);
 CREATE INDEX IF NOT EXISTS idx_laa_org ON license_agreement_acceptances(organization_id);
-CREATE INDEX IF NOT EXISTS idx_laa_tenant ON license_agreement_acceptances(tenant_id);
-CREATE INDEX IF NOT EXISTS idx_laa_type ON license_agreement_acceptances(agreement_type);
 
 CREATE INDEX IF NOT EXISTS idx_av_type ON agreement_versions(agreement_type);
 CREATE INDEX IF NOT EXISTS idx_av_effective ON agreement_versions(effective_date);

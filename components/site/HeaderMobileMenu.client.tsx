@@ -22,14 +22,21 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
   const [userProfile, setUserProfile] = useState<any>(null);
   const supabase = createClient();
 
-  // Lock body scroll when menu is open
+  // Lock body scroll when menu is open and close on Escape
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') setIsOpen(false);
+      };
+      document.addEventListener('keydown', handleEscape);
+      return () => {
+        document.body.style.overflow = '';
+        document.removeEventListener('keydown', handleEscape);
+      };
     } else {
       document.body.style.overflow = '';
     }
-    return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
   // Load user profile from DB when menu opens

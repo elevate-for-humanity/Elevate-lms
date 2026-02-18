@@ -284,9 +284,10 @@ export async function POST() {
     });
 
   } catch (error) {
+    console.error('[shop-routing test]', error);
     return NextResponse.json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Internal server error',
     }, { status: 500 });
   }
 }

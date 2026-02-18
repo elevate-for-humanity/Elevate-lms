@@ -77,7 +77,7 @@ export default function Header() {
     <header className="fixed top-0 left-0 right-0 h-[70px] bg-white z-[9999] shadow-md" role="banner">
       <div className="max-w-7xl mx-auto w-full h-full flex items-center justify-between px-4 sm:px-6">
         {/* Logo - Always visible */}
-        <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+        <Link href="/" className="flex items-center gap-2 flex-shrink-0" aria-label="Elevate for Humanity home">
           <Image
             src="/logo.png"
             alt="Elevate"

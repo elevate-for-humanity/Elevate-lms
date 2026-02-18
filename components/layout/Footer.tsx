@@ -4,9 +4,9 @@ import Link from 'next/link';
 
 export function Footer() {
   return (
-    <footer className="bg-gray-900 text-white py-12">
+    <footer className="bg-gray-900 text-white py-12" role="contentinfo">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+        <nav aria-label="Footer navigation" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="lg:col-span-2">
             <h3 className="font-bold text-lg mb-4">Elevate for Humanity</h3>
@@ -54,7 +54,7 @@ export function Footer() {
               <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
             </ul>
           </div>
-        </div>
+        </nav>
 
         {/* Enrollment Disclaimer */}
         <div className="border-t border-gray-800 mt-8 pt-8">

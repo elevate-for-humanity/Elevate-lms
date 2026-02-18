@@ -38,53 +38,7 @@ const NOTIFICATION_COLORS: Record<NotificationType, string> = {
   system: 'bg-slate-700',
 };
 
-// Mock data for demo
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: '1',
-    type: 'hours_approved',
-    title: 'Hours Approved',
-    message: '8 hours from January 24 have been approved by your supervisor.',
-    read: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    actionUrl: '/pwa/barber/history',
-  },
-  {
-    id: '2',
-    type: 'milestone',
-    title: 'Milestone Reached!',
-    message: 'Congratulations! You\'ve completed 500 hours of training.',
-    read: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-    actionUrl: '/pwa/barber/progress',
-  },
-  {
-    id: '3',
-    type: 'reminder',
-    title: 'Weekly Hours Reminder',
-    message: 'You\'ve logged 24 hours this week. Keep up the great work!',
-    read: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-  },
-  {
-    id: '4',
-    type: 'training',
-    title: 'New Training Available',
-    message: 'A new module on "Advanced Fading Techniques" is now available.',
-    read: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-    actionUrl: '/pwa/barber/training',
-  },
-  {
-    id: '5',
-    type: 'hours_rejected',
-    title: 'Hours Need Revision',
-    message: 'Your submission for January 20 needs additional details.',
-    read: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
-    actionUrl: '/pwa/barber/history',
-  },
-];
+import { createBrowserClient } from '@supabase/ssr';
 
 export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
@@ -92,11 +46,35 @@ export default function NotificationsPage() {
   const [markingRead, setMarkingRead] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setNotifications(MOCK_NOTIFICATIONS);
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    async function fetchNotifications() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setLoading(false); return; }
+
+      const { data } = await supabase
+        .from('notifications')
+        .select('id, type, title, message, read, created_at, action_url')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      setNotifications((data || []).map(n => ({
+        id: n.id,
+        type: (n.type || 'system') as NotificationType,
+        title: n.title || '',
+        message: n.message || '',
+        read: n.read ?? false,
+        createdAt: n.created_at,
+        actionUrl: n.action_url || undefined,
+      })));
       setLoading(false);
-    }, 500);
+    }
+
+    fetchNotifications();
   }, []);
 
   const formatTime = (dateString: string) => {
@@ -113,10 +91,14 @@ export default function NotificationsPage() {
     return date.toLocaleDateString();
   };
 
+  const getSupabase = () => createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   const markAsRead = async (id: string) => {
     setMarkingRead(id);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await getSupabase().from('notifications').update({ read: true }).eq('id', id);
     setNotifications(prev => 
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
@@ -125,12 +107,16 @@ export default function NotificationsPage() {
 
   const markAllAsRead = async () => {
     setMarkingRead('all');
-    await new Promise(resolve => setTimeout(resolve, 500));
+    const unreadIds = notifications.filter(n => !n.read).map(n => n.id);
+    if (unreadIds.length > 0) {
+      await getSupabase().from('notifications').update({ read: true }).in('id', unreadIds);
+    }
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     setMarkingRead(null);
   };
 
-  const deleteNotification = (id: string) => {
+  const deleteNotification = async (id: string) => {
+    await getSupabase().from('notifications').delete().eq('id', id);
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
 

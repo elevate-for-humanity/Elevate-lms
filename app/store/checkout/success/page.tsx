@@ -17,17 +17,37 @@ function CheckoutSuccessContent() {
   } | null>(null);
 
   useEffect(() => {
-    // In production, verify session with Stripe
-    // For now, show success with trial info
-    const trialEnd = new Date();
-    trialEnd.setDate(trialEnd.getDate() + TRIAL_DAYS);
-    
-    setSessionData({
-      customerEmail: 'your email',
-      planName: 'Platform License',
-      trialEnd,
-    });
-    setLoading(false);
+    if (!sessionId) {
+      setLoading(false);
+      return;
+    }
+
+    fetch(`/api/store/checkout/verify?session_id=${sessionId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          // Fallback if session can't be verified
+          const trialEnd = new Date();
+          trialEnd.setDate(trialEnd.getDate() + TRIAL_DAYS);
+          setSessionData({ customerEmail: '', planName: 'Platform License', trialEnd });
+        } else {
+          setSessionData({
+            customerEmail: data.customerEmail || '',
+            planName: data.planName || 'Platform License',
+            trialEnd: data.trialEnd ? new Date(data.trialEnd * 1000) : (() => {
+              const d = new Date();
+              d.setDate(d.getDate() + TRIAL_DAYS);
+              return d;
+            })(),
+          });
+        }
+      })
+      .catch(() => {
+        const trialEnd = new Date();
+        trialEnd.setDate(trialEnd.getDate() + TRIAL_DAYS);
+        setSessionData({ customerEmail: '', planName: 'Platform License', trialEnd });
+      })
+      .finally(() => setLoading(false));
   }, [sessionId]);
 
   if (loading) {

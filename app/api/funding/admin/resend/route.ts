@@ -9,11 +9,10 @@ import { getUserById } from '@/lib/supabase-admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-// Simple email function (replace with Resend in production)
+import { sendEmail as realSendEmail } from '@/lib/email';
+
 async function sendEmail(to: string, subject: string, text: string) {
-  // logger.info('[EMAIL]', { to, subject, text });
-  // Note: Replace with actual email service (Resend, Postmark, etc.)
-  return true;
+  await realSendEmail({ to, subject, html: text.replace(/\n/g, '<br>') });
 }
 
 export async function POST(req: NextRequest) {

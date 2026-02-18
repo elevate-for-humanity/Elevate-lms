@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ChevronRight,
@@ -15,6 +15,7 @@ import {
   Smile,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createBrowserClient } from '@supabase/ssr';
 
 interface Conversation {
   id: string;
@@ -33,70 +34,157 @@ interface Message {
   timestamp: string;
 }
 
+const getSupabase = () => createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 export default function StudentChatPage() {
-  const [selectedConversation, setSelectedConversation] = useState<string | null>('1');
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  const conversations: Conversation[] = [
-    {
-      id: '1',
-      name: 'David T.',
-      role: 'Instructor',
-      lastMessage: 'Great work on your practical assignment!',
-      timestamp: '10:30 AM',
-      unread: 2,
-      online: true,
-    },
-    {
-      id: '2',
-      name: 'Career Services',
-      role: 'Support',
-      lastMessage: 'Your resume has been reviewed.',
-      timestamp: 'Yesterday',
-      unread: 0,
-      online: true,
-    },
-    {
-      id: '3',
-      name: 'Student Support',
-      role: 'Support',
-      lastMessage: 'How can we help you today?',
-      timestamp: 'Jan 15',
-      unread: 0,
-      online: false,
-    },
-  ];
+  useEffect(() => {
+    async function loadConversations() {
+      const supabase = getSupabase();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      setUserId(user.id);
 
-  const messages: Message[] = [
-    {
-      id: '1',
-      sender: 'other',
-      text: 'Hi! I reviewed your Week 3 practical assignment.',
-      timestamp: '10:15 AM',
-    },
-    {
-      id: '2',
-      sender: 'other',
-      text: 'Great work on your practical assignment! Your technique has improved significantly.',
-      timestamp: '10:30 AM',
-    },
-    {
-      id: '3',
-      sender: 'me',
-      text: 'Thank you! I practiced a lot this week.',
-      timestamp: '10:32 AM',
-    },
-    {
-      id: '4',
-      sender: 'other',
-      text: 'It shows! Keep up the good work. Let me know if you have any questions about the next module.',
-      timestamp: '10:35 AM',
-    },
-  ];
+      // Get distinct conversation partners from messages table
+      const { data: sent } = await supabase
+        .from('messages')
+        .select('recipient_id, body, created_at, read')
+        .eq('sender_id', user.id)
+        .order('created_at', { ascending: false });
 
-  const handleSend = () => {
-    if (!newMessage.trim()) return;
-    // In production, this would send the message via API
+      const { data: received } = await supabase
+        .from('messages')
+        .select('sender_id, body, created_at, read')
+        .eq('recipient_id', user.id)
+        .order('created_at', { ascending: false });
+
+      // Build conversation list from unique partners
+      const partnerMap = new Map<string, { lastMessage: string; timestamp: string; unread: number }>();
+
+      for (const m of (received || [])) {
+        if (!partnerMap.has(m.sender_id)) {
+          partnerMap.set(m.sender_id, {
+            lastMessage: m.body || '',
+            timestamp: m.created_at,
+            unread: !m.read ? 1 : 0,
+          });
+        } else if (!m.read) {
+          const existing = partnerMap.get(m.sender_id)!;
+          existing.unread++;
+        }
+      }
+
+      for (const m of (sent || [])) {
+        if (!partnerMap.has(m.recipient_id)) {
+          partnerMap.set(m.recipient_id, {
+            lastMessage: m.body || '',
+            timestamp: m.created_at,
+            unread: 0,
+          });
+        }
+      }
+
+      // Fetch partner profiles
+      const partnerIds = Array.from(partnerMap.keys());
+      if (partnerIds.length === 0) return;
+
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, role')
+        .in('id', partnerIds);
+
+      const convos: Conversation[] = partnerIds.map(pid => {
+        const profile = (profiles || []).find(p => p.id === pid);
+        const info = partnerMap.get(pid)!;
+        const ts = new Date(info.timestamp);
+        const now = new Date();
+        const diffDays = Math.floor((now.getTime() - ts.getTime()) / (1000 * 60 * 60 * 24));
+        const timeStr = diffDays === 0
+          ? ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          : diffDays === 1 ? 'Yesterday'
+          : ts.toLocaleDateString();
+
+        return {
+          id: pid,
+          name: profile?.full_name || 'Unknown',
+          role: profile?.role || 'user',
+          lastMessage: info.lastMessage.substring(0, 60),
+          timestamp: timeStr,
+          unread: info.unread,
+          online: false,
+        };
+      });
+
+      setConversations(convos);
+      if (convos.length > 0) setSelectedConversation(convos[0].id);
+    }
+
+    loadConversations();
+  }, []);
+
+  // Load messages when conversation changes
+  useEffect(() => {
+    if (!selectedConversation || !userId) return;
+
+    async function loadMessages() {
+      const supabase = getSupabase();
+      const { data } = await supabase
+        .from('messages')
+        .select('id, sender_id, body, created_at')
+        .or(`and(sender_id.eq.${userId},recipient_id.eq.${selectedConversation}),and(sender_id.eq.${selectedConversation},recipient_id.eq.${userId})`)
+        .order('created_at', { ascending: true })
+        .limit(100);
+
+      setMessages((data || []).map(m => ({
+        id: m.id,
+        sender: m.sender_id === userId ? 'me' : 'other',
+        text: m.body || '',
+        timestamp: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      })));
+
+      // Mark received messages as read
+      await supabase
+        .from('messages')
+        .update({ read: true })
+        .eq('sender_id', selectedConversation)
+        .eq('recipient_id', userId)
+        .eq('read', false);
+    }
+
+    loadMessages();
+  }, [selectedConversation, userId]);
+
+  const handleSend = async () => {
+    if (!newMessage.trim() || !selectedConversation || !userId) return;
+
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('messages')
+      .insert({
+        sender_id: userId,
+        recipient_id: selectedConversation,
+        body: newMessage.trim(),
+      })
+      .select('id, created_at')
+      .single();
+
+    if (!error && data) {
+      setMessages(prev => [...prev, {
+        id: data.id,
+        sender: 'me',
+        text: newMessage.trim(),
+        timestamp: new Date(data.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      }]);
+    }
+
     setNewMessage('');
   };
 

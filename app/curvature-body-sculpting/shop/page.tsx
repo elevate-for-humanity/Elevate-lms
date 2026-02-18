@@ -31,6 +31,7 @@ interface Product {
   ingredients?: string;
 }
 
+// CurvatureBody product catalog — static, managed by business owner
 const products: Product[] = [
   // Teas
   {

@@ -36,53 +36,7 @@ const NOTIFICATION_COLORS: Record<NotificationType, string> = {
   system: 'bg-slate-700',
 };
 
-// Mock data for demo
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: '1',
-    type: 'hours_submitted',
-    title: 'Hours Pending Approval',
-    message: 'James W. submitted 32 hours for the week ending Jan 24.',
-    read: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-    actionUrl: '/pwa/shop-owner/approve-hours',
-  },
-  {
-    id: '2',
-    type: 'hours_submitted',
-    title: 'Hours Pending Approval',
-    message: 'Deja Williams submitted 28 hours for the week ending Jan 24.',
-    read: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-    actionUrl: '/pwa/shop-owner/approve-hours',
-  },
-  {
-    id: '3',
-    type: 'apprentice_joined',
-    title: 'New Apprentice',
-    message: 'Tyrone Davis has been assigned to your shop.',
-    read: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    actionUrl: '/pwa/shop-owner/apprentices',
-  },
-  {
-    id: '4',
-    type: 'report_ready',
-    title: 'Monthly Report Ready',
-    message: 'Your January 2025 compliance report is ready for download.',
-    read: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-    actionUrl: '/pwa/shop-owner/reports',
-  },
-  {
-    id: '5',
-    type: 'reminder',
-    title: 'Weekly Reminder',
-    message: 'Don\'t forget to approve pending hours before Friday.',
-    read: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
-  },
-];
+import { createBrowserClient } from '@supabase/ssr';
 
 export default function ShopOwnerNotificationsPage() {
   const [loading, setLoading] = useState(true);
@@ -90,11 +44,35 @@ export default function ShopOwnerNotificationsPage() {
   const [markingRead, setMarkingRead] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setNotifications(MOCK_NOTIFICATIONS);
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    async function fetchNotifications() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setLoading(false); return; }
+
+      const { data } = await supabase
+        .from('notifications')
+        .select('id, type, title, message, read, created_at, action_url')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      setNotifications((data || []).map(n => ({
+        id: n.id,
+        type: (n.type || 'system') as NotificationType,
+        title: n.title || '',
+        message: n.message || '',
+        read: n.read ?? false,
+        createdAt: n.created_at,
+        actionUrl: n.action_url || undefined,
+      })));
       setLoading(false);
-    }, 500);
+    }
+
+    fetchNotifications();
   }, []);
 
   const formatTime = (dateString: string) => {
@@ -111,9 +89,14 @@ export default function ShopOwnerNotificationsPage() {
     return date.toLocaleDateString();
   };
 
+  const getSupabase = () => createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   const markAsRead = async (id: string) => {
     setMarkingRead(id);
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await getSupabase().from('notifications').update({ read: true }).eq('id', id);
     setNotifications(prev => 
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
@@ -122,12 +105,16 @@ export default function ShopOwnerNotificationsPage() {
 
   const markAllAsRead = async () => {
     setMarkingRead('all');
-    await new Promise(resolve => setTimeout(resolve, 500));
+    const unreadIds = notifications.filter(n => !n.read).map(n => n.id);
+    if (unreadIds.length > 0) {
+      await getSupabase().from('notifications').update({ read: true }).in('id', unreadIds);
+    }
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     setMarkingRead(null);
   };
 
-  const deleteNotification = (id: string) => {
+  const deleteNotification = async (id: string) => {
+    await getSupabase().from('notifications').delete().eq('id', id);
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
 

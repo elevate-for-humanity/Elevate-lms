@@ -211,11 +211,10 @@ const { searchParams } = new URL(request.url);
     );
   }
 
-  // In production, check actual generation status
-  return NextResponse.json({
-    videoId,
-    status: 'completed',
-    progress: 100,
-    videoUrl: '/videos/hero-home.mp4',
-  });
+  // Video generation is synchronous — the POST response includes the final URL.
+  // No async status polling is available.
+  return NextResponse.json(
+    { error: 'Video generation is synchronous. Status is returned in the POST response.' },
+    { status: 404 }
+  );
 }

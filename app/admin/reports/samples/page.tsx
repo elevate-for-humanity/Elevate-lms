@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: 'Download sample enrollment records, certificates, and funding reports.',
 };
 
-// Sample enrollment data
+// Report format examples — shows admins what exported data looks like
 const SAMPLE_ENROLLMENT = {
   id: 'ENR-2026-00142',
   student: {

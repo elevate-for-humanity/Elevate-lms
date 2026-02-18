@@ -12,8 +12,8 @@ import CodeEditor from '@/components/editor/CodeEditor';
 import Terminal from '@/components/editor/Terminal';
 export const dynamic = 'force-dynamic';
 
-// Mock file structure
-const mockFiles = [
+// Default file tree scaffold — replaced when user generates/loads a site project
+const defaultFiles = [
   {
     name: 'app',
     path: '/app',
@@ -217,7 +217,7 @@ export default function EditorPage() {
           {/* File Tree */}
           <div className="h-full overflow-hidden">
             <FileTree
-              files={mockFiles}
+              files={defaultFiles}
               onFileSelect={handleFileSelect}
               selectedFile={selectedFile}
             />

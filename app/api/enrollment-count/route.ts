@@ -1,63 +1,45 @@
 import { NextResponse } from 'next/server';
-// AUTH: Intentionally public — no authentication required
-
-export const runtime = 'edge';
-export const maxDuration = 60;
-import { parseBody } from '@/lib/api-helpers';
+import { createClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+// AUTH: Intentionally public — returns aggregate counts only
 
-// Simulated database - in production, this would query your actual database
-const enrollmentData = {
-  total: 2847,
-  thisMonth: 156,
-  today: 12,
-  activeStudents: 1234,
-  lastUpdated: new Date().toISOString(),
-};
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export async function GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    // In production, query your database here
-    // const data = await db.query('SELECT COUNT(*) FROM enrollments...');
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+
+    const [totalRes, monthRes, todayRes, activeRes] = await Promise.all([
+      supabase.from('enrollments').select('id', { count: 'exact', head: true }),
+      supabase.from('enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfMonth),
+      supabase.from('enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfDay),
+      supabase.from('enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    ]);
 
     return NextResponse.json({
       success: true,
-      data: enrollmentData,
+      data: {
+        total: totalRes.count ?? 0,
+        thisMonth: monthRes.count ?? 0,
+        today: todayRes.count ?? 0,
+        activeStudents: activeRes.count ?? 0,
+        lastUpdated: now.toISOString(),
+      },
     });
-  } catch (error) { 
+  } catch (error) {
     return NextResponse.json(
       { success: false, error: 'Failed to fetch enrollment data' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(request: Request) {
-  try {
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-
-    const body = await parseBody<Record<string, any>>(request);
-
-    // Increment counters
-    enrollmentData.total += 1;
-    enrollmentData.thisMonth += 1;
-    enrollmentData.today += 1;
-    enrollmentData.lastUpdated = new Date().toISOString();
-
-    // In production, save to database
-    // await db.query('INSERT INTO enrollments...');
-
-    return NextResponse.json({
-      success: true,
-      data: enrollmentData,
-    });
-  } catch (error) { 
-    return NextResponse.json(
-      { success: false, error: 'Failed to update enrollment data' },
       { status: 500 }
     );
   }

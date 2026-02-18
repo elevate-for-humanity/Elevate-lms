@@ -11,11 +11,19 @@ import {
 } from "./base";
 
 /**
- * TEMP STUB IMPLEMENTATION
- * ------------------------
- * These stubs let the automation system work end-to-end NOW.
- * You / a dev will later replace each stub with real API
- * calls using the vendor's documentation.
+ * Partner API Integration Layer
+ * 
+ * STATUS: Stub implementation — returns placeholder data.
+ * 
+ * Each partner (NDS, CareerSafe, etc.) will need a concrete
+ * implementation that calls their vendor API. The stub allows
+ * the enrollment/automation pipeline to function without
+ * blocking on vendor integration timelines.
+ * 
+ * To connect a real partner:
+ *   1. Create a class extending BasePartnerAPI
+ *   2. Implement createAccount, enrollInCourse, getProgress, getCertificate, getSSOLink
+ *   3. Add the partner type to getPartnerAPI()
  */
 
 class StubPartnerAPI extends BasePartnerAPI {

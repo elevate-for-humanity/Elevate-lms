@@ -192,29 +192,21 @@ function determineOverallStatus(checks: any): 'healthy' | 'degraded' | 'down' {
 }
 
 async function getMetrics() {
-  // Get memory usage
   const memoryUsage = process.memoryUsage();
-  
-  // Get uptime
   const uptime = process.uptime();
 
-  // In production, these would come from a metrics store
-  // For now, return mock data that would be collected
   return {
     uptime,
     memory: {
       used: Math.round(memoryUsage.heapUsed / 1024 / 1024),
       total: Math.round(memoryUsage.heapTotal / 1024 / 1024),
+      rss: Math.round(memoryUsage.rss / 1024 / 1024),
       unit: 'MB',
     },
-    requests: {
-      total: 0, // Would be tracked in Redis
-      errors: 0, // Would be tracked in Redis
-      rate: 0, // Requests per minute
-    },
-    rateLimits: {
-      blocked: 0, // Would come from Upstash analytics
-      allowed: 0, // Would come from Upstash analytics
+    node: {
+      version: process.version,
+      platform: process.platform,
+      arch: process.arch,
     },
   };
 }

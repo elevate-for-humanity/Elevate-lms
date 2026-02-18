@@ -158,13 +158,13 @@ export default function AnalyticsPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/contact"
+                href="/admin/email-marketing"
                 className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
               >
                 Get Started Free
               </Link>
               <Link
-                href="/programs"
+                href="/admin/email-marketing/campaigns/new"
                 className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
               >
                 View Programs
@@ -182,23 +182,23 @@ export default function AnalyticsPage() {
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h2 className="text-2xl md:text-3xl font-bold mb-6">
-                  Need Help?
-                </h2>
+              Email Campaign Analytics
+                            </h2>
                 <p className="text-base md:text-lg mb-8 text-brand-blue-100">
-                  Manage platform tools and resources for Elevate for Humanity.
-                </p>
+              Track open rates, click-through, and conversion metrics.
+                            </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
-                    href="/contact"
+                    href="/admin/email-marketing"
                     className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
                   >
-                    Apply Now - It's Free
+                View Campaigns
                   </Link>
                   <Link
-                    href="/programs"
+                    href="/admin/email-marketing/campaigns/new"
                     className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
                   >
-                    Browse All Programs
+                Create Campaign
                   </Link>
                 </div>
               </div>

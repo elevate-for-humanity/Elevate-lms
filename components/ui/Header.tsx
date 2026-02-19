@@ -47,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
         { name: 'All Programs', href: '/programs' },
         { name: 'Healthcare', href: '/programs/healthcare' },
         { name: 'Skilled Trades', href: '/programs/skilled-trades' },
-        { name: 'Beauty & Wellness', href: '/programs/beauty' },
+        { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
         { name: 'Technology', href: '/programs/technology' },
         { name: 'Apprenticeships', href: '/programs/apprenticeships' },
       ],

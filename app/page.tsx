@@ -2,17 +2,17 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { lazy, Suspense } from 'react';
+
 
 import HomeHeroVideo from './HomeHeroVideo';
 import PageAvatar from '@/components/PageAvatar';
 import { InView } from '@/components/ui/InView';
 
-const ProgramFinderQuiz = lazy(() => import('@/components/quiz/ProgramFinderQuiz'));
+// Quiz removed — program cards now serve as the path selector
 
 const programs = [
-  { name: 'Healthcare', href: '/programs/healthcare', image: '/images/hero/hero-healthcare.jpg', desc: 'CNA, Medical Assistant, Phlebotomy' },
-  { name: 'Skilled Trades', href: '/programs/skilled-trades', image: '/images/trades/hero-program-hvac.jpg', desc: 'HVAC, Electrical, Welding, Plumbing' },
+  { name: 'Healthcare', href: '/programs/healthcare', image: '/images/programs-hq/healthcare-hero.jpg', desc: 'CNA, Medical Assistant, Phlebotomy' },
+  { name: 'Skilled Trades', href: '/programs/skilled-trades', image: '/images/programs-hq/skilled-trades-hero.jpg', desc: 'HVAC, Electrical, Welding, Plumbing' },
   { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.jpg', desc: 'Earn while you learn' },
   { name: 'CDL Training', href: '/programs/cdl', image: '/images/cdl-vibrant.jpg', desc: 'Class A & B — start earning $50K+' },
   { name: 'Technology', href: '/programs/technology', image: '/images/programs-hq/it-support.jpg', desc: 'IT Support, Cybersecurity' },
@@ -85,7 +85,7 @@ export default function HomePage() {
                 image: '/images/business-vibrant.jpg',
                 alt: 'Employer reviewing candidate profiles',
                 label: "I'm an employer",
-                desc: 'Hire credentialed graduates, access WOTC tax credits up to $9,600/hire, and get OJT wage reimbursements.',
+                desc: 'Hire credentialed graduates, access WOTC tax credits ($2,400-$9,600/hire depending on category), and get OJT wage reimbursements.',
                 cta: 'Hire Graduates',
               },
               {
@@ -128,7 +128,7 @@ export default function HomePage() {
             {[
               { title: 'Career Opportunities', desc: 'We offer certification programs in healthcare (CNA, Medical Assistant, Phlebotomy), skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking, IT/cybersecurity, and barbering. Most programs are 4-16 weeks and include hands-on training.', href: '/programs', image: '/images/programs-hq/training-classroom.jpg' },
               { title: 'Funding Available', desc: 'Most students pay nothing out of pocket when they qualify for workforce funding. WIOA covers tuition, books, and supplies. The Workforce Ready Grant funds high-demand certifications. JRI provides paid apprenticeships for justice-involved individuals. Check your eligibility online in minutes.', href: '/funding', image: '/images/heroes-hq/funding-hero.jpg' },
-              { title: 'Hire Our Graduates', desc: 'Employers: our graduates hold industry-recognized credentials and are ready to work. Access WOTC tax credits (up to $9,600/hire), OJT wage reimbursements (50-75% of wages), and post jobs directly to our candidate pool.', href: '/employer', image: '/images/heroes-hq/employer-hero.jpg' },
+              { title: 'Hire Our Graduates', desc: 'Employers: our graduates hold industry-recognized credentials and are ready to work. Access WOTC tax credits ($2,400-$9,600/hire), OJT wage reimbursements (50-75% of wages), and post jobs directly to our candidate pool.', href: '/employer', image: '/images/programs-hq/business-office.jpg' },
             ].map((card) => (
               <Link key={card.title} href={card.href} className="group block">
                 <div className="relative aspect-[3/2] rounded-lg overflow-hidden">
@@ -152,62 +152,46 @@ export default function HomePage() {
       </section>
       </InView>
 
-      {/* ===== PROGRAMS ===== */}
+      {/* ===== WHAT KIND OF WORK EXCITES YOU ===== */}
       <InView animation="fade-up">
-      <section aria-label="Programs and pathways" className="py-10 sm:py-14 bg-white border-t border-slate-100">
+      <section aria-label="Programs and pathways" className="py-14 sm:py-20 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">Programs & Pathways</h2>
+          <div className="text-center mb-12">
+            <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Choose Your Path</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">What Kind of Work Excites You?</h2>
             <p className="text-lg text-slate-700 max-w-2xl mx-auto">
-              Industry-recognized certifications in high-demand fields. Start your new career in weeks.
+              Pick a field and start training in weeks. Most programs are fully funded.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {programs.map((program) => (
-              <Link key={program.name} href={program.href} className="group">
-                <div className="relative aspect-[16/10] rounded-lg overflow-hidden bg-slate-100">
+              <Link key={program.name} href={program.href} className="group bg-white rounded-xl border-2 border-slate-200 hover:border-brand-red-400 hover:shadow-lg transition-all overflow-hidden">
+                <div className="relative aspect-[16/10] overflow-hidden">
                   <Image
                     src={program.image}
                     alt={program.name}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover brightness-105 group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-                <div className="pt-3">
-                  <h3 className="text-slate-900 font-bold text-lg sm:text-xl">{program.name}</h3>
-                  <p className="text-slate-600 text-sm sm:text-base mt-1">{program.desc}</p>
+                <div className="p-5">
+                  <h3 className="text-slate-900 font-bold text-lg sm:text-xl mb-1">{program.name}</h3>
+                  <p className="text-slate-600 text-sm mb-4">{program.desc}</p>
+                  <span className="inline-block bg-brand-red-600 text-white font-semibold text-sm px-5 py-2.5 rounded-lg group-hover:bg-brand-red-700 transition-colors">
+                    Explore Program &rarr;
+                  </span>
                 </div>
               </Link>
             ))}
           </div>
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-10">
             <Link href="/programs" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-10 py-4 rounded-lg transition-colors">
               View All Programs
             </Link>
           </div>
-        </div>
-      </section>
-      </InView>
-
-      {/* ===== FIND YOUR PATH QUIZ ===== */}
-      <InView animation="fade-up">
-      <section id="find-your-path" aria-label="Find your path" className="py-16 sm:py-20 bg-gradient-to-b from-slate-50 to-white border-t border-slate-100">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Interactive Guide</p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Find your path in 30 seconds
-            </h2>
-            <p className="text-lg text-slate-600 mt-3">
-              {"Answer three quick questions and we'll match you with the right program."}
-            </p>
-          </div>
-          <Suspense fallback={<div className="h-64 flex items-center justify-center text-slate-400">Loading...</div>}>
-            <ProgramFinderQuiz />
-          </Suspense>
         </div>
       </section>
       </InView>
@@ -304,15 +288,16 @@ export default function HomePage() {
       <InView animation="fade">
       <section aria-label="Approved training partners" className="py-10 sm:py-14 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-10">Approved Training Provider</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Approved Training Provider</h2>
+          <p className="text-slate-600 mb-10">Listed on Indiana&apos;s INTraining directory and approved by these workforce partners.</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center">
             {[
-              { src: '/images/partners/usdol.webp', alt: 'U.S. Department of Labor', href: 'https://www.dol.gov' },
-              { src: '/images/partners/dwd.webp', alt: 'Indiana DWD', href: 'https://www.in.gov/dwd' },
-              { src: '/images/partners/workone.webp', alt: 'WorkOne Indiana', href: 'https://www.in.gov/dwd/workone' },
-              { src: '/images/partners/nextleveljobs.webp', alt: 'Next Level Jobs', href: 'https://nextleveljobs.org' },
+              { src: '/images/partners/usdol.webp', alt: 'U.S. Department of Labor', href: 'https://www.dol.gov', label: 'U.S. DOL' },
+              { src: '/images/partners/dwd.webp', alt: 'Indiana DWD', href: 'https://www.in.gov/dwd', label: 'Indiana DWD' },
+              { src: '/images/partners/workone.webp', alt: 'WorkOne Indiana', href: 'https://www.in.gov/dwd/workone', label: 'WorkOne' },
+              { src: '/images/partners/nextleveljobs.webp', alt: 'Next Level Jobs', href: 'https://nextleveljobs.org', label: 'Next Level Jobs' },
             ].map((logo) => (
-              <a key={logo.alt} href={logo.href} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center p-4 hover:opacity-80 transition-opacity">
+              <a key={logo.alt} href={logo.href} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-3 p-4 bg-white border-2 border-slate-200 rounded-xl hover:border-brand-red-400 hover:shadow-md transition-all group">
                 <Image
                   src={logo.src}
                   alt={logo.alt}
@@ -320,6 +305,7 @@ export default function HomePage() {
                   height={64}
                   className="object-contain h-14 w-auto"
                 />
+                <span className="text-sm font-semibold text-brand-red-600 group-hover:text-brand-red-700">Visit {logo.label} &rarr;</span>
               </a>
             ))}
           </div>
@@ -346,8 +332,8 @@ export default function HomePage() {
           </p>
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
-              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. Background checks and drug screening are completed where required by employer or program.', href: '/career-services', image: '/images/heroes-hq/career-services-hero.jpg' },
-              { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives you up to $9,600 per qualifying hire. We help you identify eligible candidates and file the paperwork before the 28-day deadline.', href: '/employer', image: '/images/programs-hq/business-training.jpg' },
+              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. Background checks and drug screening are completed where required by employer or program.', href: '/career-services', image: '/images/programs-hq/students-learning.jpg' },
+              { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives employers $2,400 per qualifying hire (up to $9,600 for qualified veterans). Targeted groups include formerly incarcerated, TANF/SNAP recipients, and long-term unemployed. We help file Form 8850 within the 28-day deadline.', href: '/employer', image: '/images/programs-hq/business-training.jpg' },
               { label: 'OJT Reimbursement', desc: 'On-the-Job Training funding reimburses 50-75% of a new hire\'s wages during their training period. You train them your way while the workforce board covers most of the cost.', href: '/ojt-and-funding', image: '/images/heroes-hq/employer-hero.jpg' },
               { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/artlist/cropped/hero-training-8-wide.jpg' },
             ].map((item) => (

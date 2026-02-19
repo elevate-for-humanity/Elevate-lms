@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     default: 'Apps | Elevate for Humanity',
   },
   description: 'Access your purchased apps and tools from Elevate for Humanity.',
+  robots: { index: false, follow: false },
 };
 
 export default function AppsLayout({

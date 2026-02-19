@@ -29,7 +29,7 @@ export default function LMSError({
           We couldn't load your learning content. Your progress is saved.
         </p>
 
-        {error.message && (
+        {error.message && process.env.NODE_ENV === 'development' && (
           <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6 text-left">
             <p className="text-sm text-brand-red-800 font-mono break-words">
               {error.message}

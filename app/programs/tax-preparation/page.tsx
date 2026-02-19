@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   title:
     'Tax Preparation Training | IRS Certified | Start Your Tax Business | Indianapolis',
   description:
-    'IRS-certified tax preparation training in Indianapolis. $1,500 tuition. Become a VITA volunteer or start your own tax business. IRS Link & Learn certified. Earn $40k-$100k+ per year.',
+    'Tax Preparation & Financial Service Career program in Indianapolis. 10-week program, $4,950. Earn Rise Up, MS 365 Fundamentals, QuickBooks Pro Advisor credentials. INTraining #10004627.',
   keywords:
     'tax preparation training, IRS certified tax preparer, VITA volunteer training, start tax business, tax preparer course Indianapolis, IRS Link and Learn, become tax preparer, tax business training, H&R Block alternative, TurboTax Pro alternative, tax franchise alternative, PTIN certification, tax season business',
   alternates: {
@@ -78,7 +78,7 @@ export default async function Page() {
                 Start Your Tax Preparation Business
               </h1>
               <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-                IRS-certified training for $1,500. Earn $40k-$100k+ per year. Work
+                10-week career program ($4,950) with 6 credentials. Earn $40k-$100k+ per year. Work
                 from home. Be your own boss.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -320,7 +320,7 @@ export default async function Page() {
           </p>
           <div className="bg-white rounded-xl p-8 shadow-lg">
             <h3 className="text-2xl font-bold mb-6 text-brand-green-600">
-              Our Training: $1,500 (No Ongoing Fees)
+              Our Training: $4,950 (10-Week Career Program, No Ongoing Fees)
             </h3>
             <div className="grid md:grid-cols-2 gap-6 text-left">
               <div>
@@ -377,7 +377,7 @@ export default async function Page() {
             Ready to Start Your Tax Business?
           </h2>
           <p className="text-xl mb-8">
-            $1,500 tuition. IRS-certified. Start earning this tax season.
+            10-week career program. 6 credentials. Start earning this tax season. INTraining Program ID: #10004627.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

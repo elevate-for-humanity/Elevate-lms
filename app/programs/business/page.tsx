@@ -67,7 +67,7 @@ export default function BusinessPage() {
                 <Image src="/images/programs-hq/business-training.jpg" alt="Tax Prep & Entrepreneurship" fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="50vw" />
               </div>
               <h3 className="font-bold text-slate-900 text-sm">Tax Prep &amp; Entrepreneurship</h3>
-              <p className="text-slate-500 text-xs">4-8 weeks — Start your own tax office</p>
+              <p className="text-slate-500 text-xs">10 weeks — Tax Preparation &amp; Financial Service Career ($4,950)</p>
             </Link>
             <Link href="/programs/tax-entrepreneurship" className="group">
               <div className="relative aspect-[3/2] rounded-xl overflow-hidden mb-2">

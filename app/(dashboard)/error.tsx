@@ -27,7 +27,7 @@ export default function DashboardError({
           We couldn't load your dashboard. This might be a temporary issue.
         </p>
 
-        {error.message && (
+        {error.message && process.env.NODE_ENV === 'development' && (
           <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6 text-left">
             <p className="text-sm text-brand-red-800 font-mono break-words">
               {error.message}

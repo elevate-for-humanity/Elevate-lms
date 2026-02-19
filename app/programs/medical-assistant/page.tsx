@@ -31,7 +31,7 @@ export default function MedicalAssistantProgramPage() {
     },
     {
       question: "How long is the program?",
-      answer: "The program is 16-20 weeks including classroom instruction, lab practice, and a clinical externship at a healthcare facility. The externship provides real-world experience that employers value."
+      answer: "The program is 21 days of intensive classroom instruction, lab practice, and competency-based training. You'll earn CCHW, CPR, and Rise Up credentials. Total training cost is $4,325. INTraining Program ID: #10004639."
     },
     {
       question: "Where do Medical Assistants work?",
@@ -105,7 +105,7 @@ export default function MedicalAssistantProgramPage() {
   const stats = [
     { value: "14%", label: "Job Growth Rate", icon: TrendingUp },
     { value: "$38K", label: "Average Starting Salary", icon: DollarSign },
-    { value: "20", label: "Weeks to Career", icon: Calendar },
+    { value: "21 Days", label: "Program Duration", icon: Calendar },
     { value: "92%", label: "Job Placement Rate*", icon: Briefcase }
   ];
 

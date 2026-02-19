@@ -25,7 +25,7 @@ export function Footer() {
               <li><Link href="/programs" className="hover:text-white">All Programs</Link></li>
               <li><Link href="/programs/healthcare" className="hover:text-white">Healthcare</Link></li>
               <li><Link href="/programs/skilled-trades" className="hover:text-white">Skilled Trades</Link></li>
-              <li><Link href="/programs/beauty" className="hover:text-white">Beauty & Barbering</Link></li>
+              <li><Link href="/programs/barber-apprenticeship" className="hover:text-white">Barber Apprenticeship</Link></li>
               <li><Link href="/programs/technology" className="hover:text-white">Technology</Link></li>
               <li><Link href="/check-eligibility" className="hover:text-white">Check Eligibility</Link></li>
               <li><Link href="/how-it-works" className="hover:text-white">How It Works</Link></li>

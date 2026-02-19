@@ -111,18 +111,18 @@ export default function LiveChatPage() {
         <Breadcrumbs items={[{ label: "Support", href: "/support" }, { label: "Chat" }]} />
       </div>
 {/* Header */}
-      <div className="bg-sky-600 text-white py-4 px-4 shadow-md">
+      <div className="bg-brand-blue-600 text-white py-4 px-4 shadow-md">
         <div className="max-w-3xl mx-auto flex items-center gap-4">
-          <Link href="/support" className="p-2 hover:bg-sky-700 rounded-lg transition">
+          <Link href="/support" className="p-2 hover:bg-brand-blue-700 rounded-lg transition">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-brand-blue-500 rounded-full flex items-center justify-center">
               <MessageSquare className="w-5 h-5" />
             </div>
             <div>
               <h1 className="font-semibold">Live Chat Support</h1>
-              <p className="text-xs text-sky-200 flex items-center gap-1">
+              <p className="text-xs text-brand-blue-200 flex items-center gap-1">
                 <span className="w-2 h-2 bg-brand-green-400 rounded-full"></span>
                 Online
               </p>
@@ -141,7 +141,7 @@ export default function LiveChatPage() {
             >
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  message.role === 'user' ? 'bg-sky-600' : 'bg-gray-200'
+                  message.role === 'user' ? 'bg-brand-blue-600' : 'bg-gray-200'
                 }`}
               >
                 {message.role === 'user' ? (
@@ -153,14 +153,14 @@ export default function LiveChatPage() {
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                   message.role === 'user'
-                    ? 'bg-sky-600 text-white rounded-tr-sm'
+                    ? 'bg-brand-blue-600 text-white rounded-tr-sm'
                     : 'bg-white border border-gray-200 rounded-tl-sm'
                 }`}
               >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 <p
                   className={`text-xs mt-1 ${
-                    message.role === 'user' ? 'text-sky-200' : 'text-gray-400'
+                    message.role === 'user' ? 'text-brand-blue-200' : 'text-gray-400'
                   }`}
                 >
                   {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -217,12 +217,12 @@ export default function LiveChatPage() {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
-            className="flex-1 px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+            className="flex-1 px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
           />
           <button
             onClick={() => handleSend()}
             disabled={!input.trim()}
-            className="bg-sky-600 text-white p-3 rounded-full hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="bg-brand-blue-600 text-white p-3 rounded-full hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             <Send className="w-5 h-5" />
           </button>

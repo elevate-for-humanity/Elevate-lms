@@ -21,7 +21,7 @@ const sitemapSections = [
       { name: 'CNA Training', href: '/programs/cna' },
       { name: 'Skilled Trades', href: '/programs/skilled-trades' },
       { name: 'CDL Transportation', href: '/programs/cdl-transportation' },
-      { name: 'Beauty & Wellness', href: '/programs/beauty' },
+      { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
       { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
       { name: 'Cosmetology', href: '/programs/cosmetology-apprenticeship' },
       { name: 'Business & Finance', href: '/programs/business-financial' },

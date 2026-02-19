@@ -68,7 +68,7 @@ export default async function SupportPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {supportOptions.map((option) => (
             <Link key={option.title} href={option.href} className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition text-center">
-              <option.icon className="w-10 h-10 text-sky-600 mx-auto mb-4" />
+              <option.icon className="w-10 h-10 text-brand-blue-600 mx-auto mb-4" />
               <h3 className="font-semibold text-lg mb-2">{option.title}</h3>
               <p className="text-gray-600 text-sm mb-3">{option.desc}</p>
               <div className="flex items-center justify-center gap-1 text-xs text-gray-500">
@@ -113,7 +113,7 @@ export default async function SupportPage() {
               <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
                 <LifeBuoy className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                 <p className="text-gray-600 mb-4">Sign in to view your support tickets</p>
-                <Link href="/login?redirect=/support" className="text-sky-600 font-medium hover:underline">
+                <Link href="/login?redirect=/support" className="text-brand-blue-600 font-medium hover:underline">
                   Sign In
                 </Link>
               </div>
@@ -205,12 +205,16 @@ export default async function SupportPage() {
           <p className="text-slate-400 mb-6">Our support team is available Monday-Friday, 9am-5pm EST</p>
           <div className="flex flex-wrap gap-6 justify-center">
             <div className="text-white">
-              <p className="text-sm text-slate-400">Phone</p>
-              <a href="/support" className="text-lg font-semibold hover:text-brand-blue-400">Get Help Online</a>
+              <p className="text-sm text-slate-400">Live Chat</p>
+              <a href="/support/chat" className="text-lg font-semibold hover:text-brand-blue-400">Chat With Us</a>
             </div>
             <div className="text-white">
               <p className="text-sm text-slate-400">Email</p>
               <a href="/contact" className="text-lg font-semibold hover:text-brand-blue-400">Contact Us</a>
+            </div>
+            <div className="text-white">
+              <p className="text-sm text-slate-400">Submit a Ticket</p>
+              <a href="/support/ticket" className="text-lg font-semibold hover:text-brand-blue-400">Open a Ticket</a>
             </div>
           </div>
         </div>

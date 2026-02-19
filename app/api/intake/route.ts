@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { sendApplicationConfirmation, sendAdminApplicationNotification } from '@/lib/notifications/application-emails';
 
 // Auto-tag funding eligibility based on intake answers
 function determineFundingTag(body: Record<string, string>): string {
@@ -67,6 +68,36 @@ export async function POST(req: Request) {
   if (error) {
     logger.error('[Intake API]', error.message);
     return NextResponse.json({ error: 'Failed to save' }, { status: 500 });
+  }
+
+  // Send email notifications (non-blocking — don't fail the response if email fails)
+  const applicationData = {
+    id: `intake-${Date.now()}`,
+    firstName: body.full_name.trim().split(' ')[0] || body.full_name.trim(),
+    lastName: body.full_name.trim().split(' ').slice(1).join(' ') || '',
+    email: body.email?.trim() || '',
+    phone: body.phone?.trim(),
+    programInterest: body.program_interest || 'general',
+    city: body.city?.trim(),
+    zipCode: '',
+    submittedAt: new Date().toISOString(),
+  };
+
+  try {
+    const emailPromises: Promise<unknown>[] = [];
+
+    // Send admin notification always
+    emailPromises.push(sendAdminApplicationNotification(applicationData));
+
+    // Send student confirmation if they provided an email
+    if (applicationData.email) {
+      emailPromises.push(sendApplicationConfirmation(applicationData));
+    }
+
+    await Promise.allSettled(emailPromises);
+  } catch (emailError) {
+    // Log but don't fail the intake submission
+    logger.error('[Intake API] Email notification failed', emailError instanceof Error ? emailError.message : 'Unknown error');
   }
 
   return NextResponse.json({ success: true, funding_tag: fundingTag });

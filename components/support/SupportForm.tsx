@@ -47,7 +47,7 @@ export default function SupportForm() {
         </p>
         <button
           onClick={() => setStatus('idle')}
-          className="text-sky-600 font-medium hover:underline"
+          className="text-brand-blue-600 font-medium hover:underline"
         >
           Submit Another Request
         </button>
@@ -77,7 +77,7 @@ export default function SupportForm() {
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             placeholder="Brief description of your issue"
           />
         </div>
@@ -86,7 +86,7 @@ export default function SupportForm() {
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
           >
             <option value="account">Account Issues</option>
             <option value="program">Program Questions</option>
@@ -103,14 +103,14 @@ export default function SupportForm() {
             onChange={(e) => setMessage(e.target.value)}
             rows={4}
             required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             placeholder="Please describe your issue in detail..."
           />
         </div>
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="w-full bg-sky-600 text-white py-3 rounded-lg font-semibold hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full bg-brand-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {status === 'loading' ? (
             <>

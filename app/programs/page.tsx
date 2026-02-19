@@ -319,7 +319,7 @@ export default async function ProgramsPage() {
               {
                 name: 'Professional Esthetician & Client Services',
                 slug: 'professional-esthetician',
-                href: '/programs/beauty',
+                href: '/programs/barber-apprenticeship',
                 programId: '#10004628',
                 duration: '5 weeks',
                 cost: '$4,575',

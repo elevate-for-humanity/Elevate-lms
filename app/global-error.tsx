@@ -49,7 +49,7 @@ export default function GlobalError({
                 Our team has been automatically notified and is working to resolve this issue.
               </p>
 
-              {error.message && (
+              {error.message && process.env.NODE_ENV === 'development' && (
                 <div className="bg-brand-red-50 border-2 border-brand-red-200 rounded-lg p-4 mb-6 text-left">
                   <p className="text-xs font-semibold text-brand-red-800 mb-2">Error Details:</p>
                   <p className="text-sm text-brand-red-700 font-mono break-words">

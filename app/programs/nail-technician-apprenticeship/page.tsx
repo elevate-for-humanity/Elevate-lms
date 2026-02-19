@@ -25,7 +25,7 @@ export default function NailTechnicianPage() {
       <ProgramHeroBanner videoSrc="/videos/nail-tech.mp4" />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Beauty', href: '/programs/beauty' }, { label: 'Nail Technician' }]} />
+          <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Nail Technician Apprenticeship' }]} />
         </div>
       </div>
 

@@ -24,7 +24,7 @@ export default function HVACProgramPage() {
     },
     {
       question: "How long does the program take to complete?",
-      answer: "The program runs 12-16 weeks depending on your schedule. We offer flexible morning, afternoon, and evening classes to fit around your life. Most students complete the program while working part-time."
+      answer: "The program runs 12 weeks with 144 total instructional hours. It combines evening classroom instruction, self-paced LMS coursework, and employer site visits. Cohort-based scheduling with evening and adult-friendly options available. Most students complete the program while working."
     },
     {
       question: "Is this program really free?",
@@ -40,11 +40,11 @@ export default function HVACProgramPage() {
     },
     {
       question: "Do you help with job placement?",
-      answer: "Absolutely! We have partnerships with over 50 local HVAC companies actively hiring our graduates. Our career services team helps with resume writing, interview prep, and direct introductions to employers. Many of our graduates find employment within 30 days through our employer partnerships."
+      answer: "Yes. Our career services team helps with resume writing, interview prep, and employer introductions. During the program, you'll visit employer job sites and meet hiring managers through structured employer site days. We also provide apprenticeship application guidance and referral support to union and non-union sponsors in the Indianapolis area."
     },
     {
       question: "What tools and equipment will I need?",
-      answer: "All tools and equipment are provided during training. Upon graduation, you'll receive a starter tool kit to begin your career. We also provide uniforms and safety gear during the program."
+      answer: "PPE (safety glasses, hard hat, gloves) is provided for employer site days and you keep it at completion. This is a theory + certification prep program — you won't need personal tools during training. We provide a recommended tool list for when you start your apprenticeship or first job."
     },
     {
       question: "Can I work while attending the program?",
@@ -85,56 +85,38 @@ export default function HVACProgramPage() {
     },
     {
       week: "Weeks 11-12",
-      title: "Troubleshooting & Diagnostics",
-      topics: ["Systematic troubleshooting", "Electrical diagnostics", "Reading schematics", "Customer service skills"],
-      project: "Diagnose and repair multiple system faults"
-    },
-    {
-      week: "Weeks 13-14",
-      title: "Advanced Systems",
-      topics: ["Commercial HVAC overview", "Building automation basics", "Energy efficiency upgrades", "Smart thermostat integration"],
-      project: "Design an energy-efficient system upgrade"
-    },
-    {
-      week: "Weeks 15-16",
-      title: "Career Preparation",
-      topics: ["Resume and interview skills", "Industry certifications review", "Job search strategies", "Employer meet-and-greet"],
-      project: "Complete job shadowing and secure employment"
+      title: "Troubleshooting & Career Readiness",
+      topics: ["Systematic troubleshooting", "Electrical diagnostics", "Reading schematics", "Resume and interview preparation", "Apprenticeship application portfolio"],
+      project: "Complete apprenticeship application portfolio"
     }
   ];
 
-  const successStories = [
+  const careerOutcomes = [
     {
-      name: "James W.",
       role: "HVAC Service Technician",
-      company: "Comfort Systems USA",
-      quote: "I was working retail making $12/hour with no future. Six months after graduating, I'm earning $52,000 with full benefits. This program changed my life.",
-      salary: "$52,000/year",
-      timeToJob: "3 weeks"
+      sector: "Residential & commercial service companies",
+      salaryRange: "$40,000–$55,000/year",
+      outlook: "High demand year-round"
     },
     {
-      name: "Sarah Mitchell",
       role: "Installation Specialist",
-      company: "Johnson Controls",
-      quote: "As a single mom, I needed a career that could support my family. The flexible schedule let me train while my kids were in school. Now I have a real career.",
-      salary: "$48,000/year",
-      timeToJob: "2 weeks"
+      sector: "Mechanical contractors & builders",
+      salaryRange: "$42,000–$58,000/year",
+      outlook: "Strong growth in new construction"
     },
     {
-      name: "David Chen",
-      role: "Lead Technician",
-      company: "Carrier Enterprise",
-      quote: "The hands-on training was incredible. I learned more in 16 weeks than I thought possible. The instructors really care about your success.",
-      salary: "$58,000/year",
-      timeToJob: "1 week"
+      role: "Refrigeration Technician",
+      sector: "Industrial & commercial facilities",
+      salaryRange: "$50,000–$70,000/year",
+      outlook: "Specialized, premium pay"
     }
   ];
 
   const stats = [
-    { value: "95%", label: "Job Placement Rate", icon: Briefcase },
+    { value: "4★", label: "Indiana Top Jobs Rating", icon: Briefcase },
     { value: "$48K", label: "Average Starting Salary", icon: DollarSign },
-    { value: "16", label: "Weeks to Career", icon: Calendar },
-    { value: "500+", label: "Graduates Employed", icon: Users }
+    { value: "12", label: "Weeks to Career", icon: Calendar },
+    { value: "144", label: "Instructional Hours", icon: Users }
   ];
 
   return (
@@ -164,28 +146,31 @@ export default function HVACProgramPage() {
               <FundingBadge type="funded" />
               
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mt-6 mb-6 leading-tight">
-                Become a Certified
-                <span className="text-brand-blue-400"> HVAC Technician</span>
+                HVAC Fundamentals
+                <span className="text-brand-blue-400"> Career Pathway</span>
               </h1>
               
               <p className="text-xl text-brand-blue-100 mb-8 leading-relaxed">
-                Launch your career in one of America's fastest-growing trades. 
-                Learn to install, maintain, and repair heating and cooling systems. 
-                <strong className="text-white"> May be available at no cost for eligible WIOA participants.</strong>
+                Start your path into HVAC with EPA 608 exam prep, employer site days, and apprenticeship readiness. 
+                <strong className="text-white">Funding may be available for eligible WIOA participants.</strong>
               </p>
 
               <div className="flex flex-wrap gap-4 mb-10">
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
                   <Clock className="w-4 h-4 text-brand-blue-400" />
-                  12-16 Weeks
+                  12 Weeks • 144 Hours
+                </span>
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
+                  <Calendar className="w-4 h-4 text-brand-blue-400" />
+                  Evening & Adult-Friendly
+                </span>
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/20 backdrop-blur rounded-full text-sm font-semibold">
+                  <TrendingUp className="w-4 h-4 text-yellow-400" />
+                  4-Star Indiana Top Jobs
                 </span>
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
                   <DollarSign className="w-4 h-4 text-brand-green-400" />
-                  $0 Tuition (WIOA)
-                </span>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <TrendingUp className="w-4 h-4 text-yellow-400" />
-                  $48K+ Avg Salary
+                  Funding Available (WIOA)
                 </span>
               </div>
 
@@ -227,6 +212,87 @@ export default function HVACProgramPage() {
                 <div className="text-sm text-gray-500">{stat.label}</div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Program Overview + Delivery Model */}
+      <section className="py-16 bg-slate-50 border-b">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="inline-block bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
+              Program Structure
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Delivery Model: Classroom + LMS + Employer Site Days
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              A hybrid workforce pathway combining evening classroom instruction, self-paced LMS coursework, and supervised employer site days with OJT exposure.
+            </p>
+          </div>
+
+          {/* Hours Breakdown */}
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
+              <div className="w-14 h-14 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <GraduationCap className="w-7 h-7 text-brand-blue-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">72</div>
+              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Classroom Hours (RTI)</div>
+              <p className="text-gray-600 text-sm">Evening classroom instruction covering HVAC theory, electrical fundamentals, refrigeration principles, and EPA 608 exam preparation.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
+              <div className="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Briefcase className="w-7 h-7 text-yellow-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">36</div>
+              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Employer Site Days (OJT Exposure)</div>
+              <p className="text-gray-600 text-sm">6 supervised visits to HVAC contractor job sites. Observe installations, service calls, and equipment. Meet hiring managers. All hours documented.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
+              <div className="w-14 h-14 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Target className="w-7 h-7 text-brand-green-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">36</div>
+              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">LMS Coursework</div>
+              <p className="text-gray-600 text-sm">Self-paced online modules with progress tracking, quizzes, and bi-weekly reporting dashboards. Complete on your own schedule.</p>
+            </div>
+          </div>
+
+          {/* Program Details Grid */}
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Briefcase className="w-6 h-6 text-brand-blue-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Employer Site Days</h3>
+              <p className="text-gray-600 mb-3">Structured visits to HVAC contractor job sites. Observe residential and commercial work, meet hiring managers, and build employer connections.</p>
+              <p className="text-sm text-brand-blue-600 font-semibold">All site day hours documented for apprenticeship application portfolios.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Calendar className="w-6 h-6 text-brand-blue-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Flexible Cohort Scheduling</h3>
+              <p className="text-gray-600 mb-3">Cohort-based scheduling with evening and adult-friendly options available. Final schedule customized per partner cohort.</p>
+              <p className="text-sm text-gray-500"><strong>Format:</strong> 12 weeks, 144 total instructional hours</p>
+              <p className="text-sm text-gray-500"><strong>Cohort size:</strong> 8–20 participants</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-brand-blue-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Bilingual Support</h3>
+              <p className="text-gray-600 mb-3">Bilingual (English/Spanish) instructional assistants available for cohort groups. Written materials available in Spanish upon request.</p>
+              <p className="text-sm text-gray-500"><strong>Admission:</strong> 18+, valid ID, no experience required</p>
+            </div>
+          </div>
+
+          {/* Funding */}
+          <div className="mt-12 bg-white rounded-2xl p-8 shadow-sm text-center">
+            <h3 className="text-xl font-bold mb-3">Funding Options</h3>
+            <p className="text-gray-600 mb-4">Workforce-funded cohorts, employer-sponsored training, grant-funded programs, and custom organizational cohorts supported.</p>
+            <p className="text-sm text-gray-500">Cohort-based and workforce-funded pricing available. Custom pricing provided per partner cohort and program scope.</p>
           </div>
         </div>
       </section>
@@ -305,10 +371,10 @@ export default function HVACProgramPage() {
               What You'll Learn
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Comprehensive 16-Week Curriculum
+              12-Week HVAC Curriculum
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              From fundamentals to advanced diagnostics, you'll gain the skills employers are looking for.
+              Theory instruction, EPA 608 certification prep, and employer site days. 144 total hours.
             </p>
           </div>
 
@@ -338,7 +404,7 @@ export default function HVACProgramPage() {
                       ))}
                     </div>
                     <div className="bg-brand-blue-50 rounded-lg p-4 mt-4">
-                      <span className="text-sm font-semibold text-brand-blue-700">Hands-On Project:</span>
+                      <span className="text-sm font-semibold text-brand-blue-700">Applied Exercise:</span>
                       <span className="text-sm text-brand-blue-600 ml-2">{module.project}</span>
                     </div>
                   </div>
@@ -378,7 +444,7 @@ export default function HVACProgramPage() {
               },
               {
                 title: "Program Certificate",
-                description: "Comprehensive completion certificate documenting your 400+ hours of hands-on training.",
+                description: "Program completion certificate documenting your 144 hours of instruction, employer site days, and exam preparation.",
                 icon: GraduationCap
               }
             ].map((cert, index) => (
@@ -400,23 +466,23 @@ export default function HVACProgramPage() {
         </div>
       </section>
 
-      {/* Success Stories */}
+      {/* Career Outcomes */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="inline-block bg-yellow-100 text-yellow-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              Graduate Success
+              Career Outcomes
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Real People, Real Results
+              Where This Pathway Leads
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Our graduates are building successful careers across Indiana. Here are some of their stories.
+              HVAC is a 4-star Indiana Top Jobs occupation. These are typical entry-level positions available to program completers with EPA 608 certification.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {successStories.map((story, index) => (
+            {careerOutcomes.map((outcome, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -426,28 +492,29 @@ export default function HVACProgramPage() {
               >
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center">
-                    <Users className="w-8 h-8 text-brand-blue-600" />
+                    <Briefcase className="w-8 h-8 text-brand-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">{story.name}</h3>
-                    <p className="text-sm text-gray-500">{story.role}</p>
-                    <p className="text-sm text-brand-blue-600">{story.company}</p>
+                    <h3 className="font-bold text-gray-900">{outcome.role}</h3>
+                    <p className="text-sm text-gray-500">{outcome.sector}</p>
                   </div>
                 </div>
-                <p className="text-gray-600 italic mb-6">"{story.quote}"</p>
-                <div className="flex justify-between text-sm">
-                  <div>
-                    <span className="text-gray-500">Salary:</span>
-                    <span className="font-semibold text-brand-green-600 ml-1">{story.salary}</span>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Salary Range:</span>
+                    <span className="font-semibold text-brand-green-600">{outcome.salaryRange}</span>
                   </div>
-                  <div>
-                    <span className="text-gray-500">Hired in:</span>
-                    <span className="font-semibold text-brand-blue-600 ml-1">{story.timeToJob}</span>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Outlook:</span>
+                    <span className="font-semibold text-brand-blue-600">{outcome.outlook}</span>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
+          <p className="text-center text-sm text-gray-500 mt-8">
+            Salary data based on Bureau of Labor Statistics and Indiana DWD for the Indianapolis metro area.
+          </p>
         </div>
       </section>
 
@@ -504,7 +571,7 @@ export default function HVACProgramPage() {
             Ready to Start Your HVAC Career?
           </h2>
           <p className="text-xl text-brand-blue-100 mb-8 max-w-2xl mx-auto">
-            Take the first step today. Check your eligibility for free WIOA-funded training and join our next class.
+            Take the first step today. Check your eligibility for WIOA-funded training and apply for our next cohort.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

@@ -19,11 +19,11 @@ export default function PlumbingProgramPage() {
   const faqs = [
     {
       question: "Do I need experience to start plumbing training?",
-      answer: "No prior experience required. We teach everything from basic pipe fitting to complex system installation. You'll learn proper techniques from day one with hands-on practice in our training facility."
+      answer: "No prior experience required. We teach everything from plumbing fundamentals to system design principles. You'll learn through classroom instruction, LMS coursework, and employer site visits where you observe real installations and meet hiring managers."
     },
     {
-      question: "How long does it take to become a licensed plumber?",
-      answer: "Our training program is 12-16 weeks. After that, Indiana requires 8,000 hours (about 4 years) of apprenticeship under a licensed plumber before you can take the journeyman exam. Our program prepares you to start that apprenticeship."
+      question: "How long is the program and what comes after?",
+      answer: "Our career pathway program is 12 weeks (144 total instructional hours). It combines evening classroom instruction, self-paced LMS coursework, and employer site visits. Cohort-based scheduling with evening and adult-friendly options available. After completing the program, you'll be prepared for entry-level plumbing helper positions and apprenticeship registration. Indiana requires apprenticeship hours under a licensed plumber before you can take the journeyman exam — our program gives you the foundation and employer connections to start that path."
     },
     {
       question: "What's the difference between residential and commercial plumbing?",
@@ -34,8 +34,8 @@ export default function PlumbingProgramPage() {
       answer: "Yes, plumbing requires physical fitness. You'll lift heavy materials, work in tight spaces, and spend time on your feet. However, proper techniques and tools minimize strain. Many plumbers work well into their 60s."
     },
     {
-      question: "What certifications will I earn?",
-      answer: "You'll earn OSHA 10 Safety Certification and our program completion certificate. You'll also learn about backflow prevention certification and medical gas certification, which are valuable add-ons for your career."
+      question: "What credentials will I earn?",
+      answer: "You'll complete OSHA 10 Safety training (via CareerSafe) and receive a program completion credential documenting your instructional hours and competencies. You'll also learn about backflow prevention and medical gas — valuable specializations as you advance in your career."
     },
     {
       question: "How much do plumbers earn?",
@@ -43,7 +43,7 @@ export default function PlumbingProgramPage() {
     },
     {
       question: "Can I start my own plumbing business?",
-      answer: "Yes! After becoming a licensed master plumber (typically 2+ years after journeyman), you can start your own contracting business. Plumbing businesses have low startup costs compared to other trades and steady demand."
+      answer: "Yes — long-term. After completing your apprenticeship and earning your journeyman license, you can pursue a master plumber license and start your own contracting business. This pathway program is your first step toward that goal."
     },
     {
       question: "What tools will I need?",
@@ -84,29 +84,17 @@ export default function PlumbingProgramPage() {
     },
     {
       week: "Weeks 11-12",
-      title: "Gas Piping",
-      topics: ["Natural gas and propane systems", "Gas pipe sizing and materials", "Appliance connections", "Leak testing and safety"],
-      project: "Install gas line to appliance"
-    },
-    {
-      week: "Weeks 13-14",
-      title: "Service and Repair",
-      topics: ["Troubleshooting drain problems", "Leak repair techniques", "Water heater service", "Customer service skills"],
-      project: "Diagnose and repair common plumbing issues"
-    },
-    {
-      week: "Weeks 15-16",
-      title: "Career Preparation",
-      topics: ["Blueprint reading for plumbers", "Estimating and bidding basics", "Apprenticeship requirements", "Job placement assistance"],
-      project: "Secure apprenticeship placement"
+      title: "Service, Repair & Career Readiness",
+      topics: ["Troubleshooting drain problems", "Leak repair techniques", "Water heater service", "Apprenticeship requirements", "Resume and interview preparation"],
+      project: "Complete apprenticeship application portfolio"
     }
   ];
 
   const stats = [
-    { value: "91%", label: "Job Placement Rate", icon: Briefcase },
+    { value: "High", label: "Indiana Demand Rating", icon: Briefcase },
     { value: "$52K", label: "Average Starting Salary", icon: DollarSign },
-    { value: "16", label: "Weeks Training", icon: Calendar },
-    { value: "5%", label: "Job Growth Rate", icon: TrendingUp }
+    { value: "12", label: "Weeks Training", icon: Calendar },
+    { value: "144", label: "Instructional Hours", icon: TrendingUp }
   ];
 
   return (
@@ -125,7 +113,7 @@ export default function PlumbingProgramPage() {
       {/* Hero */}
       <section className="bg-slate-900 py-16">
         <div className="max-w-5xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Become a Licensed <span className="text-cyan-300"> Plumber</span></h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Plumbing Fundamentals <span className="text-cyan-300">Career Pathway</span></h1>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto">Master the essential trade that keeps water flowing and buildings functioning. Learn installation, repair, and service skills for a <strong className="text-white">recession-proof career.</strong></p>
         </div>
       </section>
@@ -141,6 +129,87 @@ export default function PlumbingProgramPage() {
                 <div className="text-sm text-gray-500">{stat.label}</div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Program Overview + Delivery Model */}
+      <section className="py-16 bg-slate-50 border-b">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="inline-block bg-cyan-100 text-cyan-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
+              Program Structure
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Delivery Model: Classroom + LMS + Employer Site Days
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              A hybrid workforce pathway combining evening classroom instruction, self-paced LMS coursework, and supervised employer site days with OJT exposure.
+            </p>
+          </div>
+
+          {/* Hours Breakdown */}
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
+              <div className="w-14 h-14 bg-cyan-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <GraduationCap className="w-7 h-7 text-cyan-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">72</div>
+              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Classroom Hours (RTI)</div>
+              <p className="text-gray-600 text-sm">Evening classroom instruction covering plumbing fundamentals, water supply systems, drainage, fixture installation, and code compliance.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
+              <div className="w-14 h-14 bg-cyan-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Briefcase className="w-7 h-7 text-cyan-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">36</div>
+              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Employer Site Days (OJT Exposure)</div>
+              <p className="text-gray-600 text-sm">6 supervised visits to plumbing contractor job sites. Observe residential and commercial installations, service calls, and new construction. Meet hiring managers.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
+              <div className="w-14 h-14 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-7 h-7 text-brand-green-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">36</div>
+              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">LMS Coursework</div>
+              <p className="text-gray-600 text-sm">Self-paced online modules with progress tracking, quizzes, and bi-weekly reporting dashboards. Complete on your own schedule.</p>
+            </div>
+          </div>
+
+          {/* Program Details Grid */}
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mb-4">
+                <Briefcase className="w-6 h-6 text-cyan-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Employer Site Days</h3>
+              <p className="text-gray-600 mb-3">Structured visits to plumbing contractor job sites. Observe real installations, meet hiring managers, and build employer connections.</p>
+              <p className="text-sm text-cyan-600 font-semibold">All site day hours documented for apprenticeship application portfolios.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mb-4">
+                <Calendar className="w-6 h-6 text-cyan-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Flexible Cohort Scheduling</h3>
+              <p className="text-gray-600 mb-3">Cohort-based scheduling with evening and adult-friendly options available. Final schedule customized per partner cohort.</p>
+              <p className="text-sm text-gray-500"><strong>Format:</strong> 12 weeks, 144 total instructional hours</p>
+              <p className="text-sm text-gray-500"><strong>Cohort size:</strong> 8–20 participants</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-cyan-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Bilingual Support</h3>
+              <p className="text-gray-600 mb-3">Bilingual (English/Spanish) instructional assistants available for cohort groups. Written materials available in Spanish upon request.</p>
+              <p className="text-sm text-gray-500"><strong>Admission:</strong> 18+, valid ID, no experience required</p>
+            </div>
+          </div>
+
+          {/* Funding */}
+          <div className="mt-12 bg-white rounded-2xl p-8 shadow-sm text-center">
+            <h3 className="text-xl font-bold mb-3">Funding Options</h3>
+            <p className="text-gray-600 mb-4">Workforce-funded cohorts, employer-sponsored training, grant-funded programs, and custom organizational cohorts supported.</p>
+            <p className="text-sm text-gray-500">Cohort-based and workforce-funded pricing available. Custom pricing provided per partner cohort and program scope.</p>
           </div>
         </div>
       </section>
@@ -180,8 +249,8 @@ export default function PlumbingProgramPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="inline-block bg-brand-green-100 text-brand-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">Training Program</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">16-Week Plumbing Curriculum</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">Comprehensive hands-on training in water supply, drainage, fixtures, and gas piping.</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">12-Week Plumbing Fundamentals Curriculum</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">Theory instruction, code preparation, and employer site days covering water supply, drainage, fixtures, and system design.</p>
           </div>
 
           <div className="space-y-6">
@@ -204,7 +273,7 @@ export default function PlumbingProgramPage() {
                       ))}
                     </div>
                     <div className="bg-cyan-50 rounded-lg p-4 mt-4">
-                      <span className="text-sm font-semibold text-cyan-700">Hands-On Project:</span>
+                      <span className="text-sm font-semibold text-cyan-700">Applied Exercise:</span>
                       <span className="text-sm text-cyan-600 ml-2">{module.project}</span>
                     </div>
                   </div>

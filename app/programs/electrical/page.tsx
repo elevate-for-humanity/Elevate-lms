@@ -19,19 +19,19 @@ export default function ElectricalProgramPage() {
   const faqs = [
     {
       question: "Do I need experience to become an electrician?",
-      answer: "No prior experience is needed. Our program teaches you from the ground up - starting with basic electrical theory, safety, and the National Electrical Code. You'll progress to hands-on wiring, troubleshooting, and installation skills."
+      answer: "No prior experience is needed. Our program teaches you from the ground up — starting with basic electrical theory, safety, and the National Electrical Code. You'll progress through wiring principles, troubleshooting methodology, and employer site visits where you observe real installations."
     },
     {
       question: "What's the difference between residential and commercial electrical work?",
       answer: "Residential work focuses on homes - 120/240V systems, outlets, lighting, and panels. Commercial work involves larger 277/480V systems, three-phase power, motor controls, and complex distribution. Our program covers both so you can work in either field."
     },
     {
-      question: "How do I become a licensed electrician in Indiana?",
-      answer: "Indiana requires 8,000 hours (about 4 years) of supervised work experience plus passing the journeyman exam. Our program gives you the foundation to start your apprenticeship. Many employers sponsor apprentices and pay for continued education."
+      question: "What career path does this program prepare me for?",
+      answer: "This program prepares you for entry-level electrical helper and apprentice positions. Indiana requires 8,000 hours (about 4 years) of supervised work experience plus passing the journeyman exam. Our program gives you the foundation and employer connections to start that apprenticeship. Many employers sponsor apprentices and pay for continued education."
     },
     {
-      question: "What certifications will I earn?",
-      answer: "You'll earn OSHA 10 Safety Certification and our program completion certificate. You'll also be prepared for the Indiana Electrical Apprentice registration. Additional certifications like EPA 608 (for HVAC electrical work) can be added."
+      question: "What credentials will I earn?",
+      answer: "You'll complete OSHA 10 Safety training (via CareerSafe) and receive a program completion credential documenting your instructional hours and competencies. You'll also be prepared to register as an Indiana Electrical Apprentice and begin your career pathway."
     },
     {
       question: "Is electrical work dangerous?",
@@ -84,29 +84,17 @@ export default function ElectricalProgramPage() {
     },
     {
       week: "Weeks 11-12",
-      title: "Troubleshooting & Testing",
-      topics: ["Multimeter and megger usage", "Systematic troubleshooting", "Circuit tracing techniques", "Common electrical faults"],
-      project: "Diagnose and repair circuit faults"
-    },
-    {
-      week: "Weeks 13-14",
-      title: "Specialty Systems",
-      topics: ["Low voltage wiring (data, phone, security)", "Electric vehicle charger installation", "Solar PV system basics", "Smart home technology"],
-      project: "Install EV charger circuit"
-    },
-    {
-      week: "Weeks 15-16",
-      title: "Career Preparation",
-      topics: ["Apprenticeship requirements", "Journeyman exam preparation", "Resume and interview skills", "Employer connections"],
-      project: "Secure apprenticeship placement"
+      title: "Troubleshooting & Career Readiness",
+      topics: ["Multimeter and megger usage", "Systematic troubleshooting", "Circuit tracing techniques", "Apprenticeship requirements", "Resume and interview preparation"],
+      project: "Complete apprenticeship application portfolio"
     }
   ];
 
   const stats = [
-    { value: "90%", label: "Job Placement Rate", icon: Briefcase },
+    { value: "3★", label: "Indiana Top Jobs Rating", icon: Briefcase },
     { value: "$56K", label: "Average Starting Salary", icon: DollarSign },
-    { value: "16", label: "Weeks Training", icon: Calendar },
-    { value: "6%", label: "Job Growth Rate", icon: TrendingUp }
+    { value: "12", label: "Weeks Training", icon: Calendar },
+    { value: "144", label: "Instructional Hours", icon: TrendingUp }
   ];
 
   return (
@@ -136,27 +124,31 @@ export default function ElectricalProgramPage() {
               <FundingBadge type="funded" />
               
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mt-6 mb-6 leading-tight">
-                Start Your Career as an
-                <span className="text-yellow-300"> Electrician</span>
+                Electrical Fundamentals
+                <span className="text-yellow-300"> Career Pathway</span>
               </h1>
               
               <p className="text-xl text-yellow-100 mb-8 leading-relaxed">
-                Power the future. Learn residential and commercial electrical installation, maintenance, and repair. 
-                Begin your path to becoming a <strong className="text-white">licensed journeyman electrician.</strong>
+                Build your foundation in the electrical trades. Learn residential and commercial wiring theory, NEC code awareness, safety, and troubleshooting. 
+                Begin your path into <strong className="text-white">apprenticeship and entry-level electrical positions.</strong>
               </p>
 
               <div className="flex flex-wrap gap-4 mb-10">
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
                   <Clock className="w-4 h-4 text-yellow-300" />
-                  12-16 Weeks
+                  12 Weeks • 144 Hours
+                </span>
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
+                  <Calendar className="w-4 h-4 text-yellow-300" />
+                  Evening & Adult-Friendly
+                </span>
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/20 backdrop-blur rounded-full text-sm font-semibold">
+                  <TrendingUp className="w-4 h-4 text-yellow-300" />
+                  3-Star Indiana Top Jobs
                 </span>
                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
                   <DollarSign className="w-4 h-4 text-brand-green-400" />
-                  $0 with WIOA Funding
-                </span>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <TrendingUp className="w-4 h-4 text-yellow-300" />
-                  $56K+ Starting Salary
+                  Funding Available (WIOA)
                 </span>
               </div>
 
@@ -202,6 +194,87 @@ export default function ElectricalProgramPage() {
         </div>
       </section>
 
+      {/* Program Overview + Delivery Model */}
+      <section className="py-16 bg-slate-50 border-b">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="inline-block bg-yellow-100 text-yellow-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
+              Program Structure
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Delivery Model: Classroom + LMS + Employer Site Days
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              A hybrid workforce pathway combining evening classroom instruction, self-paced LMS coursework, and supervised employer site days with OJT exposure.
+            </p>
+          </div>
+
+          {/* Hours Breakdown */}
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
+              <div className="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <GraduationCap className="w-7 h-7 text-yellow-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">72</div>
+              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Classroom Hours (RTI)</div>
+              <p className="text-gray-600 text-sm">Evening classroom instruction covering electrical theory, NEC code, wiring principles, safety protocols, and troubleshooting methodology.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
+              <div className="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Briefcase className="w-7 h-7 text-yellow-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">36</div>
+              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Employer Site Days (OJT Exposure)</div>
+              <p className="text-gray-600 text-sm">6 supervised visits to electrical contractor job sites. Observe residential rough-ins, panel installations, and commercial wiring. Meet hiring managers.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
+              <div className="w-14 h-14 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Gauge className="w-7 h-7 text-brand-green-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">36</div>
+              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">LMS Coursework</div>
+              <p className="text-gray-600 text-sm">Self-paced online modules with progress tracking, quizzes, and bi-weekly reporting dashboards. Complete on your own schedule.</p>
+            </div>
+          </div>
+
+          {/* Program Details Grid */}
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+                <Briefcase className="w-6 h-6 text-yellow-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Employer Site Days</h3>
+              <p className="text-gray-600 mb-3">Structured visits to electrical contractor job sites. Observe real installations, meet hiring managers, and build employer connections.</p>
+              <p className="text-sm text-brand-blue-600 font-semibold">All site day hours documented for apprenticeship application portfolios.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+                <Calendar className="w-6 h-6 text-yellow-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Flexible Cohort Scheduling</h3>
+              <p className="text-gray-600 mb-3">Cohort-based scheduling with evening and adult-friendly options available. Final schedule customized per partner cohort.</p>
+              <p className="text-sm text-gray-500"><strong>Format:</strong> 12 weeks, 144 total instructional hours</p>
+              <p className="text-sm text-gray-500"><strong>Cohort size:</strong> 8–20 participants</p>
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-yellow-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Bilingual Support</h3>
+              <p className="text-gray-600 mb-3">Bilingual (English/Spanish) instructional assistants available for cohort groups. Written materials available in Spanish upon request.</p>
+              <p className="text-sm text-gray-500"><strong>Admission:</strong> 18+, valid ID, no experience required</p>
+            </div>
+          </div>
+
+          {/* Funding */}
+          <div className="mt-12 bg-white rounded-2xl p-8 shadow-sm text-center">
+            <h3 className="text-xl font-bold mb-3">Funding Options</h3>
+            <p className="text-gray-600 mb-4">Workforce-funded cohorts, employer-sponsored training, grant-funded programs, and custom organizational cohorts supported.</p>
+            <p className="text-sm text-gray-500">Cohort-based and workforce-funded pricing available. Custom pricing provided per partner cohort and program scope.</p>
+          </div>
+        </div>
+      </section>
+
       {/* Why Electrical */}
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -241,8 +314,8 @@ export default function ElectricalProgramPage() {
               },
               {
                 icon: Shield,
-                title: "Licensed Profession",
-                description: "Licensing requirements protect your career from unqualified competition. Your skills are legally recognized and valued."
+                title: "Apprenticeship Ready",
+                description: "This pathway prepares you to register as an Indiana Electrical Apprentice and begin earning while you learn under licensed electricians."
               },
               {
                 icon: Lightbulb,
@@ -276,7 +349,7 @@ export default function ElectricalProgramPage() {
               Training Program
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              16-Week Electrical Curriculum
+              12-Week Electrical Curriculum
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Comprehensive training covering NEC code, residential and commercial wiring, and troubleshooting.
@@ -309,7 +382,7 @@ export default function ElectricalProgramPage() {
                       ))}
                     </div>
                     <div className="bg-white rounded-lg p-4 mt-4">
-                      <span className="text-sm font-semibold text-yellow-700">Hands-On Project:</span>
+                      <span className="text-sm font-semibold text-yellow-700">Applied Exercise:</span>
                       <span className="text-sm text-yellow-600 ml-2">{module.project}</span>
                     </div>
                   </div>
@@ -334,7 +407,7 @@ export default function ElectricalProgramPage() {
 
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { title: "Training Graduate", salary: "$35-45K", time: "16 weeks", desc: "Complete our program" },
+              { title: "Training Graduate", salary: "$35-45K", time: "12 weeks", desc: "Complete our program" },
               { title: "Electrical Apprentice", salary: "$40-55K", time: "4 years", desc: "8,000 hours supervised work" },
               { title: "Journeyman Electrician", salary: "$55-75K", time: "Licensed", desc: "Work independently" },
               { title: "Master Electrician", salary: "$75-100K+", time: "2+ years", desc: "Supervise and train others" }

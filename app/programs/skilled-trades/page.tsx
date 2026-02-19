@@ -71,12 +71,12 @@ export default function SkilledTradesPage() {
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6 text-center">Choose Your Trade</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {[
-              { name: 'HVAC Technician', href: '/programs/hvac-technician', img: '/images/trades/hero-program-hvac.jpg', duration: '8-16 weeks' },
-              { name: 'Electrical', href: '/programs/electrical', img: '/images/trades/hero-program-electrical.jpg', duration: '8-16 weeks' },
-              { name: 'Welding', href: '/programs/welding', img: '/images/trades/hero-program-welding.jpg', duration: '8-12 weeks' },
-              { name: 'Plumbing', href: '/programs/plumbing', img: '/images/trades/hero-program-plumbing.jpg', duration: '8-16 weeks' },
+              { name: 'HVAC Technician', href: '/programs/hvac', img: '/images/trades/hero-program-hvac.jpg', duration: '12 weeks' },
+              { name: 'Electrical', href: '/programs/electrical', img: '/images/trades/hero-program-electrical.jpg', duration: '12 weeks' },
+              { name: 'Plumbing', href: '/programs/plumbing', img: '/images/trades/hero-program-plumbing.jpg', duration: '12 weeks' },
+              { name: 'Forklift Certification', href: '/programs/forklift', img: '/images/programs-hq/skilled-trades-hero.jpg', duration: '1–2 weeks' },
               { name: 'CDL Training', href: '/programs/cdl-training', img: '/images/trades/program-cdl-commercial-driving.jpg', duration: '4-8 weeks' },
-              { name: 'Carpentry', href: '/programs/carpentry', img: '/images/trades/hero-program-carpentry.jpg', duration: '8-12 weeks' },
+              { name: 'Welding', href: '/programs/welding', img: '/images/trades/hero-program-welding.jpg', duration: '8-12 weeks' },
             ].map((p) => (
               <Link key={p.name} href={p.href} className="group">
                 <div className="relative aspect-[3/2] rounded-xl overflow-hidden mb-2">

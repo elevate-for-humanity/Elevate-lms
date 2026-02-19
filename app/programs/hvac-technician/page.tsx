@@ -14,8 +14,8 @@ import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
-  title: 'HVAC Technician Training | Free Trade School Indianapolis | Elevate',
-  description: 'Become an HVAC Technician in 12-16 weeks. Free training through WIOA funding in Indianapolis. EPA 608 certification included. Earn $45K-$75K/year.',
+  title: 'HVAC Technician Career Pathway | Trade Training Indianapolis | Elevate',
+  description: 'HVAC Fundamentals Career Pathway. 12 weeks, 144 hours of instruction + employer site days. EPA 608 exam prep included. Funding available through WIOA.',
   alternates: { canonical: `${SITE_URL}/programs/hvac-technician` },
   keywords: [
     'HVAC training Indianapolis',
@@ -34,8 +34,8 @@ export const metadata: Metadata = {
     'heating ventilation air conditioning',
   ],
   openGraph: {
-    title: 'HVAC Technician Training | Free Trade School Indianapolis',
-    description: 'Become an HVAC Technician in 12-16 weeks. Free training through WIOA funding. EPA 608 certification included.',
+    title: 'HVAC Technician Career Pathway | Trade Training Indianapolis',
+    description: 'HVAC Fundamentals Career Pathway. 12 weeks, 144 hours of instruction + employer site days. EPA 608 exam prep included.',
     url: `${SITE_URL}/programs/hvac-technician`,
     siteName: 'Elevate for Humanity',
     images: [{ url: `${SITE_URL}/images/trades/program-hvac-overview.jpg`, width: 1200, height: 630, alt: 'HVAC Technician Training Program' }],
@@ -43,15 +43,15 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'HVAC Technician Training | Free Trade School',
-    description: 'Become an HVAC Technician in 12-16 weeks. Free training through WIOA funding.',
+    title: 'HVAC Technician Career Pathway | Trade Training',
+    description: 'HVAC Fundamentals Career Pathway. 12 weeks, 144 hours. EPA 608 exam prep + employer site days. Funding available through WIOA.',
     images: [`${SITE_URL}/images/trades/hero-program-hvac.jpg`],
   },
 };
 
 const programDetails = {
-  duration: '12-16 weeks',
-  hours: '400+ training hours',
+  duration: '12 weeks',
+  hours: '144 instructional hours',
   certification: 'EPA 608 Universal',
   salary: '$45,000 - $75,000/year',
   jobGrowth: '6% (faster than average)',
@@ -74,14 +74,14 @@ const careers = [
 ];
 
 const employers = [
-  'Carrier',
-  'Trane',
-  'Lennox',
-  'Local contractors',
+  'Mechanical contractors',
+  'HVAC service companies',
   'Property management',
-  'Hospitals',
-  'Schools',
-  'Manufacturing',
+  'Hospitals & healthcare',
+  'School districts',
+  'Manufacturing facilities',
+  'Commercial buildings',
+  'Residential builders',
 ];
 
 export default function HVACTechnicianPage() {
@@ -89,10 +89,10 @@ export default function HVACTechnicianPage() {
     <>
     <ProgramStructuredData program={{
       id: 'hvac-technician',
-      name: 'HVAC Technician Training',
+      name: 'HVAC Technician Career Pathway',
       slug: 'hvac-technician',
-      description: 'Learn heating, ventilation, and air conditioning installation and repair. EPA 608 certification included. WIOA funding available.',
-      duration_weeks: 16,
+      description: 'HVAC fundamentals career pathway. 12 weeks, 144 instructional hours. Classroom + LMS + employer site days. EPA 608 exam prep included.',
+      duration_weeks: 12,
       price: 0,
       image_url: `${SITE_URL}/images/programs-hq/hvac-technician.jpg`,
       category: 'Skilled Trades',
@@ -127,10 +127,10 @@ export default function HVACTechnicianPage() {
               <Thermometer className="w-4 h-4" /> WIOA Funding Available
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-              HVAC Technician
+              HVAC Career Pathway
             </h1>
             <p className="text-xl text-white/90 max-w-xl mb-6">
-              Master heating, ventilation, and air conditioning. High-demand career with excellent pay and year-round work.
+              12-week fundamentals program with EPA 608 exam prep, employer site days, and apprenticeship readiness support. 144 instructional hours.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link href="/apply?program=hvac-technician" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
@@ -172,6 +172,33 @@ export default function HVACTechnicianPage() {
         </div>
       </section>
 
+      {/* Program Overview + Delivery Model */}
+      <section className="py-12 bg-slate-50 border-b">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-center mb-8">Delivery Model: Classroom + LMS + Employer Site Days</h2>
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-xl p-6 shadow-sm text-center">
+              <div className="text-3xl font-bold text-brand-blue-600 mb-1">72</div>
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Classroom Hours (RTI)</div>
+              <p className="text-gray-600 text-sm">Evening instruction: HVAC theory, electrical fundamentals, refrigeration, EPA 608 prep.</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm text-center">
+              <div className="text-3xl font-bold text-yellow-600 mb-1">36</div>
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Employer Site Days (OJT)</div>
+              <p className="text-gray-600 text-sm">6 supervised visits to HVAC contractor job sites. Observe installations and meet hiring managers.</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm text-center">
+              <div className="text-3xl font-bold text-brand-green-600 mb-1">36</div>
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">LMS Coursework</div>
+              <p className="text-gray-600 text-sm">Self-paced online modules with progress tracking and bi-weekly reporting dashboards.</p>
+            </div>
+          </div>
+          <div className="text-center text-sm text-gray-500">
+            <p><strong>Total:</strong> 144 instructional hours over 12 weeks &bull; Cohort-based scheduling with evening and adult-friendly options &bull; Bilingual (English/Spanish) support available</p>
+          </div>
+        </div>
+      </section>
+
       {/* Why HVAC */}
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
@@ -189,7 +216,7 @@ export default function HVACTechnicianPage() {
                   <strong>Job Security:</strong> Every residential, commercial, and industrial building needs HVAC. This work cannot be outsourced or automated. The Bureau of Labor Statistics projects 6% job growth through 2032.
                 </p>
                 <p>
-                  <strong>Business Ownership:</strong> Many HVAC technicians start their own service companies within 5 years. With an EPA certification and a contractor license, you can run your own business with relatively low startup costs.
+                  <strong>Career Growth:</strong> HVAC offers a clear advancement path — from entry-level installer to service technician to lead tech. With experience and additional certifications, many technicians move into supervisory or specialized roles.
                 </p>
               </div>
             </div>
@@ -210,7 +237,7 @@ export default function HVACTechnicianPage() {
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-4">What You&apos;ll Learn</h2>
           <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
-            Comprehensive hands-on training covering residential and commercial HVAC systems.
+            Theory instruction, EPA 608 certification prep, and employer site days covering residential and commercial HVAC systems.
           </p>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

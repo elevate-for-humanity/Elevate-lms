@@ -3,6 +3,7 @@
 import { createAdminClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { sendEmail } from '@/lib/email';
+import { logger } from '@/lib/logger';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
@@ -17,7 +18,156 @@ async function sendEmailDirect(to: string, subject: string, html: string) {
 }
 
 /**
- * Application-only submission. No auth user created at submit time.
+ * Resolve program_interest to a course UUID.
+ */
+async function resolveCourseId(supabase: any, programInterest: string): Promise<string | null> {
+  if (!programInterest) return null;
+  const normalized = programInterest.toLowerCase().replace(/-/g, ' ').trim();
+  const ALIASES: Record<string, string> = {
+    'cna certification': 'cna training',
+    'cna': 'cna training',
+    'cosmetology apprenticeship': 'hair stylist esthetician apprenticeship',
+    'accounting': 'bookkeeping',
+    'home health aide': 'direct support professional',
+    'entrepreneurship': 'entrepreneurship small business',
+    'phlebotomy': 'phlebotomy technician',
+    'barber apprenticeship': 'barber',
+  };
+  const { data: courses } = await supabase.from('courses').select('id, title');
+  if (!courses?.length) return null;
+  const exact = courses.find((c: any) => c.title.toLowerCase() === normalized);
+  if (exact) return exact.id;
+  const alias = ALIASES[normalized];
+  if (alias) {
+    const m = courses.find((c: any) => c.title.toLowerCase().includes(alias));
+    if (m) return m.id;
+  }
+  const partial = courses.find((c: any) => {
+    const t = c.title.toLowerCase();
+    return t.includes(normalized) || normalized.includes(t.replace(/\(.*\)/, '').trim());
+  });
+  return partial?.id || null;
+}
+
+/**
+ * Auto-approve: create auth user + profile + enrollment on application submit.
+ */
+async function autoApproveAndEnroll(
+  supabase: any,
+  applicationId: string,
+  email: string,
+  firstName: string,
+  lastName: string,
+  programInterest: string,
+): Promise<{ userId?: string; courseId?: string; enrolled: boolean }> {
+  try {
+    // 1. Resolve course
+    const courseId = await resolveCourseId(supabase, programInterest);
+    if (!courseId) {
+      logger.error('Auto-enroll: no course match', { programInterest });
+      return { enrolled: false };
+    }
+
+    // 2. Find or create auth user
+    const normalizedEmail = email.toLowerCase().trim();
+    let userId: string | null = null;
+
+    // Check profiles first
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', normalizedEmail)
+      .single();
+
+    if (existingProfile?.id) {
+      userId = existingProfile.id;
+    } else {
+      // Create new auth user
+      const tempPassword = `Elevate-${Date.now().toString(36)}!`;
+      const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+        email: normalizedEmail,
+        password: tempPassword,
+        email_confirm: true,
+        user_metadata: {
+          full_name: `${firstName} ${lastName}`,
+          first_name: firstName,
+          last_name: lastName,
+        },
+      });
+
+      if (newUser?.user) {
+        userId = newUser.user.id;
+        await supabase.from('profiles').upsert({
+          id: userId,
+          email: normalizedEmail,
+          first_name: firstName,
+          last_name: lastName,
+          full_name: `${firstName} ${lastName}`,
+          role: 'student',
+        }, { onConflict: 'id' });
+      } else if (createError) {
+        // User may exist in auth but not profiles — scan for them
+        let page = 1;
+        while (page <= 6 && !userId) {
+          const { data: batch } = await supabase.auth.admin.listUsers({ page, perPage: 100 });
+          if (!batch?.users?.length) break;
+          const found = batch.users.find((u: any) => u.email?.toLowerCase() === normalizedEmail);
+          if (found) {
+            userId = found.id;
+            await supabase.from('profiles').upsert({
+              id: userId,
+              email: normalizedEmail,
+              first_name: firstName,
+              last_name: lastName,
+              full_name: `${firstName} ${lastName}`,
+              role: 'student',
+            }, { onConflict: 'id' });
+          }
+          page++;
+        }
+      }
+    }
+
+    if (!userId) {
+      logger.error('Auto-enroll: could not create user', { email: normalizedEmail });
+      return { enrolled: false };
+    }
+
+    // 3. Create enrollment (skip if already enrolled)
+    const { data: existing } = await supabase
+      .from('enrollments')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('course_id', courseId)
+      .single();
+
+    if (!existing) {
+      await supabase.from('enrollments').insert({
+        user_id: userId,
+        course_id: courseId,
+        status: 'active',
+        progress: 0,
+        enrolled_at: new Date().toISOString(),
+      });
+    }
+
+    // 4. Update application to enrolled
+    await supabase
+      .from('applications')
+      .update({ status: 'enrolled', program_id: courseId, user_id: userId })
+      .eq('id', applicationId);
+
+    logger.info('Auto-enrolled student', { applicationId, userId, courseId, email: normalizedEmail });
+    return { userId, courseId, enrolled: true };
+  } catch (err) {
+    logger.error('Auto-enroll failed', err as Error);
+    return { enrolled: false };
+  }
+}
+
+/**
+ * Application submission with auto-approve and auto-enroll.
+ * On submit: save application → create auth user → enroll in course → send welcome email.
  * User accounts are created later upon admin approval.
  * All inserts use admin client (service role) to bypass RLS.
  */
@@ -127,23 +277,53 @@ async function insertApplication(payload: {
       return { success: false, error: 'Failed to save application. Please try again or use our contact form at /contact.' };
     }
 
-    // Application saved — send notifications
+    // Auto-approve and enroll immediately
+    const enrollResult = await autoApproveAndEnroll(
+      supabase,
+      data.id,
+      payload.email,
+      payload.firstName,
+      payload.lastName,
+      payload.programInterest,
+    );
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
-    // Send confirmation to applicant (non-blocking)
-    sendEmailDirect(
-      payload.email,
-      `Application Received [${referenceNumber}] - Elevate for Humanity`,
-      `<p>Hi ${payload.firstName},</p><p>We received your application (Ref: <strong>${referenceNumber}</strong>). Our team will review it and contact you within 2 business days.</p><p>— Elevate for Humanity</p>`,
-    ).catch(() => {});
+    // Send welcome/onboarding email to student
+    if (enrollResult.enrolled) {
+      sendEmailDirect(
+        payload.email,
+        `You're Enrolled! Welcome to Elevate for Humanity [${referenceNumber}]`,
+        [
+          `<h2>Welcome, ${payload.firstName}!</h2>`,
+          `<p>You've been enrolled in <strong>${payload.programInterest.replace(/-/g, ' ')}</strong> at Elevate for Humanity.</p>`,
+          `<h3>Next Steps:</h3>`,
+          `<ol>`,
+          `<li><strong>Log in</strong> at <a href="${siteUrl}/signin">${siteUrl}/signin</a> using your email: <strong>${payload.email}</strong></li>`,
+          `<li>If this is your first time, click <strong>"Forgot Password"</strong> to set your password</li>`,
+          `<li>Once logged in, go to <strong>My Courses</strong> to start your lessons</li>`,
+          `</ol>`,
+          `<p>Your reference number: <strong>${referenceNumber}</strong></p>`,
+          `<p>Questions? Reply to this email or call us.</p>`,
+          `<p>— Elevate for Humanity</p>`,
+        ].join(''),
+      ).catch(() => {});
+    } else {
+      // Fallback: send basic confirmation if auto-enroll failed
+      sendEmailDirect(
+        payload.email,
+        `Application Received [${referenceNumber}] - Elevate for Humanity`,
+        `<p>Hi ${payload.firstName},</p><p>We received your application (Ref: <strong>${referenceNumber}</strong>). Our team will review it and contact you within 2 business days.</p><p>— Elevate for Humanity</p>`,
+      ).catch(() => {});
+    }
 
     // Notify admin (non-blocking)
     sendEmailDirect(
       ADMIN_EMAIL,
-      `New Application: ${payload.firstName} ${payload.lastName} — ${payload.programInterest} [${referenceNumber}]`,
+      `${enrollResult.enrolled ? '[AUTO-ENROLLED]' : '[PENDING]'} ${payload.firstName} ${payload.lastName} — ${payload.programInterest} [${referenceNumber}]`,
       [
         `<h3>New ${payload.source.replace(/-/g, ' ')} received</h3>`,
+        enrollResult.enrolled ? `<p style="color:green"><strong>✅ Auto-enrolled successfully</strong></p>` : `<p style="color:orange"><strong>⚠️ Auto-enroll failed — manual action needed</strong></p>`,
         `<p><strong>Name:</strong> ${payload.firstName} ${payload.lastName}</p>`,
         `<p><strong>Email:</strong> <a href="mailto:${payload.email}">${payload.email}</a></p>`,
         `<p><strong>Phone:</strong> <a href="tel:${payload.phone}">${payload.phone}</a></p>`,

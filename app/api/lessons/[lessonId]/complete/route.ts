@@ -122,6 +122,13 @@ export async function POST(
     // Auto-create certificate if course completed
     let certificate = null;
     if (courseCompleted) {
+      // Fetch actual course title (lesson.title is the lesson name, not the course)
+      const { data: course } = await supabase
+        .from('courses')
+        .select('title')
+        .eq('id', lesson.course_id)
+        .single();
+
       const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
       const certResult = await issueCertificate({
         supabase,
@@ -129,7 +136,7 @@ export async function POST(
         courseId: lesson.course_id,
         enrollmentId: enrollment.id,
         studentName: user.user_metadata?.full_name || user.email || 'Student',
-        courseTitle: lesson.title,
+        courseTitle: course?.title || lesson.title,
       });
       if (certResult.success && certResult.certificate) {
         certificate = certResult.certificate;

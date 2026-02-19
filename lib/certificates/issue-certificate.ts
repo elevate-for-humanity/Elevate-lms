@@ -89,9 +89,9 @@ export async function issueCertificate(
         certificate: {
           id: existingCert.id,
           certificate_number: existingCert.certificate_number,
-          student_name: existingCert.student_name,
-          program_name: existingCert.program_name,
-          completion_date: existingCert.completion_date,
+          student_name: existingCert.metadata?.student_name || studentName,
+          program_name: existingCert.program_name || existingCert.course_title || existingCert.metadata?.course_name || programName || courseTitle || 'Course',
+          completion_date: existingCert.issued_at || existingCert.metadata?.completion_date || '',
           url: certificateUrl,
         },
       };
@@ -104,25 +104,30 @@ export async function issueCertificate(
     const displayName = programName || courseTitle || 'Course Completion';
 
     // Create certificate record
+    // Table columns: id, user_id, course_id, enrollment_id, certificate_number,
+    // issued_at, expires_at, pdf_url, verification_url, metadata, created_at,
+    // tenant_id, student_id, verification_code, course_title, program_name,
+    // hours_completed, issued_date
     const { data: certificate, error: certError } = await supabase
       .from('certificates')
       .insert({
         user_id: studentId,
         student_id: studentId,
         course_id: courseId || null,
-        program_id: programId || null,
         enrollment_id: enrollmentId || null,
         certificate_number: certificateNumber,
-        student_name: studentName,
         course_title: courseTitle || null,
         program_name: programName || null,
-        completion_date: completionDate,
         issued_date: completionDate.split('T')[0],
-        program_hours: programHours,
+        hours_completed: programHours || null,
         issued_at: completionDate,
         verification_code: certificateNumber.split('-').pop(),
-        status: 'active',
-        metadata: { issued_via: 'canonical_issue_certificate' },
+        verification_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/verify/${certificateNumber.split('-').pop()?.toLowerCase()}`,
+        metadata: {
+          issued_via: 'canonical_issue_certificate',
+          student_name: studentName,
+          completion_date: completionDate,
+        },
       })
       .select()
       .single();

@@ -2,6 +2,19 @@
 
 import { createAdminClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { sendEmail } from '@/lib/email';
+
+const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
+
+async function sendEmailDirect(to: string, subject: string, html: string) {
+  try {
+    const result = await sendEmail({ to, subject, html });
+    return result.success;
+  } catch (err) {
+    console.error('[Email] Send failed:', err instanceof Error ? err.message : err);
+    return false;
+  }
+}
 
 /**
  * Application-only submission. No auth user created at submit time.
@@ -114,49 +127,33 @@ async function insertApplication(payload: {
       return { success: false, error: 'Failed to save application. Please try again or use our contact form at /contact.' };
     }
 
-    // Application saved successfully
+    // Application saved — send notifications
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-    const emailEndpoint = `${siteUrl}/api/email/send`;
 
-    // Send confirmation to applicant
-    try {
-      await fetch(emailEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          to: payload.email,
-          subject: `Application Received [${referenceNumber}] - Elevate for Humanity`,
-          html: `<p>Hi ${payload.firstName},</p><p>We received your application (Ref: <strong>${referenceNumber}</strong>). Our team will review it and contact you within 2 business days.</p><p>— Elevate for Humanity</p>`,
-        }),
-      });
-    } catch {
-      // Email failure must not block submission
-    }
+    // Send confirmation to applicant (non-blocking)
+    sendEmailDirect(
+      payload.email,
+      `Application Received [${referenceNumber}] - Elevate for Humanity`,
+      `<p>Hi ${payload.firstName},</p><p>We received your application (Ref: <strong>${referenceNumber}</strong>). Our team will review it and contact you within 2 business days.</p><p>— Elevate for Humanity</p>`,
+    ).catch(() => {});
 
-    // Notify Elevate team
-    try {
-      await fetch(emailEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          to: 'our contact form',
-          subject: `New Application: ${payload.firstName} ${payload.lastName} [${referenceNumber}]`,
-          html: [
-            `<h3>New ${payload.source.replace(/-/g, ' ')} received</h3>`,
-            `<p><strong>Name:</strong> ${payload.firstName} ${payload.lastName}</p>`,
-            `<p><strong>Email:</strong> ${payload.email}</p>`,
-            `<p><strong>Phone:</strong> ${payload.phone}</p>`,
-            `<p><strong>Program:</strong> ${payload.programInterest}</p>`,
-            `<p><strong>Reference:</strong> ${referenceNumber}</p>`,
-            payload.supportNotes ? `<p><strong>Details:</strong> ${payload.supportNotes}</p>` : '',
-            `<p><a href="${siteUrl}/admin/applications">View in Admin Dashboard</a></p>`,
-          ].filter(Boolean).join(''),
-        }),
-      });
-    } catch {
-      // Admin email failure must not block submission
-    }
+    // Notify admin (non-blocking)
+    sendEmailDirect(
+      ADMIN_EMAIL,
+      `New Application: ${payload.firstName} ${payload.lastName} — ${payload.programInterest} [${referenceNumber}]`,
+      [
+        `<h3>New ${payload.source.replace(/-/g, ' ')} received</h3>`,
+        `<p><strong>Name:</strong> ${payload.firstName} ${payload.lastName}</p>`,
+        `<p><strong>Email:</strong> <a href="mailto:${payload.email}">${payload.email}</a></p>`,
+        `<p><strong>Phone:</strong> <a href="tel:${payload.phone}">${payload.phone}</a></p>`,
+        `<p><strong>Program:</strong> ${payload.programInterest}</p>`,
+        `<p><strong>City:</strong> ${payload.city} | <strong>ZIP:</strong> ${payload.zip}</p>`,
+        `<p><strong>Reference:</strong> ${referenceNumber}</p>`,
+        payload.supportNotes ? `<p><strong>Details:</strong> ${payload.supportNotes}</p>` : '',
+        `<p><a href="${siteUrl}/admin/applications">View in Admin Dashboard</a></p>`,
+      ].filter(Boolean).join(''),
+    ).catch(() => {});
 
     revalidatePath('/admin/applications');
     return { success: true, applicationId: data.id, referenceNumber };

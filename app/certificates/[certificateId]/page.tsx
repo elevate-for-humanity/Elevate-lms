@@ -52,12 +52,12 @@ export default async function CertificateViewPage({ params }: Props) {
   }
 
   // Fetch certificate with user and course info
+  // profiles join works via user_id FK; courses join does not exist on this table
   const { data: certificate, error } = await supabase
     .from('certificates')
     .select(`
       *,
-      profiles (first_name, last_name),
-      courses (title)
+      profiles (first_name, last_name, full_name)
     `)
     .eq('id', certificateId)
     .single();
@@ -66,9 +66,11 @@ export default async function CertificateViewPage({ params }: Props) {
     notFound();
   }
 
-  const recipient = certificate.profiles as { first_name: string; last_name: string } | null;
-  const course = certificate.courses as { title: string } | null;
-  const recipientName = recipient ? `${recipient.first_name} ${recipient.last_name}` : certificate.recipient_name || 'Student';
+  const recipient = certificate.profiles as { first_name: string; last_name: string; full_name: string } | null;
+  const recipientName = recipient?.full_name
+    || (recipient ? `${recipient.first_name} ${recipient.last_name}` : null)
+    || certificate.metadata?.student_name
+    || 'Student';
 
   return (
     <div className="min-h-screen bg-brand-blue-50 py-12">
@@ -104,7 +106,7 @@ export default async function CertificateViewPage({ params }: Props) {
             <p className="text-slate-600 text-lg mb-4">has successfully completed</p>
             
             <h3 className="text-2xl font-bold text-brand-blue-900 mb-8">
-              {certificate.title || course?.title || 'Course'}
+              {certificate.course_title || certificate.program_name || certificate.metadata?.course_name || 'Course'}
             </h3>
 
             {/* Details */}
@@ -144,14 +146,13 @@ export default async function CertificateViewPage({ params }: Props) {
                 <p>Verify at: elevateforhumanity.org/verify/{certificate.id}</p>
               </div>
               <div className="flex gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
+                <a
+                  href={`/api/certificates/${certificateId}/download`}
+                  className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
+                >
                   <Download className="w-4 h-4" />
                   Download PDF
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50">
-                  <Share2 className="w-4 h-4" />
-                  Share
-                </button>
+                </a>
               </div>
             </div>
           </div>

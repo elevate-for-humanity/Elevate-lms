@@ -268,7 +268,7 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
               { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/community-healthcare-worker.jpg' },
-              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/facility-hero.jpg' },
+              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/heroes-hq/funding-hero.jpg' },
               { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/funding/funding-jri-program.jpg' },
               { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/homepage/government-agencies.jpg', external: true },
             ].map((item) => (

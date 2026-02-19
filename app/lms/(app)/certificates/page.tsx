@@ -48,18 +48,10 @@ export default async function CertificatesPage() {
     .eq('id', user.id)
     .single();
 
-  // Fetch certificates
+  // Fetch certificates (no FK to courses table, use stored course_title/program_name)
   const { data: certificates } = await supabase
     .from('certificates')
-    .select(
-      `
-      *,
-      courses (
-        id,
-        title
-      )
-    `
-    )
+    .select('*')
     .eq('user_id', user.id)
     .order('issued_at', { ascending: false });
 
@@ -82,7 +74,7 @@ export default async function CertificatesPage() {
               <div key={cert.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <CertificateTemplate
                   studentName={profile?.first_name ? `${profile.first_name} ${profile.last_name || ''}` : user.email || 'Student'}
-                  courseName={cert.courses?.title || cert.course_name || 'Course'}
+                  courseName={cert.course_title || cert.program_name || cert.metadata?.course_name || 'Course'}
                   completionDate={cert.issued_at}
                   certificateId={cert.id}
                 />

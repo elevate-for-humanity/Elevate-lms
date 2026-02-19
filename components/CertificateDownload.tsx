@@ -72,34 +72,33 @@ export default function CertificateDownload({
             id,
             certificate_number,
             verification_code,
-            credential_type,
-            issue_date,
-            expiry_date,
+            course_title,
+            program_name,
+            issued_date,
             hours_completed,
-            grade,
-            profiles!certificates_user_id_fkey(full_name),
-            training_programs(name),
-            courses(title)
+            metadata,
+            profiles!certificates_user_id_fkey(full_name)
           `)
           .eq('id', certificateId)
           .single();
 
         if (fetchError) throw fetchError;
 
+        const meta = (data.metadata as any) || {};
         setCertificate({
           id: data.id,
-          student_name: (data.profiles as any)?.full_name || 'Student',
-          program_name: (data.training_programs as any)?.name || (data.courses as any)?.title || 'Program',
-          course_name: (data.courses as any)?.title,
-          issue_date: data.issue_date,
-          expiry_date: data.expiry_date,
+          student_name: (data.profiles as any)?.full_name || meta.student_name || 'Student',
+          program_name: data.program_name || data.course_title || meta.course_name || 'Program',
+          course_name: data.course_title || meta.course_name,
+          issue_date: data.issued_date || meta.completion_date || new Date().toISOString(),
+          expiry_date: undefined,
           certificate_number: data.certificate_number,
-          verification_code: data.verification_code,
-          credential_type: data.credential_type || 'Certificate of Completion',
+          verification_code: data.verification_code || data.certificate_number?.split('-').pop() || '',
+          credential_type: 'Certificate of Completion',
           issuer_name: 'Program Director',
           issuer_title: 'Director of Training',
           hours_completed: data.hours_completed,
-          grade: data.grade,
+          grade: undefined,
         });
       } catch (err: any) {
         console.error('Error fetching certificate:', err);

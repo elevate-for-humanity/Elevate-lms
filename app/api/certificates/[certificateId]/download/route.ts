@@ -25,9 +25,10 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // profiles join works via user_id FK; courses join does not exist on this table
     const { data: certificate } = await supabase
       .from('certificates')
-      .select('*, profiles(full_name), courses(title, program_hours)')
+      .select('*, profiles(full_name)')
       .eq('id', certificateId)
       .eq('user_id', user.id)
       .single();
@@ -40,11 +41,11 @@ export async function GET(
     }
 
     const pdfBlob = await generateCertificatePDF({
-      studentName: certificate.profiles.full_name,
-      courseName: certificate.courses.title,
+      studentName: certificate.profiles?.full_name || certificate.metadata?.student_name || 'Student',
+      courseName: certificate.course_title || certificate.program_name || certificate.metadata?.course_name || 'Course',
       completionDate: new Date(certificate.issued_at).toLocaleDateString(),
       certificateNumber: certificate.certificate_number,
-      programHours: certificate.courses.program_hours,
+      programHours: certificate.hours_completed,
     });
 
     return new NextResponse(pdfBlob, {

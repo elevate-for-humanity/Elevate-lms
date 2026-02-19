@@ -12,7 +12,7 @@ interface EmailOptions {
   replyTo?: string;
 }
 
-const FROM_EMAIL = process.env.EMAIL_FROM || 'elevate4humanityedu@gmail.com';
+const FROM_EMAIL = process.env.EMAIL_FROM || 'Elevate for Humanity <onboarding@resend.dev>';
 const REPLY_TO_EMAIL =
   process.env.REPLY_TO_EMAIL || 'elevate4humanityedu@gmail.com';
 const RESEND_API_KEY = process.env.RESEND_API_KEY;

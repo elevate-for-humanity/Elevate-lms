@@ -111,7 +111,7 @@ export default function MicroProgramsPage() {
               },
               {
                 name: 'Forklift Certification',
-                href: '/programs/skilled-trades',
+                href: '/programs/forklift',
                 img: '/images/trades/hero-program-carpentry.jpg',
                 duration: '1 day',
                 desc: 'Powered industrial truck (forklift) operator certification. Hands-on training and written test.',

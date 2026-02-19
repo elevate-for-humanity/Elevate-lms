@@ -128,6 +128,23 @@ export default async function ProgramDetailPage({
     return notFound();
   }
 
+  // Slugs that have dedicated page.tsx files — skip to avoid shadowing them
+  const DEDICATED_PAGES = [
+    'hvac-technician', 'hvac', 'electrical', 'plumbing', 'forklift',
+    'welding', 'cdl-training', 'cdl-transportation', 'cdl',
+    'cna-certification', 'cna', 'medical-assistant', 'healthcare',
+    'barber-apprenticeship', 'cosmetology-apprenticeship',
+    'nail-technician-apprenticeship', 'culinary-apprenticeship',
+    'beauty', 'business', 'business-financial', 'skilled-trades',
+    'technology', 'tax-preparation', 'tax-entrepreneurship',
+    'drug-collector', 'direct-support-professional', 'diesel-mechanic',
+    'cpr-first-aid-hsi', 'sanitation-infection-control',
+    'micro-programs', 'federal-funded', 'jri', 'apprenticeships',
+  ];
+  if (DEDICATED_PAGES.includes(slug)) {
+    return notFound();
+  }
+
   let program: Program | null = null;
 
   let dbOutcomes: { outcome: string }[] = [];

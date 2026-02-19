@@ -218,3 +218,193 @@ export const PROGRAMS: ProgramData[] = [
     etplApproved: true,
   },
 ];
+
+// ---------------------------------------------------------------------------
+// LOC-Ready Program Specifications
+// Used by ProgramSpecSheet component for workforce partner (LOC/WorkOne) pages
+// ---------------------------------------------------------------------------
+
+import type { LOCProgramSpec } from '@/components/programs/ProgramSpecSheet';
+
+const SHARED_LOC_FIELDS = {
+  cohortSizeMin: 15,
+  cohortSizeMax: 30,
+  costPerParticipant: 2700,
+  examFeesIncluded: true,
+  bilingualSupport: true,
+  tutoringAvailable: true,
+  nextLevelJobsEligible: true,
+  labLocation: 'Hybrid — Related Technical Instruction (RTI) delivered online via LMS. On-the-Job Training (OJT) completed as internship at employer partner sites in Indianapolis, IN (Marion County).',
+  cohortSchedule: 'Schedule coordinated with LOC partner — evening and weekend options available',
+  attendanceTracking: 'LMS-tracked daily attendance with instructor sign-off. Absence alerts sent within 24 hours.',
+  alertEscalationProcess: 'Automated alert to LOC case manager after 2 consecutive absences. Weekly status summary emailed to LOC contact.',
+  progressReportFrequency: 'Bi-weekly progress reports during program; monthly post-placement for 12 months',
+  progressReportFormat: 'CSV and PDF export — Salesforce-compatible fields (participant ID, attendance %, module completion, credential status)',
+  retentionTracking: '90-day and 180-day post-placement follow-up with employer verification',
+  paymentTerms: 'Net 30 invoice per cohort. Milestone billing available: 50% at enrollment, 50% at completion.',
+};
+
+export const LOC_PROGRAM_SPECS: Record<string, LOCProgramSpec> = {
+  'hvac-technician': {
+    slug: 'hvac-technician',
+    name: 'HVAC Technician',
+    totalWeeks: 20,
+    totalHours: '400+',
+    rtiHours: '240 (classroom/lab)',
+    ojtHours: '160+ (employer site internship)',
+    credentials: [
+      { name: 'EPA Section 608 Universal Certification', issuingBody: 'U.S. Environmental Protection Agency (EPA)', examFeeIncluded: true },
+      { name: 'OSHA 30 — Construction Safety', issuingBody: 'OSHA / CareerSafe', examFeeIncluded: true },
+      { name: 'CPR / First Aid', issuingBody: 'American Heart Association', examFeeIncluded: true },
+      { name: 'Rise Up — Retail Industry Fundamentals', issuingBody: 'National Retail Federation (NRF)', examFeeIncluded: true },
+    ],
+    admissionsRequirements: [
+      '18 years or older',
+      'High school diploma or GED',
+      'Valid driver\'s license (HVAC work requires travel to job sites)',
+      'Ability to lift 50+ pounds',
+      'Pass background check',
+      'Basic math skills (fractions, measurements)',
+    ],
+    modality: 'Hybrid — RTI delivered online via LMS + OJT internship at employer partner sites',
+    equipmentIncluded: [
+      'PPE (safety glasses, gloves, hard hat)',
+      'Refrigerant gauges',
+      'Multimeter',
+      'Hand tools',
+      'Textbooks and study materials',
+      'EPA 608 exam prep materials',
+    ],
+    workBasedLearning: 'OJT internship at employer partner sites — supervised HVAC installation, maintenance, and service calls',
+    employerPartners: [],
+    placementRate: 'Program goal: 85%+ placement within 90 days',
+    materialsIncluded: [
+      'All textbooks',
+      'PPE and safety gear',
+      'Tool kit',
+      'Certification exam fees',
+      'Job placement assistance',
+    ],
+    ...SHARED_LOC_FIELDS,
+  },
+
+  'electrical': {
+    slug: 'electrical',
+    name: 'Electrical Technology',
+    totalWeeks: '16–24',
+    totalHours: '400+',
+    rtiHours: '240 (classroom/lab)',
+    ojtHours: '160+ (employer site internship)',
+    credentials: [
+      { name: 'OSHA 10 — General Industry Safety', issuingBody: 'OSHA / CareerSafe', examFeeIncluded: true },
+      { name: 'Indiana Electrical Apprentice Registration', issuingBody: 'Indiana Department of Homeland Security (IDHS)', examFeeIncluded: true },
+      { name: 'CPR / First Aid', issuingBody: 'American Heart Association', examFeeIncluded: true },
+      { name: 'Program Completion Certificate', issuingBody: 'Elevate for Humanity', examFeeIncluded: true },
+    ],
+    admissionsRequirements: [
+      '18 years or older',
+      'High school diploma or GED',
+      'Basic math skills (algebra, fractions)',
+      'Ability to distinguish wire colors',
+      'Pass background check',
+      'Physical ability to climb ladders and work in confined spaces',
+    ],
+    modality: 'Hybrid — RTI delivered online via LMS (NEC code, electrical theory) + OJT internship at electrical contractor sites',
+    equipmentIncluded: [
+      'PPE (safety glasses, gloves, hard hat)',
+      'Multimeter',
+      'Wire strippers and lineman\'s pliers',
+      'Hand tools',
+      'NEC codebook',
+      'Textbooks and study materials',
+    ],
+    workBasedLearning: 'OJT internship at electrical contractor sites — supervised residential and commercial wiring, installation, and troubleshooting',
+    employerPartners: [],
+    placementRate: 'Program goal: 85%+ placement within 90 days',
+    materialsIncluded: [
+      'All textbooks and NEC codebook',
+      'PPE and safety gear',
+      'Basic tool set',
+      'Certification exam fees',
+      'Job placement assistance',
+    ],
+    ...SHARED_LOC_FIELDS,
+  },
+
+  'plumbing': {
+    slug: 'plumbing',
+    name: 'Plumbing Technology',
+    totalWeeks: 16,
+    totalHours: '400+',
+    rtiHours: '240 (classroom/lab)',
+    ojtHours: '160+ (employer site internship)',
+    credentials: [
+      { name: 'OSHA 10 — Construction Safety', issuingBody: 'OSHA / CareerSafe', examFeeIncluded: true },
+      { name: 'CPR / First Aid', issuingBody: 'American Heart Association', examFeeIncluded: true },
+      { name: 'Program Completion Certificate', issuingBody: 'Elevate for Humanity', examFeeIncluded: true },
+    ],
+    admissionsRequirements: [
+      '18 years or older',
+      'High school diploma or GED',
+      'Physical fitness — ability to lift heavy materials and work in tight spaces',
+      'Pass background check',
+      'Basic math skills (measurements, slope calculations)',
+    ],
+    modality: 'Hybrid — RTI delivered online via LMS (plumbing code, system design) + OJT internship at plumbing contractor sites',
+    equipmentIncluded: [
+      'PPE (safety glasses, gloves, hard hat)',
+      'Pipe wrenches',
+      'Tubing cutters',
+      'PEX crimpers',
+      'Hand tools',
+      'Textbooks and study materials',
+    ],
+    workBasedLearning: 'OJT internship at plumbing contractor sites — supervised residential and commercial plumbing installation and service',
+    employerPartners: [],
+    placementRate: 'Program goal: 85%+ placement within 90 days',
+    materialsIncluded: [
+      'All textbooks',
+      'PPE and safety gear',
+      'Basic tool set',
+      'Certification exam fees',
+      'Job placement assistance',
+    ],
+    ...SHARED_LOC_FIELDS,
+  },
+
+  'forklift': {
+    slug: 'forklift',
+    name: 'Forklift Operator Certification',
+    totalWeeks: '1 day',
+    totalHours: 8,
+    rtiHours: '4 (classroom instruction)',
+    ojtHours: '4 (hands-on driving evaluation)',
+    credentials: [
+      { name: 'OSHA-Compliant Forklift Operator Certification', issuingBody: 'OSHA / Employer-Verified', examFeeIncluded: true },
+    ],
+    admissionsRequirements: [
+      '18 years or older',
+      'Valid photo ID',
+      'Physical ability to operate powered industrial truck',
+      'No active restrictions on operating heavy equipment',
+    ],
+    modality: 'In-person — Classroom instruction + hands-on driving evaluation and written test',
+    equipmentIncluded: [
+      'PPE (safety vest, hard hat)',
+      'Training forklift provided',
+      'Study materials',
+      'Written and practical exam',
+    ],
+    workBasedLearning: 'Hands-on forklift operation during training — warehouse and dock simulation',
+    employerPartners: [],
+    placementRate: 'Immediate employability — certification valid for 3 years per OSHA 29 CFR 1910.178',
+    materialsIncluded: [
+      'All training materials',
+      'PPE',
+      'Certification card',
+      'Exam fee',
+    ],
+    ...SHARED_LOC_FIELDS,
+    costPerParticipant: 2700,
+  },
+};

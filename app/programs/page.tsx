@@ -197,7 +197,7 @@ export default async function ProgramsPage() {
           <div className="grid md:grid-cols-3 gap-6 text-center md:text-left">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-1">Delivery Model</p>
-              <p className="text-sm text-slate-600">Related Technical Instruction (RTI) delivered through licensed credential partners. On-the-Job Training (OJT) supervised by employer partners.</p>
+              <p className="text-sm text-slate-600">Related Technical Instruction (RTI) delivered online via LMS. On-the-Job Training (OJT) completed as internship at employer partner sites.</p>
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-1">Credentials</p>
@@ -391,6 +391,48 @@ export default async function ProgramsPage() {
                 ],
                 funding: 'WIOA',
                 category: 'Healthcare',
+              },
+              {
+                name: 'Electrical Technology',
+                slug: 'electrical',
+                href: '/programs/electrical',
+                programId: '#10004700',
+                duration: '16–24 weeks',
+                cost: '$2,700',
+                credentials: [
+                  { name: 'OSHA 10 — General Industry Safety', partner: 'OSHA / CareerSafe' },
+                  { name: 'Indiana Electrical Apprentice Registration', partner: 'Indiana IDHS' },
+                  { name: 'CPR / First Aid', partner: 'American Heart Association' },
+                ],
+                funding: 'WIOA, WRG, NLJ',
+                category: 'Skilled Trades',
+              },
+              {
+                name: 'Plumbing Technology',
+                slug: 'plumbing',
+                href: '/programs/plumbing',
+                programId: '#10004701',
+                duration: '16 weeks',
+                cost: '$2,700',
+                credentials: [
+                  { name: 'OSHA 10 — Construction Safety', partner: 'OSHA / CareerSafe' },
+                  { name: 'CPR / First Aid', partner: 'American Heart Association' },
+                ],
+                funding: 'WIOA, WRG, NLJ',
+                category: 'Skilled Trades',
+              },
+              {
+                name: 'Forklift Operator Certification',
+                slug: 'forklift',
+                href: '/programs/forklift',
+                programId: '#10004702',
+                duration: '1 day',
+                cost: '$2,700',
+                credentials: [
+                  { name: 'OSHA-Compliant Forklift Operator Certification', partner: 'OSHA / Employer-Verified' },
+                ],
+                funding: 'WIOA, NLJ',
+                category: 'Skilled Trades',
               },
             ].map((program) => (
               <div key={program.programId} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 overflow-hidden">

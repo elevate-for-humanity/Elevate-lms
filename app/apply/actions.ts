@@ -50,25 +50,18 @@ async function resolveCourseId(supabase: any, programInterest: string): Promise<
 }
 
 /**
- * Auto-approve: create auth user + profile + enrollment on application submit.
+ * Auto-approve: create auth user + profile on application submit.
+ * Does NOT enroll — student must complete onboarding + WorkOne approval first.
  */
-async function autoApproveAndEnroll(
+async function autoApprove(
   supabase: any,
   applicationId: string,
   email: string,
   firstName: string,
   lastName: string,
   programInterest: string,
-): Promise<{ userId?: string; courseId?: string; enrolled: boolean }> {
+): Promise<{ userId?: string; approved: boolean }> {
   try {
-    // 1. Resolve course
-    const courseId = await resolveCourseId(supabase, programInterest);
-    if (!courseId) {
-      logger.error('Auto-enroll: no course match', { programInterest });
-      return { enrolled: false };
-    }
-
-    // 2. Find or create auth user
     const normalizedEmail = email.toLowerCase().trim();
     let userId: string | null = null;
 
@@ -129,39 +122,28 @@ async function autoApproveAndEnroll(
     }
 
     if (!userId) {
-      logger.error('Auto-enroll: could not create user', { email: normalizedEmail });
-      return { enrolled: false };
+      logger.error('Auto-approve: could not create user', { email: normalizedEmail });
+      return { approved: false };
     }
 
-    // 3. Create enrollment (skip if already enrolled)
-    const { data: existing } = await supabase
-      .from('enrollments')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('course_id', courseId)
-      .single();
+    // Resolve course ID for tracking (but don't enroll yet)
+    const courseId = await resolveCourseId(supabase, programInterest);
 
-    if (!existing) {
-      await supabase.from('enrollments').insert({
-        user_id: userId,
-        course_id: courseId,
-        status: 'active',
-        progress: 0,
-        enrolled_at: new Date().toISOString(),
-      });
-    }
-
-    // 4. Update application to enrolled
+    // Update application to approved — ready for onboarding
     await supabase
       .from('applications')
-      .update({ status: 'enrolled', program_id: courseId, user_id: userId })
+      .update({
+        status: 'approved',
+        user_id: userId,
+        program_id: courseId || null,
+      })
       .eq('id', applicationId);
 
-    logger.info('Auto-enrolled student', { applicationId, userId, courseId, email: normalizedEmail });
-    return { userId, courseId, enrolled: true };
+    logger.info('Auto-approved student for onboarding', { applicationId, userId, email: normalizedEmail });
+    return { userId, approved: true };
   } catch (err) {
-    logger.error('Auto-enroll failed', err as Error);
-    return { enrolled: false };
+    logger.error('Auto-approve failed', err as Error);
+    return { approved: false };
   }
 }
 
@@ -277,8 +259,8 @@ async function insertApplication(payload: {
       return { success: false, error: 'Failed to save application. Please try again or use our contact form at /contact.' };
     }
 
-    // Auto-approve and enroll immediately
-    const enrollResult = await autoApproveAndEnroll(
+    // Auto-approve: create account, send to onboarding
+    const approveResult = await autoApprove(
       supabase,
       data.id,
       payload.email,
@@ -289,27 +271,28 @@ async function insertApplication(payload: {
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
-    // Send welcome/onboarding email to student
-    if (enrollResult.enrolled) {
+    // Send onboarding email to student
+    if (approveResult.approved) {
       sendEmailDirect(
         payload.email,
-        `You're Enrolled! Welcome to Elevate for Humanity [${referenceNumber}]`,
+        `Application Approved — Start Your Onboarding [${referenceNumber}]`,
         [
           `<h2>Welcome, ${payload.firstName}!</h2>`,
-          `<p>You've been enrolled in <strong>${payload.programInterest.replace(/-/g, ' ')}</strong> at Elevate for Humanity.</p>`,
-          `<h3>Next Steps:</h3>`,
+          `<p>Your application for <strong>${payload.programInterest.replace(/-/g, ' ')}</strong> at Elevate for Humanity has been approved.</p>`,
+          `<h3>Complete Your Onboarding:</h3>`,
           `<ol>`,
-          `<li><strong>Log in</strong> at <a href="${siteUrl}/signin">${siteUrl}/signin</a> using your email: <strong>${payload.email}</strong></li>`,
-          `<li>If this is your first time, click <strong>"Forgot Password"</strong> to set your password</li>`,
-          `<li>Once logged in, go to <strong>My Courses</strong> to start your lessons</li>`,
+          `<li><strong>Set your password:</strong> Go to <a href="${siteUrl}/forgot-password">${siteUrl}/forgot-password</a> and enter your email: <strong>${payload.email}</strong></li>`,
+          `<li><strong>Log in:</strong> Go to <a href="${siteUrl}/signin">${siteUrl}/signin</a></li>`,
+          `<li><strong>Complete onboarding:</strong> Once logged in, you'll be guided through your profile, agreements, handbook, and document uploads</li>`,
+          `<li><strong>WorkOne verification:</strong> If you're applying for WIOA funding, we'll coordinate with WorkOne on your behalf</li>`,
           `</ol>`,
+          `<p>You must complete all onboarding steps before enrollment in your program.</p>`,
           `<p>Your reference number: <strong>${referenceNumber}</strong></p>`,
           `<p>Questions? Reply to this email or call us.</p>`,
           `<p>— Elevate for Humanity</p>`,
         ].join(''),
       ).catch(() => {});
     } else {
-      // Fallback: send basic confirmation if auto-enroll failed
       sendEmailDirect(
         payload.email,
         `Application Received [${referenceNumber}] - Elevate for Humanity`,
@@ -320,10 +303,10 @@ async function insertApplication(payload: {
     // Notify admin (non-blocking)
     sendEmailDirect(
       ADMIN_EMAIL,
-      `${enrollResult.enrolled ? '[AUTO-ENROLLED]' : '[PENDING]'} ${payload.firstName} ${payload.lastName} — ${payload.programInterest} [${referenceNumber}]`,
+      `${approveResult.approved ? '[APPROVED]' : '[PENDING]'} ${payload.firstName} ${payload.lastName} — ${payload.programInterest} [${referenceNumber}]`,
       [
         `<h3>New ${payload.source.replace(/-/g, ' ')} received</h3>`,
-        enrollResult.enrolled ? `<p style="color:green"><strong>✅ Auto-enrolled successfully</strong></p>` : `<p style="color:orange"><strong>⚠️ Auto-enroll failed — manual action needed</strong></p>`,
+        approveResult.approved ? `<p style="color:green"><strong>Account created — sent to onboarding</strong></p>` : `<p style="color:orange"><strong>Auto-approve failed — manual action needed</strong></p>`,
         `<p><strong>Name:</strong> ${payload.firstName} ${payload.lastName}</p>`,
         `<p><strong>Email:</strong> <a href="mailto:${payload.email}">${payload.email}</a></p>`,
         `<p><strong>Phone:</strong> <a href="tel:${payload.phone}">${payload.phone}</a></p>`,

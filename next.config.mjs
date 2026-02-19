@@ -19,8 +19,6 @@ const nextConfig = {
     'pg',
     'openai',
     'stripe',
-    '@stripe/stripe-js',
-    '@stripe/react-stripe-js',
     'ioredis',
     'redis',
     '@upstash/redis',

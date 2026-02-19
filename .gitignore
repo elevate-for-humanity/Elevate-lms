@@ -143,3 +143,14 @@ reports/ats-evidence/
 audit_http.json
 audit_crawl.json
 artifacts/
+-e 
+# Generated assets — served by CDN, not bundled into server handler
+public/generated/
+public/generated-images/
+reports/
+-e audit-packet/
+playwright-report/
+lighthouse-*.json
+lighthouse-report.json
+lighthouse-final.json
+deno.lock

@@ -71,8 +71,6 @@
     "pg",
     "openai",
     "stripe",
-    "@stripe/stripe-js",
-    "@stripe/react-stripe-js",
     "ioredis",
     "redis",
     "@upstash/redis",
@@ -92,6 +90,9 @@
     "puppeteer-core",
     "playwright",
     "chromium-bidi",
+    "jsdom",
+    "typescript",
+    "core-js",
   ]
 
 # PDF export function - isolated bundle with PDF libraries

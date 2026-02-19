@@ -84,7 +84,7 @@ export default function HomePage() {
                 href: '/employer',
                 image: '/images/business-vibrant.jpg',
                 alt: 'Employer reviewing candidate profiles',
-                label: 'I&apos;m an employer',
+                label: "I'm an employer",
                 desc: 'Hire credentialed graduates, access WOTC tax credits up to $9,600/hire, and get OJT wage reimbursements.',
                 cta: 'Hire Graduates',
               },
@@ -127,7 +127,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {[
               { title: 'Career Opportunities', desc: 'We offer certification programs in healthcare (CNA, Medical Assistant, Phlebotomy), skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking, IT/cybersecurity, and barbering. Most programs are 4-16 weeks and include hands-on training.', href: '/programs', image: '/images/heroes-hq/programs-hero.jpg' },
-              { title: 'Funding Available', desc: 'Most students pay nothing. WIOA covers tuition, books, and supplies. The Workforce Ready Grant funds high-demand certifications. JRI provides paid apprenticeships for justice-involved individuals. Check your eligibility online in minutes.', href: '/funding', image: '/images/highlights/government-certified.jpg' },
+              { title: 'Funding Available', desc: 'Most students pay nothing out of pocket when they qualify for workforce funding. WIOA covers tuition, books, and supplies. The Workforce Ready Grant funds high-demand certifications. JRI provides paid apprenticeships for justice-involved individuals. Check your eligibility online in minutes.', href: '/funding', image: '/images/highlights/government-certified.jpg' },
               { title: 'Hire Our Graduates', desc: 'Employers: our graduates hold industry-recognized credentials and are ready to work. Access WOTC tax credits (up to $9,600/hire), OJT wage reimbursements (50-75% of wages), and post jobs directly to our candidate pool.', href: '/employer', image: '/images/business-hero-new.jpg' },
             ].map((card) => (
               <Link key={card.title} href={card.href} className="group block">
@@ -166,13 +166,13 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {programs.map((program) => (
               <Link key={program.name} href={program.href} className="group">
-                <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
+                <div className="relative aspect-[16/10] rounded-lg overflow-hidden bg-slate-100">
                   <Image
                     src={program.image}
                     alt={program.name}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover brightness-105 group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
                 <div className="pt-3">
@@ -202,7 +202,7 @@ export default function HomePage() {
               Find your path in 30 seconds
             </h2>
             <p className="text-lg text-slate-600 mt-3">
-              Answer three quick questions and we&apos;ll match you with the right program.
+              {"Answer three quick questions and we'll match you with the right program."}
             </p>
           </div>
           <Suspense fallback={<div className="h-64 flex items-center justify-center text-slate-400">Loading...</div>}>
@@ -268,7 +268,7 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
               { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/community-healthcare-worker.jpg' },
-              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost.', href: '/funding/state-programs', image: '/images/facility-hero.jpg' },
+              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/facility-hero.jpg' },
               { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/funding/funding-jri-program.jpg' },
               { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/homepage/government-agencies.jpg', external: true },
             ].map((item) => (

@@ -264,7 +264,7 @@ export default function HVACTechnicianPage() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-black mb-4">Eligibility Requirements</h2>
-          <p className="text-slate-600 mb-8">Most adults qualify for free training through WIOA funding</p>
+          <p className="text-slate-600 mb-8">Many adults qualify for funded training through WIOA</p>
           
           <div className="max-w-2xl mx-auto mb-8 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <p className="text-slate-700 leading-relaxed">

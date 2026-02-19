@@ -1,0 +1,304 @@
+import { Metadata } from 'next';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import {
+  Shield,
+  GraduationCap,
+  Building2,
+  Award,
+  FileCheck,
+  CheckCircle,
+  AlertTriangle,
+} from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Credential Partner Registry | Compliance | Elevate for Humanity',
+  description:
+    'Formal registry of credential partners, license status, program assignments, credential issuance, and MOU status for Elevate for Humanity workforce training programs.',
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/compliance/credential-partners',
+  },
+};
+
+/* ── Credential Partner Registry Data ── */
+const CREDENTIAL_PARTNERS = [
+  {
+    program: 'Barber Apprenticeship',
+    partnerType: 'Licensed Barber School',
+    licenseStatus: 'State-Approved',
+    licensingBody: 'Indiana Professional Licensing Agency (PLA)',
+    programAssignment: 'Barber RTI (144 hours)',
+    credentialIssued: 'Indiana Barber License',
+    credentialIssuer: 'Indiana PLA',
+    mouStatus: 'Required',
+    instructorReq: 'Active Indiana Master Barber License + 3 years experience',
+    notes: 'RAPIDS-registered apprenticeship. OJT at approved host barbershops.',
+  },
+  {
+    program: 'CNA Certification',
+    partnerType: 'Accredited Nursing Program',
+    licenseStatus: 'State-Approved',
+    licensingBody: 'Indiana State Department of Health (ISDH)',
+    programAssignment: 'CNA RTI (105 hours) + Clinical Rotation (45 hours)',
+    credentialIssued: 'CNA Certification',
+    credentialIssuer: 'Indiana ISDH',
+    mouStatus: 'Required',
+    instructorReq: 'Active Indiana RN/LPN license + state-approved instructor certification',
+    notes: 'Clinical rotation at approved healthcare facility required.',
+  },
+  {
+    program: 'CDL Commercial Driving',
+    partnerType: 'ELDT-Compliant CDL School',
+    licenseStatus: 'FMCSA Registered',
+    licensingBody: 'Federal Motor Carrier Safety Administration (FMCSA) / Indiana BMV',
+    programAssignment: 'CDL RTI (40 hours) + Behind-the-Wheel (120 hours)',
+    credentialIssued: 'CDL Class A or Class B',
+    credentialIssuer: 'Indiana BMV',
+    mouStatus: 'Required',
+    instructorReq: 'Active CDL + ELDT instructor certification + 2 years experience',
+    notes: 'ELDT compliance mandatory per FMCSA regulations (effective Feb 2022).',
+  },
+  {
+    program: 'HVAC Technician',
+    partnerType: 'DOE-Approved Trade School',
+    licenseStatus: 'State-Approved',
+    licensingBody: 'Indiana Department of Education (DOE)',
+    programAssignment: 'HVAC RTI (200 hours) + OJT (200 hours)',
+    credentialIssued: 'EPA 608 Certification + OSHA 10-Hour',
+    credentialIssuer: 'EPA / OSHA',
+    mouStatus: 'Required',
+    instructorReq: 'EPA 608 Universal + OSHA 30 + 5 years HVAC experience',
+    notes: 'EPA 608 exam administered by EPA-approved testing organization.',
+  },
+  {
+    program: 'IT Support',
+    partnerType: 'Authorized CompTIA Academy',
+    licenseStatus: 'Authorized Training Center',
+    licensingBody: 'CompTIA',
+    programAssignment: 'IT Support RTI (280 hours) + Labs (40 hours)',
+    credentialIssued: 'CompTIA A+',
+    credentialIssuer: 'CompTIA',
+    mouStatus: 'Required',
+    instructorReq: 'Active CompTIA A+ + 3 years IT experience + CTT+ preferred',
+    notes: 'Online delivery with virtual lab environments.',
+  },
+  {
+    program: 'Cybersecurity',
+    partnerType: 'Authorized CompTIA Academy',
+    licenseStatus: 'Authorized Training Center',
+    licensingBody: 'CompTIA',
+    programAssignment: 'Cybersecurity RTI (360 hours) + Labs (40 hours)',
+    credentialIssued: 'CompTIA Security+',
+    credentialIssuer: 'CompTIA',
+    mouStatus: 'Required',
+    instructorReq: 'Active CompTIA Security+ + 3 years cybersecurity experience',
+    notes: 'CySA+, CISSP, or CEH instructor credentials preferred.',
+  },
+  {
+    program: 'Welding',
+    partnerType: 'AWS-Accredited Testing Facility / DOE-Approved Trade School',
+    licenseStatus: 'State-Approved + AWS Accredited',
+    licensingBody: 'American Welding Society (AWS) / Indiana DOE',
+    programAssignment: 'Welding RTI (160 hours) + OJT (240 hours)',
+    credentialIssued: 'AWS D1.1 Certification + OSHA 10-Hour',
+    credentialIssuer: 'AWS / OSHA',
+    mouStatus: 'Required',
+    instructorReq: 'AWS Certified Welder (D1.1) + OSHA 30 + 5 years experience',
+    notes: 'AWS CWI (Certified Welding Inspector) instructor preferred.',
+  },
+  {
+    program: 'Electrical',
+    partnerType: 'DOE-Approved Trade School',
+    licenseStatus: 'State-Approved',
+    licensingBody: 'Indiana Department of Education (DOE)',
+    programAssignment: 'Electrical RTI (200 hours) + OJT (200 hours)',
+    credentialIssued: 'OSHA 10-Hour + NCCER Core Certification',
+    credentialIssuer: 'OSHA / NCCER',
+    mouStatus: 'Required',
+    instructorReq: 'Active Indiana Journeyman/Master Electrician + OSHA 30 + 5 years experience',
+    notes: 'NCCER Certified Instructor preferred.',
+  },
+];
+
+export default function CredentialPartnersPage() {
+  return (
+    <div className="bg-white min-h-screen">
+      {/* Breadcrumbs */}
+      <div className="bg-slate-50 border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs items={[
+            { label: 'Compliance', href: '/compliance' },
+            { label: 'Credential Partner Registry' },
+          ]} />
+        </div>
+      </div>
+
+      {/* Hero */}
+      <section className="relative h-[240px] sm:h-[300px]">
+        <Image
+          src="/images/heroes-hq/employer-hero.jpg"
+          alt="Credential partners and training providers"
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
+          <div className="max-w-6xl mx-auto">
+            <p className="text-white/80 text-sm font-medium uppercase tracking-wider mb-2">
+              Compliance Registry
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white">
+              Credential Partner Registry
+            </h1>
+          </div>
+        </div>
+      </section>
+
+      {/* Purpose */}
+      <section className="py-10 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="border-l-4 border-brand-blue-600 pl-6 mb-8">
+            <h2 className="text-lg font-bold text-gray-900 mb-2">Registry Purpose</h2>
+            <p className="text-gray-700 text-sm leading-relaxed">
+              This registry documents the credential partners authorized to deliver Related
+              Technical Instruction (RTI) for each Elevate program. When a workforce agency,
+              ETPL reviewer, or partner asks &ldquo;Who delivers RTI?&rdquo; — this single
+              document provides the answer. Specific provider names are maintained in internal
+              compliance files and disclosed to authorized reviewers upon request.
+            </p>
+          </div>
+
+          {/* Summary Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
+            <div className="bg-slate-50 rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-brand-blue-600">{CREDENTIAL_PARTNERS.length}</p>
+              <p className="text-xs text-gray-600 mt-1">Programs Covered</p>
+            </div>
+            <div className="bg-slate-50 rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-brand-blue-600">100%</p>
+              <p className="text-xs text-gray-600 mt-1">MOU Required</p>
+            </div>
+            <div className="bg-slate-50 rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-brand-blue-600">100%</p>
+              <p className="text-xs text-gray-600 mt-1">State/Federal Approved</p>
+            </div>
+            <div className="bg-slate-50 rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-brand-blue-600">8</p>
+              <p className="text-xs text-gray-600 mt-1">Credential Types</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Registry Cards */}
+      <section className="py-10 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Per-Program Credential Partners</h2>
+
+          <div className="space-y-6">
+            {CREDENTIAL_PARTNERS.map((partner, i) => (
+              <div key={i} className="bg-white rounded-xl border overflow-hidden">
+                <div className="bg-brand-blue-600 px-6 py-3 flex items-center justify-between">
+                  <h3 className="font-bold text-white">{partner.program}</h3>
+                  <span className="text-xs text-brand-blue-100 bg-brand-blue-700 px-2 py-0.5 rounded">
+                    {partner.licenseStatus}
+                  </span>
+                </div>
+
+                <div className="p-6">
+                  <div className="grid sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Partner Type</p>
+                      <p className="text-sm text-gray-900 font-medium">{partner.partnerType}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Licensing Body</p>
+                      <p className="text-sm text-gray-700">{partner.licensingBody}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Program Assignment</p>
+                      <p className="text-sm text-gray-700">{partner.programAssignment}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">MOU Status</p>
+                      <p className="text-sm text-green-700 font-medium flex items-center gap-1">
+                        <CheckCircle className="w-4 h-4" /> {partner.mouStatus}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Credential Issued</p>
+                      <p className="text-sm text-gray-900 font-medium">{partner.credentialIssued}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Issued by: {partner.credentialIssuer}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Instructor Requirements</p>
+                      <p className="text-sm text-gray-700">{partner.instructorReq}</p>
+                    </div>
+                  </div>
+
+                  {partner.notes && (
+                    <div className="bg-slate-50 rounded-lg p-3 mt-3">
+                      <p className="text-xs text-gray-600">
+                        <span className="font-medium">Note:</span> {partner.notes}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Disclosure */}
+      <section className="py-10 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-bold text-gray-900 mb-2">Disclosure & Verification</h3>
+                <p className="text-sm text-gray-700 mb-2">
+                  This public registry documents the structural framework and provider type
+                  requirements for each program. Specific provider names, MOU documents, and
+                  instructor credential files are maintained in internal compliance records.
+                </p>
+                <p className="text-sm text-gray-700">
+                  Authorized reviewers (ETPL, DWD, DOL, workforce boards, grant evaluators)
+                  may request full provider documentation by contacting Elevate for Humanity
+                  directly. Verification requests are processed within 5 business days.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Navigation */}
+      <section className="py-10 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex flex-wrap gap-3">
+            <Link href="/compliance/apprenticeship-structure" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition">
+              Apprenticeship & RTI Structure
+            </Link>
+            <Link href="/instructional-framework" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+              Instructional Framework
+            </Link>
+            <Link href="/instructor-credentials" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+              Instructor Credentials
+            </Link>
+            <Link href="/compliance/workforce-partnership-packet" className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+              Workforce Partnership Packet
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

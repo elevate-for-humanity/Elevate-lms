@@ -56,10 +56,10 @@ export default function BarberApprenticeshipPage() {
         </div>
       </section>
 
-      {/* Avatar Guide */}
+      {/* Program Overview Video */}
       <section className="py-8 bg-white">
         <div className="max-w-3xl mx-auto px-4">
-          <PageAvatar videoSrc="/videos/avatars/barber-guide.mp4" title="Barber Apprenticeship Guide" />
+          <PageAvatar videoSrc="/videos/avatars/barber-guide.mp4" title="Barber Apprenticeship Program Overview" />
         </div>
       </section>
 
@@ -169,7 +169,7 @@ export default function BarberApprenticeshipPage() {
             </p>
             <p className="text-sm text-slate-700 leading-relaxed mb-3">
               <strong>JRI (Justice Reinvestment Initiative):</strong> If you are justice-involved (currently on probation, parole, or recently released), 
-              JRI funding may cover your entire apprenticeship at no cost. JRI also provides supportive services like transportation assistance and work supplies.
+              JRI funding may cover your entire apprenticeship at no cost for eligible participants. JRI also provides supportive services like transportation assistance and work supplies.
             </p>
             <p className="text-sm text-slate-700 leading-relaxed mb-3">
               <strong>WIOA:</strong> Adults and dislocated workers who meet income guidelines or are receiving public assistance may qualify for WIOA funding, 

@@ -42,7 +42,7 @@ const apprenticeships = [
     duration: '2-4 years', 
     wage: '$15-$25/hr',
     image: '/images/gallery/image10.jpg',
-    href: '/programs/hvac-apprenticeship',
+    href: '/programs/hvac-technician',
     description: 'Heating, ventilation, and air conditioning installation and repair.'
   },
   { 

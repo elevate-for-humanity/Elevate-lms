@@ -38,7 +38,7 @@ export const PROGRAMS: ProgramEntry[] = [
   { slug: 'beauty-career-educator', name: 'Beauty & Career Educator', category: 'Barber & Beauty', formType: 'apply', active: true },
 
   // Business & Financial
-  { slug: 'tax-prep-financial-services', name: 'Tax Preparation & Financial Services', category: 'Business & Financial', formType: 'apply', active: true },
+  { slug: 'tax-prep-financial-services', name: 'Financial Literacy Program', category: 'Business & Financial', formType: 'apply', active: true },
   { slug: 'business-startup-marketing', name: 'Business Start-up & Marketing', category: 'Business & Financial', formType: 'apply', active: true },
 
   // Human Services

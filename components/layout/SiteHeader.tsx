@@ -25,6 +25,18 @@ const NAV_ITEMS = [
       { name: 'Business', href: '/programs/business' },
     ]
   },
+  {
+    name: 'Career Pathways',
+    href: '/pathways',
+    subItems: [
+      { name: 'Pathway Framework', href: '/pathways' },
+      { name: 'Outcomes & Metrics', href: '/pathways/outcomes' },
+      { name: 'Partners & Cohorts', href: '/pathways/partners' },
+      { name: 'Training Delivery Model', href: '/pathways/training-model' },
+      { name: 'Instructional Framework', href: '/instructional-framework' },
+      { name: 'Instructor Credentials', href: '/instructor-credentials' },
+    ]
+  },
   { 
     name: 'Funding', 
     href: '/funding',
@@ -44,6 +56,8 @@ const NAV_ITEMS = [
       { name: 'How It Works', href: '/how-it-works' },
       { name: 'Success Stories', href: '/testimonials' },
       { name: 'FAQ', href: '/faq' },
+      { name: 'Compliance & Credentials', href: '/compliance' },
+      { name: 'Accreditation', href: '/accreditation' },
     ]
   },
   { 
@@ -73,6 +87,18 @@ const DESKTOP_NAV_LINKS = [
       { name: 'Business', href: '/programs/business' },
     ]
   },
+  {
+    name: 'Career Pathways',
+    href: '/pathways',
+    subItems: [
+      { name: 'Pathway Framework', href: '/pathways' },
+      { name: 'Outcomes & Metrics', href: '/pathways/outcomes' },
+      { name: 'Partners & Cohorts', href: '/pathways/partners' },
+      { name: 'Training Delivery Model', href: '/pathways/training-model' },
+      { name: 'Instructional Framework', href: '/instructional-framework' },
+      { name: 'Instructor Credentials', href: '/instructor-credentials' },
+    ]
+  },
   { 
     name: 'Funding', 
     href: '/funding',
@@ -92,6 +118,8 @@ const DESKTOP_NAV_LINKS = [
       { name: 'How It Works', href: '/how-it-works' },
       { name: 'Success Stories', href: '/testimonials' },
       { name: 'FAQ', href: '/faq' },
+      { name: 'Compliance & Credentials', href: '/compliance' },
+      { name: 'Accreditation', href: '/accreditation' },
     ]
   },
   { 

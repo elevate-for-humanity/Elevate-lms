@@ -71,7 +71,7 @@ export default function SkilledTradesPage() {
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6 text-center">Choose Your Trade</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {[
-              { name: 'HVAC Technician', href: '/programs/hvac', img: '/images/trades/hero-program-hvac.jpg', duration: '8-16 weeks' },
+              { name: 'HVAC Technician', href: '/programs/hvac-technician', img: '/images/trades/hero-program-hvac.jpg', duration: '8-16 weeks' },
               { name: 'Electrical', href: '/programs/electrical', img: '/images/trades/hero-program-electrical.jpg', duration: '8-16 weeks' },
               { name: 'Welding', href: '/programs/welding', img: '/images/trades/hero-program-welding.jpg', duration: '8-12 weeks' },
               { name: 'Plumbing', href: '/programs/plumbing', img: '/images/trades/hero-program-plumbing.jpg', duration: '8-16 weeks' },

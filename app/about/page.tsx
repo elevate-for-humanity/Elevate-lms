@@ -1,262 +1,380 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
-
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TEAM } from '@/data/team';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
-  title: 'About Us | Our Story | Elevate for Humanity',
-  description: 'Learn about Elevate for Humanity - a nonprofit workforce development organization providing free career training in Indianapolis, Indiana. Founded by Elizabeth Greene.',
-  alternates: {
-    canonical: `${SITE_URL}/about`,
-  },
+  title: 'About Us | Elevate for Humanity',
+  description: 'Elevate for Humanity is a nonprofit workforce development institute in Indianapolis providing funded career training in healthcare, trades, CDL, technology, and barbering. Founded by Elizabeth Greene.',
+  alternates: { canonical: `${SITE_URL}/about` },
   openGraph: {
     title: 'About Elevate for Humanity',
-    description: 'A nonprofit workforce development organization providing free career training in Indianapolis, Indiana. Founded by Elizabeth Greene.',
+    description: 'A nonprofit workforce development institute providing funded career training in Indianapolis, Indiana. Founded by Elizabeth Greene.',
     url: `${SITE_URL}/about`,
     siteName: 'Elevate for Humanity',
     images: [{ url: '/images/heroes-hq/about-hero.jpg', width: 1200, height: 630, alt: 'About Elevate for Humanity' }],
     type: 'website',
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'About Elevate for Humanity',
-    description: 'A nonprofit providing free career training in Indianapolis, Indiana.',
-    images: ['/images/heroes-hq/about-hero.jpg'],
-  },
 };
 
 export default function AboutPage() {
+  const founder = TEAM[0];
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'About Us' }]} />
         </div>
       </div>
 
-      {/* HERO — image only, no text overlay */}
-      <section className="relative h-[40vh] sm:h-[50vh] min-h-[300px] sm:min-h-[400px]">
+      {/* Visual hero */}
+      <section className="relative h-[300px] sm:h-[400px]">
         <Image
-          src="/images/heroes-hq/about-hero.jpg"
-          alt="Elevate for Humanity"
+          src="/images/heroes-hq/team-hero.jpg"
+          alt="Elevate for Humanity team and workforce training"
           fill
-          quality={90}
           sizes="100vw"
-          className="object-cover object-center"
+          className="object-cover"
           priority
         />
       </section>
 
-      {/* LOGO + ORG NAME */}
-      <section className="py-12 sm:py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <Image
-            src="/logo.png"
-            alt="Elevate for Humanity"
-            width={120}
-            height={120}
-            className="mx-auto mb-6"
-          />
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-            Elevate for Humanity
-          </h1>
-          <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
-            A workforce development and career training institute operated by 2Exclusive LLC-S, 
-            in partnership with Rise Forward Foundation. Founded in 2019 by Elizabeth Greene.
+      {/* Who We Are */}
+      <section className="py-12 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex items-center gap-4 mb-6">
+            <Image src="/logo.png" alt="Elevate for Humanity" width={64} height={64} />
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Elevate for Humanity</h1>
+          </div>
+          <div className="text-gray-700 space-y-4">
+            <p>
+              Elevate for Humanity is a nonprofit workforce development institute based in
+              Indianapolis, Indiana. We provide funded career training to people who need it most —
+              justice-involved individuals, low-income families, veterans, dislocated workers, and
+              anyone facing barriers to employment.
+            </p>
+            <p>
+              We are operated by 2Exclusive LLC-S in partnership with Rise Forward Foundation.
+              Founded in 2019 by Elizabeth Greene, we have grown from a single training program
+              into a structured career pathway system covering healthcare, skilled trades, CDL
+              trucking, technology, and barbering.
+            </p>
+            <p>
+              Many of our programs are available at no cost to eligible participants through
+              WIOA (Workforce Innovation and Opportunity Act), the Workforce Ready Grant, and
+              JRI (Justice Reinvestment Initiative) funding. Eligibility is determined through
+              Indiana WorkOne career centers. We assist with the screening and paperwork —
+              participants focus on training.
+            </p>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-4">
+            <Link href="/pathways" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center">
+              See Our Career Pathways <ArrowRight className="ml-2 w-4 h-4" />
+            </Link>
+            <Link href="/apply" className="bg-white hover:bg-gray-50 text-brand-red-600 border-2 border-brand-red-200 px-6 py-3 rounded-lg font-bold transition">
+              Check Eligibility &amp; Apply
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Mission */}
+      <section className="py-12 bg-brand-red-600">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Our Mission</h2>
+          <p className="text-lg text-brand-red-100 leading-relaxed max-w-3xl mx-auto">
+            To create pathways out of poverty and into prosperity by connecting justice-involved
+            individuals, low-income families, veterans, and anyone facing barriers to employment
+            with high-quality, funded career training and direct employer placement.
           </p>
         </div>
       </section>
 
-      {/* MISSION */}
-      <section id="mission" className="py-10 sm:py-12 md:py-16 bg-brand-red-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6">Our Mission</h2>
-          <p className="text-base sm:text-lg md:text-xl text-brand-red-100 leading-relaxed">
-            To create pathways out of poverty and into prosperity by providing free, high-quality
-            career training to justice-involved individuals, low-income families, veterans, and
-            anyone facing barriers to employment.
+      {/* What We Actually Do — with images */}
+      <section className="py-12 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">What We Do</h2>
+
+          <div className="space-y-8">
+            <div className="flex flex-col sm:flex-row gap-5">
+              <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
+                <Image src="/images/heroes-hq/programs-hero.jpg" alt="Career training programs" fill sizes="(max-width: 640px) 100vw, 224px" className="object-cover" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-lg mb-2">Career Training Programs</h3>
+                <p className="text-sm text-gray-700 mb-2">
+                  We run certification programs in healthcare (CNA, Medical Assistant, Phlebotomy),
+                  skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking (Class A and B),
+                  IT and cybersecurity (CompTIA A+, Security+), barbering (DOL Registered Apprenticeship),
+                  and CPR/First Aid. Most programs run 4 to 16 weeks and include hands-on training,
+                  certification exam preparation, and job placement assistance.
+                </p>
+                <Link href="/programs" className="text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
+                  Browse All Programs <ArrowRight className="ml-1 w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-5">
+              <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
+                <Image src="/images/heroes-hq/funding-hero.jpg" alt="Funding and financial aid" fill sizes="(max-width: 640px) 100vw, 224px" className="object-cover" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-lg mb-2">Funding Navigation</h3>
+                <p className="text-sm text-gray-700 mb-2">
+                  Most people do not know they qualify for free training. We walk every participant
+                  through the eligibility process for WIOA (covers tuition, books, supplies, and
+                  sometimes transportation and childcare), the Workforce Ready Grant (covers
+                  high-demand certifications regardless of income), and JRI (covers training for
+                  justice-involved individuals). We handle the paperwork with WorkOne and DWD.
+                </p>
+                <Link href="/funding" className="text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
+                  See Funding Options <ArrowRight className="ml-1 w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-5">
+              <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
+                <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer partnerships" fill sizes="(max-width: 640px) 100vw, 224px" className="object-cover" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-lg mb-2">Job Placement &amp; Employer Partnerships</h3>
+                <p className="text-sm text-gray-700 mb-2">
+                  Our career services team helps every graduate with resume building, interview
+                  preparation, and direct introductions to employers who are hiring. We partner
+                  with HVAC contractors, hospitals, trucking companies, barbershops, IT firms, and
+                  construction companies across Central Indiana. We track employment outcomes at
+                  6 and 12 months after graduation.
+                </p>
+                <Link href="/career-services/job-placement" className="text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
+                  Career Services &amp; Placement <ArrowRight className="ml-1 w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-5">
+              <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
+                <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Supportive services" fill sizes="(max-width: 640px) 100vw, 224px" className="object-cover" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-lg mb-2">Supportive Services</h3>
+                <p className="text-sm text-gray-700">
+                  Training alone is not enough if someone cannot get to class or keep the lights on.
+                  We provide career counseling, mental health support (through our board-certified
+                  Psychiatric Mental Health Nurse Practitioner), housing assistance, transportation
+                  help, and connections to community resources. Our goal is to remove every barrier
+                  between a participant and a stable career.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Training Delivery Model */}
+      <section className="py-10 bg-slate-50 border-t border-gray-200">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-xl font-bold text-slate-900 mb-3">How We Deliver Training</h2>
+          <div className="text-sm text-gray-700 space-y-3">
+            <p>
+              Elevate operates as a Hybrid Workforce Training Provider and Registered
+              Apprenticeship Sponsor. Training is delivered through licensed credential partners
+              and approved program holders under centralized institutional oversight, with
+              employer partners providing structured on-the-job training. Elevate manages
+              enrollment, funding navigation, progress tracking, and career services.
+            </p>
+            <p>
+              All credentials are issued by recognized third-party authorities (Indiana ISDH,
+              Indiana BMV, EPA, OSHA, CompTIA, AWS, NCCER, Indiana PLA) — not by Elevate.
+              Apprenticeship programs are DOL Registered Apprenticeships with Elevate as the
+              registered sponsor.
+            </p>
+          </div>
+          <Link href="/accreditation" className="mt-3 text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
+            View accreditation and credential details <ArrowRight className="ml-1 w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+
+      {/* Who We Serve — with images */}
+      <section className="py-12 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Who We Serve</h2>
+          <div className="grid sm:grid-cols-2 gap-6">
+            {[
+              {
+                title: 'Justice-Involved Individuals',
+                image: '/images/heroes-hq/jri-hero.jpg',
+                desc: 'People on probation, parole, or recently released. JRI funding covers training, supplies, and supportive services at no cost. We work directly with community corrections and reentry programs across Central Indiana.',
+              },
+              {
+                title: 'Low-Income Adults & Dislocated Workers',
+                image: '/images/heroes-hq/funding-hero.jpg',
+                desc: 'Indiana residents who meet WIOA income guidelines or receive public assistance (SNAP, TANF, Medicaid). WIOA funding covers tuition, books, supplies, and in some cases transportation and childcare.',
+              },
+              {
+                title: 'Veterans',
+                image: '/images/heroes-hq/success-hero.jpg',
+                desc: 'Military veterans transitioning to civilian careers. Veterans receive priority enrollment and may qualify for additional funding through VA education benefits combined with WIOA.',
+              },
+              {
+                title: 'Young Adults (16–24)',
+                image: '/images/programs-hq/students-learning.jpg',
+                desc: 'Young people who are not sure what to do after high school. WIOA Youth funding covers career training that leads to a credential and a job in weeks, not years.',
+              },
+              {
+                title: 'Career Changers',
+                image: '/images/heroes-hq/how-it-works-hero.jpg',
+                desc: 'Anyone looking to enter a new field. The Workforce Ready Grant covers high-demand certification programs for Indiana residents regardless of income level.',
+              },
+              {
+                title: 'Employers & Workforce Partners',
+                image: '/images/heroes-hq/employer-hero.jpg',
+                desc: 'Organizations that need trained, credentialed workers. We run custom training cohorts for your hiring needs and handle all the funding paperwork.',
+              },
+            ].map((item) => (
+              <div key={item.title} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="relative h-40">
+                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 100vw, 50vw" className="object-cover" />
+                </div>
+                <div className="p-5">
+                  <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
+                  <p className="text-sm text-gray-600">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <Link href="/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center">
+              Check Your Eligibility <ArrowRight className="ml-2 w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Credentials */}
+      <section className="py-12 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 text-center">Our Credentials</h2>
+          <p className="text-gray-600 text-center mb-8 max-w-2xl mx-auto">
+            These are the government agencies and workforce organizations that have approved,
+            registered, or partnered with Elevate for Humanity.
           </p>
-        </div>
-      </section>
 
-      {/* WHAT WE DO */}
-      <section className="py-12 sm:py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-6">What We Do</h2>
-          <div className="space-y-4 text-slate-700 leading-relaxed">
-            <p>
-              Elevate for Humanity connects eligible Indiana residents with free career training
-              through WIOA (Workforce Innovation and Opportunity Act), the Workforce Ready Grant,
-              and JRI (Justice Reinvestment Initiative) funding. We are a U.S. Department of Labor
-              Registered Apprenticeship Sponsor and an Indiana DWD Approved Training Provider listed
-              on the Eligible Training Provider List (ETPL).
-            </p>
-            <p>
-              Our programs cover healthcare (CNA, Medical Assistant, Phlebotomy), skilled trades
-              (HVAC, Electrical, Welding, Plumbing), CDL trucking, IT and cybersecurity, barbering,
-              cosmetology, and CPR/First Aid. Most programs run 4 to 16 weeks and include hands-on
-              training, certification exam preparation, and job placement assistance.
-            </p>
-            <p>
-              We also provide supportive services including career counseling, resume building,
-              interview preparation, mental health support, housing assistance, and transportation
-              help. Our goal is to remove every barrier between a participant and a stable career.
-            </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { logo: '/images/partners/usdol.webp', name: 'U.S. Department of Labor', role: 'Registered Apprenticeship Sponsor', desc: 'Our barber and building technician apprenticeships are registered with USDOL and tracked in the RAPIDS system.' },
+              { logo: '/images/partners/dwd.webp', name: 'Indiana DWD', role: 'Approved Training Provider', desc: 'Listed on the Eligible Training Provider List (ETPL). Our programs qualify for WIOA and Workforce Ready Grant funding.' },
+              { logo: '/images/partners/workone.webp', name: 'WorkOne', role: 'Workforce Partner', desc: 'We work with WorkOne career centers across Central Indiana for participant referrals and eligibility screening.' },
+              { logo: '/images/partners/nextleveljobs.webp', name: 'Next Level Jobs', role: 'Workforce Ready Grant Provider', desc: 'Our high-demand certification programs qualify for the Workforce Ready Grant through Next Level Jobs.' },
+            ].map((cred) => (
+              <div key={cred.name} className="bg-slate-50 rounded-lg border border-gray-200 p-5 text-center">
+                <div className="relative w-16 h-16 mx-auto mb-3">
+                  <Image src={cred.logo} alt={cred.name} fill sizes="64px" className="object-contain" />
+                </div>
+                <h3 className="font-bold text-slate-900 text-sm">{cred.name}</h3>
+                <p className="text-brand-red-600 text-xs font-semibold mb-2">{cred.role}</p>
+                <p className="text-xs text-gray-600">{cred.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+            {[
+              { name: 'WIOA', role: 'Eligible Training Provider', desc: 'Programs approved for WIOA Adult, Dislocated Worker, and Youth funding.' },
+              { name: 'JRI', role: 'Approved Provider', desc: 'Approved for Justice Reinvestment Initiative funding for justice-involved participants.' },
+              { name: 'EmployIndy', role: 'Workforce Partner', desc: 'Partner with EmployIndy for workforce development in Marion County.' },
+              { name: 'Indiana State Board', role: 'Cosmetology & Barber Examiners', desc: 'Barber apprenticeship aligned with Indiana State Board licensing requirements.' },
+            ].map((cred) => (
+              <div key={cred.name} className="bg-slate-50 rounded-lg border border-gray-200 p-5 text-center">
+                <div className="w-16 h-16 mx-auto mb-3 bg-white rounded-lg border border-gray-200 flex items-center justify-center">
+                  <span className="text-slate-700 font-bold text-xs">{cred.name}</span>
+                </div>
+                <h3 className="font-bold text-slate-900 text-sm">{cred.name}</h3>
+                <p className="text-brand-red-600 text-xs font-semibold mb-2">{cred.role}</p>
+                <p className="text-xs text-gray-600">{cred.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* WHO WE SERVE */}
-      <section className="py-12 sm:py-16 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-6">Who We Serve</h2>
-          <div className="space-y-4 text-slate-700 leading-relaxed">
-            <p>
-              <strong>Justice-Involved Individuals:</strong> People currently on probation, parole,
-              or recently released from incarceration. JRI funding covers training, supplies, and
-              supportive services at no cost. We work directly with community corrections and
-              reentry programs across Central Indiana.
-            </p>
-            <p>
-              <strong>Low-Income Adults and Dislocated Workers:</strong> Indiana residents who meet
-              WIOA income guidelines or are receiving public assistance (SNAP, TANF, Medicaid).
-              WIOA funding covers tuition, books, supplies, and in some cases transportation and childcare.
-            </p>
-            <p>
-              <strong>Veterans:</strong> Military veterans transitioning to civilian careers.
-              Veterans receive priority enrollment and may qualify for additional funding through
-              VA education benefits combined with WIOA.
-            </p>
-            <p>
-              <strong>Career Changers:</strong> Anyone looking to enter a new field. The Workforce
-              Ready Grant covers high-demand certification programs for Indiana residents regardless
-              of income level.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* CREDENTIALS */}
-      <section className="py-12 sm:py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8 text-center">Our Credentials</h2>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="flex items-start gap-4">
-              <div className="relative w-20 h-20 flex-shrink-0">
-                <Image src="/images/partners/usdol.webp" alt="USDOL" fill sizes="160px" quality={90} className="object-contain" />
+      {/* Founder */}
+      <section className="py-12 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Our Founder</h2>
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="flex flex-col sm:flex-row">
+              <div className="relative h-72 sm:h-auto sm:w-72 flex-shrink-0">
+                <Image
+                  src={founder.headshotSrc || '/images/heroes-hq/team-hero.jpg'}
+                  alt={founder.name}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 288px"
+                  className="object-cover object-center"
+                />
               </div>
-              <div>
-                <div className="font-bold text-slate-900">U.S. Department of Labor</div>
-                <div className="text-brand-red-600 text-sm">Registered Apprenticeship Sponsor</div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="relative w-20 h-20 flex-shrink-0">
-                <Image src="/images/partners/dwd.webp" alt="Indiana DWD" fill sizes="160px" quality={90} className="object-contain" />
-              </div>
-              <div>
-                <div className="font-bold text-slate-900">Indiana DWD</div>
-                <div className="text-brand-red-600 text-sm">Approved Training Provider</div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="relative w-20 h-20 flex-shrink-0">
-                <Image src="/images/partners/workone.webp" alt="WorkOne" fill sizes="160px" quality={90} className="object-contain" />
-              </div>
-              <div>
-                <div className="font-bold text-slate-900">WorkOne</div>
-                <div className="text-brand-red-600 text-sm">Workforce Partner</div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="relative w-20 h-20 flex-shrink-0">
-                <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" fill sizes="160px" quality={90} className="object-contain" />
-              </div>
-              <div>
-                <div className="font-bold text-slate-900">Next Level Jobs</div>
-                <div className="text-brand-red-600 text-sm">Workforce Ready Grant Provider</div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="relative w-20 h-20 flex-shrink-0 bg-slate-100 rounded-lg flex items-center justify-center">
-                <span className="text-slate-700 font-bold text-sm">WIOA</span>
-              </div>
-              <div>
-                <div className="font-bold text-slate-900">WIOA</div>
-                <div className="text-brand-red-600 text-sm">Eligible Training Provider</div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="relative w-20 h-20 flex-shrink-0 bg-slate-100 rounded-lg flex items-center justify-center">
-                <span className="text-slate-700 font-bold text-sm">JRI</span>
-              </div>
-              <div>
-                <div className="font-bold text-slate-900">JRI</div>
-                <div className="text-brand-red-600 text-sm">Approved Provider</div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="relative w-20 h-20 flex-shrink-0 bg-slate-100 rounded-lg flex items-center justify-center">
-                <span className="text-slate-700 font-bold text-sm">EmployIndy</span>
-              </div>
-              <div>
-                <div className="font-bold text-slate-900">EmployIndy</div>
-                <div className="text-brand-red-600 text-sm">Workforce Partner</div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="relative w-20 h-20 flex-shrink-0 bg-slate-100 rounded-lg flex items-center justify-center">
-                <span className="text-slate-700 font-bold text-sm">ISBCE</span>
-              </div>
-              <div>
-                <div className="font-bold text-slate-900">Indiana State Board</div>
-                <div className="text-brand-red-600 text-sm">Cosmetology &amp; Barber Examiners</div>
+              <div className="p-6 flex-1">
+                <h3 className="text-xl font-bold text-slate-900">{founder.name}</h3>
+                <p className="text-brand-red-600 font-semibold text-sm mb-4">{founder.title}</p>
+                <p className="text-sm text-gray-700 mb-4">{founder.bio}</p>
+                <p className="text-sm text-gray-700 mb-4">
+                  Elizabeth is also the founder of SupersonicFastCash, a tax preparation software
+                  company. She is an IRS Enrolled Agent with an EFIN and PTIN, authorized to
+                  represent taxpayers before the IRS. This combination of workforce development
+                  and financial services expertise drives the holistic approach at Elevate — helping
+                  participants not just get trained and employed, but build financial stability.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Link href="/about/team" className="text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
+                    Meet the Full Team <ArrowRight className="ml-1 w-4 h-4" />
+                  </Link>
+                  {founder.email && (
+                    <a href={`mailto:${founder.email}`} className="text-gray-500 text-sm hover:text-gray-700">
+                      {founder.email}
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* OUR TEAM */}
-      <section className="py-12 sm:py-16 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      {/* Team */}
+      <section className="py-12 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Our Team</h2>
-            <p className="text-lg text-slate-600">The people behind the mission</p>
+            <p className="text-gray-600">
+              The people behind the mission — workforce professionals, healthcare specialists,
+              financial experts, and community advocates.
+            </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {TEAM.map((member) => (
               <Link
                 key={member.id}
                 href={`/about/team#member-${member.id}`}
                 className="group text-center"
               >
-                <div className="relative w-full aspect-square max-w-[240px] mx-auto rounded-xl overflow-hidden mb-4 shadow-md group-hover:shadow-xl transition-shadow">
+                <div className="relative w-full aspect-[3/4] max-w-[240px] mx-auto rounded-xl overflow-hidden mb-4 shadow-md group-hover:shadow-xl transition-shadow">
                   <Image
-                    src={member.headshotSrc || '/images/hero-new/hero-10.jpg'}
+                    src={member.headshotSrc || '/images/heroes-hq/team-hero.jpg'}
                     alt={member.name}
                     fill
-                    quality={90}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="object-cover object-top"
+                    className="object-cover object-center"
                   />
                 </div>
-                <h3 className="font-bold text-slate-900 text-base sm:text-lg">{member.name}</h3>
-                <p className="text-slate-600 text-sm mt-1 leading-snug">{member.title}</p>
+                <h3 className="font-bold text-slate-900 text-sm sm:text-base">{member.name}</h3>
+                <p className="text-gray-500 text-xs sm:text-sm mt-1 leading-snug">{member.title}</p>
                 <span className="inline-flex items-center gap-1 text-brand-red-600 text-sm font-semibold mt-2 group-hover:gap-2 transition-all">
                   View Bio <ArrowRight className="w-3.5 h-3.5" />
                 </span>
@@ -266,46 +384,85 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* FOR PARTNERS */}
-      <section className="py-12 sm:py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <h2 className="text-2xl font-bold text-slate-900 text-center mb-8">For Organizations &amp; Partners</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <Link href="/store/guides/capital-readiness" className="bg-slate-50 rounded-xl p-6 shadow-sm hover:shadow-md transition border border-slate-200">
-              <h3 className="font-semibold text-lg mb-2">Capital Readiness Guide</h3>
-              <p className="text-slate-600 text-sm mb-3">Build institutional trust and funding readiness for workforce-aligned organizations.</p>
-              <span className="text-brand-red-600 text-sm font-medium">Get the guide →</span>
+      {/* Programs at a glance */}
+      <section className="py-12 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Programs at a Glance</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/programs-hq/cna-training.jpg', href: '/programs/cna-certification' },
+              { name: 'CDL Training', duration: '4–6 weeks', image: '/images/programs-hq/cdl-trucking.jpg', href: '/programs/cdl' },
+              { name: 'HVAC Technician', duration: '12–16 weeks', image: '/images/programs-hq/hvac-technician.jpg', href: '/programs/hvac-technician' },
+              { name: 'Electrical', duration: '12–16 weeks', image: '/images/programs-hq/electrical.jpg', href: '/programs/electrical' },
+              { name: 'Barber Apprenticeship', duration: '~18 months', image: '/images/programs-hq/barber-training.jpg', href: '/programs/barber-apprenticeship' },
+              { name: 'IT & Cybersecurity', duration: '8–16 weeks', image: '/images/programs-hq/cybersecurity.jpg', href: '/programs/technology' },
+            ].map((p) => (
+              <Link key={p.name} href={p.href} className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition">
+                <div className="relative h-36">
+                  <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-slate-900 text-sm">{p.name}</h3>
+                  <p className="text-xs text-gray-500">{p.duration}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-6 text-center">
+            <Link href="/programs" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center">
+              View All Programs <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
-            <Link href="/partner" className="bg-slate-50 rounded-xl p-6 shadow-sm hover:shadow-md transition border border-slate-200">
-              <h3 className="font-semibold text-lg mb-2">Partner With Us</h3>
-              <p className="text-slate-600 text-sm mb-3">Become a training provider, employer partner, or community organization.</p>
-              <span className="text-brand-red-600 text-sm font-medium">Learn more →</span>
+          </div>
+        </div>
+      </section>
+
+      {/* For Partners */}
+      <section className="py-12 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-slate-900 text-center mb-6">For Organizations &amp; Partners</h2>
+          <div className="grid sm:grid-cols-2 gap-6">
+            <Link href="/pathways/partners" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
+              <div className="relative h-40">
+                <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner with Elevate" fill sizes="50vw" className="object-cover" />
+              </div>
+              <div className="p-5">
+                <h3 className="font-bold text-slate-900 mb-2">Partner With Us</h3>
+                <p className="text-sm text-gray-600 mb-2">Workforce boards, community organizations, and employers — see how custom cohort training works.</p>
+                <span className="text-brand-red-600 text-sm font-semibold inline-flex items-center">
+                  Partnership Details <ArrowRight className="ml-1 w-4 h-4" />
+                </span>
+              </div>
+            </Link>
+            <Link href="/pathways" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
+              <div className="relative h-40">
+                <Image src="/images/heroes-hq/programs-hero.jpg" alt="Career pathways" fill sizes="50vw" className="object-cover" />
+              </div>
+              <div className="p-5">
+                <h3 className="font-bold text-slate-900 mb-2">Career Pathways Framework</h3>
+                <p className="text-sm text-gray-600 mb-2">See our structured 5-stage pathway model: eligibility, training, credentialing, placement, and advancement.</p>
+                <span className="text-brand-red-600 text-sm font-semibold inline-flex items-center">
+                  View Pathways <ArrowRight className="ml-1 w-4 h-4" />
+                </span>
+              </div>
             </Link>
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-20 bg-brand-red-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Questions? Contact Us
-          </h2>
-          <p className="text-brand-red-100 text-lg mb-8">
-            Training may be free for eligible Indiana residents.
+      <section className="py-14 bg-brand-red-600">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
+          <p className="text-lg text-brand-red-100 mb-8 max-w-2xl mx-auto">
+            Check your eligibility in about 5 minutes. If you qualify for funding,
+            your entire training can be free — tuition, materials, certifications, and career services.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href="/programs"
-              className="inline-flex items-center bg-white text-brand-red-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-50 transition"
-            >
-              Explore Programs
+            <Link href="/apply" className="bg-white text-brand-red-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-50 transition inline-flex items-center">
+              Check Eligibility &amp; Apply <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
-            <Link
-              href="/apply/student"
-              className="inline-flex items-center bg-slate-900 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-slate-800 transition"
-            >
-              Apply Now <ArrowRight className="w-5 h-5 ml-2" />
+            <Link href="/contact" className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg font-bold text-lg transition border-2 border-white/30">
+              Contact Us
             </Link>
           </div>
         </div>

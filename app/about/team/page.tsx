@@ -128,12 +128,12 @@ export default async function TeamPage() {
               {members.map((member: any) => (
                 <div key={member.id} id={`member-${member.id}`} className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start scroll-mt-24">
                   <div className="md:col-span-1">
-                    <div className="relative w-full aspect-square max-w-[300px] mx-auto rounded-xl overflow-hidden shadow-lg">
+                    <div className="relative w-full aspect-[3/4] max-w-[300px] mx-auto rounded-xl overflow-hidden shadow-lg">
                       <Image
                         src={member.image_url || '/images/avatar-default.svg'}
                         alt={member.name}
                         fill
-                        className="object-cover"
+                        className="object-cover object-center"
                       />
                     </div>
                   </div>

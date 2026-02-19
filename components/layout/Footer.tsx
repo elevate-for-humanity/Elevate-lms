@@ -32,15 +32,18 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Career Pathways */}
           <div>
-            <h4 className="font-semibold mb-4">Resources</h4>
+            <h4 className="font-semibold mb-4">Career Pathways</h4>
             <ul className="space-y-2 text-sm text-gray-400">
+              <li><Link href="/pathways" className="hover:text-white">Pathway Framework</Link></li>
+              <li><Link href="/pathways/outcomes" className="hover:text-white">Outcomes & Metrics</Link></li>
+              <li><Link href="/pathways/partners" className="hover:text-white">Partners & Cohorts</Link></li>
+              <li><Link href="/pathways/training-model" className="hover:text-white">Training Model</Link></li>
+              <li><Link href="/instructional-framework" className="hover:text-white">Instructional Framework</Link></li>
+              <li><Link href="/instructor-credentials" className="hover:text-white">Instructor Credentials</Link></li>
               <li><Link href="/funding" className="hover:text-white">Funding & Financial Aid</Link></li>
-              <li><Link href="/faq" className="hover:text-white">FAQ</Link></li>
-              <li><Link href="/employers" className="hover:text-white">For Employers</Link></li>
               <li><Link href="/career-services" className="hover:text-white">Career Services</Link></li>
-              <li><Link href="/support" className="hover:text-white">Support</Link></li>
             </ul>
           </div>
 
@@ -52,6 +55,9 @@ export function Footer() {
               <li><Link href="/directory" className="hover:text-white">Partner Directory</Link></li>
               <li><Link href="/philanthropy" className="hover:text-white">Support Us</Link></li>
               <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
+              <li><Link href="/accreditation" className="hover:text-white">Accreditation</Link></li>
+              <li><Link href="/compliance" className="hover:text-white">Compliance</Link></li>
+              <li><Link href="/transparency" className="hover:text-white">Transparency</Link></li>
             </ul>
           </div>
         </nav>

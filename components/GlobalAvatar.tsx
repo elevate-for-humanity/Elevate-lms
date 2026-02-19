@@ -40,11 +40,7 @@ const avatarConfig: { pattern: RegExp; video: string; name: string }[] = [
   { pattern: /^\/instructor\/courses/i, video: '/videos/avatars/ai-tutor.mp4', name: 'Course Management' },
   { pattern: /^\/instructor\/students/i, video: '/videos/avatars/ai-tutor.mp4', name: 'Student Management' },
   
-  // Employer Portal
-  { pattern: /^\/employer-portal$/i, video: '/videos/avatars/orientation-guide.mp4', name: 'Employer Welcome' },
-  { pattern: /^\/employer-portal\/dashboard/i, video: '/videos/avatars/orientation-guide.mp4', name: 'Employer Dashboard' },
-  { pattern: /^\/employer-portal\/candidates/i, video: '/videos/avatars/orientation-guide.mp4', name: 'Find Candidates' },
-  { pattern: /^\/employer-portal\/jobs/i, video: '/videos/avatars/orientation-guide.mp4', name: 'Job Postings' },
+  // Employer Portal — uses its own PageAvatar
   
   // Staff Portal
   { pattern: /^\/staff-portal$/i, video: '/videos/avatars/orientation-guide.mp4', name: 'Staff Welcome' },
@@ -75,39 +71,22 @@ const avatarConfig: { pattern: RegExp; video: string; name: string }[] = [
   { pattern: /^\/about\/team/i, video: '/videos/avatars/home-welcome.mp4', name: 'Meet Our Team' },
   { pattern: /^\/about\/mission/i, video: '/videos/about-mission.mp4', name: 'Our Mission' },
   
-  // Contact page
-  { pattern: /^\/contact/i, video: '/videos/avatars/orientation-guide.mp4', name: 'Contact Us' },
+  // Contact page — uses its own PageAvatar
   
   // Careers page
   { pattern: /^\/careers/i, video: '/videos/avatars/home-welcome.mp4', name: 'Join Our Team' },
   
   // Partners/Employers pages
   { pattern: /^\/partners/i, video: '/videos/avatars/orientation-guide.mp4', name: 'Partner With Us' },
-  { pattern: /^\/employers/i, video: '/videos/avatars/orientation-guide.mp4', name: 'Employer Partners' },
+  // Employers page — uses its own PageAvatar
   
   // Apply/Enroll pages
   { pattern: /^\/apply$/i, video: '/videos/apply-section-video.mp4', name: 'Start Your Journey' },
   { pattern: /^\/enroll/i, video: '/videos/avatars/orientation-guide.mp4', name: 'Enrollment Guide' },
   { pattern: /^\/inquiry/i, video: '/videos/avatars/orientation-guide.mp4', name: 'Get Information' },
   
-  // Programs landing
-  { pattern: /^\/programs$/i, video: '/videos/avatars/home-welcome.mp4', name: 'Explore Programs' },
-  
-  // Healthcare pages
-  { pattern: /^\/programs\/healthcare/i, video: '/videos/avatars/healthcare-guide.mp4', name: 'Healthcare Guide' },
-  
-  // Barber pages
-  { pattern: /^\/programs\/barber/i, video: '/videos/avatars/barber-guide.mp4', name: 'Barber Guide' },
-  
-  // Skilled trades pages
-  { pattern: /^\/programs\/skilled-trades/i, video: '/videos/avatars/trades-guide.mp4', name: 'Trades Guide' },
-  { pattern: /^\/programs\/cdl/i, video: '/videos/avatars/trades-guide.mp4', name: 'CDL Guide' },
-  
-  // Technology pages
-  { pattern: /^\/programs\/technology/i, video: '/videos/avatars/ai-tutor.mp4', name: 'Tech Guide' },
-  
-  // Business page
-  { pattern: /^\/programs\/business/i, video: '/videos/avatars/financial-guide.mp4', name: 'Business Guide' },
+  // Program pages use their own PageAvatar component — do not duplicate here
+  // Pages with PageAvatar: barber, cdl, cna, healthcare, hvac, skilled-trades, drug-collector, tax-preparation
   
   // Financial/Tax pages (funding pages excluded per audit)
   { pattern: /^\/(vita|tax|financial-aid)/i, video: '/videos/avatars/financial-guide.mp4', name: 'Financial Guide' },

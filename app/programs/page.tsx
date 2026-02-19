@@ -84,7 +84,7 @@ async function getCategories() {
       { title: 'Technology', description: 'IT Support, Cybersecurity, Web Development programs.', href: '/programs/technology', programs: ['IT Support', 'Cybersecurity', 'Web Dev'] },
       { title: 'CDL & Transportation', description: 'Commercial driving license training programs.', href: '/programs/cdl', programs: ['CDL Class A', 'CDL Class B'] },
       { title: 'Beauty & Barbering', description: 'Barber apprenticeship and cosmetology programs.', href: '/programs/barber-apprenticeship', programs: ['Barber Apprenticeship', 'Cosmetology'] },
-      { title: 'Business & Finance', description: 'Tax preparation and business training programs.', href: '/programs/business', programs: ['Tax Preparation', 'Business Admin'] },
+      { title: 'Business & Finance', description: 'Financial literacy and business training programs.', href: '/programs/business', programs: ['Financial Literacy', 'Business Admin'] },
     ];
   }
   
@@ -108,7 +108,7 @@ async function getCategories() {
       { title: 'Technology', description: 'IT Support, Cybersecurity, Web Development programs.', href: '/programs/technology', programs: ['IT Support', 'Cybersecurity', 'Web Dev'] },
       { title: 'CDL & Transportation', description: 'Commercial driving license training programs.', href: '/programs/cdl', programs: ['CDL Class A', 'CDL Class B'] },
       { title: 'Beauty & Barbering', description: 'Barber apprenticeship and cosmetology programs.', href: '/programs/barber-apprenticeship', programs: ['Barber Apprenticeship', 'Cosmetology'] },
-      { title: 'Business & Finance', description: 'Tax preparation and business training programs.', href: '/programs/business', programs: ['Tax Preparation', 'Business Admin'] },
+      { title: 'Business & Finance', description: 'Financial literacy and business training programs.', href: '/programs/business', programs: ['Financial Literacy', 'Business Admin'] },
     ];
   }
 
@@ -175,7 +175,7 @@ export default async function ProgramsPage() {
             <span className="text-brand-red-600">Start Free.</span>
           </h1>
           <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-6">
-            If you're here, you're in the right place. This program is designed to take you from interested to enrolled, then into class with a clear next step at every stage.
+            If you&apos;re here, you&apos;re in the right place. This program is designed to take you from interested to enrolled, then into class with a clear next step at every stage.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link href="/apply" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-brand-blue-700 transition-all shadow-lg">
@@ -191,13 +191,33 @@ export default async function ProgramsPage() {
         </div>
       </section>
 
+      {/* DELIVERY MODEL STATEMENT — Institutional positioning for workforce reviewers */}
+      <section className="py-8 bg-slate-50 border-y border-slate-200">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-3 gap-6 text-center md:text-left">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-1">Delivery Model</p>
+              <p className="text-sm text-slate-600">Related Technical Instruction (RTI) delivered through licensed credential partners. On-the-Job Training (OJT) supervised by employer partners.</p>
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-1">Credentials</p>
+              <p className="text-sm text-slate-600">Industry credentials issued by certifying bodies (EPA, OSHA, state boards). Completion certificates issued by Elevate for Humanity.</p>
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-1">Progress Tracking</p>
+              <p className="text-sm text-slate-600">LMS-tracked module completion, RTI attendance, OJT hour logs, and competency-based evaluations documented per program.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* MARQUEE */}
-      <section className="py-3 bg-slate-900 overflow-hidden" aria-hidden="true">
+      <section className="py-3 bg-slate-100 border-y border-slate-200 overflow-hidden" aria-hidden="true">
         <div className="flex animate-marquee whitespace-nowrap will-change-transform">
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex items-center gap-8 mx-4">
               {['Healthcare', 'Skilled Trades', 'Technology', 'CDL', 'Barbering', 'Business', 'Funded Training'].map((text, j) => (
-                <span key={j} className="text-white/80 text-base font-medium flex items-center gap-4">
+                <span key={j} className="text-slate-600 text-base font-medium flex items-center gap-4">
                   {text}<span className="text-brand-red-500">★</span>
                 </span>
               ))}
@@ -206,36 +226,254 @@ export default async function ProgramsPage() {
         </div>
       </section>
 
-      {/* PROGRAMS LIST - Clean text-based design */}
+      {/* ETPL-REGISTERED PROGRAMS — Matched to INTraining registry under 2Exclusive LLC-S */}
       <section className="py-16 lg:py-24 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <p className="text-brand-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Training Categories</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Choose Your Career Path</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">Each program is designed to take you from beginner to job-ready.</p>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-4">
+            <p className="text-brand-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">INTraining Eligible Programs</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Training Programs</h2>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">Each program is registered on Indiana&apos;s INTraining system under provider 2Exclusive LLC-S at the Elevate for Humanity Training Center. Credentials are paired with their issuing partner below.</p>
           </div>
+          <p className="text-center text-xs text-slate-400 mb-10">Provider: 2Exclusive LLC-S &nbsp;|&nbsp; Location: Elevate for Humanity Training Center, Indianapolis, IN (Marion County) &nbsp;|&nbsp; <span className="font-medium">W</span> = WIOA Eligible &nbsp; <span className="font-medium">WRG</span> = Workforce Ready Grant</p>
           
-          <div className="space-y-4">
-            {categories.map((cat) => (
-              <Link key={cat.title} href={cat.href} className="group block bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 hover:border-brand-blue-300">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-1 group-hover:text-brand-blue-600 transition-colors">{cat.title}</h3>
-                    <p className="text-slate-600 text-sm mb-3">{cat.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {cat.programs.map((p, i) => (
-                        <span key={i} className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded">{p}</span>
+          <div className="grid md:grid-cols-2 gap-6">
+            {[
+              {
+                name: 'HVAC Technician',
+                slug: 'hvac-technician',
+                href: '/programs/hvac-technician',
+                programId: '#10004322',
+                duration: '20 weeks',
+                cost: '$5,000',
+                credentials: [
+                  { name: 'Residential HVAC Certification 1', partner: 'Industry Certification Body' },
+                  { name: 'Residential HVAC Certification 2 — Refrigeration Diagnostics', partner: 'Industry Certification Body' },
+                  { name: 'OSHA 30', partner: 'OSHA / CareerSafe' },
+                  { name: 'CPR', partner: 'American Heart Association / American Red Cross' },
+                  { name: 'Rise Up', partner: 'National Retail Federation (NRF)' },
+                ],
+                funding: 'WIOA, WRG',
+                category: 'Skilled Trades',
+              },
+              {
+                name: 'Barber Apprenticeship Program',
+                slug: 'barber-apprenticeship',
+                href: '/programs/barber-apprenticeship',
+                programId: '#10004637',
+                duration: '15 months',
+                cost: '$4,890',
+                credentials: [
+                  { name: 'Registered Barber License', partner: 'Indiana Professional Licensing Agency (PLA)' },
+                  { name: 'Rise Up', partner: 'National Retail Federation (NRF)' },
+                ],
+                funding: 'WIOA',
+                category: 'Apprenticeship',
+              },
+              {
+                name: 'Emergency Health & Safety Technician',
+                slug: 'emergency-health-safety-tech',
+                href: '/programs/healthcare',
+                programId: '#10004621',
+                duration: '4 weeks',
+                cost: '$4,950',
+                credentials: [
+                  { name: 'Emergency Medical Responder (EMR)', partner: 'NREMT / State EMS Agency' },
+                  { name: 'OSHA 10 — CareerSafe', partner: 'OSHA / CareerSafe' },
+                  { name: 'CPR', partner: 'American Heart Association / American Red Cross' },
+                ],
+                funding: 'WIOA',
+                category: 'Healthcare',
+              },
+              {
+                name: 'Home Health Aide Certification',
+                slug: 'home-health-aide',
+                href: '/programs/healthcare',
+                programId: '#10004626',
+                duration: '4 weeks',
+                cost: '$4,700',
+                credentials: [
+                  { name: 'Home Health Aide (HHA) License', partner: 'Indiana State Department of Health (ISDH)' },
+                  { name: 'Certified Community Healthcare Worker (CCHW)', partner: 'Indiana CCHW Certification Board' },
+                  { name: 'CPR', partner: 'American Heart Association / American Red Cross' },
+                  { name: 'Rise Up', partner: 'National Retail Federation (NRF)' },
+                ],
+                funding: 'WIOA',
+                category: 'Healthcare',
+              },
+              {
+                name: 'Medical Assistant',
+                slug: 'medical-assistant',
+                href: '/programs/medical-assistant',
+                programId: '#10004639',
+                duration: '21 days',
+                cost: '$4,325',
+                credentials: [
+                  { name: 'Certified Community Healthcare Worker (CCHW)', partner: 'Indiana CCHW Certification Board' },
+                  { name: 'CPR', partner: 'American Heart Association / American Red Cross' },
+                  { name: 'Rise Up', partner: 'National Retail Federation (NRF)' },
+                ],
+                funding: 'WIOA',
+                category: 'Healthcare',
+              },
+
+              {
+                name: 'Professional Esthetician & Client Services',
+                slug: 'professional-esthetician',
+                href: '/programs/beauty',
+                programId: '#10004628',
+                duration: '5 weeks',
+                cost: '$4,575',
+                credentials: [
+                  { name: 'Business of Retail Certified Specialist', partner: 'National Retail Federation (NRF)' },
+                  { name: 'Customer Service and Sales Certified Specialist', partner: 'National Retail Federation (NRF)' },
+                  { name: 'OSHA 10 — CareerSafe', partner: 'OSHA / CareerSafe' },
+                ],
+                funding: 'WIOA',
+                category: 'Beauty & Barbering',
+              },
+              {
+                name: 'Business Start-up & Marketing Program',
+                slug: 'business-startup-marketing',
+                href: '/programs/business',
+                programId: '#10004645',
+                duration: '5 weeks',
+                cost: '$4,550',
+                credentials: [
+                  { name: 'Business of Retail Certified Specialist', partner: 'National Retail Federation (NRF)' },
+                  { name: 'Retail Industry Fundamentals Specialist', partner: 'National Retail Federation (NRF)' },
+                  { name: 'Certificate of Completion', partner: 'Elevate for Humanity' },
+                ],
+                funding: 'WIOA',
+                category: 'Business',
+              },
+              {
+                name: 'Financial Literacy Program',
+                slug: 'tax-prep-financial-services',
+                href: '/programs/tax-entrepreneurship',
+                programId: '#10004627',
+                duration: '10 weeks',
+                cost: '$4,950',
+                credentials: [
+                  { name: 'Microsoft 365 Fundamentals', partner: 'Microsoft' },
+                  { name: 'QuickBooks Pro Advisor', partner: 'Intuit' },
+                  { name: 'Rise Up', partner: 'National Retail Federation (NRF)' },
+                  { name: 'Certificate of Completion', partner: 'Elevate for Humanity' },
+                ],
+                funding: 'WIOA',
+                category: 'Business',
+              },
+              {
+                name: 'Public Safety Reentry Specialist',
+                slug: 'public-safety-reentry-specialist',
+                href: '/programs/healthcare',
+                programId: '#10004666',
+                duration: '45 days',
+                cost: '$4,750',
+                credentials: [
+                  { name: 'Certified Peer Support Professional', partner: 'Indiana Division of Mental Health & Addiction (DMHA)' },
+                  { name: 'Certified Peer Recovery Coach (CPRC)', partner: 'Indiana DMHA' },
+                  { name: 'Certified Community Healthcare Worker (CCHW)', partner: 'Indiana CCHW Certification Board' },
+                  { name: 'CPR', partner: 'American Heart Association / American Red Cross' },
+                  { name: 'Rise Up', partner: 'National Retail Federation (NRF)' },
+                ],
+                funding: 'WIOA',
+                category: 'Public Safety',
+              },
+              {
+                name: 'CPR, AED & First Aid Certification',
+                slug: 'cpr-first-aid-hsi',
+                href: '/programs/healthcare',
+                programId: '#10004674',
+                duration: '1 day',
+                cost: '$575',
+                credentials: [
+                  { name: 'CPR / AED / First Aid', partner: 'American Heart Association / American Red Cross' },
+                ],
+                funding: 'WIOA',
+                category: 'Healthcare',
+              },
+            ].map((program) => (
+              <div key={program.programId} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 overflow-hidden">
+                <Link href={program.href} className="block p-6 pb-3 group">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-xs font-bold uppercase tracking-wider text-brand-blue-600">{program.category}</span>
+                        <span className="text-[10px] font-mono text-slate-400">{program.programId}</span>
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-900 group-hover:text-brand-blue-600 transition-colors leading-tight">{program.name}</h3>
+                    </div>
+                    <span className="text-brand-blue-600 font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all flex-shrink-0 mt-1">
+                      Details →
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-x-3 gap-y-1 text-sm mb-4">
+                    <div>
+                      <span className="text-slate-500 text-xs block">Duration</span>
+                      <span className="font-medium text-slate-800">{program.duration}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-xs block">Cost</span>
+                      <span className="font-medium text-slate-800">{program.cost}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 text-xs block">Funding</span>
+                      <span className="font-medium text-brand-green-700">{program.funding}</span>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-slate-100 pt-3">
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Credentials &amp; Issuing Partners</p>
+                    <div className="space-y-1.5">
+                      {program.credentials.map((cred, ci) => (
+                        <div key={ci} className="flex items-start gap-2 text-sm">
+                          <svg className="w-3.5 h-3.5 text-brand-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          <div>
+                            <span className="font-medium text-slate-800">{cred.name}</span>
+                            <span className="text-slate-400 ml-1 text-xs">— {cred.partner}</span>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
-                  <div className="flex-shrink-0 ml-4">
-                    <span className="text-brand-blue-600 font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-                      View →
-                    </span>
-                  </div>
+                </Link>
+                {/* Action bar: Apply, Inquiry, LMS */}
+                <div className="px-6 pb-4 pt-2 border-t border-slate-100 flex flex-wrap gap-2">
+                  <Link href={`/apply?program=${program.slug}`} className="inline-flex items-center gap-1 bg-brand-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-brand-blue-700 transition-colors">
+                    Apply Now
+                  </Link>
+                  <Link href={`/contact?subject=${encodeURIComponent(program.name)}`} className="inline-flex items-center gap-1 border border-slate-300 text-slate-600 text-xs font-semibold px-3 py-1.5 rounded-full hover:border-brand-blue-400 hover:text-brand-blue-600 transition-colors">
+                    Inquiry
+                  </Link>
+                  <Link href="/lms/courses" className="inline-flex items-center gap-1 border border-slate-300 text-slate-600 text-xs font-semibold px-3 py-1.5 rounded-full hover:border-brand-blue-400 hover:text-brand-blue-600 transition-colors">
+                    LMS Dashboard
+                  </Link>
                 </div>
-              </Link>
+              </div>
             ))}
+          </div>
+
+          {/* Additional Programs — Category browsing */}
+          <div className="mt-12">
+            <h3 className="text-lg font-bold text-slate-900 mb-4 text-center">Browse by Category</h3>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {categories.map((cat) => (
+                <Link key={cat.title} href={cat.href} className="group flex items-center justify-between bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all border border-slate-200 hover:border-brand-blue-300">
+                  <div>
+                    <h4 className="font-semibold text-slate-900 group-hover:text-brand-blue-600 transition-colors text-sm">{cat.title}</h4>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {cat.programs.slice(0, 3).map((p, i) => (
+                        <span key={i} className="text-xs text-slate-500">{p}{i < Math.min(cat.programs.length, 3) - 1 ? ',' : ''}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <span className="text-brand-blue-600 text-sm font-medium flex-shrink-0 ml-2">→</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -277,10 +515,10 @@ export default async function ProgramsPage() {
       </section>
 
       {/* SCROLLING TEXT */}
-      <section className="py-6 bg-brand-blue-600 overflow-hidden" aria-hidden="true">
+      <section className="py-6 bg-brand-blue-50 border-y border-brand-blue-100 overflow-hidden" aria-hidden="true">
         <div className="flex animate-marquee-reverse whitespace-nowrap">
           {[...Array(2)].map((_, i) => (
-            <span key={i} className="text-4xl md:text-5xl font-black text-white/70 mx-6">
+            <span key={i} className="text-4xl md:text-5xl font-black text-brand-blue-200 mx-6">
               Funded Training • Real Careers • No Debt • Job Placement Assistance • 
             </span>
           ))}
@@ -319,6 +557,71 @@ export default async function ProgramsPage() {
                 <Image src="/images/prog-why.jpg" alt="Career support" fill sizes="100vw" className="object-cover" />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PROGRESS REPORTING & COHORT CAPABILITY — Workforce partner section */}
+      <section className="py-16 lg:py-24 bg-white border-t border-slate-200">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <p className="text-brand-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">For Workforce Partners</p>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Progress Reporting &amp; Cohort Capability</h2>
+            <p className="text-base text-slate-600 max-w-3xl mx-auto">
+              Elevate for Humanity operates as a Hybrid Workforce Training Provider and Registered Apprenticeship Sponsor. All programs are tracked through our LMS with documented evaluations and reporting available to workforce partners.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-10">
+            {/* Progress Reporting */}
+            <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-4">Progress Reporting</h3>
+              <ul className="space-y-2.5 text-sm text-slate-700">
+                {[
+                  'RTI attendance tracking (per session, per student)',
+                  'OJT hour logs verified by employer supervisors',
+                  'LMS module completion with timestamped records',
+                  'Competency rubric evaluations (scored 0–5 per competency)',
+                  'Monthly progress summaries available to referring agencies',
+                  'Credential attainment documentation with issuer verification',
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <svg className="w-4 h-4 text-brand-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Cohort Setup */}
+            <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-4">Cohort Setup Timeline</h3>
+              <div className="space-y-3 text-sm">
+                {[
+                  { day: 'Day 1–3', action: 'Referral intake and eligibility verification' },
+                  { day: 'Day 4–5', action: 'Student enrollment and LMS account provisioning' },
+                  { day: 'Day 6–7', action: 'Orientation and program materials distribution' },
+                  { day: 'Day 8–10', action: 'RTI schedule confirmed with credential partner' },
+                  { day: 'Day 11–14', action: 'Cohort launch with first RTI session' },
+                ].map((step, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <span className="text-xs font-bold text-brand-blue-600 bg-brand-blue-50 px-2 py-1 rounded whitespace-nowrap">{step.day}</span>
+                    <span className="text-slate-700">{step.action}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 pt-4 border-t border-slate-200">
+                <p className="text-xs text-slate-500">Reporting cadence: weekly attendance, biweekly progress summaries, monthly competency updates. Custom reporting available for workforce board partners.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <Link href="/compliance/workforce-partnership-packet" className="inline-flex items-center gap-2 border-2 border-brand-blue-600 text-brand-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-brand-blue-600 hover:text-white transition-all text-sm">
+              View Workforce Partnership Packet
+            </Link>
           </div>
         </div>
       </section>
@@ -379,22 +682,22 @@ export default async function ProgramsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-brand-blue-600">
+      <section className="py-16 lg:py-24 bg-slate-50 border-t border-slate-200">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Begin Your Journey Today</h2>
-          <p className="text-lg text-white/90 mb-8">Whether you&apos;re starting fresh or changing careers, we&apos;re here to help.</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Begin Your Journey Today</h2>
+          <p className="text-lg text-slate-600 mb-8">Whether you&apos;re starting fresh or changing careers, we&apos;re here to help.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-brand-blue-50 transition-all">
+            <Link href="/apply" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-brand-blue-700 transition-all">
               Check Eligibility
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
-            <Link href="/support" className="inline-flex items-center gap-2 text-white border-2 border-white/50 px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/10 transition-all">
+            <Link href="/support" className="inline-flex items-center gap-2 text-slate-700 border-2 border-slate-300 px-8 py-4 rounded-full font-semibold text-lg hover:border-brand-blue-600 hover:text-brand-blue-600 transition-all">
               Get Help Online
             </Link>
           </div>
-          <p className="text-white/80 text-sm mt-4">
+          <p className="text-slate-500 text-sm mt-4">
             Enrollment is availability- and eligibility-based. A workforce advisor will confirm your placement and start date.
           </p>
         </div>

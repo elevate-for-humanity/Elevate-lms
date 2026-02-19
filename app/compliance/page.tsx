@@ -43,12 +43,12 @@ export default function CompliancePage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Credential Disclosure</h2>
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-4 text-gray-700">
             <p>
-              Elevate for Humanity delivers training and prepares students for industry-recognized credentials.
+              Training is delivered through licensed credential partners and approved program holders under centralized institutional oversight by Elevate for Humanity, preparing students for industry-recognized credentials.
               <strong> Credentials and licenses are issued by external credential bodies, exam providers, and state agencies — not by Elevate for Humanity.</strong>
             </p>
             <p>
               Where applicable, certification exams are administered through authorized testing centers or approved proctoring organizations.
-              Elevate provides the instruction, materials, and exam preparation; the credentialing authority makes the final determination.
+              Elevate coordinates instruction through licensed credential partners, provides materials and exam preparation support; the credentialing authority makes the final determination.
             </p>
           </div>
         </section>
@@ -94,6 +94,44 @@ export default function CompliancePage() {
               <span className="font-medium">WIOA / WRG / JRI Eligible Programs</span>
               <span className="text-gray-500">Via EmployIndy and regional workforce boards</span>
             </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Institutional Compliance Documents</h2>
+          <div className="grid sm:grid-cols-2 gap-4 mb-8">
+            <Link href="/compliance/apprenticeship-structure" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">
+              <h3 className="font-semibold text-gray-900">Apprenticeship & RTI Structure</h3>
+              <p className="text-sm text-gray-500 mt-1">Master compliance document: institutional hierarchy, RTI/OJT hour mapping, credential issuance chain</p>
+            </Link>
+            <Link href="/compliance/credential-partners" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">
+              <h3 className="font-semibold text-gray-900">Credential Partner Registry</h3>
+              <p className="text-sm text-gray-500 mt-1">Per-program credential partners, license status, MOU requirements</p>
+            </Link>
+            <Link href="/compliance/workforce-partnership-packet" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">
+              <h3 className="font-semibold text-gray-900">Workforce Partnership Packet</h3>
+              <p className="text-sm text-gray-500 mt-1">Ready-to-share packet for workforce boards and community partners</p>
+            </Link>
+            <Link href="/instructional-framework" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">
+              <h3 className="font-semibold text-gray-900">Instructional Framework</h3>
+              <p className="text-sm text-gray-500 mt-1">RTI governance, provider tiers, competency tracking, assessment authority</p>
+            </Link>
+            <Link href="/instructor-credentials" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">
+              <h3 className="font-semibold text-gray-900">Instructor Credentials</h3>
+              <p className="text-sm text-gray-500 mt-1">Per-program instructor qualifications, credential partner requirements, MOU framework</p>
+            </Link>
+            <Link href="/compliance/competency-verification" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">
+              <h3 className="font-semibold text-gray-900">Competency Verification Matrix</h3>
+              <p className="text-sm text-gray-500 mt-1">Per-program assessment rubrics with competency-to-assessment mapping and pass criteria</p>
+            </Link>
+            <Link href="/compliance/competency-verification/barber" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">
+              <h3 className="font-semibold text-gray-900">Barber Apprenticeship Rubric</h3>
+              <p className="text-sm text-gray-500 mt-1">6-section, 30-competency RAPIDS-aligned rubric for barbershop apprenticeship</p>
+            </Link>
+            <Link href="/workone-partner-packet" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">
+              <h3 className="font-semibold text-gray-900">WorkOne Partner Packet</h3>
+              <p className="text-sm text-gray-500 mt-1">ETPL-ready partnership documentation for WorkOne regions</p>
+            </Link>
           </div>
         </section>
 

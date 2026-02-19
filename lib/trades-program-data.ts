@@ -32,6 +32,7 @@ export const HVAC_DATA: TradesProgramData = {
   ojtHours: '160+ hours (internship at employer)',
   modality: 'Hybrid — RTI online via LMS + OJT internship at employer sites',
   credentials: [
+    { name: 'EPA Section 608 Universal Certification', issuingBody: 'U.S. Environmental Protection Agency (EPA)' },
     { name: 'Residential HVAC Certification 1', issuingBody: 'Industry Certification Body' },
     { name: 'Residential HVAC Certification 2 — Refrigeration Diagnostics', issuingBody: 'Industry Certification Body' },
     { name: 'OSHA 30 — Construction Safety', issuingBody: 'OSHA / CareerSafe' },
@@ -42,7 +43,7 @@ export const HVAC_DATA: TradesProgramData = {
     { week: 'Weeks 1–2', title: 'HVAC Fundamentals', topics: ['Heating and cooling principles', 'System components and terminology', 'Safety protocols and OSHA standards', 'Basic electrical theory'], image: '/images/trades/program-hvac-overview.jpg', project: 'Identify and diagram a complete HVAC system' },
     { week: 'Weeks 3–4', title: 'Heating Systems', topics: ['Furnace operation and maintenance', 'Heat pump technology', 'Gas and electric heating', 'Combustion analysis'], image: '/images/programs-hq/hvac-technician.jpg', project: 'Perform a complete furnace inspection and tune-up' },
     { week: 'Weeks 5–6', title: 'Cooling Systems', topics: ['Air conditioning fundamentals', 'Refrigeration cycle', 'Compressor and condenser operation', 'Evaporator coil maintenance'], project: 'Diagnose and repair a malfunctioning AC unit' },
-    { week: 'Weeks 7–8', title: 'Refrigerant Handling & Diagnostics', topics: ['Refrigerant types and properties', 'Recovery and recycling procedures', 'Refrigeration diagnostics', 'Environmental regulations'], project: 'Residential HVAC Certification prep' },
+    { week: 'Weeks 7–8', title: 'Refrigerant Handling & EPA 608 Prep', topics: ['EPA 608 certification prep (Core, Type I, II, III, Universal)', 'Refrigerant types and properties', 'Recovery and recycling procedures', 'Refrigeration diagnostics', 'Environmental regulations'], project: 'EPA 608 Universal Certification Exam' },
     { week: 'Weeks 9–10', title: 'Installation Techniques', topics: ['Ductwork design and installation', 'Equipment sizing and selection', 'Brazing and soldering', 'System startup procedures'], project: 'Complete a mini-split installation' },
     { week: 'Weeks 11–12', title: 'Troubleshooting & Diagnostics', topics: ['Systematic troubleshooting', 'Electrical diagnostics', 'Reading schematics', 'Customer service skills'], project: 'Diagnose and repair multiple system faults' },
     { week: 'Weeks 13–16', title: 'Advanced Systems & Career Prep', topics: ['Commercial HVAC overview', 'Building automation basics', 'Energy efficiency upgrades', 'Resume, interview skills, employer connections'], project: 'Complete job shadowing and secure employment' },

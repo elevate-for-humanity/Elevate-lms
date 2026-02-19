@@ -138,7 +138,10 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
 
       {/* Curriculum with images */}
       <section className="max-w-5xl mx-auto px-4 py-12">
-        <h2 className="text-xl font-bold text-slate-900 border-b-2 border-slate-900 pb-2 mb-6">Curriculum</h2>
+        <div className="flex items-center justify-between border-b-2 border-slate-900 pb-2 mb-6">
+          <h2 className="text-xl font-bold text-slate-900">Curriculum</h2>
+          <Link href={`/programs/${data.slug}/curriculum`} className="text-sm text-brand-blue-600 underline hover:text-brand-blue-800">View Full Curriculum</Link>
+        </div>
         <div className="space-y-6">
           {data.curriculum.map((mod, i) => (
             <div key={i} className="grid sm:grid-cols-4 gap-0 border border-slate-200 rounded-lg overflow-hidden">

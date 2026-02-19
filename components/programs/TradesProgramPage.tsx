@@ -66,28 +66,30 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
         </div>
       </div>
 
-      {/* Hero */}
+      {/* Hero — clean image, no text overlay */}
       <section className="relative h-[320px] sm:h-[420px]">
         <Image src={data.heroImage} alt={data.name} fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-black/45" />
-        <div className="absolute bottom-8 left-0 right-0 px-4">
-          <div className="max-w-5xl mx-auto">
-            {data.nextLevelJobsEligible && (
-              <span className="inline-block bg-green-700 text-white text-xs font-bold px-3 py-1 rounded mb-3">Next Level Jobs Eligible</span>
-            )}
-            <h1 className="text-3xl sm:text-5xl font-bold text-white leading-tight">{data.name}</h1>
-            <p className="text-white/85 mt-2 text-lg max-w-2xl">{data.tagline}</p>
-          </div>
+        <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-white/90 backdrop-blur-sm px-4 py-2 rounded">
+          <span className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">Elevate for Humanity</span>
         </div>
       </section>
 
-      {/* Quick facts */}
+      {/* Program title + quick facts */}
       <section className="bg-slate-900 text-white">
-        <div className="max-w-5xl mx-auto px-4 py-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-sm">
-          <div><div className="font-bold text-lg">{data.duration}</div><div className="text-slate-400">Duration</div></div>
-          <div><div className="font-bold text-lg">{data.totalHours}</div><div className="text-slate-400">Total Hours</div></div>
-          <div><div className="font-bold text-lg">${data.costPerParticipant.toLocaleString()}</div><div className="text-slate-400">Per Participant</div></div>
-          <div><div className="font-bold text-lg">{data.cohortMin}–{data.cohortMax}</div><div className="text-slate-400">Cohort Size</div></div>
+        <div className="max-w-5xl mx-auto px-4 py-6">
+          <div className="flex flex-wrap items-center gap-3 mb-3">
+            <h1 className="text-2xl sm:text-3xl font-bold">{data.name}</h1>
+            {data.nextLevelJobsEligible && (
+              <span className="inline-block bg-green-700 text-white text-xs font-bold px-3 py-1 rounded">Next Level Jobs Eligible</span>
+            )}
+          </div>
+          <p className="text-slate-300 text-sm mb-4 max-w-2xl">{data.tagline}</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-sm border-t border-slate-700 pt-4">
+            <div><div className="font-bold text-lg">{data.duration}</div><div className="text-slate-400">Duration</div></div>
+            <div><div className="font-bold text-lg">{data.totalHours}</div><div className="text-slate-400">Total Hours</div></div>
+            <div><div className="font-bold text-lg">${data.costPerParticipant.toLocaleString()}</div><div className="text-slate-400">Per Participant</div></div>
+            <div><div className="font-bold text-lg">{data.cohortMin}–{data.cohortMax}</div><div className="text-slate-400">Cohort Size</div></div>
+          </div>
         </div>
       </section>
 

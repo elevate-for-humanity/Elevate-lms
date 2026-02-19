@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import StudentApplicationForm from './StudentApplicationForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { resolveSlug } from '@/lib/program-registry';
@@ -36,8 +37,16 @@ export default async function StudentApplicationPage({
   const initialProgram = resolveSlug(params?.program || '') || '';
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Hero */}
+      <div className="relative h-[200px] sm:h-[260px]">
+        <Image src="/images/heroes-hq/success-hero.jpg" alt="Student application" fill sizes="100vw" className="object-cover" priority />
+        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded">
+          <span className="text-sm font-bold text-slate-900">Elevate for Humanity</span>
+        </div>
+      </div>
+
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Apply', href: '/apply' }, { label: 'Student' }]} />
         </div>

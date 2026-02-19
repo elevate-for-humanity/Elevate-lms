@@ -55,6 +55,7 @@ export const PROGRAMS: ProgramEntry[] = [
   // Additional Skilled Trades
   { slug: 'electrical', name: 'Electrical Apprenticeship', category: 'Skilled Trades', formType: 'apply', active: true },
   { slug: 'plumbing', name: 'Plumbing Apprenticeship', category: 'Skilled Trades', formType: 'apply', active: true },
+  { slug: 'forklift', name: 'Forklift Operator Certification', category: 'Skilled Trades', formType: 'apply', active: true },
   { slug: 'welding', name: 'Welding Certification', category: 'Skilled Trades', formType: 'apply', active: true },
   { slug: 'diesel-mechanic', name: 'Diesel Mechanic', category: 'Skilled Trades', formType: 'apply', active: true },
 

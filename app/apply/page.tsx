@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import ApplyHeroVideo from './ApplyHeroVideo';
-import ApplyAvatarGuide from './ApplyAvatarGuide';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -52,16 +51,10 @@ export default async function ApplyPage({
         <ApplyHeroVideo />
       </section>
 
-      {/* Avatars — overlapping bottom of hero */}
-      <div className="flex items-center justify-center -space-x-4 -mt-10 sm:-mt-12 relative z-20">
-        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
-          <Image src="/avatars/avatar-1.jpg" alt="Student" width={80} height={80} className="object-cover w-full h-full" />
-        </div>
-        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-4 border-white shadow-lg">
-          <Image src="/avatars/avatar-2.jpg" alt="Graduate" width={96} height={96} className="object-cover w-full h-full" />
-        </div>
-        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
-          <Image src="/avatars/avatar-3.jpg" alt="Professional" width={80} height={80} className="object-cover w-full h-full" />
+      {/* Elevate branding over hero */}
+      <div className="flex items-center justify-center -mt-8 relative z-20">
+        <div className="bg-white/90 backdrop-blur-sm px-5 py-2 rounded-lg shadow">
+          <span className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">Elevate for Humanity</span>
         </div>
       </div>
 
@@ -77,8 +70,7 @@ export default async function ApplyPage({
         </div>
       </section>
 
-      {/* Avatar guide with voiceover */}
-      <ApplyAvatarGuide />
+
 
       {/* Application cards */}
       <section className="max-w-6xl mx-auto px-4 pb-10 sm:pb-14 space-y-8">

@@ -111,7 +111,6 @@ const nextConfig = {
       'react-hot-toast',
       'date-fns',
       'framer-motion',
-      '@stripe/stripe-js',
       'zod',
       'react-hook-form',
       '@hookform/resolvers',

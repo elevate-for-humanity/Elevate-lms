@@ -106,3 +106,4 @@ CREATE TRIGGER trg_exam_sessions_updated_at
   BEFORE UPDATE ON exam_sessions
   FOR EACH ROW
   EXECUTE FUNCTION update_exam_sessions_updated_at();
+

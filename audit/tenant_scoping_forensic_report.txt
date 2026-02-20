@@ -1,0 +1,215 @@
+ELEVATE LMS — TENANT SCOPING FORENSIC REPORT
+===============================================
+Generated: 2026-02-20
+Source: Full codebase scan + live schema snapshot (679 tables)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ANSWER TO THE DIRECT QUESTION:
+Have you enabled RLS on ANY tables in production?
+
+NO. ZERO TABLES HAVE RLS ENABLED.
+
+  Total tables in production:     679
+  Tables with RLS enabled:          0
+  Tables with RLS policies:         0
+  Tables with data but no RLS:    146
+
+Every table is globally readable to any authenticated user.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 1: QUERY SCOPING ANALYSIS — ALL 5 CORE TABLES
+======================================================
+
+Table          Total   Auth-scoped   Tenant-scoped   Other filter   Writes   UNSCOPED
+                       (user.id)     (tenant_id)     (.eq/.in)               (global)
+──────────────────────────────────────────────────────────────────────────────────────
+profiles         898       617             22            121           71        67
+enrollments      437        94              3            117           91       132
+courses          141        53              4             31           21        32
+certificates      76        20              0             17           18        21
+programs         189        28              1             67           10        83
+──────────────────────────────────────────────────────────────────────────────────────
+TOTALS         1,741       812             30            353          211       335
+
+BREAKDOWN:
+  Auth-scoped (user.id):     812 queries (47%) — SAFE after RLS
+  Tenant-scoped:              30 queries ( 2%) — SAFE now
+  Other filter (.eq/.in):    353 queries (20%) — PARTIALLY safe (filters by course_id, etc.)
+  Write operations:          211 queries (12%) — Need tenant_id on INSERT
+  UNSCOPED GLOBAL READS:     335 queries (19%) — *** CROSS-TENANT RISK ***
+
+The 335 unscoped queries will return data from ALL tenants.
+After RLS is enabled, these will automatically be scoped to the
+authenticated user's tenant — no code changes needed for reads.
+
+However: INSERT/UPSERT operations (211) must include tenant_id
+in the payload, or the row will have NULL tenant_id and become
+invisible after RLS enforcement.
+
+
+SECTION 2: UNSCOPED QUERIES BY RISK CATEGORY
+=============================================
+
+profiles (67 unscoped):
+  Admin pages (app/admin/*):           52   Risk: LOW (admin context)
+  API routes (app/api/*):              12   Risk: HIGH
+  Other pages:                          3   Risk: MEDIUM
+
+enrollments (132 unscoped):
+  Admin pages:                         68   Risk: LOW
+  API routes:                          47   Risk: HIGH
+  Dashboard/workforce pages:           17   Risk: HIGH
+
+courses (32 unscoped):
+  Admin pages:                         17   Risk: LOW
+  API routes:                          12   Risk: HIGH
+  Other:                                3   Risk: MEDIUM
+
+certificates (21 unscoped):
+  Admin pages:                          8   Risk: LOW
+  API routes:                          13   Risk: HIGH
+
+programs (83 unscoped):
+  Admin pages:                         42   Risk: LOW
+  API routes:                          22   Risk: HIGH
+  Public/workforce pages:              19   Risk: MEDIUM
+
+HIGH-RISK API ROUTES (unscoped reads on core tables):
+  app/api/public/metrics/route.ts         — profiles, enrollments, certificates
+  app/api/courses/list/route.ts           — courses (full catalog)
+  app/api/courses/index/route.ts          — courses
+  app/api/programs/list/route.ts          — programs (full catalog)
+  app/api/v1/courses/route.ts             — courses
+  app/api/v1/users/route.ts              — profiles
+  app/api/partners/catalog/route.ts       — courses
+  app/api/outcomes/stats/route.ts         — enrollments, certificates
+  app/api/certificates/route.ts           — certificates
+  app/api/admin/export/students/route.ts  — profiles (full export)
+  app/api/admin/export/enrollments/route.ts — enrollments (full export)
+
+
+SECTION 3: RLS STATUS — ZERO AMBIGUITY
+=======================================
+
+  679 tables checked.
+  0 have RLS enabled.
+  0 have any RLS policies.
+
+  Top exposed tables (by row count, no RLS):
+    v_app_slow_queries          3,099 rows
+    timezone_names              1,194 rows
+    users                         671 rows
+    admin_compliance_status       516 rows
+    profiles                      516 rows
+    user_capabilities             516 rows
+    lessons                       514 rows
+    training_lessons              514 rows
+    partner_courses               329 rows
+    partner_lms_courses           329 rows
+    audit_logs                    262 rows
+    stripe_webhook_events         233 rows
+    enrollments                    91 rows
+    programs                       49 rows
+    courses                        43 rows
+    certificates                    5 rows
+
+
+SECTION 4: USERS vs PROFILES MISMATCH
+======================================
+
+  profiles: 516 rows, 19 columns (PRIMARY — tied to auth)
+  users:    671 rows,  6 columns (LEGACY — should be deprecated)
+  Delta:    155 orphan rows in users with no matching profile
+
+  Shared columns: id, email, created_at, organization_id, updated_at
+  Only in profiles: full_name, role, tenant_id, phone, address, city,
+                    state, zip, avatar_url, enrollment_status, is_active,
+                    onboarding_completed, onboarding_completed_at, zip_code
+  Only in users: app_role
+
+  8 code files still query 'users' table:
+    app/account/profile/ProfileEditForm.tsx:51
+    app/account/profile/page.tsx:24
+    app/api/account/delete/route.ts:24
+    app/api/account/export/route.ts:27
+    app/api/admin/reports/daily/route.ts:39
+    app/api/lti/launch/route.ts:64
+    app/messages/page.tsx:47
+    lib/grants/notification-system.ts:181
+
+  The 155 orphan records are likely pre-trigger legacy signups.
+  They exist in users but NOT in profiles, meaning:
+    - They have no tenant_id
+    - They have no role (only app_role in users table)
+    - They are invisible to the auth flow
+    - They should be reconciled into profiles or archived
+
+
+SECTION 5: ROLE ENFORCEMENT AUDIT
+==================================
+
+  Role checks in API routes:     296 (via profiles.role)
+  Role checks via user_roles:      4 (via lib/requireRole.ts — dormant)
+  withAuth wrapper usage:         30+ routes
+  authGuard usage:                server components
+
+  ALL role checks use profiles.role (global, not tenant-scoped).
+  ZERO role checks use user_roles table (tenant-scoped, but empty).
+
+  This means: an 'admin' is admin across ALL tenants.
+  After RBAC activation (run_part21), role checks should migrate
+  from profiles.role to user_roles + tenant_id.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DEFINITIVE ANSWERS
+==================
+
+Q: Is tenant_id included in every query filter?
+A: NO. Only 30 of 1,741 queries (2%) filter by tenant_id.
+   812 (47%) filter by user.id which is auth-safe.
+   335 (19%) are completely unscoped global reads.
+
+Q: Have you enabled RLS on ANY tables?
+A: NO. Zero of 679 tables have RLS enabled. Zero policies exist.
+
+Q: What happens if you enable partner logins today?
+A: Any authenticated user can:
+   - Read all 516 profiles (names, emails, phones, addresses)
+   - Read all 91 enrollments across all tenants
+   - Read all 43 courses (full catalog, no tenant boundary)
+   - Read all 49 programs
+   - Read all 5 certificates
+   - Export student data cross-tenant via admin API routes
+   - See aggregate metrics that mix all tenants
+
+Q: Is the fix surgical or a rewrite?
+A: SURGICAL. The 5 migration files (run_part17-21) fix the database
+   layer completely. After running them:
+   - RLS auto-scopes the 335 unscoped reads to the user's tenant
+   - No code changes needed for SELECT queries
+   - INSERT operations need tenant_id added to payload (211 writes)
+   - 8 'users' table queries need migration to 'profiles'
+   - withAuth wrapper needs one tenant_id check added
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MIGRATION FILES READY (run in Supabase SQL Editor, in order):
+
+  1. run_part17_tenant_isolation.sql    — Add tenant_id to 7 core tables
+  2. run_part18_tenant_backfill.sql     — Backfill all rows to default tenant
+  3. run_part19_rls_core_tables.sql     — RLS + policies on 12 core tables
+  4. run_part20_rls_remaining_tenant_tables.sql — RLS on 71 more tables
+  5. run_part21_rbac_seed.sql           — Seed roles + user_roles
+
+After running: 83 tables will have tenant-enforcing RLS.
+Remaining 596 tables are either:
+  - Anchor tables (tenants, organizations, partners) — no self-scoping
+  - System tables (views, configs) — no tenant concept
+  - Future module tables — add RLS when activated
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+END OF FORENSIC REPORT

@@ -28,7 +28,7 @@ export const maxDuration = 60;
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -64,7 +64,10 @@ export async function POST(req: Request) {
     }
     const { firstName, lastName, email, phone, programSlug } = parsed.data;
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
+    }
 
     // Get program details
     const { data: program, error: programError } = await supabase
@@ -104,8 +107,11 @@ export async function POST(req: Request) {
         last_name: lastName,
         email: email.toLowerCase(),
         phone: phone ?? null,
-        program_id: programSlug,
+        program_interest: programSlug,
+        city: 'Not provided',
+        zip: '00000',
         status: 'pending_payment',
+        source: 'enrollment-checkout',
       })
       .select('id')
       .single();
@@ -157,8 +163,12 @@ export async function POST(req: Request) {
           quantity: 1,
         },
       ],
-      success_url: `${siteUrl}/enroll/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${siteUrl}/apply?program=${programSlug}`,
+      success_url: programSlug
+        ? `${siteUrl}/programs/${programSlug}/apply/success?session_id={CHECKOUT_SESSION_ID}&provider=stripe`
+        : `${siteUrl}/enroll/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: programSlug
+        ? `${siteUrl}/programs/${programSlug}/apply?canceled=true&provider=stripe`
+        : `${siteUrl}/apply?program=${programSlug}`,
       metadata: {
         // Standardized metadata for grant/license compliance
         payment_type: 'enrollment',
@@ -173,12 +183,8 @@ export async function POST(req: Request) {
         email: email.toLowerCase(),
         phone: phone || '',
       },
-      // Enable all payment methods including BNPL
-      payment_method_types: ['card', 'affirm', 'klarna', 'afterpay_clearpay'],
-      // Enable automatic tax if configured
-      automatic_tax: {
-        enabled: true,
-      },
+      // Use whatever payment methods are enabled in the Stripe dashboard
+      payment_method_types: ['card'],
     });
 
     if (!session.url) {

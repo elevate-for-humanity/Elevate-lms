@@ -1,18 +1,20 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Phone, Shield } from 'lucide-react';
+import { ProgramTutorCTA } from '@/components/ProgramTutorCTA';
 import { CAREERS, EMPLOYERS, ENROLLMENT_STEPS, ELIGIBILITY } from '../hvac-program-data';
 
 export function HvacEnrollment() {
   return (
     <>
-      {/* Career Pathways */}
+      {/* Career Pathways — with image */}
       <section className="py-16 bg-brand-blue-600">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div className="text-white">
               <h2 className="text-3xl md:text-4xl font-black mb-6">Career Pathways</h2>
               <p className="text-white/80 mb-8">
-                Graduates enter the workforce with 6 industry-recognized credentials including EPA 608 and documented competencies. HVAC technicians are in high demand across Indiana.
+                Graduates enter the workforce with 6 industry-recognized credentials including EPA 608. HVAC technicians are in high demand across Indiana.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {CAREERS.map((career, i) => (
@@ -38,29 +40,41 @@ export function HvacEnrollment() {
         </div>
       </section>
 
-      {/* Tuition & Payment */}
+      {/* Tuition & Payment — with image side */}
       <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 text-center">Tuition, Funding &amp; Payment Options</h2>
-          <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto">
-            Multiple funding pathways available. Many qualifying Indiana residents complete this program at no cost through the Workforce Ready Grant.
-          </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 text-center">
-              <h3 className="font-bold text-slate-900 mb-1">Workforce Ready Grant</h3>
-              <p className="text-slate-600 text-sm">No cost for qualifying residents via Next Level Jobs</p>
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="relative h-[380px] rounded-2xl overflow-hidden shadow-2xl">
+              <Image
+                src="/images/programs-hq/students-learning.jpg"
+                alt="Students in workforce training program"
+                fill className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
             </div>
-            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 text-center">
-              <h3 className="font-bold text-slate-900 mb-1">WIOA Funding</h3>
-              <p className="text-slate-600 text-sm">Through your local WorkOne office</p>
-            </div>
-            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 text-center">
-              <h3 className="font-bold text-slate-900 mb-1">Payment Plans</h3>
-              <p className="text-slate-600 text-sm">Weekly or monthly installments</p>
-            </div>
-            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 text-center">
-              <h3 className="font-bold text-slate-900 mb-1">BNPL Options</h3>
-              <p className="text-slate-600 text-sm">Affirm, Sezzle where eligible</p>
+            <div>
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Tuition &amp; Payment</h2>
+              <p className="text-slate-600 mb-6">
+                Multiple funding pathways. Many qualifying Indiana residents complete this program at no cost.
+              </p>
+              <div className="space-y-3">
+                <div className="bg-brand-green-50 rounded-xl p-4 border border-brand-green-200">
+                  <h3 className="font-bold text-brand-green-900">Workforce Ready Grant</h3>
+                  <p className="text-brand-green-700 text-sm">No cost for qualifying residents via Next Level Jobs</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                  <h3 className="font-bold text-slate-900">WIOA Funding</h3>
+                  <p className="text-slate-600 text-sm">Through your local WorkOne office</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                  <h3 className="font-bold text-slate-900">Self-Pay: $5,000</h3>
+                  <p className="text-slate-600 text-sm">Payment plans, Affirm, Sezzle, or pay in full</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                  <h3 className="font-bold text-slate-900">Employer Sponsored</h3>
+                  <p className="text-slate-600 text-sm">Invoice or sponsorship agreement available</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -69,34 +83,38 @@ export function HvacEnrollment() {
       {/* Eligibility & Enrollment */}
       <section className="py-16 bg-slate-50">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-black text-slate-900 text-center mb-4">Eligibility &amp; Enrollment</h2>
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 text-center mb-4">Eligibility &amp; How to Enroll</h2>
 
-          <div className="max-w-2xl mx-auto mb-10 bg-white p-6 rounded-xl border border-slate-200">
-            <h3 className="font-bold text-slate-900 mb-3">Eligibility Requirements</h3>
-            <div className="space-y-2">
-              {ELIGIBILITY.map((req, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <span className="w-1.5 h-1.5 bg-brand-blue-600 rounded-full flex-shrink-0 mt-2" />
-                  <span className="text-slate-700 text-sm">{req}</span>
-                </div>
-              ))}
+          <div className="grid lg:grid-cols-2 gap-8 mt-10">
+            {/* Eligibility */}
+            <div className="bg-white p-6 rounded-xl border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-4 text-lg">Requirements</h3>
+              <div className="space-y-3">
+                {ELIGIBILITY.map((req, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-brand-blue-600 rounded-full flex-shrink-0 mt-2" />
+                    <span className="text-slate-700 text-sm">{req}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="max-w-3xl mx-auto">
-            <h3 className="font-bold text-xl text-slate-900 text-center mb-6">How to Enroll</h3>
-            <div className="space-y-3">
-              {ENROLLMENT_STEPS.map((step, i) => (
-                <div key={i} className="flex items-start gap-4 bg-white rounded-lg p-4 border border-slate-200">
-                  <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                    {i + 1}
+            {/* Steps */}
+            <div>
+              <h3 className="font-bold text-slate-900 mb-4 text-lg">Enrollment Steps</h3>
+              <div className="space-y-3">
+                {ENROLLMENT_STEPS.map((step, i) => (
+                  <div key={i} className="flex items-start gap-4 bg-white rounded-lg p-4 border border-slate-200">
+                    <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                      {i + 1}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-sm">{step.title}</h4>
+                      <p className="text-slate-600 text-sm">{step.description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900 text-sm">{step.title}</h4>
-                    <p className="text-slate-600 text-sm">{step.description}</p>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -116,22 +134,30 @@ export function HvacEnrollment() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Final CTA */}
       <section className="py-20 bg-slate-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
             Start Your HVAC Career
           </h2>
           <p className="text-xl text-slate-300 mb-8">
-            20-week program with 6 credentials including EPA 608. Workforce Ready Grant eligible. Apply today.
+            20-week program. 6 credentials. Workforce Ready Grant eligible. Apply today.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/apply?program=hvac-technician" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/programs/hvac-technician/apply" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/support" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">
               <Phone className="w-5 h-5" /> Get Help Online
             </Link>
+          </div>
+          <div className="mt-6 flex justify-center">
+            <ProgramTutorCTA
+              programSlug="hvac-technician"
+              programName="HVAC Technician"
+              applyHref="/programs/hvac-technician/apply"
+              suggestions={['What is EPA 608?', 'How long is the program?', 'Is tuition covered?', 'What jobs can I get?']}
+            />
           </div>
         </div>
       </section>

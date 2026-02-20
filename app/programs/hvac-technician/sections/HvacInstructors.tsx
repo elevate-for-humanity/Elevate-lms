@@ -123,7 +123,7 @@ function InstructorsAndTutorsSection({ block }: { block: HvacProgramInstructorsB
         <ProgramTutorCTA
           programSlug="hvac-technician"
           programName="HVAC Technician"
-          applyHref="/apply?program=hvac-technician"
+          applyHref="/programs/hvac-technician/apply"
           suggestions={['What is EPA 608?', 'How long is the program?', 'Is tuition covered?', 'What jobs can I get?']}
         />
       </div>

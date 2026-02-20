@@ -25,6 +25,11 @@ const PROGRAM_PRICING: Record<string, ProgramPricing> = {
     full: BARBER_PRICING.fullPrice,     // $4,980
     max: BARBER_PRICING.fullPrice,      // Cap at full tuition
   },
+  'hvac-technician': {
+    deposit: 1750,
+    full: 5000,
+    max: 5000,
+  },
 };
 
 export type AmountResolution = {

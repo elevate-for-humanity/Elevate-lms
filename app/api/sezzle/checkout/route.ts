@@ -120,12 +120,13 @@ export async function POST(request: NextRequest) {
     const referenceId = `EFH-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     // Determine redirect URLs - use custom if provided, otherwise default based on programSlug
-    const defaultCancelUrl = programSlug === 'barber-apprenticeship' 
-      ? `${siteUrl}/programs/barber-apprenticeship/apply?canceled=true&provider=sezzle`
-      : `${siteUrl}/enroll/payment?canceled=true&provider=sezzle&ref=${referenceId}`;
-    
-    const defaultSuccessUrl = programSlug === 'barber-apprenticeship'
-      ? `${siteUrl}/programs/barber-apprenticeship/apply/success?provider=sezzle&ref=${referenceId}`
+    const programApplyBase = programSlug
+      ? `${siteUrl}/programs/${programSlug}/apply`
+      : `${siteUrl}/enroll/payment`;
+
+    const defaultCancelUrl = `${programApplyBase}?canceled=true&provider=sezzle`;
+    const defaultSuccessUrl = programSlug
+      ? `${siteUrl}/programs/${programSlug}/apply/success?provider=sezzle&ref=${referenceId}`
       : `${siteUrl}/enroll/success?provider=sezzle&ref=${referenceId}`;
 
     // Build session request

@@ -14,7 +14,7 @@ import { AuthorityBanner } from '@/components/InstitutionalAuthority';
 const programs = [
   { name: 'Healthcare', href: '/programs/healthcare', image: '/images/programs-hq/healthcare-hero.webp', desc: 'CNA, Medical Assistant, Phlebotomy' },
   { name: 'Skilled Trades', href: '/programs/skilled-trades', image: '/images/programs-hq/skilled-trades-hero.webp', desc: 'HVAC, Electrical, Welding, Plumbing' },
-  { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.webp', desc: 'Earn while you learn' },
+  { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.webp', desc: 'Paid apprenticeship — earn while you learn' },
   { name: 'CDL Training', href: '/programs/cdl', image: '/images/cdl-vibrant.webp', desc: 'Class A & B — start earning $50K+' },
   { name: 'Technology', href: '/programs/technology', image: '/images/programs-hq/it-support.webp', desc: 'IT Support, Cybersecurity' },
   { name: 'CPR & First Aid', href: '/programs/cpr-first-aid-hsi', image: '/images/healthcare/healthcare-professional-portrait-1.webp', desc: 'HSI certified — same-day available' },
@@ -37,7 +37,7 @@ export default function HomePage() {
               Free Training Programs — Learn, Certify, Work
             </h1>
             <p className="text-lg sm:text-xl text-slate-300 mt-4 leading-relaxed max-w-2xl mx-auto">
-              WIOA-funded career training in healthcare, skilled trades, CDL, technology, and barbering. Zero tuition for eligible Indiana residents.
+              WIOA-funded career training in healthcare, skilled trades, CDL, and technology. Zero tuition for eligible Indiana residents.
             </p>
           </div>
         </div>
@@ -70,7 +70,7 @@ export default function HomePage() {
                 image: '/images/artlist/cropped/hero-training-3-square.webp',
                 alt: 'Students in a hands-on training session',
                 label: 'I want to train',
-                desc: 'Browse programs in healthcare, trades, CDL, tech, and barbering. See schedules, requirements, and how to enroll.',
+                desc: 'Browse programs in healthcare, trades, CDL, and tech. See schedules, requirements, and how to enroll.',
                 cta: 'Browse Programs',
               },
               {
@@ -130,7 +130,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {[
-              { title: 'Career Opportunities', desc: 'We offer certification programs in healthcare (CNA, Medical Assistant, Phlebotomy), skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking, IT/cybersecurity, and barbering. Most programs are 4-16 weeks and include hands-on training.', href: '/programs', image: '/images/programs-hq/training-classroom.webp' },
+              { title: 'Career Opportunities', desc: 'We offer certification programs in healthcare (CNA, Medical Assistant, Phlebotomy), skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking, and IT/cybersecurity. Most programs are 4-16 weeks and include hands-on training.', href: '/programs', image: '/images/programs-hq/training-classroom.webp' },
               { title: 'Funding Available', desc: 'Most students pay nothing out of pocket when they qualify for workforce funding. WIOA covers tuition, books, and supplies. The Workforce Ready Grant funds high-demand certifications. JRI provides paid apprenticeships for justice-involved individuals. Check your eligibility online in minutes.', href: '/funding', image: '/images/heroes-hq/funding-hero.webp' },
               { title: 'Hire Our Graduates', desc: 'Employers: our graduates hold industry-recognized credentials and are ready to work. Access WOTC tax credits ($2,400-$9,600/hire), OJT wage reimbursements (50-75% of wages), and post jobs directly to our candidate pool.', href: '/employer', image: '/images/programs-hq/business-office.webp' },
             ].map((card) => (

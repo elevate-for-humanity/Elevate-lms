@@ -1,10 +1,12 @@
 import Image from 'next/image';
+import Link from 'next/link';
+import { ArrowRight, Phone } from 'lucide-react';
 import { QUICK_STATS } from '../hvac-program-data';
 
 export function HvacHero() {
   return (
     <>
-      {/* Hero Image — no text overlay */}
+      {/* Hero Image */}
       <section className="relative h-[55vh] min-h-[400px]">
         <Image
           src="/images/trades/hero-program-hvac.jpg"
@@ -29,7 +31,25 @@ export function HvacHero() {
         </div>
       </section>
 
-      {/* Program Overview with real images */}
+      {/* Early CTA — right after stats */}
+      <section className="py-10 bg-brand-red-600">
+        <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="text-white text-center sm:text-left">
+            <h2 className="text-2xl md:text-3xl font-black">Ready to Start?</h2>
+            <p className="text-white/80 mt-1">Workforce Ready Grant may cover full tuition. Check your eligibility.</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/programs/hvac-technician/apply" className="inline-flex items-center gap-2 bg-white text-brand-red-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all hover:scale-105">
+              Apply Now <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link href="/support" className="inline-flex items-center gap-2 bg-white/10 text-white px-6 py-4 rounded-full font-bold border border-white/30 hover:bg-white/20 transition-all">
+              <Phone className="w-4 h-4" /> Questions?
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Program Overview with images */}
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-start">

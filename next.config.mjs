@@ -97,6 +97,21 @@ const nextConfig = {
     } : false,
   },
 
+  // Allow cross-origin requests from preview/deploy URLs
+  allowedDevOrigins: [
+    'localhost',
+    '**.gitpod.dev',
+  ],
+
+  serverActions: {
+    allowedOrigins: [
+      'localhost:3000',
+      '**.gitpod.dev',
+      'www.elevateforhumanity.org',
+      'elevateforhumanity.org',
+    ],
+  },
+
   // Experimental features for better performance
   experimental: {
     optimizePackageImports: [

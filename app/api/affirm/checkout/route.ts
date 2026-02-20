@@ -134,7 +134,9 @@ export async function POST(request: NextRequest) {
       customerName: `${firstName} ${lastName}`,
       customerPhone: phone,
       successUrl: `${siteUrl}/api/affirm/capture?order_id=${orderId}`,
-      cancelUrl: `${siteUrl}/programs/barber-apprenticeship/apply?canceled=true&provider=affirm`,
+      cancelUrl: programSlug
+        ? `${siteUrl}/programs/${programSlug}/apply?canceled=true&provider=affirm`
+        : `${siteUrl}/enroll/payment?canceled=true&provider=affirm`,
     });
 
     logger.info('[Affirm] Checkout context created', {

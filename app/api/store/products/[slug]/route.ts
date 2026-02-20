@@ -22,7 +22,7 @@ export async function GET(
 
   // Try DB first; fall back to hardcoded on error OR null result
   let product = null;
-  let source = 'database';
+  const source = 'database';
   try {
     product = await getCatalogProduct(slug);
   } catch {

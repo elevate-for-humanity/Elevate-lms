@@ -40,7 +40,7 @@ export default async function CampaignsPage() {
 
   // Get all campaigns
   const { data: campaigns } = await supabase
-    .from('email_campaigns')
+    .from('campaigns')
     .select('*')
     .order('created_at', { ascending: false });
 

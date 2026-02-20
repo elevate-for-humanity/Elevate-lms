@@ -33,7 +33,7 @@ export default function HomeHeroVideo() {
   return (
     <>
       <Image
-        src="/images/hero-poster.jpg"
+        src="/images/hero-poster.webp"
         alt="Elevate for Humanity career training"
         fill
         priority

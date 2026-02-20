@@ -35,12 +35,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default: 'Elevate for Humanity | Workforce Infrastructure',
+    default: 'Elevate for Humanity | Free Training Programs Funded by WIOA',
     template: '%s | Elevate for Humanity',
   },
 
   description:
-    'Workforce infrastructure that connects public funding, employer demand, and credential-backed training to drive measurable outcomes.',
+    'Learn job-ready skills through free training programs in healthcare, skilled trades, CDL, and technology. WIOA funding covers tuition for eligible Indiana residents. Enroll today and start your career.',
 
   // Homepage canonical - child pages should override with their own
   alternates: {
@@ -77,24 +77,24 @@ export const metadata: Metadata = {
     type: 'website',
     url: SITE_URL,
     siteName: 'Elevate for Humanity',
-    title: 'Elevate for Humanity',
+    title: 'Elevate for Humanity | Free Training Programs Funded by WIOA',
     description:
-      'Workforce training, credentials, and community programs connecting learners to funded pathways and employer-aligned opportunities.',
+      'Learn job-ready skills through free training programs in healthcare, skilled trades, CDL, and technology. WIOA funding covers tuition for eligible Indiana residents.',
     images: [
       {
         url: '/images/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Elevate for Humanity',
+        alt: 'Elevate for Humanity — free workforce training programs',
       },
     ],
   },
 
   twitter: {
     card: 'summary_large_image',
-    title: 'Elevate for Humanity',
+    title: 'Elevate for Humanity | Free Training Programs Funded by WIOA',
     description:
-      'Workforce training, credentials, and community programs connecting learners to funded pathways and employer-aligned opportunities.',
+      'Learn job-ready skills through free training programs in healthcare, skilled trades, CDL, and technology. WIOA funding covers tuition for eligible Indiana residents.',
     images: ['/images/og-image.jpg'],
   },
 
@@ -152,6 +152,11 @@ export default function RootLayout({
       <head>
         {!isProduction && <meta name="robots" content="noindex,nofollow" />}
 
+        {/* DNS prefetch for external resources */}
+        <link rel="dns-prefetch" href="https://widget.sezzle.com" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
+
         <link rel="icon" href="/favicon.ico" sizes="32x32" />
         <link rel="icon" href="/favicon.png" type="image/png" sizes="192x192" />
         <link
@@ -163,8 +168,9 @@ export default function RootLayout({
         {/* Preload hero image for faster LCP */}
         <link
           rel="preload"
-          href="/images/hero-poster.jpg"
+          href="/images/hero-poster.webp"
           as="image"
+          type="image/webp"
           fetchPriority="high"
         />
         {!isProduction && (
@@ -217,47 +223,32 @@ export default function RootLayout({
       >
         <SkipToContent />
         <GoogleAnalytics />
-        {/* Sezzle Price Widget Configuration */}
+        {/* Sezzle Price Widget — loads only when target elements exist */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              document.sezzleConfig = {
-                configGroups: [
-                  {
-                    targetXPath: ".sezzle-hero-price",
-                    renderToPath: ".sezzle-hero-widget",
-                    theme: "dark",
-                    alignment: "left"
-                  },
-                  {
-                    targetXPath: ".sezzle-price-target",
-                    renderToPath: ".sezzle-widget-container", 
-                    theme: "light",
-                    alignment: "left"
-                  },
-                  {
-                    targetXPath: ".product-price",
-                    theme: "light",
-                    alignment: "left"
-                  },
-                  {
-                    targetXPath: ".cart-total",
-                    renderToPath: ".sezzle-cart-widget",
-                    theme: "light",
-                    alignment: "right"
-                  }
-                ],
-                language: "en",
-                minPrice: 35,
-                maxPrice: 2500
-              };
+              (function() {
+                var targets = ['.sezzle-hero-price', '.sezzle-price-target', '.product-price', '.cart-total'];
+                var hasTarget = targets.some(function(sel) { return document.querySelector(sel); });
+                if (!hasTarget) return;
+                document.sezzleConfig = {
+                  configGroups: [
+                    { targetXPath: ".sezzle-hero-price", renderToPath: ".sezzle-hero-widget", theme: "dark", alignment: "left" },
+                    { targetXPath: ".sezzle-price-target", renderToPath: ".sezzle-widget-container", theme: "light", alignment: "left" },
+                    { targetXPath: ".product-price", theme: "light", alignment: "left" },
+                    { targetXPath: ".cart-total", renderToPath: ".sezzle-cart-widget", theme: "light", alignment: "right" }
+                  ],
+                  language: "en",
+                  minPrice: 35,
+                  maxPrice: 2500
+                };
+                var s = document.createElement('script');
+                s.src = 'https://widget.sezzle.com/v1/javascript/price-widget?uuid=8ac76455-16d3-44f4-9b11-64b85a80184c';
+                s.async = true;
+                document.head.appendChild(s);
+              })();
             `,
           }}
-        />
-        {/* Sezzle Price Widget Script */}
-        <script
-          src="https://widget.sezzle.com/v1/javascript/price-widget?uuid=8ac76455-16d3-44f4-9b11-64b85a80184c"
-          async
         />
         <PublicLayout>{children}</PublicLayout>
         <CookieConsent />

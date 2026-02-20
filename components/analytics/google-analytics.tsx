@@ -14,12 +14,8 @@ const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export function GoogleAnalytics() {
   useEffect(() => {
-    if (!GA_MEASUREMENT_ID) {
-      console.warn(
-        '[analytics] NEXT_PUBLIC_GA_MEASUREMENT_ID is not set. GA4 is disabled. ' +
-        'Set this env var in Netlify or .env.local to enable analytics.'
-      );
-    }
+    // GA_MEASUREMENT_ID check is silent in production — operators
+    // should verify via Netlify env vars, not browser console.
   }, []);
 
   if (!GA_MEASUREMENT_ID) {

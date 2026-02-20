@@ -18,14 +18,11 @@ export default function HomeHeroVideo() {
         await video.play();
         setIsPlaying(true);
       } catch {
-        // Autoplay blocked - poster image stays visible
+        // Autoplay blocked — poster image stays visible
       }
     };
 
-    // Use loadeddata instead of canplay — fires as soon as first frame is ready
     video.addEventListener('loadeddata', playVideo, { once: true });
-
-    // Also try immediately in case already loaded
     if (video.readyState >= 2) playVideo();
 
     return () => {
@@ -50,9 +47,9 @@ export default function HomeHeroVideo() {
         muted
         playsInline
         autoPlay
-        preload="metadata"
+        preload="auto"
       >
-        <source src="/videos/hero-home-fast.mp4" type="video/mp4" />
+        <source src="/videos/homepage-hero-montage.mp4" type="video/mp4" />
       </video>
     </>
   );

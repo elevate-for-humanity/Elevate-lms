@@ -1,7 +1,8 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 
 /**
  * GlobalAvatar - Video avatar component
@@ -120,53 +121,145 @@ const excludedPatterns = [
 
 export default function GlobalAvatar() {
   const pathname = usePathname();
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
   // Find matching avatar config
   const config = avatarConfig.find(c => c.pattern.test(pathname));
-  
-  // Check if excluded
   const isExcluded = excludedPatterns.some(pattern => pattern.test(pathname));
 
-  // Auto-play on page load (must be before any returns)
+  // Scroll-triggered visibility
   useEffect(() => {
-    if (isExcluded || !config) return;
-    
+    const el = containerRef.current;
+    if (!el || isExcluded || !config) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.4 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [pathname, isExcluded, config]);
+
+  // Auto-play when visible, pause when not
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || isExcluded || !config) return;
+    if (isVisible) {
+      video.play().then(() => setIsPlaying(true)).catch(() => {});
+    } else if (!video.paused) {
+      video.pause();
+      setIsPlaying(false);
+    }
+  }, [isVisible, isExcluded, config]);
+
+  // Reset state on page change
+  useEffect(() => {
+    setIsPlaying(false);
+    setIsMuted(true);
+    setHasInteracted(false);
+    setIsVisible(false);
+  }, [pathname]);
+
+  if (isExcluded || !config) return null;
+
+  const unmute = () => {
     const video = videoRef.current;
     if (!video) return;
-    
-    video.muted = true;
-    video.volume = 0;
-    video.play().catch(() => {
-      // Browser blocked autoplay - will play on interaction
-    });
-  }, [pathname, isExcluded, config]);
-  
-  // Don't show on excluded pages
-  if (isExcluded) {
-    return null;
-  }
-  
-  if (!config) {
-    return null;
-  }
-  
+    video.muted = false;
+    setIsMuted(false);
+    setHasInteracted(true);
+  };
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      video.play().then(() => setIsPlaying(true)).catch(() => {});
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !video.muted;
+    setIsMuted(video.muted);
+    setHasInteracted(true);
+  };
+
   return (
-    <section className="relative w-full bg-slate-100 py-8">
+    <section ref={containerRef} className="relative w-full bg-slate-100 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="relative rounded-2xl overflow-hidden shadow-xl">
           <video
             ref={videoRef}
             className="w-full aspect-video object-cover"
             playsInline
-            autoPlay
             muted
-            preload="metadata"
+            preload="auto"
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onEnded={() => setIsPlaying(false)}
           >
             <source src={config.video} type="video/mp4" />
           </video>
-          <div className="absolute bottom-4 left-4 bg-black/60 text-white px-4 py-2 rounded-lg">
-            <span className="font-medium">{config.name}</span>
+
+          {/* Tap to unmute — shown when playing muted before user interaction */}
+          {isPlaying && isMuted && !hasInteracted && (
+            <button
+              onClick={unmute}
+              className="absolute inset-0 z-20 flex items-center justify-center cursor-pointer"
+              aria-label="Tap to unmute"
+            >
+              <span className="flex items-center gap-2 bg-black/70 hover:bg-black/80 text-white text-sm font-semibold rounded-full px-5 py-2.5 transition-colors shadow-lg backdrop-blur-sm">
+                <VolumeX className="w-5 h-5" />
+                Tap to unmute
+              </span>
+            </button>
+          )}
+
+          {/* Play button — shown when paused */}
+          {!isPlaying && (
+            <button
+              onClick={togglePlay}
+              className="absolute inset-0 z-20 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors cursor-pointer"
+              aria-label="Play video"
+            >
+              <span className="flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white text-base font-bold rounded-full px-6 py-3 transition-colors shadow-lg">
+                <Play className="w-6 h-6 fill-white" />
+                Play
+              </span>
+            </button>
+          )}
+
+          {/* Controls — shown after user has interacted */}
+          {isPlaying && hasInteracted && (
+            <div className="absolute bottom-4 left-4 z-20 flex gap-2">
+              <button
+                onClick={togglePlay}
+                className="p-2 bg-black/60 hover:bg-black/80 rounded-full transition-colors"
+                title="Pause"
+              >
+                <Pause className="w-5 h-5 text-white" />
+              </button>
+              <button
+                onClick={toggleMute}
+                className="p-2 bg-black/60 hover:bg-black/80 rounded-full transition-colors"
+                title={isMuted ? 'Unmute' : 'Mute'}
+              >
+                {isMuted ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
+              </button>
+            </div>
+          )}
+
+          <div className="absolute bottom-4 right-4 z-10 pointer-events-none">
+            <span className="bg-black/70 text-white text-xs font-medium rounded px-2 py-1">{config.name}</span>
           </div>
         </div>
       </div>

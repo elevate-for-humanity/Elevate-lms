@@ -1,54 +1,26 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Users, MapPin, Phone, ArrowRight, Handshake, Award, FileText } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Workforce Partners | WorkOne & Community Organizations | Elevate For Humanity',
   description: 'Partner with Elevate for Humanity to connect job seekers with free career training. WorkOne centers, community organizations, and workforce boards - learn how we work together.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/workforce-partners' },
 };
 
-const partners = [
-  {
-    name: 'WorkOne Indy',
-    type: 'American Job Center',
-    description: 'Primary workforce development partner for Marion County. Provides WIOA eligibility determination and career counseling.',
-    location: 'Indianapolis, IN',
-    image: '/images/heroes/workforce-partner-1.jpg',
-  },
-  {
-    name: 'Employ Indy',
-    type: 'Workforce Development Board',
-    description: 'Local workforce board overseeing federal workforce funding and programs in Marion County.',
-    location: 'Indianapolis, IN',
-    image: '/images/heroes/workforce-partner-2.jpg',
-  },
-  {
-    name: 'Indiana DWD',
-    type: 'State Agency',
-    description: 'Indiana Department of Workforce Development administers WIOA, Workforce Ready Grant, and unemployment programs statewide.',
-    location: 'Statewide',
-    image: '/images/heroes/workforce-partner-3.jpg',
-  },
-  {
-    name: 'Goodwill of Central Indiana',
-    type: 'Community Partner',
-    description: 'Provides job readiness training, career coaching, and supportive services for job seekers.',
-    location: 'Central Indiana',
-    image: '/images/heroes/workforce-partner-4.jpg',
-  },
-];
 
-const services = [
-  { icon: Users, title: 'Referral Pipeline', desc: 'We accept referrals from WorkOne and community partners for WIOA-eligible training.' },
-  { icon: FileText, title: 'ITA Processing', desc: 'Streamlined Individual Training Account voucher processing for enrolled students.' },
-  { icon: Award, title: 'Credential Tracking', desc: 'Real-time reporting on student progress, completions, and credential attainment.' },
-  { icon: Handshake, title: 'Employer Connections', desc: 'Direct pipeline to hiring employers for job placement after training.' },
-];
 
-export default function WorkforcePartnersPage() {
+export default async function WorkforcePartnersPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+const partners = (dbRows as any[]) || [];
+const services = (dbRows as any[]) || [];
+
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

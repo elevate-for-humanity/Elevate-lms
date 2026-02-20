@@ -1,80 +1,22 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { FileText, ChevronRight, Shield, Scale, BookOpen, ShoppingCart, Calculator, UserPlus, Building } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Governance Documents | Elevate For Humanity',
   description: 'Authoritative governance documents for Elevate For Humanity platform operations, compliance, and standards.',
 };
 
-const documents = [
-  {
-    id: 'EFH-GOV-001',
-    title: 'Platform Overview and Governance',
-    description: 'Platform components, user roles, governance model, and organizational structure.',
-    href: '/legal/governance/platform-overview',
-    icon: Building,
-    color: 'bg-gray-100 text-gray-700',
-    owner: 'Executive Director',
-  },
-  {
-    id: 'EFH-SEC-001',
-    title: 'Security and Data Protection Statement',
-    description: 'Data handling, encryption, access controls, incident response, and user responsibilities.',
-    href: '/legal/governance/security',
-    icon: Shield,
-    color: 'bg-brand-orange-100 text-brand-orange-700',
-    owner: 'Data Protection Officer',
-  },
-  {
-    id: 'EFH-COM-001',
-    title: 'Compliance and Disclosure Framework',
-    description: 'Regulatory compliance, required disclosures, consumer protection, and accessibility.',
-    href: '/legal/governance/compliance',
-    icon: Scale,
-    color: 'bg-brand-blue-100 text-brand-blue-700',
-    owner: 'Chief Compliance Officer',
-  },
-  {
-    id: 'EFH-LMS-001',
-    title: 'LMS Governance and Course Standards',
-    description: 'Course creation, instructor requirements, certification policies, and quality assurance.',
-    href: '/legal/governance/lms-standards',
-    icon: BookOpen,
-    color: 'bg-brand-green-100 text-brand-green-700',
-    owner: 'Director of Education',
-  },
-  {
-    id: 'EFH-STO-001',
-    title: 'Store, Payments, and Licensing Framework',
-    description: 'E-commerce operations, payment processing, digital licensing, and refund policies.',
-    href: '/legal/governance/store-payments',
-    icon: ShoppingCart,
-    color: 'bg-brand-blue-100 text-brand-blue-700',
-    owner: 'Director of Operations',
-  },
-  {
-    id: 'EFH-TAX-001',
-    title: 'Tax Preparation and Refund Advance Operations',
-    description: 'Supersonic Fast Cash services, IRS compliance, refund advances, and data security.',
-    href: '/legal/governance/tax-operations',
-    icon: Calculator,
-    color: 'bg-brand-red-100 text-brand-red-700',
-    owner: 'Tax Operations Manager',
-  },
-  {
-    id: 'EFH-UX-001',
-    title: 'Onboarding and User Experience Standards',
-    description: 'User journeys, accessibility standards, support channels, and design system.',
-    href: '/legal/governance/onboarding-ux',
-    icon: UserPlus,
-    color: 'bg-teal-100 text-teal-700',
-    owner: 'Director of Product',
-  },
-];
 
-export default function GovernanceIndexPage() {
+export default async function GovernanceIndexPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+const documents = (dbRows as any[]) || [];
+
   return (
     <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 py-4">

@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Settings, BookOpen, ShoppingCart, Code, Shield } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Operational Controls | Governance | Elevate for Humanity',
   description: 'How quality, integrity, and risk controls are enforced across the platform including audits, CI gates, and deployment controls.',
@@ -46,7 +49,10 @@ const deploymentChecks = [
   'Linting and code quality',
 ];
 
-export default function OperationalControlsPage() {
+export default async function OperationalControlsPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('governance_documents').select('*').limit(50);
+
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',

@@ -1,31 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import Link from 'next/link';
 import { Users, GraduationCap, DollarSign, FileText, ChevronRight, ArrowRight, Search, Clock, Eye, ThumbsUp, Download } from 'lucide-react';
 
-const APPRENTICES = [
-  { id: 1, name: 'Marcus Johnson', program: 'CDL Commercial Driving', hours: 680, total: 2000, wage: '$18.50/hr', status: 'On Track', pendingHours: 8 },
-  { id: 2, name: 'David Chen', program: 'HVAC Technician', hours: 420, total: 2000, wage: '$16.00/hr', status: 'On Track', pendingHours: 0 },
-  { id: 3, name: 'James Brown', program: 'Welding', hours: 1200, total: 2000, wage: '$20.00/hr', status: 'Ahead', pendingHours: 6 },
-  { id: 4, name: 'Aisha Patel', program: 'Medical Assistant', hours: 150, total: 1500, wage: '$15.00/hr', status: 'New', pendingHours: 0 },
-];
-
-const CANDIDATES = [
-  { id: 1, name: 'Jasmine Davis', credential: 'Indiana CNA License', program: 'CNA Training', available: 'Immediately', match: 95 },
-  { id: 2, name: 'Maria Gonzalez', credential: 'CPT(ASCP)', program: 'Phlebotomy', available: 'Immediately', match: 88 },
-  { id: 3, name: 'Robert Lee', credential: 'CDL Class B Permit', program: 'CDL Class B', available: 'Mar 2026', match: 82 },
-];
-
-const INCENTIVES = [
-  { type: 'WOTC Tax Credit', employee: 'Marcus Johnson', amount: '$9,600', status: 'Approved' },
-  { type: 'OJT Reimbursement', employee: 'David Chen', amount: '$4,800', status: 'Pending' },
-  { type: 'WOTC Tax Credit', employee: 'James Brown', amount: '$2,400', status: 'Approved' },
-  { type: 'OJT Reimbursement', employee: 'Aisha Patel', amount: '$1,600', status: 'Processing' },
-];
+import { createBrowserClient } from '@supabase/ssr';
 
 export default function DemoEmployerPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  const APPRENTICES = (dbRows as any[]) || [];
+  const CANDIDATES = (dbRows as any[]) || [];
+  const INCENTIVES = (dbRows as any[]) || [];
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('employers').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [toast, setToast] = useState<string | null>(null);
   const [approvedHours, setApprovedHours] = useState<Set<number>>(new Set());
   const [search, setSearch] = useState('');

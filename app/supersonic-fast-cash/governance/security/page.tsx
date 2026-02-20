@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
@@ -5,6 +7,7 @@ import { ArrowLeft, Shield, Zap } from 'lucide-react';
 import { QuickSummary } from '@/app/governance/_content/QuickSummary';
 import { SupersonicScopeSection } from '@/app/governance/_content/SupersonicScopeSection';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Security & Data Protection | Supersonic Fast Cash',
   description: 'How Supersonic Fast Cash protects personal, financial, and tax preparation data.',
@@ -25,7 +28,10 @@ const summaryBullets = [
   'Users are responsible for protecting their login credentials',
 ];
 
-export default function SupersonicSecurityPage() {
+export default async function SupersonicSecurityPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',

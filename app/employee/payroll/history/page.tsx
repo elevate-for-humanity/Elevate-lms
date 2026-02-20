@@ -1,21 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Download } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createBrowserClient } from '@supabase/ssr';
 export default function PayrollHistoryPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('pay_stubs').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [year, setYear] = useState('2026');
 
-  const payHistory = [
-    { id: '1', period: 'Jan 1-15, 2026', grossPay: 2450.00, netPay: 1876.50, hours: 80, date: 'Jan 17, 2026' },
-    { id: '2', period: 'Dec 16-31, 2025', grossPay: 2450.00, netPay: 1876.50, hours: 80, date: 'Jan 3, 2026' },
-    { id: '3', period: 'Dec 1-15, 2025', grossPay: 2450.00, netPay: 1876.50, hours: 80, date: 'Dec 17, 2025' },
-    { id: '4', period: 'Nov 16-30, 2025', grossPay: 2450.00, netPay: 1876.50, hours: 80, date: 'Dec 3, 2025' },
-    { id: '5', period: 'Nov 1-15, 2025', grossPay: 2450.00, netPay: 1876.50, hours: 80, date: 'Nov 17, 2025' },
-    { id: '6', period: 'Oct 16-31, 2025', grossPay: 2450.00, netPay: 1876.50, hours: 80, date: 'Nov 3, 2025' },
-  ];
+  const payHistory = (dbRows as any[]) || [];
 
   const ytdTotals = {
     grossPay: 14700.00,

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { createBrowserClient } from '@supabase/ssr';
 import { 
   Briefcase, Users, MapPin, Clock, DollarSign,
   CheckCircle, ChevronRight, Building, ArrowLeft
@@ -36,6 +37,16 @@ const hiringTimelines = [
 ];
 
 export default function HiringNeedsPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('onboarding_steps').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const router = useRouter();
   const [formData, setFormData] = useState({
     industry: '',

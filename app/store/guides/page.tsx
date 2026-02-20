@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -14,6 +16,7 @@ import {
 CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Guides & Resources | Elevate Store',
   description: 'Professional guides and resources for workforce development, capital readiness, and licensing compliance. Build institutional trust and scale responsibly.',
@@ -72,7 +75,10 @@ const categories = [
   { name: 'Training', count: 6, icon: Users },
 ];
 
-export default function GuidesPage() {
+export default async function GuidesPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

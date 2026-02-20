@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { ArrowRight, AlertTriangle } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Licensing Guide | Elevate LMS Platform',
   description: 'Step-by-step guide to licensing the Elevate LMS platform. Understand managed vs source-use options, setup process, and billing.',
@@ -10,7 +13,10 @@ export const metadata: Metadata = {
 
 const MASTER_STATEMENT = `All platform products are licensed access to systems operated by Elevate for Humanity. Ownership of software, infrastructure, and intellectual property is not transferred.`;
 
-export default function LicensingGuidePage() {
+export default async function LicensingGuidePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">

@@ -1,9 +1,12 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FileText, HelpCircle } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/workforce-board/eligibility' },
   title: 'WIOA Eligibility | Workforce Board | Elevate For Humanity',
@@ -41,7 +44,10 @@ const DOCUMENTS_NEEDED = [
   'Court documents (if applicable for priority population status)',
 ];
 
-export default function EligibilityPage() {
+export default async function EligibilityPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">

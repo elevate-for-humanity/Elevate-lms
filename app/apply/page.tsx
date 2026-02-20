@@ -10,6 +10,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 import { resolveProgram } from '@/lib/program-registry';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Apply | Elevate for Humanity',
   description: 'Apply for workforce training programs, employer partnerships, or program holder positions at Elevate for Humanity.',
@@ -23,6 +24,9 @@ export default async function ApplyPage({
 }: {
   searchParams: Promise<{ program?: string; pathway?: string }>;
 }) {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('applications').select('*').limit(50);
+
   const params = await searchParams;
   const rawProgram = (params?.program || params?.pathway || '').trim();
 

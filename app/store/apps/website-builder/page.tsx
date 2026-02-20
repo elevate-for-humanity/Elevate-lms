@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Check, Play, ShoppingCart, Star, Layout, Palette, Globe, Zap, Shield, BarChart } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Website Builder for Training Providers | Elevate Store',
   description: 'Build professional training provider websites in minutes. Pre-built templates, LMS integration, enrollment forms, and SEO optimization included.',
@@ -44,7 +47,10 @@ const pricing = [
   { name: 'Agency', price: 199, period: '/month', features: ['Unlimited Websites', 'White-label Builder', 'Client Management', 'API Access', 'Custom Templates', 'Dedicated Support', 'Multi-user Access', 'Revenue Sharing'] },
 ];
 
-export default function WebsiteBuilderAppPage() {
+export default async function WebsiteBuilderAppPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">

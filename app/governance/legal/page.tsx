@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Building2, Handshake, Heart, GraduationCap, FileText, Mail, MapPin, Phone } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Legal & Entity Information | Elevate for Humanity',
   description: 'Corporate structure, entity relationships, and governance documents for Elevate for Humanity Career & Technical Institute.',
@@ -11,7 +14,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LegalGovernancePage() {
+export default async function LegalGovernancePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('governance_documents').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">

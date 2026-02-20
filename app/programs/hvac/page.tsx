@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
+import { createBrowserClient } from '@supabase/ssr';
 import { 
   Clock, DollarSign, TrendingUp, ArrowRight, 
   Thermometer, Wind, Wrench, Award, Users, Calendar,
@@ -15,6 +16,16 @@ import {
 } from 'lucide-react';
 
 export default function HVACProgramPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('programs').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const faqs = [

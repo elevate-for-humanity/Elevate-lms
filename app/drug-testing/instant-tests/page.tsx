@@ -1,9 +1,12 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Phone, ArrowLeft, Clock, Zap } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Instant Rapid Drug Tests | Drug Testing Services',
   description: 'On-site rapid drug testing with results in 5-10 minutes. Cost-effective screening for employers.',
@@ -60,7 +63,10 @@ const instantTests = [
   },
 ];
 
-export default function InstantTestsPage() {
+export default async function InstantTestsPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('drug_tests').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">

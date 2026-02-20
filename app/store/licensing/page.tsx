@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -5,6 +7,7 @@ import { Server, Code, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { RedirectNotice } from '@/components/store/RedirectNotice';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Licenses | Elevate Store',
   description: 'Choose your license for the Elevate Workforce Operating System. Managed platform or enterprise source-use.',
@@ -54,7 +57,10 @@ const licenses = [
   },
 ];
 
-export default function StoreLicensesPage() {
+export default async function StoreLicensesPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs + framing */}

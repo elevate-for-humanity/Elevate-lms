@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import PageAvatar from '@/components/PageAvatar';
@@ -14,7 +14,18 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 
+import { createBrowserClient } from '@supabase/ssr';
 export default function CDLProgramPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('programs').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const faqs = [

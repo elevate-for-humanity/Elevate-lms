@@ -1,10 +1,12 @@
 "use client";
 export const dynamic = 'force-dynamic';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { programs } from '@/app/data/programs';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createBrowserClient } from '@supabase/ssr';
 const grantFundedPrograms = programs.filter((p) =>
   p.fundingOptions.some(
     (f) =>
@@ -19,6 +21,16 @@ const grantFundedPrograms = programs.filter((p) =>
 
 
 export default function GrantProgramsPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('funding_sources').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

@@ -1,15 +1,14 @@
+export const dynamic = 'force-dynamic';
+
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 
-const sources = [
-  { name: 'WIOA Adult', allocated: 450000, spent: 312000, students: 89 },
-  { name: 'WIOA Youth', allocated: 280000, spent: 195000, students: 52 },
-  { name: 'WIOA Dislocated Worker', allocated: 320000, spent: 248000, students: 41 },
-  { name: 'State Workforce Grant', allocated: 175000, spent: 98000, students: 35 },
-  { name: 'Employer OJT Reimbursement', allocated: 120000, spent: 87000, students: 18 },
-  { name: 'Pell Grant (pass-through)', allocated: 95000, spent: 72000, students: 12 },
-];
+import { createClient } from '@/lib/supabase/server';
 
-export default function DemoFundingPage() {
+export default async function DemoFundingPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('funding_sources').select('*').limit(50);
+const sources = (dbRows as any[]) || [];
+
   return (
     <DemoPageShell title="Funding" description="Track funding sources, allocations, and expenditures." portal="admin">
       <div className="bg-white rounded-xl border overflow-hidden">

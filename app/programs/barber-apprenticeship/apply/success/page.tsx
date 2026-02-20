@@ -1,13 +1,19 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Phone, Mail, ArrowRight } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Application Submitted | Barber Apprenticeship',
   robots: 'noindex',
 };
 
-export default function ApplicationSuccessPage() {
+export default async function ApplicationSuccessPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
       <div className="max-w-lg w-full">

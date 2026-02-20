@@ -1,11 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FileText, Send } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createBrowserClient } from '@supabase/ssr';
 export default function ComplianceReportPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('compliance_records').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [formData, setFormData] = useState({ type: '', description: '', anonymous: false });
   const [submitted, setSubmitted] = useState(false);
 

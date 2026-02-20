@@ -1,13 +1,19 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'License Agreement | Elevate For Humanity',
   description: 'Software License Agreement for organizations licensing the Elevate For Humanity platform.',
 };
 
-export default function LicenseAgreementPage() {
+export default async function LicenseAgreementPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
             <div className="max-w-7xl mx-auto px-4 py-4">

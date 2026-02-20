@@ -1,13 +1,19 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import HoursTracker from './HoursTracker';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Hours & Progress | Student Portal | Elevate For Humanity',
   description: 'Track your verified and pending hours, view progress toward program completion.',
 };
 
-export default function HoursPage() {
+export default async function HoursPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('enrollments').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-4">

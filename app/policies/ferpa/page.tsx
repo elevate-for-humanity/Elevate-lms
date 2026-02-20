@@ -1,6 +1,9 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 // Force static generation - FERPA is a trust page that must never hang
 
 export const metadata: Metadata = {
@@ -11,7 +14,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function FERPAPage() {
+export default async function FERPAPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">

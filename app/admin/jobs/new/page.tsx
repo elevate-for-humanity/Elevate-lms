@@ -1,16 +1,22 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowLeft, Briefcase, MapPin, DollarSign, Building, Save } from 'lucide-react';
 import { createJob } from '../actions';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Post New Job | Admin',
   description: 'Create a new job listing.',
   robots: { index: false, follow: false },
 };
 
-export default function AdminNewJobPage() {
+export default async function AdminNewJobPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('job_postings').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-3xl mx-auto">

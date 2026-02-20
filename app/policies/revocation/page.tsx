@@ -1,6 +1,9 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Credential Revocation Policy | Elevate for Humanity',
   description: 'Conditions under which credentials may be revoked, revocation procedures, and appeal rights.',
@@ -9,7 +12,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RevocationPage() {
+export default async function RevocationPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 py-4">

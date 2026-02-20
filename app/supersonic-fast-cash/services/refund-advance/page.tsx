@@ -1,6 +1,9 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
 import {
   DollarSign,
   Clock,
@@ -88,7 +91,10 @@ const faqs = [
   },
 ];
 
-export default function RefundAdvancePage() {
+export default async function RefundAdvancePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">

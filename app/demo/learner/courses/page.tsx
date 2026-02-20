@@ -1,15 +1,15 @@
+export const dynamic = 'force-dynamic';
+
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { Play, Lock } from 'lucide-react';
 
-const courses = [
-  { name: 'CDL Pre-Trip Inspection', modules: 8, completed: 8, progress: 100, status: 'Completed', grade: 'A' },
-  { name: 'CDL Road Skills', modules: 12, completed: 9, progress: 72, status: 'In Progress', grade: '—' },
-  { name: 'HAZMAT Safety', modules: 6, completed: 3, progress: 45, status: 'In Progress', grade: '—' },
-  { name: 'DOT Regulations', modules: 10, completed: 0, progress: 0, status: 'Locked', grade: '—' },
-  { name: 'Air Brakes', modules: 5, completed: 0, progress: 0, status: 'Locked', grade: '—' },
-];
+import { createClient } from '@/lib/supabase/server';
 
-export default function DemoCoursesPage() {
+export default async function DemoCoursesPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('courses').select('*').limit(50);
+const courses = (dbRows as any[]) || [];
+
   return (
     <DemoPageShell title="Courses" description="Your enrolled courses and module progress." portal="learner">
       <div className="space-y-4">

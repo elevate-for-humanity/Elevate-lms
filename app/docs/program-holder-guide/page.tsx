@@ -1,7 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { BookOpen, ArrowLeft, Users, FileText, Settings, BarChart3 } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 const sections = [
   { icon: Users, title: 'Managing Students', items: ['Add new students', 'Track enrollment status', 'Monitor progress', 'Generate reports'] },
   { icon: FileText, title: 'Program Administration', items: ['Update program details', 'Manage curriculum', 'Set schedules', 'Configure prerequisites'] },
@@ -9,7 +12,10 @@ const sections = [
   { icon: Settings, title: 'Settings & Configuration', items: ['Branding customization', 'User permissions', 'Notification preferences', 'Integration setup'] },
 ];
 
-export default function ProgramHolderGuidePage() {
+export default async function ProgramHolderGuidePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('documentation').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 py-4">

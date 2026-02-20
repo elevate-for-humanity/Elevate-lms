@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -5,12 +7,16 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import RequestMeeting from '@/components/RequestMeeting';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Apply for CPR & First Aid (HSI) | Elevate for Humanity',
   description: 'Apply for our CPR & First Aid (HSI) program. WIOA-funded training available in Indianapolis.',
 };
 
-export default function ApplyPage() {
+export default async function ApplyPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+
   return (
     <main className="min-h-screen bg-white">
       <div className="relative h-[40vh] min-h-[300px] max-h-[400px]">

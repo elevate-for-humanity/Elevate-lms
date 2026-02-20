@@ -1,11 +1,22 @@
 'use client';
 
-import { useState, Fragment } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { DEMO_STUDENTS } from '@/lib/demo/sandbox-data';
 import { Search, Filter, Download, ChevronDown, ChevronUp, Clock, AlertTriangle, XCircle, Mail, Phone } from 'lucide-react';
 
+import { createBrowserClient } from '@supabase/ssr';
 export default function DemoEnrollmentsPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('enrollments').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [search, setSearch] = useState('');
   const [programFilter, setProgramFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -18,7 +29,7 @@ export default function DemoEnrollmentsPage() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const programs = [...new Set(DEMO_STUDENTS.map((s: any) => s.program))];
+  const programs = (dbRows as any[]) || [];
 
   const filtered = DEMO_STUDENTS
     .filter((s: any) => {

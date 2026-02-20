@@ -1,10 +1,11 @@
 'use client';
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+import { createBrowserClient } from '@supabase/ssr';
 function Button({ children, variant, onClick, type, className }: { children: React.ReactNode; variant?: string; onClick?: () => void; type?: 'button' | 'submit'; className?: string }) {
   const baseClass = 'px-4 py-2 rounded-lg font-medium transition-colors';
   const variantClass = variant === 'outline' ? 'border border-gray-300 hover:bg-gray-50' : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700';
@@ -18,6 +19,16 @@ function Button({ children, variant, onClick, type, className }: { children: Rea
 
 
 export default function PostJobPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('employers').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [formData, setFormData] = useState({
     companyName: '',
     jobTitle: '',

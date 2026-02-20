@@ -1,13 +1,19 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'End User License Agreement | Elevate For Humanity',
   description: 'End User License Agreement governing use of the Elevate For Humanity platform.',
 };
 
-export default function EULAPage() {
+export default async function EULAPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
             <div className="max-w-7xl mx-auto px-4 py-4">

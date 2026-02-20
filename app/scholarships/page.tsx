@@ -1,7 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/server';
 import { 
   Clock, DollarSign, Award, ArrowRight, 
   GraduationCap, Users, FileText, Calendar, Heart, Star
@@ -45,67 +48,7 @@ export const metadata: Metadata = {
   },
 };
 
-const fundingOptions = [
-  {
-    title: 'WIOA Funding',
-    icon: DollarSign,
-    amount: 'Up to 100%',
-    desc: 'Federal workforce funding covers tuition, books, supplies, and support services for eligible adults.',
-    eligibility: ['18+ years old', 'US citizen or authorized to work', 'Meet income guidelines OR other barriers', 'Indiana resident'],
-    link: '/wioa-eligibility',
-  },
-  {
-    title: 'Employer Sponsorship',
-    icon: Users,
-    amount: 'Varies',
-    desc: 'Many employers pay for training in exchange for employment commitment after graduation.',
-    eligibility: ['Accepted into program', 'Willing to work for sponsor', 'Pass background check', 'Meet employer requirements'],
-    link: '/employers',
-  },
-  {
-    title: 'Need-Based Scholarships',
-    icon: Heart,
-    amount: '$500 - $2,000',
-    desc: 'Elevate scholarships for students who don\'t qualify for other funding but demonstrate financial need.',
-    eligibility: ['Enrolled in Elevate program', 'Demonstrate financial need', 'Submit scholarship application', 'Maintain good standing'],
-    link: '/apply',
-  },
-  {
-    title: 'Veteran Benefits',
-    icon: Star,
-    amount: 'Up to 100%',
-    desc: 'GI Bill and veteran-specific funding for eligible service members and veterans.',
-    eligibility: ['Veteran or active duty', 'Eligible for VA benefits', 'Program must be VA-approved', 'Certificate of Eligibility'],
-    link: '/contact',
-  },
-];
 
-const scholarshipTypes = [
-  {
-    name: 'Elevate Forward Scholarship',
-    amount: '$1,000',
-    deadline: 'Rolling',
-    criteria: 'For students overcoming significant barriers to employment',
-  },
-  {
-    name: 'Single Parent Scholarship',
-    amount: '$750',
-    deadline: 'Quarterly',
-    criteria: 'For single parents pursuing career training',
-  },
-  {
-    name: 'Second Chance Scholarship',
-    amount: '$1,500',
-    deadline: 'Rolling',
-    criteria: 'For justice-involved individuals seeking new careers',
-  },
-  {
-    name: 'Community Partner Scholarship',
-    amount: '$500',
-    deadline: 'Monthly',
-    criteria: 'Funded by local businesses for community members',
-  },
-];
 
 const steps = [
   { num: 1, title: 'Apply to Program', desc: 'Complete your program application first' },
@@ -114,7 +57,12 @@ const steps = [
   { num: 4, title: 'Get Approved', desc: 'Receive funding confirmation and start training' },
 ];
 
-export default function ScholarshipsPage() {
+export default async function ScholarshipsPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('scholarships').select('*').limit(50);
+const fundingOptions = (dbRows as any[]) || [];
+const scholarshipTypes = (dbRows as any[]) || [];
+
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
@@ -32,6 +34,7 @@ import AnnouncementsFeed from './AnnouncementsFeed';
 import EnrollmentDashboard from './EnrollmentDashboard';
 import StudentProgressWidget from './StudentProgressWidget';
 
+import { createClient } from '@/lib/supabase/server';
 export const revalidate = 3600; // Revalidate every hour
 
 export const metadata: Metadata = {
@@ -45,6 +48,9 @@ export const metadata: Metadata = {
 };
 
 export default async function StudentPortalPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('enrollments').select('*').limit(50);
+
   const quickLinks = [
     {
       icon: BookOpen,

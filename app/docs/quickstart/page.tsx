@@ -1,7 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Zap, ArrowLeft, ArrowRight } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 const steps = [
   { num: 1, title: 'Create Your Account', desc: 'Sign up and verify your email to get started.', link: '/register' },
   { num: 2, title: 'Complete Your Profile', desc: 'Add your organization details and contact information.', link: '/settings/profile' },
@@ -11,7 +14,10 @@ const steps = [
   { num: 6, title: 'Track Progress', desc: 'Monitor student progress and generate reports.', link: '/program-holder/reports' },
 ];
 
-export default function QuickstartPage() {
+export default async function QuickstartPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('documentation').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 py-4">

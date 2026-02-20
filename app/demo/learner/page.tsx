@@ -1,31 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import Link from 'next/link';
 import { BookOpen, Clock, Trophy, ChevronRight, ArrowRight, Play, Download, Plus, Calendar } from 'lucide-react';
 
-const COURSES = [
-  { id: 1, name: 'CDL Pre-Trip Inspection', progress: 100, status: 'Completed', grade: 'A' },
-  { id: 2, name: 'CDL Road Skills', progress: 72, status: 'In Progress', grade: 'B+', nextLesson: 'Highway merging techniques' },
-  { id: 3, name: 'HAZMAT Safety', progress: 45, status: 'In Progress', grade: 'B', nextLesson: 'Placarding requirements' },
-  { id: 4, name: 'DOT Regulations', progress: 0, status: 'Not Started', grade: '—', nextLesson: 'Hours of service rules' },
-];
-
-const HOURS_LOG = [
-  { date: 'Feb 14', hours: 8, activity: 'Behind-the-wheel training', supervisor: 'Tom Richards', approved: true },
-  { date: 'Feb 13', hours: 6, activity: 'Yard maneuvers practice', supervisor: 'Tom Richards', approved: true },
-  { date: 'Feb 12', hours: 4, activity: 'Classroom — DOT regulations', supervisor: 'Instructor Davis', approved: true },
-  { date: 'Feb 11', hours: 8, activity: 'Highway driving — I-65 route', supervisor: 'Tom Richards', approved: false },
-  { date: 'Feb 10', hours: 6, activity: 'Pre-trip inspection practice', supervisor: 'Tom Richards', approved: true },
-];
-
-const CERTS = [
-  { name: 'CDL Learner Permit', issued: 'Dec 2025', status: 'Active' },
-  { name: 'HAZMAT Awareness', issued: 'Jan 2026', status: 'Active' },
-];
+import { createBrowserClient } from '@supabase/ssr';
 
 export default function DemoLearnerPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  const COURSES = (dbRows as any[]) || [];
+  const HOURS_LOG = (dbRows as any[]) || [];
+  const CERTS = (dbRows as any[]) || [];
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('enrollments').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [toast, setToast] = useState<string | null>(null);
   const [showLogForm, setShowLogForm] = useState(false);
   const [logHours, setLogHours] = useState('');

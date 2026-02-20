@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import {
@@ -12,6 +14,7 @@ import {
 CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Enterprise Source-Use Access | Elevate Workforce OS',
   description:
@@ -47,7 +50,10 @@ const includedItems = [
   'Quarterly compliance review calls',
 ];
 
-export default function EnterprisePage() {
+export default async function EnterprisePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('system_settings').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: 'Platform', href: '/platform' }, { label: 'Enterprise Access' }]} />

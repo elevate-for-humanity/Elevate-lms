@@ -1,6 +1,9 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Data Retention Policy | Elevate for Humanity',
   description: 'How long we keep student and institutional data, retention schedules, and secure deletion procedures.',
@@ -9,7 +12,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function DataRetentionPage() {
+export default async function DataRetentionPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 py-4">

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
@@ -5,6 +7,7 @@ import Image from 'next/image';
 import { ArrowRight, Home, ChevronRight, Download, FileText, Users, BarChart3, Shield, CheckCircle, } from 'lucide-react';
 import AvatarGuide from '@/components/AvatarGuide';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'WIOA Compliance Tools | Elevate for Humanity Store',
   description: 'Complete WIOA compliance toolkit with participant tracking, performance metrics, PIRL exports, and automated quarterly reporting.',
@@ -103,7 +106,10 @@ const wioaGuideSteps = [
   },
 ];
 
-export default function WIOACompliancePage() {
+export default async function WIOACompliancePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+
   return (
     <div className="bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">

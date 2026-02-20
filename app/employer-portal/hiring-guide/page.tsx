@@ -1,9 +1,12 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { BookOpen, Circle, ArrowRight, FileText, Users, DollarSign, Clock, Award, Download } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Hiring Guide | Employer Portal',
   description: 'Step-by-step guide to hiring through Elevate and maximizing tax credits.',
@@ -62,7 +65,10 @@ const resources = [
   { title: 'Tax Credit Calculator', type: 'XLSX', size: '120 KB' },
 ];
 
-export default function HiringGuidePage() {
+export default async function HiringGuidePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('employers').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Hiring Guide" }]} />

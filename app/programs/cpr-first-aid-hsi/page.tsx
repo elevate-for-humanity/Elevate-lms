@@ -1,10 +1,13 @@
 // Force static generation for performance
 
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
+import { createClient } from '@/lib/supabase/server';
 import { 
   Clock, Award, ArrowRight, Heart, 
   Users, Shield, Phone, Calendar, Building, Briefcase
@@ -48,40 +51,6 @@ export const metadata: Metadata = {
   },
 };
 
-const courses = [
-  {
-    title: 'CPR/AED/First Aid',
-    duration: '4-5 hours',
-    price: '$75',
-    certification: '2-year certification',
-    desc: 'Complete training for workplace and community responders',
-    skills: ['Adult CPR', 'AED operation', 'Choking response', 'Wound care', 'Shock management'],
-  },
-  {
-    title: 'BLS for Healthcare Providers',
-    duration: '4 hours',
-    price: '$85',
-    certification: '2-year certification',
-    desc: 'Advanced life support for medical professionals',
-    skills: ['Adult/Child/Infant CPR', 'Bag-valve mask', 'Team resuscitation', 'AED protocols'],
-  },
-  {
-    title: 'Heartsaver CPR/AED',
-    duration: '3 hours',
-    price: '$65',
-    certification: '2-year certification',
-    desc: 'Basic CPR and AED for non-healthcare workers',
-    skills: ['Adult CPR', 'AED use', 'Choking relief', 'Emergency response'],
-  },
-  {
-    title: 'First Aid Only',
-    duration: '3 hours',
-    price: '$55',
-    certification: '2-year certification',
-    desc: 'Injury and illness response without CPR',
-    skills: ['Bleeding control', 'Burns', 'Fractures', 'Medical emergencies'],
-  },
-];
 
 const whoNeeds = [
   { icon: Building, title: 'Workplaces', desc: 'OSHA compliance, safety teams' },
@@ -92,7 +61,11 @@ const whoNeeds = [
   { icon: Calendar, title: 'Community', desc: 'Parents, volunteers, anyone' },
 ];
 
-export default function CPRFirstAidPage() {
+export default async function CPRFirstAidPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+const courses = (dbRows as any[]) || [];
+
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

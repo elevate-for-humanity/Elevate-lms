@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -18,6 +18,7 @@ import {
 CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createBrowserClient } from '@supabase/ssr';
 const addOns = [
   {
     id: 'community-hub',
@@ -62,6 +63,16 @@ const comingSoon = [
 ];
 
 export default function AddOnsPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('products').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
 
   return (

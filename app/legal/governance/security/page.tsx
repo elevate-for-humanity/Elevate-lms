@@ -1,14 +1,20 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { FileText, Download, ChevronRight, Shield, Lock, Eye, AlertTriangle, Server, Users } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Security and Data Protection Statement | Elevate For Humanity',
   description: 'Comprehensive security practices, data handling, and protection measures for the Elevate For Humanity platform.',
 };
 
-export default function SecurityStatementPage() {
+export default async function SecurityStatementPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">

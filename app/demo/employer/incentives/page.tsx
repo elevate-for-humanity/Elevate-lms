@@ -1,16 +1,15 @@
+export const dynamic = 'force-dynamic';
+
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { DollarSign, Clock } from 'lucide-react';
 
-const incentives = [
-  { type: 'OJT Reimbursement', apprentice: 'Marcus Johnson', amount: '$4,625', status: 'Paid', date: 'Jan 15, 2026' },
-  { type: 'OJT Reimbursement', apprentice: 'James Brown', amount: '$6,000', status: 'Paid', date: 'Jan 10, 2026' },
-  { type: 'WOTC Tax Credit', apprentice: 'David Chen', amount: '$2,400', status: 'Approved', date: 'Dec 20, 2025' },
-  { type: 'OJT Reimbursement', apprentice: 'David Chen', amount: '$2,100', status: 'Pending', date: 'Feb 1, 2026' },
-  { type: 'WOTC Tax Credit', apprentice: 'Aisha Patel', amount: '$2,400', status: 'Submitted', date: 'Jan 28, 2026' },
-  { type: 'Apprenticeship Completion Bonus', apprentice: 'James Brown', amount: '$1,500', status: 'Pending', date: 'Est. Apr 2026' },
-];
+import { createClient } from '@/lib/supabase/server';
 
-export default function DemoIncentivesPage() {
+export default async function DemoIncentivesPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('employer_incentives').select('*').limit(50);
+const incentives = (dbRows as any[]) || [];
+
   return (
     <DemoPageShell title="Incentives" description="OJT reimbursements, WOTC tax credits, and hiring incentives." portal="employer">
       <div className="grid sm:grid-cols-3 gap-4 mb-6">

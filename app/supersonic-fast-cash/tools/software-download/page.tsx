@@ -2,7 +2,7 @@
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Download,
   FileText,
@@ -15,7 +15,18 @@ import Link from 'next/link';
 
 
 
+import { createBrowserClient } from '@supabase/ssr';
 export default function SupersonicFastCashDownloadPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('tax_returns').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [showCredentials, setShowCredentials] = useState(false);
 
   // SupersonicFastCash credentials are provided to authorized staff only

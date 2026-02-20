@@ -1,9 +1,12 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FileText, Users, Award, BarChart3 } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/create-program' },
   title: 'Create a Training Program | Partners | Elevate For Humanity',
@@ -24,7 +27,10 @@ const BENEFITS = [
   { title: 'Outcome Reporting', desc: 'Automated reporting for completion rates, employment outcomes, and wage data.', icon: BarChart3 },
 ];
 
-export default function CreateProgramPage() {
+export default async function CreateProgramPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('partners').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">

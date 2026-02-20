@@ -1,9 +1,11 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import TestimonialsSection from '@/components/content/TestimonialsSection';
+import { createBrowserClient } from '@supabase/ssr';
 import {
   BadgeCheck,
   Calculator,
@@ -22,6 +24,16 @@ import {
 CheckCircle, } from 'lucide-react';
 
 export default function SupersonicFastCashPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('tax_returns').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

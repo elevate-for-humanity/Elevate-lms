@@ -1,13 +1,19 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import PublicLandingPage from '@/components/marketing/PublicLandingPage';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Training Provider Partnership | Elevate for Humanity',
   description: 'Partner with Elevate for Humanity as a training provider. Co-deliver programs, share facilities, and expand your reach.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/training' },
 };
 
-export default function TrainingPartnerPage() {
+export default async function TrainingPartnerPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('partners').select('*').limit(50);
+
   return (
     <PublicLandingPage config={{
       breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Training' }],

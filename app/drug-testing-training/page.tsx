@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Phone, GraduationCap, Award, Users } from 'lucide-react';
 
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Drug Testing Training Courses | Elevate for Humanity',
   description:
@@ -133,6 +134,9 @@ const trainingCourses = {
 };
 
 export default async function DrugTestingTrainingPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('drug_tests').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">

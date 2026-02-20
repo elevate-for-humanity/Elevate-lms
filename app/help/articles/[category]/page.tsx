@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { FileText, Clock, ChevronRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = { title: 'Help Articles | Elevate LMS' };
 
 interface Props {
@@ -10,16 +13,13 @@ interface Props {
 }
 
 export default async function HelpCategoryPage({ params }: Props) {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('help_articles').select('*').limit(50);
+
   const { category } = await params;
   const categoryName = category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   
-  const articles = [
-    { id: '1', title: 'How to create your account', readTime: '3 min', updated: 'Jan 15, 2026' },
-    { id: '2', title: 'Setting up your profile', readTime: '2 min', updated: 'Jan 10, 2026' },
-    { id: '3', title: 'Navigating the dashboard', readTime: '4 min', updated: 'Jan 8, 2026' },
-    { id: '4', title: 'Understanding your learning path', readTime: '5 min', updated: 'Jan 5, 2026' },
-    { id: '5', title: 'Tracking your progress', readTime: '3 min', updated: 'Jan 3, 2026' },
-  ];
+  const articles = (dbRows as any[]) || [];
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -1,13 +1,14 @@
+export const dynamic = 'force-dynamic';
+
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 
-const apprentices = [
-  { name: 'Marcus Johnson', program: 'CDL Commercial Driving', hoursLogged: 680, hoursRequired: 2000, wage: '$18.50', wageTarget: '$24.00', mentor: 'Tom Richards', startDate: 'Jun 2025' },
-  { name: 'David Chen', program: 'HVAC Technician', hoursLogged: 420, hoursRequired: 2000, wage: '$16.00', wageTarget: '$22.00', mentor: 'Mike Santos', startDate: 'Sep 2025' },
-  { name: 'James Brown', program: 'Welding', hoursLogged: 1200, hoursRequired: 2000, wage: '$20.00', wageTarget: '$26.00', mentor: 'Bill Carter', startDate: 'Mar 2025' },
-  { name: 'Aisha Patel', program: 'Medical Assistant', hoursLogged: 150, hoursRequired: 1500, wage: '$15.00', wageTarget: '$19.00', mentor: 'Dr. Sarah Lee', startDate: 'Dec 2025' },
-];
+import { createClient } from '@/lib/supabase/server';
 
-export default function DemoApprenticeshipsPage() {
+export default async function DemoApprenticeshipsPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('apprenticeships').select('*').limit(50);
+const apprentices = (dbRows as any[]) || [];
+
   return (
     <DemoPageShell title="Apprenticeships" description="Track apprentice hours, wage progression, and mentor assignments." portal="employer">
       <div className="space-y-4">

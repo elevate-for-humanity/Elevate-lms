@@ -1,7 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FileText, ArrowLeft, Tag, Calendar } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 const releases = [
   { version: '2.5.0', date: 'January 15, 2026', type: 'feature', changes: ['Added PWA support for all portals', 'Enhanced FAQ with search highlighting', 'New financial assurance tracking', 'Program catalog PDF generator'] },
   { version: '2.4.0', date: 'January 10, 2026', type: 'feature', changes: ['Stripe webhook idempotency', 'Improved enrollment flow', 'Course leaderboards', 'Instructor analytics charts'] },
@@ -10,7 +13,10 @@ const releases = [
   { version: '2.2.0', date: 'December 1, 2025', type: 'feature', changes: ['Multi-tenant support', 'Partner portal launch', 'WIOA compliance reports', 'Bulk student import'] },
 ];
 
-export default function ChangelogPage() {
+export default async function ChangelogPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('documentation').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 py-4">

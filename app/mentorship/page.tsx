@@ -1,6 +1,9 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
 import { Users, MessageSquare, Calendar, Star, ArrowRight,
   Phone
 } from 'lucide-react';
@@ -22,7 +25,10 @@ const benefits = [
   'Accountability and motivation',
 ];
 
-export default function MentorshipPage() {
+export default async function MentorshipPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('mentors').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b">

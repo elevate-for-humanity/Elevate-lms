@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Reporting Documentation | Elevate For Humanity',
   description: 'Guide to reports and analytics.',
@@ -15,7 +18,10 @@ const sections = [
   { title: 'Compliance Reports', href: '/docs/reporting/compliance' },
 ];
 
-export default function ReportingDocsPage() {
+export default async function ReportingDocsPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('documentation').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b">

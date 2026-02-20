@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Scissors, Building2, ChevronRight } from 'lucide-react';
 
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Pwa | Elevate for Humanity',
   description: 'Elevate for Humanity - Career training and workforce development programs.',
@@ -11,7 +14,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PWAIndexPage() {
+export default async function PWAIndexPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('system_settings').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col">
       {/* Header */}

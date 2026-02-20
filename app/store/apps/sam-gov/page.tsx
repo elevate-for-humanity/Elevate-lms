@@ -1,6 +1,9 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { ProductPage } from '@/components/store/ProductPage';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'SAM.gov Assistant - Federal Contractor Registration Tool | Elevate Store',
   description: 'Complete your SAM.gov registration in hours, not days. Step-by-step wizard, compliance monitoring, and automatic renewal reminders. Trusted by 2,500+ organizations.',
@@ -244,6 +247,9 @@ const productData = {
   supportEmail: '/contact',
 };
 
-export default function SamGovProductPage() {
+export default async function SamGovProductPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+
   return <ProductPage product={productData} />;
 }

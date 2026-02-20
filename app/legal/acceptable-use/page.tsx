@@ -1,13 +1,19 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Acceptable Use Policy | Elevate For Humanity',
   description: 'Acceptable Use Policy governing behavior and usage of the Elevate For Humanity platform.',
 };
 
-export default function AcceptableUsePage() {
+export default async function AcceptableUsePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
             <div className="max-w-7xl mx-auto px-4 py-4">

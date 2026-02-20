@@ -1,18 +1,15 @@
+export const dynamic = 'force-dynamic';
+
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { AlertTriangle, XCircle } from 'lucide-react';
 
-const checks = [
-  { area: 'WIOA Eligibility Documentation', status: 'pass', detail: '247/247 students have verified eligibility' },
-  { area: 'FERPA Consent Forms', status: 'pass', detail: '245/247 signed — 2 pending' },
-  { area: 'Background Check Clearance', status: 'warning', detail: '3 students awaiting results' },
-  { area: 'Drug Screening (where required)', status: 'pass', detail: '89/89 CDL students cleared' },
-  { area: 'Attendance Compliance (80% min)', status: 'warning', detail: '12 students below threshold' },
-  { area: 'Instructor Certifications', status: 'pass', detail: 'All 18 instructors current' },
-  { area: 'ADA Accommodations Documented', status: 'pass', detail: '7 accommodations on file' },
-  { area: 'PIRL Data Submission', status: 'fail', detail: 'Q4 2025 report overdue — due Jan 31' },
-];
+import { createClient } from '@/lib/supabase/server';
 
-export default function DemoCompliancePage() {
+export default async function DemoCompliancePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('compliance_records').select('*').limit(50);
+const checks = (dbRows as any[]) || [];
+
   return (
     <DemoPageShell title="Compliance" description="Compliance status across WIOA, FERPA, and program requirements." portal="admin">
       <div className="bg-white rounded-xl border overflow-hidden">

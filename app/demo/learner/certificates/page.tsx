@@ -1,14 +1,15 @@
+export const dynamic = 'force-dynamic';
+
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { Award, Download, Lock } from 'lucide-react';
 
-const certs = [
-  { name: 'CDL Permit — Class A', issuer: 'State DMV', earned: 'Oct 15, 2025', status: 'Earned', credentialId: 'CDL-2025-4821' },
-  { name: 'OSHA 10-Hour General Industry', issuer: 'OSHA / DOL', earned: 'Nov 3, 2025', status: 'Earned', credentialId: 'OSHA10-2025-7734' },
-  { name: 'CDL Class A License', issuer: 'State DMV', earned: '—', status: 'In Progress', credentialId: '—' },
-  { name: 'HAZMAT Endorsement', issuer: 'State DMV / TSA', earned: '—', status: 'Locked', credentialId: '—' },
-];
+import { createClient } from '@/lib/supabase/server';
 
-export default function DemoCertificatesPage() {
+export default async function DemoCertificatesPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('certificates').select('*').limit(50);
+const certs = (dbRows as any[]) || [];
+
   return (
     <DemoPageShell title="Certificates & Credentials" description="Credentials you've earned and those in progress." portal="learner">
       <div className="space-y-4">

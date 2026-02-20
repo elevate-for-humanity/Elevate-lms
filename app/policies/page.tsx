@@ -1,6 +1,9 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
 import { 
   FileText, Circle, 
   Shield, 
@@ -82,7 +85,10 @@ const policies = [
   },
 ];
 
-export default function PoliciesIndexPage() {
+export default async function PoliciesIndexPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+
   return (
     <div className="space-y-8">
             <div className="max-w-7xl mx-auto px-4 py-4">

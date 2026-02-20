@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -15,6 +17,7 @@ import {
 } from 'lucide-react';
 import { PrintButton } from './PrintButton';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Apprenticeship & RTI Structure | Compliance | Elevate for Humanity',
   description:
@@ -36,7 +39,10 @@ const PROGRAM_HOURS = [
   { program: 'Electrical', occupation: 'Electrician', rtiHours: 200, ojtHours: 200, totalHours: 400, rtiMethod: 'Hybrid', credential: 'OSHA 10 + NCCER Core', issuer: 'OSHA / NCCER', registered: false },
 ];
 
-export default function ApprenticeshipStructurePage() {
+export default async function ApprenticeshipStructurePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('compliance_records').select('*').limit(50);
+
   return (
     <div className="bg-white min-h-screen print:bg-white">
       {/* Breadcrumbs — hidden on print */}

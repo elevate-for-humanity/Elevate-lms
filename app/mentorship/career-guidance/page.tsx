@@ -1,16 +1,22 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Compass, ArrowRight } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Career Guidance Mentorship | Elevate for Humanity',
   description: 'Get personalized career guidance from experienced mentors. Navigate your career path with expert advice and support.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/mentorship/career-guidance' },
 };
 
-export default function CareerGuidancePage() {
+export default async function CareerGuidancePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('mentors').select('*').limit(50);
+
   const benefits = [
     { title: 'Personalized Advice', description: 'One-on-one sessions tailored to your goals' },
     { title: 'Industry Insights', description: 'Learn from professionals in your field' },

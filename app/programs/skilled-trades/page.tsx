@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -6,6 +8,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
 
+import { createClient } from '@/lib/supabase/server';
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
@@ -20,7 +23,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SkilledTradesPage() {
+export default async function SkilledTradesPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       <ProgramHeroBanner videoSrc="/videos/electrician-trades.mp4" />

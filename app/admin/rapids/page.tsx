@@ -1,11 +1,23 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
 import { Circle, XCircle, Copy, Shield, FileText, Users, Download, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
+import { createBrowserClient } from '@supabase/ssr';
 export default function RapidsAdminPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('apprenticeships').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const programs = Object.entries(RAPIDS_CONFIG.programs).map(([key, program]) => ({
     key,
     ...program,

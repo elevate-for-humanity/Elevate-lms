@@ -1,16 +1,22 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { BARBER_SECTIONS, BARBER_STATS } from '../barber-rubric-data';
 import { PrintButton } from '../PrintButton';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Barber Apprenticeship Scoring Sheet | Elevate for Humanity',
   description: 'Printable master competency scoring rubric for barber apprenticeship. 30 competencies, 0–5 scale, evaluator signature lines.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/compliance/competency-verification/barber/scoring-sheet' },
 };
 
-export default function BarberScoringSheetPage() {
+export default async function BarberScoringSheetPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('compliance_records').select('*').limit(50);
+
   return (
     <div className="bg-white min-h-screen print:bg-white print:text-[11px]">
       {/* Screen nav */}

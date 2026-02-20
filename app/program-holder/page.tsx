@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -5,6 +7,7 @@ import { Building2, BookOpen, Users, BarChart3, FileText, Settings } from 'lucid
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import PageAvatar from '@/components/PageAvatar';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Program Holder Portal | Elevate For Humanity',
   description: 'Manage your training programs, track student progress, and access program management tools.',
@@ -46,7 +49,10 @@ const features = [
   },
 ];
 
-export default function ProgramHolderLanding() {
+export default async function ProgramHolderLanding() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('program_holders').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

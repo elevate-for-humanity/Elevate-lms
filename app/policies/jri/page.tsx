@@ -1,16 +1,22 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight, Phone, Mail } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Justice Reinvestment Initiative Policy | Elevate for Humanity',
   description: 'JRI funding policy for workforce training for justice-involved individuals. Eligibility, covered services, and application process.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/policies/jri' },
 };
 
-export default function JRIPage() {
+export default async function JRIPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { Play, ArrowRight, Mail } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Purchase Successful | Elevate for Humanity',
   description: 'Thank you for your purchase. Access your courses now.',
@@ -15,6 +16,9 @@ export default async function CourseSuccessPage({
 }: {
   searchParams: Promise<{ session_id?: string }>;
 }) {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('career_services').select('*').limit(50);
+
   const { session_id } = await searchParams;
 
   // In production, verify the session with Stripe and record the purchase

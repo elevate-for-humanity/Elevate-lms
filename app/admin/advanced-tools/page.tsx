@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
 import { Search, Star, X } from "lucide-react";
 
+import { createBrowserClient } from '@supabase/ssr';
 type ToolLink = {
   title: string;
   href: string;
@@ -148,6 +149,16 @@ function ToolCard({
 }
 
 export default function AdvancedToolsPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('system_settings').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [search, setSearch] = useState("");
   const [pinnedTools, setPinnedTools] = useState<string[]>([]);
 

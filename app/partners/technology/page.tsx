@@ -1,13 +1,19 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import PublicLandingPage from '@/components/marketing/PublicLandingPage';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Technology Partnership | Elevate for Humanity',
   description: 'Technology integration partnerships with Elevate for Humanity. LMS integrations, API access, and workforce data interoperability.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/technology' },
 };
 
-export default function TechnologyPartnerPage() {
+export default async function TechnologyPartnerPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('partners').select('*').limit(50);
+
   return (
     <PublicLandingPage config={{
       breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Technology' }],

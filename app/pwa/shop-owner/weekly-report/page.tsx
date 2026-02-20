@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { createBrowserClient } from '@supabase/ssr';
 import { 
   ArrowLeft, Calendar, Clock, Users, TrendingUp,
   AlertCircle, Download, Share2, Loader2,
@@ -31,6 +32,16 @@ interface WeeklyReport {
 }
 
 export default function ShopWeeklyReportPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('system_settings').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [loading, setLoading] = useState(true);
   const [report, setReport] = useState<WeeklyReport | null>(null);
   const [expandedApprentice, setExpandedApprentice] = useState<string | null>(null);

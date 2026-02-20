@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { createBrowserClient } from '@supabase/ssr';
 import { 
   ArrowLeft, Mail, Calendar, Clock, TrendingUp,
   Award, AlertCircle, Loader2, Share2,
@@ -26,6 +27,16 @@ interface WeeklySummary {
 }
 
 export default function WeeklySummaryPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('system_settings').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<WeeklySummary | null>(null);
 

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { 
@@ -6,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Governance | Elevate for Humanity',
   description: 'Platform governance, authoritative documents, and operational controls. For partners, buyers, reviewers, and agency representatives.',
@@ -71,7 +74,10 @@ const highlights = [
   'Clear change management and review processes',
 ];
 
-export default function GovernancePage() {
+export default async function GovernancePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('governance_documents').select('*').limit(50);
+
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',

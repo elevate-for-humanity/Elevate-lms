@@ -1,14 +1,20 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { FileText, Download, ChevronRight, Building2, Users, Shield, BookOpen } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Platform Overview and Governance | Elevate For Humanity',
   description: 'Comprehensive overview of the Elevate For Humanity platform architecture, governance model, and operational standards.',
 };
 
-export default function PlatformOverviewPage() {
+export default async function PlatformOverviewPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">

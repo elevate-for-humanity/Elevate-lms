@@ -1,7 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = { 
   title: 'Compliance & Credentials | Elevate for Humanity',
   description: 'Compliance posture, credential disclosure, and program-to-credential mapping for Elevate for Humanity workforce programs.',
@@ -10,15 +13,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CompliancePage() {
-  const programCredentials = [
-    { program: 'Barber Apprenticeship', credential: 'Indiana Barber License', issuer: 'Indiana Professional Licensing Agency (IPLA)', delivery: 'State board exam after apprenticeship hours' },
-    { program: 'Cosmetology Apprenticeship', credential: 'Indiana Cosmetology License', issuer: 'Indiana Professional Licensing Agency (IPLA)', delivery: 'State board exam after apprenticeship hours' },
-    { program: 'CNA Certification', credential: 'Certified Nursing Assistant', issuer: 'Indiana State Department of Health', delivery: 'State competency exam via approved testing site' },
-    { program: 'CPR / First Aid (HSI)', credential: 'CPR/AED/First Aid Certification', issuer: 'Health & Safety Institute (HSI)', delivery: 'HSI-authorized instructor assessment' },
-    { program: 'HVAC Technician', credential: 'EPA Section 608 Certification', issuer: 'U.S. Environmental Protection Agency', delivery: 'EPA-approved testing organization' },
-    { program: 'CDL Training', credential: 'Commercial Driver License', issuer: 'Indiana Bureau of Motor Vehicles', delivery: 'BMV skills and knowledge test' },
-  ];
+export default async function CompliancePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('compliance_records').select('*').limit(50);
+
+  const programCredentials = (dbRows as any[]) || [];
 
   return (
     <div className="min-h-screen bg-gray-50">

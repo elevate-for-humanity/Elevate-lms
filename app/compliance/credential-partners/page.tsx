@@ -1,7 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/server';
 import {
   Shield,
   GraduationCap,
@@ -22,106 +25,12 @@ export const metadata: Metadata = {
 };
 
 /* ── Credential Partner Registry Data ── */
-const CREDENTIAL_PARTNERS = [
-  {
-    program: 'Barber Apprenticeship',
-    partnerType: 'Licensed Barber School',
-    licenseStatus: 'State-Approved',
-    licensingBody: 'Indiana Professional Licensing Agency (PLA)',
-    programAssignment: 'Barber RTI (144 hours)',
-    credentialIssued: 'Indiana Barber License',
-    credentialIssuer: 'Indiana PLA',
-    mouStatus: 'Required',
-    instructorReq: 'Active Indiana Master Barber License + 3 years experience',
-    notes: 'RAPIDS-registered apprenticeship. OJT at approved host barbershops.',
-  },
-  {
-    program: 'CNA Certification',
-    partnerType: 'Accredited Nursing Program',
-    licenseStatus: 'State-Approved',
-    licensingBody: 'Indiana State Department of Health (ISDH)',
-    programAssignment: 'CNA RTI (105 hours) + Clinical Rotation (45 hours)',
-    credentialIssued: 'CNA Certification',
-    credentialIssuer: 'Indiana ISDH',
-    mouStatus: 'Required',
-    instructorReq: 'Active Indiana RN/LPN license + state-approved instructor certification',
-    notes: 'Clinical rotation at approved healthcare facility required.',
-  },
-  {
-    program: 'CDL Commercial Driving',
-    partnerType: 'ELDT-Compliant CDL School',
-    licenseStatus: 'FMCSA Registered',
-    licensingBody: 'Federal Motor Carrier Safety Administration (FMCSA) / Indiana BMV',
-    programAssignment: 'CDL RTI (40 hours) + Behind-the-Wheel (120 hours)',
-    credentialIssued: 'CDL Class A or Class B',
-    credentialIssuer: 'Indiana BMV',
-    mouStatus: 'Required',
-    instructorReq: 'Active CDL + ELDT instructor certification + 2 years experience',
-    notes: 'ELDT compliance mandatory per FMCSA regulations (effective Feb 2022).',
-  },
-  {
-    program: 'HVAC Technician',
-    partnerType: 'DOE-Approved Trade School',
-    licenseStatus: 'State-Approved',
-    licensingBody: 'Indiana Department of Education (DOE)',
-    programAssignment: 'HVAC RTI (200 hours) + OJT (200 hours)',
-    credentialIssued: 'EPA 608 Certification + OSHA 10-Hour',
-    credentialIssuer: 'EPA / OSHA',
-    mouStatus: 'Required',
-    instructorReq: 'EPA 608 Universal + OSHA 30 + 5 years HVAC experience',
-    notes: 'EPA 608 exam administered by EPA-approved testing organization.',
-  },
-  {
-    program: 'IT Support',
-    partnerType: 'Authorized CompTIA Academy',
-    licenseStatus: 'Authorized Training Center',
-    licensingBody: 'CompTIA',
-    programAssignment: 'IT Support RTI (280 hours) + Labs (40 hours)',
-    credentialIssued: 'CompTIA A+',
-    credentialIssuer: 'CompTIA',
-    mouStatus: 'Required',
-    instructorReq: 'Active CompTIA A+ + 3 years IT experience + CTT+ preferred',
-    notes: 'Online delivery with virtual lab environments.',
-  },
-  {
-    program: 'Cybersecurity',
-    partnerType: 'Authorized CompTIA Academy',
-    licenseStatus: 'Authorized Training Center',
-    licensingBody: 'CompTIA',
-    programAssignment: 'Cybersecurity RTI (360 hours) + Labs (40 hours)',
-    credentialIssued: 'CompTIA Security+',
-    credentialIssuer: 'CompTIA',
-    mouStatus: 'Required',
-    instructorReq: 'Active CompTIA Security+ + 3 years cybersecurity experience',
-    notes: 'CySA+, CISSP, or CEH instructor credentials preferred.',
-  },
-  {
-    program: 'Welding',
-    partnerType: 'AWS-Accredited Testing Facility / DOE-Approved Trade School',
-    licenseStatus: 'State-Approved + AWS Accredited',
-    licensingBody: 'American Welding Society (AWS) / Indiana DOE',
-    programAssignment: 'Welding RTI (160 hours) + OJT (240 hours)',
-    credentialIssued: 'AWS D1.1 Certification + OSHA 10-Hour',
-    credentialIssuer: 'AWS / OSHA',
-    mouStatus: 'Required',
-    instructorReq: 'AWS Certified Welder (D1.1) + OSHA 30 + 5 years experience',
-    notes: 'AWS CWI (Certified Welding Inspector) instructor preferred.',
-  },
-  {
-    program: 'Electrical',
-    partnerType: 'DOE-Approved Trade School',
-    licenseStatus: 'State-Approved',
-    licensingBody: 'Indiana Department of Education (DOE)',
-    programAssignment: 'Electrical RTI (200 hours) + OJT (200 hours)',
-    credentialIssued: 'OSHA 10-Hour + NCCER Core Certification',
-    credentialIssuer: 'OSHA / NCCER',
-    mouStatus: 'Required',
-    instructorReq: 'Active Indiana Journeyman/Master Electrician + OSHA 30 + 5 years experience',
-    notes: 'NCCER Certified Instructor preferred.',
-  },
-];
 
-export default function CredentialPartnersPage() {
+export default async function CredentialPartnersPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('compliance_records').select('*').limit(50);
+const CREDENTIAL_PARTNERS = (dbRows as any[]) || [];
+
   return (
     <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}

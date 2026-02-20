@@ -1,11 +1,17 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'FERPA Consent | Elevate for Humanity',
 };
 
-export default function FerpaConsentPage() {
+export default async function FerpaConsentPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 py-12">

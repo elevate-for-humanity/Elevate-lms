@@ -2,9 +2,10 @@
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
 
+import { createBrowserClient } from '@supabase/ssr';
 const CALENDLY_SCRIPT = 'https://assets.calendly.com/assets/external/widget.js';
 const CALENDLY_LINK = 'https://calendly.com/elevateforhumanity/free-tax-prep';
 
@@ -12,6 +13,16 @@ const CALENDLY_LINK = 'https://calendly.com/elevateforhumanity/free-tax-prep';
 
 
 export default function FreeTaxHelpPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('tax_returns').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   useEffect(() => {
     const script = document.createElement('script');
     script.src = CALENDLY_SCRIPT;

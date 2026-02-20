@@ -1,5 +1,8 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
 import { 
   
   BookOpen, 
@@ -63,7 +66,10 @@ const courseSchema = {
   },
 };
 
-export default function CapitalReadinessCoursePage() {
+export default async function CapitalReadinessCoursePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('courses').select('*').limit(50);
+
   const outcomes = [
     'Understand how institutions evaluate organizations for funding',
     'Build systems that survive audits and earn trust',

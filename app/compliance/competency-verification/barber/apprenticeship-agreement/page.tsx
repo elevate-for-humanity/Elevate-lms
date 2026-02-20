@@ -1,15 +1,21 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PrintButton } from '../PrintButton';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Barbering Apprenticeship Agreement | Elevate for Humanity',
   description: 'Formal apprenticeship agreement for workplace-based barber training. Defines RTI, OJT, supervision, competency evaluation, roles, and completion requirements. RAPIDS ID: 2025-IN-132301.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/compliance/competency-verification/barber/apprenticeship-agreement' },
 };
 
-export default function ApprenticeshipAgreementPage() {
+export default async function ApprenticeshipAgreementPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('compliance_records').select('*').limit(50);
+
   return (
     <div className="bg-white min-h-screen print:bg-white print:text-[11px]">
       {/* Screen nav */}

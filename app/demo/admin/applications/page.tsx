@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { DEMO_STUDENTS } from '@/lib/demo/sandbox-data';
 import { Search, XCircle, Eye, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 
+import { createBrowserClient } from '@supabase/ssr';
 const applicants = DEMO_STUDENTS.filter((s: any) => s.status === 'pending' || s.status === 'active').map((s: any, i: number) => ({
   ...s,
   applied: s.enrolledDate || 'Jan 2026',
@@ -13,6 +14,16 @@ const applicants = DEMO_STUDENTS.filter((s: any) => s.status === 'pending' || s.
 }));
 
 export default function DemoApplicationsPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('applications').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);

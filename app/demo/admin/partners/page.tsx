@@ -1,15 +1,14 @@
+export const dynamic = 'force-dynamic';
+
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 
-const partners = [
-  { name: 'Midwest Manufacturing Co.', type: 'Employer', students: 12, status: 'Active', since: 'Mar 2025' },
-  { name: 'Regional Health Systems', type: 'Employer', students: 8, status: 'Active', since: 'Jun 2025' },
-  { name: 'City Workforce Board', type: 'Workforce Board', students: 45, status: 'Active', since: 'Jan 2025' },
-  { name: 'State DOL Region 5', type: 'Government', students: 89, status: 'Active', since: 'Nov 2024' },
-  { name: 'Community College District', type: 'Training Provider', students: 34, status: 'Active', since: 'Aug 2025' },
-  { name: 'BuildRight Construction', type: 'Employer', students: 6, status: 'Pending MOU', since: 'Jan 2026' },
-];
+import { createClient } from '@/lib/supabase/server';
 
-export default function DemoPartnersPage() {
+export default async function DemoPartnersPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('partners').select('*').limit(50);
+const partners = (dbRows as any[]) || [];
+
   return (
     <DemoPageShell title="Partners" description="Employer partners, workforce boards, and training providers in your network." portal="admin">
       <div className="bg-white rounded-xl border overflow-hidden">

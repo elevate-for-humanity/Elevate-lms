@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
@@ -5,6 +7,7 @@ import Image from 'next/image';
 import { ArrowRight, Home, ChevronRight, Circle, Eye, Keyboard, Volume2, Monitor } from 'lucide-react';
 import AvatarGuide from '@/components/AvatarGuide';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'WCAG Accessibility Tools | Elevate for Humanity Store',
   description: 'WCAG 2.1 Level AA compliance tools with screen reader support, keyboard navigation, and accessibility auditing.',
@@ -58,7 +61,10 @@ const guideSteps = [
   },
 ];
 
-export default function WCAGCompliancePage() {
+export default async function WCAGCompliancePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+
   return (
     <div className="bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">

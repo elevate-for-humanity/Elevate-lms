@@ -1,16 +1,22 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight, Phone, Mail, DollarSign } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Workforce Ready Grant Policy | Elevate for Humanity',
   description: 'Indiana Workforce Ready Grant provides up to $7,500/year for tuition in high-demand career training programs. Eligibility, covered programs, and application process.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/policies/wrg' },
 };
 
-export default function WRGPage() {
+export default async function WRGPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">

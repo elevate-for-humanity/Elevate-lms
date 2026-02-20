@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'LMS Documentation | Elevate For Humanity',
   description: 'Complete guide to LMS features and functionality.',
@@ -16,7 +19,10 @@ const sections = [
   { title: 'Gamification', href: '/docs/lms/gamification' },
 ];
 
-export default function LmsDocsPage() {
+export default async function LmsDocsPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('documentation').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b">

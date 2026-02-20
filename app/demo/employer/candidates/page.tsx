@@ -1,16 +1,15 @@
+export const dynamic = 'force-dynamic';
+
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { Star } from 'lucide-react';
 
-const candidates = [
-  { name: 'Lisa Thompson', program: 'CNA Training', completion: '100%', credentials: ['CNA Certification', 'CPR/BLS'], available: 'Immediately', match: 95 },
-  { name: 'Robert Kim', program: 'CDL Commercial Driving', completion: '100%', credentials: ['CDL Class A', 'HAZMAT'], available: 'Immediately', match: 92 },
-  { name: 'Angela Davis', program: 'Medical Assistant', completion: '95%', credentials: ['CCMA (pending)'], available: '2 weeks', match: 88 },
-  { name: 'Carlos Rivera', program: 'HVAC Technician', completion: '100%', credentials: ['EPA 608', 'OSHA 10'], available: 'Immediately', match: 85 },
-  { name: 'Tanya Mitchell', program: 'Phlebotomy', completion: '100%', credentials: ['CPT Certification'], available: 'Immediately', match: 82 },
-  { name: 'Derek Washington', program: 'Welding', completion: '88%', credentials: ['AWS D1.1 (in progress)'], available: '4 weeks', match: 78 },
-];
+import { createClient } from '@/lib/supabase/server';
 
-export default function DemoCandidatesPage() {
+export default async function DemoCandidatesPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('applications').select('*').limit(50);
+const candidates = (dbRows as any[]) || [];
+
   return (
     <DemoPageShell title="Candidates" description="Pre-screened candidates from training programs ready for hire." portal="employer">
       <div className="space-y-4">

@@ -1,7 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import type { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'VITA FAQ - Common Questions | Rise Up Foundation',
   description:
@@ -24,7 +27,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function FAQPage() {
+export default async function FAQPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+
   const faqs = [
     {
       question: 'Who qualifies for free VITA tax help?',

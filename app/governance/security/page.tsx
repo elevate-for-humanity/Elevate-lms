@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Security & Data Protection Statement | Elevate for Humanity',
   description: 'How 2Exclusive LLC-S (d/b/a Elevate for Humanity Career & Technical Institute) protects personal, educational, and operational data.',
@@ -11,7 +14,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SecurityDocumentPage() {
+export default async function SecurityDocumentPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('governance_documents').select('*').limit(50);
+
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',

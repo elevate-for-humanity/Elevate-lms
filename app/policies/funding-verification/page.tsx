@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight, Phone, Mail, Shield, AlertCircle } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Funding Verification Policy | Elevate for Humanity',
   description: 'Funding verification requirements for enrollment. Accepted funding sources, verification process, and required documentation.',
@@ -18,7 +21,10 @@ const fundingSources = [
   { title: 'Self-Pay', description: 'Direct payment via credit card, payment plan, or bank transfer.' },
 ];
 
-export default function FundingVerificationPage() {
+export default async function FundingVerificationPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">

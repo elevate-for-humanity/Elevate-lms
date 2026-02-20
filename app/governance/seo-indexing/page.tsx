@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Search, XCircle, Code } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'SEO & Indexing Governance | Elevate for Humanity',
   description: 'How search engine indexing is controlled and enforced to protect platform credibility and prevent accidental exposure.',
@@ -52,7 +55,10 @@ const enforcementMethods = [
   },
 ];
 
-export default function SeoIndexingPage() {
+export default async function SeoIndexingPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('governance_documents').select('*').limit(50);
+
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',

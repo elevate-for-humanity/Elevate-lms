@@ -1,15 +1,14 @@
+export const dynamic = 'force-dynamic';
+
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 
-const hours = [
-  { date: 'Feb 14, 2026', hours: 8, activity: 'Behind-the-wheel training', supervisor: 'Tom Richards', approved: true },
-  { date: 'Feb 13, 2026', hours: 6, activity: 'Yard maneuvers practice', supervisor: 'Tom Richards', approved: true },
-  { date: 'Feb 12, 2026', hours: 4, activity: 'Classroom — DOT regulations', supervisor: 'Instructor Davis', approved: true },
-  { date: 'Feb 11, 2026', hours: 8, activity: 'Highway driving practice', supervisor: 'Tom Richards', approved: true },
-  { date: 'Feb 10, 2026', hours: 6, activity: 'Pre-trip inspection drill', supervisor: 'Tom Richards', approved: true },
-  { date: 'Feb 7, 2026', hours: 8, activity: 'Behind-the-wheel training', supervisor: 'Tom Richards', approved: false },
-];
+import { createClient } from '@/lib/supabase/server';
 
-export default function DemoHoursPage() {
+export default async function DemoHoursPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('training_hours').select('*').limit(50);
+const hours = (dbRows as any[]) || [];
+
   const totalHours = 680;
   const requiredHours = 2000;
   const pct = Math.round((totalHours / requiredHours) * 100);

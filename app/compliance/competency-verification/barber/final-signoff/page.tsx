@@ -1,16 +1,22 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PrintButton } from '../PrintButton';
 import { BARBER_SECTIONS, BARBER_STATS } from '../barber-rubric-data';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Final Competency Sign-Off — Barber Apprenticeship | Elevate for Humanity',
   description: 'Tri-party final competency sign-off form for barber apprenticeship completion. RTI Instructor, Employer Supervisor, Program Holder, and Sponsor verification.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/compliance/competency-verification/barber/final-signoff' },
 };
 
-export default function FinalSignoffPage() {
+export default async function FinalSignoffPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('compliance_records').select('*').limit(50);
+
   return (
     <div className="bg-white min-h-screen print:bg-white print:text-[11px]">
       {/* Screen nav */}

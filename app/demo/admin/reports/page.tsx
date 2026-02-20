@@ -1,17 +1,15 @@
+export const dynamic = 'force-dynamic';
+
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { FileText, Download } from 'lucide-react';
 
-const reports = [
-  { name: 'PIRL Quarterly Report', period: 'Q4 2025', status: 'Overdue', format: 'CSV' },
-  { name: 'WIOA Performance Summary', period: 'Q3 2025', status: 'Submitted', format: 'PDF' },
-  { name: 'Enrollment by Program', period: 'January 2026', status: 'Ready', format: 'Excel' },
-  { name: 'Completion & Credential Report', period: 'Q3 2025', status: 'Submitted', format: 'PDF' },
-  { name: 'Funding Utilization', period: 'FY 2025', status: 'Ready', format: 'Excel' },
-  { name: 'Employer Outcome Tracking', period: 'Q4 2025', status: 'Draft', format: 'PDF' },
-  { name: 'Attendance & Compliance', period: 'January 2026', status: 'Ready', format: 'Excel' },
-];
+import { createClient } from '@/lib/supabase/server';
 
-export default function DemoReportsPage() {
+export default async function DemoReportsPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('reports').select('*').limit(50);
+const reports = (dbRows as any[]) || [];
+
   return (
     <DemoPageShell title="Reports" description="Generate and download compliance, enrollment, and outcome reports." portal="admin">
       <div className="space-y-3">

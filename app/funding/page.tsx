@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding' },
   title: 'Funding & Financial Aid | Elevate For Humanity',
@@ -26,7 +27,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function FundingPage() {
+export default async function FundingPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('funding_sources').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">

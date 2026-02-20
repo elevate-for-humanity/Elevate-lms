@@ -1,16 +1,22 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Wrench, ArrowRight, BookOpen, Target, Award } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Skill Development Mentorship | Elevate for Humanity',
   description: 'Develop new skills with guidance from experienced mentors. Get hands-on coaching to accelerate your learning.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/mentorship/skill-development' },
 };
 
-export default function SkillDevelopmentPage() {
+export default async function SkillDevelopmentPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('mentors').select('*').limit(50);
+
   const skills = [
     { category: 'Technical Skills', examples: ['Industry certifications', 'Software proficiency', 'Trade skills'] },
     { category: 'Soft Skills', examples: ['Communication', 'Leadership', 'Problem-solving'] },

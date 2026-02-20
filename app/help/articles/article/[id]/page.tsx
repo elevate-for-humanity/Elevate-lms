@@ -1,12 +1,18 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Clock, ThumbsUp, ThumbsDown, Share2, Printer } from 'lucide-react';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = { title: 'Help Article | Elevate LMS' };
 
 export default async function HelpArticlePage({ params }: { params: Promise<{ id: string }> }) {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('help_articles').select('*').limit(50);
+
   const { id } = await params;
   const article = {
     id: id,

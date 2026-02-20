@@ -1,9 +1,12 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Phone, Circle, ArrowLeft, Clock, Calendar, Shield } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Hair Follicle Drug Tests | Drug Testing Services',
   description: '90-day detection window hair drug testing. Difficult to cheat, ideal for pre-employment screening.',
@@ -61,7 +64,10 @@ const hairTests = [
   },
 ];
 
-export default function HairTestsPage() {
+export default async function HairTestsPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('drug_tests').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">

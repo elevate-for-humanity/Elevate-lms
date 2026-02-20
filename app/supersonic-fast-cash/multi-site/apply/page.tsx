@@ -1,8 +1,9 @@
 'use client';
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { createBrowserClient } from '@supabase/ssr';
 import {
   Building2,
   User,
@@ -40,6 +41,16 @@ const hearAboutUs = [
 ];
 
 export default function MultiSiteApplyPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('tax_returns').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',

@@ -1,57 +1,18 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Building2, MapPin, Globe, ArrowRight } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Partner Directory | Elevate for Humanity',
   description: 'Workforce development partners, employer partners, and community resources in Indianapolis. WorkOne, Indiana DWD, EmployIndy, and more.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/directory' },
 };
 
-const partners = [
-  {
-    name: 'WorkOne Indy',
-    type: 'Workforce Center',
-    desc: 'WIOA and WRG funding eligibility, career counseling, and job search assistance.',
-    address: 'Indianapolis, IN',
-    url: 'https://www.workoneindy.com',
-    logo: '/images/partners/workone.svg',
-  },
-  {
-    name: 'Indiana DWD',
-    type: 'State Agency',
-    desc: 'Indiana Department of Workforce Development. Administers WIOA, WRG, JRI, and Next Level Jobs.',
-    address: 'Indianapolis, IN',
-    url: 'https://www.in.gov/dwd',
-    logo: '/images/partners/dwd.svg',
-  },
-  {
-    name: 'EmployIndy',
-    type: 'Workforce Board',
-    desc: 'Marion County workforce development board. Oversees local WIOA funding and employer partnerships.',
-    address: 'Indianapolis, IN',
-    url: 'https://employindy.org',
-    logo: null,
-  },
-  {
-    name: 'U.S. Department of Labor',
-    type: 'Federal Agency',
-    desc: 'Registered Apprenticeship oversight and national workforce policy.',
-    address: 'Washington, DC',
-    url: 'https://www.dol.gov',
-    logo: '/images/partners/usdol.webp',
-  },
-  {
-    name: 'Next Level Jobs',
-    type: 'State Program',
-    desc: 'Workforce Ready Grant and Employer Training Grant programs for Indiana residents.',
-    address: 'Indiana',
-    url: 'https://nextleveljobs.org',
-    logo: '/images/partners/nextleveljobs.webp',
-  },
-];
 
 const resources = [
   { name: 'Indiana Career Connect', desc: 'State job board and career services portal', url: 'https://www.indianacareerconnect.com' },
@@ -60,7 +21,11 @@ const resources = [
   { name: 'Indiana PLA', desc: 'Professional Licensing Agency — barber and cosmetology licensing', url: 'https://www.in.gov/pla' },
 ];
 
-export default function DirectoryPage() {
+export default async function DirectoryPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('partners').select('*').limit(50);
+const partners = (dbRows as any[]) || [];
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">

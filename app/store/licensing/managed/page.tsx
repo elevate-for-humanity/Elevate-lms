@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
@@ -5,6 +7,7 @@ import Image from 'next/image';
 import { Check, Shield, Users, BarChart3, Lock, Headphones, ArrowRight, AlertTriangle } from 'lucide-react';
 import { LicenseDemo } from '@/components/store/LicenseDemo';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Managed Enterprise LMS Platform | Elevate for Humanity',
   description: 'Run your organization on an enterprise LMS operated by Elevate for Humanity. Your branding, your domain, our infrastructure.',
@@ -79,7 +82,10 @@ const plans = [
   },
 ];
 
-export default function ManagedPlatformPage() {
+export default async function ManagedPlatformPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">

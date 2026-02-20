@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { createBrowserClient } from '@supabase/ssr';
 import { 
   ArrowLeft, Circle, ChevronRight, 
   User, FileText, Building2, BookOpen, Clock,
@@ -28,6 +29,16 @@ const ICON_MAP = {
 };
 
 export default function OnboardingPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('system_settings').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [loading, setLoading] = useState(true);
   const [steps, setSteps] = useState<OnboardingStep[]>([]);
 

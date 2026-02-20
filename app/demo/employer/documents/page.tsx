@@ -1,18 +1,15 @@
+export const dynamic = 'force-dynamic';
+
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { FileText, Download, Clock } from 'lucide-react';
 
-const docs = [
-  { name: 'OJT Agreement — Marcus Johnson', type: 'Contract', signed: true, date: 'Jun 1, 2025' },
-  { name: 'OJT Agreement — David Chen', type: 'Contract', signed: true, date: 'Sep 15, 2025' },
-  { name: 'OJT Agreement — James Brown', type: 'Contract', signed: true, date: 'Mar 10, 2025' },
-  { name: 'OJT Agreement — Aisha Patel', type: 'Contract', signed: false, date: 'Pending signature' },
-  { name: 'Employer MOU — Elevate for Humanity', type: 'MOU', signed: true, date: 'Jan 5, 2025' },
-  { name: 'WOTC Pre-Screening Form 8850', type: 'Tax Form', signed: true, date: 'Dec 18, 2025' },
-  { name: 'Apprenticeship Standards', type: 'DOL Filing', signed: true, date: 'Feb 20, 2025' },
-  { name: 'Wage Schedule — CDL Program', type: 'Schedule', signed: true, date: 'Jun 1, 2025' },
-];
+import { createClient } from '@/lib/supabase/server';
 
-export default function DemoDocumentsPage() {
+export default async function DemoDocumentsPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('documents').select('*').limit(50);
+const docs = (dbRows as any[]) || [];
+
   return (
     <DemoPageShell title="Documents" description="Contracts, MOUs, and compliance documents." portal="employer">
       <div className="space-y-3">

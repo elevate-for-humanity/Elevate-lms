@@ -1,9 +1,12 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Play, Shield, GraduationCap, Briefcase, BarChart3, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Platform Demos | Elevate for Humanity',
   description: 'Try the Elevate platform yourself. Interactive demos of the admin dashboard, student portal, and employer tools — no signup required.',
@@ -52,7 +55,10 @@ const demos = [
   },
 ];
 
-export default function StoreDemosPage() {
+export default async function StoreDemosPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">

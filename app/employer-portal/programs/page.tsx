@@ -1,55 +1,24 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Award, DollarSign, Users, Clock, ArrowRight } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Employer Programs | Employer Portal',
   description: 'Explore tax credit programs, apprenticeships, and workforce development opportunities.',
   robots: { index: false, follow: false },
 };
 
-const programs = [
-  {
-    id: 'wotc',
-    name: 'Work Opportunity Tax Credit',
-    description: 'Earn up to $9,600 per eligible hire through federal tax credits for hiring from target groups.',
-    image: '/images/employers/partnership-hiring-event.jpg',
-    savings: 'Up to $9,600/hire',
-    eligibility: ['Veterans', 'SNAP Recipients', 'Ex-Felons', 'Long-term Unemployed'],
-    status: 'Active',
-  },
-  {
-    id: 'apprenticeship',
-    name: 'Registered Apprenticeship',
-    description: 'Build your talent pipeline with earn-and-learn programs. We handle compliance and curriculum.',
-    image: '/images/community/community-hero.jpg',
-    savings: 'Reduce training costs 50%',
-    eligibility: ['All Industries', 'DOL Registered', 'State Approved'],
-    status: 'Active',
-  },
-  {
-    id: 'ojt',
-    name: 'On-the-Job Training',
-    description: 'Get reimbursed up to 75% of wages during training period for eligible WIOA participants.',
-    image: '/images/homepage/employer-partnership.png',
-    savings: '50-75% wage reimbursement',
-    eligibility: ['WIOA Eligible', 'New Hires', 'Skill Development'],
-    status: 'Active',
-  },
-  {
-    id: 'fidelity-bond',
-    name: 'Federal Bonding Program',
-    description: 'Free fidelity bonds for at-risk hires, protecting your business from employee dishonesty.',
-    image: '/images/artlist/office-meeting.jpg',
-    savings: 'Free $5,000-$25,000 bonds',
-    eligibility: ['Ex-Offenders', 'Recovering Addicts', 'Welfare Recipients'],
-    status: 'Active',
-  },
-];
 
-export default function EmployerProgramsPage() {
+export default async function EmployerProgramsPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('employers').select('*').limit(50);
+const programs = (dbRows as any[]) || [];
+
   return (
     <div className="min-h-screen bg-gray-50">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Programs" }]} />

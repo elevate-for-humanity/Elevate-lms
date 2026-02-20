@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,6 +18,7 @@ import { PrintButton } from './PrintButton';
 import { ALL_RUBRICS } from './rubric-data';
 import type { ProgramRubric, Competency } from './rubric-data';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Competency Verification Matrix | Compliance | Elevate for Humanity',
   description:
@@ -99,7 +102,10 @@ function ProgramRubricSection({ rubric }: { rubric: ProgramRubric }) {
   );
 }
 
-export default function CompetencyVerificationPage() {
+export default async function CompetencyVerificationPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('compliance_records').select('*').limit(50);
+
   return (
     <div className="bg-white min-h-screen print:bg-white">
       {/* Breadcrumbs */}

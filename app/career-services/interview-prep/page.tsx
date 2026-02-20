@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -14,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Interview Preparation - Ace Your Next Interview | Elevate for Humanity',
   description:
@@ -23,7 +26,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function InterviewPrepPage() {
+export default async function InterviewPrepPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('career_services').select('*').limit(50);
+
   const interviewTypes = [
     {
       title: 'Behavioral Interviews',

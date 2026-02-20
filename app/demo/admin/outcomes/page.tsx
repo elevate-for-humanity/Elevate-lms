@@ -1,7 +1,13 @@
+export const dynamic = 'force-dynamic';
+
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { DEMO_PROGRAMS } from '@/lib/demo/sandbox-data';
 
-export default function DemoOutcomesPage() {
+import { createClient } from '@/lib/supabase/server';
+export default async function DemoOutcomesPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('outcomes').select('*').limit(50);
+
   return (
     <DemoPageShell title="Outcomes" description="Program completion rates, credential attainment, and employment outcomes." portal="admin">
       <div className="grid sm:grid-cols-3 gap-4 mb-6">

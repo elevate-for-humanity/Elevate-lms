@@ -1,9 +1,12 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'DOL Registered Apprenticeship Programs | Elevate for Humanity',
   description:
@@ -20,14 +23,12 @@ const benefits = [
   'Portable, nationally recognized certification',
 ];
 
-const programs = [
-  { name: 'Barber Apprenticeship', duration: '18-24 months', href: '/programs/barber-apprenticeship' },
-  { name: 'HVAC Technician', duration: '12-18 months', href: '/programs/skilled-trades' },
-  { name: 'Electrical Apprentice', duration: '12-24 months', href: '/programs/skilled-trades' },
-  { name: 'Welding', duration: '6-12 months', href: '/programs/skilled-trades' },
-];
 
-export default function DOLFundingPage() {
+export default async function DOLFundingPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('funding_sources').select('*').limit(50);
+const programs = (dbRows as any[]) || [];
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">

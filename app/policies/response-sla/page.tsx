@@ -1,6 +1,9 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Response Time SLA | Elevate for Humanity',
   description: 'Service level agreements for support and communication response times.',
@@ -9,7 +12,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ResponseSLAPage() {
+export default async function ResponseSLAPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 py-4">

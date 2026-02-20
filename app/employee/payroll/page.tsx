@@ -1,18 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { DollarSign, Download, FileText, Clock } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createBrowserClient } from '@supabase/ssr';
 export default function PayrollPage() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('pay_stubs').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [selectedPeriod, setSelectedPeriod] = useState('current');
 
-  const payStubs = [
-    { id: '1', period: 'Jan 1-15, 2026', grossPay: 2450.00, netPay: 1876.50, status: 'Paid', date: 'Jan 17, 2026' },
-    { id: '2', period: 'Dec 16-31, 2025', grossPay: 2450.00, netPay: 1876.50, status: 'Paid', date: 'Jan 3, 2026' },
-    { id: '3', period: 'Dec 1-15, 2025', grossPay: 2450.00, netPay: 1876.50, status: 'Paid', date: 'Dec 17, 2025' },
-  ];
+  const payStubs = (dbRows as any[]) || [];
 
   return (
     <div className="bg-gray-50 min-h-screen">

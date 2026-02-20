@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
@@ -13,6 +15,7 @@ import {
 CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Free Community Services | VITA, Mental Wellness, Job Training | Elevate for Humanity',
   description:
@@ -22,60 +25,6 @@ export const metadata: Metadata = {
   },
 };
 
-const services = [
-  {
-    title: 'Free Tax Preparation (VITA)',
-    description: 'IRS-certified volunteers prepare your taxes for free if you earn under $64,000.',
-    icon: DollarSign,
-    color: 'green',
-    href: '/tax',
-    benefits: [
-      'Save $200+ in tax prep fees',
-      'Average refund $2,847',
-      'IRS-certified preparers',
-      'E-file included',
-    ],
-  },
-  {
-    title: 'Mental Wellness (Selfish Inc.)',
-    description: 'Free counseling, stress management, and holistic healing support.',
-    icon: Heart,
-    color: 'blue',
-    href: '/nonprofit/mental-wellness',
-    benefits: [
-      'Individual counseling',
-      'Group therapy sessions',
-      'Mindfulness workshops',
-      'Holistic healing',
-    ],
-  },
-  {
-    title: 'Free Job Training',
-    description: 'Funded career training through WIOA for eligible participants. Get certified, get hired.',
-    icon: GraduationCap,
-    color: 'blue',
-    href: '/programs',
-    benefits: [
-      'Healthcare certifications',
-      'Skilled trades training',
-      'Technology programs',
-      'Job placement assistance',
-    ],
-  },
-  {
-    title: 'Employment Services',
-    description: 'Job placement, resume help, interview prep, and career coaching.',
-    icon: Briefcase,
-    color: 'amber',
-    href: '/career-services',
-    benefits: [
-      'Resume building',
-      'Interview preparation',
-      'Job matching',
-      'Career coaching',
-    ],
-  },
-];
 
 const colorClasses: Record<string, { bg: string; text: string; border: string; light: string }> = {
   green: { bg: 'bg-brand-green-600', text: 'text-brand-green-600', border: 'border-brand-green-200', light: 'bg-brand-green-50' },
@@ -84,7 +33,11 @@ const colorClasses: Record<string, { bg: string; text: string; border: string; l
   amber: { bg: 'bg-amber-600', text: 'text-amber-600', border: 'border-amber-200', light: 'bg-amber-50' },
 };
 
-export default function CommunityServicesPage() {
+export default async function CommunityServicesPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('community_groups').select('*').limit(50);
+const services = (dbRows as any[]) || [];
+
   return (
     <div className="min-h-screen bg-white">
       <Breadcrumbs

@@ -1,15 +1,21 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { ArrowRight, Download, Phone, Mail, Clock } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Application Received | Barbershop Partner | Elevate for Humanity',
   description: 'Thank you for applying to become a barbershop partner for the Indiana Barber Apprenticeship program.',
   robots: { index: false, follow: false },
 };
 
-export default function ThankYouPage() {
+export default async function ThankYouPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('partners').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 py-4">

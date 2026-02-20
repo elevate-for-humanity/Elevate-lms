@@ -1,16 +1,15 @@
+export const dynamic = 'force-dynamic';
+
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { Clock, AlertTriangle } from 'lucide-react';
 
-const participants = [
-  { name: 'Marcus Johnson', title: 'Adult', eligible: true, barriers: ['Low Income', 'Basic Skills Deficient'], ita: '$4,500', status: 'Active' },
-  { name: 'Sarah Williams', title: 'Dislocated Worker', eligible: true, barriers: ['Plant Closure'], ita: '$6,200', status: 'Active' },
-  { name: 'David Chen', title: 'Youth', eligible: true, barriers: ['Out of School', 'Foster Care'], ita: '$3,800', status: 'Active' },
-  { name: 'Maria Garcia', title: 'Adult', eligible: true, barriers: ['English Language Learner'], ita: '$4,500', status: 'Pending Docs' },
-  { name: 'James Brown', title: 'Dislocated Worker', eligible: true, barriers: ['Long-term Unemployed'], ita: '$5,100', status: 'Active' },
-  { name: 'Aisha Patel', title: 'Youth', eligible: false, barriers: [], ita: '—', status: 'Ineligible' },
-];
+import { createClient } from '@/lib/supabase/server';
 
-export default function DemoWioaPage() {
+export default async function DemoWioaPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('wioa_participants').select('*').limit(50);
+const participants = (dbRows as any[]) || [];
+
   return (
     <DemoPageShell title="WIOA" description="WIOA eligibility, Individual Training Accounts, and participant tracking." portal="admin">
       <div className="grid sm:grid-cols-3 gap-4 mb-6">

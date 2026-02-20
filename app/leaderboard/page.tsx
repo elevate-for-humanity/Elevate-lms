@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Trophy, Medal, Flame } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Leaderboard | Elevate For Humanity',
   description: 'See top learners and compete for the top spots.',
@@ -13,15 +14,12 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-const topLearners = [
-  { rank: 1, name: 'Sarah M.', points: 12450, streak: 45, courses: 8 },
-  { rank: 2, name: 'Michael R.', points: 11200, streak: 32, courses: 7 },
-  { rank: 3, name: 'Emily K.', points: 10800, streak: 28, courses: 6 },
-  { rank: 4, name: 'David L.', points: 9500, streak: 21, courses: 5 },
-  { rank: 5, name: 'Jessica T.', points: 8900, streak: 18, courses: 5 },
-];
 
 export default async function LeaderboardPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('user_points').select('*').limit(50);
+const topLearners = (dbRows as any[]) || [];
+
 
   return (
     <div className="min-h-screen bg-gray-50">

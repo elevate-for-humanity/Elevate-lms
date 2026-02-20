@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import {
@@ -11,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Contact Career Services | Elevate for Humanity',
   description:
@@ -20,7 +23,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CareerServicesContactPage() {
+export default async function CareerServicesContactPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('career_services').select('*').limit(50);
+
   return (
     <div className="bg-white">
       {/* Breadcrumbs */}

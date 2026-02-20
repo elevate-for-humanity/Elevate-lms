@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
@@ -7,6 +9,7 @@ import {
 } from 'lucide-react';
 import { QuickSummary } from '@/app/governance/_content/QuickSummary';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Authoritative Documents | Governance | Supersonic Fast Cash',
   description: 'The seven governing documents that define platform operations for Supersonic Fast Cash tax preparation and refund advance services.',
@@ -19,94 +22,6 @@ export const metadata: Metadata = {
   },
 };
 
-const documents = [
-  {
-    number: 1,
-    title: 'Platform Overview & Governance',
-    icon: FileText,
-    covers: 'Entire ecosystem',
-    description: 'What the platform is, how components relate, who owns decisions, and how governance is enforced.',
-    governs: [
-      'Public positioning',
-      'Platform components and roles',
-      'Change management and review cadence',
-    ],
-  },
-  {
-    number: 2,
-    title: 'Security & Data Protection Statement',
-    icon: Shield,
-    covers: 'All data handling and security practices',
-    description: 'How data is collected, protected, accessed, retained, and how incidents are handled.',
-    governs: [
-      'Security and privacy language',
-      'Data handling across website, LMS, Store, and tax services',
-    ],
-    link: '/governance/security',
-  },
-  {
-    number: 3,
-    title: 'Compliance & Disclosure Framework',
-    icon: Scale,
-    covers: 'Legal, financial, eligibility, and claims discipline',
-    description: 'How disclosures are presented, how claims are supported, and how compliance alignment is maintained.',
-    governs: [
-      'Eligibility statements',
-      'Pricing and fee disclosures',
-      'Outcome and capability claims',
-    ],
-    link: '/governance/compliance',
-  },
-  {
-    number: 4,
-    title: 'LMS Governance & Course Standards',
-    icon: BookOpen,
-    covers: 'Learning Management System operations',
-    description: 'How courses are owned, structured, audited, and maintained.',
-    governs: [
-      'Course completeness requirements',
-      'Instructor and ownership rules',
-      'Assessments, completion, and audits',
-    ],
-  },
-  {
-    number: 5,
-    title: 'Store, Payments & Licensing Framework',
-    icon: CreditCard,
-    covers: 'Store products and payments',
-    description: 'How products are sold, priced, paid for, and supported after purchase.',
-    governs: [
-      'Checkout behavior',
-      'Stripe configuration and metadata discipline',
-      'Refunds, disputes, and post-purchase obligations',
-    ],
-  },
-  {
-    number: 6,
-    title: 'Tax Preparation & Refund Advance Operations',
-    icon: Receipt,
-    covers: 'Supersonic Fast Cash tax services',
-    description: 'How tax preparation works and how optional refund-based advances are positioned and controlled.',
-    governs: [
-      'Tax filing workflow',
-      'Refund advance eligibility and opt-in',
-      'Repayment mechanics and disclosures',
-    ],
-    highlight: true,
-  },
-  {
-    number: 7,
-    title: 'Onboarding & User Experience Standards',
-    icon: Users,
-    covers: 'All onboarding flows',
-    description: 'How users are guided from entry to completion across roles.',
-    governs: [
-      'Student, instructor, admin, and tax user onboarding',
-      'Required disclosures by stage',
-      'Completion and exit criteria',
-    ],
-  },
-];
 
 const summaryBullets = [
   'Seven authoritative documents govern all platform operations',
@@ -115,7 +30,11 @@ const summaryBullets = [
   'Website pages summarize; these documents govern',
 ];
 
-export default function SupersonicAuthoritativeDocsPage() {
+export default async function SupersonicAuthoritativeDocsPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+const documents = (dbRows as any[]) || [];
+
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',

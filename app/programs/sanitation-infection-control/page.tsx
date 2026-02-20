@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -5,6 +7,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 import RequestMeeting from '@/components/RequestMeeting';
 
+import { createClient } from '@/lib/supabase/server';
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
@@ -19,7 +22,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SanitationInfectionControlPage() {
+export default async function SanitationInfectionControlPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">

@@ -1,7 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/server';
 import { 
   DollarSign, Briefcase, Building2, ArrowRight, 
   Users, Clock, Award, GraduationCap, Zap, Phone 
@@ -20,56 +23,6 @@ const benefits = [
   { icon: Award, title: 'Credentials', color: 'orange' },
 ];
 
-const apprenticeships = [
-  { 
-    name: 'Barber Apprenticeship', 
-    duration: '1,500 hours', 
-    wage: 'Earn while learning',
-    image: '/images/beauty/hero-program-barber.jpg',
-    href: '/programs/barber-apprenticeship',
-    description: 'USDOL Registered program. Learn cutting, styling, and shaving in a licensed shop.'
-  },
-  { 
-    name: 'Cosmetology Apprenticeship', 
-    duration: '1,500 hours', 
-    wage: 'Earn while learning',
-    image: '/images/beauty/hero-program-cosmetology.jpg',
-    href: '/programs/cosmetology-apprenticeship',
-    description: 'Full cosmetology training covering hair, nails, and skincare.'
-  },
-  { 
-    name: 'HVAC Apprenticeship', 
-    duration: '2-4 years', 
-    wage: '$15-$25/hr',
-    image: '/images/gallery/image10.jpg',
-    href: '/programs/hvac-technician',
-    description: 'Heating, ventilation, and air conditioning installation and repair.'
-  },
-  { 
-    name: 'Electrical Apprenticeship', 
-    duration: '4-5 years', 
-    wage: '$16-$30/hr',
-    image: '/images/trades/program-electrical-training.jpg',
-    href: '/programs/electrical-apprenticeship',
-    description: 'Commercial and residential electrical systems installation.'
-  },
-  { 
-    name: 'Welding Apprenticeship', 
-    duration: '3-4 years', 
-    wage: '$17-$28/hr',
-    image: '/images/trades/welding-hero.jpg',
-    href: '/programs/welding-apprenticeship',
-    description: 'MIG, TIG, and stick welding for manufacturing and construction.'
-  },
-  { 
-    name: 'CDL Training', 
-    duration: '3-6 weeks', 
-    wage: '$50K-$80K/yr',
-    image: '/images/heroes/about-impact.jpg',
-    href: '/programs/cdl-training',
-    description: 'Commercial driver license training with job placement.'
-  },
-];
 
 const steps = [
   { num: 1, title: 'Apply', desc: 'Submit your application', image: '/images/business/collaboration-1.jpg' },
@@ -78,7 +31,11 @@ const steps = [
   { num: 4, title: 'Certify', desc: 'Earn your credential', image: '/images/hero-new/hero-8.jpg' },
 ];
 
-export default function ApprenticeshipsPage() {
+export default async function ApprenticeshipsPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('apprenticeships').select('*').limit(50);
+const apprenticeships = (dbRows as any[]) || [];
+
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

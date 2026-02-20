@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { ChevronRight, GraduationCap } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Student Guide | Elevate For Humanity',
   description: 'Complete guide for students using the Elevate platform.',
@@ -17,7 +20,10 @@ const sections = [
   { title: 'Getting Help', href: '/docs/students/help' },
 ];
 
-export default function StudentDocsPage() {
+export default async function StudentDocsPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('documentation').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b">

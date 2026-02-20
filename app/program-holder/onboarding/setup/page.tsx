@@ -1,13 +1,24 @@
 'use client';
 
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, FileText, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 
 
+import { createBrowserClient } from '@supabase/ssr';
 export default function ProgramHolderSetup() {
+  const [dbRows, setDbRows] = useState<any[]>([]);
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabase.from('program_holders').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
+  }, []);
+
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     organizationName: '',

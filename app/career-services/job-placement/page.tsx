@@ -1,9 +1,12 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { Briefcase, Building2, TrendingUp, ArrowRight, Users, Target, Award, Search, Handshake } from 'lucide-react';
 import { CareerHero } from '../components/CareerHero';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Job Placement Services | Elevate for Humanity',
   description: 'Direct connections to employers actively hiring our graduates. Job matching, employer partnerships, interview coordination, and ongoing career support.',
@@ -13,7 +16,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function JobPlacementPage() {
+export default async function JobPlacementPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('career_services').select('*').limit(50);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}

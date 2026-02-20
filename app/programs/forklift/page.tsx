@@ -1,7 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import TradesProgramPage from '@/components/programs/TradesProgramPage';
 import { FORKLIFT_DATA } from '@/lib/trades-program-data';
 
+import { createClient } from '@/lib/supabase/server';
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
@@ -16,6 +19,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ForkliftPage() {
+export default async function ForkliftPage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+
   return <TradesProgramPage data={FORKLIFT_DATA} />;
 }

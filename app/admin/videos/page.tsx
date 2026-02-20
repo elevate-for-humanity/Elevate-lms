@@ -53,7 +53,7 @@ export default async function VideosPage() {
 
   // Fetch videos data
   const { data: videos, count: totalVideos } = await supabase
-    .from('videos')
+    .from('media')
     .select(
       `
       *,
@@ -65,7 +65,7 @@ export default async function VideosPage() {
     .limit(50);
 
   const { count: publishedVideos } = await supabase
-    .from('videos')
+    .from('media')
     .select('*', { count: 'exact', head: true })
     .eq('published', true);
 

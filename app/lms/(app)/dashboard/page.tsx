@@ -111,9 +111,9 @@ export default async function StudentDashboardOrchestrated() {
     }
   }
 
-  // Get certifications (gracefully handle if table doesn't exist)
+  // Get certifications from certificates table
   const { data: certifications } = await supabase
-    .from('certifications')
+    .from('certificates')
     .select('*')
     .eq('user_id', user.id)
     .then((res) => res)

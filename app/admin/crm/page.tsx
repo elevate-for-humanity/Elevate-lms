@@ -63,24 +63,24 @@ export default async function CRMHubPage() {
     { data: openDeals },
   ] = await Promise.all([
     supabase.from('profiles').select('*', { count: 'exact', head: true }),
-    supabase.from('license_leads').select('*', { count: 'exact', head: true }),
+    supabase.from('leads').select('*', { count: 'exact', head: true }),
     supabase
-      .from('follow_up_reminders')
+      .from('follow_ups')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'pending'),
     supabase
       .from('appointments')
       .select('*', { count: 'exact', head: true })
-      .gte('appointment_date', new Date().toISOString()),
+      .gte('created_at', new Date().toISOString()),
     supabase
-      .from('email_campaigns')
+      .from('campaigns')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(5),
     supabase
-      .from('deals')
+      .from('leads')
       .select('*')
-      .in('stage', ['prospecting', 'qualification', 'proposal', 'negotiation'])
+      .in('status', ['new', 'contacted', 'qualified', 'proposal'])
       .limit(10),
   ]);
 

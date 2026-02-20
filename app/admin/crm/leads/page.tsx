@@ -31,7 +31,7 @@ export default async function LeadsPage() {
 
   // Fetch real leads from CRM
   const { data: leadData } = await supabase
-    .from('crm_leads')
+    .from('leads')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(20);

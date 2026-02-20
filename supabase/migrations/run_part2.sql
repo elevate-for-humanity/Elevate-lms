@@ -596,20 +596,6 @@ CREATE TABLE IF NOT EXISTS data_processing_jobs (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS deals (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  all text,
-  amount numeric DEFAULT 0,
-  clicked_count integer DEFAULT 0,
-  expected_close_date date,
-  opened_count integer DEFAULT 0,
-  sent_count integer DEFAULT 0,
-  stage text,
-  subject text,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS demo_analytics (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
@@ -1025,20 +1011,6 @@ CREATE TABLE IF NOT EXISTS financial_assurances (
   issue_date date,
   provider text,
   status text DEFAULT 'active',
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS follow_up_reminders (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  all text,
-  amount numeric DEFAULT 0,
-  clicked_count integer DEFAULT 0,
-  expected_close_date date,
-  opened_count integer DEFAULT 0,
-  sent_count integer DEFAULT 0,
-  stage text,
-  subject text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );

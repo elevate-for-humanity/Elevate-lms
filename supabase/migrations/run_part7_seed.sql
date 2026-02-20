@@ -48,7 +48,7 @@ INSERT INTO library_resources (title, description, resource_type, is_public) VAL
   ('Interview Preparation', 'Common interview questions and best practices', 'document', true),
   ('Financial Literacy Basics', 'Budgeting, saving, and credit fundamentals', 'document', true);
 
--- Videos
+-- Videos (media table has minimal schema — seed into videos table created by migration)
 INSERT INTO videos (title, description, category, published, duration_seconds) VALUES
   ('Welcome to Elevate', 'Introduction to Elevate for Humanity and our mission', 'orientation', true, 180),
   ('Campus Tour', 'Virtual tour of our Indianapolis training facility', 'orientation', true, 300),
@@ -56,14 +56,14 @@ INSERT INTO videos (title, description, category, published, duration_seconds) V
   ('Student Success Stories', 'Hear from graduates who launched new careers', 'testimonials', true, 360);
 
 -- CRM leads (sample)
-INSERT INTO crm_leads (name, email, source, status) VALUES
-  ('Sample Lead', 'sample@example.com', 'website', 'new');
+INSERT INTO leads (first_name, last_name, email, source, status) VALUES
+  ('Sample', 'Lead', 'sample@example.com', 'website', 'new');
 
--- Email campaign templates
-INSERT INTO email_campaigns (name, subject, status) VALUES
-  ('Welcome Series', 'Welcome to Elevate for Humanity!', 'draft'),
-  ('Program Reminder', 'Your training starts next week', 'draft'),
-  ('Graduate Follow-Up', 'How is your new career going?', 'draft');
+-- Campaign templates
+INSERT INTO campaigns (name, description, type, status, is_active) VALUES
+  ('Welcome Series', 'Onboarding email sequence for new students', 'email', 'draft', true),
+  ('Program Reminder', 'Automated reminder before training start date', 'email', 'draft', true),
+  ('Graduate Follow-Up', 'Post-graduation career check-in', 'email', 'draft', true);
 
 -- Job opportunities
 INSERT INTO job_opportunities (title, description, location, salary_range, job_type, status) VALUES

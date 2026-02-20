@@ -166,19 +166,6 @@ CREATE TABLE IF NOT EXISTS forum_members (
 -- ADMIN / CRM TABLES
 -- ============================================================
 
-CREATE TABLE IF NOT EXISTS crm_leads (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text NOT NULL,
-  email text,
-  phone text,
-  source text,
-  status text DEFAULT 'new',
-  assigned_to uuid,
-  notes text,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS email_campaigns (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text NOT NULL,

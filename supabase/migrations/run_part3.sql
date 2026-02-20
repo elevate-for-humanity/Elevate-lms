@@ -550,20 +550,6 @@ CREATE TABLE IF NOT EXISTS license_keys (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS license_leads (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  all text,
-  amount numeric DEFAULT 0,
-  clicked_count integer DEFAULT 0,
-  expected_close_date date,
-  opened_count integer DEFAULT 0,
-  sent_count integer DEFAULT 0,
-  stage text,
-  subject text,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS license_tiers (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   answer text,

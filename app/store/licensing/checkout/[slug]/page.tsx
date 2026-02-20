@@ -12,7 +12,7 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
-import { getProductBySlug } from '@/app/data/store-products';
+// Product data fetched from /api/store/products/:slug (DB-backed with hardcoded fallback)
 import { ArrowLeft, Lock, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
@@ -102,10 +102,25 @@ function CheckoutForm({
         )}
       </button>
 
-      <p className="text-xs text-center text-gray-600">
-        Secure payment powered by Stripe. Your payment information is encrypted
-        and secure.
-      </p>
+      <div className="space-y-2 mt-2">
+        <p className="text-xs text-center text-gray-600">
+          Secure payment powered by Stripe. Card, Affirm, and Sezzle BNPL accepted.
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-slate-400">
+          <span className="flex items-center gap-1"><Lock size={12} /> SSL Encrypted</span>
+          <span>•</span>
+          <span>Cancel anytime</span>
+          <span>•</span>
+          <span>Data export on cancellation</span>
+        </div>
+      </div>
+
+      {/* Inline terms summary */}
+      <div className="mt-4 bg-slate-50 rounded-lg p-4 text-xs text-slate-500 space-y-1">
+        <p><strong className="text-slate-700">License terms:</strong> Month-to-month after initial purchase. Cancel anytime with 30-day notice.</p>
+        <p><strong className="text-slate-700">Data ownership:</strong> You own your data. Full export (CSV + JSON) available at any time.</p>
+        <p><strong className="text-slate-700">Onboarding:</strong> Included in setup fee. Your branded instance launches within 2 weeks.</p>
+      </div>
     </form>
   );
 }
@@ -128,15 +143,18 @@ export default function LicenseCheckoutPage() {
 
   useEffect(() => {
     const slug = params.slug as string;
-    const foundProduct = getProductBySlug(slug);
-
-    if (!foundProduct) {
-      router.push(`/store/licensing?reason=invalid-product&from=/store/licensing/checkout/${slug}`);
-      return;
-    }
-
-    setProduct(foundProduct);
-    setLoading(false);
+    fetch(`/api/store/products/${encodeURIComponent(slug)}`)
+      .then(res => {
+        if (!res.ok) throw new Error('not found');
+        return res.json();
+      })
+      .then(data => {
+        setProduct(data.product);
+        setLoading(false);
+      })
+      .catch(() => {
+        router.push(`/store/licensing?reason=invalid-product&from=/store/licensing/checkout/${slug}`);
+      });
   }, [params.slug, router]);
 
   const handleInfoSubmit = async (e: React.FormEvent) => {
@@ -145,7 +163,7 @@ export default function LicenseCheckoutPage() {
     // Create payment intent
     try {
       const response = await fetch(
-        '/api/store/licensing/create-payment-intent',
+        '/api/store/licenses/create-payment-intent',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -237,9 +255,12 @@ export default function LicenseCheckoutPage() {
                 </div>
                 {product.billingType === 'subscription' && (
                   <p className="text-sm text-gray-600 text-right mt-1">
-                    per month
+                    per month (${((product.price / 100) * 12).toLocaleString()}/year)
                   </p>
                 )}
+                <p className="text-xs text-slate-400 text-right mt-2">
+                  Affirm & Sezzle BNPL options available below
+                </p>
               </div>
             </div>
 

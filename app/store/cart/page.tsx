@@ -197,13 +197,16 @@ export default async function CartPage() {
                     <span>${total.toFixed(2)}</span>
                   </div>
                 </div>
-                <Link
-                  href="/store/checkout"
-                  className="w-full flex items-center justify-center gap-2 bg-brand-red-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-red-700"
-                >
-                  <CreditCard className="w-5 h-5" />
-                  Proceed to Checkout
-                </Link>
+                <form action="/api/store/cart-checkout" method="POST">
+                  <input type="hidden" name="customerEmail" value={user.email || ''} />
+                  <button
+                    type="submit"
+                    className="w-full flex items-center justify-center gap-2 bg-brand-red-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-red-700"
+                  >
+                    <CreditCard className="w-5 h-5" />
+                    Proceed to Checkout
+                  </button>
+                </form>
                 <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
                   <ShieldCheck className="w-4 h-4" />
                   Secure checkout

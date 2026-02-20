@@ -4,7 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
-import { getProductBySlug } from '@/app/data/store-products';
+import { getCatalogProduct } from '@/lib/store/db';
 import { STRIPE_PRICE_IDS, isPriceConfigured } from '@/lib/stripe/price-map';
 import { toErrorMessage } from '@/lib/safe';
 import { createClient } from '@/lib/supabase/server';
@@ -80,16 +80,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing productId' }, { status: 400 });
     }
 
-    const product = getProductBySlug(productId);
+    // DB-backed product lookup with hardcoded fallback
+    let product: Awaited<ReturnType<typeof getCatalogProduct>> = null;
+    try { product = await getCatalogProduct(productId); } catch { /* DB unavailable */ }
+    if (!product) {
+      const { getProductBySlug } = await import('@/app/data/store-products');
+      const legacy = getProductBySlug(productId);
+      if (legacy) {
+        product = {
+          id: legacy.id,
+          slug: legacy.slug,
+          name: legacy.name,
+          description: legacy.description,
+          price: legacy.price,
+          billingType: legacy.billingType as any || 'one_time',
+          licenseType: legacy.licenseType as any,
+          features: legacy.features || [],
+          appsIncluded: legacy.appsIncluded,
+          stripePriceId: legacy.stripePriceId,
+          stripeProductId: undefined,
+          isActive: true,
+        };
+      }
+    }
     if (!product) {
       return NextResponse.json({ error: 'Invalid productId' }, { status: 400 });
-    }
-
-    if (product.requiresApproval) {
-      return NextResponse.json(
-        { error: 'This license requires approval. Please contact us.' },
-        { status: 403 }
-      );
     }
 
     // Check if Stripe Price ID is configured

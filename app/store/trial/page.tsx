@@ -150,15 +150,30 @@ export default function TrialPage() {
       </div>
 
       <section className="py-16 sm:py-20">
-        <div className="max-w-xl mx-auto px-4">
-          <div className="text-center mb-10">
-            <h1 className="text-4xl font-black text-slate-900 mb-4">Start Your 14-Day Trial</h1>
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
+            {/* Left: visual */}
+            <div className="hidden lg:block">
+              <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl border border-slate-200 mb-4">
+                <img src="/images/demos/admin-dashboard-thumb.jpg" alt="Your admin dashboard after trial setup" className="w-full h-full object-cover" />
+              </div>
+              <p className="text-sm text-slate-500 text-center mb-6">Your admin dashboard — ready in under 60 seconds</p>
+              <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                <h3 className="text-sm font-bold text-slate-900 mb-3">What happens next</h3>
+                <ol className="space-y-2 text-sm text-slate-600">
+                  <li className="flex gap-2"><span className="text-brand-red-600 font-bold">1.</span> Fill out the form — 3 fields, 30 seconds</li>
+                  <li className="flex gap-2"><span className="text-brand-red-600 font-bold">2.</span> Your branded instance is provisioned instantly</li>
+                  <li className="flex gap-2"><span className="text-brand-red-600 font-bold">3.</span> Log in and start configuring your programs</li>
+                  <li className="flex gap-2"><span className="text-brand-red-600 font-bold">4.</span> Go live when ready — trial data carries over</li>
+                </ol>
+              </div>
+            </div>
+            {/* Right: form */}
+            <div>
+          <div className="text-center lg:text-left mb-10">
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">Start Your 14-Day Trial</h1>
             <p className="text-lg text-slate-800">
-              Full platform access. No credit card. Your environment is provisioned instantly.
-            </p>
-            <p className="mt-2 text-sm text-slate-600">
-              This creates your real workspace with your own subdomain and admin dashboard.
-              The demo used sample data — this will be your live environment.
+              Full platform access. No credit card. Provisioned instantly.
             </p>
           </div>
 
@@ -267,20 +282,22 @@ export default function TrialPage() {
             </button>
           </form>
 
-          <div className="mt-8 text-center space-y-3">
+          <div className="mt-8 text-center lg:text-left space-y-3">
             <p className="text-sm text-slate-600">
               Already know what you need?{' '}
-              <Link href="/store/licenses" className="text-brand-red-600 font-medium hover:underline">
-                Go directly to licensing
+              <Link href="/store/licensing/managed" className="text-brand-red-600 font-medium hover:underline">
+                Purchase directly
               </Link>
             </p>
             <p className="text-sm text-slate-600">
               Want to see the platform first?{' '}
-              <Link href="/store/demo" className="text-brand-red-600 font-medium hover:underline">
-                View guided tour →
+              <Link href="/demo/admin" className="text-brand-red-600 font-medium hover:underline">
+                Open full demo →
               </Link>
             </p>
           </div>
+          </div>{/* close right column */}
+          </div>{/* close grid */}
         </div>
       </section>
     </div>

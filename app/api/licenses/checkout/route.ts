@@ -2,7 +2,7 @@ import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { CLONE_LICENSES } from '@/app/data/store-products';
+import { getCatalogProduct } from '@/lib/store/db';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
@@ -39,8 +39,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'plan_id is required' }, { status: 400 });
     }
 
-    // Find the license product
-    const license = CLONE_LICENSES.find(l => l.slug === plan_id || l.id === plan_id);
+    // Find the license product from DB (with hardcoded fallback)
+    let license: Awaited<ReturnType<typeof getCatalogProduct>> = null;
+    try { license = await getCatalogProduct(plan_id); } catch { /* DB unavailable */ }
+    if (!license) {
+      const { ALL_PRODUCTS } = await import('@/app/data/store-products');
+      const legacy = ALL_PRODUCTS.find(l => l.slug === plan_id || l.id === plan_id);
+      if (legacy) {
+        license = {
+          id: legacy.id,
+          slug: legacy.slug,
+          name: legacy.name,
+          description: legacy.description,
+          price: legacy.price,
+          billingType: legacy.billingType as any || 'one_time',
+          licenseType: legacy.licenseType as any,
+          features: legacy.features || [],
+          appsIncluded: legacy.appsIncluded,
+          stripePriceId: legacy.stripePriceId,
+          stripeProductId: undefined,
+          isActive: true,
+        };
+      }
+    }
     if (!license) {
       return NextResponse.json({ error: 'Invalid plan_id' }, { status: 400 });
     }
@@ -122,7 +143,7 @@ export async function POST(request: NextRequest) {
               name: license.name,
               description: license.description,
             },
-            unit_amount: license.price * 100,
+            unit_amount: license.price, // already in cents
             ...(license.billingType === 'subscription' ? {
               recurring: {
                 interval: 'year',

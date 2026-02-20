@@ -148,17 +148,24 @@ export default async function ManagedPlatformPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-12">What You Get</h2>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             {[
-              { icon: Users, title: 'Your Branding', desc: 'Your logo, colors, and domain. It looks like your platform.' },
-              { icon: Lock, title: 'We Operate', desc: 'We handle hosting, security, updates, backups, and maintenance.' },
-              { icon: BarChart3, title: 'Your Data', desc: 'Your learners, your programs, your reports. Fully yours to manage.' },
-              { icon: Headphones, title: 'Our Support', desc: 'Dedicated support team. We keep it running so you can focus on training.' },
+              { icon: Users, title: 'Your Branding', desc: 'Your logo, colors, and domain. Students and employers see your organization — the platform is invisible.', img: '/images/demos/lms-overview-thumb.jpg' },
+              { icon: BarChart3, title: 'Your Data', desc: 'Your learners, your programs, your reports. Full data export anytime. You own everything.', img: '/images/demos/admin-dashboard-thumb.jpg' },
+              { icon: Lock, title: 'We Operate', desc: 'We handle hosting, security, updates, backups, and maintenance. 99.9% uptime SLA.', img: '/images/heroes-hq/how-it-works-hero.jpg' },
+              { icon: Headphones, title: 'Our Support', desc: 'Dedicated support team. We keep it running so you can focus on training people.', img: '/images/heroes-hq/career-services-hero.jpg' },
             ].map((item) => (
-              <div key={item.title} className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-                <item.icon className="w-10 h-10 text-brand-red-600 mb-4" />
-                <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-slate-600 text-sm">{item.desc}</p>
+              <div key={item.title} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                <div className="relative h-36">
+                  <Image src={item.img} alt={item.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                </div>
+                <div className="p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <item.icon className="w-5 h-5 text-brand-red-600" />
+                    <h3 className="text-lg font-bold text-slate-900">{item.title}</h3>
+                  </div>
+                  <p className="text-slate-600 text-sm">{item.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -260,8 +267,9 @@ export default async function ManagedPlatformPage() {
                   <span className="text-4xl font-black text-slate-900">${plan.monthlyPrice.toLocaleString()}</span>
                   <span className="text-slate-600">/month</span>
                   <p className="text-sm text-slate-600 mt-1">
-                    + ${plan.setupFee.toLocaleString()} one-time setup
+                    ${(plan.monthlyPrice * 12).toLocaleString()}/year + ${plan.setupFee.toLocaleString()} one-time setup
                   </p>
+                  <p className="text-xs text-slate-400 mt-0.5">Stripe, Affirm & Sezzle BNPL accepted</p>
                 </div>
 
                 <ul className="space-y-3 mb-8">
@@ -274,14 +282,20 @@ export default async function ManagedPlatformPage() {
                 </ul>
 
                 <Link
-                  href={plan.href}
+                  href="/store/trial"
                   className={`block text-center py-3 px-6 rounded-lg font-bold transition ${
                     plan.popular
                       ? 'bg-brand-red-600 hover:bg-brand-red-700 text-white'
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-900'
                   }`}
                 >
-                  {plan.cta}
+                  Start 14-Day Free Trial
+                </Link>
+                <Link
+                  href={plan.href}
+                  className="block text-center text-sm text-slate-500 font-medium mt-2 hover:underline"
+                >
+                  Or purchase directly →
                 </Link>
               </div>
             ))}
@@ -290,6 +304,33 @@ export default async function ManagedPlatformPage() {
           <p className="text-center text-slate-600 text-sm mt-8">
             Annual contracts preferred. Custom pricing available for multi-year agreements.
           </p>
+        </div>
+      </section>
+
+      {/* Onboarding Timeline */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-slate-900 text-center mb-4">From signup to live in 2 weeks</h2>
+          <p className="text-slate-600 text-center mb-10 max-w-2xl mx-auto">
+            Every step is self-service. No calls, no waiting for approvals.
+          </p>
+          <div className="grid md:grid-cols-4 gap-4">
+            {[
+              { day: 'Day 1', title: 'Trial starts', desc: 'Your branded instance is provisioned instantly. Log in, explore the admin dashboard.' },
+              { day: 'Days 2-5', title: 'Configure', desc: 'Add your programs, set up user roles, import student data. All self-service.' },
+              { day: 'Days 6-10', title: 'Test', desc: 'Enroll test learners, run compliance reports, invite employer partners.' },
+              { day: 'Day 14', title: 'Go live', desc: 'Choose a plan at checkout. Your trial data carries over. Launch to your organization.' },
+            ].map((step, i) => (
+              <div key={step.day} className="relative">
+                <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 h-full">
+                  <span className="text-brand-red-600 text-xs font-bold uppercase">{step.day}</span>
+                  <h3 className="font-bold text-slate-900 mt-1 mb-1">{step.title}</h3>
+                  <p className="text-slate-600 text-sm">{step.desc}</p>
+                </div>
+                {i < 3 && <div className="hidden md:block absolute top-1/2 -right-2 w-4 h-0.5 bg-slate-300" />}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -326,19 +367,19 @@ export default async function ManagedPlatformPage() {
       {/* CTA */}
       <section className="py-20 bg-brand-red-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Launch Your Platform?</h2>
-          <p className="text-slate-900/80 mb-8">
-            Choose a plan above and start onboarding immediately.
+          <h2 className="text-3xl font-bold text-white mb-4">Start your 14-day free trial now.</h2>
+          <p className="text-white/80 mb-8">
+            No credit card. Full platform access. Your branded instance is provisioned instantly.
           </p>
           <Link
-            href="#plans"
+            href="/store/trial"
             className="inline-flex items-center gap-2 bg-white text-brand-red-600 font-bold px-8 py-4 rounded-lg hover:bg-slate-50 transition"
           >
-            Choose a Plan
+            Start Free Trial
             <ArrowRight className="w-5 h-5" />
           </Link>
-          <p className="mt-4 text-sm text-slate-900/60">
-            <Link href="/contact?topic=enterprise-review" className="text-slate-900/80 hover:text-slate-900 underline">Enterprise / Government procurement review</Link>
+          <p className="mt-4 text-sm text-white/60">
+            Already decided? <Link href="#plans" className="text-white/80 hover:text-white underline">Purchase directly</Link>
           </p>
         </div>
       </section>

@@ -40,9 +40,30 @@ export async function POST(request: NextRequest) {
     }
     const { productId, customerInfo } = parsed.data;
 
-    // Get product details
-    const products = await import('@/app/data/store-products');
-    const product = products.STORE_PRODUCTS.find((p) => p.id === productId);
+    // Get product details from DB (with hardcoded fallback during migration)
+    const { getCatalogProduct } = await import('@/lib/store/db');
+    let product: Awaited<ReturnType<typeof getCatalogProduct>> = null;
+    try { product = await getCatalogProduct(productId); } catch { /* DB unavailable */ }
+    if (!product) {
+      const { ALL_PRODUCTS } = await import('@/app/data/store-products');
+      const legacy = ALL_PRODUCTS.find((p) => p.id === productId || p.slug === productId);
+      if (legacy) {
+        product = {
+          id: legacy.id,
+          slug: legacy.slug,
+          name: legacy.name,
+          description: legacy.description,
+          price: legacy.price,
+          billingType: legacy.billingType as any || 'one_time',
+          licenseType: legacy.licenseType as any,
+          features: legacy.features || [],
+          appsIncluded: legacy.appsIncluded,
+          stripePriceId: legacy.stripePriceId,
+          stripeProductId: undefined,
+          isActive: true,
+        };
+      }
+    }
 
     if (!product) {
       return NextResponse.json(
@@ -71,11 +92,12 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Create payment intent
+    // Create payment intent with card + BNPL options
     const paymentIntent = await stripe.paymentIntents.create({
       amount: product.price,
       currency: 'usd',
       customer: customer.id,
+      automatic_payment_methods: { enabled: true },
       metadata: {
         productId: product.id,
         productSlug: product.slug,

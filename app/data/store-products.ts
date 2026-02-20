@@ -537,8 +537,15 @@ export const CLONE_LICENSES: StoreProduct[] = [
 ];
 
 // Helper Functions
+/** All purchasable products across every catalog. */
+export const ALL_PRODUCTS: StoreProduct[] = [
+  ...STORE_PRODUCTS,
+  ...COMMUNITY_ADDONS,
+  ...CLONE_LICENSES,
+];
+
 export function getProductBySlug(slug: string): StoreProduct | undefined {
-  return STORE_PRODUCTS.find((p) => p.slug === slug);
+  return ALL_PRODUCTS.find((p) => p.slug === slug);
 }
 
 export function getAppByKey(key: string): PlatformApp | undefined {

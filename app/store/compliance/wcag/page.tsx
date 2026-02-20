@@ -165,7 +165,7 @@ export default async function WCAGCompliancePage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/store/checkout" className={`block text-center py-3 rounded-lg font-bold ${plan.popular ? 'bg-brand-blue-600 text-white' : 'bg-gray-100 text-black'}`}>
+                <Link href="/store/licensing" className={`block text-center py-3 rounded-lg font-bold ${plan.popular ? 'bg-brand-blue-600 text-white' : 'bg-gray-100 text-black'}`}>
                   Get Started
                 </Link>
               </div>

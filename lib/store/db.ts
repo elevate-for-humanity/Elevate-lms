@@ -16,6 +16,7 @@ export interface Product {
   slug: string;
   description: string;
   price: number;
+  price_cents?: number;
   compare_at_price?: number;
   type: string;
   category: string;
@@ -23,11 +24,12 @@ export interface Product {
   image_url: string;
   images?: ProductImage[];
   stripe_price_id?: string;
+  stripe_product_id?: string;
   is_active: boolean;
   is_featured: boolean;
   badge?: string;
   audiences: string[];
-  features: string[];
+  features: string[] | object[];
   tags: string[];
   inventory_quantity: number;
   track_inventory: boolean;
@@ -35,6 +37,59 @@ export interface Product {
   variants?: ProductVariant[];
   reviews_count?: number;
   average_rating?: number;
+  // New catalog fields
+  billing_type?: 'one_time' | 'subscription';
+  license_type?: 'single' | 'school' | 'enterprise';
+  long_description?: string;
+  ideal_for?: string;
+  apps_included?: string[];
+  setup_fee_cents?: number;
+  catalog_group?: 'store' | 'addon' | 'clone';
+  sort_order?: number;
+}
+
+/**
+ * Shape expected by checkout pages. Maps from DB row to checkout-compatible object.
+ */
+export interface CatalogProduct {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  longDescription?: string;
+  price: number; // cents
+  billingType: 'one_time' | 'subscription';
+  licenseType?: 'single' | 'school' | 'enterprise';
+  features: string[];
+  idealFor?: string;
+  appsIncluded?: string[];
+  setupFeeCents?: number;
+  catalogGroup?: string;
+  stripeProductId?: string;
+  stripePriceId?: string;
+  isActive: boolean;
+}
+
+/** Convert a DB product row to the shape checkout/store pages expect. */
+export function toCatalogProduct(row: Product): CatalogProduct {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    description: row.description,
+    longDescription: row.long_description || undefined,
+    price: row.price_cents ?? Math.round(row.price * 100),
+    billingType: row.billing_type || 'one_time',
+    licenseType: row.license_type || undefined,
+    features: Array.isArray(row.features) ? row.features.map(String) : [],
+    idealFor: row.ideal_for || undefined,
+    appsIncluded: Array.isArray(row.apps_included) ? row.apps_included.map(String) : undefined,
+    setupFeeCents: row.setup_fee_cents || 0,
+    catalogGroup: row.catalog_group || 'store',
+    stripeProductId: row.stripe_product_id || undefined,
+    stripePriceId: row.stripe_price_id || undefined,
+    isActive: row.is_active,
+  };
 }
 
 export interface ProductImage {
@@ -262,6 +317,43 @@ export async function getProduct(slug: string): Promise<Product | null> {
   }
 
   return data;
+}
+
+/**
+ * Get a product by slug, mapped to the CatalogProduct shape for checkout/store pages.
+ * This is the canonical way to look up products — replaces the hardcoded getProductBySlug.
+ */
+export async function getCatalogProduct(slug: string): Promise<CatalogProduct | null> {
+  const product = await getProduct(slug);
+  if (!product) return null;
+  return toCatalogProduct(product);
+}
+
+/**
+ * Get all active catalog products, optionally filtered by catalog_group.
+ */
+export async function getCatalogProducts(group?: 'store' | 'addon' | 'clone'): Promise<CatalogProduct[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+
+  let query = supabase
+    .from('products')
+    .select('*')
+    .eq('is_active', true)
+    .order('sort_order', { ascending: true });
+
+  if (group) {
+    query = query.eq('catalog_group', group);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    logger.error('Error fetching catalog products:', error);
+    return [];
+  }
+
+  return (data || []).map(toCatalogProduct);
 }
 
 export async function getProductsByIds(ids: string[]): Promise<Product[]> {

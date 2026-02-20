@@ -12,7 +12,7 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
-import { getProductBySlug } from '@/app/data/store-products';
+// Product data fetched from /api/store/products/:slug (DB-backed with hardcoded fallback)
 import { ArrowLeft, Lock, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
@@ -128,15 +128,18 @@ export default function LicenseCheckoutPage() {
 
   useEffect(() => {
     const slug = params.slug as string;
-    const foundProduct = getProductBySlug(slug);
-
-    if (!foundProduct) {
-      router.push(`/store/licenses?reason=invalid-product&from=/store/licenses/checkout/${slug}`);
-      return;
-    }
-
-    setProduct(foundProduct);
-    setLoading(false);
+    fetch(`/api/store/products/${encodeURIComponent(slug)}`)
+      .then(res => {
+        if (!res.ok) throw new Error('not found');
+        return res.json();
+      })
+      .then(data => {
+        setProduct(data.product);
+        setLoading(false);
+      })
+      .catch(() => {
+        router.push(`/store/licenses?reason=invalid-product&from=/store/licenses/checkout/${slug}`);
+      });
   }, [params.slug, router]);
 
   const handleInfoSubmit = async (e: React.FormEvent) => {

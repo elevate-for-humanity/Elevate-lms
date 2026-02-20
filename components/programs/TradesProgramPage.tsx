@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { AuthorityStrip, CredentialPipeline } from '@/components/InstitutionalAuthority';
 
 export interface CurriculumModule {
   week: string;
@@ -93,6 +94,11 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
         </div>
       </section>
 
+      {/* Authority badges */}
+      <div className="bg-white py-4 border-b border-gray-100">
+        <AuthorityStrip />
+      </div>
+
       {/* Overview + photo */}
       <section className="max-w-5xl mx-auto px-4 py-12">
         <div className="grid lg:grid-cols-5 gap-8">
@@ -135,6 +141,9 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
           {data.examFeesIncluded && <p className="text-sm text-slate-500 mt-3">All certification exam fees included in program cost.</p>}
         </div>
       </section>
+
+      {/* Credential Pipeline */}
+      <CredentialPipeline />
 
       {/* Curriculum with images */}
       <section className="max-w-5xl mx-auto px-4 py-12">

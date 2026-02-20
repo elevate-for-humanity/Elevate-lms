@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { ArrowLeft, Gift, DollarSign, Calendar, User, Building, Save } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ArrowLeft, Gift, DollarSign, Calendar, Building, Save } from 'lucide-react';
+import { createIncentive } from '../actions';
 
 export const metadata: Metadata = {
   title: 'Create Incentive | Admin',
@@ -11,147 +12,80 @@ export const metadata: Metadata = {
 
 export default function CreateIncentivePage() {
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Create" }]} />
-      </div>
-<div className="max-w-3xl mx-auto">
-        <Link href="/admin/incentives" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">
-          <ArrowLeft className="w-4 h-4" />
-          Back to Incentives
-        </Link>
-
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center">
-            <Gift className="w-6 h-6 text-brand-green-600" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Create Incentive</h1>
-            <p className="text-gray-600">Set up a new employer incentive or tax credit</p>
-          </div>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-4">
+          <Breadcrumbs items={[
+            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Incentives', href: '/admin/incentives' },
+            { label: 'Create Incentive' },
+          ]} />
         </div>
 
-        <form className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Incentive Details</h2>
-            
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Incentive Type *</label>
-                <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
-                  <option>Select type</option>
-                  <option>WOTC Tax Credit</option>
-                  <option>On-the-Job Training Reimbursement</option>
-                  <option>Apprenticeship Grant</option>
-                  <option>Hiring Bonus</option>
-                  <option>Training Subsidy</option>
-                </select>
-              </div>
+        <Link href="/admin/incentives" className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-4">
+          <ArrowLeft className="w-4 h-4" /> Back to Incentives
+        </Link>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="number"
-                      placeholder="0.00"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
-                    <option>Pending</option>
-                    <option>Approved</option>
-                    <option>Processing</option>
-                    <option>Completed</option>
-                  </select>
-                </div>
-              </div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Create Incentive</h1>
+
+        <form action={createIncentive} className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <span className="flex items-center gap-1"><Gift className="w-3.5 h-3.5" /> Incentive Name *</span>
+            </label>
+            <input name="name" required className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="e.g., WOTC Tax Credit" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+              <select name="type" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500">
+                <option value="tax_credit">Tax Credit</option>
+                <option value="grant">Grant</option>
+                <option value="subsidy">Wage Subsidy</option>
+                <option value="bonus">Completion Bonus</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><DollarSign className="w-3.5 h-3.5" /> Amount ($)</span>
+              </label>
+              <input name="amount" type="number" step="0.01" min="0" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="2400.00" />
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Employer Information</h2>
-            
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Employer *</label>
-                <div className="relative">
-                  <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search employer..."
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <span className="flex items-center gap-1"><Building className="w-3.5 h-3.5" /> Employer</span>
+            </label>
+            <input name="employer" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="Employer name (if applicable)" />
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Employee (if applicable)</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search employee..."
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Start Date</span>
+              </label>
+              <input name="start_date" type="date" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> End Date</span>
+              </label>
+              <input name="end_date" type="date" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" />
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Timeline</h2>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="date"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="date"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-              <textarea
-                rows={3}
-                placeholder="Additional details about this incentive..."
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea name="description" rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="Details about this incentive program..." />
           </div>
 
-          <div className="flex items-center justify-between">
-            <Link
-              href="/admin/incentives"
-              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-            >
-              Cancel
-            </Link>
-            <button
-              type="submit"
-              className="px-8 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold flex items-center gap-2"
-            >
-              <Save className="w-4 h-4" />
-              Create Incentive
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            <Link href="/admin/incentives" className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Cancel</Link>
+            <button type="submit" className="flex items-center gap-2 px-5 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">
+              <Save className="w-4 h-4" /> Create Incentive
             </button>
           </div>
         </form>

@@ -58,7 +58,7 @@ export async function POST(req: Request) {
   // Send notification email
   try {
     await getResend().emails.send({
-      from: process.env.EMAIL_FROM || 'noreply@www.elevateforhumanity.org',
+      from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
       to: process.env.NOTIFY_EMAIL_TO || 'elevate4humanityedu@gmail.com',
       subject: `New License Request: ${payload.full_name} (${payload.desired_tier})`,
       text:
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
 
     // SMS alert via AT&T gateway
     await getResend().emails.send({
-      from: process.env.EMAIL_FROM || 'noreply@www.elevateforhumanity.org',
+      from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
       to: process.env.ADMIN_SMS_GATEWAY || '',
       subject: 'License',
       text: `${payload.full_name}\n${payload.organization || ''}\n${payload.desired_tier}`,
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
 
     // Send auto-reply to submitter
     await getResend().emails.send({
-      from: process.env.EMAIL_FROM || 'noreply@www.elevateforhumanity.org',
+      from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
       to: payload.email,
       subject: 'We received your licensing request | Elevate for Humanity',
       text:

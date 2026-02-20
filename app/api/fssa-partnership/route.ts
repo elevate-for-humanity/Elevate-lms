@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     // Send notification to admin
     try {
       await resend.emails.send({
-        from: 'FSSA Partnership <noreply@www.elevateforhumanity.org>',
+        from: 'FSSA Partnership <noreply@elevateforhumanity.org>',
         to: 'partnerships@www.elevateforhumanity.org',
         subject: `🎯 FSSA Partnership Request: ${data.organization}`,
         html: `

@@ -145,6 +145,21 @@ export default function ServerFooter() {
               </p>
             </div>
             
+            {/* Authority Badges */}
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+              {[
+                { abbr: 'USDOL', label: 'DOL Registered Sponsor' },
+                { abbr: 'ETPL', label: 'Approved Training Provider' },
+                { abbr: 'Certiport', label: 'Authorized Testing Center' },
+                { abbr: 'EPA 608', label: 'Certification Prep' },
+                { abbr: 'OSHA', label: 'Safety Training' },
+              ].map((b) => (
+                <span key={b.abbr} className="inline-flex items-center text-[10px] font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                  {b.abbr}
+                </span>
+              ))}
+            </div>
+
             {/* Legal Links */}
             <div className="flex flex-wrap justify-center gap-6 text-sm">
               {footerLinks.legal.map((link) => (

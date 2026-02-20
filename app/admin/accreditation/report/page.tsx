@@ -1,126 +1,134 @@
 import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { Download, Calendar, AlertTriangle, Clock, ArrowLeft } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { Download, Calendar, AlertTriangle, Clock, ArrowLeft, CheckCircle2, Shield, FileText } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Accreditation Report | Admin',
-  description: 'Generate and view accreditation compliance reports.',
+  description: 'Accreditation compliance report with live data.',
   robots: { index: false, follow: false },
 };
 
-const reportData = {
-  overallScore: 94,
-  lastAudit: 'January 15, 2025',
-  nextAudit: 'July 15, 2025',
-  categories: [
-    { name: 'Curriculum Standards', score: 96, status: 'compliant' },
-    { name: 'Instructor Qualifications', score: 92, status: 'compliant' },
-    { name: 'Student Outcomes', score: 95, status: 'compliant' },
-    { name: 'Facility Requirements', score: 88, status: 'attention' },
-    { name: 'Documentation', score: 97, status: 'compliant' },
-  ],
-  recentFindings: [
-    { id: 1, type: 'observation', description: 'Update emergency exit signage in Building B', dueDate: 'Feb 28, 2025' },
-    { id: 2, type: 'recommendation', description: 'Consider adding more hands-on training hours', dueDate: 'Mar 15, 2025' },
-  ],
-};
+async function getAccreditationData(supabase: any) {
+  const [programs, courses, certificates, enrollments, completions] = await Promise.all([
+    supabase.from('programs').select('id, name, status, created_at').eq('status', 'active'),
+    supabase.from('training_courses').select('id, course_name, is_active').eq('is_active', true),
+    supabase.from('certificates').select('id, created_at, status'),
+    supabase.from('enrollments').select('id, status, created_at'),
+    supabase.from('completions').select('id, created_at'),
+  ]);
 
-export default function AccreditationReportPage() {
+  const totalPrograms = programs.data?.length ?? 0;
+  const totalCourses = courses.data?.length ?? 0;
+  const totalCerts = certificates.data?.length ?? 0;
+  const totalEnrollments = enrollments.data?.length ?? 0;
+  const totalCompletions = completions.data?.length ?? 0;
+  const completionRate = totalEnrollments > 0 ? Math.round((totalCompletions / totalEnrollments) * 100) : 0;
+
+  return {
+    programs: programs.data ?? [],
+    totalPrograms,
+    totalCourses,
+    totalCerts,
+    totalEnrollments,
+    totalCompletions,
+    completionRate,
+  };
+}
+
+export default async function AccreditationReportPage() {
+  const supabase = await createClient();
+  if (!supabase) {
+    return <div className="p-8 text-center text-gray-600">Database unavailable.</div>;
+  }
+
+  const data = await getAccreditationData(supabase);
+  const now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const metrics = [
+    { label: 'Active Programs', value: data.totalPrograms, icon: Shield, color: 'brand-blue' },
+    { label: 'Active Courses', value: data.totalCourses, icon: FileText, color: 'emerald' },
+    { label: 'Certificates Issued', value: data.totalCerts, icon: CheckCircle2, color: 'purple' },
+    { label: 'Completion Rate', value: `${data.completionRate}%`, icon: Clock, color: 'amber' },
+    { label: 'Total Enrollments', value: data.totalEnrollments, icon: Calendar, color: 'teal' },
+    { label: 'Total Completions', value: data.totalCompletions, icon: CheckCircle2, color: 'brand-green' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Report" }]} />
-      </div>
-<div className="max-w-6xl mx-auto">
-        <Link href="/admin/accreditation" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">
-          <ArrowLeft className="w-4 h-4" />
-          Back to Accreditation
-        </Link>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-4">
+          <Breadcrumbs items={[
+            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Accreditation', href: '/admin/accreditation' },
+            { label: 'Report' },
+          ]} />
+        </div>
 
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
+            <Link href="/admin/accreditation" className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-2">
+              <ArrowLeft className="w-4 h-4" /> Back to Accreditation
+            </Link>
             <h1 className="text-2xl font-bold text-gray-900">Accreditation Compliance Report</h1>
-            <p className="text-gray-600">Generated: {new Date().toLocaleDateString()}</p>
+            <p className="text-sm text-gray-500 mt-1">Generated {now} from live platform data</p>
           </div>
-          <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2">
-            <Download className="w-4 h-4" />
-            Export PDF
-          </button>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-            <div className="w-24 h-24 mx-auto mb-4 relative">
-              <svg className="w-24 h-24 transform -rotate-90">
-                <circle cx="48" cy="48" r="40" stroke="#e5e7eb" strokeWidth="8" fill="none" />
-                <circle cx="48" cy="48" r="40" stroke="#9333ea" strokeWidth="8" fill="none"
-                  strokeDasharray={`${reportData.overallScore * 2.51} 251`} />
-              </svg>
-              <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-900">
-                {reportData.overallScore}%
-              </span>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+          {metrics.map((m) => (
+            <div key={m.label} className="bg-white rounded-xl border border-gray-200 p-4">
+              <m.icon className="w-5 h-5 text-gray-400 mb-2" />
+              <div className="text-2xl font-bold text-gray-900">{m.value}</div>
+              <div className="text-xs text-gray-500 mt-1">{m.label}</div>
             </div>
-            <p className="font-semibold text-gray-900">Overall Compliance</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <Calendar className="w-8 h-8 text-brand-green-600 mb-3" />
-            <p className="text-sm text-gray-500">Last Audit</p>
-            <p className="text-xl font-bold text-gray-900">{reportData.lastAudit}</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <Clock className="w-8 h-8 text-brand-blue-600 mb-3" />
-            <p className="text-sm text-gray-500">Next Audit</p>
-            <p className="text-xl font-bold text-gray-900">{reportData.nextAudit}</p>
-          </div>
+          ))}
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-6">Compliance by Category</h2>
-          <div className="space-y-4">
-            {reportData.categories.map((cat, index) => (
-              <div key={index} className="flex items-center gap-4">
-                <div className="w-48 font-medium text-gray-700">{cat.name}</div>
-                <div className="flex-1">
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div
-                      className={`h-3 rounded-full ${cat.status === 'compliant' ? 'bg-brand-green-500' : 'bg-yellow-500'}`}
-                      style={{ width: `${cat.score}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="w-16 text-right font-bold text-gray-900">{cat.score}%</div>
-                {cat.status === 'compliant' ? (
-                  <span className="text-slate-400 flex-shrink-0">•</span>
-                ) : (
-                  <AlertTriangle className="w-5 h-5 text-yellow-600" />
-                )}
-              </div>
-            ))}
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-6">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h2 className="font-semibold text-gray-900">Active Programs</h2>
           </div>
+          {data.programs.length === 0 ? (
+            <div className="px-6 py-8 text-center text-sm text-gray-500">No active programs found.</div>
+          ) : (
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Program</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {data.programs.map((p: any) => (
+                  <tr key={p.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-3 text-sm font-medium text-gray-900">{p.name || 'Unnamed'}</td>
+                    <td className="px-6 py-3">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-brand-green-100 text-brand-green-700 font-medium">{p.status}</span>
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-500">{p.created_at ? new Date(p.created_at).toLocaleDateString() : '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-6">Action Items</h2>
-          <div className="space-y-4">
-            {reportData.recentFindings.map((finding) => (
-              <div key={finding.id} className="flex items-start gap-4 p-4 border rounded-lg">
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  finding.type === 'observation' ? 'bg-yellow-100 text-yellow-700' : 'bg-brand-blue-100 text-brand-blue-700'
-                }`}>
-                  {finding.type}
-                </div>
-                <div className="flex-1">
-                  <p className="text-gray-900">{finding.description}</p>
-                  <p className="text-sm text-gray-500 mt-1">Due: {finding.dueDate}</p>
-                </div>
-                <button className="px-4 py-2 border rounded-lg hover:bg-gray-50 transition text-sm">
-                  Mark Complete
-                </button>
+        {data.completionRate < 50 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <div className="font-medium text-amber-800">Low Completion Rate</div>
+              <div className="text-sm text-amber-700 mt-1">
+                Completion rate is {data.completionRate}%. Review at-risk students and retention strategies.
               </div>
-            ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

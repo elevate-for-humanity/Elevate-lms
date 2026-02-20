@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
     // Step 8: Send confirmation email to client
     try {
       await resend.emails.send({
-        from: 'SupersonicFastCash <noreply@www.elevateforhumanity.org>',
+        from: 'SupersonicFastCash <noreply@elevateforhumanity.org>',
         to: clientData.email,
         subject: 'Your Tax Return Information Received',
         html: `
@@ -244,7 +244,7 @@ export async function POST(request: NextRequest) {
     // Step 9: Send notification to tax pro
     try {
       await resend.emails.send({
-        from: 'SupersonicFastCash <noreply@www.elevateforhumanity.org>',
+        from: 'SupersonicFastCash <noreply@elevateforhumanity.org>',
         to: 'supersonicfastcashllc@gmail.com',
         subject: `New Client: ${clientData.firstName} ${clientData.lastName}`,
         html: `

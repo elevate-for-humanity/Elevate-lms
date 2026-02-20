@@ -1,42 +1,68 @@
 import { logger } from '@/lib/logger';
-import { Resend } from 'resend';
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
 
 export interface EmailOptions {
   to: string | string[];
   subject: string;
   html: string;
+  text?: string;
   from?: string;
 }
 
+/**
+ * Send email via Resend HTTP API (no SDK — direct fetch).
+ * Returns { success, data?, error? }.
+ */
 export async function sendEmail(options: EmailOptions) {
-  if (!resend) {
-    return { success: false, error: 'Email service not configured' };
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    logger.warn('[Email] RESEND_API_KEY not configured — email not sent');
+    return { success: false, error: 'Email service not configured (RESEND_API_KEY missing)' };
   }
 
+  const from =
+    options.from ||
+    process.env.MAIL_FROM ||
+    'Elevate for Humanity <noreply@elevateforhumanity.org>';
+  const toArr = Array.isArray(options.to) ? options.to : [options.to];
+
   try {
-    const { data, error } = await resend.emails.send({
-      from:
-        options.from || 'Elevate for Humanity <noreply@www.elevateforhumanity.org>',
-      to: options.to,
-      subject: options.subject,
-      html: options.html,
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from,
+        to: toArr,
+        subject: options.subject,
+        html: options.html,
+        ...(options.text ? { text: options.text } : {}),
+      }),
     });
 
-    if (error) {
-      logger.error('[Email] Send failed:', error);
-      return { success: false, error: 'Operation failed' };
+    const data = await resp.json().catch(() => ({}));
+
+    if (!resp.ok) {
+      logger.error(`[Email] Resend ${resp.status}:`, data);
+      return { success: false, error: `Resend error ${resp.status}` };
     }
 
     return { success: true, data };
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) {
     logger.error('[Email] Send error:', error);
-    const errorMessage = 'Operation failed';
-    return { success: false, error: errorMessage };
+    return { success: false, error: 'Operation failed' };
   }
+}
+
+/**
+ * Fire-and-forget email send. Never throws.
+ */
+export async function trySendEmail(
+  options: EmailOptions
+): Promise<{ ok: boolean; error?: string }> {
+  const result = await sendEmail(options);
+  return { ok: result.success, error: result.error };
 }
 
 export async function sendWelcomeEmail(params: {

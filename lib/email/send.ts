@@ -14,7 +14,7 @@ export async function sendEmail(options: EmailOptions) {
   try {
     const { data, error } = await resend.emails.send({
       from:
-        options.from || 'Elevate for Humanity <noreply@www.elevateforhumanity.org>',
+        options.from || 'Elevate for Humanity <noreply@elevateforhumanity.org>',
       to: options.to,
       subject: options.subject,
       html: options.html,

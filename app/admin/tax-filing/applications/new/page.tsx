@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { ArrowLeft, FileText, User, DollarSign, Calendar, Save, Upload } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ArrowLeft, FileText, User, DollarSign, Calendar, Save, Mail, Phone } from 'lucide-react';
+import { createTaxApplication } from '../actions';
 
 export const metadata: Metadata = {
   title: 'New Tax Filing Application | Admin',
@@ -11,159 +12,80 @@ export const metadata: Metadata = {
 
 export default function NewTaxFilingApplicationPage() {
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "New" }]} />
-      </div>
-<div className="max-w-3xl mx-auto">
-        <Link href="/admin/tax-filing" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">
-          <ArrowLeft className="w-4 h-4" />
-          Back to Tax Filing
-        </Link>
-
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center">
-            <FileText className="w-6 h-6 text-brand-green-600" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">New Tax Filing Application</h1>
-            <p className="text-gray-600">Create a VITA tax filing assistance request</p>
-          </div>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-4">
+          <Breadcrumbs items={[
+            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Tax Filing', href: '/admin/tax-filing' },
+            { label: 'Applications', href: '/admin/tax-filing/applications' },
+            { label: 'New Application' },
+          ]} />
         </div>
 
-        <form className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Client Information</h2>
-            
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Client *</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search by name or email..."
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
+        <Link href="/admin/tax-filing/applications" className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-4">
+          <ArrowLeft className="w-4 h-4" /> Back to Applications
+        </Link>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tax Year *</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
-                    <option>2024</option>
-                    <option>2023</option>
-                    <option>2022</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Filing Status *</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
-                    <option>Single</option>
-                    <option>Married Filing Jointly</option>
-                    <option>Married Filing Separately</option>
-                    <option>Head of Household</option>
-                    <option>Qualifying Widow(er)</option>
-                  </select>
-                </div>
-              </div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">New Tax Filing Application</h1>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Estimated Income</label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="number"
-                      placeholder="0.00"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Number of Dependents</label>
-                  <input
-                    type="number"
-                    placeholder="0"
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
+        <form action={createTaxApplication} className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Client Name *</span>
+            </label>
+            <input name="client_name" required className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="Full legal name" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><Mail className="w-3.5 h-3.5" /> Email *</span>
+              </label>
+              <input name="client_email" type="email" required className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="client@email.com" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5" /> Phone</span>
+              </label>
+              <input name="client_phone" type="tel" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="(317) 555-0100" />
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Income Sources</h2>
-            
-            <div className="space-y-4">
-              {['W-2 Employment', '1099 Self-Employment', 'Unemployment Benefits', 'Social Security', 'Other Income'].map((source) => (
-                <label key={source} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-brand-blue-300">
-                  <input type="checkbox" className="w-4 h-4 text-brand-blue-600 rounded" />
-                  <span className="text-gray-700">{source}</span>
-                </label>
-              ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><FileText className="w-3.5 h-3.5" /> Filing Type</span>
+              </label>
+              <select name="filing_type" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500">
+                <option value="individual">Individual (1040)</option>
+                <option value="business">Business</option>
+                <option value="nonprofit">Nonprofit</option>
+                <option value="amendment">Amendment</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Tax Year</span>
+              </label>
+              <select name="tax_year" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500">
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+              </select>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Documents</h2>
-            
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-brand-blue-400 transition cursor-pointer">
-              <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-              <p className="text-sm text-gray-600 mb-1">Click to upload or drag and drop</p>
-              <p className="text-xs text-gray-500">W-2s, 1099s, ID, and other tax documents</p>
-            </div>
-
-            <div className="mt-4 text-sm text-gray-500">
-              <p className="font-medium mb-2">Required Documents:</p>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Government-issued ID</li>
-                <li>Social Security cards for all family members</li>
-                <li>All W-2 and 1099 forms</li>
-                <li>Prior year tax return (if available)</li>
-              </ul>
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <textarea name="notes" rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="Special circumstances, documents needed, etc." />
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Appointment</h2>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Date</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="date"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Time</label>
-                <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
-                  <option>Morning (9am - 12pm)</option>
-                  <option>Afternoon (12pm - 5pm)</option>
-                  <option>Evening (5pm - 8pm)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <Link
-              href="/admin/tax-filing"
-              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-            >
-              Cancel
-            </Link>
-            <button
-              type="submit"
-              className="px-8 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold flex items-center gap-2"
-            >
-              <Save className="w-4 h-4" />
-              Create Application
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            <Link href="/admin/tax-filing/applications" className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Cancel</Link>
+            <button type="submit" className="flex items-center gap-2 px-5 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">
+              <Save className="w-4 h-4" /> Create Application
             </button>
           </div>
         </form>

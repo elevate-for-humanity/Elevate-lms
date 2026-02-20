@@ -75,7 +75,7 @@ export default async function LearnerOnboardingPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*, onboarding_completed')
+    .select('*, onboarding_completed, funding_confirmed, funding_source, orientation_completed, schedule_selected, enrollment_status')
     .eq('id', user.id)
     .single();
 
@@ -105,15 +105,15 @@ export default async function LearnerOnboardingPage() {
     completedSteps.push('documents');
   }
 
-  if (enrollment?.funding_confirmed) {
+  if (profile?.funding_confirmed) {
     completedSteps.push('funding');
   }
 
-  if (enrollment?.orientation_completed) {
+  if (profile?.orientation_completed) {
     completedSteps.push('orientation');
   }
 
-  if (enrollment?.schedule_selected) {
+  if (profile?.schedule_selected) {
     completedSteps.push('schedule');
   }
 

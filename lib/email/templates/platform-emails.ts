@@ -8,7 +8,7 @@ export const platformEmailTemplates = {
    * EMAIL 1: Platform Inquiry Received
    */
   inquiryReceived: {
-    from: 'noreply@www.elevateforhumanity.org',
+    from: 'noreply@elevateforhumanity.org',
     subject: 'Platform inquiry received',
     getHtml: (data: { name: string }) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -93,7 +93,7 @@ Elevate for Humanity
    * EMAIL 3: Platform Payment Confirmation
    */
   paymentConfirmation: {
-    from: 'noreply@www.elevateforhumanity.org',
+    from: 'noreply@elevateforhumanity.org',
     subject: 'Platform access & onboarding details',
     getHtml: (data: { name: string }) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

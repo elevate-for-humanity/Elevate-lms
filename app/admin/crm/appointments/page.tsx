@@ -1,137 +1,134 @@
-import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Clock, User, MapPin, Video, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { Calendar, Plus, Clock, User, Search, RefreshCw } from 'lucide-react';
 
-export const metadata: Metadata = {
-  title: 'Appointments | CRM Admin',
-  description: 'Manage CRM appointments and meetings.',
-  robots: { index: false, follow: false },
-};
+interface Appointment {
+  id: string;
+  title: string;
+  contact_name: string;
+  scheduled_at: string;
+  status: string;
+  notes: string;
+}
 
-const appointments = [
-  { id: 1, title: 'Enrollment Consultation', contact: 'James W.', time: '9:00 AM', duration: '30 min', type: 'video', status: 'confirmed' },
-  { id: 2, title: 'WOTC Review Meeting', contact: 'ABC Healthcare', time: '11:00 AM', duration: '1 hour', type: 'in-person', status: 'confirmed' },
-  { id: 3, title: 'Training Progress Check', contact: 'Sarah Williams', time: '2:00 PM', duration: '30 min', type: 'phone', status: 'pending' },
-  { id: 4, title: 'Partnership Discussion', contact: 'Tech Solutions', time: '4:00 PM', duration: '1 hour', type: 'video', status: 'confirmed' },
-];
+export default function AppointmentsPage() {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
-const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
 
-export default function CRMAppointmentsPage() {
+  async function fetchAppointments() {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/crm/appointments');
+      if (res.ok) {
+        const data = await res.json();
+        setAppointments(data.appointments ?? data ?? []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch appointments:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const filtered = appointments.filter((a) =>
+    (a.title || '').toLowerCase().includes(search.toLowerCase()) ||
+    (a.contact_name || '').toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Appointments" }]} />
-      </div>
-<div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Appointments</h1>
-            <p className="text-gray-600">Manage your meetings and consultations</p>
-          </div>
-          <Link
-            href="/admin/crm/appointments/new"
-            className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            New Appointment
-          </Link>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-4">
+          <Breadcrumbs items={[
+            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'CRM', href: '/admin/crm' },
+            { label: 'Appointments' },
+          ]} />
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-gray-900">January 2025</h2>
-                <div className="flex items-center gap-2">
-                  <button className="p-2 hover:bg-gray-100 rounded-lg">
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <button className="px-4 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-lg font-medium">
-                    Today
-                  </button>
-                  <button className="p-2 hover:bg-gray-100 rounded-lg">
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-7 gap-1 mb-2">
-                {weekDays.map((day) => (
-                  <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-7 gap-1">
-                {Array.from({ length: 35 }, (_, i) => {
-                  const day = i - 2;
-                  const isCurrentMonth = day > 0 && day <= 31;
-                  const isToday = day === 18;
-                  const hasAppointment = [15, 18, 22, 25].includes(day);
-                  
-                  return (
-                    <div
-                      key={i}
-                      className={`aspect-square p-2 rounded-lg ${
-                        isToday ? 'bg-brand-blue-600 text-white' :
-                        isCurrentMonth ? 'hover:bg-gray-100 cursor-pointer' : 'text-gray-300'
-                      }`}
-                    >
-                      <span className="text-sm">{isCurrentMonth ? day : ''}</span>
-                      {hasAppointment && isCurrentMonth && !isToday && (
-                        <div className="w-1.5 h-1.5 bg-brand-blue-600 rounded-full mx-auto mt-1" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="font-bold text-gray-900 mb-4">Today - January 18</h3>
-              <div className="space-y-4">
-                {appointments.map((apt) => (
-                  <div key={apt.id} className="p-4 border rounded-xl hover:border-brand-blue-300 transition">
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-medium text-gray-900">{apt.title}</h4>
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                        apt.status === 'confirmed' ? 'bg-brand-green-100 text-brand-green-700' : 'bg-yellow-100 text-yellow-700'
-                      }`}>
-                        {apt.status}
-                      </span>
-                    </div>
-                    <div className="space-y-1 text-sm text-gray-500">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        {apt.contact}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
-                        {apt.time} ({apt.duration})
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {apt.type === 'video' ? <Video className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
-                        {apt.type === 'video' ? 'Video Call' : apt.type === 'in-person' ? 'In Person' : 'Phone Call'}
-                      </div>
-                    </div>
-                    <div className="mt-3 flex gap-2">
-                      <button className="flex-1 px-3 py-2 bg-brand-blue-600 text-white text-sm rounded-lg hover:bg-brand-blue-700 transition">
-                        {apt.type === 'video' ? 'Join Call' : 'View Details'}
-                      </button>
-                      <button className="px-3 py-2 border rounded-lg hover:bg-gray-50 transition text-sm">
-                        Reschedule
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <h1 className="text-2xl font-bold text-gray-900">Appointments</h1>
+            <p className="text-sm text-gray-500 mt-1">{appointments.length} scheduled appointments</p>
           </div>
+          <div className="flex items-center gap-3">
+            <button onClick={fetchAppointments} className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+            <Link href="/admin/crm/appointments/new" className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">
+              <Plus className="w-4 h-4" /> New Appointment
+            </Link>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search appointments..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          {loading ? (
+            <div className="px-6 py-12 text-center">
+              <RefreshCw className="w-6 h-6 text-gray-300 mx-auto mb-2 animate-spin" />
+              <p className="text-sm text-gray-500">Loading appointments...</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="px-6 py-12 text-center">
+              <Calendar className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+              <p className="text-sm text-gray-500">{search ? 'No matching appointments.' : 'No appointments scheduled.'}</p>
+              <Link href="/admin/crm/appointments/new" className="inline-block mt-4 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium">
+                Schedule an appointment
+              </Link>
+            </div>
+          ) : (
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Scheduled</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filtered.map((a) => (
+                  <tr key={a.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-3 text-sm font-medium text-gray-900">{a.title || 'Untitled'}</td>
+                    <td className="px-6 py-3 text-sm text-gray-600 flex items-center gap-2">
+                      <User className="w-3.5 h-3.5 text-gray-400" /> {a.contact_name || '—'}
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-500 flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5 text-gray-400" />
+                      {a.scheduled_at ? new Date(a.scheduled_at).toLocaleString() : '—'}
+                    </td>
+                    <td className="px-6 py-3">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        a.status === 'completed' ? 'bg-brand-green-100 text-brand-green-700' :
+                        a.status === 'cancelled' ? 'bg-brand-red-100 text-brand-red-700' :
+                        'bg-brand-blue-100 text-brand-blue-700'
+                      }`}>{a.status || 'scheduled'}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

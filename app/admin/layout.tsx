@@ -7,6 +7,7 @@ import { AdminLicenseWrapper } from '@/components/licensing/AdminLicenseWrapper'
 import { getLicenseAccessMode } from '@/lib/licensing/billing-authority';
 import { reconcileTrialOnboarding } from '@/lib/trial/reconcile-onboarding';
 import AdminHeader from '@/components/admin/AdminHeader';
+import AdminSidebar from '@/components/admin/AdminSidebar';
 import { DemoTourProvider } from '@/components/demo/DemoTourProvider';
 import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
 import { SkipToContent } from '@/components/ui/SkipToContent';
@@ -108,29 +109,30 @@ export default async function AdminLayout({
     }
   }
 
-  // If no license context, render without wrapper (handles demo mode, etc.)
-  if (!context) {
-    return (
-      <DemoTourProvider>
-        <SkipToContent />
-        <IdleTimeoutGuard />
+  const content = (
+    <>
+      <SkipToContent />
+      <IdleTimeoutGuard />
+      <AdminSidebar />
+      <div className="lg:pl-60">
         <AdminHeader />
-        <div id="main-content" className="pt-16">{children}</div>
-      </DemoTourProvider>
-    );
+        <main id="main-content" className="pt-16 min-h-screen bg-gray-50">{children}</main>
+      </div>
+    </>
+  );
+
+  if (!context) {
+    return <DemoTourProvider>{content}</DemoTourProvider>;
   }
 
   return (
     <DemoTourProvider>
-      <SkipToContent />
-      <IdleTimeoutGuard />
       <AdminLicenseWrapper
         license={context.license}
         userRole={context.userRole}
         tenantId={context.tenantId}
       >
-        <AdminHeader />
-        <div id="main-content" className="pt-16">{children}</div>
+        {content}
       </AdminLicenseWrapper>
     </DemoTourProvider>
   );

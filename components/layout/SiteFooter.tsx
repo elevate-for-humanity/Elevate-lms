@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { AuthorityStrip } from '@/components/InstitutionalAuthority';
 
 // GOVERNMENT-GRADE FOOTER - Clean, senior, compliant
 // 4 columns: About, Programs, Compliance & Trust, Access & Support
@@ -140,6 +141,13 @@ export default function SiteFooter() {
             </div>
           ))}
           
+        </div>
+      </div>
+
+      {/* Authority Badges */}
+      <div className="border-t border-gray-800 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AuthorityStrip className="opacity-80" />
         </div>
       </div>
 

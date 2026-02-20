@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     // Send confirmation email to applicant
     try {
       await resend.emails.send({
-        from: 'SupersonicFastCash <noreply@www.elevateforhumanity.org>',
+        from: 'SupersonicFastCash <noreply@elevateforhumanity.org>',
         to: body.email,
         subject: 'Career Application Received - SupersonicFastCash',
         html: `
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
     // Send notification to admin
     try {
       await resend.emails.send({
-        from: 'SupersonicFastCash <noreply@www.elevateforhumanity.org>',
+        from: 'SupersonicFastCash <noreply@elevateforhumanity.org>',
         to: 'careers@www.elevateforhumanity.org',
         subject: `New Career Application: ${body.firstName} ${body.lastName} - ${body.position || 'Tax Preparer'}`,
         html: `

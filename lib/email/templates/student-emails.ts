@@ -8,7 +8,7 @@ export const studentEmailTemplates = {
    * EMAIL 1: Application Received (Auto)
    */
   applicationReceived: {
-    from: 'noreply@www.elevateforhumanity.org',
+    from: 'noreply@elevateforhumanity.org',
     subject: 'We received your application — here\'s what happens next',
     getHtml: (data: { firstName: string }) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -119,7 +119,7 @@ Elevate for Humanity
    * EMAIL 3: Eligibility Outcome
    */
   eligibilityOutcome: {
-    from: 'noreply@www.elevateforhumanity.org',
+    from: 'noreply@elevateforhumanity.org',
     subject: 'Update on your program eligibility',
     getHtml: (data: { firstName: string; eligibilityStatus: string }) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -166,7 +166,7 @@ Elevate for Humanity
    * EMAIL 4: Enrollment Confirmation
    */
   enrollmentConfirmation: {
-    from: 'noreply@www.elevateforhumanity.org',
+    from: 'noreply@elevateforhumanity.org',
     subject: 'You\'re enrolled — here\'s what\'s next',
     getHtml: (data: {
       firstName: string;

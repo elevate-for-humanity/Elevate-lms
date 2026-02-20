@@ -35,7 +35,7 @@ export async function sendEmail(
       from:
         options.from ||
         process.env.EMAIL_FROM ||
-        'Elevate For Humanity <noreply@www.elevateforhumanity.org>',
+        'Elevate For Humanity <noreply@elevateforhumanity.org>',
       to: Array.isArray(options.to) ? options.to : [options.to],
       subject: options.subject,
       html: options.html,

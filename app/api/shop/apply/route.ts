@@ -115,7 +115,7 @@ export async function POST(req: Request) {
     // Send welcome email
     try {
       await getResend().emails.send({
-        from: process.env.EMAIL_FROM || 'noreply@www.elevateforhumanity.org',
+        from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
         to: email,
         subject: 'Shop Partner Application Received - Elevate for Humanity',
         text: `

@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowLeft, Briefcase, MapPin, DollarSign, Building, Save } from 'lucide-react';
+import { createJob } from '../actions';
 
 export const metadata: Metadata = {
   title: 'Post New Job | Admin',
@@ -11,178 +12,84 @@ export const metadata: Metadata = {
 
 export default function AdminNewJobPage() {
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "New" }]} />
-      </div>
-<div className="max-w-3xl mx-auto">
-        <Link href="/admin/jobs" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">
-          <ArrowLeft className="w-4 h-4" />
-          Back to Jobs
-        </Link>
-
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
-            <Briefcase className="w-6 h-6 text-brand-blue-600" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Post New Job</h1>
-            <p className="text-gray-600">Create a job listing for partner employers</p>
-          </div>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-4">
+          <Breadcrumbs items={[
+            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Jobs', href: '/admin/jobs' },
+            { label: 'New Job' },
+          ]} />
         </div>
 
-        <form className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Job Details</h2>
-            
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Job Title *</label>
-                <input
-                  type="text"
-                  placeholder="e.g., Barber Apprentice"
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                />
-              </div>
+        <Link href="/admin/jobs" className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-4">
+          <ArrowLeft className="w-4 h-4" /> Back to Jobs
+        </Link>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Employer *</label>
-                <div className="relative">
-                  <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search employers..."
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Post New Job</h1>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
-                    <option>Healthcare</option>
-                    <option>Barbering & Cosmetology</option>
-                    <option>IT & Technology</option>
-                    <option>Manufacturing</option>
-                    <option>Retail</option>
-                    <option>Hospitality</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Employment Type</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
-                    <option>Full-time</option>
-                    <option>Part-time</option>
-                    <option>Apprenticeship</option>
-                    <option>Contract</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Location *</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="City, State"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Pay Type</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
-                    <option>Hourly</option>
-                    <option>Salary</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Min Pay</label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="number"
-                      placeholder="15.00"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Max Pay</label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="number"
-                      placeholder="25.00"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Job Description *</label>
-                <textarea
-                  rows={6}
-                  placeholder="Describe the role, responsibilities, and requirements..."
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
+        <form action={createJob} className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <span className="flex items-center gap-1"><Briefcase className="w-3.5 h-3.5" /> Job Title *</span>
+            </label>
+            <input name="title" required className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="e.g., HVAC Technician Apprentice" />
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">WOTC Eligibility</h2>
-            <p className="text-gray-600 mb-4">Select which WOTC-eligible groups this job is open to:</p>
-            
-            <div className="grid md:grid-cols-2 gap-3">
-              {['Veterans', 'SNAP Recipients', 'Long-term Unemployed', 'Ex-Felons', 'TANF Recipients', 'SSI Recipients', 'Vocational Rehabilitation', 'Summer Youth'].map((group) => (
-                <label key={group} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-brand-blue-300">
-                  <input type="checkbox" defaultChecked className="w-4 h-4 text-brand-blue-600 rounded" />
-                  <span className="text-sm text-gray-700">{group}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Publishing Options</h2>
-            
-            <div className="space-y-4">
-              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-brand-blue-300">
-                <input type="radio" name="status" defaultChecked className="w-4 h-4 text-brand-blue-600" />
-                <div>
-                  <p className="font-medium text-gray-900">Publish Immediately</p>
-                  <p className="text-sm text-gray-500">Job will be visible to candidates right away</p>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><Building className="w-3.5 h-3.5" /> Company *</span>
               </label>
-              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-brand-blue-300">
-                <input type="radio" name="status" className="w-4 h-4 text-brand-blue-600" />
-                <div>
-                  <p className="font-medium text-gray-900">Save as Draft</p>
-                  <p className="text-sm text-gray-500">Review and publish later</p>
-                </div>
+              <input name="company" required className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="Employer name" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> Location *</span>
               </label>
+              <input name="location" required className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="Indianapolis, IN" />
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <Link
-              href="/admin/jobs"
-              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-            >
-              Cancel
-            </Link>
-            <button
-              type="submit"
-              className="px-8 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold flex items-center gap-2"
-            >
-              <Save className="w-4 h-4" />
-              Post Job
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Job Type</label>
+              <select name="type" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500">
+                <option value="full_time">Full-Time</option>
+                <option value="part_time">Part-Time</option>
+                <option value="apprenticeship">Apprenticeship</option>
+                <option value="internship">Internship</option>
+                <option value="contract">Contract</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><DollarSign className="w-3.5 h-3.5" /> Min Salary</span>
+              </label>
+              <input name="salary_min" type="number" step="1000" min="0" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="35000" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><DollarSign className="w-3.5 h-3.5" /> Max Salary</span>
+              </label>
+              <input name="salary_max" type="number" step="1000" min="0" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="55000" />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Job Description *</label>
+            <textarea name="description" required rows={4} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="Describe the role, responsibilities, and expectations..." />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Requirements</label>
+            <textarea name="requirements" rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="Required qualifications, certifications, experience..." />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            <Link href="/admin/jobs" className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Cancel</Link>
+            <button type="submit" className="flex items-center gap-2 px-5 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">
+              <Save className="w-4 h-4" /> Post Job
             </button>
           </div>
         </form>

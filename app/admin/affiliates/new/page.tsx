@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowLeft, Users, Mail, Phone, Globe, DollarSign, Save } from 'lucide-react';
+import { createAffiliate } from '../actions';
 
 export const metadata: Metadata = {
   title: 'New Affiliate | Admin',
@@ -11,162 +12,69 @@ export const metadata: Metadata = {
 
 export default function NewAffiliatePage() {
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "New" }]} />
-      </div>
-<div className="max-w-2xl mx-auto">
-        <Link href="/admin/affiliates" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">
-          <ArrowLeft className="w-4 h-4" />
-          Back to Affiliates
-        </Link>
-
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
-            <Users className="w-6 h-6 text-brand-blue-600" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Add New Affiliate</h1>
-            <p className="text-gray-600">Register a new affiliate partner</p>
-          </div>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-4">
+          <Breadcrumbs items={[
+            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Affiliates', href: '/admin/affiliates' },
+            { label: 'New Affiliate' },
+          ]} />
         </div>
 
-        <form className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Contact Information</h2>
-            
-            <div className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
-                  <input
-                    type="text"
-                    placeholder="First name"
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
-                  <input
-                    type="text"
-                    placeholder="Smith"
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
+        <Link href="/admin/affiliates" className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-4">
+          <ArrowLeft className="w-4 h-4" /> Back to Affiliates
+        </Link>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="email"
-                    placeholder="your.email@gmail.com"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Add New Affiliate</h1>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="tel"
-                    placeholder="(555) 123-4567"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
+        <form action={createAffiliate} className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> Organization / Name *</span>
+            </label>
+            <input name="name" required className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="Partner organization name" />
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
-                <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="url"
-                    placeholder="https://elevateforhumanity.org"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><Mail className="w-3.5 h-3.5" /> Email *</span>
+              </label>
+              <input name="email" type="email" required className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="contact@partner.org" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5" /> Phone</span>
+              </label>
+              <input name="phone" type="tel" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="(317) 555-0100" />
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Affiliate Settings</h2>
-            
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Affiliate Type</label>
-                <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
-                  <option>Individual</option>
-                  <option>Organization</option>
-                  <option>Workforce Board</option>
-                  <option>Educational Institution</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Commission Rate (%)</label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="number"
-                    placeholder="10"
-                    min="0"
-                    max="50"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <p className="text-sm text-gray-500 mt-1">Standard rate is 10% of referred sales</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Referral Code</label>
-                <input
-                  type="text"
-                  placeholder="Auto-generated if left blank"
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">Programs to Promote</label>
-                <div className="space-y-2">
-                  {['Barber Apprenticeship', 'Medical Assistant Training', 'IT Certifications', 'WOTC Services', 'All Programs'].map((program) => (
-                    <label key={program} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-brand-blue-300">
-                      <input type="checkbox" className="w-4 h-4 text-brand-blue-600 rounded" />
-                      <span className="text-sm text-gray-700">{program}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-                <textarea
-                  rows={3}
-                  placeholder="Any additional notes about this affiliate..."
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><Globe className="w-3.5 h-3.5" /> Website</span>
+              </label>
+              <input name="website" type="url" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="https://partner.org" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <span className="flex items-center gap-1"><DollarSign className="w-3.5 h-3.5" /> Commission Rate (%)</span>
+              </label>
+              <input name="commission" type="number" step="0.1" min="0" max="100" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="10" />
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <Link
-              href="/admin/affiliates"
-              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-            >
-              Cancel
-            </Link>
-            <button
-              type="submit"
-              className="px-8 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold flex items-center gap-2"
-            >
-              <Save className="w-4 h-4" />
-              Add Affiliate
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <textarea name="notes" rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500" placeholder="Additional details about this affiliate..." />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            <Link href="/admin/affiliates" className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Cancel</Link>
+            <button type="submit" className="flex items-center gap-2 px-5 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">
+              <Save className="w-4 h-4" /> Create Affiliate
             </button>
           </div>
         </form>

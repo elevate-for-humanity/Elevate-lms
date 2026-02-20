@@ -51,12 +51,7 @@ export async function POST(
     const body = await req.json().catch(() => ({}));
     const { program_id, funding_type, source } = body;
 
-    if (!program_id) {
-      return NextResponse.json(
-        { error: "program_id is required" },
-        { status: 400 }
-      );
-    }
+    // program_id is optional — if missing, user is created but not enrolled in a specific course
 
     // 1) Load the application
     const { data: app, error: appError } = await supabaseAdmin
@@ -149,26 +144,28 @@ export async function POST(
 
     const userId = user.id;
 
-    // 4) Create enrollment for this program
-    const { data: enrollment, error: enrollError } =
-      await supabaseAdmin
-        .from("training_enrollments")
-        .insert({
-          user_id: userId,
-          program_id,
-          status: "active",
-          funding_source: funding_type || null,
-          enrolled_at: new Date().toISOString(),
-        })
-        .select("*")
-        .maybeSingle();
+    // 4) Create enrollment if program_id provided
+    let enrollmentId: string | null = null;
+    if (program_id) {
+      const { data: enrollment, error: enrollError } =
+        await supabaseAdmin
+          .from("training_enrollments")
+          .insert({
+            user_id: userId,
+            program_id,
+            status: "active",
+            funding_source: funding_type || null,
+            enrolled_at: new Date().toISOString(),
+          })
+          .select("*")
+          .maybeSingle();
 
-    if (enrollError || !enrollment) {
-      logger.error("Enrollment error:", enrollError);
-      return NextResponse.json(
-        { error: "Failed to create enrollment" },
-        { status: 500 }
-      );
+      if (enrollError) {
+        logger.error("Enrollment error:", enrollError);
+        // Don't fail — user was created, enrollment can be added later
+      } else {
+        enrollmentId = enrollment?.id || null;
+      }
     }
 
     // 5) Update application status
@@ -182,13 +179,20 @@ export async function POST(
 
     if (updateError) {
       logger.error("Update application status error:", updateError);
-      // Don't fail the whole thing just for this, but log it
     }
 
+    // 6) Update profile enrollment_status
+    await supabaseAdmin
+      .from("profiles")
+      .update({ enrollment_status: "active" })
+      .eq("id", userId);
+
     return NextResponse.json({
-      message: "Application approved and enrolled",
+      message: program_id
+        ? "Application approved, user created, and enrolled"
+        : "Application approved and user created (no program assigned)",
       user_id: userId,
-      enrollment_id: enrollment.id,
+      enrollment_id: enrollmentId,
     });
   } catch (err) {
     logger.error("Approve application error:", err);

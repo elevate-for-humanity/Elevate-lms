@@ -178,7 +178,7 @@ async function sendEmailNotification(data: z.infer<typeof ContactSchema>) {
     const resend = new Resend(resendApiKey);
 
     await resend.emails.send({
-      from: 'Elevate for Humanity <noreply@www.elevateforhumanity.org>',
+      from: 'Elevate for Humanity <noreply@elevateforhumanity.org>',
       to: 'elevate4humanityedu@gmail.com',
       subject: `New Inquiry from ${data.name}`,
       html: `
@@ -196,7 +196,7 @@ async function sendEmailNotification(data: z.infer<typeof ContactSchema>) {
 
     // SMS alert via AT&T gateway
     await resend.emails.send({
-      from: 'Elevate <noreply@www.elevateforhumanity.org>',
+      from: 'Elevate <noreply@elevateforhumanity.org>',
       to: process.env.ADMIN_SMS_GATEWAY || '',
       subject: 'Contact',
       text: `${data.name}\n${data.email}\n${data.message.substring(0, 100)}`,

@@ -72,7 +72,7 @@ export async function POST(
     if (review.reviewer_email) {
       await supabase.from('email_queue').insert({
         to_email: review.reviewer_email,
-        from_email: 'noreply@www.elevateforhumanity.org',
+        from_email: 'noreply@elevateforhumanity.org',
         subject: 'Response to Your Review',
         template_name: 'review_response',
         template_data: {

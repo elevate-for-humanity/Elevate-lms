@@ -7,6 +7,7 @@ import Image from 'next/image';
 import HomeHeroVideo from './HomeHeroVideo';
 import PageAvatar from '@/components/PageAvatar';
 import { InView } from '@/components/ui/InView';
+import { AuthorityBanner } from '@/components/InstitutionalAuthority';
 
 // Quiz removed — program cards now serve as the path selector
 
@@ -119,6 +120,9 @@ export default function HomePage() {
         </div>
       </section>
       </InView>
+
+      {/* ===== INSTITUTIONAL AUTHORITY ===== */}
+      <AuthorityBanner />
 
       {/* ===== 3-CARD VALUE PROPS ===== */}
       <InView animation="fade-up">

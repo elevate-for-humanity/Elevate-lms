@@ -95,7 +95,7 @@ export async function POST(req: Request) {
         const resend = new Resend(resendApiKey);
 
         await resend.emails.send({
-          from: 'Elevate for Humanity <noreply@www.elevateforhumanity.org>',
+          from: 'Elevate for Humanity <noreply@elevateforhumanity.org>',
           to: 'elevate4humanityedu@gmail.com',
           subject: `Meeting Request from ${data.name}`,
           html: `
@@ -114,7 +114,7 @@ export async function POST(req: Request) {
 
         // Confirmation email to the requester
         await resend.emails.send({
-          from: 'Elevate for Humanity <noreply@www.elevateforhumanity.org>',
+          from: 'Elevate for Humanity <noreply@elevateforhumanity.org>',
           to: data.email,
           subject: 'Meeting Request Received — Elevate for Humanity',
           html: `
@@ -131,7 +131,7 @@ export async function POST(req: Request) {
 
         // SMS alert
         await resend.emails.send({
-          from: 'Elevate <noreply@www.elevateforhumanity.org>',
+          from: 'Elevate <noreply@elevateforhumanity.org>',
           to: process.env.ADMIN_SMS_GATEWAY || '',
           subject: 'Meeting',
           text: `${data.name}\n${data.meetingType}\n${dateStr} ${data.time}`,

@@ -1,299 +1,187 @@
-import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  
-  XCircle, 
-  Settings, 
-  RefreshCw, 
-  Users, 
-  Building2,
-  TrendingUp,
-  ArrowRight,
-  ExternalLink,
-  Shield,
-  Zap
-} from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ArrowLeft, CheckCircle2, XCircle, RefreshCw, Settings, Users, Database, Zap, AlertTriangle } from 'lucide-react';
 
-export const metadata: Metadata = {
-  title: 'Salesforce Integration | Admin',
-  description: 'Configure and manage Salesforce CRM integration',
-};
-
-// Check if Salesforce is configured
-function isSalesforceConfigured(): boolean {
-  return !!(
-    (process.env.SALESFORCE_API_KEY && process.env.SALESFORCE_INSTANCE_URL) ||
-    (process.env.SALESFORCE_CLIENT_ID && process.env.SALESFORCE_CLIENT_SECRET)
-  );
+interface SyncStatus {
+  contacts: number;
+  leads: number;
+  lastSync: string | null;
+  connected: boolean;
 }
 
 export default function SalesforceIntegrationPage() {
-  const isConfigured = isSalesforceConfigured();
+  const [status, setStatus] = useState<SyncStatus>({ contacts: 0, leads: 0, lastSync: null, connected: false });
+  const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+
+  useEffect(() => {
+    checkStatus();
+  }, []);
+
+  async function checkStatus() {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/integrations?provider=salesforce');
+      if (res.ok) {
+        const data = await res.json();
+        setStatus({
+          contacts: data.contacts ?? 0,
+          leads: data.leads ?? 0,
+          lastSync: data.last_sync ?? null,
+          connected: data.connected ?? false,
+        });
+      }
+    } catch {
+      // API may not exist yet — show disconnected state
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function triggerSync() {
+    setSyncing(true);
+    try {
+      await fetch('/api/admin/integrations?provider=salesforce', { method: 'POST' });
+      await checkStatus();
+    } catch {
+      // handle error
+    } finally {
+      setSyncing(false);
+    }
+  }
+
+  const configFields = [
+    { label: 'Salesforce Instance URL', placeholder: 'https://yourorg.my.salesforce.com', type: 'url' },
+    { label: 'Client ID', placeholder: 'Connected App Consumer Key', type: 'text' },
+    { label: 'Client Secret', placeholder: '••••••••', type: 'password' },
+    { label: 'Callback URL', placeholder: `${typeof window !== 'undefined' ? window.location.origin : ''}/api/integrations/salesforce/callback`, type: 'text' },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Salesforce" }]} />
-      </div>
-<div className="max-w-5xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-            <Link href="/admin" className="hover:text-gray-700">Admin</Link>
-            <span>/</span>
-            <Link href="/admin/integrations" className="hover:text-gray-700">Integrations</Link>
-            <span>/</span>
-            <span className="text-gray-900">Salesforce</span>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-4">
+          <Breadcrumbs items={[
+            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Integrations', href: '/admin/integrations' },
+            { label: 'Salesforce' },
+          ]} />
+        </div>
+
+        <Link href="/admin/integrations" className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-4">
+          <ArrowLeft className="w-4 h-4" /> Back to Integrations
+        </Link>
+
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+            <Database className="w-6 h-6 text-brand-blue-600" />
           </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center">
-                <svg className="w-10 h-10" viewBox="0 0 24 24" fill="#00A1E0">
-                  <path d="M10.006 5.415a3.724 3.724 0 0 1 2.942-1.415c1.397 0 2.61.778 3.243 1.923a4.143 4.143 0 0 1 1.558-.305c2.29 0 4.147 1.857 4.147 4.147 0 2.29-1.857 4.147-4.147 4.147-.233 0-.46-.02-.682-.057a3.46 3.46 0 0 1-3.063 1.857 3.46 3.46 0 0 1-2.032-.657 3.926 3.926 0 0 1-3.37 1.927c-1.862 0-3.443-1.293-3.856-3.03a3.598 3.598 0 0 1-.537.04c-1.988 0-3.6-1.612-3.6-3.6 0-1.574 1.01-2.912 2.418-3.398a4.153 4.153 0 0 1-.127-1.01c0-2.29 1.857-4.147 4.147-4.147 1.41 0 2.657.704 3.406 1.78z"/>
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Salesforce Integration</h1>
-                <p className="text-gray-600">Sync students, leads, and opportunities with your CRM</p>
-              </div>
-            </div>
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${
-              isConfigured ? 'bg-brand-green-100 text-brand-green-700' : 'bg-yellow-100 text-yellow-700'
-            }`}>
-              {isConfigured ? (
-                <>
-                  <span className="text-slate-400 flex-shrink-0">•</span>
-                  <span className="font-medium">Connected</span>
-                </>
-              ) : (
-                <>
-                  <XCircle className="w-5 h-5" />
-                  <span className="font-medium">Not Configured</span>
-                </>
-              )}
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Salesforce Integration</h1>
+            <p className="text-sm text-gray-500">Sync contacts, leads, and enrollment data with Salesforce CRM</p>
           </div>
         </div>
 
-        {/* Status Cards */}
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <div className="flex items-center gap-3 mb-2">
-              <Users className="w-5 h-5 text-brand-blue-600" />
-              <span className="font-medium text-gray-900">Contacts Synced</span>
-            </div>
-            <p className="text-3xl font-bold text-gray-900">{isConfigured ? '—' : '0'}</p>
-            <p className="text-sm text-gray-500 mt-1">Last sync: Never</p>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <div className="flex items-center gap-3 mb-2">
-              <Building2 className="w-5 h-5 text-brand-blue-600" />
-              <span className="font-medium text-gray-900">Accounts</span>
-            </div>
-            <p className="text-3xl font-bold text-gray-900">{isConfigured ? '—' : '0'}</p>
-            <p className="text-sm text-gray-500 mt-1">Partner organizations</p>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <div className="flex items-center gap-3 mb-2">
-              <TrendingUp className="w-5 h-5 text-brand-green-600" />
-              <span className="font-medium text-gray-900">Opportunities</span>
-            </div>
-            <p className="text-3xl font-bold text-gray-900">{isConfigured ? '—' : '0'}</p>
-            <p className="text-sm text-gray-500 mt-1">Active deals</p>
-          </div>
-        </div>
-
-        {/* Configuration Section */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-8">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-bold text-gray-900">Configuration</h2>
-            <p className="text-gray-600 mt-1">Set up your Salesforce connection</p>
-          </div>
-          
-          {!isConfigured ? (
-            <div className="p-6">
-              <div className="bg-brand-blue-50 rounded-lg p-6 mb-6">
-                <h3 className="font-bold text-brand-blue-900 mb-2">Quick Setup Guide</h3>
-                <p className="text-brand-blue-800 mb-4">No IT team required! Follow these steps to connect Salesforce:</p>
-                <ol className="space-y-3 text-brand-blue-800">
-                  <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
-                    <span>Log into Salesforce and go to <strong>Setup → Apps → App Manager</strong></span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
-                    <span>Click <strong>New Connected App</strong> and fill in the details</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
-                    <span>Enable OAuth and select scopes: <code className="bg-brand-blue-100 px-1 rounded">api</code>, <code className="bg-brand-blue-100 px-1 rounded">refresh_token</code></span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">4</span>
-                    <span>Copy the <strong>Consumer Key</strong> and <strong>Consumer Secret</strong></span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">5</span>
-                    <span>Add them to your environment variables (see below)</span>
-                  </li>
-                </ol>
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="font-bold text-gray-900 mb-4">Required Environment Variables</h3>
-                <div className="space-y-3 font-mono text-sm">
-                  <div className="flex items-center gap-2">
-                    <code className="bg-gray-200 px-2 py-2 rounded">SALESFORCE_CLIENT_ID</code>
-                    <span className="text-gray-500">= your Consumer Key</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <code className="bg-gray-200 px-2 py-2 rounded">SALESFORCE_CLIENT_SECRET</code>
-                    <span className="text-gray-500">= your Consumer Secret</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <code className="bg-gray-200 px-2 py-2 rounded">SALESFORCE_USERNAME</code>
-                    <span className="text-gray-500">= your Salesforce email</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <code className="bg-gray-200 px-2 py-2 rounded">SALESFORCE_PASSWORD</code>
-                    <span className="text-gray-500">= your Salesforce password</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <code className="bg-gray-200 px-2 py-2 rounded">SALESFORCE_SECURITY_TOKEN</code>
-                    <span className="text-gray-500">= from Salesforce settings</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-500 mt-4">
-                  Or use the simpler API Key method:
-                </p>
-                <div className="space-y-3 font-mono text-sm mt-3">
-                  <div className="flex items-center gap-2">
-                    <code className="bg-gray-200 px-2 py-2 rounded">SALESFORCE_API_KEY</code>
-                    <span className="text-gray-500">= your access token</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <code className="bg-gray-200 px-2 py-2 rounded">SALESFORCE_INSTANCE_URL</code>
-                    <span className="text-gray-500">= https://yourorg.salesforce.com</span>
-                  </div>
-                </div>
-              </div>
+        {/* Connection Status */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Zap className="w-4 h-4 text-gray-400" /> Connection Status
+          </h2>
+          {loading ? (
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <RefreshCw className="w-4 h-4 animate-spin" /> Checking connection...
             </div>
           ) : (
-            <div className="p-6">
-              <div className="flex items-center gap-3 text-brand-green-700 bg-brand-green-50 rounded-lg p-4 mb-6">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <p className="font-medium">Salesforce is connected!</p>
-                  <p className="text-sm text-brand-green-600">Your LMS data will sync automatically.</p>
-                </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Status</span>
+                {status.connected ? (
+                  <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-brand-green-100 text-brand-green-700 font-medium">
+                    <CheckCircle2 className="w-3 h-3" /> Connected
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">
+                    <XCircle className="w-3 h-3" /> Not Connected
+                  </span>
+                )}
               </div>
-              
-              <div className="grid md:grid-cols-2 gap-4">
-                <button className="flex items-center justify-center gap-2 px-4 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition">
-                  <RefreshCw className="w-5 h-5" />
-                  Sync Now
-                </button>
-                <button className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                  <Settings className="w-5 h-5" />
-                  Configure Mapping
-                </button>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Synced Contacts</span>
+                <span className="text-sm font-medium text-gray-900">{status.contacts}</span>
               </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Synced Leads</span>
+                <span className="text-sm font-medium text-gray-900">{status.leads}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Last Sync</span>
+                <span className="text-sm text-gray-500">{status.lastSync ? new Date(status.lastSync).toLocaleString() : 'Never'}</span>
+              </div>
+              {status.connected && (
+                <button
+                  onClick={triggerSync}
+                  disabled={syncing}
+                  className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                  {syncing ? 'Syncing...' : 'Sync Now'}
+                </button>
+              )}
             </div>
           )}
         </div>
 
-        {/* Sync Settings */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-8">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-bold text-gray-900">Automatic Sync Settings</h2>
-            <p className="text-gray-600 mt-1">Configure what data syncs to Salesforce</p>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {[
-                { label: 'New student enrollments → Leads', description: 'Create a Lead when a student enrolls', enabled: true },
-                { label: 'Completed enrollments → Contacts', description: 'Convert Lead to Contact on completion', enabled: true },
-                { label: 'Partner signups → Accounts', description: 'Create Account for new partners', enabled: true },
-                { label: 'License purchases → Opportunities', description: 'Track revenue in Salesforce', enabled: true },
-                { label: 'Student progress updates', description: 'Sync hours and completion status', enabled: false },
-              ].map((setting, idx) => (
-                <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-900">{setting.label}</p>
-                    <p className="text-sm text-gray-500">{setting.description}</p>
-                  </div>
-                  <div className={`w-12 h-6 rounded-full relative cursor-pointer transition ${
-                    setting.enabled ? 'bg-brand-blue-600' : 'bg-gray-300'
-                  }`}>
-                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition ${
-                      setting.enabled ? 'right-1' : 'left-1'
-                    }`} />
-                  </div>
-                </div>
-              ))}
+        {/* Configuration */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Settings className="w-4 h-4 text-gray-400" /> Configuration
+          </h2>
+          <div className="space-y-4">
+            {configFields.map((field) => (
+              <div key={field.label}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{field.label}</label>
+                <input
+                  type={field.type}
+                  placeholder={field.placeholder}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                />
+              </div>
+            ))}
+            <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-amber-700">
+                Store credentials securely. Use environment variables for production deployments. Never commit secrets to source control.
+              </p>
             </div>
+            <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">
+              Save Configuration
+            </button>
           </div>
         </div>
 
-        {/* Features */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-bold text-gray-900">Integration Features</h2>
+        {/* Sync Mapping */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Users className="w-4 h-4 text-gray-400" /> Field Mapping
+          </h2>
+          <div className="space-y-3">
+            {[
+              { local: 'profiles.full_name', remote: 'Contact.Name' },
+              { local: 'profiles.email', remote: 'Contact.Email' },
+              { local: 'profiles.phone', remote: 'Contact.Phone' },
+              { local: 'enrollments.status', remote: 'Opportunity.Stage' },
+              { local: 'programs.name', remote: 'Campaign.Name' },
+            ].map((m) => (
+              <div key={m.local} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <span className="text-xs font-mono text-gray-600 flex-1">{m.local}</span>
+                <span className="text-xs text-gray-400">→</span>
+                <span className="text-xs font-mono text-brand-blue-600 flex-1">{m.remote}</span>
+              </div>
+            ))}
           </div>
-          <div className="p-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Zap className="w-5 h-5 text-brand-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Real-time Sync</h3>
-                  <p className="text-sm text-gray-600">Data syncs instantly when events occur in the LMS</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-5 h-5 text-brand-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Secure Connection</h3>
-                  <p className="text-sm text-gray-600">OAuth 2.0 authentication with encrypted data transfer</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Users className="w-5 h-5 text-brand-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Custom Field Mapping</h3>
-                  <p className="text-sm text-gray-600">Map LMS fields to your custom Salesforce fields</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <RefreshCw className="w-5 h-5 text-brand-orange-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Bi-directional Sync</h3>
-                  <p className="text-sm text-gray-600">Changes in Salesforce can trigger LMS updates</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Help Link */}
-        <div className="mt-8 text-center">
-          <a 
-            href="https://help.salesforce.com/s/articleView?id=sf.connected_app_create.htm" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700"
-          >
-            Salesforce Connected App Documentation
-            <ExternalLink className="w-4 h-4" />
-          </a>
         </div>
       </div>
     </div>

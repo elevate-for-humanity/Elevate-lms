@@ -21,12 +21,15 @@ export default async function StudentHandbookPage() {
   }
   const { data: { user } } = await supabase.auth.getUser();
 
+  // Handbook content is rendered from hardcoded sections below.
+  // This query is for optional metadata (last updated date, PDF download link).
   const { data: handbook } = await supabase
     .from('documents')
     .select('*')
-    .eq('type', 'student-handbook')
-    .eq('is_active', true)
-    .single();
+    .eq('document_type', 'student-handbook')
+    .eq('owner_type', 'system')
+    .limit(1)
+    .maybeSingle();
 
   const { data: acknowledgment } = user ? await supabase
     .from('handbook_acknowledgments')

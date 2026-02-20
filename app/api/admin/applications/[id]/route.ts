@@ -48,18 +48,15 @@ async function resolveCourseId(supabase: any, programInterest: string): Promise<
 
   if (!courses?.length) return null;
 
-  // Exact title match
   const exact = courses.find((c: any) => c.title.toLowerCase() === normalized);
   if (exact) return exact.id;
 
-  // Alias match
   const alias = PROGRAM_ALIASES[normalized];
   if (alias) {
     const aliasMatch = courses.find((c: any) => c.title.toLowerCase().includes(alias));
     if (aliasMatch) return aliasMatch.id;
   }
 
-  // Partial match: program_interest contained in title or vice versa
   const partial = courses.find((c: any) => {
     const t = c.title.toLowerCase();
     return t.includes(normalized) || normalized.includes(t.replace(/\(.*\)/, '').trim());
@@ -71,7 +68,6 @@ async function resolveCourseId(supabase: any, programInterest: string): Promise<
 
 /**
  * Find or create a Supabase auth user + profile for an applicant.
- * Strategy: check profiles first, then try createUser (fails gracefully if email taken).
  */
 async function findOrCreateUser(
   email: string,
@@ -83,7 +79,6 @@ async function findOrCreateUser(
 
   const normalizedEmail = email.toLowerCase().trim();
 
-  // 1. Check if profile already exists
   const { data: existingProfile } = await adminClient
     .from('profiles')
     .select('id')
@@ -92,7 +87,6 @@ async function findOrCreateUser(
 
   if (existingProfile?.id) return existingProfile.id;
 
-  // 2. Try to create auth user — if email already exists, Supabase returns an error
   const tempPassword = `Elevate-${Date.now().toString(36)}!`;
   const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
     email: normalizedEmail,
@@ -106,7 +100,6 @@ async function findOrCreateUser(
   });
 
   if (newUser?.user) {
-    // New user created — ensure profile exists
     await adminClient.from('profiles').upsert({
       id: newUser.user.id,
       email: normalizedEmail,
@@ -124,15 +117,11 @@ async function findOrCreateUser(
     return newUser.user.id;
   }
 
-  // 3. createUser failed — user likely exists in auth but not in profiles
-  // Search auth users by email (paginated, but we only need one)
   if (createError) {
     logger.info('Auth user may already exist, searching', { email: normalizedEmail, error: createError.message });
 
-    // Try listing with a filter — Supabase JS doesn't support email filter on listUsers,
-    // so we do a small page scan. For 515 users this is acceptable.
     let page = 1;
-    while (page <= 6) { // 6 pages × 100 = 600 users max
+    while (page <= 6) {
       const { data: batch } = await adminClient.auth.admin.listUsers({ page, perPage: 100 });
       if (!batch?.users?.length) break;
       const found = batch.users.find((u: any) => u.email?.toLowerCase() === normalizedEmail);

@@ -146,7 +146,7 @@ export const ApplicationCreateSchema = z.object({
 });
 
 export const ApplicationUpdateSchema = z.object({
-  status: z.enum(['submitted', 'under_review', 'approved', 'rejected', 'enrolled']).optional(),
+  status: z.enum(['pending', 'submitted', 'in_review', 'under_review', 'approved', 'rejected', 'enrolled', 'waitlisted']).optional(),
   reviewer_id: z.string().uuid().optional().nullable(),
   review_notes: z.string().optional().nullable(),
   reviewed_at: z.string().datetime().optional().nullable(),

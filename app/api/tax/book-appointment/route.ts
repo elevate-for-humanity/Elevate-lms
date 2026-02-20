@@ -87,7 +87,7 @@ export async function POST(req: Request) {
     // Send confirmation email to customer
     try {
       await resend.emails.send({
-        from: 'SupersonicFastCash <noreply@www.elevateforhumanity.org>',
+        from: 'SupersonicFastCash <noreply@elevateforhumanity.org>',
         to: appointmentData.email,
         subject: 'Tax Appointment Confirmation - SupersonicFastCash',
         html: `
@@ -112,7 +112,7 @@ export async function POST(req: Request) {
     // Send notification to staff
     try {
       await resend.emails.send({
-        from: 'SupersonicFastCash <noreply@www.elevateforhumanity.org>',
+        from: 'SupersonicFastCash <noreply@elevateforhumanity.org>',
         to: 'elevate4humanityedu@gmail.com',
         subject: 'New Tax Appointment Booked',
         html: `

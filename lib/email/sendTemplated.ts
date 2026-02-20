@@ -32,7 +32,7 @@ export async function sendTenantTemplatedEmail(params: {
   try {
     await sgMail.send({
       to: params.to,
-      from: process.env.SENDGRID_FROM || "noreply@www.elevateforhumanity.org",
+      from: process.env.SENDGRID_FROM || "noreply@elevateforhumanity.org",
       subject,
       html,
     });

@@ -28,7 +28,7 @@ export default async function ApprenticeHandbookPage() {
   const { data: handbookPdf } = await supabase
     .from('documents')
     .select('url')
-    .eq('type', 'apprentice-handbook')
+    .eq('document_type', 'apprentice-handbook')
     .single();
 
   const defaultSections = [

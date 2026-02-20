@@ -1,8 +1,10 @@
 import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Plus, Search, ExternalLink, Mail, Edit, Trash2 } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { Building2, Mail, ExternalLink, ArrowLeft, Users } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Course Partners | Admin',
@@ -10,146 +12,84 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const partners = [
-  {
-    id: 1,
-    name: 'Certiport',
-    logo: '/images/community/community-hero.jpg',
-    type: 'Certification Provider',
-    courses: 12,
-    activeStudents: 245,
-    contact: 'partnerships@certiport.com',
-    status: 'active',
-  },
-  {
-    id: 2,
-    name: 'CompTIA',
-    logo: '/images/heroes/employer-partner-1.jpg',
-    type: 'IT Certification',
-    courses: 8,
-    activeStudents: 189,
-    contact: 'edu@comptia.org',
-    status: 'active',
-  },
-  {
-    id: 3,
-    name: 'Adobe',
-    logo: '/images/heroes/employer-partner-1.jpg',
-    type: 'Creative Software',
-    courses: 6,
-    activeStudents: 156,
-    contact: 'education@adobe.com',
-    status: 'active',
-  },
-  {
-    id: 4,
-    name: 'OSHA Training Institute',
-    logo: '/images/homepage/employer-partnership.png',
-    type: 'Safety Training',
-    courses: 4,
-    activeStudents: 312,
-    contact: 'training@osha.gov',
-    status: 'active',
-  },
-];
+export default async function CoursePartnersPage() {
+  const supabase = await createClient();
+  if (!supabase) {
+    return <div className="p-8 text-center text-gray-600">Database unavailable.</div>;
+  }
 
-export default function CoursePartnersPage() {
+  const { data: partners, count } = await supabase
+    .from('profiles')
+    .select('id, full_name, email, organization_id, created_at, is_active', { count: 'exact' })
+    .eq('role', 'partner')
+    .order('created_at', { ascending: false });
+
+  const partnerList = partners ?? [];
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Partners" }]} />
-      </div>
-<div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-4">
+          <Breadcrumbs items={[
+            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Courses', href: '/admin/courses' },
+            { label: 'Partners' },
+          ]} />
+        </div>
+
+        <div className="flex items-center justify-between mb-6">
           <div>
+            <Link href="/admin/courses" className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-2">
+              <ArrowLeft className="w-4 h-4" /> Back to Courses
+            </Link>
             <h1 className="text-2xl font-bold text-gray-900">Course Partners</h1>
-            <p className="text-gray-600">Manage certification and training provider partnerships</p>
+            <p className="text-sm text-gray-500 mt-1">{count ?? 0} partner organizations</p>
           </div>
-          <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            Add Partner
-          </button>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm mb-6">
-          <div className="p-4 border-b flex items-center gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search partners..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-              />
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          {partnerList.length === 0 ? (
+            <div className="px-6 py-12 text-center">
+              <Building2 className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+              <p className="text-sm text-gray-500">No course partners found.</p>
+              <p className="text-xs text-gray-400 mt-1">Partners will appear here when profiles with the partner role are created.</p>
+              <Link href="/admin/partners" className="inline-block mt-4 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium">
+                Go to Partner Management
+              </Link>
             </div>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
-              <option>All Types</option>
-              <option>Certification Provider</option>
-              <option>IT Certification</option>
-              <option>Safety Training</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          {partners.map((partner) => (
-            <div key={partner.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
-              <div className="p-6">
-                <div className="flex items-start gap-4">
-                  <Image
-                    src={partner.logo}
-                    alt={partner.name}
-                    width={64}
-                    height={64}
-                    className="rounded-xl object-cover"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-bold text-gray-900">{partner.name}</h3>
-                      <span className="px-3 py-1 bg-brand-green-100 text-brand-green-700 text-xs font-medium rounded-full">
-                        {partner.status}
+          ) : (
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Partner</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {partnerList.map((p: any) => (
+                  <tr key={p.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center">
+                          <span className="text-xs font-semibold text-teal-700">{(p.full_name || 'P')[0].toUpperCase()}</span>
+                        </div>
+                        <span className="text-sm font-medium text-gray-900">{p.full_name || 'Unnamed Partner'}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-500">{p.email || '—'}</td>
+                    <td className="px-6 py-3">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${p.is_active ? 'bg-brand-green-100 text-brand-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                        {p.is_active ? 'Active' : 'Inactive'}
                       </span>
-                    </div>
-                    <p className="text-sm text-gray-500">{partner.type}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 mt-6">
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
-                    <p className="text-2xl font-bold text-gray-900">{partner.courses}</p>
-                    <p className="text-xs text-gray-500">Courses</p>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
-                    <p className="text-2xl font-bold text-gray-900">{partner.activeStudents}</p>
-                    <p className="text-xs text-gray-500">Active Students</p>
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-4 border-t">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Mail className="w-4 h-4" />
-                    {partner.contact}
-                  </div>
-                </div>
-              </div>
-
-              <div className="px-6 py-3 bg-gray-50 border-t flex items-center justify-between">
-                <Link
-                  href={`/admin/courses/partners/${partner.id}`}
-                  className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium flex items-center gap-1"
-                >
-                  View Details <ExternalLink className="w-3 h-3" />
-                </Link>
-                <div className="flex items-center gap-2">
-                  <button className="p-2 hover:bg-gray-200 rounded-lg transition">
-                    <Edit className="w-4 h-4 text-gray-500" />
-                  </button>
-                  <button className="p-2 hover:bg-gray-200 rounded-lg transition">
-                    <Trash2 className="w-4 h-4 text-brand-red-500" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-500">{p.created_at ? new Date(p.created_at).toLocaleDateString() : '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

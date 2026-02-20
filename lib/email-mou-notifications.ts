@@ -33,7 +33,7 @@ export async function sendMOUSignedConfirmation(
 
   try {
     const { error } = await resend.emails.send({
-      from: 'Elevate for Humanity <noreply@www.elevateforhumanity.org>',
+      from: 'Elevate for Humanity <noreply@elevateforhumanity.org>',
       to: data.contactEmail,
       subject: 'MOU Signed Successfully - Elevate for Humanity',
       html: `
@@ -105,7 +105,7 @@ export async function sendMOUSignedAdminNotification(
 
   try {
     const { error } = await resend.emails.send({
-      from: 'Elevate for Humanity <noreply@www.elevateforhumanity.org>',
+      from: 'Elevate for Humanity <noreply@elevateforhumanity.org>',
       to: 'admin@www.elevateforhumanity.org', // Update with actual admin email
       subject: `MOU Signed: ${data.programHolderName}`,
       html: `

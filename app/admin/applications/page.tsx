@@ -14,61 +14,47 @@ export const metadata: Metadata = {
   description: 'Manage all applications',
 };
 
-interface QueueApplication {
-  application_type: string;
-  application_id: string;
-  created_at: string;
-  state: string;
-  state_updated_at: string;
-  intake: {
-    first_name?: string;
-    last_name?: string;
-    email?: string;
-    phone?: string;
-    [key: string]: unknown;
-  };
-}
-
-const stateLabels: Record<string, string> = {
-  started: 'Started',
+const statusLabels: Record<string, string> = {
   pending: 'Pending',
   submitted: 'Submitted',
   approved: 'Approved',
   rejected: 'Rejected',
   in_review: 'In Review',
-  eligibility_complete: 'Eligibility Complete',
-  documents_complete: 'Documents Complete',
-  review_ready: 'Ready for Review',
+  enrolled: 'Enrolled',
+  waitlisted: 'Waitlisted',
 };
 
-const stateColors: Record<string, string> = {
-  started: 'bg-gray-100 text-gray-800',
+const statusColors: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
   submitted: 'bg-brand-blue-100 text-brand-blue-800',
   approved: 'bg-brand-green-100 text-brand-green-800',
   rejected: 'bg-brand-red-100 text-brand-red-800',
   in_review: 'bg-brand-blue-100 text-brand-blue-800',
-  eligibility_complete: 'bg-brand-blue-100 text-brand-blue-800',
-  documents_complete: 'bg-indigo-100 text-indigo-800',
-  review_ready: 'bg-yellow-100 text-yellow-800',
+  enrolled: 'bg-emerald-100 text-emerald-800',
+  waitlisted: 'bg-purple-100 text-purple-800',
 };
 
-const typeLabels: Record<string, string> = {
-  student: 'Student',
-  partner: 'Partner',
-  employer: 'Employer',
-};
-
-const typeColors: Record<string, string> = {
-  student: 'bg-brand-blue-50 text-brand-blue-700 border-brand-blue-200',
-  partner: 'bg-brand-green-50 text-brand-green-700 border-brand-green-200',
-  employer: 'bg-brand-blue-50 text-brand-blue-700 border-brand-blue-200',
-};
+interface ApplicationRow {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  city: string | null;
+  zip: string | null;
+  program_interest: string | null;
+  support_notes: string | null;
+  status: string;
+  source: string | null;
+  created_at: string;
+  updated_at: string | null;
+}
 
 export default async function ApplicationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ state?: string; type?: string; search?: string; page?: string }>;
+  searchParams: Promise<{ status?: string; search?: string; page?: string }>;
 }) {
   const params = await searchParams;
   const supabase = await createClient();
@@ -76,9 +62,6 @@ export default async function ApplicationsPage({
   if (!supabase) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Applications" }]} />
-        </div>
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -105,25 +88,22 @@ export default async function ApplicationsPage({
     redirect('/unauthorized');
   }
 
-  // Build query for admin_applications_queue view
+  // Query the applications table (where the public form inserts)
   let query = supabase
-    .from('admin_applications_queue')
-    .select('application_type, application_id, created_at, state, state_updated_at, intake', { count: 'exact' })
+    .from('applications')
+    .select('*', { count: 'exact' })
     .order('created_at', { ascending: false });
 
-  // Filter by state if provided
-  const stateFilter = params.state;
-  if (stateFilter && stateFilter !== 'all') {
-    query = query.eq('state', stateFilter);
+  const statusFilter = params.status;
+  if (statusFilter && statusFilter !== 'all') {
+    query = query.eq('status', statusFilter);
   }
 
-  // Filter by type if provided
-  const typeFilter = params.type;
-  if (typeFilter && typeFilter !== 'all') {
-    query = query.eq('application_type', typeFilter);
+  const search = params.search;
+  if (search) {
+    query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,full_name.ilike.%${search}%`);
   }
 
-  // Pagination
   const page = parseInt(params.page || '1', 10);
   const pageSize = 25;
   const offset = (page - 1) * pageSize;
@@ -131,19 +111,18 @@ export default async function ApplicationsPage({
 
   const { data: applications, count: totalCount, error } = await query;
 
-  // Get counts by state
+  // Status counts
   const { data: allApps } = await supabase
-    .from('admin_applications_queue')
-    .select('state, application_type');
-  
-  const stateCounts: Record<string, number> = {};
-  const typeCounts: Record<string, number> = {};
-  allApps?.forEach((app: { state: string; application_type: string }) => {
-    stateCounts[app.state] = (stateCounts[app.state] || 0) + 1;
-    typeCounts[app.application_type] = (typeCounts[app.application_type] || 0) + 1;
+    .from('applications')
+    .select('status');
+
+  const statusCounts: Record<string, number> = {};
+  let totalApplications = 0;
+  allApps?.forEach((app: { status: string }) => {
+    statusCounts[app.status] = (statusCounts[app.status] || 0) + 1;
+    totalApplications++;
   });
 
-  const totalApplications = allApps?.length || 0;
   const totalPages = Math.ceil((totalCount || 0) / pageSize);
 
   return (
@@ -163,56 +142,63 @@ export default async function ApplicationsPage({
           </Link>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <h3 className="text-xs font-medium text-gray-500 uppercase">Total</h3>
             <p className="text-2xl font-bold text-gray-900">{totalApplications}</p>
           </div>
-          {['student', 'partner', 'employer'].map((type) => (
-            <div key={type} className="bg-white rounded-lg shadow-sm border p-4">
-              <h3 className="text-xs font-medium text-gray-500 uppercase">{typeLabels[type] || type}</h3>
-              <p className="text-2xl font-bold text-gray-900">{typeCounts[type] || 0}</p>
-            </div>
-          ))}
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <h3 className="text-xs font-medium text-gray-500 uppercase">Pending</h3>
+            <p className="text-2xl font-bold text-yellow-600">{statusCounts['pending'] || 0}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <h3 className="text-xs font-medium text-gray-500 uppercase">In Review</h3>
+            <p className="text-2xl font-bold text-brand-blue-600">{statusCounts['in_review'] || 0}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <h3 className="text-xs font-medium text-gray-500 uppercase">Approved</h3>
+            <p className="text-2xl font-bold text-brand-green-600">{statusCounts['approved'] || 0}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <h3 className="text-xs font-medium text-gray-500 uppercase">Rejected</h3>
+            <p className="text-2xl font-bold text-brand-red-600">{statusCounts['rejected'] || 0}</p>
+          </div>
         </div>
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
           <form method="GET" className="flex flex-wrap gap-4 items-end">
-            <div className="w-40">
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
-                Type
-              </label>
-              <select
-                id="type"
-                name="type"
-                defaultValue={typeFilter || 'all'}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-              >
-                <option value="all">All Types</option>
-                <option value="student">Student</option>
-                <option value="partner">Partner</option>
-                <option value="employer">Employer</option>
-              </select>
-            </div>
             <div className="w-48">
-              <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
-                State
+              <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+                Status
               </label>
               <select
-                id="state"
-                name="state"
-                defaultValue={stateFilter || 'all'}
+                id="status"
+                name="status"
+                defaultValue={statusFilter || 'all'}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
-                <option value="all">All States</option>
-                <option value="submitted">Submitted</option>
+                <option value="all">All Statuses</option>
                 <option value="pending">Pending</option>
                 <option value="in_review">In Review</option>
                 <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
+                <option value="enrolled">Enrolled</option>
               </select>
+            </div>
+            <div className="w-64">
+              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+                Search
+              </label>
+              <input
+                type="text"
+                id="search"
+                name="search"
+                defaultValue={search || ''}
+                placeholder="Name or email..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+              />
             </div>
             <button
               type="submit"
@@ -229,11 +215,11 @@ export default async function ApplicationsPage({
           </form>
         </div>
 
-        {/* Applications Table */}
+        {/* Table */}
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
           {error ? (
             <div className="p-8 text-center text-brand-red-600">
-              Error loading applications
+              Error loading applications. Check that the applications table exists in Supabase.
             </div>
           ) : applications && applications.length > 0 ? (
             <>
@@ -242,22 +228,19 @@ export default async function ApplicationsPage({
                   <thead className="bg-gray-50 border-b">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Type
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Applicant
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Email
+                        Contact
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        State
+                        Program
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Created
+                        Status
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Last Updated
+                        Submitted
                       </th>
                       <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
@@ -265,46 +248,53 @@ export default async function ApplicationsPage({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {applications.map((app: QueueApplication) => {
-                      const intake = app.intake || {};
-                      const firstName = intake.first_name || '';
-                      const lastName = intake.last_name || '';
-                      const email = intake.email || '';
-                      const displayName = firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Unknown';
-                      
+                    {(applications as ApplicationRow[]).map((app) => {
+                      const displayName =
+                        [app.first_name, app.last_name].filter(Boolean).join(' ') ||
+                        app.full_name ||
+                        'Unknown';
+
                       return (
-                        <tr key={`${app.application_type}-${app.application_id}`} className="hover:bg-gray-50">
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded border ${typeColors[app.application_type] || 'bg-gray-50 text-gray-700 border-gray-200'}`}>
-                              {typeLabels[app.application_type] || app.application_type}
-                            </span>
-                          </td>
+                        <tr key={app.id} className="hover:bg-gray-50">
                           <td className="px-4 py-4 whitespace-nowrap">
                             <div className="font-medium text-gray-900">{displayName}</div>
-                            {intake.phone && (
-                              <div className="text-sm text-gray-500">{intake.phone}</div>
+                            {app.city && (
+                              <div className="text-sm text-gray-500">
+                                {app.city}
+                                {app.zip ? `, ${app.zip}` : ''}
+                              </div>
                             )}
                           </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {email || 'N/A'}
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">{app.email || 'N/A'}</div>
+                            {app.phone && <div className="text-sm text-gray-500">{app.phone}</div>}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
-                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${stateColors[app.state] || 'bg-gray-100 text-gray-800'}`}>
-                              {stateLabels[app.state] || app.state}
+                            <span className="text-sm text-gray-900">
+                              {app.program_interest || 'Not specified'}
+                            </span>
+                            {app.source && (
+                              <div className="text-xs text-gray-400">
+                                {app.source.replace(/-/g, ' ')}
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${statusColors[app.status] || 'bg-gray-100 text-gray-800'}`}
+                            >
+                              {statusLabels[app.status] || app.status}
                             </span>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {new Date(app.created_at).toLocaleDateString()}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {app.state_updated_at ? new Date(app.state_updated_at).toLocaleDateString() : '-'}
+                            {new Date(app.created_at).toLocaleDateString('en-US')}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-right">
                             <Link
-                              href={`/admin/applications/${app.application_type}/${app.application_id}`}
+                              href={`/admin/applications/review/${app.id}`}
                               className="text-brand-blue-600 hover:text-brand-blue-800 text-sm font-medium"
                             >
-                              View Details
+                              Review
                             </Link>
                           </td>
                         </tr>
@@ -314,16 +304,16 @@ export default async function ApplicationsPage({
                 </table>
               </div>
 
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="px-4 py-3 border-t bg-gray-50 flex items-center justify-between">
                   <div className="text-sm text-gray-500">
-                    Showing {offset + 1} to {Math.min(offset + pageSize, totalCount || 0)} of {totalCount} applications
+                    Showing {offset + 1} to {Math.min(offset + pageSize, totalCount || 0)} of{' '}
+                    {totalCount} applications
                   </div>
                   <div className="flex gap-2">
                     {page > 1 && (
                       <Link
-                        href={`/admin/applications?page=${page - 1}${stateFilter ? `&state=${stateFilter}` : ''}${typeFilter ? `&type=${typeFilter}` : ''}`}
+                        href={`/admin/applications?page=${page - 1}${statusFilter ? `&status=${statusFilter}` : ''}${search ? `&search=${search}` : ''}`}
                         className="px-3 py-1 border rounded text-sm hover:bg-gray-100"
                       >
                         Previous
@@ -334,7 +324,7 @@ export default async function ApplicationsPage({
                     </span>
                     {page < totalPages && (
                       <Link
-                        href={`/admin/applications?page=${page + 1}${stateFilter ? `&state=${stateFilter}` : ''}${typeFilter ? `&type=${typeFilter}` : ''}`}
+                        href={`/admin/applications?page=${page + 1}${statusFilter ? `&status=${statusFilter}` : ''}${search ? `&search=${search}` : ''}`}
                         className="px-3 py-1 border rounded text-sm hover:bg-gray-100"
                       >
                         Next
@@ -346,7 +336,8 @@ export default async function ApplicationsPage({
             </>
           ) : (
             <div className="p-8 text-center text-gray-500">
-              No applications found{stateFilter || typeFilter ? ' matching your filters' : ''}.
+              No applications found
+              {statusFilter && statusFilter !== 'all' ? ' matching your filters' : ''}.
             </div>
           )}
         </div>

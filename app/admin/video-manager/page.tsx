@@ -1,18 +1,47 @@
 'use client';
+
+import { useState, useEffect } from 'react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-
-import React from 'react';
-
-import { useState } from 'react';
 import VideoUploader from '@/components/admin/VideoUploader';
-import { Check, Copy, FileText, Sparkles, Video } from 'lucide-react';
+import { Check, Copy, FileText, Sparkles, Video, Trash2, RefreshCw, Search, ExternalLink } from 'lucide-react';
+
+interface VideoRecord {
+  id: string;
+  title: string;
+  url: string;
+  created_at: string;
+  duration_minutes: number | null;
+}
 
 export default function VideoManagerPage() {
   const [uploadedVideos, setUploadedVideos] = useState<string[]>([]);
+  const [videos, setVideos] = useState<VideoRecord[]>([]);
+  const [loading, setLoading] = useState(true);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    fetchVideos();
+  }, []);
+
+  async function fetchVideos() {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/videos/upload');
+      if (res.ok) {
+        const data = await res.json();
+        setVideos(data.videos ?? data ?? []);
+      }
+    } catch {
+      // API may return empty
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const handleUploadComplete = (url: string) => {
     setUploadedVideos((prev) => [url, ...prev]);
+    fetchVideos();
   };
 
   const copyToClipboard = (url: string) => {
@@ -22,144 +51,104 @@ export default function VideoManagerPage() {
     setTimeout(() => setCopiedUrl(null), 2000);
   };
 
+  const allVideos = [
+    ...uploadedVideos.map((url, i) => ({ id: `new-${i}`, title: url.split('/').pop() || 'Uploaded', url, created_at: new Date().toISOString(), duration_minutes: null })),
+    ...videos,
+  ];
+
+  const filtered = allVideos.filter((v) =>
+    (v.title || '').toLowerCase().includes(search.toLowerCase()) ||
+    (v.url || '').toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Video Manager" }]} />
-      </div>
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-black mb-2 text-2xl md:text-3xl lg:text-4xl">
-              Video Manager
-            </h1>
-            <p className="text-lg text-black">
-              Upload and enhance videos for your hero banners and content
-            </p>
-          </div>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-4">
+          <Breadcrumbs items={[
+            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Videos', href: '/admin/videos' },
+            { label: 'Video Manager' },
+          ]} />
+        </div>
 
-          {/* Uploader */}
-          <div className="mb-12">
-            <VideoUploader onUploadComplete={handleUploadComplete} />
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Video Manager</h1>
+            <p className="text-sm text-gray-500 mt-1">Upload, manage, and organize lesson videos</p>
           </div>
+          <button onClick={fetchVideos} className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
 
-          {/* Uploaded Videos */}
-          {uploadedVideos.length > 0 && (
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-black mb-4 flex items-center gap-2">
-                <Video className="h-10 w-10" />
-                Uploaded Videos
-              </h2>
-              <div className="space-y-4">
-                {uploadedVideos.map((url, index) => (
-                  <div
-                    key={index}
-                    className="border border-slate-200 rounded-lg p-4 hover:border-brand-blue-300 transition-colors"
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex-1">
-                        <p className="text-sm font-mono text-black break-all">
-                          {url}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => copyToClipboard(url)}
-                        className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
-                      >
-                        {copiedUrl === url ? (
-                          <>
-                            <Check className="h-4 w-4" />
-                            Copied!
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="h-4 w-4" />
-                            Copy URL
-                          </>
-                        )}
-                      </button>
+        {/* Upload Section */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-gray-400" /> Upload Video
+          </h2>
+          <VideoUploader onUploadComplete={handleUploadComplete} />
+        </div>
+
+        {/* Search */}
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search videos..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        {/* Video List */}
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h2 className="font-semibold text-gray-900">{filtered.length} Videos</h2>
+          </div>
+          {loading ? (
+            <div className="px-6 py-12 text-center">
+              <RefreshCw className="w-6 h-6 text-gray-300 mx-auto mb-2 animate-spin" />
+              <p className="text-sm text-gray-500">Loading videos...</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="px-6 py-12 text-center">
+              <Video className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+              <p className="text-sm text-gray-500">{search ? 'No matching videos.' : 'No videos uploaded yet.'}</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {filtered.map((v) => (
+                <div key={v.id} className="px-6 py-3 flex items-center justify-between hover:bg-gray-50">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+                      <Video className="w-4 h-4 text-purple-600" />
                     </div>
-                    <div className="mt-3">
-                      <video
-                        src={url}
-                        controls
-                        className="w-full max-w-md rounded-lg"
-                      />
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-gray-900 truncate">{v.title || v.url.split('/').pop()}</div>
+                      <div className="text-xs text-gray-400 truncate">{v.url}</div>
                     </div>
                   </div>
-                ))}
-              </div>
+                  <div className="flex items-center gap-2 ml-4">
+                    {v.duration_minutes && (
+                      <span className="text-xs text-gray-400">{v.duration_minutes}m</span>
+                    )}
+                    <span className="text-xs text-gray-400">{new Date(v.created_at).toLocaleDateString()}</span>
+                    <button
+                      onClick={() => copyToClipboard(v.url)}
+                      className="p-1.5 text-gray-400 hover:text-gray-600 rounded"
+                      title="Copy URL"
+                    >
+                      {copiedUrl === v.url ? <Check className="w-3.5 h-3.5 text-brand-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
-
-          {/* Instructions */}
-          <div className="mt-12    rounded-lg p-6 border border-brand-blue-200">
-            <h3 className="text-lg font-bold text-black mb-4">
-              <FileText className="w-5 h-5 inline-block" /> How to Use Your
-              Enhanced Video
-            </h3>
-            <div className="space-y-3 text-black">
-              <p>
-                <strong>1. Upload your video</strong> - Even low quality videos
-                will be enhanced
-              </p>
-              <p>
-                <strong>2. Copy the enhanced URL</strong> - Click the "Copy URL"
-                button
-              </p>
-              <p>
-                <strong>3. Use in your pages</strong> - Add to hero sections
-                like this:
-              </p>
-              <pre className="bg-slate-800 text-brand-green-400 p-4 rounded-lg overflow-x-auto text-sm mt-2">
-                {`<video
-  autoPlay
-  loop
-  muted
-  playsInline
-  className="absolute inset-0 w-full h-full object-cover"
->
-  <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home.mp4" type="video/mp4" />
-</video>`}
-              </pre>
-              <p className="mt-4">
-                <strong>4. For barber page</strong> - I'll add it automatically
-                once you upload!
-              </p>
-            </div>
-          </div>
-
-          {/* Enhancement Details */}
-          <div className="mt-8 grid md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h4 className="font-bold text-black mb-3">
-                <Sparkles className="w-5 h-5 inline-block" /> What Gets
-                Enhanced:
-              </h4>
-              <ul className="space-y-2 text-sm text-black">
-                <li>• Resolution upscaled to 1080p</li>
-                <li>• Noise and grain removed</li>
-                <li>• Colors enhanced and balanced</li>
-                <li>• Contrast improved</li>
-                <li>• Shaky footage stabilized</li>
-                <li>• Optimized for web streaming</li>
-              </ul>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h4 className="font-bold text-black mb-3">
-                📹 Best Practices:
-              </h4>
-              <ul className="space-y-2 text-sm text-black">
-                <li>• Keep videos 10-30 seconds long</li>
-                <li>• Show your barbershop atmosphere</li>
-                <li>• Include cutting techniques</li>
-                <li>• Good lighting helps enhancement</li>
-                <li>• Horizontal (landscape) format</li>
-                <li>• No audio needed (will be muted)</li>
-              </ul>
-            </div>
-          </div>
         </div>
       </div>
     </div>

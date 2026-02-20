@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { CheckCircle, Upload, AlertCircle, FileText } from 'lucide-react';
+import { Upload, FileText } from 'lucide-react';
 
 const REQUIRED_DOCUMENTS = [
   {
@@ -166,13 +166,9 @@ export default function DocumentUploadPage() {
                           : 'bg-gray-50 border-gray-200'
                     }`}
                   >
-                    {isUploaded ? (
-                      <CheckCircle className="w-5 h-5 text-brand-green-600 mt-0.5 flex-shrink-0" />
-                    ) : doc.required ? (
-                      <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-                    ) : (
-                      <FileText className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                    )}
+                    <FileText className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
+                      isUploaded ? 'text-brand-green-600' : doc.required ? 'text-yellow-600' : 'text-gray-400'
+                    }`} />
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-gray-900">{doc.label}</span>

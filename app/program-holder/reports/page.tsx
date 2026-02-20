@@ -61,7 +61,7 @@ export default async function ReportsPage() {
     .single();
 
   if (!programHolder) {
-    redirect('/program-holder/apply');
+    redirect('/program-holder/onboarding');
   }
 
   // Fetch compliance reports (using apprentice_weekly_reports as template)

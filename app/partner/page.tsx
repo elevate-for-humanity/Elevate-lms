@@ -14,5 +14,5 @@ export const metadata: Metadata = {
   },
 };
 export default function PartnerPage() {
-  redirect('/partner/dashboard');
+  redirect('/partner/onboarding');
 }

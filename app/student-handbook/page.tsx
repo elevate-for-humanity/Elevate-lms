@@ -24,9 +24,11 @@ export default async function StudentHandbookPage() {
   const { data: handbook } = await supabase
     .from('documents')
     .select('*')
-    .eq('type', 'student-handbook')
-    .eq('is_active', true)
-    .single();
+    .eq('status', 'approved')
+    .contains('metadata', { handbook_type: 'student-handbook' })
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   const { data: acknowledgment } = user ? await supabase
     .from('handbook_acknowledgments')

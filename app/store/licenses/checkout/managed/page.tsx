@@ -1,2 +1,2 @@
 import { redirect } from 'next/navigation';
-export default function ManagedCheckoutRedirect() { redirect('/store/licensing/checkout/managed-platform'); }
+export default function ManagedCheckoutRedirect() { redirect('/store/licensing/managed'); }

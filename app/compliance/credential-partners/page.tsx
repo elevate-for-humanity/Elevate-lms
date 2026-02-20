@@ -51,7 +51,7 @@ const CREDENTIAL_PARTNERS = (dbRows as any[]) || [];
           fill
           sizes="100vw"
           className="object-cover"
-          priority
+          priority quality={90}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">

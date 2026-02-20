@@ -25,6 +25,7 @@ export default function StoreCoursesPage() {
     { name: 'Healthcare & Safety', filter: (c: any) => c.category === 'healthcare-safety' },
     { name: 'Business & Accounting', filter: (c: any) => c.category === 'business-accounting' },
     { name: 'Workplace Safety', filter: (c: any) => c.category === 'workplace-safety' },
+    { name: 'HVAC & Trades', filter: (c: any) => c.category === 'HVAC & Trades' },
   ];
 
   return (

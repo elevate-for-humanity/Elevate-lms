@@ -40,7 +40,7 @@ export default async function EnrollmentPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-64 md:h-80 overflow-hidden">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Elevate for Humanity enrollment" fill className="object-cover" priority />
+        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Elevate for Humanity enrollment" fill className="object-cover" priority quality={90} />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-900/50" />
         <div className="relative z-10 h-full flex flex-col justify-center px-6 md:px-10 max-w-5xl mx-auto">
           <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Enrollment' }]} />

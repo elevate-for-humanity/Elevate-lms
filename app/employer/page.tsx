@@ -23,7 +23,7 @@ export default function EmployerPage() {
 
       {/* Hero — clean image, no text overlay */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer partnership with Elevate for Humanity" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer partnership with Elevate for Humanity" fill sizes="100vw" className="object-cover" priority quality={90} />
       </section>
 
       {/* Headline below hero */}
@@ -51,7 +51,7 @@ export default function EmployerPage() {
             ].map((item) => (
               <div key={item.step} className="flex sm:flex-col gap-4 sm:gap-0 overflow-hidden bg-white border border-slate-200">
                 <div className="relative w-28 h-28 sm:w-full sm:h-[160px] flex-shrink-0 sm:flex-shrink">
-                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 112px, 25vw" className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 112px, 25vw" quality={90} className="object-cover" />
                   <div className="absolute top-2 left-2 w-7 h-7 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">{item.step}</div>
                 </div>
                 <div className="py-3 pr-3 sm:p-4 flex-1">
@@ -78,7 +78,7 @@ export default function EmployerPage() {
             ].map((item) => (
               <Link key={item.title} href={item.href} className="flex gap-4 bg-slate-50 border border-slate-200 p-4 hover:shadow-lg transition-shadow group">
                 <div className="relative w-20 h-20 sm:w-28 sm:h-28 overflow-hidden flex-shrink-0">
-                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 80px, 112px" className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 80px, 112px" quality={90} className="object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>

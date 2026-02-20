@@ -15,7 +15,7 @@ const credentials = [
   { name: 'HSI CPR/AED/First Aid', field: 'Healthcare & General', issuer: 'Health & Safety Institute', desc: 'Same-day certification. Valid for 2 years. Required for healthcare, childcare, and many trades.' },
   { name: 'Certified Nursing Assistant (CNA)', field: 'Healthcare', issuer: 'Indiana State Dept. of Health', desc: 'State-certified credential for patient care in hospitals, nursing homes, and home health.' },
   { name: 'Commercial Driver License (CDL)', field: 'Transportation', issuer: 'Indiana BMV', desc: 'Class A or Class B CDL for commercial truck driving. Includes pre-trip, skills, and road test.' },
-  { name: 'EPA 608 Certification', field: 'HVAC', issuer: 'EPA', desc: 'Required for handling refrigerants. Universal, Type I, II, or III certification.' },
+  { name: 'EPA Section 608 Universal Certification', field: 'HVAC', issuer: 'EPA (via approved testing partner)', desc: 'Required by federal law to purchase and handle refrigerants. 15-week prep curriculum with study kits, practice test bank, and proctored certification exam access. Unlimited online retesting. Certification does not expire.' },
   { name: 'Barber License', field: 'Cosmetology', issuer: 'Indiana PLA', desc: 'State barber license earned through DOL Registered Apprenticeship. 1,500 hours of training.' },
   { name: 'Phlebotomy Technician', field: 'Healthcare', issuer: 'NHA / ASCP', desc: 'National certification for blood draw and specimen collection.' },
   { name: 'Medical Assistant', field: 'Healthcare', issuer: 'NHA', desc: 'Clinical and administrative skills for physician offices and outpatient clinics.' },
@@ -32,7 +32,7 @@ export default function CredentialsPage() {
 
       {/* Hero */}
       <section className="relative h-[300px] sm:h-[380px] overflow-hidden">
-        <Image src="/images/hero/hero-certifications.jpg" alt="Industry certifications" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/hero/hero-certifications.jpg" alt="Industry certifications" fill className="object-cover" priority quality={90} sizes="100vw" />
         
       </section>
 

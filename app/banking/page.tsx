@@ -54,7 +54,7 @@ export default async function BankingPage() {
           alt="Banking Services"
           fill
           className="object-cover"
-          priority
+          priority quality={90}
           sizes="100vw"
         />
         

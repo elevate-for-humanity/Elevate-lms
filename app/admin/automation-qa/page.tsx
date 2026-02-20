@@ -45,7 +45,7 @@ interface ReviewQueueItem {
   id: string;
   entity_type: string;
   review_type: string;
-  priority: number;
+  priority quality={90}: number;
   status: string;
   system_recommendation: string | null;
   created_at: string;
@@ -427,8 +427,8 @@ export default function AutomationQAPage() {
                   {reviewItems.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell>
-                        <Badge variant={item.priority <= 2 ? 'destructive' : 'secondary'}>
-                          P{item.priority}
+                        <Badge variant={item.priority quality={90} <= 2 ? 'destructive' : 'secondary'}>
+                          P{item.priority quality={90}}
                         </Badge>
                       </TableCell>
                       <TableCell>

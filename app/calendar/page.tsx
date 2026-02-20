@@ -76,7 +76,7 @@ export default async function CalendarPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/hero-new/hero-6.jpg" alt="Calendar and Schedule" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/hero-new/hero-6.jpg" alt="Calendar and Schedule" fill className="object-cover" priority quality={90} sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

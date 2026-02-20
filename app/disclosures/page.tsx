@@ -45,7 +45,7 @@ export default function DisclosuresPage() {
           alt="Student Consumer Information"
           fill
           className="object-cover"
-          priority
+          priority quality={90}
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 w-full">
           <div className="max-w-2xl">

@@ -217,7 +217,7 @@ const productData = {
     },
     {
       question: 'What if I need help during registration?',
-      answer: 'All plans include email support. Professional plans get priority support with faster response times. Enterprise customers get a dedicated account manager and phone support.',
+      answer: 'All plans include email support. Professional plans get priority quality={90} support with faster response times. Enterprise customers get a dedicated account manager and phone support.',
     },
   ],
   whatsIncluded: [

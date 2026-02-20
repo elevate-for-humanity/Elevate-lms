@@ -73,7 +73,7 @@ export default async function HelpArticlesPage() {
           alt="Help Center"
           fill
           className="object-cover opacity-30"
-          priority
+          priority quality={90}
         />
         <div className="relative max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold mb-4">Help Center</h1>

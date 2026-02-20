@@ -105,7 +105,7 @@ export default async function TeamPage() {
           alt="Elevate for Humanity Team"
           fill
           className="object-cover"
-          priority
+          priority quality={90}
         />
       </section>
 

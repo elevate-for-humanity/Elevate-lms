@@ -45,7 +45,16 @@ export default function CNACertificationPage() {
       </div>
 
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/heroes/programs/healthcare/hero-program-cna.jpg" alt="CNA Certification Training" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/heroes/programs/healthcare/hero-program-cna.jpg" alt="CNA Certification Training" fill sizes="100vw" className="object-cover" priority quality={90} />
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
+          <div className="max-w-4xl mx-auto">
+            <span className="inline-block bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Funding Available</span>
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">CNA Certification</h1>
+            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
+              Become a Certified Nursing Assistant in 4-6 weeks. State certification exam included. Start a career in healthcare.
+            </p>
+          </div>
+        </div>
       </section>
 
       <section className="bg-slate-900 py-5">
@@ -68,7 +77,7 @@ export default function CNACertificationPage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex flex-col sm:flex-row gap-5 items-start">
             <div className="relative w-full h-[200px] sm:w-72 sm:h-[280px] rounded-xl overflow-hidden flex-shrink-0">
-              <Image src="/images/healthcare/program-cna-training.jpg" alt="CNA student training" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/healthcare/program-cna-training.jpg" alt="CNA student training" fill sizes="100vw" quality={90} className="object-cover" />
             </div>
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What You&apos;ll Learn</h2>

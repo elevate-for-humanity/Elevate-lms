@@ -130,7 +130,7 @@ export default function ManagedPlatformPage() {
                   src="/images/demos/admin-dashboard-thumb.jpg"
                   alt="Elevate managed platform dashboard"
                   fill
-                  className="object-cover"
+                  quality={85} className="object-cover"
                   sizes="(max-width: 768px) 100vw, 80vw"
                 />
               </div>
@@ -153,7 +153,7 @@ export default function ManagedPlatformPage() {
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                 <div className="relative h-36">
-                  <Image src={item.img} alt={item.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                  <Image src={item.img} alt={item.title} fill quality={85} className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                 </div>
                 <div className="p-5">
                   <div className="flex items-center gap-2 mb-2">

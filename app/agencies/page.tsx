@@ -104,7 +104,7 @@ export default async function AgenciesPage() {
           alt="Workforce agencies and partners"
           fill
           className="object-cover"
-          priority
+          priority quality={90}
           sizes="100vw"
         />
       </section>

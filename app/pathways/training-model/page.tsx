@@ -21,7 +21,7 @@ export default function TrainingModelPage() {
 
       {/* Visual hero */}
       <section className="relative h-[280px] sm:h-[360px]">
-        <Image src="/images/programs-hq/training-classroom.jpg" alt="Students in a hands-on training classroom" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/programs-hq/training-classroom.jpg" alt="Students in a hands-on training classroom" fill sizes="100vw" className="object-cover" priority quality={90} />
       </section>
 
       {/* Intro */}

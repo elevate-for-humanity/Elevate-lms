@@ -37,7 +37,7 @@ export default function HowItWorksPage() {
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/hero-images/how-it-works-hero.jpg" alt="How Elevate works" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/hero-images/how-it-works-hero.jpg" alt="How Elevate works" fill sizes="100vw" className="object-cover" priority quality={90} />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">How It Works</h1>
@@ -61,7 +61,7 @@ export default function HowItWorksPage() {
             ].map((item) => (
               <div key={item.step} className="flex flex-col sm:flex-row gap-0 sm:gap-5 rounded-xl overflow-hidden border border-slate-200 bg-white">
                 <div className="relative w-full h-[180px] sm:w-64 sm:h-auto sm:min-h-[200px] flex-shrink-0">
-                  <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="100vw" quality={90} className="object-cover" />
                   
                 </div>
                 <div className="p-5 flex-1">

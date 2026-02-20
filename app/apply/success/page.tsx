@@ -53,8 +53,8 @@ const ROLE_CONFIG: Record<string, {
   primaryLabel: string;
 }> = {
   student: {
-    title: 'Application Approved',
-    message: 'Your student account has been created. Follow the steps below to complete onboarding and start your program.',
+    title: 'Application Received',
+    message: 'Your student account has been created. Complete all onboarding steps below — your application will be reviewed and approved once everything is in.',
     steps: STUDENT_STEPS,
     primaryLink: '/forgot-password',
     primaryLabel: 'Set Your Password',

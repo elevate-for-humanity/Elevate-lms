@@ -32,7 +32,16 @@ export default function SanitationInfectionControlPage() {
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/healthcare/emergency-safety.jpg" alt="Sanitation & Infection Control Training" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/healthcare/emergency-safety.jpg" alt="Sanitation & Infection Control Training" fill sizes="100vw" className="object-cover" priority quality={90} />
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
+          <div className="max-w-4xl mx-auto">
+            <span className="inline-block bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Certification</span>
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Sanitation &amp; Infection Control</h1>
+            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
+              OSHA-compliant sanitation and infection prevention training. Required for healthcare, cosmetology, food service, and other licensed professions.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* Stats */}

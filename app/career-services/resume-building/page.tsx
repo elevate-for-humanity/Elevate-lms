@@ -75,7 +75,7 @@ export default function ResumeBuildingPage() {
           alt="Resume Building Services"
           fill
           className="object-cover object-center"
-          priority
+          priority quality={90}
           sizes="100vw"
         />
         

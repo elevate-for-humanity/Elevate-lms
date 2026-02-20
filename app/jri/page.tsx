@@ -130,7 +130,7 @@ export default function JRIPage() {
           alt="JRI Program participants"
           fill
           className="object-cover opacity-30"
-          priority
+          priority quality={90}
         />
         
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

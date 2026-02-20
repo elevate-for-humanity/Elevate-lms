@@ -100,7 +100,7 @@ export default async function CommunityPage() {
           alt="Community members collaborating"
           fill
           className="object-cover"
-          priority
+          priority quality={90}
         />
       </section>
 

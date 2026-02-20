@@ -1,18 +1,12 @@
-
 import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
-import { HvacHero } from './sections/HvacHero';
-import { HvacDeliveryModel } from './sections/HvacDeliveryModel';
-import { HvacCredentials } from './sections/HvacCredentials';
-import { HvacInstructors } from './sections/HvacInstructors';
-import { HvacEnrollment } from './sections/HvacEnrollment';
+import HVACProgramContent from '@/app/programs/hvac/HVACProgramContent';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
-  title: 'HVAC Technician Training | 20-Week Program | Workforce Ready Grant | Elevate',
-  description: 'HVAC technician training in Indianapolis. 20-week program with 6 credentials including EPA 608, Residential HVAC Certification 1 & 2, OSHA 30, CPR, and Rise Up. Workforce Ready Grant eligible.',
+  title: 'HVAC Technician Training | 12-Week Program | Elevate for Humanity',
+  description: 'HVAC technician training in Indianapolis. 12-week program with EPA 608, OSHA 10, and program certificate. Funding available through WIOA for qualifying adults.',
   alternates: { canonical: `${SITE_URL}/programs/hvac-technician` },
   keywords: [
     'HVAC training Indianapolis',
@@ -20,62 +14,43 @@ export const metadata: Metadata = {
     'Workforce Ready Grant HVAC',
     'HVAC school Indiana',
     'heating and cooling training',
-    'OSHA 30 HVAC',
-    'Residential HVAC Certification',
+    'OSHA 10 HVAC',
+    'EPA 608 certification',
     'WIOA HVAC program',
     'free HVAC training Indiana',
-    'Next Level Jobs HVAC',
     'HVAC apprenticeship Indiana',
-    'refrigeration technician training',
   ],
   openGraph: {
-    title: 'HVAC Technician Training | 20-Week Program | Workforce Ready Grant',
-    description: '20-week HVAC program with 6 credentials including EPA 608. Workforce Ready Grant eligible through Next Level Jobs.',
+    title: 'HVAC Technician Training | Elevate for Humanity',
+    description: '12-week HVAC program with EPA 608 and OSHA 10 certifications. Funding available for qualifying adults.',
     url: `${SITE_URL}/programs/hvac-technician`,
     siteName: 'Elevate for Humanity',
-    images: [{ url: `${SITE_URL}/images/trades/program-hvac-overview.jpg`, width: 1200, height: 630, alt: 'HVAC Technician Training Program' }],
+    images: [{ url: `${SITE_URL}/images/trades/hero-program-hvac.jpg`, width: 1200, height: 630, alt: 'HVAC Technician Training Program' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'HVAC Technician Training | Workforce Ready Grant Eligible',
-    description: '20-week HVAC program with 6 credentials including EPA 608 in Indianapolis.',
+    title: 'HVAC Technician Training | Elevate for Humanity',
+    description: '12-week HVAC program with EPA 608 and OSHA 10 in Indianapolis.',
     images: [`${SITE_URL}/images/trades/hero-program-hvac.jpg`],
   },
 };
 
 export default function HVACTechnicianPage() {
-
   return (
     <>
       <ProgramStructuredData program={{
         id: 'hvac-technician',
         name: 'HVAC Technician Training',
         slug: 'hvac-technician',
-        description: '20-week competency-based HVAC training with 6 industry credentials including EPA 608 Universal, Residential HVAC Certification 1 & 2, OSHA 30, CPR, and Rise Up. Workforce Ready Grant eligible.',
-        duration_weeks: 20,
-        price: 5000,
-        image_url: `${SITE_URL}/images/programs-hq/hvac-technician.jpg`,
+        description: '12-week HVAC fundamentals program with EPA 608, OSHA 10, employer site days, and apprenticeship readiness. Funding available through WIOA.',
+        duration_weeks: 12,
+        price: 0,
+        image_url: `${SITE_URL}/images/trades/hero-program-hvac.jpg`,
         category: 'Skilled Trades',
-        outcomes: ['Residential HVAC Certification 1', 'Residential HVAC Certification 2 - Refrigeration Diagnostics', 'EPA 608 Universal Certification', 'OSHA 30', 'CPR', 'Rise Up Certificate'],
+        outcomes: ['EPA 608 Universal Certification', 'OSHA 10 Safety Certification', 'Program Completion Certificate'],
       }} />
-      <div className="min-h-screen bg-white">
-        <div className="bg-slate-50 border-b">
-          <div className="max-w-6xl mx-auto px-4 py-3">
-            <Breadcrumbs items={[
-              { label: 'Programs', href: '/programs' },
-              { label: 'Skilled Trades', href: '/programs/skilled-trades' },
-              { label: 'HVAC Technician' },
-            ]} />
-          </div>
-        </div>
-
-        <HvacHero />
-        <HvacDeliveryModel />
-        <HvacCredentials />
-        <HvacInstructors />
-        <HvacEnrollment />
-      </div>
+      <HVACProgramContent />
     </>
   );
 }

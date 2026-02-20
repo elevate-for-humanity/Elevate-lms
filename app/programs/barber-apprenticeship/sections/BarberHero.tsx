@@ -15,7 +15,7 @@ export function BarberHero() {
           alt="Barber apprentice cutting hair in a licensed barbershop"
           fill sizes="100vw"
           className="object-cover"
-          priority
+          priority quality={90}
         />
       </section>
 

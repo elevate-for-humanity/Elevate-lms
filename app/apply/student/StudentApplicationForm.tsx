@@ -36,24 +36,22 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
       role: 'student' as const,
     };
 
-    const result = await submitStudentApplication(data);
+    try {
+      const result = await submitStudentApplication(data);
 
-    if (result.success) {
-      router.push(result.redirectTo!);
-    } else {
-      // Fallback: open pre-filled email if system is unavailable
-      const subject = encodeURIComponent(`Student Application: ${data.firstName} ${data.lastName}`);
-      const body = encodeURIComponent(
-        `Name: ${data.firstName} ${data.lastName}\n` +
-        `Email: ${data.email}\n` +
-        `Phone: ${data.phone}\n` +
-        `City: ${data.city || 'N/A'}, ${data.state || 'N/A'} ${data.zipCode || ''}\n` +
-        `Program Interest: ${data.programInterest || 'Not specified'}\n` +
-        `Employment: ${data.employmentStatus || 'N/A'}\n` +
-        `Education: ${data.educationLevel || 'N/A'}\n` +
-        `Goals: ${data.goals || 'N/A'}\n`
+      if (result.success) {
+        router.push(result.redirectTo!);
+      } else {
+        setError(
+          result.error ||
+          'Something went wrong submitting your application. Please try again or contact us at elevate4humanityedu@gmail.com.'
+        );
+        setLoading(false);
+      }
+    } catch {
+      setError(
+        'The application system is temporarily unavailable. Please email us at elevate4humanityedu@gmail.com with your name, phone, and program interest.'
       );
-      window.location.href = "/contact";
       setLoading(false);
     }
   }

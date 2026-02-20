@@ -32,7 +32,16 @@ export default function BusinessPage() {
       </div>
 
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/hero/hero-business.jpg" alt="Business and Entrepreneurship Programs" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/hero/hero-business.jpg" alt="Business & Entrepreneurship Programs" fill sizes="100vw" className="object-cover" priority quality={90} />
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
+          <div className="max-w-4xl mx-auto">
+            <span className="inline-block bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Business Training</span>
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Business &amp; Entrepreneurship</h1>
+            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
+              Tax preparation, financial services, and business startup training. Learn to run your own business.
+            </p>
+          </div>
+        </div>
       </section>
 
       <section className="bg-slate-900 py-5">

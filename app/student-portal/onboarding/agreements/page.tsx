@@ -111,6 +111,13 @@ export default function OnboardingAgreementsPage() {
       // Update onboarding progress
       await updateOnboardingProgress(user.id, 'agreements', true);
 
+      // Notify admin that agreements step is complete
+      fetch('/api/onboarding/step-complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ step: 'agreements' }),
+      }).catch(() => {}); // non-blocking
+
       // Redirect to next step after short delay
       setTimeout(() => {
         router.push('/student-portal/onboarding');

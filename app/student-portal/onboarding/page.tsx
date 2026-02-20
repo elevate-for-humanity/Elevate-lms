@@ -107,13 +107,15 @@ export default function StudentOnboardingPage() {
           documents: onboardingData.documents_uploaded || false,
         });
 
-        // If all required steps complete, redirect to LMS
+        // If ALL steps complete (including documents), application is approved
+        // The DB trigger (check_onboarding_complete) handles the actual approval
         if (
           onboardingData.profile_completed &&
           onboardingData.agreements_completed &&
-          onboardingData.handbook_acknowledged
+          onboardingData.handbook_acknowledged &&
+          onboardingData.documents_uploaded
         ) {
-          router.push('/lms/dashboard');
+          router.push('/student-portal/onboarding/approved');
           return;
         }
       } else {
@@ -124,10 +126,21 @@ export default function StudentOnboardingPage() {
         });
       }
 
+      // Helper: notify admin when a step is newly completed
+      const notifyStepComplete = (step: string) => {
+        fetch('/api/onboarding/step-complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ step }),
+        }).catch(() => {}); // non-blocking
+      };
+
       // Check if profile is complete
       if (profileData?.full_name && profileData?.phone) {
+        const wasAlreadyComplete = onboardingData?.profile_completed;
         setProgress((prev) => ({ ...prev, profile: true }));
         await updateOnboardingProgress(data.user.id, 'profile', true);
+        if (!wasAlreadyComplete) notifyStepComplete('profile');
       }
 
       // Check agreement acceptances
@@ -143,8 +156,10 @@ export default function StudentOnboardingPage() {
       );
 
       if (allAgreementsSigned) {
+        const wasAlreadyComplete = onboardingData?.agreements_completed;
         setProgress((prev) => ({ ...prev, agreements: true }));
         await updateOnboardingProgress(data.user.id, 'agreements', true);
+        if (!wasAlreadyComplete) notifyStepComplete('agreements');
       }
 
       // Check handbook acknowledgment
@@ -155,8 +170,10 @@ export default function StudentOnboardingPage() {
         .single();
 
       if (handbook) {
+        const wasAlreadyComplete = onboardingData?.handbook_acknowledged;
         setProgress((prev) => ({ ...prev, handbook: true }));
         await updateOnboardingProgress(data.user.id, 'handbook', true);
+        if (!wasAlreadyComplete) notifyStepComplete('handbook');
       }
 
       setLoading(false);

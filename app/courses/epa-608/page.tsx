@@ -1,0 +1,220 @@
+import { Metadata } from 'next';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Clock, BookOpen, Award, CheckCircle, Shield, ArrowRight, Users } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const metadata: Metadata = {
+  title: 'EPA Section 608 Certification Prep | Elevate for Humanity',
+  description:
+    'Complete 15-week EPA 608 Universal certification preparation. Covers Core, Type I, II, and III with study kits, practice exams, and proctored exam access through an approved testing partner.',
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/courses/epa-608',
+  },
+};
+
+const weeks = [
+  { week: 1, title: 'Ozone Depletion & Environmental Regulations', section: 'Core', color: 'bg-brand-blue-100 text-brand-blue-700' },
+  { week: 2, title: 'Refrigerant Types, Properties & Safety', section: 'Core', color: 'bg-brand-blue-100 text-brand-blue-700' },
+  { week: 3, title: 'Pressure-Temperature Relationships & the Refrigeration Cycle', section: 'Core', color: 'bg-brand-blue-100 text-brand-blue-700' },
+  { week: 4, title: 'Recovery, Recycling & Reclamation', section: 'Core', color: 'bg-brand-blue-100 text-brand-blue-700' },
+  { week: 5, title: 'Leak Detection, Repair & Evacuation', section: 'Core', color: 'bg-brand-blue-100 text-brand-blue-700' },
+  { week: 6, title: 'Shipping, Labeling & Recordkeeping', section: 'Core', color: 'bg-brand-blue-100 text-brand-blue-700' },
+  { week: 7, title: 'Core Review & Practice Exam', section: 'Core', color: 'bg-brand-blue-100 text-brand-blue-700' },
+  { week: 8, title: 'Small Appliance Systems & Recovery', section: 'Type I', color: 'bg-emerald-100 text-emerald-700' },
+  { week: 9, title: 'Type I Recovery Procedures & High-Pressure Systems Intro', section: 'Type I / II', color: 'bg-emerald-100 text-emerald-700' },
+  { week: 10, title: 'High-Pressure Systems & Equipment', section: 'Type II', color: 'bg-amber-100 text-amber-700' },
+  { week: 11, title: 'Type II Leak Rates, Repair, Evacuation & Review', section: 'Type II', color: 'bg-amber-100 text-amber-700' },
+  { week: 12, title: 'Low-Pressure Systems & Chillers', section: 'Type III', color: 'bg-purple-100 text-purple-700' },
+  { week: 13, title: 'Type III Recovery, Leak Detection & Water Tubes', section: 'Type III', color: 'bg-purple-100 text-purple-700' },
+  { week: 14, title: 'Type III Review & Practice Exam', section: 'Type III', color: 'bg-purple-100 text-purple-700' },
+  { week: 15, title: 'Universal Review & Proctored Certification Exam', section: 'Exam', color: 'bg-brand-red-100 text-brand-red-700' },
+];
+
+export default function EPA608CoursePage() {
+  return (
+    <main className="min-h-screen bg-white">
+      {/* Breadcrumbs */}
+      <div className="bg-slate-50 border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs
+            items={[
+              { label: 'Courses', href: '/courses' },
+              { label: 'EPA 608 Certification Prep' },
+            ]}
+          />
+        </div>
+      </div>
+
+      {/* Hero */}
+      <section className="relative bg-slate-900">
+        <div className="absolute inset-0">
+          <Image
+            src="/images/trades/program-hvac-overview.jpg"
+            alt="HVAC technician working with refrigerant gauges"
+            fill
+            quality={90}
+            className="object-cover opacity-30"
+          />
+        </div>
+        <div className="relative max-w-5xl mx-auto px-6 py-16 sm:py-20">
+          <div className="flex flex-wrap gap-3 mb-4">
+            <span className="bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+              Included with HVAC Program
+            </span>
+            <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">
+              Also Available Standalone
+            </span>
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-white leading-tight mb-4">
+            EPA Section 608 Universal<br />Certification Prep
+          </h1>
+          <p className="text-lg text-slate-300 max-w-2xl mb-8">
+            15-week structured certification prep course using industry-aligned curriculum.
+            Covers Core, Type I, Type II, and Type III — everything you need to pass the
+            EPA 608 Universal certification exam.
+          </p>
+          <div className="flex flex-wrap gap-6 text-sm text-slate-300 mb-8">
+            <span className="flex items-center gap-2"><Clock className="w-4 h-4" /> 15 Weeks</span>
+            <span className="flex items-center gap-2"><BookOpen className="w-4 h-4" /> 16 Lessons</span>
+            <span className="flex items-center gap-2"><Award className="w-4 h-4" /> EPA 608 Universal</span>
+            <span className="flex items-center gap-2"><Users className="w-4 h-4" /> Proctored Exam Access</span>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link
+              href="/apply/student"
+              className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors text-center"
+            >
+              Enroll Now
+            </Link>
+            <Link
+              href="/programs/hvac"
+              className="border-2 border-white text-white font-bold px-8 py-4 rounded-lg hover:bg-white/10 transition-colors text-center"
+            >
+              View Full HVAC Program
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* What's Included */}
+      <section className="py-14 bg-white border-b">
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8 text-center">
+            What&apos;s Included
+          </h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { icon: BookOpen, title: '15-Week Structured Curriculum', desc: 'Industry-aligned certification prep curriculum covering all four EPA 608 exam sections with structured weekly progression.' },
+              { icon: CheckCircle, title: 'Study Kits Provided Free', desc: 'Every student receives a study kit at no cost — reference materials, practice questions, and exam prep guides.' },
+              { icon: Shield, title: 'Full Practice Test Bank', desc: 'Practice exams for Core, Type I, Type II, and Type III sections. Take them as many times as needed.' },
+              { icon: Award, title: 'Proctored Exam Access', desc: 'Certification exam administered through an approved testing partner. No need to find a testing center on your own.' },
+              { icon: Users, title: 'Unlimited Online Retesting', desc: 'If you don\'t pass on the first attempt, retake the exam online at no additional cost.' },
+              { icon: Clock, title: 'Certification Does Not Expire', desc: 'Once you pass, your EPA 608 certification is valid for life. No renewal required.' },
+            ].map((item, i) => (
+              <div key={i} className="flex gap-4 p-5 rounded-xl border border-slate-200 bg-slate-50/50">
+                <item.icon className="w-6 h-6 text-brand-blue-600 shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
+                  <p className="text-sm text-slate-600">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 15-Week Schedule */}
+      <section className="py-14 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 text-center">
+            15-Week Course Schedule
+          </h2>
+          <p className="text-center text-slate-600 mb-4 max-w-2xl mx-auto">
+            Structured progression from Core fundamentals through all three specialty types, ending with a proctored Universal certification exam.
+          </p>
+          <div className="flex justify-center gap-3 mb-10">
+            <span className="text-xs font-bold bg-slate-200 text-slate-700 px-3 py-1 rounded-full">Standard: 15 Weeks</span>
+            <span className="text-xs font-bold bg-brand-red-100 text-brand-red-700 px-3 py-1 rounded-full">Accelerated: 6 Weeks (Workforce Cohorts)</span>
+          </div>
+
+          <div className="space-y-3">
+            {weeks.map((w) => (
+              <div
+                key={w.week}
+                className="flex items-center gap-4 bg-white rounded-lg border border-slate-200 p-4 hover:shadow-sm transition-shadow"
+              >
+                <span className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold text-sm shrink-0">
+                  {w.week}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-slate-900 text-sm sm:text-base">{w.title}</h3>
+                </div>
+                <span className={`text-xs font-bold px-3 py-1 rounded-full shrink-0 ${w.color}`}>
+                  {w.section}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Exam Details */}
+      <section className="py-14 bg-white border-t">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8 text-center">
+            About the EPA 608 Exam
+          </h2>
+          <div className="grid sm:grid-cols-2 gap-8">
+            <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-3">Exam Structure</h3>
+              <ul className="space-y-2 text-sm text-slate-700">
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> <strong>Core</strong> — 25 questions (must score 70%+)</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> <strong>Type I</strong> — 25 questions (must score 70%+)</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> <strong>Type II</strong> — 25 questions (must score 70%+)</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> <strong>Type III</strong> — 25 questions (must score 70%+)</li>
+              </ul>
+              <p className="text-sm text-slate-600 mt-3">Pass all four sections to earn your <strong>Universal</strong> certification.</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-3">What You Should Know</h3>
+              <ul className="space-y-2 text-sm text-slate-700">
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> Exam is proctored through an approved testing partner</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> Available online — no travel to a testing center required</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> Unlimited retesting at no additional cost</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> Certification does not expire</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> Recognized nationwide by all HVAC employers</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-14 bg-slate-900">
+        <div className="max-w-3xl mx-auto px-6 text-center">
+          <h2 className="text-3xl font-extrabold text-white mb-3">
+            Ready to Get Certified?
+          </h2>
+          <p className="text-lg text-slate-300 mb-8">
+            Apply in 5 minutes. If you qualify for WIOA funding, the course and exam are fully covered.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link
+              href="/apply/student"
+              className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-10 py-4 rounded-lg transition-colors"
+            >
+              Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
+            </Link>
+            <Link
+              href="/funding"
+              className="border-2 border-white text-white font-bold px-10 py-4 rounded-lg hover:bg-white/10 transition-colors"
+            >
+              Check Funding Eligibility
+            </Link>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}

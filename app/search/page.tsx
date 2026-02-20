@@ -96,7 +96,7 @@ export default function SearchPage() {
           alt="Workforce training programs"
           fill
           className="object-cover"
-          priority
+          priority quality={90}
           sizes="100vw"
         />
         

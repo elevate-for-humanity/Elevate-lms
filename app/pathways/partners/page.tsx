@@ -21,7 +21,7 @@ export default function PartnersPage() {
 
       {/* Visual hero */}
       <section className="relative h-[280px] sm:h-[360px]">
-        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer and workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer and workforce partnership meeting" fill sizes="100vw" className="object-cover" priority quality={90} />
       </section>
 
       {/* Intro */}
@@ -87,7 +87,7 @@ export default function PartnersPage() {
                 title: 'Participants earn credentials',
                 time: 'End of program',
                 image: '/images/heroes-hq/success-hero.jpg',
-                desc: 'Participants take their certification exams. We report results to you: who passed, what credential was issued, and by which authority. Credentials are issued by recognized third parties (Indiana ISDH, Indiana BMV, EPA, OSHA, CompTIA, AWS, Indiana PLA) — not by Elevate.',
+                desc: 'Participants take their certification exams. We report results to you: who passed, what credential was issued, and by which authority. Certification pathways include EPA Section 608 preparation with proctored exam administration through an approved testing partner. Credentials are issued by recognized third parties (Indiana ISDH, Indiana BMV, EPA, OSHA, CompTIA, AWS, Indiana PLA) — not by Elevate.',
               },
               {
                 step: 6,

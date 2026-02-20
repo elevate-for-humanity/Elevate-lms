@@ -103,7 +103,7 @@ export default function AnalyticsProPage() {
           alt="Analytics Pro"
           fill
           className="object-cover"
-          priority
+          priority quality={90}
         />
         
         <div className="relative z-10 max-w-6xl mx-auto px-4 w-full">

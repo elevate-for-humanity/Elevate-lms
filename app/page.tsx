@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 
 import HomeHeroVideo from './HomeHeroVideo';
-import PageAvatar from '@/components/PageAvatar';
+
 import { InView } from '@/components/ui/InView';
 import { AuthorityBanner } from '@/components/InstitutionalAuthority';
 
@@ -39,19 +39,13 @@ export default function HomePage() {
             <p className="text-lg sm:text-xl text-slate-300 mt-4 leading-relaxed max-w-2xl mx-auto">
               WIOA-funded career training in healthcare, skilled trades, CDL, and technology. Zero tuition for eligible Indiana residents.
             </p>
+            <p className="text-sm text-slate-400 mt-3 tracking-wide">
+              EPA Section 608 Certification Preparation &amp; Proctored Exam Access Available
+            </p>
           </div>
         </div>
       </section>
 
-      {/* ===== AVATAR GUIDE ===== */}
-      <section className="py-8 sm:py-12 bg-white">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <PageAvatar
-            videoSrc="/videos/avatars/home-welcome.mp4"
-            title="Welcome to Elevate for Humanity"
-          />
-        </div>
-      </section>
 
       {/* ===== AUDIENCE QUICK LINKS ===== */}
       <InView animation="fade-up">

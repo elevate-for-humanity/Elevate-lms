@@ -117,7 +117,7 @@ export default function CurvatureCareersPage() {
             alt="Careers at Curvature Body Sculpting"
             fill
             className="object-cover"
-            priority
+            priority quality={90}
           />
         </div>
         <div className="relative max-w-6xl mx-auto px-4 text-center text-white">

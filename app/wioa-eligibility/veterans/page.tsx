@@ -31,7 +31,7 @@ export default async function VeteransPage() {
     .from('programs')
     .select('id, name, slug, description')
     .eq('is_active', true)
-    .eq('veteran_priority', true)
+    .eq('veteran_priority quality={90}', true)
     .limit(6);
 
   // Get veteran resources
@@ -82,12 +82,12 @@ export default async function VeteransPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/hero-images/about-hero.jpg" alt="Veterans Priority Services" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/hero-images/about-hero.jpg" alt="Veterans Priority Services" fill className="object-cover" priority quality={90} sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">WIOA Priority for Veterans</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Expedited services and priority enrollment for those who served</p>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Expedited services and priority quality={90} enrollment for those who served</p>
           </div>
         </div>
       </section>
@@ -102,7 +102,7 @@ export default async function VeteransPage() {
           <h2 className="text-3xl font-bold text-black mb-6">Veterans Priority Services</h2>
           
           <p className="text-lg text-gray-600 mb-8">
-            As a veteran, you receive <strong>priority of service</strong> under WIOA. 
+            As a veteran, you receive <strong>priority quality={90} of service</strong> under WIOA. 
             This means you get first access to training programs, career counseling, 
             and job placement services.
           </p>
@@ -192,7 +192,7 @@ export default async function VeteransPage() {
         <div className="bg-brand-blue-600 rounded-lg p-8 text-center text-white">
           <h3 className="text-2xl font-bold mb-4">Ready to Get Started?</h3>
           <p className="text-brand-blue-100 mb-6">
-            Apply today and receive priority processing as a veteran.
+            Apply today and receive priority quality={90} processing as a veteran.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

@@ -47,7 +47,16 @@ export default function CDLTrainingPage() {
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/programs-hq/cdl-trucking.jpg" alt="CDL Training Program" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/programs-hq/cdl-trucking.jpg" alt="CDL Training Program" fill sizes="100vw" className="object-cover" priority quality={90} />
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
+          <div className="max-w-4xl mx-auto">
+            <span className="inline-block bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Funding Available</span>
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">CDL Training</h1>
+            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
+              Get your Class A Commercial Driver License in 4-8 weeks. High demand across the country with strong earning potential.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* Avatar Guide */}

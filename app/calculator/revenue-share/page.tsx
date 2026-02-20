@@ -41,7 +41,7 @@ export default function RevenueShareCalculator() {
           alt="Revenue Share Calculator"
           fill
           className="object-cover"
-          priority
+          priority quality={90}
           sizes="100vw"
         />
         

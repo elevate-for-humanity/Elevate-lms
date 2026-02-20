@@ -27,7 +27,7 @@ export default function FederalCompliancePage() {
           alt="Federal Compliance"
           fill
           className="object-cover"
-          priority
+          priority quality={90}
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 w-full">
           <div className="max-w-3xl">

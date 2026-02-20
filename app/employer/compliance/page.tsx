@@ -58,10 +58,10 @@ const complianceAreas = [
 ];
 
 const upcomingDeadlines = [
-  { title: 'Q1 WIOA Performance Report', date: 'March 31, 2026', priority: 'high' },
-  { title: 'Annual EEO-1 Report', date: 'March 31, 2026', priority: 'high' },
-  { title: 'WOTC Certification Renewal', date: 'April 15, 2026', priority: 'medium' },
-  { title: 'Apprenticeship Progress Report', date: 'April 30, 2026', priority: 'medium' },
+  { title: 'Q1 WIOA Performance Report', date: 'March 31, 2026', priority quality={90}: 'high' },
+  { title: 'Annual EEO-1 Report', date: 'March 31, 2026', priority quality={90}: 'high' },
+  { title: 'WOTC Certification Renewal', date: 'April 15, 2026', priority quality={90}: 'medium' },
+  { title: 'Apprenticeship Progress Report', date: 'April 30, 2026', priority quality={90}: 'medium' },
 ];
 
 const quickChecklist = [
@@ -142,7 +142,7 @@ export default async function EmployerCompliancePage() {
               {upcomingDeadlines.map((item, i) => (
                 <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <AlertCircle className={`w-4 h-4 ${item.priority === 'high' ? 'text-brand-red-500' : 'text-yellow-500'}`} />
+                    <AlertCircle className={`w-4 h-4 ${item.priority quality={90} === 'high' ? 'text-brand-red-500' : 'text-yellow-500'}`} />
                     <div>
                       <p className="text-sm font-medium text-gray-900">{item.title}</p>
                       <p className="text-xs text-gray-500">{item.date}</p>

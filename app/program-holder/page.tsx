@@ -65,7 +65,7 @@ export default function ProgramHolderLanding() {
           alt="Program Holder Portal"
           fill
           className="object-cover opacity-30"
-          priority
+          priority quality={90}
         />
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-16 text-center text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Program Holder Portal</h1>

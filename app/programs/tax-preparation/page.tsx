@@ -62,7 +62,7 @@ export default async function Page() {
             alt="VITA Tax Preparation Training"
             fill
             className="object-cover"
-            priority
+            priority quality={90}
           />
           
           

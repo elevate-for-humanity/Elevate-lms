@@ -196,6 +196,13 @@ export default function OnboardingDocumentsPage() {
 
       if (allRequiredUploaded) {
         await updateOnboardingProgress(user.id, 'documents', true);
+
+        // Notify admin that documents step is complete
+        fetch('/api/onboarding/step-complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ step: 'documents' }),
+        }).catch(() => {}); // non-blocking
       }
     } catch (err) {
       console.error('Upload error:', err);
@@ -235,6 +242,14 @@ export default function OnboardingDocumentsPage() {
   const handleContinue = async () => {
     if (user && requiredComplete) {
       await updateOnboardingProgress(user.id, 'documents', true);
+
+      // Notify admin (idempotent — API is non-blocking)
+      fetch('/api/onboarding/step-complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ step: 'documents' }),
+      }).catch(() => {});
+
       router.push('/student-portal/onboarding');
     }
   };

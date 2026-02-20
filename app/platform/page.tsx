@@ -116,7 +116,7 @@ export default function PlatformPage() {
           alt="Elevate Workforce Operating System"
           fill
           className="object-cover opacity-25"
-          priority
+          priority quality={90}
         />
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <p className="text-brand-red-400 font-bold text-sm uppercase tracking-widest mb-4">

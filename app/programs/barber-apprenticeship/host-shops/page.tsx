@@ -31,7 +31,7 @@ export default function HostShopsPage() {
           alt="Professional barbershop interior"
           fill sizes="100vw"
           className="object-cover"
-          priority
+          priority quality={90}
         />
       </section>
 

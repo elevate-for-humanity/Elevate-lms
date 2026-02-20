@@ -49,7 +49,7 @@ export default function TaxServicesPage() {
           alt="Tax Preparation Services"
           fill
           className="object-cover"
-          priority
+          priority quality={90}
         />
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 w-full">

@@ -33,7 +33,7 @@ export default function SubofficeOnboardingPage() {
           alt="Suboffice Onboarding"
           fill
           className="object-cover"
-          priority
+          priority quality={90}
           sizes="100vw"
         />
         

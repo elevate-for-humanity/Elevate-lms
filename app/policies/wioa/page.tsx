@@ -37,7 +37,7 @@ export default function WIOAPage() {
       </ul>
 
       <h2>Priority of Service</h2>
-      <p>WIOA gives priority to:</p>
+      <p>WIOA gives priority quality={90} to:</p>
       <ol>
         <li>Veterans and eligible spouses</li>
         <li>Recipients of public assistance</li>

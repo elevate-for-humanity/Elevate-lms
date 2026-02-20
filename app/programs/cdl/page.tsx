@@ -130,7 +130,7 @@ export default function CDLProgramPage() {
       {/* Hero */}
       <section className="relative text-white overflow-hidden">
         <div className="absolute inset-0">
-          <Image src="/images/cdl-vibrant.jpg" alt="CDL Training" fill className="object-cover" />
+          <Image src="/images/cdl-vibrant.jpg" alt="CDL Training" fill quality={85} className="object-cover" />
           
         </div>
         

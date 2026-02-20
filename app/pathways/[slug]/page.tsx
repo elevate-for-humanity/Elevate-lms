@@ -54,7 +54,7 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
           alt={pathway.title}
           fill
           className="object-cover"
-          priority
+          priority quality={90}
         />
         
         <div className="relative z-10 mx-auto max-w-6xl px-6 py-14 text-white">

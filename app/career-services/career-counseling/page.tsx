@@ -84,7 +84,7 @@ export default function CareerCounselingPage() {
           alt="Career Counseling Services"
           fill
           className="object-cover object-center"
-          priority
+          priority quality={90}
           sizes="100vw"
         />
         

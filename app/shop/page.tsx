@@ -74,7 +74,7 @@ export default async function ShopPage() {
           alt="Shop"
           fill
           className="object-cover opacity-40"
-          priority
+          priority quality={90}
         />
         <div className="relative max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">

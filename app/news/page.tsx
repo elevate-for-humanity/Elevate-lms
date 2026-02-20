@@ -80,7 +80,7 @@ export default async function NewsPage() {
             <article key={article.id} className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition">
               {article.image_url && (
                 <div className="h-48 bg-gray-200 relative">
-                  <Image src={article.image_url} alt={article.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+                  <Image src={article.image_url} alt={article.title} fill quality={85} className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
                 </div>
               )}
               <div className="p-6">

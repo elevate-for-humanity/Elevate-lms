@@ -151,7 +151,7 @@ export default function WorkOnePartnerPacketPage() {
                   src="/images/heroes/workforce-partner-1.jpg"
                   alt="Workforce partnership"
                   fill
-                  className="object-cover"
+                  quality={85} className="object-cover"
                 />
               </div>
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
@@ -213,7 +213,7 @@ export default function WorkOnePartnerPacketPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-32">
-                <Image src="/images/programs-hq/business-training.jpg" alt="Referral" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/programs-hq/business-training.jpg" alt="Referral" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">1</div>
@@ -226,7 +226,7 @@ export default function WorkOnePartnerPacketPage() {
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-32">
-                <Image src="/images/homepage/employer-partnership.png" alt="Enrollment" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/homepage/employer-partnership.png" alt="Enrollment" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">2</div>
@@ -239,7 +239,7 @@ export default function WorkOnePartnerPacketPage() {
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-32">
-                <Image src="/images/programs-new/program-14.jpg" alt="Training" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/programs-new/program-14.jpg" alt="Training" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">3</div>
@@ -252,7 +252,7 @@ export default function WorkOnePartnerPacketPage() {
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-32">
-                <Image src="/images/programs-new/program-16.jpg" alt="Placement" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/programs-new/program-16.jpg" alt="Placement" fill sizes="100vw" quality={85} className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">4</div>
@@ -295,7 +295,7 @@ export default function WorkOnePartnerPacketPage() {
             ].map((program, index) => (
               <div key={index} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
                 <div className="relative h-40">
-                  <Image src={program.image} alt={program.title} fill sizes="100vw" className="object-cover" />
+                  <Image src={program.image} alt={program.title} fill sizes="100vw" quality={85} className="object-cover" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-3">{program.title}</h3>

@@ -39,7 +39,7 @@ export default function AboutPage() {
           alt="Elevate for Humanity team and workforce training"
           fill
           sizes="100vw"
-          className="object-cover"
+          quality={90} className="object-cover"
           priority
         />
       </section>
@@ -103,7 +103,7 @@ export default function AboutPage() {
           <div className="space-y-8">
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/heroes-hq/programs-hero.jpg" alt="Career training programs" fill sizes="(max-width: 640px) 100vw, 224px" className="object-cover" />
+                <Image src="/images/heroes-hq/programs-hero.jpg" alt="Career training programs" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Career Training Programs</h3>
@@ -122,7 +122,7 @@ export default function AboutPage() {
 
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/heroes-hq/funding-hero.jpg" alt="Funding and financial aid" fill sizes="(max-width: 640px) 100vw, 224px" className="object-cover" />
+                <Image src="/images/heroes-hq/funding-hero.jpg" alt="Funding and financial aid" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Funding Navigation</h3>
@@ -141,7 +141,7 @@ export default function AboutPage() {
 
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer partnerships" fill sizes="(max-width: 640px) 100vw, 224px" className="object-cover" />
+                <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer partnerships" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Job Placement &amp; Employer Partnerships</h3>
@@ -160,7 +160,7 @@ export default function AboutPage() {
 
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Supportive services" fill sizes="(max-width: 640px) 100vw, 224px" className="object-cover" />
+                <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Supportive services" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Supportive Services</h3>
@@ -241,7 +241,7 @@ export default function AboutPage() {
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div className="relative h-40">
-                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 100vw, 50vw" className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 100vw, 50vw" quality={90} className="object-cover" />
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
@@ -317,7 +317,7 @@ export default function AboutPage() {
                   alt={founder.name}
                   fill
                   sizes="(max-width: 640px) 100vw, 288px"
-                  className="object-cover object-center"
+                  quality={90} className="object-cover object-center"
                 />
               </div>
               <div className="p-6 flex-1">
@@ -370,7 +370,7 @@ export default function AboutPage() {
                     alt={member.name}
                     fill
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="object-cover object-center"
+                    quality={90} className="object-cover object-center"
                   />
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm sm:text-base">{member.name}</h3>
@@ -399,7 +399,7 @@ export default function AboutPage() {
             ].map((p) => (
               <Link key={p.name} href={p.href} className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition">
                 <div className="relative h-36">
-                  <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover group-hover:scale-105 transition-transform duration-300" />
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold text-slate-900 text-sm">{p.name}</h3>
@@ -423,7 +423,7 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-2 gap-6">
             <Link href="/pathways/partners" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
               <div className="relative h-40">
-                <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner with Elevate" fill sizes="50vw" className="object-cover" />
+                <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner with Elevate" fill sizes="50vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Partner With Us</h3>
@@ -435,7 +435,7 @@ export default function AboutPage() {
             </Link>
             <Link href="/pathways" className="bg-slate-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition">
               <div className="relative h-40">
-                <Image src="/images/heroes-hq/programs-hero.jpg" alt="Career pathways" fill sizes="50vw" className="object-cover" />
+                <Image src="/images/heroes-hq/programs-hero.jpg" alt="Career pathways" fill sizes="50vw" quality={90} className="object-cover" />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Career Pathways Framework</h3>

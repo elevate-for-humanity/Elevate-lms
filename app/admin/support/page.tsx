@@ -22,7 +22,7 @@ interface Ticket {
   email: string;
   subject: string;
   category: string;
-  priority: string;
+  priority quality={90}: string;
   status: string;
   created_at: string;
   updated_at: string;
@@ -37,7 +37,7 @@ const statusColors: Record<string, string> = {
   closed: 'bg-gray-100 text-gray-700',
 };
 
-const priorityColors: Record<string, string> = {
+const priority quality={90}Colors: Record<string, string> = {
   low: 'bg-gray-100 text-gray-600',
   medium: 'bg-brand-blue-100 text-brand-blue-600',
   high: 'bg-brand-orange-100 text-brand-orange-600',
@@ -76,7 +76,7 @@ export default function AdminSupportPage() {
     open: tickets.filter(t => t.status === 'open').length,
     inProgress: tickets.filter(t => t.status === 'in_progress').length,
     resolved: tickets.filter(t => t.status === 'resolved').length,
-    urgent: tickets.filter(t => t.priority === 'urgent').length,
+    urgent: tickets.filter(t => t.priority quality={90} === 'urgent').length,
   };
 
   const filteredTickets = tickets.filter(ticket => {
@@ -262,8 +262,8 @@ export default function AdminSupportPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-2 text-xs font-medium rounded-full capitalize ${priorityColors[ticket.priority]}`}>
-                        {ticket.priority}
+                      <span className={`px-2 py-2 text-xs font-medium rounded-full capitalize ${priority quality={90}Colors[ticket.priority quality={90}]}`}>
+                        {ticket.priority quality={90}}
                       </span>
                     </td>
                     <td className="px-6 py-4">

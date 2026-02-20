@@ -16,7 +16,7 @@ export default function ApplyPage() {
   return (
     <main className="min-h-screen bg-white">
       <div className="relative h-[40vh] min-h-[300px] max-h-[400px]">
-        <Image src="/images/trades/electrical-hero.jpg" alt="Electrical" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/trades/electrical-hero.jpg" alt="Electrical" fill sizes="100vw" className="object-cover" priority quality={90} />
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-4">

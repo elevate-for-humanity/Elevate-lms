@@ -602,8 +602,6 @@ ALTER TABLE IF EXISTS progress ENABLE ROW LEVEL SECURITY;
 DO $$ BEGIN CREATE POLICY "auth_read_progress" ON progress FOR SELECT TO authenticated USING (true); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 ALTER TABLE IF EXISTS provisioning_jobs ENABLE ROW LEVEL SECURITY;
 DO $$ BEGIN CREATE POLICY "auth_read_provisioning_jobs" ON provisioning_jobs FOR SELECT TO authenticated USING (true); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
-ALTER TABLE IF EXISTS public_ai_tutor_logs ENABLE ROW LEVEL SECURITY;
-DO $$ BEGIN CREATE POLICY "auth_read_public_ai_tutor_logs" ON public_ai_tutor_logs FOR SELECT TO authenticated USING (true); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 ALTER TABLE IF EXISTS push_notification_send_log ENABLE ROW LEVEL SECURITY;
 DO $$ BEGIN CREATE POLICY "auth_read_push_notification_send_log" ON push_notification_send_log FOR SELECT TO authenticated USING (true); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 ALTER TABLE IF EXISTS push_notifications_log ENABLE ROW LEVEL SECURITY;

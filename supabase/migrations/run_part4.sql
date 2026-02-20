@@ -230,16 +230,6 @@ CREATE TABLE IF NOT EXISTS provisioning_jobs (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS public_ai_tutor_logs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  blocked_reason text,
-  ip_hash text,
-  question_length text,
-  response_length text,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS push_notification_send_log (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,

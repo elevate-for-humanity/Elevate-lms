@@ -22,31 +22,6 @@ CREATE TABLE IF NOT EXISTS certifications (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS course_progress (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-  course_id uuid,
-  enrollment_id uuid,
-  progress_percentage numeric DEFAULT 0,
-  last_accessed_at timestamptz,
-  completed_at timestamptz,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS job_placements (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-  employer_id uuid,
-  job_title text,
-  company_name text,
-  salary numeric,
-  placement_date date,
-  status text DEFAULT 'placed',
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS support_tickets (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -156,20 +131,6 @@ CREATE TABLE IF NOT EXISTS payment_methods (
   exp_year integer,
   is_default boolean DEFAULT false,
   stripe_payment_method_id text,
-  created_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS invoices (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-  amount numeric NOT NULL,
-  status text DEFAULT 'pending',
-  description text,
-  date timestamptz DEFAULT now(),
-  due_date timestamptz,
-  paid_at timestamptz,
-  stripe_invoice_id text,
-  account_balance numeric DEFAULT 0,
   created_at timestamptz DEFAULT now()
 );
 

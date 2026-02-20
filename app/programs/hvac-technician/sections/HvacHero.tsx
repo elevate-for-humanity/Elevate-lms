@@ -70,16 +70,16 @@ export function HvacHero() {
             <div className="space-y-4">
               <div className="relative h-64 rounded-2xl overflow-hidden shadow-2xl">
                 <Image
-                  src="/images/programs-hq/hvac-technician.jpg"
-                  alt="HVAC training classroom with students working on equipment"
+                  src="/images/hvac-highlight.jpg"
+                  alt="HVAC equipment and tools used in hands-on training"
                   fill sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover"
                 />
               </div>
               <div className="relative h-48 rounded-2xl overflow-hidden shadow-lg">
                 <Image
-                  src="/images/trades/program-hvac-overview.jpg"
-                  alt="HVAC technician inspecting a residential unit"
+                  src="/images/pathways/hvac.jpg"
+                  alt="HVAC career pathway from training to employment"
                   fill sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover"
                 />

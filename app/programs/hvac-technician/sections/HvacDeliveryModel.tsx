@@ -1,12 +1,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { COMPETENCIES } from '../hvac-program-data';
 
 export function HvacDeliveryModel() {
   return (
     <>
-      {/* Training Delivery — image-driven cards */}
+      {/* Training Delivery — image-driven cards, each image unique */}
       <section className="py-16 bg-slate-50">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">How You&apos;ll Train</h2>
@@ -16,7 +16,7 @@ export function HvacDeliveryModel() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
               <div className="relative h-48">
-                <Image src="/images/programs-hq/training-classroom.jpg" alt="Students in HVAC classroom instruction" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src="/images/efh/sections/classroom.jpg" alt="Instructor-led classroom session at Elevate training center" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-lg text-slate-900 mb-2">Classroom &amp; Theory</h3>
@@ -25,7 +25,7 @@ export function HvacDeliveryModel() {
             </div>
             <div className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
               <div className="relative h-48">
-                <Image src="/images/trades/program-hvac-technician.jpg" alt="Hands-on HVAC lab training with equipment" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src="/images/trades/program-hvac-technician.jpg" alt="Hands-on HVAC lab training with residential equipment" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-lg text-slate-900 mb-2">Hands-On Labs</h3>
@@ -34,7 +34,7 @@ export function HvacDeliveryModel() {
             </div>
             <div className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
               <div className="relative h-48">
-                <Image src="/images/programs-hq/electrical.jpg" alt="Electrical wiring and controls training" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src="/images/trades/program-electrical-training.jpg" alt="Electrical wiring and controls hands-on training" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-lg text-slate-900 mb-2">Electrical &amp; Controls</h3>
@@ -43,7 +43,7 @@ export function HvacDeliveryModel() {
             </div>
             <div className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
               <div className="relative h-48">
-                <Image src="/images/programs-hq/skilled-trades-hero.jpg" alt="HVAC certification exam preparation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src="/images/courses/hvac-technician-10002289-cover.jpg" alt="HVAC certification exam preparation and study materials" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-lg text-slate-900 mb-2">Certification Prep</h3>
@@ -54,7 +54,7 @@ export function HvacDeliveryModel() {
         </div>
       </section>
 
-      {/* Program Structure — clean stats */}
+      {/* Program Structure — clean stats with unique image */}
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -81,8 +81,8 @@ export function HvacDeliveryModel() {
             </div>
             <div className="relative h-[450px] rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="/images/trades/program-hvac-overview.jpg"
-                alt="HVAC technician servicing residential unit"
+                src="/images/programs/hvac-hero.jpg"
+                alt="HVAC technician servicing a commercial unit"
                 fill className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
@@ -99,11 +99,11 @@ export function HvacDeliveryModel() {
         </div>
       </section>
 
-      {/* Mid-page CTA break with image */}
+      {/* Mid-page CTA break with unique image */}
       <section className="relative py-20 overflow-hidden">
         <Image
-          src="/images/programs-hq/hvac-technician.jpg"
-          alt="HVAC training in progress"
+          src="/images/hvac-technician-success.jpg"
+          alt="HVAC graduate ready for the workforce"
           fill className="object-cover"
           sizes="100vw"
         />
@@ -119,7 +119,7 @@ export function HvacDeliveryModel() {
         </div>
       </section>
 
-      {/* Core Competencies — condensed */}
+      {/* Core Competencies — styled list, no generic icons */}
       <section className="py-16 bg-slate-50">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">What You&apos;ll Master</h2>
@@ -129,7 +129,7 @@ export function HvacDeliveryModel() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {COMPETENCIES.map((comp, i) => (
               <div key={i} className="flex items-start gap-3 bg-white rounded-lg p-4 border border-slate-200">
-                <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                <span className="w-6 h-6 bg-brand-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5">{i + 1}</span>
                 <span className="text-slate-700">{comp}</span>
               </div>
             ))}

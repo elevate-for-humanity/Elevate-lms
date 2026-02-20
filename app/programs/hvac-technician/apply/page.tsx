@@ -223,7 +223,7 @@ export default function HvacApplyPage() {
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Enroll &amp; Pay</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Apply Now</h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">HVAC Technician Program — 20 Weeks, 6 Credentials</p>
           </div>
         </div>

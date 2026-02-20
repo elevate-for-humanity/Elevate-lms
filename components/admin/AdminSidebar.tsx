@@ -94,6 +94,7 @@ const NAV: NavSection[] = [
       { name: 'Completions', href: '/admin/completions' },
       { name: 'Signatures', href: '/admin/signatures' },
       { name: 'License', href: '/admin/license' },
+      { name: 'Proctor Portal', href: '/proctor' },
     ],
   },
   {

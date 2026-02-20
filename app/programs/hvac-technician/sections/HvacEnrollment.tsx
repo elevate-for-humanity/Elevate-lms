@@ -46,8 +46,8 @@ export function HvacEnrollment() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[380px] rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="/images/programs-hq/students-learning.jpg"
-                alt="Students in workforce training program"
+                src="/images/heroes-hq/funding-hero.jpg"
+                alt="Workforce funding and tuition assistance resources"
                 fill className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />

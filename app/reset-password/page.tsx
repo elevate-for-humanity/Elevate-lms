@@ -21,13 +21,13 @@ export default function ResetPasswordPage() {
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/update-password`,
+        redirectTo: `${window.location.origin}/auth/callback?next=/update-password`,
       });
 
       if (error) throw error;
       setSuccess(true);
     } catch (err: any) {
-      setError('An error occurred');
+      setError(err?.message || 'Unable to send reset link. Please try again or contact support.');
     } finally {
       setLoading(false);
     }

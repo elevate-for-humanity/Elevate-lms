@@ -1,54 +1,22 @@
-import Link from 'next/link';
 import Image from 'next/image';
-import { Award, Clock, BookOpen, DollarSign, ArrowRight } from 'lucide-react';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
-import PageAvatar from '@/components/PageAvatar';
 import { QUICK_STATS } from '../barber-program-data';
 
 export function BarberHero() {
   return (
     <>
-      {/* Avatar Guide Video */}
+      {/* Hero Video Banner */}
       <ProgramHeroBanner videoSrc="/videos/barber-hero-final.mp4" />
 
-      {/* Hero */}
+      {/* Hero Image — no text overlay */}
       <section className="relative h-[55vh] min-h-[400px]">
         <Image
-          src="/images/barber-hero-new.jpg"
-          alt="Barber Apprenticeship training program"
+          src="/images/barber-hero-new.webp"
+          alt="Barber apprentice cutting hair in a licensed barbershop"
           fill sizes="100vw"
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
-          <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
-              <Award className="w-4 h-4" /> Earn While You Learn &middot; Licensure Pathway
-            </div>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-              Barber Apprenticeship
-            </h1>
-            <p className="text-xl text-white/90 max-w-2xl mb-6">
-              A competency-based 2,000-hour apprenticeship program with licensed shop training, structured RTI, and a pathway toward Indiana barber licensure.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/apply?program=barber-apprenticeship" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
-                Apply Now <ArrowRight className="w-5 h-5" />
-              </Link>
-              <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
-                Register at Indiana Career Connect
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Program Overview Video */}
-      <section className="py-8 bg-white">
-        <div className="max-w-3xl mx-auto px-4">
-          <PageAvatar videoSrc="/videos/avatars/barber-guide.mp4" title="Barber Apprenticeship Program Overview" />
-        </div>
       </section>
 
       {/* Quick Stats */}

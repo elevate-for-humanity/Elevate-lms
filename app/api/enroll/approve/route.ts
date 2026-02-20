@@ -270,7 +270,7 @@ export async function POST(req: NextRequest) {
       logger.warn('Failed to write audit log (non-critical)', err);
     }
 
-    // STEP 5: Notify student of approval (using notification outbox)
+    // STEP 5: Notify student of approval
     try {
       // In-app notification
       await supabase.from('notifications').insert({
@@ -289,15 +289,40 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (studentProfile?.email) {
-        await notifyApprenticeDecision(
-          studentProfile.email,
-          studentProfile.full_name || 'Student',
-          true, // approved
-          enrollment_id
-        );
-        logger.info('Student notification enqueued', {
-          userId: enrollment.user_id,
-        });
+        // Try outbox pattern first
+        try {
+          await notifyApprenticeDecision(
+            studentProfile.email,
+            studentProfile.full_name || 'Student',
+            true, // approved
+            enrollment_id
+          );
+          logger.info('Student notification enqueued via outbox', {
+            userId: enrollment.user_id,
+          });
+        } catch (outboxErr: any) {
+          // Outbox failed (missing admin client, RPC, or table) — send directly
+          logger.warn('Outbox enqueue failed, sending direct email', outboxErr);
+          const { sendWelcomeEmail } = await import('@/lib/email/resend');
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+
+          // Get program name for the email
+          const { data: program } = await supabase
+            .from('programs')
+            .select('name')
+            .eq('id', enrollment.program_id)
+            .single();
+
+          await sendWelcomeEmail({
+            email: studentProfile.email,
+            name: studentProfile.full_name || 'Student',
+            programName: program?.name || 'Your Program',
+            dashboardUrl: `${siteUrl}/learner/dashboard`,
+          });
+          logger.info('Student approval email sent directly via Resend', {
+            userId: enrollment.user_id,
+          });
+        }
       }
     } catch (err: any) {
       logger.warn(
@@ -372,13 +397,9 @@ export async function POST(req: NextRequest) {
       message: 'Enrollment approved and activated successfully',
     });
   } catch (err: any) {
-    logger.error('Enrollment approval err', err);
+    logger.error('Enrollment approval error', err);
     return NextResponse.json(
-      {
-        err:
-          ('Internal server error') ||
-          'Internal server err',
-      },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

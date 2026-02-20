@@ -138,7 +138,7 @@ export default function HVACActivationPage() {
     }
   };
 
-  const StatusIcon = ({ status }: { status: StepStatus['status'] }) => {
+  const statusIcon = (status: StepStatus['status']) => {
     switch (status) {
       case 'running':
         return <Loader2 className="w-5 h-5 text-brand-blue-600 animate-spin" />;
@@ -167,7 +167,7 @@ export default function HVACActivationPage() {
           <div className="bg-white rounded-lg border p-6">
             <div className="flex items-start gap-4">
               <div className="mt-1">
-                <StatusIcon status={sqlStep.status} />
+                {statusIcon(sqlStep.status)}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
@@ -203,7 +203,7 @@ export default function HVACActivationPage() {
           <div className="bg-white rounded-lg border p-6">
             <div className="flex items-start gap-4">
               <div className="mt-1">
-                <StatusIcon status={syncStep.status} />
+                {statusIcon(syncStep.status)}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
@@ -239,7 +239,7 @@ export default function HVACActivationPage() {
           <div className="bg-white rounded-lg border p-6">
             <div className="flex items-start gap-4">
               <div className="mt-1">
-                <StatusIcon status={videoStep.status} />
+                {statusIcon(videoStep.status)}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
@@ -276,7 +276,7 @@ export default function HVACActivationPage() {
           <div className="bg-white rounded-lg border p-6">
             <div className="flex items-start gap-4">
               <div className="mt-1">
-                <StatusIcon status={statusStep.status} />
+                {statusIcon(statusStep.status)}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">

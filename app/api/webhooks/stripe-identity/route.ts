@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       signature,
       process.env.STRIPE_IDENTITY_WEBHOOK_SECRET!
     );
-  } catch (error) { }
+  } catch { /* non-fatal */ }
 
   // Idempotency check
   if (supabase) {

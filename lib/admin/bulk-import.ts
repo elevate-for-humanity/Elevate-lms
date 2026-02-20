@@ -290,8 +290,7 @@ export async function importUsers(
         email: user.email,
         field: 'system',
         message:
-          ('Operation failed') ||
-          'Unknown error',
+          'Operation failed',
       });
     }
   }

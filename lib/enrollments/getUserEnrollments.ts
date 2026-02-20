@@ -57,7 +57,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
   if (enrollments) {
     // Fetch programs separately if program_ids exist
     const programIds = enrollments.map(e => e.program_id).filter(Boolean);
-    let programMap: Record<string, any> = {};
+    const programMap: Record<string, any> = {};
     if (programIds.length > 0) {
       const { data: programs } = await supabase
         .from('programs')

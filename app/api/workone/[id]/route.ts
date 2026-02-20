@@ -93,8 +93,7 @@ export async function PATCH(
     return NextResponse.json(
       {
         err:
-          ('Internal server error') ||
-          'Internal server err',
+          'Internal server error',
       },
       { status: 500 }
     );

@@ -72,10 +72,10 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
     setStudentSort(prev => ({ key, dir: prev.key === key && prev.dir === 'asc' ? 'desc' : 'asc' }));
   }
 
-  function SortIcon({ col }: { col: SortKey }) {
+  const sortIcon = (col: SortKey) => {
     if (studentSort.key !== col) return <ChevronDown className="w-3 h-3 text-gray-300" />;
     return studentSort.dir === 'asc' ? <ChevronUp className="w-3 h-3 text-brand-blue-600" /> : <ChevronDown className="w-3 h-3 text-brand-blue-600" />;
-  }
+  };
 
   const stats = [
     { label:'Students', value:c.students, icon:Users, href:'/admin/students', color:'#2563eb', bg:'bg-blue-50', bd:'border-blue-200', sub:`${certRate}% cert rate` },
@@ -262,13 +262,13 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-5 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none" onClick={() => toggleSort('full_name')}>
-                      <span className="flex items-center gap-1">Student <SortIcon col="full_name" /></span>
+                      <span className="flex items-center gap-1">Student {sortIcon("full_name")}</span>
                     </th>
                     <th className="px-5 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none" onClick={() => toggleSort('enrollment_status')}>
-                      <span className="flex items-center gap-1">Status <SortIcon col="enrollment_status" /></span>
+                      <span className="flex items-center gap-1">Status {sortIcon("enrollment_status")}</span>
                     </th>
                     <th className="px-5 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none" onClick={() => toggleSort('created_at')}>
-                      <span className="flex items-center gap-1">Registered <SortIcon col="created_at" /></span>
+                      <span className="flex items-center gap-1">Registered {sortIcon("created_at")}</span>
                     </th>
                   </tr>
                 </thead>

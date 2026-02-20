@@ -147,8 +147,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error:
-          ('Internal server error') ||
-          'Failed to complete course',
+          'Internal server error',
       },
       { status: 500 }
     );

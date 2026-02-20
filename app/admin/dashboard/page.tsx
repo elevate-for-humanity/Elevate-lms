@@ -105,7 +105,7 @@ async function getDashboardData(supabase: any) {
       const { data } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).single();
       profile = data;
     }
-  } catch {}
+  } catch { /* non-fatal */ }
 
   return {
     counts: {

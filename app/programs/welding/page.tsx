@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -133,63 +134,9 @@ export default function WeldingProgramPage() {
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="relative bg-brand-red-800 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
-        
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32">
-          <div className="max-w-2xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <FundingBadge type="funded" />
-              
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mt-6 mb-6 leading-tight">
-                Become a Certified
-                <span className="text-brand-red-400"> Welder</span>
-              </h1>
-              
-              <p className="text-xl text-brand-red-100 mb-8 leading-relaxed">
-                Master the art and science of welding. Learn MIG, TIG, Stick, and Flux-Core welding from industry professionals. 
-                Earn AWS certifications and join a trade with <strong className="text-white">unlimited earning potential.</strong>
-              </p>
-
-              <div className="flex flex-wrap gap-4 mb-10">
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <Clock className="w-4 h-4 text-brand-red-400" />
-                  12-16 Weeks
-                </span>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <DollarSign className="w-4 h-4 text-brand-green-400" />
-                  $0 with WIOA Funding
-                </span>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <TrendingUp className="w-4 h-4 text-yellow-400" />
-                  $54K+ Starting Salary
-                </span>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/apply?program=welding"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white0 hover:bg-brand-red-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-brand-red-500/30"
-                >
-                  Check Your Eligibility
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Link>
-                <Link
-                  href="#curriculum"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-semibold rounded-full transition-all"
-                >
-                  <Play className="w-5 h-5 mr-2" />
-                  View Curriculum
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-        </div>
+      {/* Hero Image — no text overlay */}
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+        <Image src="/images/trades/welding-hero.jpg" alt="Welding training program" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Stats */}

@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
           </html>
         `
       });
-    } catch (error) { }
+    } catch { /* non-fatal */ }
 
     return NextResponse.json({
       success: true,

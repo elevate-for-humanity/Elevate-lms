@@ -69,7 +69,7 @@ export async function POST(req: Request) {
           `,
         }),
       });
-    } catch (error) { }
+    } catch { /* non-fatal */ }
 
     return NextResponse.json({ success: true, onboarding: data });
   } catch (error) { 

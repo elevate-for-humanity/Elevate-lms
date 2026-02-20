@@ -32,6 +32,9 @@ async function resolveCourseId(supabase: any, programInterest: string): Promise<
     'entrepreneurship': 'entrepreneurship small business',
     'phlebotomy': 'phlebotomy technician',
     'barber apprenticeship': 'barber',
+    'hvac technician': 'hvac technician',
+    'hvac': 'hvac technician',
+    'hvac tech': 'hvac technician',
   };
   const { data: courses } = await supabase.from('courses').select('id, title');
   if (!courses?.length) return null;
@@ -129,13 +132,22 @@ async function autoApprove(
     // Resolve course ID for tracking (but don't enroll yet)
     const courseId = await resolveCourseId(supabase, programInterest);
 
+    // Resolve program ID from programs table (used by enrollment system)
+    const slug = programInterest.toLowerCase().replace(/\s+/g, '-').trim();
+    const { data: programRow } = await supabase
+      .from('programs')
+      .select('id')
+      .eq('slug', slug)
+      .maybeSingle();
+    const programId = programRow?.id || courseId || null;
+
     // Update application to approved — ready for onboarding
     await supabase
       .from('applications')
       .update({
         status: 'approved',
         user_id: userId,
-        program_id: courseId || null,
+        program_id: programId,
       })
       .eq('id', applicationId);
 
@@ -147,7 +159,7 @@ async function autoApprove(
         .from('program_enrollments')
         .insert({
           user_id: userId,
-          program_id: courseId || null,
+          program_id: programId,
           email: normalizedEmail,
           full_name: `${firstName} ${lastName}`,
           amount_paid_cents: 0,

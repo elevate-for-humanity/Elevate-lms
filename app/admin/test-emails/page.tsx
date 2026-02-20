@@ -39,8 +39,7 @@ export default function TestEmailsPage() {
       setResult({
         success: false,
         message:
-          ('Operation failed') ||
-          'Failed to send test email',
+          'Operation failed',
       });
     } finally {
       setLoading(false);

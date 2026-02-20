@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
           </p>
         `,
       });
-    } catch (error) { }
+    } catch { /* non-fatal */ }
 
     // Send notification to admin
     try {
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
           </p>
         `,
       });
-    } catch (error) { }
+    } catch { /* non-fatal */ }
 
     return NextResponse.json({
       success: true,

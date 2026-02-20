@@ -157,14 +157,12 @@ export async function autoEnrollPartnerCourse(
       provider_id: payload.partnerId,
       course_id: payload.courseId,
       program_id: payload.programId ?? null,
-      error_message:
-        ('Operation failed') ?? 'Unknown error',
+      error_message: 'Operation failed',
     });
 
     return {
       success: false,
-      error:
-        ('Operation failed') ?? 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }

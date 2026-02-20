@@ -187,6 +187,35 @@ export async function POST(
       .update({ enrollment_status: "active" })
       .eq("id", userId);
 
+    // 7) Send approval notification email
+    try {
+      if (email) {
+        const { sendWelcomeEmail } = await import('@/lib/email/resend');
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+
+        // Get program name if enrolled
+        let programName = 'Your Program';
+        if (program_id) {
+          const { data: program } = await supabaseAdmin
+            .from('programs')
+            .select('name')
+            .eq('id', program_id)
+            .single();
+          if (program?.name) programName = program.name;
+        }
+
+        await sendWelcomeEmail({
+          email,
+          name: `${app.first_name || ''} ${app.last_name || ''}`.trim() || 'Student',
+          programName,
+          dashboardUrl: `${siteUrl}/learner/dashboard`,
+        });
+        logger.info('Approval email sent', { userId, email });
+      }
+    } catch (emailErr) {
+      logger.warn('Failed to send approval email (non-critical)', emailErr);
+    }
+
     return NextResponse.json({
       message: program_id
         ? "Application approved, user created, and enrolled"

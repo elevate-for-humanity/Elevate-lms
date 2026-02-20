@@ -79,36 +79,9 @@ const courses = (dbRows as any[]) || [];
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="relative h-[50vh] min-h-[400px]">
-        <Image 
-          src="/images/healthcare/program-cpr-certification.jpg" 
-          alt="CPR First Aid Training" 
-          fill sizes="100vw"
-          className="object-cover" 
-          priority 
-        />
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
-          <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
-              <Heart className="w-4 h-4" /> HSI Certified Training
-            </div>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-              CPR & First Aid
-            </h1>
-            <p className="text-xl text-white/90 max-w-xl mb-6">
-              Get certified in one day. Learn life-saving skills that could help you save a coworker, family member, or stranger.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/inquiry?program=cpr-first-aid-hsi" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
-                Schedule a Class <ArrowRight className="w-5 h-5" />
-              </Link>
-              <a href="/support" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
-                <Phone className="w-5 h-5" /> Get Help Online
-              </a>
-            </div>
-          </div>
-        </div>
+      {/* Hero Image — no text overlay */}
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+        <Image src="/images/healthcare/program-cpr-certification.jpg" alt="CPR First Aid Training" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Avatar Guide */}

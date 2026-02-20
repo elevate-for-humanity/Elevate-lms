@@ -86,8 +86,7 @@ export async function enrollInExternalModule(
       success: false,
       mode: 'link',
       error:
-        ('Operation failed') ||
-        'Enrollment failed',
+        'Operation failed',
     };
   }
 }

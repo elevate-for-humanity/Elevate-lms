@@ -1,7 +1,5 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-// useToken is not a React hook - it's a server-side token validation function
-// eslint-disable-next-line react-hooks/rules-of-hooks
 import { useToken } from '@/lib/notifications';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 // AUTH: Intentionally public — no authentication required

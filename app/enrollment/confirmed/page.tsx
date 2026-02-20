@@ -20,6 +20,7 @@ function EnrollmentConfirmedContent() {
   const searchParams = useSearchParams();
   const [enrollment, setEnrollment] = useState<EnrollmentData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
     async function fetchEnrollment() {
@@ -95,7 +96,6 @@ function EnrollmentConfirmedContent() {
   if (!enrollment) return null;
 
   const isApproved = enrollment.enrollment_state === 'approved';
-  const [confirming, setConfirming] = useState(false);
 
   async function handleConfirm() {
     setConfirming(true);

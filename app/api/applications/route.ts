@@ -126,6 +126,80 @@ export async function POST(req: Request) {
       );
     }
 
+    // Auto-approve: create auth user, profile, and enrollment record
+    let userId: string | null = null;
+    try {
+      // Check if user already exists
+      const { data: existingUsers } = await supabase.auth.admin.listUsers({ perPage: 1 });
+      const existingUser = existingUsers?.users?.find(
+        (u: any) => u.email?.toLowerCase() === body.email.toLowerCase()
+      );
+
+      if (existingUser) {
+        userId = existingUser.id;
+      } else {
+        // Create auth user with random password (student sets it via reset flow)
+        const tempPassword = `Elv-${crypto.randomUUID().slice(0, 16)}!`;
+        const { data: newUser, error: createErr } = await supabase.auth.admin.createUser({
+          email: body.email,
+          password: tempPassword,
+          email_confirm: true,
+          user_metadata: {
+            full_name: `${body.firstName} ${body.lastName}`,
+            role: 'student',
+          },
+        });
+        if (!createErr && newUser?.user) {
+          userId = newUser.user.id;
+        } else {
+          logger.warn('Auto-approve: could not create user', { email: body.email, error: createErr });
+        }
+      }
+
+      if (userId) {
+        // Upsert profile
+        await supabase.from('profiles').upsert({
+          id: userId,
+          email: body.email,
+          full_name: `${body.firstName} ${body.lastName}`,
+          phone: body.phone,
+          role: 'student',
+          enrollment_status: 'active',
+        }, { onConflict: 'id' });
+
+        // Resolve program ID
+        const { data: programRow } = await supabase
+          .from('programs')
+          .select('id')
+          .eq('slug', body.programSlug || 'barber-apprenticeship')
+          .maybeSingle();
+
+        // Create enrollment record
+        await supabase.from('program_enrollments').insert({
+          user_id: userId,
+          program_id: programRow?.id || null,
+          email: body.email,
+          full_name: `${body.firstName} ${body.lastName}`,
+          amount_paid_cents: 0,
+          funding_source: body.fundingType || 'self-pay',
+          status: 'pending',
+          enrollment_state: 'approved',
+          next_required_action: 'COMPLETE_PAYMENT',
+        });
+
+        // Update application with user_id and approved status
+        await supabase
+          .from('applications')
+          .update({ status: 'approved', user_id: userId, program_id: programRow?.id || null })
+          .eq('id', data.id);
+
+        logger.info('Barber application auto-approved', { userId, applicationId: data.id });
+      }
+    } catch (autoApproveErr) {
+      // Non-fatal — application is saved, payment can proceed
+      logger.warn('Auto-approve failed (non-fatal)', autoApproveErr);
+    }
+
     // Send email notifications
     try {
       // Send confirmation email to applicant

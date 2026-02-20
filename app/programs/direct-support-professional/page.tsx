@@ -60,18 +60,10 @@ export default async function Page() {
           { label: 'Direct Support Professional' },
         ]}
       />
-      <CompactHero
-        variant="default"
-        badge={{
-          icon: Heart,
-          text: 'Healthcare Career',
-          href: '/programs/healthcare',
-        }}
-        headline="Direct Support Professional: Make a difference in people's lives"
-        description="Funded DSP training. Help individuals with disabilities live independently and participate fully in their communities. 4-6 weeks, job placement included."
-        primaryCTA={{ text: 'Start Eligibility & Choose This Program', href: '/apply?program=direct-support-professional' }}
-        secondaryCTA={{ text: 'Questions? Contact Us', href: 'tel:support center' }}
-      />
+      {/* Hero Image — no text overlay */}
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+        <Image src="/images/programs-hq/healthcare-hero.jpg" alt="Direct Support Professional training" fill sizes="100vw" className="object-cover" priority />
+      </section>
 
       {/* Funding Badge */}
       <section className="bg-gray-50 border-b">

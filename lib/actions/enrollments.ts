@@ -201,8 +201,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
     return {
       success: false,
       error:
-        ('Operation failed') ||
-        'Failed to create enrollment',
+        'Operation failed',
     };
   }
 }
@@ -259,8 +258,7 @@ export async function addTransferHours(input: AddTransferHoursInput) {
     return {
       success: false,
       error:
-        ('Operation failed') ||
-        'Failed to add transfer hours',
+        'Operation failed',
     };
   }
 }
@@ -370,8 +368,7 @@ export async function approveTransferHours(input: ApproveTransferHoursInput) {
     return {
       success: false,
       error:
-        ('Operation failed') ||
-        'Failed to approve transfer hours',
+        'Operation failed',
     };
   }
 }
@@ -405,8 +402,7 @@ export async function rejectTransferHours(
     return {
       success: false,
       error:
-        ('Operation failed') ||
-        'Failed to reject transfer hours',
+        'Operation failed',
     };
   }
 }
@@ -453,8 +449,7 @@ export async function updateFundingAmounts(input: UpdateFundingAmountsInput) {
     return {
       success: false,
       error:
-        ('Operation failed') ||
-        'Failed to update funding amounts',
+        'Operation failed',
     };
   }
 }
@@ -531,8 +526,7 @@ export async function getEnrollmentDetails(enrollment_id: string) {
     return {
       success: false,
       error:
-        ('Operation failed') ||
-        'Failed to fetch enrollment details',
+        'Operation failed',
     };
   }
 }

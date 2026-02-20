@@ -88,8 +88,7 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         error:
-          ('Internal server error') ||
-          'Internal server err',
+          'Internal server error',
       },
       { status: 500 }
     );

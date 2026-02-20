@@ -136,10 +136,7 @@ Preferred Contact: ${form.preferredContact}`,
         );
       }
     } catch (err: any) {
-      setErrorMessage(
-        ('Operation failed') ||
-          "We're having a temporary issue submitting this form. Please call support center or use the Quick Inquiry form while we fix this."
-      );
+      setErrorMessage('Operation failed');
     } finally {
       setSubmitting(false);
     }

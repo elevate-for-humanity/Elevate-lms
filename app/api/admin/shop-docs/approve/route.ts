@@ -87,6 +87,35 @@ export async function POST(req: Request) {
             completed_at: new Date().toISOString(),
           })
           .eq('shop_id', doc.shop_id);
+
+        // Notify shop owner that all docs are approved and onboarding is complete
+        try {
+          const { data: shop } = await supabase
+            .from('host_shops')
+            .select('owner_id, name')
+            .eq('id', doc.shop_id)
+            .single();
+
+          if (shop?.owner_id) {
+            const { data: ownerProfile } = await supabase
+              .from('profiles')
+              .select('email, full_name')
+              .eq('id', shop.owner_id)
+              .single();
+
+            if (ownerProfile?.email) {
+              const { notifyHostShopDecision } = await import('@/lib/notifications');
+              await notifyHostShopDecision(
+                ownerProfile.email,
+                shop.name || 'Your Shop',
+                true,
+                doc.shop_id
+              );
+            }
+          }
+        } catch (notifyErr) {
+          // Non-fatal
+        }
       }
     }
 

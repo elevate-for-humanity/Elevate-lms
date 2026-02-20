@@ -97,8 +97,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         err:
-          ('Internal server error') ||
-          'Failed to create organization',
+          'Internal server error',
       },
       { status: 500 }
     );

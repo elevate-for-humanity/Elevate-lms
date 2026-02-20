@@ -122,8 +122,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error:
-          ('Internal server error') ||
-          'Failed to send emails',
+          'Internal server error',
       },
       { status: 500 }
     );

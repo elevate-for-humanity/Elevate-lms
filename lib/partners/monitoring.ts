@@ -54,8 +54,7 @@ class PartnerMonitoring {
       if (error) {
         metrics.lastError = {
           message:
-            ('Operation failed') ||
-            'Unknown error',
+            'Operation failed',
           timestamp: new Date().toISOString(),
           statusCode: error.statusCode,
         };

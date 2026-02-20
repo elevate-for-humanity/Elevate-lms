@@ -370,7 +370,7 @@ export default function LessonPage() {
                   if (score >= (lesson.passing_score || 70)) {
                     markComplete();
                   }
-                } catch {}
+                } catch { /* non-fatal */ }
               }}
               passingScore={lesson.passing_score || 70}
             />

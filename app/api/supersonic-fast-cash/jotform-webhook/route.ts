@@ -288,7 +288,7 @@ export async function POST(request: NextRequest) {
           </p>
         `,
       });
-    } catch (error) { }
+    } catch { /* non-fatal */ }
 
     // Return success
     return NextResponse.json({

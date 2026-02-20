@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     if (error) {
       logger.error('Supabase error:', error);
       return NextResponse.json(
-        { error: 'Failed to fetch products', details: 'Internal server error' || 'Database error' },
+        { error: 'Failed to fetch products', details: 'Internal server error' },
         { status: 500 }
       );
     }

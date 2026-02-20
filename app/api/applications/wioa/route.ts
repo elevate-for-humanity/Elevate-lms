@@ -152,7 +152,7 @@ export async function POST(req: Request) {
           `,
         }),
       });
-    } catch (error) { }
+    } catch { /* non-fatal */ }
 
     // Send notification to admin
     try {
@@ -179,7 +179,7 @@ export async function POST(req: Request) {
           `,
         }),
       });
-    } catch (error) { }
+    } catch { /* non-fatal */ }
 
     return NextResponse.json(
       {
@@ -193,8 +193,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         error:
-          ('Internal server error') ||
-          'Internal server err',
+          'Internal server error',
       },
       { status: 500 }
     );

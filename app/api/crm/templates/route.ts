@@ -28,8 +28,7 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         error:
-          ('Internal server error') ||
-          'Failed to fetch templates',
+          'Internal server error',
       },
       { status: 500 }
     );

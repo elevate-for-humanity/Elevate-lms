@@ -64,8 +64,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error:
-          ('Internal server error') ||
-          'Failed to start course progress',
+          'Internal server error',
       },
       { status: 500 }
     );

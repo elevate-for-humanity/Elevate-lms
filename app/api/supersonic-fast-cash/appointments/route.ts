@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
           ${needsRefundAdvance ? `<p><strong>Refund Advance:</strong> ${refundAdvanceAmount}</p>` : ''}
         `,
       });
-    } catch (error) { }
+    } catch { /* non-fatal */ }
 
     return NextResponse.json({
       success: true,

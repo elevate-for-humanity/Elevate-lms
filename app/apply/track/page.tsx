@@ -120,8 +120,7 @@ export default function TrackApplicationPage() {
       setApplication(data);
     } catch (err: any) {
       setError(
-        ('Operation failed') ||
-          'An error occurred while tracking your application'
+        'Operation failed'
       );
     } finally {
       setLoading(false);

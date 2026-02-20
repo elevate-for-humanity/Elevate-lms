@@ -104,7 +104,7 @@ export async function purchaseMiladyCourse(
 
     return {
       success: false,
-      error: 'Operation failed' || 'Failed to purchase Milady course',
+      error: 'Operation failed',
     };
   }
 }

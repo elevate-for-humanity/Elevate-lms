@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -133,13 +134,9 @@ export default function MedicalAssistantProgramPage() {
         </div>
       </div>
 
-      {/* Hero */}
-      {/* Hero */}
-      <section className="bg-slate-900 py-16">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Become a Certified <span className="text-rose-300"> Medical Assistant</span></h1>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto">Launch your healthcare career helping patients and supporting physicians. Learn clinical and administrative skills for one of the <strong className="text-white">fastest-growing healthcare roles.</strong></p>
-        </div>
+      {/* Hero Image — no text overlay */}
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+        <Image src="/images/programs-hq/medical-assistant.jpg" alt="Medical Assistant training" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Stats */}

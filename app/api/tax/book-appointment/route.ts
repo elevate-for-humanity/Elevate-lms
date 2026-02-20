@@ -129,7 +129,7 @@ export async function POST(req: Request) {
           </ul>
         `,
       });
-    } catch (error) { }
+    } catch { /* non-fatal */ }
 
     return NextResponse.json({
       success: true,

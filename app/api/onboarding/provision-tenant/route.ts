@@ -161,8 +161,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         err:
-          ('Internal server error') ||
-          'Failed to provision tenant',
+          'Internal server error',
       },
       { status: 500 }
     );

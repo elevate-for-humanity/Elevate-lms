@@ -49,41 +49,9 @@ export default async function TaxEntrepreneurshipPage() {
           { label: 'Tax Entrepreneurship' },
         ]}
       />
-      {/* Hero */}
-      <section className="bg-white text-white py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="px-4 py-2 bg-white0 text-white text-sm font-bold rounded-full">
-              Free with funding
-            </span>
-            <span className="px-4 py-2 bg-white0 text-white text-sm font-bold rounded-full">
-              Online / Hybrid
-            </span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            Tax Preparation & Entrepreneurship
-          </h1>
-          <p className="text-xl text-black mb-8 max-w-3xl">
-            Tax preparation certification and small business development
-            training
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link
-              href="/apply?program=tax-prep-financial-services"
-              className="px-8 py-4 bg-brand-orange-600 hover:bg-brand-orange-600 text-white font-bold rounded-lg transition-all text-center"
-            >
-              Apply Now
-            </Link>
-            <Link
-              href="/contact"
-              className="px-8 py-4 bg-white hover:bg-gray-100 text-brand-blue-900 font-bold rounded-lg transition-all text-center"
-            >
-              Get Free Info
-            </Link>
-          </div>
-        </div>
+      {/* Hero Image — no text overlay */}
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+        <Image src="/images/programs-hq/tax-preparation.jpg" alt="Tax Preparation and Entrepreneurship training" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Avatar Guide */}

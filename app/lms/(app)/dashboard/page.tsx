@@ -15,6 +15,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
 import { getStudentState } from '@/lib/orchestration/state-machine';
 import {
   StateAwareDashboard,
@@ -493,6 +494,9 @@ export default async function StudentDashboardOrchestrated() {
 
           {/* Sidebar - 1/3 width */}
           <div className="space-y-6">
+            {/* WorkOne Visit Checklist */}
+            <WorkOneChecklistSection />
+
             {/* Progress Indicator */}
             <ProgressIndicator steps={progressSteps} />
 

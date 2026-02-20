@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { AuthorityStrip, CredentialPipeline } from '@/components/InstitutionalAuthority';
+import CohortWaitlist from '@/components/programs/CohortWaitlist';
 
 export interface CurriculumModule {
   week: string;
@@ -256,6 +257,11 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
           <Link href={`/contact?subject=${encodeURIComponent(data.name + ' Brochure Request')}`} className="text-brand-blue-600 underline hover:text-brand-blue-800">Request Brochure</Link>
           <Link href="/contact" className="text-brand-blue-600 underline hover:text-brand-blue-800">Contact Program Director</Link>
         </div>
+      </section>
+
+      {/* Waitlist */}
+      <section className="max-w-5xl mx-auto px-4 py-12">
+        <CohortWaitlist programSlug={data.slug} programName={data.name} />
       </section>
 
       {/* CTA */}

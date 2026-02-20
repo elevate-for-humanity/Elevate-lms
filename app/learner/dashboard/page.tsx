@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
 import {
   Clock,
   Play,
@@ -397,6 +398,9 @@ export default async function LearnerDashboardPage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* WorkOne Checklist */}
+            <WorkOneChecklistSection />
+
             {/* Achievements */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200">
               <div className="p-6 border-b border-gray-200">

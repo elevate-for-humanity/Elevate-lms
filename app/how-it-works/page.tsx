@@ -62,7 +62,7 @@ export default function HowItWorksPage() {
               <div key={item.step} className="flex flex-col sm:flex-row gap-0 sm:gap-5 rounded-xl overflow-hidden border border-slate-200 bg-white">
                 <div className="relative w-full h-[180px] sm:w-64 sm:h-auto sm:min-h-[200px] flex-shrink-0">
                   <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
-                  <div className="absolute top-3 left-3 w-9 h-9 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow">{item.step}</div>
+                  
                 </div>
                 <div className="p-5 flex-1">
                   <h3 className="font-bold text-slate-900 text-base sm:text-lg mb-2">{item.title}</h3>
@@ -89,7 +89,7 @@ export default function HowItWorksPage() {
       <section className="py-8 sm:py-14 bg-brand-blue-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Ready to Begin?</h2>
-          <p className="text-white mb-6 text-sm">Start with step 1 — register at Indiana Career Connect.</p>
+          <p className="text-white mb-6 text-sm">Register at Indiana Career Connect to get started.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
               className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">

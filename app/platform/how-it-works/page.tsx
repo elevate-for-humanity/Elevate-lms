@@ -1,11 +1,9 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Play, CreditCard, Rocket, Settings, BarChart3 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'How the Platform Works | Elevate for Humanity',
   description:
@@ -63,9 +61,7 @@ const steps = [
   },
 ];
 
-export default async function PlatformHowItWorksPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('system_settings').select('*').limit(50);
+export default function PlatformHowItWorksPage() {
 
   return (
     <div className="min-h-screen bg-white">

@@ -1,19 +1,15 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { FileText, Download, ChevronRight, UserPlus, Layout, Accessibility, MessageSquare, HelpCircle, Settings } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Onboarding and User Experience Standards | Elevate For Humanity',
   description: 'User onboarding flows, accessibility standards, support channels, and UX guidelines for the platform.',
 };
 
-export default async function OnboardingUXPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+export default function OnboardingUXPage() {
 
   return (
     <div className="min-h-screen bg-white">

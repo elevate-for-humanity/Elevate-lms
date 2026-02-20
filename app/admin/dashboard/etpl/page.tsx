@@ -9,7 +9,6 @@ import {
   getWotcMetrics,
 } from '@/lib/metrics';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import {
   Users,
   DollarSign,
@@ -26,8 +25,6 @@ export const metadata = {
 };
 
 export default async function EtplDashboard() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
 
   const etpl = await getEtplMetrics();
   const funding = await getFundingMetrics();

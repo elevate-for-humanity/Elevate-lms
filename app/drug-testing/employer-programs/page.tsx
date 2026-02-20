@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Phone, ArrowLeft, Building2, Users, Shield, Clock, BarChart3, CheckCircle, } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Employer Drug Testing Programs | Drug Testing Services',
   description: 'Comprehensive drug testing programs for employers. Pre-employment, random, post-accident testing with volume discounts.',
@@ -96,9 +94,7 @@ const volumePricing = [
   { volume: '100+ tests/month', discount: 'Custom pricing' },
 ];
 
-export default async function EmployerProgramsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('drug_tests').select('*').limit(50);
+export default function EmployerProgramsPage() {
 
   return (
     <div className="min-h-screen bg-white">

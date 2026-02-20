@@ -1,19 +1,15 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { FileText, Download, ChevronRight, Scale, FileCheck, AlertCircle, Globe, Building, Users } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Compliance and Disclosure Framework | Elevate For Humanity',
   description: 'Regulatory compliance, required disclosures, and legal framework for Elevate For Humanity platform operations.',
 };
 
-export default async function ComplianceFrameworkPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+export default function ComplianceFrameworkPage() {
 
   return (
     <div className="min-h-screen bg-white">

@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,7 +5,6 @@ import Link from 'next/link';
 import { ArrowLeft, Search, XCircle, Code, Zap } from 'lucide-react';
 import { QuickSummary } from '@/app/governance/_content/QuickSummary';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'SEO & Indexing Governance | Supersonic Fast Cash',
   description: 'How search engine indexing is controlled and enforced to protect platform credibility.',
@@ -63,9 +61,7 @@ const summaryBullets = [
   'Supersonic governance pages canonical back to Elevate for SEO authority',
 ];
 
-export default async function SupersonicSeoIndexingPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+export default function SupersonicSeoIndexingPage() {
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',

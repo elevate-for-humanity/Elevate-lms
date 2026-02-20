@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/server';
 import {
   Zap,
   Video,
@@ -102,9 +100,7 @@ const capabilities = [
   },
 ];
 
-export default async function AIStudioPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+export default function AIStudioPage() {
 
   return (
     <div className="bg-white">

@@ -1,9 +1,7 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Admissions Policy | Elevate for Humanity',
   description: 'Requirements, procedures, and guidelines for program enrollment and admission to Elevate for Humanity training programs.',
@@ -12,9 +10,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function AdmissionsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+export default function AdmissionsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

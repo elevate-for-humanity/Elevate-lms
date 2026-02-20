@@ -1,16 +1,12 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Participation Agreement | Elevate for Humanity',
 };
 
-export default async function ParticipationAgreementPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+export default function ParticipationAgreementPage() {
 
   return (
     <div className="min-h-screen bg-white">

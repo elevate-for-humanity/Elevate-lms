@@ -93,9 +93,9 @@ const programs = (dbRows as any[]) || [];
                     >
                       Learn More <ArrowRight className="w-4 h-4" />
                     </Link>
-                    <button className="px-6 py-3 border border-brand-blue-600 text-brand-blue-600 rounded-lg hover:bg-brand-blue-50 transition">
+                    <Link href="/apply" className="px-6 py-3 border border-brand-blue-600 text-brand-blue-600 rounded-lg hover:bg-brand-blue-50 transition">
                       Apply Now
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>

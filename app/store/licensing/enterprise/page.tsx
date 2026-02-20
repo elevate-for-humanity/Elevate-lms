@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -7,7 +6,6 @@ import Image from 'next/image';
 import { Info, Check, X, Building2, Shield, ArrowRight } from 'lucide-react';
 import { LicenseDemo } from '@/components/store/LicenseDemo';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Enterprise Source-Use License | Elevate for Humanity',
   description: 'Enterprise internal deployment license. Source code access for internal use.',
@@ -16,9 +14,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function SourceUseLicensePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+export default function SourceUseLicensePage() {
 
   return (
     <div className="min-h-screen bg-white">

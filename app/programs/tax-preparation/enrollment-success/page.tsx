@@ -2,8 +2,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { CheckCircle, BookOpen, ExternalLink } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title:
@@ -12,9 +10,7 @@ export const metadata: Metadata = {
     'Your enrollment in the Tax Preparation & Financial Services program is confirmed.',
 };
 
-export default async function EnrollmentSuccessPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+export default function EnrollmentSuccessPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-brand-green-50 to-white">

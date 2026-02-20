@@ -1,19 +1,15 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { FileText, Download, ChevronRight, Calculator, DollarSign, Shield, AlertTriangle, Users } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Tax Preparation and Refund Advance Operations | Elevate For Humanity',
   description: 'Supersonic Fast Cash tax preparation services, refund advance loans, IRS compliance, and operational procedures.',
 };
 
-export default async function TaxOperationsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+export default function TaxOperationsPage() {
 
   return (
     <div className="min-h-screen bg-white">

@@ -1,19 +1,15 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowLeft, ArrowRight, Clock, Calendar, Award } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Apply for Sanitation & Infection Control Apprenticeship | Elevate for Humanity',
   description: 'Apply for the 2Exclusive Sanitation & Infection Control Apprenticeship. 32-week program with paid OJT.',
 };
 
-export default async function ApplyPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+export default function ApplyPage() {
 
   return (
     <main className="min-h-screen bg-white">

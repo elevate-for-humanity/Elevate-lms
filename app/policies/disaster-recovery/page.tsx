@@ -1,11 +1,9 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Shield, Database, Clock } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Disaster Recovery Policy | Elevate for Humanity',
   description: 'Disaster recovery procedures and business continuity practices for the Elevate platform.',
@@ -14,9 +12,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function DisasterRecoveryPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+export default function DisasterRecoveryPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

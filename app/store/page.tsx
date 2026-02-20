@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -7,16 +6,13 @@ import { ArrowRight, Zap, Users, FileCheck, Building2, GraduationCap, BarChart3,
 import StoreDemoVideo from './StoreDemoVideo';
 import StoreFAQ from './StoreFAQ';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'License the Elevate Platform | White-Label Workforce LMS',
   description: 'License a turnkey workforce development platform. Automated enrollment, WIOA compliance, credential tracking, employer matching, and reporting.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/store' },
 };
 
-export default async function StorePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+export default function StorePage() {
 
   return (
     <div className="bg-white min-h-screen">

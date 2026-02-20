@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -6,16 +5,13 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowLeft, FileText, User, DollarSign, Calendar, Save, Mail, Phone } from 'lucide-react';
 import { createTaxApplication } from '../actions';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'New Tax Filing Application | Admin',
   description: 'Create a new tax filing assistance application.',
   robots: { index: false, follow: false },
 };
 
-export default async function NewTaxFilingApplicationPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_applications').select('*').limit(50);
+export default function NewTaxFilingApplicationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

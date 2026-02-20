@@ -1,19 +1,15 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, User, Building, FileText, Calendar } from 'lucide-react';
 import { createWOTCApplication } from '../actions';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'New WOTC Application | Admin',
   description: 'Submit a new Work Opportunity Tax Credit application.',
 };
 
-export default async function NewWOTCPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('wotc_applications').select('*').limit(50);
+export default function NewWOTCPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -1,11 +1,9 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { Phone, GraduationCap, Award, Users } from 'lucide-react';
 
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Drug Testing Training Courses | Elevate for Humanity',
   description:
@@ -133,9 +131,7 @@ const trainingCourses = {
   ],
 };
 
-export default async function DrugTestingTrainingPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('drug_tests').select('*').limit(50);
+export default function DrugTestingTrainingPage() {
 
   return (
     <div className="min-h-screen bg-white">

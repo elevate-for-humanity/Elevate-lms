@@ -1,18 +1,14 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import PublicLandingPage from '@/components/marketing/PublicLandingPage';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'LMS Licensing & Sales | Elevate for Humanity',
   description: 'License the Elevate LMS platform for your training organization. White-label workforce training technology.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/sales' },
 };
 
-export default async function SalesPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('partners').select('*').limit(50);
+export default function SalesPage() {
 
   return (
     <PublicLandingPage config={{

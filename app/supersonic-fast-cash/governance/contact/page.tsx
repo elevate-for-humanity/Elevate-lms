@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,7 +5,6 @@ import Link from 'next/link';
 import { ArrowLeft, Mail, Building2, Shield, Scale, FileText, Zap } from 'lucide-react';
 import { QuickSummary } from '@/app/governance/_content/QuickSummary';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Governance Contact | Supersonic Fast Cash',
   description: 'Contact information for governance, compliance, and diligence inquiries for Supersonic Fast Cash.',
@@ -57,9 +55,7 @@ const summaryBullets = [
   'Response times vary by inquiry type (1-5 business days)',
 ];
 
-export default async function SupersonicGovernanceContactPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+export default function SupersonicGovernanceContactPage() {
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',

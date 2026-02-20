@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Shield, Scale, Users, Accessibility, FileText, ArrowRight, Phone, Mail } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Federal Compliance Policy | Elevate for Humanity',
   description: 'Our commitment to compliance with FERPA, Title IX, ADA, WIOA, and other federal regulations.',
@@ -15,9 +13,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function FederalCompliancePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+export default function FederalCompliancePage() {
 
   return (
     <div className="min-h-screen bg-white">

@@ -1,11 +1,9 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import ProductReviews from '@/components/store/ProductReviews';
 import ProductRecommendations from '@/components/store/ProductRecommendations';
-import { createClient } from '@/lib/supabase/server';
 import {
   Users,
   MessageSquare,
@@ -79,9 +77,7 @@ const useCases = [
   },
 ];
 
-export default async function CommunityHubPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+export default function CommunityHubPage() {
 
   return (
     <div className="min-h-screen bg-white">

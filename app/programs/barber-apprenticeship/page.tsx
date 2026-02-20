@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -9,7 +8,6 @@ import { BarberCredentials } from './sections/BarberCredentials';
 import { BarberPartnership } from './sections/BarberPartnership';
 import { BarberEnrollment } from './sections/BarberEnrollment';
 
-import { createClient } from '@/lib/supabase/server';
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
@@ -44,9 +42,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function BarberApprenticeshipPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+export default function BarberApprenticeshipPage() {
 
   return (
     <>

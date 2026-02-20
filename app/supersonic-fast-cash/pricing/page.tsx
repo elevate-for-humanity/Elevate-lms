@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Phone, ArrowRight, HelpCircle } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata = {
   title: 'Pricing | Supersonic Fast Cash',
   description:
@@ -61,9 +59,7 @@ const taxPrepPlans = [
   },
 ];
 
-export default async function PricingPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

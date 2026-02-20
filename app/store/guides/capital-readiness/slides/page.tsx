@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Download, Presentation } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Capital Readiness Slide Deck | Elevate Store',
   description: 'Presentation slides for the Elevate Capital Readiness Framework.',
@@ -103,9 +101,7 @@ const slides = [
   },
 ];
 
-export default async function CapitalReadinessSlidesPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+export default function CapitalReadinessSlidesPage() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">

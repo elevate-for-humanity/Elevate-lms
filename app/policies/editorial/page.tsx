@@ -1,9 +1,7 @@
-export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Editorial Policy | Elevate for Humanity',
   description: 'Standards for published content, editorial review processes, and content quality guidelines.',
@@ -12,9 +10,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function EditorialPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+export default function EditorialPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

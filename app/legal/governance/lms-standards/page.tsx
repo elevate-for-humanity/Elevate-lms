@@ -1,19 +1,15 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { FileText, Download, ChevronRight, BookOpen, Award, Users, Clock, Settings } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'LMS Governance and Course Standards | Elevate For Humanity',
   description: 'Course creation standards, instructor requirements, certification policies, and learning management governance.',
 };
 
-export default async function LMSStandardsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+export default function LMSStandardsPage() {
 
   return (
     <div className="min-h-screen bg-white">

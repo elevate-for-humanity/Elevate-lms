@@ -1,11 +1,9 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Check, Play, ShoppingCart, Star, Search, Bell, FileText, DollarSign, Calendar, Users } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Grants Discovery & Management App | Elevate Store',
   description: 'Find and manage federal, state, and foundation grants. AI-powered grant matching, application tracking, deadline alerts, and compliance reporting.',
@@ -45,9 +43,7 @@ const pricing = [
   { name: 'Agency', price: 499, period: '/month', features: ['Everything in Organization', 'Multi-department Access', 'API Integration', 'Dedicated Success Manager', 'Unlimited Team Members', 'White-label Reports', 'Compliance Automation'] },
 ];
 
-export default async function GrantsAppPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+export default function GrantsAppPage() {
 
   return (
     <div className="min-h-screen bg-white">

@@ -1,19 +1,15 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, DollarSign, Calendar, Link as LinkIcon, Tag } from 'lucide-react';
 import { createGrantOpportunity } from '../actions';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Add Grant Opportunity | Admin',
   description: 'Add a new grant funding opportunity.',
 };
 
-export default async function NewGrantPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('grants').select('*').limit(50);
+export default function NewGrantPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

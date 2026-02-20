@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -7,7 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Award, Briefcase } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/docs/ENV_CONFIG.md',
@@ -17,9 +15,7 @@ export const metadata: Metadata = {
     'Environment configuration documentation for developers.',
 };
 
-export default async function ENVCONFIGmdPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('documentation').select('*').limit(50);
+export default function ENVCONFIGmdPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/legal',
@@ -14,9 +12,7 @@ export const metadata: Metadata = {
     'Legal documents, agreements, and policies for Elevate For Humanity.',
 };
 
-export default async function LegalPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+export default function LegalPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

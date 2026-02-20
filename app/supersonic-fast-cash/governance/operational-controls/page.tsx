@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,7 +5,6 @@ import Link from 'next/link';
 import { ArrowLeft, Settings, BookOpen, ShoppingCart, Code, Shield, Zap } from 'lucide-react';
 import { QuickSummary } from '@/app/governance/_content/QuickSummary';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Operational Controls | Governance | Supersonic Fast Cash',
   description: 'How quality, integrity, and risk controls are enforced across the platform.',
@@ -57,9 +55,7 @@ const summaryBullets = [
   'Change management requires explicit review for sensitive changes',
 ];
 
-export default async function SupersonicOperationalControlsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+export default function SupersonicOperationalControlsPage() {
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',

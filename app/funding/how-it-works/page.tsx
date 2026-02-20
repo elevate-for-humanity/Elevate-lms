@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -6,7 +5,6 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DollarSign, FileCheck, GraduationCap, HelpCircle } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/how-it-works' },
   title: 'How Funding Works | Elevate For Humanity',
@@ -27,9 +25,7 @@ const FUNDING_SOURCES = [
   { name: 'Justice Reinvestment Initiative (JRI)', desc: 'Funding for justice-involved individuals re-entering the workforce. Covers training, certifications, and supportive services.', href: '/funding/jri' },
 ];
 
-export default async function FundingHowItWorksPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('funding_sources').select('*').limit(50);
+export default function FundingHowItWorksPage() {
 
   return (
     <div className="min-h-screen bg-white">

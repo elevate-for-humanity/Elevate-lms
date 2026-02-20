@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -13,7 +12,6 @@ import {
 CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Managed Platform | Elevate Workforce OS',
   description:
@@ -70,9 +68,7 @@ const pricingTiers = [
   },
 ];
 
-export default async function ManagedPlatformPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('system_settings').select('*').limit(50);
+export default function ManagedPlatformPage() {
 
   return (
     <div className="min-h-screen bg-white">

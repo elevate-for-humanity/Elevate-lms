@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -6,7 +5,6 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'JRI — Job-Ready Incentive Funding | Elevate for Humanity',
   description:
@@ -29,9 +27,7 @@ const coveredItems = [
   'Background check fees (where applicable)',
 ];
 
-export default async function JRIFundingPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('funding_sources').select('*').limit(50);
+export default function JRIFundingPage() {
 
   return (
     <div className="min-h-screen bg-white">

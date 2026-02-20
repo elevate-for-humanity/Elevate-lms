@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,16 +5,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Users, Circle, ArrowRight, Briefcase, MessageSquare, Globe } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Networking Mentorship | Elevate for Humanity',
   description: 'Build your professional network with mentor guidance. Learn networking strategies and make valuable connections.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/mentorship/networking' },
 };
 
-export default async function NetworkingPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('mentors').select('*').limit(50);
+export default function NetworkingPage() {
 
   return (
     <div className="bg-white">

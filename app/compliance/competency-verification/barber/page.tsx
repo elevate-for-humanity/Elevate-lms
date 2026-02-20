@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -20,7 +19,6 @@ import { PrintButton } from './PrintButton';
 import { BARBER_SECTIONS, BARBER_STATS } from './barber-rubric-data';
 import type { RubricSection, RubricItem } from './barber-rubric-data';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Barber Apprenticeship Competency Rubric | Compliance | Elevate for Humanity',
   description:
@@ -125,9 +123,7 @@ function SectionBlock({ section }: { section: RubricSection }) {
   );
 }
 
-export default async function BarberCompetencyRubricPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('compliance_records').select('*').limit(50);
+export default function BarberCompetencyRubricPage() {
 
   return (
     <div className="bg-white min-h-screen print:bg-white">

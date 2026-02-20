@@ -1,9 +1,7 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Content Policy | Elevate for Humanity',
   description: 'Guidelines for user-generated content, intellectual property rights, and content standards on our platforms.',
@@ -12,9 +10,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function ContentPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+export default function ContentPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

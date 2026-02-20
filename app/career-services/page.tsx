@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -10,16 +9,13 @@ import VirtualCareerFair from '@/components/VirtualCareerFair';
 import { StudentSuccessCoaching } from '@/components/StudentSuccessCoaching';
 import WorkOneLocator from '@/components/WorkOneLocator';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/career-services' },
   title: 'Career Services | Elevate For Humanity',
   description: 'Resume building, interview prep, job fairs, and direct employer connections. We help you get hired after training.',
 };
 
-export default async function CareerServicesPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('career_services').select('*').limit(50);
+export default function CareerServicesPage() {
 
   return (
     <div className="min-h-screen bg-white">

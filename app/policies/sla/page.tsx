@@ -1,11 +1,9 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Clock, Shield, AlertTriangle, CreditCard } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Service Level Agreement | Elevate for Humanity',
   description: 'Platform availability targets, service commitments, and service credit policy.',
@@ -14,9 +12,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function SLAPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+export default function SLAPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

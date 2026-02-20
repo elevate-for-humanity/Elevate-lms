@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -16,7 +15,6 @@ CheckCircle, } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
 import EmployerPartners from '@/components/EmployerPartners';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'For Employers | Elevate for Humanity',
   description:
@@ -40,9 +38,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function EmployersPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('employers').select('*').limit(50);
+export default function EmployersPage() {
 
   return (
     <div className="min-h-screen bg-white">

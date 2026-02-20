@@ -1,9 +1,7 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
 import { 
   Shield, Clock, Trash2, Lock, FileText, 
   Database, Eye, AlertTriangle 
@@ -37,9 +35,7 @@ function PolicySection({
   );
 }
 
-export default async function DataGovernancePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('governance_documents').select('*').limit(50);
+export default function DataGovernancePage() {
 
   return (
     <div className="min-h-screen bg-slate-50">

@@ -1,11 +1,9 @@
 
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
 import {
   ArrowRight, Code, Layout, Database,
   Globe, GitBranch, Palette, Server, Smartphone,
@@ -60,9 +58,7 @@ const projectPortfolio = [
   'Collaborative team project (capstone)',
 ];
 
-export default async function WebDevelopmentPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+export default function WebDevelopmentPage() {
 
   return (
     <main className="min-h-screen bg-white">

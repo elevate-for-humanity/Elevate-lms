@@ -1,18 +1,14 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Mail, Clock, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Application Submitted | Partner Shop | Elevate for Humanity',
 };
 
-export default async function PartnerOnboardingSuccessPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('partners').select('*').limit(50);
+export default function PartnerOnboardingSuccessPage() {
 
   return (
     <div className="min-h-screen bg-slate-800">

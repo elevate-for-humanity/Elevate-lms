@@ -1,44 +1,27 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function ApplyHeroVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-
-    const playVideo = async () => {
-      try {
-        video.muted = true;
-        video.playsInline = true;
-        await video.play();
-      } catch {
-        // Autoplay blocked — native poster stays visible
-      }
+    const play = async () => {
+      try { await video.play(); setIsPlaying(true); } catch { /* poster visible */ }
     };
-
-    video.addEventListener('canplay', playVideo, { once: true });
-    playVideo();
-
-    const handleInteraction = () => playVideo();
-    document.addEventListener('click', handleInteraction, { once: true });
-    document.addEventListener('touchstart', handleInteraction, { once: true });
-    document.addEventListener('scroll', handleInteraction, { once: true });
-
-    return () => {
-      video.removeEventListener('canplay', playVideo);
-      document.removeEventListener('click', handleInteraction);
-      document.removeEventListener('touchstart', handleInteraction);
-      document.removeEventListener('scroll', handleInteraction);
-    };
+    if (video.readyState >= 2) play();
+    else video.addEventListener('canplay', play, { once: true });
+    return () => video.removeEventListener('canplay', play);
   }, []);
 
+  // hero-home-fast.mp4 has no audio track — no sound controls needed
   return (
     <video
       ref={videoRef}
-      className="absolute inset-0 w-full h-full object-cover"
+      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
       poster="/hero-images/programs-hero.jpg"
       loop
       muted

@@ -1,9 +1,7 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { 
   DollarSign, 
   Clock, 
@@ -22,9 +20,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function CashAdvancePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+export default function CashAdvancePage() {
 
   return (
     <div className="min-h-screen bg-white">

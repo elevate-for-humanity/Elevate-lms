@@ -1,9 +1,7 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import {
   Shield,
   ArrowRight,
@@ -73,9 +71,7 @@ const faqs = [
   },
 ];
 
-export default async function AuditProtectionPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+export default function AuditProtectionPage() {
 
   return (
     <div className="min-h-screen bg-white">

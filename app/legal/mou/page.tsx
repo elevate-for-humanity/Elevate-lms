@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Memorandum of Understanding | Elevate For Humanity',
   description:
@@ -14,9 +12,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function MOUPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+export default function MOUPage() {
 
   return (
     <div className="min-h-screen bg-white py-12">

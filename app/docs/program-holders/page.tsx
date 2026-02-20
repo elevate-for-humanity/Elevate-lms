@@ -1,11 +1,9 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Program Holder Documentation | Elevate For Humanity',
   description: 'Guide for program holders and training providers.',
@@ -18,9 +16,7 @@ const sections = [
   { title: 'Reporting', href: '/docs/program-holders/reporting' },
 ];
 
-export default async function ProgramHoldersDocsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('documentation').select('*').limit(50);
+export default function ProgramHoldersDocsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

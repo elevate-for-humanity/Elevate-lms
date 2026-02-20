@@ -1,11 +1,9 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Calendar, Database, Clock, Shield } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Disaster Recovery Test Report | Elevate for Humanity',
   description: 'Documentation of disaster recovery drill execution and results.',
@@ -14,9 +12,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function DRTestReportPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+export default function DRTestReportPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

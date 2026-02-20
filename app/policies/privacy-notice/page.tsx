@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Privacy Notice | Elevate for Humanity',
   description: 'Privacy notice for Elevate for Humanity learners, partners, and visitors. Learn how we collect, use, protect, and share your personal information.',
@@ -14,9 +12,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function PrivacyNoticePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+export default function PrivacyNoticePage() {
 
   return (
     <div className="min-h-screen bg-white">

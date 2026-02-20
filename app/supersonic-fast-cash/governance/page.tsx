@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -9,7 +8,6 @@ import {
 } from 'lucide-react';
 import { QuickSummary } from '@/app/governance/_content/QuickSummary';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Governance | Supersonic Fast Cash',
   description: 'Platform governance, authoritative documents, and operational controls for Supersonic Fast Cash tax preparation and refund advance services.',
@@ -76,9 +74,7 @@ const summaryBullets = [
   'No separate governance policies exist for Supersonic services',
 ];
 
-export default async function SupersonicGovernancePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+export default function SupersonicGovernancePage() {
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',

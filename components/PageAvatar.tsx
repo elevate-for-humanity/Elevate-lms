@@ -35,17 +35,25 @@ export default function PageAvatar({ videoSrc, title, position = 'default', loop
     return () => observer.disconnect();
   }, []);
 
-  // Auto-play when visible, pause when not
+  // Auto-play when visible, pause when not. Unmute on visibility since user scrolled.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
     if (isVisible) {
-      video.play().then(() => setIsPlaying(true)).catch(() => {});
+      video.play().then(() => {
+        setIsPlaying(true);
+        // Unmute automatically — the scroll that triggered visibility is a user gesture
+        if (video.muted && !hasInteracted) {
+          video.muted = false;
+          setIsMuted(false);
+          setHasInteracted(true);
+        }
+      }).catch(() => {});
     } else if (!video.paused) {
       video.pause();
       setIsPlaying(false);
     }
-  }, [isVisible]);
+  }, [isVisible, hasInteracted]);
 
   const togglePlay = useCallback(() => {
     const video = videoRef.current;

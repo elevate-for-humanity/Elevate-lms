@@ -1,9 +1,7 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Copyright Policy | Elevate for Humanity',
   description: 'Protection of intellectual property, fair use guidelines, and DMCA compliance procedures.',
@@ -12,9 +10,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function CopyrightPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+export default function CopyrightPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

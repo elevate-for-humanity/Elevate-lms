@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -6,7 +5,6 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { MapPin } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/state-programs' },
   title: 'Indiana State Funding Programs | Elevate For Humanity',
@@ -44,9 +42,7 @@ const PROGRAMS = [
   },
 ];
 
-export default async function StateProgramsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('funding_sources').select('*').limit(50);
+export default function StateProgramsPage() {
 
   return (
     <div className="min-h-screen bg-white">

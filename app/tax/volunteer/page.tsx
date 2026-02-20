@@ -1,19 +1,15 @@
-export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
 import { Heart, Users, BookOpen, Award } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata = {
   title: 'Volunteer with VITA | Free Tax Preparation',
   description: 'Become a VITA volunteer and help your community with free tax preparation.',
 };
 
-export default async function VolunteerPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+export default function VolunteerPage() {
 
   return (
     <div className="min-h-screen bg-white">

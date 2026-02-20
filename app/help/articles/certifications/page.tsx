@@ -1,19 +1,15 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Award, FileText, Download } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Certifications Help | Elevate For Humanity',
   description: 'Learn about certifications, how to earn them, and how to access your certificates.',
 };
 
-export default async function CertificationsHelpPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('help_articles').select('*').limit(50);
+export default function CertificationsHelpPage() {
 
   const faqs = [
     {

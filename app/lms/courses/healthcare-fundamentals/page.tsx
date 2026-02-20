@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -16,7 +15,6 @@ import {
 CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Healthcare Fundamentals Course | LMS | Elevate For Humanity',
   description:
@@ -26,9 +24,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function HealthcareFundamentalsCoursePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('courses').select('*').limit(50);
+export default function HealthcareFundamentalsCoursePage() {
 
   const courseFeatures = [
     {

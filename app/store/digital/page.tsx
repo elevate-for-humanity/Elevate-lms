@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -10,7 +9,6 @@ import {
 } from 'lucide-react';
 import { DIGITAL_PRODUCTS } from '@/lib/store/digital-products';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Digital Resources | Elevate Store',
   description: 'AI tools, toolkits, guides, templates, and courses for training providers. SAM.gov assistant, grants navigator, AI studio, and more.',
@@ -19,9 +17,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function StoreDigitalPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+export default function StoreDigitalPage() {
 
   const aiTools = DIGITAL_PRODUCTS.filter((p) => 
     p.id.includes('ai-') || p.id.includes('sam-gov') || p.id.includes('grants')

@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Phone, ArrowRight, Clock, MapPin, Shield, Beaker, Truck, Building2, Users } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Drug Testing Services | Elevate for Humanity',
   description:
@@ -82,9 +80,7 @@ const features = [
   },
 ];
 
-export default async function DrugTestingLandingPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('drug_tests').select('*').limit(50);
+export default function DrugTestingLandingPage() {
 
   return (
     <div className="min-h-screen bg-white">

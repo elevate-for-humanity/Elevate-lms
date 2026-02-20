@@ -1,18 +1,14 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import PublicLandingPage from '@/components/marketing/PublicLandingPage';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Reentry Partnership | Elevate for Humanity',
   description: 'Partner with Elevate for Humanity on reentry workforce programs. JRI-funded training for justice-involved individuals returning to the workforce.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/reentry' },
 };
 
-export default async function ReentryPartnerPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('partners').select('*').limit(50);
+export default function ReentryPartnerPage() {
 
   return (
     <PublicLandingPage config={{

@@ -1,19 +1,15 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { FileText, Download, ChevronRight, ShoppingCart, CreditCard, FileCheck, RefreshCw, Shield, Users } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Store, Payments, and Licensing Framework | Elevate For Humanity',
   description: 'E-commerce operations, payment processing, digital product licensing, and refund policies.',
 };
 
-export default async function StorePaymentsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+export default function StorePaymentsPage() {
 
   return (
     <div className="min-h-screen bg-white">

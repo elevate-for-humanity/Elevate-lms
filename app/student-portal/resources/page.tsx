@@ -1,18 +1,14 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Resources | Student Portal',
   description: 'Access academic resources, library, and study materials.',
   robots: { index: false, follow: false },
 };
 
-export default async function StudentPortalResourcesPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('enrollments').select('*').limit(50);
+export default function StudentPortalResourcesPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
 import { 
   FileText, Upload, Calculator, Clock, 
   DollarSign, Shield, Phone, ArrowRight, Zap,
@@ -93,9 +91,7 @@ const features = [
   },
 ];
 
-export default async function HowItWorksPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+export default function HowItWorksPage() {
 
   return (
     <div className="min-h-screen bg-white">

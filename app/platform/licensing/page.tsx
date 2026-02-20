@@ -1,8 +1,6 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import {
   ArrowRight, Shield, Building2, Users, FileCheck, Clock,
   Server, Globe, Lock, BarChart3, CheckCircle, Zap,
@@ -15,9 +13,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/platform/licensing' },
 };
 
-export default async function LicensingPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('system_settings').select('*').limit(50);
+export default function LicensingPage() {
 
   return (
     <div className="min-h-screen bg-white">

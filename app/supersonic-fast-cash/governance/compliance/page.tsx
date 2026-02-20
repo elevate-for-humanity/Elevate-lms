@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -7,7 +6,6 @@ import { ArrowLeft, Scale, AlertTriangle, Zap } from 'lucide-react';
 import { QuickSummary } from '@/app/governance/_content/QuickSummary';
 import { SupersonicScopeSection } from '@/app/governance/_content/SupersonicScopeSection';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Compliance & Disclosure Framework | Supersonic Fast Cash',
   description: 'How legal, financial, and eligibility disclosures are presented for Supersonic Fast Cash tax preparation and refund advance services.',
@@ -28,9 +26,7 @@ const summaryBullets = [
   'Quarterly compliance audits ensure ongoing alignment',
 ];
 
-export default async function SupersonicCompliancePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+export default function SupersonicCompliancePage() {
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',

@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -34,7 +33,6 @@ import AnnouncementsFeed from './AnnouncementsFeed';
 import EnrollmentDashboard from './EnrollmentDashboard';
 import StudentProgressWidget from './StudentProgressWidget';
 
-import { createClient } from '@/lib/supabase/server';
 export const revalidate = 3600; // Revalidate every hour
 
 export const metadata: Metadata = {
@@ -47,9 +45,7 @@ export const metadata: Metadata = {
   keywords: ['student portal', 'student dashboard', 'course access', 'grades', 'schedule', 'career services', 'student resources'],
 };
 
-export default async function StudentPortalPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('enrollments').select('*').limit(50);
+export default function StudentPortalPage() {
 
   const quickLinks = [
     {

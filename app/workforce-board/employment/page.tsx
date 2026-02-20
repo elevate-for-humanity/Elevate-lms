@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Briefcase, TrendingUp, Users, MapPin, FileCheck, Handshake } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/workforce-board/employment' },
   title: 'Employment Services | Workforce Board | Elevate For Humanity',
@@ -22,9 +20,7 @@ const SERVICES = [
   { title: 'Local Job Boards', desc: 'Curated job listings from verified employers in the Indianapolis metro area and across Indiana.', icon: MapPin },
 ];
 
-export default async function EmploymentPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+export default function EmploymentPage() {
 
   return (
     <div className="min-h-screen bg-white">

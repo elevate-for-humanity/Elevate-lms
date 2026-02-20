@@ -1,17 +1,13 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Licensing Architecture v1 | Elevate for Humanity',
   description: 'Enterprise licensing system architecture documentation',
 };
 
-export default async function LicensingArchitecturePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('documentation').select('*').limit(50);
+export default function LicensingArchitecturePage() {
 
   return (
     <div className="min-h-screen bg-white">

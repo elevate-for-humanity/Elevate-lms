@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Phone, Mail } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Order Confirmed | Drug Testing Services',
   description: 'Your drug testing order has been confirmed.',
@@ -13,9 +11,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function DrugTestingSuccessPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('drug_tests').select('*').limit(50);
+export default function DrugTestingSuccessPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">

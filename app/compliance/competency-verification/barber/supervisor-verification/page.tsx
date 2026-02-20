@@ -1,20 +1,16 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PrintButton } from '../PrintButton';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Supervisor Verification Form — Barber Apprenticeship | Elevate for Humanity',
   description: 'Licensed barber supervisor verification form. Documents shop license, supervisor license, and training authority for apprenticeship compliance.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/compliance/competency-verification/barber/supervisor-verification' },
 };
 
-export default async function SupervisorVerificationPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('compliance_records').select('*').limit(50);
+export default function SupervisorVerificationPage() {
 
   return (
     <div className="bg-white min-h-screen print:bg-white print:text-[11px]">

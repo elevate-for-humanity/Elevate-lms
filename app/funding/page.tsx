@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -6,13 +5,12 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding' },
-  title: 'Funding & Financial Aid | Elevate For Humanity',
+  title: 'Workforce Funding | Elevate For Humanity',
   description: 'Explore funding options for your career training — WIOA, WRG, JRI, payment plans, and more. Many students qualify for funded training.',
   openGraph: {
-    title: 'Funding & Financial Aid | Elevate for Humanity',
+    title: 'Workforce Funding | Elevate for Humanity',
     description: 'WIOA, WRG, JRI, payment plans, and more. Many students qualify for funded career training.',
     url: 'https://www.elevateforhumanity.org/funding',
     siteName: 'Elevate for Humanity',
@@ -21,30 +19,28 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Funding & Financial Aid | Elevate for Humanity',
+    title: 'Workforce Funding | Elevate for Humanity',
     description: 'WIOA, WRG, JRI, payment plans, and more. Many students qualify for funded career training.',
     images: ['/images/heroes-hq/funding-hero.jpg'],
   },
 };
 
-export default async function FundingPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('funding_sources').select('*').limit(50);
+export default function FundingPage() {
 
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Funding & Financial Aid' }]} />
+          <Breadcrumbs items={[{ label: 'Workforce Funding' }]} />
         </div>
       </div>
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/heroes/hero-federal-funding.jpg" alt="Funding and financial aid" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/heroes-hq/funding-hero.jpg" alt="Workforce funding options" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Funding & Financial Aid</h1>
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Workforce Funding</h1>
             <p className="text-sm sm:text-lg text-white/90 max-w-xl">
               Multiple funding options are available to help cover your training costs. Many students qualify for state and federal programs that pay for tuition, books, and certifications.
             </p>

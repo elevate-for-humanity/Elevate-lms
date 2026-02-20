@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -15,7 +14,6 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Resume Building - Create a Winning Resume | Elevate for Humanity',
   description:
@@ -25,9 +23,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function ResumeBuildingPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('career_services').select('*').limit(50);
+export default function ResumeBuildingPage() {
 
   const resumeSections = [
     {

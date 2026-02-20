@@ -1,9 +1,7 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Verification Policy | Elevate for Humanity',
   description: 'Identity and eligibility verification procedures for students, credentials, and employment.',
@@ -12,9 +10,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function VerificationPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+export default function VerificationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

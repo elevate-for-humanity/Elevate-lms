@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Building2, Shield, Users, BarChart3 } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/training-provider' },
   title: 'Training Provider Partnership | Elevate For Humanity',
@@ -21,9 +19,7 @@ const REQUIREMENTS = [
   'Capacity to serve WIOA-eligible and funded students',
 ];
 
-export default async function TrainingProviderPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('partners').select('*').limit(50);
+export default function TrainingProviderPage() {
 
   return (
     <div className="min-h-screen bg-white">

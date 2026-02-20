@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
 import {
   BarChart, TrendingUp, Users, FileText, ArrowRight,
   PieChart, Activity, Target, Download,
@@ -49,9 +47,7 @@ const reportTypes = [
   { title: 'Demographic Analysis', description: 'Participation and outcomes by age, race, gender, and barriers.' },
 ];
 
-export default async function WorkforceAnalyticsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('system_settings').select('*').limit(50);
+export default function WorkforceAnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-white">

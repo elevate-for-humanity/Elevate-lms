@@ -1,9 +1,7 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { BookOpen, Users, GraduationCap, Building, Code, FileText, ArrowRight,
   Phone
 } from 'lucide-react';
@@ -25,9 +23,7 @@ const docCategories = [
   { icon: BookOpen, title: 'LMS Features', description: 'Complete guide to platform features', href: '/docs/lms' },
 ];
 
-export default async function DocsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('documentation').select('*').limit(50);
+export default function DocsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

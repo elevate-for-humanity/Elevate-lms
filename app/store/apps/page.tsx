@@ -1,11 +1,9 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Star, ShoppingCart, Building2, DollarSign, Layout } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Apps & Tools | Elevate Store',
   description: 'Discover apps and tools for workforce development, government contracting, grant management, and training provider websites.',
@@ -62,9 +60,7 @@ const colorClasses = {
   blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600', badge: 'bg-brand-blue-600' },
 };
 
-export default async function AppsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+export default function AppsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

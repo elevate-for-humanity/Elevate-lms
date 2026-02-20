@@ -1,9 +1,7 @@
-export const dynamic = 'force-dynamic';
 
 import type { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import {
   Circle,
   DollarSign,
@@ -37,9 +35,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function ServicesPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+export default function ServicesPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">

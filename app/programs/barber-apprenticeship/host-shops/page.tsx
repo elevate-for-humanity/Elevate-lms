@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -6,7 +5,6 @@ import Image from 'next/image';
 import { Shield, Users, Award, Building2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Become a Host Barbershop | Barber Apprenticeship | Elevate for Humanity',
   description: 'Partner with Elevate for Humanity as a host barbershop for our USDOL Registered Barber Apprenticeship program. Train the next generation of barbers.',
@@ -15,9 +13,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function HostShopsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+export default function HostShopsPage() {
 
   return (
     <main className="bg-white">

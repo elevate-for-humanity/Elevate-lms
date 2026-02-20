@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { ArrowRight, Mail, Phone, Calendar, CheckCircle, KeyRound, UserCheck, FileText, BookOpen } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Application Submitted | Elevate for Humanity',
   description: 'Your application has been successfully submitted.',
@@ -99,9 +98,6 @@ export default async function ApplicationSuccessPage({
 }: {
   searchParams: Promise<{ role?: string; ref?: string }>;
 }) {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('applications').select('*').limit(50);
-
   const params = await searchParams;
   const role = params.role || 'student';
   const referenceNumber = params.ref || null;

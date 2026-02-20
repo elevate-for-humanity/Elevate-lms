@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Phone, ArrowLeft, Clock, Beaker } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Urine Drug Tests | Drug Testing Services',
   description: 'Lab-based urine drug testing. 5-panel, 10-panel, DOT, and expanded opiate tests. Results in 24-48 hours.',
@@ -108,9 +106,7 @@ const urineTests = [
   },
 ];
 
-export default async function UrineTestsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('drug_tests').select('*').limit(50);
+export default function UrineTestsPage() {
 
   return (
     <div className="min-h-screen bg-white">

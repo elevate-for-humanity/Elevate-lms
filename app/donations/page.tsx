@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -6,16 +5,13 @@ import Image from 'next/image';
 import { Heart, DollarSign, Users, Award } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Donate | Elevate for Humanity',
   description: 'Support workforce development and help transform lives. Your donation helps provide training, certifications, and career opportunities.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/donations' },
 };
 
-export default async function DonationsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('donations').select('*').limit(50);
+export default function DonationsPage() {
 
   const impactStats = [
     { number: '20+', label: 'Training Programs' },

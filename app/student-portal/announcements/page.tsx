@@ -1,18 +1,14 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import AnnouncementsList from './AnnouncementsList';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Announcements | Student Portal | Elevate For Humanity',
   description: 'View all announcements and updates for students.',
 };
 
-export default async function AnnouncementsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('enrollments').select('*').limit(50);
+export default function AnnouncementsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

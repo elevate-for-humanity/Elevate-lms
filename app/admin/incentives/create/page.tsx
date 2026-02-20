@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -6,16 +5,13 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowLeft, Gift, DollarSign, Calendar, Building, Save } from 'lucide-react';
 import { createIncentive } from '../actions';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Create Incentive | Admin',
   description: 'Create a new employer incentive or tax credit.',
   robots: { index: false, follow: false },
 };
 
-export default async function CreateIncentivePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('employer_incentives').select('*').limit(50);
+export default function CreateIncentivePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

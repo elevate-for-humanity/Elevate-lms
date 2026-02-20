@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
 import {
   GraduationCap, DollarSign, Users, BarChart, ArrowRight,
   Shield, Globe,
@@ -47,9 +45,7 @@ const stats = [
   { value: '$2.4M', label: 'Funding Processed' },
 ];
 
-export default async function TrainingProvidersPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('system_settings').select('*').limit(50);
+export default function TrainingProvidersPage() {
 
   return (
     <div className="min-h-screen bg-white">

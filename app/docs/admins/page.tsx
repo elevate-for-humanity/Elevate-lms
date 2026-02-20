@@ -1,11 +1,9 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Admin Documentation | Elevate For Humanity',
   description: 'Documentation and guides for administrators.',
@@ -19,9 +17,7 @@ const sections = [
   { title: 'System Settings', href: '/docs/admins/settings' },
 ];
 
-export default async function AdminDocsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('documentation').select('*').limit(50);
+export default function AdminDocsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 
 import type { Metadata } from 'next';
 import { STATES } from '@/config/states';
 import { StateTaxPreparationPage } from '@/components/templates';
 
-import { createClient } from '@/lib/supabase/server';
 const state = STATES.illinois;
 
 export const metadata: Metadata = {
@@ -20,9 +18,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function Page() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+export default function Page() {
 
   return <StateTaxPreparationPage state={state} />;
 }

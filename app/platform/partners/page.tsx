@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import Link from "next/link";
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -7,7 +6,6 @@ import Image from "next/image";
 import { Building, Briefcase, Award } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Partners | Elevate Workforce OS',
   description: 'Training providers, employers, workforce boards, and community organizations operating on the Elevate Workforce OS.',
@@ -93,9 +91,7 @@ const industryPartners = [
   },
 ];
 
-export default async function PartnersPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('system_settings').select('*').limit(50);
+export default function PartnersPage() {
 
   return (
     <main className="w-full">

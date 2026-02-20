@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -6,16 +5,13 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowLeft, Users, Mail, Phone, Globe, DollarSign, Save } from 'lucide-react';
 import { createAffiliate } from '../actions';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'New Affiliate | Admin',
   description: 'Add a new affiliate partner.',
   robots: { index: false, follow: false },
 };
 
-export default async function NewAffiliatePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('affiliates').select('*').limit(50);
+export default function NewAffiliatePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

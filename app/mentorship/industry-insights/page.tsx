@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,16 +5,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Lightbulb, ArrowRight, TrendingUp, Briefcase, BarChart } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Industry Insights Mentorship | Elevate for Humanity',
   description: 'Gain insider knowledge about your target industry from experienced professionals. Understand trends, opportunities, and challenges.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/mentorship/industry-insights' },
 };
 
-export default async function IndustryInsightsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('mentors').select('*').limit(50);
+export default function IndustryInsightsPage() {
 
   const industries = ['Healthcare', 'Skilled Trades', 'Technology', 'Business', 'Beauty & Cosmetology'];
 

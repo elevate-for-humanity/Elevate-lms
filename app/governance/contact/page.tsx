@@ -1,11 +1,9 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Mail, Building2, Shield, Scale, FileText } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Governance Contact | Elevate for Humanity',
   description: 'Contact information for governance, compliance, and diligence inquiries.',
@@ -49,9 +47,7 @@ const contactCategories = [
   },
 ];
 
-export default async function GovernanceContactPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('governance_documents').select('*').limit(50);
+export default function GovernanceContactPage() {
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',

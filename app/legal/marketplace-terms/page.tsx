@@ -1,17 +1,13 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Legal Marketplace Terms | Elevate For Humanity',
   description: 'Elevate For Humanity - Career training and workforce development',
 };
 
-export default async function MarketplaceTermsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+export default function MarketplaceTermsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">

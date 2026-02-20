@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'SAM.gov Eligibility Criteria | Elevate for Humanity',
   description: 'SAM.gov registration and eligibility requirements for federal grant and contract opportunities at Elevate for Humanity.',
@@ -14,9 +12,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function SAMGovEligibilityPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('policies').select('*').limit(50);
+export default function SAMGovEligibilityPage() {
 
   return (
     <div className="min-h-screen bg-white">

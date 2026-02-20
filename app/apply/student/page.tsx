@@ -4,7 +4,6 @@ import StudentApplicationForm from './StudentApplicationForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { resolveSlug } from '@/lib/program-registry';
 
-import { createClient } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
@@ -34,9 +33,6 @@ export default async function StudentApplicationPage({
 }: {
   searchParams: Promise<{ program?: string }>;
 }) {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('applications').select('*').limit(50);
-
   const params = await searchParams;
   const initialProgram = resolveSlug(params?.program || '') || '';
   return (

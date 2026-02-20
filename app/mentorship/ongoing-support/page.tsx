@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,16 +5,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Heart, ArrowRight, MessageSquare, Calendar, Shield } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Ongoing Support Mentorship | Elevate for Humanity',
   description: 'Receive continuous support throughout your career journey. Your mentor is there for you every step of the way.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/mentorship/ongoing-support' },
 };
 
-export default async function OngoingSupportPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('mentors').select('*').limit(50);
+export default function OngoingSupportPage() {
 
   return (
     <div className="bg-white">

@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,16 +5,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Target, ArrowRight, Calendar, TrendingUp, Award } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Goal Setting Mentorship | Elevate for Humanity',
   description: 'Set and achieve meaningful career goals with mentor support. Create actionable plans for your professional growth.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/mentorship/goal-setting' },
 };
 
-export default async function GoalSettingPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('mentors').select('*').limit(50);
+export default function GoalSettingPage() {
 
   return (
     <div className="bg-white">

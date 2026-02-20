@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import PageAvatar from '@/components/PageAvatar';
 
@@ -6,7 +5,6 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { createClient } from '@/lib/supabase/server';
 import {
   ExternalLink,
   Clock,
@@ -25,9 +23,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function HSIPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('partners').select('*').limit(50);
+export default function HSIPage() {
 
   return (
     <div className="min-h-screen bg-white">

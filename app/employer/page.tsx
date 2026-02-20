@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -6,16 +5,13 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/employer' },
   title: 'Employer Partnership | Elevate For Humanity',
   description: 'Hire pre-screened, trained candidates. Access WOTC tax credits, OJT wage reimbursement, and WIOA-funded upskilling at no cost.',
 };
 
-export default async function EmployerPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('employers').select('*').limit(50);
+export default function EmployerPage() {
 
   return (
     <div className="min-h-screen bg-white">

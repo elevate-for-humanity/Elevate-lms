@@ -1,5 +1,4 @@
 'use client';
-import Turnstile from '@/components/Turnstile';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';

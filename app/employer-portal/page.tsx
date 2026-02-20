@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -7,15 +6,12 @@ import { Building2 } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Employer Portal | Elevate For Humanity',
   description: 'Manage apprentices, track training progress, and access employer tools.',
 };
 
-export default async function EmployerPortalLanding() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('employers').select('*').limit(50);
+export default function EmployerPortalLanding() {
 
   return (
     <div className="min-h-screen bg-white">

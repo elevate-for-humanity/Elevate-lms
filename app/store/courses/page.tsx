@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -7,7 +6,6 @@ import Image from 'next/image';
 import { Award, Clock, Check, ArrowRight, BookOpen, Shield } from 'lucide-react';
 import { COURSES as courses } from '@/app/data/courses';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Certification Courses | Elevate Store',
   description:
@@ -17,9 +15,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function StoreCoursesPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+export default function StoreCoursesPage() {
 
   // Group courses by category
   const categories = [

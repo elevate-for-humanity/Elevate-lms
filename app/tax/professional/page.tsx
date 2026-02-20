@@ -1,18 +1,14 @@
-export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata = {
   title: 'Professional Tax Services | Supersonic Fast Cash',
   description: 'Professional paid tax preparation services for complex returns.',
 };
 
-export default async function ProfessionalTaxPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('tax_returns').select('*').limit(50);
+export default function ProfessionalTaxPage() {
 
   return (
     <div className="min-h-screen bg-white">

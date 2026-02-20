@@ -1,18 +1,14 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import PublicLandingPage from '@/components/marketing/PublicLandingPage';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Memorandum of Understanding | Elevate for Humanity',
   description: 'MOU partnership framework for workforce agencies, employers, and training providers partnering with Elevate for Humanity.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/mou' },
 };
 
-export default async function MOUPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('partners').select('*').limit(50);
+export default function MOUPage() {
 
   return (
     <PublicLandingPage config={{

@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
 import {
   Building, BarChart, Users, FileText, ArrowRight,
   Shield, Globe, Clock, Target,
@@ -40,9 +38,7 @@ const complianceAreas = [
   { title: 'Fiscal Management', items: ['ITA tracking', 'OJT contracts', 'Supportive services', 'Budget monitoring'] },
 ];
 
-export default async function WorkforceBoardsPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('system_settings').select('*').limit(50);
+export default function WorkforceBoardsPage() {
 
   return (
     <div className="min-h-screen bg-white">

@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -17,7 +16,6 @@ import {
 } from 'lucide-react';
 import { BuyButton } from './BuyButton';
 
-import { createClient } from '@/lib/supabase/server';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
@@ -107,9 +105,7 @@ const faqSchema = {
   ],
 };
 
-export default async function CapitalReadinessGuidePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('products').select('*').limit(50);
+export default function CapitalReadinessGuidePage() {
 
   const features = [
     { icon: BookOpen, text: 'Full ebook (PDF)' },

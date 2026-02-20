@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -6,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Shield, Clock, AlertTriangle, GraduationCap, Heart, Scale, Phone } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/student-portal/handbook' },
   title: 'Student Handbook | Elevate For Humanity',
@@ -22,9 +20,7 @@ const SECTIONS = [
   { id: 'support', title: 'Student Support Services', icon: Heart, content: 'Elevate provides career counseling, tutoring, job placement assistance, and referrals to community resources. Students facing personal challenges that affect their training should contact their enrollment advisor for confidential support.' },
 ];
 
-export default async function StudentHandbookPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('enrollments').select('*').limit(50);
+export default function StudentHandbookPage() {
 
   return (
     <div className="min-h-screen bg-white">

@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -15,7 +14,6 @@ import {
 CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Workforce Operating System | Elevate for Humanity',
   description:
@@ -105,9 +103,7 @@ const governancePrinciples = [
 /*  PAGE                                                               */
 /* ------------------------------------------------------------------ */
 
-export default async function PlatformPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('system_settings').select('*').limit(50);
+export default function PlatformPage() {
 
   return (
     <div className="bg-white">

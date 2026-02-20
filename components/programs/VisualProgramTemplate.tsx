@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { getProgramImages } from '@/lib/program-images';
 import type { Program } from '@/app/data/programs';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ProgramTutorCTA } from '@/components/ProgramTutorCTA';
+import { PROGRAMS } from '@/lib/ai/programRegistry';
 
 interface VisualProgramTemplateProps {
   program: Program;
@@ -224,6 +226,15 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
             >
               Start Eligibility Review
             </Link>
+            {PROGRAMS[slug] && (
+              <div className="mt-4">
+                <ProgramTutorCTA
+                  programSlug={slug}
+                  programName={program.title}
+                  applyHref={`/apply?program=${slug}`}
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>

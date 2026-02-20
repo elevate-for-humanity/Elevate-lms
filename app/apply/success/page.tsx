@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { ArrowRight, Mail, Phone, Calendar } from 'lucide-react';
+import { ArrowRight, Mail, Phone, Calendar, CheckCircle, KeyRound, UserCheck, FileText, BookOpen } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -14,101 +13,98 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
+const STUDENT_STEPS = [
+  {
+    icon: <Mail className="w-5 h-5 text-brand-blue-600" />,
+    title: 'Check your email',
+    description: 'We sent a confirmation with your reference number and onboarding instructions. Check spam if you don\'t see it within a few minutes.',
+  },
+  {
+    icon: <KeyRound className="w-5 h-5 text-brand-blue-600" />,
+    title: 'Set your password',
+    description: 'We created your student account. Go to the password reset page and enter the email you applied with to set your password.',
+    link: '/forgot-password',
+    linkLabel: 'Set Password',
+  },
+  {
+    icon: <UserCheck className="w-5 h-5 text-brand-blue-600" />,
+    title: 'Log in and complete your profile',
+    description: 'Once you set your password, log in to your student dashboard. You\'ll be guided through your profile, agreements, and handbook.',
+    link: '/login',
+    linkLabel: 'Sign In',
+  },
+  {
+    icon: <FileText className="w-5 h-5 text-brand-blue-600" />,
+    title: 'Upload required documents',
+    description: 'Upload your government-issued photo ID and proof of residence. These are required before enrollment is activated.',
+  },
+  {
+    icon: <BookOpen className="w-5 h-5 text-brand-blue-600" />,
+    title: 'Complete orientation',
+    description: 'A short orientation (about 10 minutes) covers program expectations, your responsibilities, and what we handle for you.',
+  },
+];
+
+const ROLE_CONFIG: Record<string, {
+  title: string;
+  message: string;
+  steps: typeof STUDENT_STEPS;
+  primaryLink: string;
+  primaryLabel: string;
+}> = {
+  student: {
+    title: 'Application Approved',
+    message: 'Your student account has been created. Follow the steps below to complete onboarding and start your program.',
+    steps: STUDENT_STEPS,
+    primaryLink: '/forgot-password',
+    primaryLabel: 'Set Your Password',
+  },
+  'program-holder': {
+    title: 'Partnership Application Submitted',
+    message: 'Our team will review your organization details and contact you within 2 business days to discuss partnership options.',
+    steps: [
+      { icon: <Mail className="w-5 h-5 text-brand-blue-600" />, title: 'Check your email', description: 'We sent a confirmation with your reference number.' },
+      { icon: <UserCheck className="w-5 h-5 text-brand-blue-600" />, title: 'Team review', description: 'Our partnerships team will review your submission and reach out to discuss licensing and platform access.' },
+      { icon: <Calendar className="w-5 h-5 text-brand-blue-600" />, title: 'Schedule a call', description: 'You can also schedule a meeting with our team to discuss your program goals.', link: '/booking', linkLabel: 'Book a Meeting' },
+    ],
+    primaryLink: '/programs',
+    primaryLabel: 'Browse Programs',
+  },
+  employer: {
+    title: 'Employer Application Submitted',
+    message: 'Our employer relations team will review your submission and contact you within 2 business days.',
+    steps: [
+      { icon: <Mail className="w-5 h-5 text-brand-blue-600" />, title: 'Check your email', description: 'We sent a confirmation with your reference number.' },
+      { icon: <UserCheck className="w-5 h-5 text-brand-blue-600" />, title: 'Team review', description: 'Our employer relations team will contact you to discuss hiring needs, WOTC credits, and OJT reimbursement.' },
+      { icon: <Calendar className="w-5 h-5 text-brand-blue-600" />, title: 'Schedule a call', description: 'You can also schedule a meeting to discuss your workforce needs.', link: '/booking', linkLabel: 'Book a Meeting' },
+    ],
+    primaryLink: '/employer',
+    primaryLabel: 'Employer Resources',
+  },
+  staff: {
+    title: 'Staff Application Submitted',
+    message: 'HR will review your application. Qualified candidates will be contacted for interviews.',
+    steps: [
+      { icon: <Mail className="w-5 h-5 text-brand-blue-600" />, title: 'Check your email', description: 'We sent a confirmation with your reference number.' },
+      { icon: <UserCheck className="w-5 h-5 text-brand-blue-600" />, title: 'HR review', description: 'Our HR team will review your application and contact qualified candidates for interviews.' },
+    ],
+    primaryLink: '/',
+    primaryLabel: 'Return Home',
+  },
+};
+
 export default async function ApplicationSuccessPage({
   searchParams,
 }: {
   searchParams: Promise<{ role?: string; ref?: string }>;
 }) {
   const params = await searchParams;
-  const supabase = await createClient();
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
   const role = params.role || 'student';
   const referenceNumber = params.ref || null;
-
-  // Get next steps content from database
-  const { data: nextStepsContent } = await supabase
-    .from('content_blocks')
-    .select('*')
-    .eq('page', 'apply-success')
-    .eq('section', role)
-    .order('order', { ascending: true });
-
-  // Get contact info
-  const { data: contactInfo } = await supabase
-    .from('settings')
-    .select('value')
-    .eq('key', 'enrollment_contact')
-    .single();
-
-  const roleMessages: Record<string, any> = {
-    student: {
-      title: 'Student Application Submitted!',
-      message:
-        "We've received your application and will review it within 1-2 business days.",
-      nextSteps: nextStepsContent?.map((c: any) => c.content) || [
-        'Check your email for a confirmation message',
-        'A team member will contact you to discuss program options',
-        "We'll help you explore funding options like WIOA, WRG, and apprenticeships",
-        "Once approved, you'll receive access to your student dashboard",
-      ],
-      dashboardLink: '/lms/dashboard',
-      dashboardText: 'Student Dashboard',
-    },
-    'program-holder': {
-      title: 'Partnership Application Submitted!',
-      message:
-        "Thank you for your interest in partnering with us. We'll review your application and contact you soon.",
-      nextSteps: [
-        'Our team will review your organization details',
-        "We'll reach out to discuss partnership opportunities",
-        'You will receive information about licensing options',
-        'Access to partner portal upon approval',
-      ],
-      dashboardLink: '/partner/dashboard',
-      dashboardText: 'Partner Dashboard',
-    },
-    employer: {
-      title: 'Employer Application Submitted!',
-      message:
-        "Thank you for your interest in hiring our graduates. We'll be in touch soon.",
-      nextSteps: [
-        'Our employer relations team will review your submission',
-        "We'll contact you to discuss your hiring needs",
-        'You will receive access to candidate profiles',
-        'Schedule interviews with qualified graduates',
-      ],
-      dashboardLink: '/employer/dashboard',
-      dashboardText: 'Employer Dashboard',
-    },
-    staff: {
-      title: 'Staff Application Submitted!',
-      message:
-        "Thank you for your interest in joining our team. We'll review your application.",
-      nextSteps: [
-        'HR will review your application',
-        'Qualified candidates will be contacted for interviews',
-        'Background check will be conducted for selected candidates',
-        'Onboarding begins upon offer acceptance',
-      ],
-      dashboardLink: '/careers',
-      dashboardText: 'View Open Positions',
-    },
-  };
-
-  const currentRole = roleMessages[role] || roleMessages.student;
+  const config = ROLE_CONFIG[role] || ROLE_CONFIG.student;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -117,88 +113,119 @@ export default async function ApplicationSuccessPage({
       </div>
 
       <div className="flex items-center justify-center px-4 py-12">
-      <div className="max-w-2xl w-full">
-        {/* Success Icon */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-100 rounded-full mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+        <div className="max-w-2xl w-full">
+          {/* Success Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-100 rounded-full mb-6">
+              <CheckCircle className="w-10 h-10 text-brand-green-600" />
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              {config.title}
+            </h1>
+            <p className="text-lg text-gray-600">{config.message}</p>
+            {referenceNumber && (
+              <div className="mt-4 inline-block bg-brand-green-50 border border-brand-green-200 rounded-lg px-4 py-2">
+                <span className="text-sm text-brand-green-700">Reference: </span>
+                <span className="font-mono font-bold text-brand-green-900">{referenceNumber}</span>
+              </div>
+            )}
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            {currentRole.title}
-          </h1>
-          <p className="text-lg text-gray-600">{currentRole.message}</p>
-          {referenceNumber && (
-            <div className="mt-4 inline-block bg-brand-green-50 border border-brand-green-200 rounded-lg px-4 py-2">
-              <span className="text-sm text-brand-green-700">Confirmation ID: </span>
-              <span className="font-mono font-bold text-brand-green-900">{referenceNumber}</span>
+
+          {/* Onboarding Steps */}
+          <div className="bg-white rounded-xl shadow-sm border p-6 sm:p-8 mb-6">
+            <h2 className="text-xl font-bold mb-6">Complete Your Onboarding</h2>
+            <ol className="space-y-5">
+              {config.steps.map((step, index) => (
+                <li key={index} className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-brand-blue-50 rounded-full flex items-center justify-center">
+                    <span className="text-brand-blue-700 font-bold text-sm">{index + 1}</span>
+                  </div>
+                  <div className="flex-1 pt-0.5">
+                    <div className="flex items-center gap-2 mb-1">
+                      {step.icon}
+                      <h3 className="font-semibold text-gray-900">{step.title}</h3>
+                    </div>
+                    <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
+                    {'link' in step && step.link && (
+                      <Link
+                        href={step.link}
+                        className="inline-flex items-center gap-1.5 text-brand-blue-600 hover:text-brand-blue-800 font-medium text-sm mt-2"
+                      >
+                        {step.linkLabel} <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          {/* Timeline Notice */}
+          {role === 'student' && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
+              <h3 className="font-semibold text-amber-900 mb-1">WorkOne / Funding Verification</h3>
+              <p className="text-amber-800 text-sm leading-relaxed">
+                If you&apos;re applying for WIOA or Workforce Ready Grant funding, we&apos;ll coordinate with WorkOne on your behalf.
+                This process typically takes 3-5 business days. You can begin onboarding while funding is being verified.
+              </p>
             </div>
           )}
-        </div>
 
-        {/* Next Steps */}
-        <div className="bg-white rounded-xl shadow-sm border p-8 mb-6">
-          <h2 className="text-xl font-bold mb-6">What Happens Next</h2>
-          <ol className="space-y-4">
-            {currentRole.nextSteps.map((step: string, index: number) => (
-              <li key={index} className="flex items-start gap-4">
-                <span className="flex-shrink-0 w-8 h-8 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center font-bold">
-                  {index + 1}
-                </span>
-                <span className="text-gray-700 pt-1">{step}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
+          {/* Contact Info */}
+          <div className="bg-brand-blue-50 rounded-xl p-5 mb-6">
+            <h3 className="font-semibold text-brand-blue-900 mb-3">Questions?</h3>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link
+                href="/support"
+                className="flex items-center gap-2 text-brand-blue-600 hover:underline text-sm"
+              >
+                <Phone className="w-4 h-4" />
+                Get Help Online
+              </Link>
+              <Link
+                href="/contact"
+                className="flex items-center gap-2 text-brand-blue-600 hover:underline text-sm"
+              >
+                <Mail className="w-4 h-4" />
+                Contact Us
+              </Link>
+              <Link
+                href="/booking"
+                className="flex items-center gap-2 text-brand-blue-600 hover:underline text-sm"
+              >
+                <Calendar className="w-4 h-4" />
+                Schedule a Meeting
+              </Link>
+            </div>
+          </div>
 
-        {/* Contact Info */}
-        <div className="bg-brand-blue-50 rounded-xl p-6 mb-6">
-          <h3 className="font-semibold mb-4">Questions? Contact Us</h3>
+          {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4">
-            <a
-              href="/support"
-              className="flex items-center gap-2 text-brand-blue-600 hover:underline"
+            <Link
+              href={config.primaryLink}
+              className="flex-1 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-center hover:bg-brand-blue-700 transition inline-flex items-center justify-center gap-2"
             >
-              <Phone className="w-5 h-5" />
-              Get Help Online
-            </a>
-            <a
-              href="/contact"
-              className="flex items-center gap-2 text-brand-blue-600 hover:underline"
+              {config.primaryLabel}
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link
+              href="/"
+              className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold text-center hover:bg-gray-50 transition"
             >
-              <Mail className="w-5 h-5" />
-              our contact form
-            </a>
+              Return Home
+            </Link>
+          </div>
+
+          {/* Track Application */}
+          <div className="mt-6 text-center">
+            <Link
+              href="/apply/track"
+              className="text-brand-blue-600 hover:underline text-sm font-medium"
+            >
+              Track your application status
+            </Link>
           </div>
         </div>
-
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Link
-            href={currentRole.dashboardLink}
-            className="flex-1 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-center hover:bg-brand-blue-700 transition inline-flex items-center justify-center gap-2"
-          >
-            {currentRole.dashboardText}
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-          <Link
-            href="/"
-            className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold text-center hover:bg-gray-50 transition"
-          >
-            Return Home
-          </Link>
-        </div>
-
-        {/* Schedule Call */}
-        <div className="mt-8 text-center">
-          <Link
-            href="/booking"
-            className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:underline"
-          >
-            <Calendar className="w-5 h-5" />
-            Schedule a meeting with our team
-          </Link>
-        </div>
-      </div>
       </div>
     </div>
   );

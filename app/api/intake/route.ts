@@ -54,7 +54,7 @@ export async function POST(req: Request) {
       phone: clean(body.phone),
       city: clean(body.city),
       state: clean(body.state) || 'IN',
-      program_interest: clean(body.program_interest) || 'barbering',
+      program_interest: clean(body.program_interest) || 'not-specified',
       employment_status: clean(body.employment_status),
       funding_needed: body.funding_needed !== 'false',
       workforce_connection: clean(body.workforce_connection),

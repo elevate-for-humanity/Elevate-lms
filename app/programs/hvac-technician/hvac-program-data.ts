@@ -66,6 +66,107 @@ export const ENROLLMENT_STEPS = [
   { title: 'Start Training', description: 'Begin your 20-week HVAC program with hands-on instruction, classroom learning, and certification preparation.' },
 ];
 
+export type AiTutorGuide = {
+  id: string;
+  name: string;
+  role: 'AI Tutor' | 'AI Guide' | 'AI Coach';
+  availability: string;
+  specialties: string[];
+  features: string[];
+};
+
+export type CredentialedPartnerEntry = {
+  id: string;
+  name: string;
+  credentialSummary: string;
+  areas: string[];
+  verificationNote?: string;
+  websiteUrl?: string;
+};
+
+export type HvacProgramInstructorsBlock = {
+  heading: string;
+  subheading: string;
+  aiTutors: AiTutorGuide[];
+  credentialedPartners: CredentialedPartnerEntry[];
+};
+
+export const hvacInstructorsBlock: HvacProgramInstructorsBlock = {
+  heading: 'AI Tutors & Credentialed Partners',
+  subheading:
+    '24/7 AI support for learners, paired with credentialed partners who deliver instruction and verification.',
+  aiTutors: [
+    {
+      id: 'tutor-core',
+      name: 'Elevate AI Tutor',
+      role: 'AI Tutor',
+      availability: '24/7',
+      specialties: [
+        'EPA 608 prep',
+        'Troubleshooting workflows',
+        'Electrical fundamentals',
+        'Refrigeration cycle',
+        'Study plans',
+      ],
+      features: [
+        'Explains concepts step-by-step',
+        'Generates practice questions',
+        'Flags weak areas and recommends lessons',
+        'Supports role-based coaching (student/case manager)',
+      ],
+    },
+    {
+      id: 'guide-onboarding',
+      name: 'Onboarding Guide',
+      role: 'AI Guide',
+      availability: '24/7',
+      specialties: ['Enrollment steps', 'Document checklist', 'Orientation help', 'Next actions'],
+      features: [
+        'Keeps students moving through onboarding',
+        'Answers "what do I do next?" questions',
+        'Escalation prompts when stuck',
+      ],
+    },
+  ],
+  credentialedPartners: [
+    {
+      id: 'partner-hvac-lab',
+      name: 'Licensed HVAC Training Provider',
+      credentialSummary:
+        'EPA-certified, state-licensed facility delivering hands-on lab instruction and competency validation for workforce eligibility.',
+      areas: ['Hands-on labs', 'EPA 608 prep', 'Residential HVAC Cert 1 & 2', 'Equipment training'],
+      verificationNote:
+        'Partner verification and credential documentation available to admins and workforce boards upon request.',
+    },
+    {
+      id: 'partner-careersafe',
+      name: 'CareerSafe',
+      credentialSummary:
+        'OSHA-authorized outreach trainer delivering construction safety certification.',
+      areas: ['OSHA 30-Hour Construction Safety'],
+      websiteUrl: 'https://www.careersafeonline.com',
+    },
+    {
+      id: 'partner-elevate',
+      name: 'Elevate for Humanity',
+      credentialSummary:
+        'USDOL Registered Sponsor, ETPL-listed (INTraining #10004322). Program oversight, funding coordination, and career placement.',
+      areas: ['Enrollment management', 'WIOA/WRG funding', 'Progress reporting', 'Career placement'],
+    },
+  ],
+};
+
+export const HVAC_FAQS = [
+  { q: 'What schedule does the program follow?', a: 'The 20-week program runs Monday through Friday. Exact hours depend on your cohort and training location. You\'ll receive your schedule during orientation.' },
+  { q: 'Is this program fully online?', a: 'No. This is a hybrid program. Theory and some coursework are delivered through the LMS (online), but hands-on lab training and certification exams are in-person at the training facility.' },
+  { q: 'What if I need to miss a day?', a: 'Attendance is tracked and reported. If you need to miss a day, notify your instructor in advance. Excessive absences may affect your enrollment status and funding eligibility.' },
+  { q: 'Do I need to buy tools?', a: 'Basic tools are provided during training. You may want to invest in your own tool set before entering the workforce. An HVAC tool kit is available in our student store.' },
+  { q: 'What happens after I complete the program?', a: 'You\'ll have 6 industry credentials and documented competencies. Our career services team helps with resume building, interview prep, and employer connections. Many graduates are placed within 30 days.' },
+  { q: 'Can I work while enrolled?', a: 'Yes, but the program is full-time. Many students work evenings or weekends. Talk to your advisor about scheduling if you have work obligations.' },
+  { q: 'What is the refund policy?', a: 'Funded students (WIOA/WRG) have no out-of-pocket cost. Self-pay students can review the refund policy in the enrollment agreement provided during onboarding.' },
+  { q: 'Is there a language requirement?', a: 'Instruction is in English. You should be comfortable reading technical manuals and following verbal instructions in English. ESL support resources are available.' },
+];
+
 export const ELIGIBILITY = [
   'At least 18 years old with a valid government-issued ID',
   'High school diploma or GED',

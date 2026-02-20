@@ -134,6 +134,16 @@ export default async function LearnerDashboardPage() {
         .in('course_id', courseIds)
     : { data: null };
 
+  // Check for pending onboarding (program_enrollments in pre-active state)
+  const { data: pendingOnboarding } = await supabase
+    .from('program_enrollments')
+    .select('id, enrollment_state, next_required_action, full_name, program_id')
+    .eq('user_id', user.id)
+    .in('enrollment_state', ['applied', 'approved', 'confirmed', 'orientation_complete', 'documents_complete'])
+    .order('enrolled_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   // Calculate stats
   const activeEnrollments = enrollments?.filter(e => e.status === 'active') || [];
   const completedEnrollments = enrollments?.filter(e => e.status === 'completed') || [];
@@ -183,9 +193,43 @@ export default async function LearnerDashboardPage() {
             Welcome back, {userName}!
           </h1>
           <p className="text-gray-600">
-            Continue your learning journey. You're making great progress!
+            Continue your learning journey. You&apos;re making great progress!
           </p>
         </div>
+
+        {/* Onboarding Banner — shown when student has a pending program enrollment */}
+        {pendingOnboarding && (
+          <div className="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-amber-900 mb-1">Complete Your Onboarding</h2>
+                <p className="text-amber-800 text-sm">
+                  {pendingOnboarding.enrollment_state === 'approved' && 'Confirm your enrollment to proceed to orientation.'}
+                  {pendingOnboarding.enrollment_state === 'confirmed' && 'Complete your orientation to unlock document upload.'}
+                  {pendingOnboarding.enrollment_state === 'orientation_complete' && 'Upload your required documents to activate your enrollment.'}
+                  {pendingOnboarding.enrollment_state === 'documents_complete' && 'Your documents are being reviewed. You\'ll be activated shortly.'}
+                  {pendingOnboarding.enrollment_state === 'applied' && 'Your application is being reviewed. We\'ll notify you when it\'s approved.'}
+                </p>
+              </div>
+              <Link
+                href={
+                  pendingOnboarding.enrollment_state === 'approved' ? '/enrollment/confirmed' :
+                  pendingOnboarding.enrollment_state === 'confirmed' ? '/enrollment/orientation' :
+                  pendingOnboarding.enrollment_state === 'orientation_complete' ? '/enrollment/documents' :
+                  '/enrollment/confirmed'
+                }
+                className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors whitespace-nowrap"
+              >
+                {pendingOnboarding.enrollment_state === 'approved' && 'Confirm Enrollment'}
+                {pendingOnboarding.enrollment_state === 'confirmed' && 'Start Orientation'}
+                {pendingOnboarding.enrollment_state === 'orientation_complete' && 'Upload Documents'}
+                {pendingOnboarding.enrollment_state === 'documents_complete' && 'View Status'}
+                {pendingOnboarding.enrollment_state === 'applied' && 'View Status'}
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

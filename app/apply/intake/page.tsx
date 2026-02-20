@@ -1,10 +1,32 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { Suspense } from 'react';
 
-export default function IntakePage() {
+function IntakeForm() {
+  const searchParams = useSearchParams();
+  const programParam = searchParams.get('program') || '';
+
+  // Map slug to select value
+  const SLUG_TO_VALUE: Record<string, string> = {
+    'hvac-technician': 'hvac',
+    'hvac': 'hvac',
+    'barber-apprenticeship': 'barbering',
+    'barbering': 'barbering',
+    'cna-certification': 'cna',
+    'cna': 'cna',
+    'cdl-training': 'cdl',
+    'cdl': 'cdl',
+    'medical-assistant': 'medical-assistant',
+    'phlebotomy-technician': 'phlebotomy',
+    'phlebotomy': 'phlebotomy',
+    'welding': 'welding',
+    'electrical': 'electrical',
+  };
+  const initialProgram = SLUG_TO_VALUE[programParam] || programParam || '';
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [fundingTag, setFundingTag] = useState('');
@@ -144,7 +166,7 @@ export default function IntakePage() {
               <div className="space-y-4">
                 <div>
                   <label htmlFor="program_interest" className="block text-sm font-semibold text-slate-700 mb-1">Which program are you interested in?</label>
-                  <select id="program_interest" name="program_interest" className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500">
+                  <select id="program_interest" name="program_interest" defaultValue={initialProgram || 'barbering'} className="w-full border border-slate-300 bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500">
                     <option value="barbering">Barber Apprenticeship</option>
                     <option value="cna">CNA Certification</option>
                     <option value="cdl">CDL Training</option>
@@ -251,5 +273,17 @@ export default function IntakePage() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function IntakePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-red-600"></div>
+      </div>
+    }>
+      <IntakeForm />
+    </Suspense>
   );
 }

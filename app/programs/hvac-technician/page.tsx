@@ -4,6 +4,7 @@ import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 import { HvacHero } from './sections/HvacHero';
 import { HvacDeliveryModel } from './sections/HvacDeliveryModel';
 import { HvacCredentials } from './sections/HvacCredentials';
+import { HvacInstructors } from './sections/HvacInstructors';
 import { HvacEnrollment } from './sections/HvacEnrollment';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
@@ -70,6 +71,7 @@ export default function HVACTechnicianPage() {
         <HvacHero />
         <HvacDeliveryModel />
         <HvacCredentials />
+        <HvacInstructors />
         <HvacEnrollment />
       </div>
     </>

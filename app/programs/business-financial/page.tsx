@@ -88,7 +88,7 @@ export default async function BusinessFinancialPage() {
                   View Programs
                 </Link>
                 <Link
-                  href="/intake"
+                  href="/apply"
                   className="inline-flex items-center justify-center rounded-xl px-8 py-4 text-lg font-bold border-2 border-white text-white hover:bg-white/10 transition"
                 >
                   Check Eligibility

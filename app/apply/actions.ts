@@ -139,6 +139,28 @@ async function autoApprove(
       })
       .eq('id', applicationId);
 
+    // Create program_enrollments record to start the onboarding state machine.
+    // State starts at 'approved' (skipping 'applied' since auto-approve already ran).
+    // The student will proceed: approved → confirmed → orientation → documents → active.
+    try {
+      await supabase
+        .from('program_enrollments')
+        .insert({
+          user_id: userId,
+          program_id: courseId || null,
+          email: normalizedEmail,
+          full_name: `${firstName} ${lastName}`,
+          amount_paid_cents: 0,
+          funding_source: 'pending',
+          status: 'pending',
+          enrollment_state: 'approved',
+          next_required_action: 'COMPLETE_PAYMENT',
+        });
+    } catch (enrollErr) {
+      // Non-fatal — admin can create enrollment manually
+      logger.error('Failed to create program_enrollment record', enrollErr as Error);
+    }
+
     logger.info('Auto-approved student for onboarding', { applicationId, userId, email: normalizedEmail });
     return { userId, approved: true };
   } catch (err) {
@@ -282,7 +304,7 @@ async function insertApplication(payload: {
           `<h3>Complete Your Onboarding:</h3>`,
           `<ol>`,
           `<li><strong>Set your password:</strong> Go to <a href="${siteUrl}/forgot-password">${siteUrl}/forgot-password</a> and enter your email: <strong>${payload.email}</strong></li>`,
-          `<li><strong>Log in:</strong> Go to <a href="${siteUrl}/signin">${siteUrl}/signin</a></li>`,
+          `<li><strong>Log in:</strong> Go to <a href="${siteUrl}/login">${siteUrl}/login</a></li>`,
           `<li><strong>Complete onboarding:</strong> Once logged in, you'll be guided through your profile, agreements, handbook, and document uploads</li>`,
           `<li><strong>WorkOne verification:</strong> If you're applying for WIOA funding, we'll coordinate with WorkOne on your behalf</li>`,
           `</ol>`,

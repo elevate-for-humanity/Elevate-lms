@@ -126,7 +126,7 @@ export function HvacEnrollment() {
             20-week program with 6 credentials including EPA 608. Workforce Ready Grant eligible. Apply today.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/apply/intake?program=hvac-technician" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/apply?program=hvac-technician" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/support" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">

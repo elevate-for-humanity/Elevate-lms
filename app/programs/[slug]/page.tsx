@@ -12,6 +12,8 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PROGRAM_CATEGORIES } from '@/components/programs/ProgramPageWrapper';
 import { EligibilityNotice } from '@/components/EligibilityNotice';
+import { ProgramTutorCTA } from '@/components/ProgramTutorCTA';
+import { PROGRAMS } from '@/lib/ai/programRegistry';
 
 // Programs that use the new visual-first template
 const VISUAL_TEMPLATE_PROGRAMS = [
@@ -357,6 +359,15 @@ export default async function ProgramDetailPage({
               Back to Programs
             </Link>
           </div>
+          {PROGRAMS[slug] && (
+            <div className="mt-6 bg-slate-900 rounded-xl p-6">
+              <ProgramTutorCTA
+                programSlug={slug}
+                programName={displayProgram.title}
+                applyHref={program.ctaPrimary?.href || `/apply?program=${slug}`}
+              />
+            </div>
+          )}
         </div>
         </div>
       </div>

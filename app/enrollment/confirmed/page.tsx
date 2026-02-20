@@ -4,7 +4,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Calendar, Building2, Award } from 'lucide-react';
+import { Calendar, Building2, Award, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 interface EnrollmentData {
@@ -66,7 +66,8 @@ function EnrollmentConfirmedContent() {
         router.push('/dashboard');
         return;
       }
-      if (data.enrollment_state !== 'confirmed') {
+      // Accept both 'approved' and 'confirmed' — approved students confirm here
+      if (data.enrollment_state !== 'confirmed' && data.enrollment_state !== 'approved') {
         router.push('/programs');
         return;
       }
@@ -93,6 +94,29 @@ function EnrollmentConfirmedContent() {
 
   if (!enrollment) return null;
 
+  const isApproved = enrollment.enrollment_state === 'approved';
+  const [confirming, setConfirming] = useState(false);
+
+  async function handleConfirm() {
+    setConfirming(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('program_enrollments')
+        .update({
+          enrollment_state: 'confirmed',
+          enrollment_confirmed_at: new Date().toISOString(),
+          next_required_action: 'COMPLETE_ORIENTATION',
+        })
+        .eq('id', enrollment!.id);
+
+      if (error) throw error;
+      router.push('/enrollment/orientation');
+    } catch {
+      setConfirming(false);
+    }
+  }
+
   const confirmDate = enrollment.enrollment_confirmed_at 
     ? new Date(enrollment.enrollment_confirmed_at).toLocaleDateString('en-US', {
         month: 'long',
@@ -104,14 +128,19 @@ function EnrollmentConfirmedContent() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-2xl mx-auto">
-        {/* Success Icon */}
+        {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-100 rounded-full mb-4">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <Award className="w-10 h-10 text-brand-green-600" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900">
-            You are now officially enrolled.
+            {isApproved ? 'Confirm Your Enrollment' : 'Enrollment Confirmed'}
           </h1>
+          {isApproved && (
+            <p className="text-gray-600 mt-2">
+              Your application has been approved. Review the details below and confirm to begin onboarding.
+            </p>
+          )}
         </div>
 
         {/* Enrollment Details Card */}
@@ -126,20 +155,24 @@ function EnrollmentConfirmedContent() {
             </div>
 
             <div className="flex items-start gap-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <Calendar className="w-5 h-5 text-brand-blue-600 mt-0.5" />
               <div>
                 <p className="text-sm text-gray-500">Status</p>
-                <p className="font-semibold text-brand-green-600">Active Enrollment</p>
+                <p className={`font-semibold ${isApproved ? 'text-amber-600' : 'text-brand-green-600'}`}>
+                  {isApproved ? 'Approved — Awaiting Confirmation' : 'Confirmed'}
+                </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <Calendar className="w-5 h-5 text-brand-blue-600 mt-0.5" />
-              <div>
-                <p className="text-sm text-gray-500">Confirmed Date</p>
-                <p className="font-semibold text-gray-900">{confirmDate}</p>
+            {!isApproved && (
+              <div className="flex items-start gap-3">
+                <Calendar className="w-5 h-5 text-brand-blue-600 mt-0.5" />
+                <div>
+                  <p className="text-sm text-gray-500">Confirmed Date</p>
+                  <p className="font-semibold text-gray-900">{confirmDate}</p>
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="flex items-start gap-3">
               <Building2 className="w-5 h-5 text-brand-blue-600 mt-0.5" />
@@ -152,12 +185,22 @@ function EnrollmentConfirmedContent() {
         </div>
 
         {/* CTA Button */}
-        <Link
-          href="/enrollment/orientation"
-          className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center font-semibold py-4 px-6 rounded-lg transition-colors"
-        >
-          Start Orientation
-        </Link>
+        {isApproved ? (
+          <button
+            onClick={handleConfirm}
+            disabled={confirming}
+            className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center font-semibold py-4 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {confirming ? 'Confirming...' : 'Confirm Enrollment & Start Onboarding'}
+          </button>
+        ) : (
+          <Link
+            href="/enrollment/orientation"
+            className="flex items-center justify-center gap-2 w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center font-semibold py-4 px-6 rounded-lg transition-colors"
+          >
+            Start Orientation <ArrowRight className="w-5 h-5" />
+          </Link>
+        )}
 
         {/* Helper Text */}
         <p className="text-center text-sm text-gray-500 mt-4">

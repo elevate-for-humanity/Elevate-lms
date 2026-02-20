@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, Phone, Shield } from 'lucide-react';
+import { ProgramTutorCTA } from '@/components/ProgramTutorCTA';
 import { ENROLLMENT_STEPS, ELIGIBILITY } from '../barber-program-data';
 
 export function BarberEnrollment() {
@@ -114,12 +115,20 @@ export function BarberEnrollment() {
             2,000-hour apprenticeship with licensed shop training. Apply today to check your eligibility.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/apply/intake?program=barbering" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/apply?program=barber-apprenticeship" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/support" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">
               <Phone className="w-5 h-5" /> Get Help Online
             </Link>
+          </div>
+          <div className="mt-6 flex justify-center">
+            <ProgramTutorCTA
+              programSlug="barber-apprenticeship"
+              programName="Barber Apprenticeship"
+              applyHref="/apply?program=barber-apprenticeship"
+              suggestions={['How long is the apprenticeship?', 'What license will I earn?', 'Is funding available?', 'Can I work while enrolled?']}
+            />
           </div>
         </div>
       </section>

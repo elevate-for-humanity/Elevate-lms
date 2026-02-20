@@ -33,7 +33,7 @@ export function BarberHero() {
               A competency-based 2,000-hour apprenticeship program with licensed shop training, structured RTI, and a pathway toward Indiana barber licensure.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/apply/intake?program=barbering" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
+              <Link href="/apply?program=barber-apprenticeship" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
                 Apply Now <ArrowRight className="w-5 h-5" />
               </Link>
               <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">

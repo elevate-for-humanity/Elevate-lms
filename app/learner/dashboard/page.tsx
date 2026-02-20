@@ -54,8 +54,8 @@ export default async function LearnerDashboardPage() {
     .eq('id', user.id)
     .single();
 
-  // Fetch enrollments with program details
-  const { data: enrollments } = await supabase
+  // Fetch enrollments from both tables (legacy enrollments + training_enrollments)
+  const { data: legacyEnrollments } = await supabase
     .from('enrollments')
     .select(`
       id,
@@ -72,6 +72,41 @@ export default async function LearnerDashboardPage() {
     `)
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false });
+
+  const { data: trainingEnrollments } = await supabase
+    .from('training_enrollments')
+    .select(`
+      id,
+      course_id,
+      status,
+      progress,
+      enrolled_at,
+      training_courses (
+        id,
+        course_name,
+        description,
+        duration_hours
+      )
+    `)
+    .eq('user_id', user.id)
+    .order('enrolled_at', { ascending: false });
+
+  // Normalize training_enrollments to match legacy shape
+  const normalizedTraining = (trainingEnrollments || []).map((te: any) => ({
+    ...te,
+    courses: te.training_courses
+      ? { id: te.training_courses.id, title: te.training_courses.course_name, description: te.training_courses.description, duration_hours: te.training_courses.duration_hours }
+      : null,
+  }));
+
+  // Merge, dedup by course_id
+  const seen = new Set<string>();
+  const enrollments = [...(legacyEnrollments || []), ...normalizedTraining].filter((e: any) => {
+    const key = e.course_id || e.id;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 
   // Fetch achievements
   const { data: achievements } = await supabase

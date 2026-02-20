@@ -9,5 +9,5 @@ export default async function FundingAllocationsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
   
-  redirect('/admin/financial-aid');
+  redirect('/admin/funding');
 }

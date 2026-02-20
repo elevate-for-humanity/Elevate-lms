@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function CreateCoursePage() {
-  redirect('/instructor/courses/create');
+  redirect('/instructor/courses');
 }

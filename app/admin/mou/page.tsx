@@ -18,7 +18,7 @@ export default async function MOUPage() {
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
-  const { data: mous, count } = await supabase.from('mous').select('*', { count: 'exact' }).order('created_at', { ascending: false }).limit(20);
+  const { data: mous, count } = await supabase.from('partner_mous').select('*, partners:partner_id(name)', { count: 'exact' }).order('created_at', { ascending: false }).limit(20);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -39,7 +39,7 @@ export default async function MOUPage() {
           <div className="divide-y">
             {mous && mous.length > 0 ? mous.map((mou: any) => (
               <div key={mou.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
-                <div><p className="font-medium">{mou.partner_name || 'Partner'}</p><p className="text-sm text-gray-500">{mou.type} • Expires: {mou.expiry_date ? new Date(mou.expiry_date).toLocaleDateString() : 'N/A'}</p></div>
+                <div><p className="font-medium">{mou.partners?.name || 'Partner'}</p><p className="text-sm text-gray-500">{mou.mou_version || 'Standard'} • Expires: {mou.expiry_date ? new Date(mou.expiry_date).toLocaleDateString() : 'N/A'}</p></div>
                 <span className={`px-2 py-1 rounded-full text-xs ${mou.status === 'active' ? 'bg-brand-green-100 text-brand-green-800' : 'bg-yellow-100 text-yellow-800'}`}>{mou.status || 'pending'}</span>
               </div>
             )) : <div className="p-8 text-center text-gray-500">No MOUs found</div>}

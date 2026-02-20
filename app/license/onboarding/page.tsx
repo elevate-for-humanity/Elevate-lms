@@ -46,7 +46,7 @@ export default async function LicenseeOnboardingPage() {
   // If onboarding is complete, redirect to dashboard
   const org = license?.organizations as any;
   if (org?.onboarding_completed) {
-    redirect('/license/dashboard');
+    redirect('/license');
   }
 
   const steps = [

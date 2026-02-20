@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function CmPage() {
-  redirect('/admin/case-management');
+  redirect('/admin/reports/caseload');
 }

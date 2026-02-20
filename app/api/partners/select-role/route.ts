@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log audit trail
-    await supabase.from('audit_log').insert({
+    await supabase.from('audit_logs').insert({
       actor_user_id: user.id,
       action: 'partner_role_selected',
       entity: 'partner_profiles',

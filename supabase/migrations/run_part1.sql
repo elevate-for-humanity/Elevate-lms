@@ -541,31 +541,12 @@ CREATE TABLE IF NOT EXISTS ai_chat_interactions (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS ai_chat_messages (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid,
-  title text,
-  content text,
-  is_read boolean DEFAULT false,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS ai_chat_sessions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text,
   host_id uuid,
   scheduled_at timestamptz,
   status text DEFAULT 'scheduled',
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS ai_conversations (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text,
-  description text,
-  status text DEFAULT 'active',
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
@@ -757,18 +738,6 @@ CREATE TABLE IF NOT EXISTS apprentice_funding_profile (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS apprentice_hours (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  apprenticeship text,
-  date timestamptz,
-  hours integer DEFAULT 0,
-  status text DEFAULT 'active',
-  supervisor_name text,
-  target_hours text,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS apprentice_hours_log (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
@@ -895,18 +864,6 @@ CREATE TABLE IF NOT EXISTS audio_preferences (
   key text,
   value text,
   user_id uuid,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS audit_log (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  credential_code text,
-  credential_id uuid,
-  elevateforhumanity text,
-  expires_at timestamptz,
-  one_time_use text,
-  used_at timestamptz,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );

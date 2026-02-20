@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Log event
-    await supabase.from('audit_log').insert({
+    await supabase.from('audit_logs').insert({
       event_type: 'application_submitted',
       resource_type: 'lead',
       resource_id: data.leadId,

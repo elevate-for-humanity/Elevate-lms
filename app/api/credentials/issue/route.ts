@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Log issuance
-    await supabase.from('audit_log').insert({
+    await supabase.from('audit_logs').insert({
       event_type: 'credential_issued',
       resource_type: 'credential',
       resource_id: credential.id,

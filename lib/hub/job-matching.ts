@@ -77,7 +77,7 @@ export async function getJobMatches(userId: string, limit = 10): Promise<JobMatc
 
   // Get active job posts
   const { data: jobs } = await supabase
-    .from('job_posts')
+    .from('job_postings')
     .select(`
       *,
       employers(name, logo_url)
@@ -245,7 +245,7 @@ export async function getEmployerTalentPipeline(employerId: string, limit = 20):
 
   // Get employer's job requirements
   const { data: jobs } = await supabase
-    .from('job_posts')
+    .from('job_postings')
     .select('required_programs, required_certifications')
     .eq('employer_id', employerId)
     .eq('is_active', true);

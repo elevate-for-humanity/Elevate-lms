@@ -63,7 +63,7 @@ export default async function CredentialSharePage({ params }: PageProps) {
   }
 
   // Log access
-  await supabase.from('audit_log').insert({
+  await supabase.from('audit_logs').insert({
     event_type: 'credential_shared',
     resource_type: 'credential',
     resource_id: shareLink.credential_id,

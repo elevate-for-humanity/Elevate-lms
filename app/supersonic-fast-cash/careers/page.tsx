@@ -56,7 +56,7 @@ export default async function TaxCareersPage() {
   
   // Fetch tax career positions
   const { data: dbPositions } = await supabase
-    .from('job_positions')
+    .from('job_postings')
     .select('*')
     .eq('department', 'tax_services')
     .eq('status', 'active');

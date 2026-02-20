@@ -111,7 +111,7 @@ export async function logOJTHours(data: {
   }
   // Check for duplicate entry
   const { data: existing } = await supabase
-    .from('ojt_hours_logs')
+    .from('ojt_hours_log')
     .select('*')
     .eq('placement_id', data.placement_id)
     .eq('work_date', data.work_date)
@@ -120,7 +120,7 @@ export async function logOJTHours(data: {
     throw new Error('Hours already logged for this date');
   }
   const { data: log, error } = await supabase
-    .from('ojt_hours_logs')
+    .from('ojt_hours_log')
     .insert({
       ...data,
       supervisor_verified: false,
@@ -143,7 +143,7 @@ export async function verifyOJTHours(
   const supabase = await createClient();
   // Verify supervisor email matches placement
   const { data: log } = await supabase
-    .from('ojt_hours_logs')
+    .from('ojt_hours_log')
     .select('*, ojt_placements(*)')
     .eq('id', log_id)
     .single();
@@ -154,7 +154,7 @@ export async function verifyOJTHours(
     throw new Error('Unauthorized: Email does not match supervisor');
   }
   const { data: verified, error } = await supabase
-    .from('ojt_hours_logs')
+    .from('ojt_hours_log')
     .update({
       supervisor_verified: true,
       supervisor_signature: supervisor_email,
@@ -183,7 +183,7 @@ export async function getOJTProgress(placement_id: string): Promise<OJTProgressS
     throw new Error('Placement not found');
   }
   const { data: logs } = await supabase
-    .from('ojt_hours_logs')
+    .from('ojt_hours_log')
     .select('*')
     .eq('placement_id', placement_id);
   const hours_logged = logs?.reduce((sum, log) => sum + log.hours_worked, 0) || 0;
@@ -244,7 +244,7 @@ export async function getStudentOJTPlacements(student_id: string): Promise<OJTPl
 export async function getPlacementHoursLogs(placement_id: string): Promise<OJTHoursLog[]> {
   const supabase = await createClient();
   const { data: logs } = await supabase
-    .from('ojt_hours_logs')
+    .from('ojt_hours_log')
     .select('*')
     .eq('placement_id', placement_id)
     .order('work_date', { ascending: false });
@@ -256,7 +256,7 @@ export async function getPlacementHoursLogs(placement_id: string): Promise<OJTHo
 export async function getUnverifiedHours(supervisor_email: string): Promise<OJTHoursLog[]> {
   const supabase = await createClient();
   const { data: logs } = await supabase
-    .from('ojt_hours_logs')
+    .from('ojt_hours_log')
     .select('*, ojt_placements(*), profiles(full_name)')
     .eq('supervisor_verified', false)
     .eq('ojt_placements.supervisor_email', supervisor_email)

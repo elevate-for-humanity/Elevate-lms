@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Log the action
-    await supabase.from('audit_log').insert({
+    await supabase.from('audit_logs').insert({
       who: user.id,
       action: 'APPROVE_APP',
       subject: id,
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
       .eq('id', id);
 
     // Log the action
-    await supabase.from('audit_log').insert({
+    await supabase.from('audit_logs').insert({
       who: user.id,
       action: 'DENY_APP',
       subject: id,

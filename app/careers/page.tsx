@@ -55,7 +55,7 @@ export default async function CareersPage() {
   
   // Fetch real job positions from database
   const { data: dbPositions } = await supabase
-    .from('job_positions')
+    .from('job_postings')
     .select('*')
     .eq('status', 'active')
     .order('created_at', { ascending: false });

@@ -368,7 +368,7 @@ export async function scheduleWageFollowUp(enrollmentId: string) {
   const followUp4th = new Date(completionDate);
   followUp4th.setMonth(followUp4th.getMonth() + 12);
 
-  await supabase.from('follow_up_schedule').insert([
+  await supabase.from('followup_schedule').insert([
     {
       enrollment_id: enrollmentId,
       follow_up_type: '2nd_quarter_employment',

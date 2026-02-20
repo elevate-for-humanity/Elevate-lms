@@ -95,7 +95,7 @@ Welcome to Elevate for Humanity!`
     );
 
     // Log the action
-    await supabase.from('audit_log').insert({
+    await supabase.from('audit_logs').insert({
       who: user.id,
       action: 'RESEND_WELCOME',
       subject: application_id,

@@ -90,7 +90,7 @@ export async function POST(req: Request) {
     }
 
     // Save user message
-    await supabase.from('ai_chat_messages').insert({
+    await supabase.from('chat_messages').insert({
       session_id: session.id,
       role: 'user',
       content: message,
@@ -109,7 +109,7 @@ export async function POST(req: Request) {
 
     // Pull recent history
     const { data: history } = await supabase
-      .from('ai_chat_messages')
+      .from('chat_messages')
       .select('role, content')
       .eq('session_id', session.id)
       .order('created_at', { ascending: true })
@@ -138,7 +138,7 @@ export async function POST(req: Request) {
     const reply = completion.choices[0].message.content || "I'm here to help!";
 
     // Save assistant message
-    await supabase.from('ai_chat_messages').insert({
+    await supabase.from('chat_messages').insert({
       session_id: session.id,
       role: 'assistant',
       content: reply,
@@ -182,7 +182,7 @@ export async function GET(req: Request) {
 
     // Get messages
     const { data: messages } = await supabase
-      .from('ai_chat_messages')
+      .from('chat_messages')
       .select('role, content, created_at')
       .eq('session_id', session.id)
       .order('created_at', { ascending: true });

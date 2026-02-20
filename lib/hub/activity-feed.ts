@@ -115,7 +115,7 @@ export async function getActivityFeed(options: {
 
   // 3. OJT hours logged
   const { data: ojtLogs } = await supabase
-    .from('ojt_hours_logs')
+    .from('ojt_hours_log')
     .select(`
       id,
       student_id,

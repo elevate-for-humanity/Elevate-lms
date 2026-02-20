@@ -116,7 +116,7 @@ export async function publishProgram(programId: string, publishedBy: string) {
   }
 
   // Log publication
-  await supabase.from('audit_log').insert({
+  await supabase.from('audit_logs').insert({
     event_type: 'program_published',
     resource_type: 'program',
     resource_id: programId,
@@ -154,7 +154,7 @@ export async function archiveProgram(programId: string, archivedBy: string) {
   }
 
   // Log archival
-  await supabase.from('audit_log').insert({
+  await supabase.from('audit_logs').insert({
     event_type: 'program_archived',
     resource_type: 'program',
     resource_id: programId,

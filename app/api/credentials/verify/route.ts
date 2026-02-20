@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     const isValid = !isExpired && !isRevoked;
 
     // Log verification attempt
-    await supabase.from('audit_log').insert({
+    await supabase.from('audit_logs').insert({
       event_type: 'credential_viewed',
       resource_type: 'credential',
       resource_id: credential.id,

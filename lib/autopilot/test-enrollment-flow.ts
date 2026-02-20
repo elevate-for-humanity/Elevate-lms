@@ -300,7 +300,7 @@ export async function testEnrollmentFlow(
 
     if (instructor) {
       const { data: conversation, error: convError } = await supabase
-        .from('ai_conversations')
+        .from('conversations')
         .insert({
           student_id: userId,
           instructor_id: instructor.id,

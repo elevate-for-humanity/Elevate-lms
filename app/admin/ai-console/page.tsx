@@ -39,7 +39,7 @@ export default async function AIConsolePage() {
 
   // Get AI usage stats
   const { count: totalConversations } = await supabase
-    .from('ai_conversations')
+    .from('conversations')
     .select('*', { count: 'exact', head: true });
 
   return (

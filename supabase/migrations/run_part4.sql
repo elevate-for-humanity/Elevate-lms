@@ -896,15 +896,6 @@ CREATE TABLE IF NOT EXISTS support_messages (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS support_services (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text,
-  description text,
-  status text DEFAULT 'active',
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS support_sessions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   description text,

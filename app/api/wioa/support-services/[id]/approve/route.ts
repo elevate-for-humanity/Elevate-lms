@@ -33,7 +33,7 @@ export async function POST(
     };
 
     const { data, error }: any = await supabase
-      .from('support_services')
+      .from('supportive_services')
       .update(updateData)
       .eq('id', id)
       .select()

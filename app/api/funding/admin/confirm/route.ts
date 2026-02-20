@@ -100,7 +100,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   });
 
   // Log the action
-  await supabase.from('audit_log').insert({
+  await supabase.from('audit_logs').insert({
     who: null, // Case manager approval (no user session)
     action: 'APPROVE_APP_TOKEN',
     subject: app.id,

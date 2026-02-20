@@ -348,15 +348,6 @@ CREATE TABLE IF NOT EXISTS workforce_referrals (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS workone_checklist_items (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text,
-  description text,
-  status text DEFAULT 'active',
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS workshop_categories (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   capacity text,

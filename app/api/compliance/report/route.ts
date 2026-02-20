@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
 
     // Save report configuration or schedule
     const { data: savedReport, error } = await supabase
-      .from('compliance_reports')
+      .from('wioa_compliance_reports')
       .insert({
         report_type: reportType,
         filters: JSON.stringify(filters),

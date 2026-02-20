@@ -326,15 +326,6 @@ CREATE TABLE IF NOT EXISTS compliance_items (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS compliance_reports (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text,
-  data jsonb,
-  period text,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS consent_preferences (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   key text,
@@ -1052,12 +1043,3 @@ CREATE TABLE IF NOT EXISTS follow_up_reminders (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS follow_up_schedule (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  title text,
-  start_date timestamptz,
-  end_date timestamptz,
-  description text,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);

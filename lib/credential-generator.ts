@@ -68,7 +68,7 @@ export async function issueCredential(params: {
   }
 
   // Log issuance
-  await supabase.from('audit_log').insert({
+  await supabase.from('audit_logs').insert({
     event_type: 'credential_issued',
     resource_type: 'credential',
     resource_id: credential.id,
@@ -160,7 +160,7 @@ export async function revokeCredential(
   }
 
   // Log revocation
-  await supabase.from('audit_log').insert({
+  await supabase.from('audit_logs').insert({
     event_type: 'credential_revoked',
     resource_type: 'credential',
     resource_id: credentialId,

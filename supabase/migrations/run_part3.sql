@@ -392,34 +392,6 @@ CREATE TABLE IF NOT EXISTS job_listings (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS job_positions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  department text,
-  description text,
-  elevateforhumanity text,
-  employment_type text,
-  gov text,
-  irs text,
-  jpg text,
-  location text,
-  max_salary text,
-  min_salary text,
-  pay text,
-  png text,
-  requirements text,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS job_posts (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text,
-  description text,
-  status text DEFAULT 'active',
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS jobs (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
@@ -876,16 +848,6 @@ CREATE TABLE IF NOT EXISTS notes (
   name text,
   description text,
   status text DEFAULT 'active',
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS ojt_hours_logs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid,
-  action text,
-  details jsonb,
-  ip_address text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );

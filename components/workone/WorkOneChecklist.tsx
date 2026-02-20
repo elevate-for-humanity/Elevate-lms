@@ -36,7 +36,7 @@ export default function WorkOneChecklist() {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       const { data } = await supabase
-        .from('workone_checklist_items')
+        .from('workone_checklist')
         .select('id, step_key, step_label, status, notes, due_date, completed_at')
         .eq('user_id', user.id)
         .order('created_at');

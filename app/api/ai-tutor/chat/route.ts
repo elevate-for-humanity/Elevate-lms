@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     let messages = [];
     if (conversationId) {
       const { data: history } = await supabase
-        .from('ai_conversations')
+        .from('conversations')
         .select('messages')
         .eq('id', conversationId)
         .eq('user_id', user.id)
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
     let newConversationId = conversationId;
     if (!conversationId) {
       const { data: newConv } = await supabase
-        .from('ai_conversations')
+        .from('conversations')
         .insert({
           user_id: user.id,
           mode,
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
       newConversationId = newConv?.id;
     } else {
       await supabase
-        .from('ai_conversations')
+        .from('conversations')
         .update({ messages })
         .eq('id', conversationId)
         .eq('user_id', user.id);

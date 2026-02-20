@@ -37,7 +37,7 @@ export default async function HoursHistoryPage() {
 
   // Fetch hours log
   const { data: hoursLog } = await supabase
-    .from('apprentice_hours')
+    .from('apprenticeship_hours')
     .select('*')
     .eq('enrollment_id', enrollment?.id)
     .order('date', { ascending: false })

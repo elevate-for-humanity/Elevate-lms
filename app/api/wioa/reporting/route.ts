@@ -185,7 +185,7 @@ async function generateServicesReport(
   startDate: string | null,
   endDate: string | null
 ) {
-  let query = supabase.from('support_services').select('*');
+  let query = supabase.from('supportive_services').select('*');
 
   if (startDate) query = query.gte('request_date', startDate);
   if (endDate) query = query.lte('request_date', endDate);

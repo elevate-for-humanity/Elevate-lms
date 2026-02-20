@@ -51,7 +51,7 @@ export default function TransparencyPage() {
           alt="Transparency"
           fill
           className="object-cover"
-          priority quality={90}
+          priority
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Transparency</h1>

@@ -32,7 +32,7 @@ interface FerpaRequest {
   student_email: string | null;
   purpose: string;
   status: string;
-  priority quality={90}: string;
+  priority: string;
   due_date: string | null;
   created_at: string;
   reviewed_at: string | null;
@@ -298,7 +298,7 @@ export default async function FerpaRequestsPage() {
               <h3 className="font-medium text-brand-blue-800">FERPA Response Timeline</h3>
               <p className="text-sm text-brand-blue-700 mt-1">
                 Under FERPA, institutions must respond to records access requests within 45 days.
-                Requests approaching or past their due date are highlighted for priority quality={90} handling.
+                Requests approaching or past their due date are highlighted for priority handling.
               </p>
             </div>
           </div>

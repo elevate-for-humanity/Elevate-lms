@@ -47,7 +47,7 @@ export default function RefundAdvancePage() {
           alt="Refund Advance"
           fill
           className="object-cover"
-          priority quality={90}
+          priority
           sizes="100vw"
         />
         

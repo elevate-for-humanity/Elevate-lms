@@ -158,7 +158,7 @@ export default async function ProgramsPage() {
       {/* HERO - Full width, consistent height */}
       <section className="relative w-full h-[45vh] sm:h-[50vh] lg:h-[55vh]">
         <div className="absolute inset-0">
-          <Image src="/images/programs-hero-vibrant.jpg" alt="Career training programs" fill sizes="100vw" className="object-cover" priority quality={90} />
+          <Image src="/images/programs-hero-vibrant.jpg" alt="Career training programs" fill sizes="100vw" className="object-cover" priority />
         </div>
         <div className="absolute bottom-6 left-6 right-6 sm:bottom-8 sm:left-8 sm:right-8">
           <span className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold">

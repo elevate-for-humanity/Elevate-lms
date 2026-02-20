@@ -76,7 +76,7 @@ export default async function MarketplacePage() {
           alt="Marketplace"
           fill
           className="object-cover opacity-30"
-          priority quality={90}
+          priority
         />
         <div className="relative max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">

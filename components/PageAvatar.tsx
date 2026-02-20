@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface PageAvatarProps {
   videoSrc: string;
@@ -12,6 +12,10 @@ export default function PageAvatar({ videoSrc, title, position = 'default' }: Pa
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -19,6 +23,7 @@ export default function PageAvatar({ videoSrc, title, position = 'default' }: Pa
 
     const observer = new IntersectionObserver(
       ([entry]) => {
+        setIsVisible(entry.isIntersecting);
         if (!entry.isIntersecting || hasPlayed) return;
         const video = videoRef.current;
         if (!video) return;

@@ -79,7 +79,7 @@ const scholarshipTypes = (dbRows as any[]) || [];
           alt="Scholarships and Financial Aid" 
           fill 
           className="object-cover" 
-          priority quality={90} 
+          priority 
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">

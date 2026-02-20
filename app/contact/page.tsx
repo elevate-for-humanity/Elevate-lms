@@ -77,7 +77,7 @@ export default function ContactPage() {
           alt="Contact Us"
           fill
           quality={90} className="object-cover"
-          priority quality={90}
+          priority
         />
         <div className="relative z-10 text-center text-white px-4">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">Contact Us</h1>

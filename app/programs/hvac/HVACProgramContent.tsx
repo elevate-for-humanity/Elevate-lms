@@ -71,7 +71,7 @@ export default function HVACProgramContent() {
           alt="HVAC technician working on a commercial heating and cooling unit"
           fill
           quality={90} className="object-cover"
-          priority quality={90}
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
 

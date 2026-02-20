@@ -179,7 +179,7 @@ export default function OutcomesPage() {
 
       {/* Visual hero */}
       <section className="relative h-[280px] sm:h-[360px]">
-        <Image src="/images/heroes-hq/success-hero.jpg" alt="Graduates celebrating credential completion" fill sizes="100vw" className="object-cover" priority quality={90} />
+        <Image src="/images/heroes-hq/success-hero.jpg" alt="Graduates celebrating credential completion" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Intro */}

@@ -60,7 +60,7 @@ export default function StudentSupportPage() {
           alt="Student Support"
           fill
           className="object-cover opacity-30"
-          priority quality={90}
+          priority
         />
         <div className="relative max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-4">Student Support Services</h1>

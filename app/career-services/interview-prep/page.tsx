@@ -76,7 +76,7 @@ export default function InterviewPrepPage() {
           alt="Interview Preparation Services"
           fill
           className="object-cover object-center"
-          priority quality={90}
+          priority
           sizes="100vw"
         />
         

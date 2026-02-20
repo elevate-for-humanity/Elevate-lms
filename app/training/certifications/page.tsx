@@ -32,7 +32,7 @@ export default function CertificationsPage() {
 
       {/* Hero */}
       <section className="relative h-[300px] sm:h-[380px] overflow-hidden">
-        <Image src="/images/hero/hero-certifications.jpg" alt="Certification training" fill className="object-cover" priority quality={90} sizes="100vw" />
+        <Image src="/images/hero/hero-certifications.jpg" alt="Certification training" fill className="object-cover" priority sizes="100vw" />
         
       </section>
 

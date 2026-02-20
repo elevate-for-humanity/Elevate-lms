@@ -33,7 +33,7 @@ function SubmitTicketContent() {
     email: '',
     phone: '',
     category: initialCategory,
-    priority quality={90}: 'medium',
+    priority: 'medium',
     subject: '',
     description: '',
   });
@@ -196,8 +196,8 @@ function SubmitTicketContent() {
               </label>
               <select
                 required
-                value={formData.priority quality={90}}
-                onChange={(e) => setFormData({ ...formData, priority quality={90}: e.target.value })}
+                value={formData.priority}
+                onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 text-black"
               >
                 {priorities.map((pri) => (

@@ -60,7 +60,7 @@ export default function TrainingProvidersPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/hero-images/programs-hero.jpg" alt="Training Provider Solutions" fill className="object-cover" priority quality={90} sizes="100vw" />
+          <Image src="/hero-images/programs-hero.jpg" alt="Training Provider Solutions" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

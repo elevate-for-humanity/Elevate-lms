@@ -69,7 +69,7 @@ export default function StudentsPage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority quality={90}
+          priority
         />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">

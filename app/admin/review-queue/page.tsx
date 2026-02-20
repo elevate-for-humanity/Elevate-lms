@@ -60,7 +60,7 @@ export default async function ReviewQueuePage({
   let query = supabase
     .from('review_queue')
     .select('*')
-    .order('priority quality={90}', { ascending: true })
+    .order('priority', { ascending: true })
     .order('created_at', { ascending: true });
 
   if (queue_type) {
@@ -170,7 +170,7 @@ export default async function ReviewQueuePage({
                           {statusConfig.label}
                         </span>
                         <span className="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
-                          Priority {item.priority quality={90}}
+                          Priority {item.priority}
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 mb-2">

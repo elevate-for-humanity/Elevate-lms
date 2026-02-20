@@ -365,7 +365,7 @@ export default async function ReviewDetailPage({
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Priority:</span>
-                <span className="font-medium">{item.priority quality={90}}</span>
+                <span className="font-medium">{item.priority}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Created:</span>

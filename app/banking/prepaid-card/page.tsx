@@ -48,7 +48,7 @@ export default function PrepaidCardPage() {
           alt="Prepaid Card"
           fill
           className="object-cover"
-          priority quality={90}
+          priority
           sizes="100vw"
         />
         

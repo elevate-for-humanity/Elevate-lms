@@ -56,7 +56,7 @@ export default async function VolunteerPage() {
           alt="Volunteer with Elevate"
           fill
           className="object-cover"
-          priority quality={90}
+          priority
         />
         <div className="relative z-10 max-w-6xl mx-auto px-4 text-center text-white">
           <Heart className="w-16 h-16 mx-auto mb-4 opacity-90" />

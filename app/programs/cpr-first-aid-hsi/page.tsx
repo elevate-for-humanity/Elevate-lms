@@ -86,7 +86,7 @@ const courses = (dbRows as any[]) || [];
           alt="CPR First Aid Training" 
           fill sizes="100vw"
           className="object-cover" 
-          priority quality={90} 
+          priority 
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">

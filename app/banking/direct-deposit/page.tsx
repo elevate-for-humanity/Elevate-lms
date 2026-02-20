@@ -47,7 +47,7 @@ export default function DirectDepositPage() {
           alt="Direct Deposit"
           fill
           className="object-cover"
-          priority quality={90}
+          priority
           sizes="100vw"
         />
         

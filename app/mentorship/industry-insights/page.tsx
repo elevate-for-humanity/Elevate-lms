@@ -33,7 +33,7 @@ export default function IndustryInsightsPage() {
       </div>
 
       <section className="relative h-[350px] flex items-center justify-center text-white overflow-hidden">
-        <Image src="/images/hero/portal-hero.jpg" alt="Industry Insights" fill className="object-cover" priority quality={90} sizes="100vw" />
+        <Image src="/images/hero/portal-hero.jpg" alt="Industry Insights" fill className="object-cover" priority sizes="100vw" />
         
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <Lightbulb className="w-16 h-16 mx-auto mb-4 text-white/80" />

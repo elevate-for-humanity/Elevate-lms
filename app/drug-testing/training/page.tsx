@@ -63,7 +63,7 @@ export default async function DrugTestingTrainingPage() {
           alt="Drug Testing Training" 
           fill 
           className="object-cover" 
-          priority quality={90} 
+          priority 
         />
         
       </section>

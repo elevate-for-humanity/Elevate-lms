@@ -81,12 +81,12 @@ export function SupportForm() {
       </div>
 
       <div>
-        <label htmlFor="priority quality={90}" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-2">
           Priority
         </label>
         <select
-          id="priority quality={90}"
-          name="priority quality={90}"
+          id="priority"
+          name="priority"
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
         >
           <option value="low">Low - General question</option>

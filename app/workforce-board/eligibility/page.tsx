@@ -15,7 +15,7 @@ const ELIGIBLE = [
   'U.S. citizen or authorized to work in the United States',
   'Age 18 or older (16+ for youth programs)',
   'Registered with Selective Service (males born after 12/31/1959)',
-  'Meet income guidelines or qualify through a priority quality={90} population',
+  'Meet income guidelines or qualify through a priority population',
   'Not currently enrolled in secondary education (adult programs)',
 ];
 
@@ -39,7 +39,7 @@ const DOCUMENTS_NEEDED = [
   'Proof of income (pay stubs, tax return, benefits letter)',
   'Selective Service registration (males 18-25)',
   'DD-214 (veterans)',
-  'Court documents (if applicable for priority quality={90} population status)',
+  'Court documents (if applicable for priority population status)',
 ];
 
 export default function EligibilityPage() {
@@ -54,7 +54,7 @@ export default function EligibilityPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/homepage/funded-programs.jpg" alt="WIOA eligibility information" fill className="object-cover" priority quality={90} sizes="100vw" />
+          <Image src="/images/homepage/funded-programs.jpg" alt="WIOA eligibility information" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -86,7 +86,7 @@ export default function EligibilityPage() {
       <section className="py-16 bg-gray-50">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Priority Populations</h2>
-          <p className="text-gray-600 mb-8">WIOA gives priority quality={90} of service to individuals in the following categories:</p>
+          <p className="text-gray-600 mb-8">WIOA gives priority of service to individuals in the following categories:</p>
           <div className="grid sm:grid-cols-2 gap-3">
             {PRIORITY_POPULATIONS.map((item) => (
               <div key={item} className="bg-white border border-gray-200 rounded-lg px-4 py-3 flex items-center gap-3">

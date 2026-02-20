@@ -30,7 +30,7 @@ export default function DieselMechanicPage() {
       </div>
 
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/transportation/hero-program-automotive.jpg" alt="Diesel Mechanic Training" fill sizes="100vw" className="object-cover" priority quality={90} />
+        <Image src="/images/transportation/hero-program-automotive.jpg" alt="Diesel Mechanic Training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
             <span className="inline-block bg-brand-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Funding Available</span>

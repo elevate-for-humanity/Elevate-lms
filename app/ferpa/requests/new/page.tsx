@@ -60,7 +60,7 @@ export default function NewFerpaRequestPage() {
     student_email: '',
     records_requested: [] as string[],
     purpose: '',
-    priority quality={90}: 'normal',
+    priority: 'normal',
   });
 
   const handleRecordToggle = (record: string) => {
@@ -323,13 +323,13 @@ export default function NewFerpaRequestPage() {
                 />
               </div>
               <div>
-                <label htmlFor="priority quality={90}" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
                   Priority Level
                 </label>
                 <select
-                  id="priority quality={90}"
-                  value={formData.priority quality={90}}
-                  onChange={(e) => setFormData({ ...formData, priority quality={90}: e.target.value })}
+                  id="priority"
+                  value={formData.priority}
+                  onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 >
                   <option value="low">Low</option>

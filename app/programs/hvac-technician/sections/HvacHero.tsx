@@ -13,7 +13,7 @@ export function HvacHero() {
           alt="HVAC technician working on a residential air conditioning unit"
           fill sizes="100vw"
           className="object-cover"
-          priority quality={90}
+          priority
         />
       </section>
 

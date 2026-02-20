@@ -107,7 +107,7 @@ export default function PartnersPage() {
           alt="Partner with Elevate for Humanity"
           fill
           className="object-cover"
-          priority quality={90}
+          priority
         />
         
         <div className="relative z-10 mx-auto max-w-6xl px-6 py-16 text-white">

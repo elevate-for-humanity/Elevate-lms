@@ -56,7 +56,7 @@ export default function EmployersPage() {
           alt="Partner with Elevate for Humanity"
           fill
           className="object-cover"
-          priority quality={90}
+          priority
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 w-full">
           <div className="max-w-2xl bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl">

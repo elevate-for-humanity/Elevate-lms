@@ -113,7 +113,7 @@ export default function MedicalAssistantProgramPage() {
     { value: "14%", label: "Job Growth Rate" },
     { value: "$38K", label: "Average Starting Salary" },
     { value: "21 Days", label: "Program Duration" },
-    { value: "92%", label: "Job Placement Rate*" }
+    { value: "92%", label: "Placement Goal*" }
   ];
 
   return (

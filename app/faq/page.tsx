@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -14,8 +13,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = 'force-dynamic';
-
 interface FAQ {
   id: string;
   question: string;
@@ -24,27 +21,8 @@ interface FAQ {
   display_order: number;
 }
 
-export default async function FAQPage() {
-  const supabase = await createClient();
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const { data: faqs, error } = await supabase
-    .from('faqs')
-    .select('id, question, answer, category, display_order')
-    .eq('is_active', true)
-    .order('display_order', { ascending: true });
-
-  const defaultFaqs: FAQ[] = [
+export default function FAQPage() {
+  const faqs: FAQ[] = [
     // Enrollment
     { id: '1', question: 'Is the training really free?', answer: 'Yes, for eligible participants. Federal and state workforce programs (WIOA, WRG, JRI) cover tuition, books, and supplies. Some programs like Barber Apprenticeship are self-pay with payment plans available.', category: 'Enrollment', display_order: 1 },
     { id: '2', question: 'How do I know if I qualify for free training?', answer: 'You likely qualify if you are unemployed, underemployed, receiving public assistance (SNAP, TANF, Medicaid), a veteran, or have household income below 200% of poverty level. Take our 2-minute eligibility check.', category: 'Enrollment', display_order: 2 },
@@ -66,7 +44,7 @@ export default async function FAQPage() {
     { id: '19', question: 'Can non-U.S. citizens enroll?', answer: 'WIOA-funded programs require U.S. citizenship or eligible immigration status with work authorization. Self-pay programs may have different requirements. Contact us to discuss your specific situation.', category: 'Eligibility', display_order: 16 },
     // Career Services
     { id: '7', question: 'Do you help with job placement?', answer: 'Yes! Every program includes career services: resume writing, interview preparation, and direct connections to 50+ employer partners actively hiring our graduates.', category: 'Career Services', display_order: 17 },
-    { id: '20', question: 'What is the job placement rate?', answer: 'Our overall job placement rate exceeds 80% within 90 days of program completion. Rates vary by program and market conditions. Visit our Outcomes page for detailed program-specific data.', category: 'Career Services', display_order: 18 },
+    { id: '20', question: 'What is the job placement rate?', answer: 'Our placement goal is 85% within 90 days of program completion. Actual rates vary by program, cohort size, and market conditions. We provide career services including resume support, interview prep, and employer introductions to every graduate.', category: 'Career Services', display_order: 18 },
     { id: '21', question: 'What salary can I expect after training?', answer: 'Starting salaries vary by field. CNA: $15-$20/hr. Medical Assistant: $16-$22/hr. CDL Driver: $50,000-$75,000/yr. HVAC Technician: $18-$28/hr. Barber: $30,000-$60,000/yr depending on clientele. See individual program pages for detailed salary ranges.', category: 'Career Services', display_order: 19 },
     // General / Logistics
     { id: '8', question: 'Where are you located?', answer: 'We are based in Indianapolis, Indiana (Marion County). Training locations vary by program. Some programs offer hybrid or online options.', category: 'General', display_order: 20 },
@@ -81,10 +59,8 @@ export default async function FAQPage() {
     { id: '28', question: 'How do I file a complaint or grievance?', answer: 'We take all concerns seriously. You can file a grievance through our formal process outlined in the Student Handbook, speak with your program coordinator, or contact us at our main office. See our Grievance Policy page for full details.', category: 'Support', display_order: 28 },
   ];
 
-  const faqsToUse = (faqs && faqs.length > 0) ? faqs : defaultFaqs;
-
   // Group FAQs by category
-  const categories = [...new Set(faqsToUse.map((faq: FAQ) => faq.category))];
+  const categories = [...new Set(faqs.map((faq: FAQ) => faq.category))];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -158,7 +134,7 @@ export default async function FAQPage() {
         )}
 
         {/* FAQ List with Search */}
-        <FAQSearch faqs={faqsToUse} />
+        <FAQSearch faqs={faqs} />
 
         {/* Contact CTA */}
         <div className="mt-12 bg-brand-orange-50 rounded-xl p-8 text-center">

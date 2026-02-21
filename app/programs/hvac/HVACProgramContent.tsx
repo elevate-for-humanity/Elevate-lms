@@ -31,7 +31,7 @@ export default function HVACProgramContent() {
     },
     {
       question: "What certifications do I get?",
-      answer: "You'll earn your EPA Section 608 Certification (required by law to work with refrigerants), OSHA 10 Safety Certification, and a program completion certificate. These are the credentials HVAC employers look for when hiring."
+      answer: "You'll earn your EPA Section 608 Certification (required by law to work with refrigerants), OSHA 30 Safety Certification, and a program completion certificate. These are the credentials HVAC employers look for when hiring."
     },
     {
       question: "What jobs can I get after this?",
@@ -47,7 +47,7 @@ export default function HVACProgramContent() {
     },
     {
       question: "What happens after I graduate?",
-      answer: "You'll have your EPA 608 and OSHA 10 certifications, a portfolio of documented job site hours, and connections to local HVAC employers. Our career services team helps with resume writing, interview prep, and direct introductions to hiring managers. Many graduates start working within weeks of completing the program."
+      answer: "You'll have your EPA 608 and OSHA 30 certifications, a portfolio of documented job site hours, and connections to local HVAC employers. Our career services team helps with resume writing, interview prep, and direct introductions to hiring managers. Many graduates start working within weeks of completing the program."
     }
   ];
 
@@ -337,16 +337,16 @@ export default function HVACProgramContent() {
             </div>
           </div>
 
-          {/* OSHA 10 + Program Certificate */}
+          {/* OSHA 30 + Program Certificate */}
           <div className="grid md:grid-cols-2 gap-8">
             <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
               <div className="relative h-48">
-                <Image src="/images/courses/hvac-technician-10002289-cover.jpg" alt="OSHA 10 safety certification training" fill quality={90} className="object-cover" />
+                <Image src="/images/courses/hvac-technician-10002289-cover.jpg" alt="OSHA 30 safety certification training" fill quality={90} className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
                   <Shield className="w-5 h-5 text-yellow-600" />
-                  <h3 className="text-lg font-bold text-gray-900">OSHA 10 Safety</h3>
+                  <h3 className="text-lg font-bold text-gray-900">OSHA 30 Safety</h3>
                 </div>
                 <p className="text-gray-600 text-sm">
                   Occupational safety certification covering hazard recognition, fall protection,

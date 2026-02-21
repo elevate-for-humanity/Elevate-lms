@@ -147,7 +147,7 @@ const sitemapSections = [
     title: 'Resources',
     links: [
       { name: 'FAQ', href: '/faq' },
-      { name: 'Blog', href: '/blog' },
+      /* Blog hidden until posts are published */
       { name: 'Help Center', href: '/help' },
       { name: 'Calendar', href: '/calendar' },
       { name: 'Events', href: '/events' },

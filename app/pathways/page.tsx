@@ -116,7 +116,7 @@ const PROGRAMS = [
     image: '/images/programs-hq/hvac-technician.jpg',
     href: '/programs/hvac-technician',
     duration: '12–16 weeks',
-    credential: 'EPA 608 + OSHA 10',
+    credential: 'EPA 608 + OSHA 30',
     issuer: 'EPA + OSHA',
     salary: '$48K average starting ($60K–$80K+ experienced)',
     jobs: 'HVAC contractors, property management, commercial maintenance — 50+ employer partners',

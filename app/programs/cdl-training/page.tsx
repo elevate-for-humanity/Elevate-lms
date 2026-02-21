@@ -5,7 +5,6 @@ import Image from 'next/image';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
-import PageAvatar from '@/components/PageAvatar';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
@@ -38,7 +37,7 @@ export default function CDLTrainingPage() {
       outcomes: ['Class A Commercial Driver License (CDL)', 'DOT Medical Card'],
     }} />
     <div className="min-h-screen bg-white">
-      <ProgramHeroBanner videoSrc="/videos/cdl-hero.mp4" />
+      <ProgramHeroBanner videoSrc="/videos/cdl-hero.mp4" voiceoverSrc="/audio/heroes/cdl.mp3" />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Skilled Trades', href: '/programs/skilled-trades' }, { label: 'CDL Training' }]} />
@@ -62,7 +61,6 @@ export default function CDLTrainingPage() {
       {/* Avatar Guide */}
       <section className="py-8 bg-white">
         <div className="max-w-3xl mx-auto px-4">
-          <PageAvatar videoSrc="/videos/avatars/trades-guide.mp4" title="CDL Training Guide" />
         </div>
       </section>
 

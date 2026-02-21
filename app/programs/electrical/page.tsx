@@ -81,7 +81,7 @@ export default function ElectricalProgramPage() {
 
   return (
     <>
-      <ProgramHeroBanner videoSrc="/videos/electrician-trades.mp4" />
+      <ProgramHeroBanner videoSrc="/videos/electrician-trades.mp4" voiceoverSrc="/audio/heroes/electrical.mp3" />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[

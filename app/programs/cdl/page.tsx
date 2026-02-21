@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import { 
@@ -130,7 +129,7 @@ export default function CDLProgramPage() {
       {/* Hero */}
       <section className="relative text-white overflow-hidden">
         <div className="absolute inset-0">
-          <Image src="/images/cdl-vibrant.jpg" alt="CDL Training" fill quality={85} className="object-cover" />
+          <Image src="/images/cdl-vibrant.jpg" alt="CDL Training" fill sizes="100vw" className="object-cover" />
           
         </div>
         

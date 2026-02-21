@@ -1,16 +1,24 @@
 import { logger } from '@/lib/logger';
 
+const FROM_EMAIL =
+  process.env.EMAIL_FROM ||
+  process.env.MAIL_FROM ||
+  'Elevate for Humanity <noreply@elevateforhumanity.org>';
+const REPLY_TO_EMAIL =
+  process.env.REPLY_TO_EMAIL || 'elevate4humanityedu@gmail.com';
+
 export interface EmailOptions {
   to: string | string[];
   subject: string;
   html: string;
   text?: string;
   from?: string;
+  replyTo?: string;
 }
 
 /**
  * Send email via Resend HTTP API (no SDK — direct fetch).
- * Returns { success, data?, error? }.
+ * All email in the app routes through this single function.
  */
 export async function sendEmail(options: EmailOptions) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -19,10 +27,8 @@ export async function sendEmail(options: EmailOptions) {
     return { success: false, error: 'Email service not configured (RESEND_API_KEY missing)' };
   }
 
-  const from =
-    options.from ||
-    process.env.MAIL_FROM ||
-    'Elevate for Humanity <noreply@elevateforhumanity.org>';
+  const from = options.from || FROM_EMAIL;
+  const replyTo = options.replyTo ?? REPLY_TO_EMAIL;
   const toArr = Array.isArray(options.to) ? options.to : [options.to];
 
   try {
@@ -37,6 +43,7 @@ export async function sendEmail(options: EmailOptions) {
         to: toArr,
         subject: options.subject,
         html: options.html,
+        reply_to: replyTo,
         ...(options.text ? { text: options.text } : {}),
       }),
     });

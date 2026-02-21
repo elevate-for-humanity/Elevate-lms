@@ -1,4 +1,4 @@
-import { BookOpen, Building, BarChart3, Shield, Clock, Briefcase, DollarSign, CheckCircle } from 'lucide-react';
+import Image from 'next/image';
 import { COMPETENCIES } from '../barber-program-data';
 
 export function BarberDeliveryModel() {
@@ -12,33 +12,41 @@ export function BarberDeliveryModel() {
             Programs are delivered through a structured workforce training model that includes licensed credential partners for instruction, employer-based hands-on training where applicable, mapped competencies, and LMS-tracked progress under centralized program oversight.
           </p>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-              <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center mb-4">
-                <BookOpen className="w-6 h-6 text-brand-red-600" />
+            <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
+              <div className="relative h-48">
+                <Image src="/images/programs-hq/barber-training.jpg" alt="Barber classroom instruction" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
-              <h3 className="font-bold text-lg text-slate-900 mb-2">Related Technical Instruction (RTI)</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">Delivered by licensed credential partners and supervised instructional modules. Includes classroom instruction, LMS-based coursework, and structured evaluations aligned to competency standards.</p>
+              <div className="p-6">
+                <h3 className="font-bold text-lg text-slate-900 mb-2">Related Technical Instruction (RTI)</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">Delivered by licensed credential partners and supervised instructional modules. Includes classroom instruction, LMS-based coursework, and structured evaluations aligned to competency standards.</p>
+              </div>
             </div>
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-              <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center mb-4">
-                <Building className="w-6 h-6 text-brand-red-600" />
+            <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
+              <div className="relative h-48">
+                <Image src="/images/barber/gallery-1.jpg" alt="Apprentice cutting hair in licensed barbershop" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
-              <h3 className="font-bold text-lg text-slate-900 mb-2">On-the-Job Training (OJT)</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">Conducted in approved licensed barbershops under licensed barber supervision. Includes real client services, shop operations, sanitation practices, and professional skill development.</p>
+              <div className="p-6">
+                <h3 className="font-bold text-lg text-slate-900 mb-2">On-the-Job Training (OJT)</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">Conducted in approved licensed barbershops under licensed barber supervision. Includes real client services, shop operations, sanitation practices, and professional skill development.</p>
+              </div>
             </div>
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-              <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center mb-4">
-                <BarChart3 className="w-6 h-6 text-brand-red-600" />
+            <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
+              <div className="relative h-48">
+                <Image src="/images/barber/gallery-2.jpg" alt="Barber apprentice progress tracking" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
-              <h3 className="font-bold text-lg text-slate-900 mb-2">Progress Tracking</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">Competency tracking through institutional LMS, evaluation rubrics, monthly OJT employer evaluations, and tri-party competency verification (RTI + Employer + Program Oversight).</p>
+              <div className="p-6">
+                <h3 className="font-bold text-lg text-slate-900 mb-2">Progress Tracking</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">Competency tracking through institutional LMS, evaluation rubrics, monthly OJT employer evaluations, and tri-party competency verification (RTI + Employer + Program Oversight).</p>
+              </div>
             </div>
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-              <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-brand-red-600" />
+            <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
+              <div className="relative h-48">
+                <Image src="/images/barber/gallery-3.jpg" alt="Licensed barbershop training environment" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
-              <h3 className="font-bold text-lg text-slate-900 mb-2">Program Oversight</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">Oversight provided by Elevate program holders and sponsor framework. All employer training sites are approved and required to maintain active licensing and provide monthly evaluations.</p>
+              <div className="p-6">
+                <h3 className="font-bold text-lg text-slate-900 mb-2">Program Oversight</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">Oversight provided by Elevate program holders and sponsor framework. All employer training sites are approved and required to maintain active licensing and provide monthly evaluations.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -53,24 +61,24 @@ export function BarberDeliveryModel() {
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 text-center">
-              <Clock className="w-8 h-8 text-slate-400 mx-auto mb-3" />
-              <div className="text-2xl font-bold text-slate-900">15 Months</div>
-              <div className="text-slate-500 text-sm">Total Duration</div>
+              <div className="text-3xl font-black text-brand-red-600 mb-1">15</div>
+              <div className="text-sm font-bold text-slate-900">Months</div>
+              <div className="text-slate-500 text-xs mt-1">Total Duration</div>
             </div>
             <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 text-center">
-              <Briefcase className="w-8 h-8 text-slate-400 mx-auto mb-3" />
-              <div className="text-2xl font-bold text-slate-900">2,000</div>
-              <div className="text-slate-500 text-sm">OJT Hours (Licensed Shops)</div>
+              <div className="text-3xl font-black text-brand-red-600 mb-1">2,000</div>
+              <div className="text-sm font-bold text-slate-900">OJT Hours</div>
+              <div className="text-slate-500 text-xs mt-1">Licensed Shops</div>
             </div>
             <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 text-center">
-              <BookOpen className="w-8 h-8 text-slate-400 mx-auto mb-3" />
-              <div className="text-2xl font-bold text-slate-900">Structured</div>
-              <div className="text-slate-500 text-sm">RTI Hours (Competency-Aligned)</div>
+              <div className="text-3xl font-black text-brand-red-600 mb-1">RTI</div>
+              <div className="text-sm font-bold text-slate-900">Structured</div>
+              <div className="text-slate-500 text-xs mt-1">Competency-Aligned</div>
             </div>
             <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 text-center">
-              <DollarSign className="w-8 h-8 text-slate-400 mx-auto mb-3" />
-              <div className="text-2xl font-bold text-slate-900">$4,890</div>
-              <div className="text-slate-500 text-sm">Total Training Cost</div>
+              <div className="text-3xl font-black text-brand-red-600 mb-1">$4,890</div>
+              <div className="text-sm font-bold text-slate-900">Total Cost</div>
+              <div className="text-slate-500 text-xs mt-1">BNPL Available</div>
             </div>
           </div>
 
@@ -98,7 +106,7 @@ export function BarberDeliveryModel() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {COMPETENCIES.map((comp, i) => (
               <div key={i} className="flex items-start gap-3 bg-white rounded-lg p-4 border border-slate-200">
-                <CheckCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
+                <span className="w-6 h-6 bg-brand-red-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">{i + 1}</span>
                 <span className="text-slate-700">{comp}</span>
               </div>
             ))}

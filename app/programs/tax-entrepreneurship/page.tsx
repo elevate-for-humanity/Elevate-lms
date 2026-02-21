@@ -55,7 +55,7 @@ export default async function TaxEntrepreneurshipPage() {
       </section>
 
       {/* Avatar Guide */}
-      <ProgramHeroBanner videoSrc="/videos/avatars/financial-guide.mp4" />
+      <ProgramHeroBanner videoSrc="/videos/tax-career-paths.mp4" voiceoverSrc="/audio/heroes/tax.mp3" />
 
       {/* Pathway Disclosure */}
       <PathwayDisclosure programName="Tax Entrepreneurship" programSlug="tax-entrepreneurship" />

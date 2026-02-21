@@ -10,7 +10,6 @@ import { ExternalLink } from 'lucide-react';
 import { Clock, DollarSign, Shield, Award, CheckCircle, Users } from 'lucide-react';
 import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
-import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 
@@ -103,7 +102,6 @@ export default async function Page() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar videoSrc="/videos/avatars/tax-guide.mp4" title="Tax Preparation Program Guide" />
 
       {/* Pathway Disclosure */}
       <PathwayDisclosure programName="Tax Preparation" programSlug="tax-preparation" />

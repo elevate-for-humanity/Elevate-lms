@@ -440,7 +440,7 @@ export default function EmailMarketingPage() {
                 </div>
                 <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/heroes-hq/success-stories-hero.jpg"
+                    src="/images/programs-hq/business-training.jpg"
                     alt="Students learning"
                     fill
                     className="object-cover"

@@ -1,35 +1,20 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
-
-const STORAGE_KEY = 'elevate-hero-sound';
 
 interface ProgramHeroBannerProps {
   videoSrc: string;
+  voiceoverSrc?: string;
 }
 
-export default function ProgramHeroBanner({ videoSrc }: ProgramHeroBannerProps) {
+export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHeroBannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const voiceoverRef = useRef<HTMLAudioElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [muted, setMuted] = useState(true); // always start muted (autoplay-safe)
-  const [hasInteracted, setHasInteracted] = useState(false);
+  const [voiceActive, setVoiceActive] = useState(false);
 
-  // On mount, check if user previously opted in to sound
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === 'on') {
-        // User previously enabled sound — still start muted for autoplay,
-        // but mark as interacted so the "Tap for sound" label is hidden
-        setHasInteracted(true);
-      }
-    } catch {
-      // localStorage unavailable
-    }
-  }, []);
-
-  // Play/pause based on scroll visibility
+  // Play/pause video based on scroll visibility
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -38,7 +23,6 @@ export default function ProgramHeroBanner({ videoSrc }: ProgramHeroBannerProps) 
       ([entry]) => {
         const video = videoRef.current;
         if (!video) return;
-
         if (entry.isIntersecting) {
           video.play().catch(() => {});
         } else {
@@ -52,24 +36,26 @@ export default function ProgramHeroBanner({ videoSrc }: ProgramHeroBannerProps) 
     return () => observer.disconnect();
   }, []);
 
-  // Sync muted state to video element
+  // Auto-start voiceover on page load — plays once, no loop
   useEffect(() => {
-    const video = videoRef.current;
-    if (video) video.muted = muted;
-  }, [muted]);
+    if (!voiceoverSrc) return;
+    const voiceover = voiceoverRef.current;
+    if (!voiceover) return;
+    voiceover.play().then(() => setVoiceActive(true)).catch(() => {});
+  }, [voiceoverSrc]);
 
-  const toggleMute = useCallback(() => {
-    setHasInteracted(true);
-    setMuted((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem(STORAGE_KEY, next ? 'off' : 'on');
-      } catch {
-        // localStorage unavailable
-      }
-      return next;
-    });
-  }, []);
+  const toggleVoiceover = () => {
+    const voiceover = voiceoverRef.current;
+    if (!voiceover) return;
+    if (!voiceActive) {
+      voiceover.currentTime = 0;
+      voiceover.play().catch(() => {});
+      setVoiceActive(true);
+    } else {
+      voiceover.pause();
+      setVoiceActive(false);
+    }
+  };
 
   return (
     <div ref={containerRef} className="relative w-full overflow-hidden bg-black" style={{ maxHeight: '400px' }}>
@@ -84,17 +70,27 @@ export default function ProgramHeroBanner({ videoSrc }: ProgramHeroBannerProps) 
         preload="metadata"
       />
 
-      {/* Sound control */}
-      <button
-        onClick={toggleMute}
-        aria-label={muted ? 'Unmute video' : 'Mute video'}
-        className="absolute bottom-4 right-4 z-10 flex items-center gap-2 bg-black/60 hover:bg-black/80 text-white px-4 py-3 rounded-full transition-all backdrop-blur-sm"
-      >
-        {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-        {muted && !hasInteracted && (
-          <span className="text-sm font-medium">Tap for sound</span>
-        )}
-      </button>
+      {voiceoverSrc && (
+        <audio ref={voiceoverRef} src={voiceoverSrc} preload="auto" onEnded={() => setVoiceActive(false)} />
+      )}
+
+      {voiceoverSrc && (
+        <button
+          onClick={toggleVoiceover}
+          aria-label={voiceActive ? 'Stop narration' : 'Play narration'}
+          className={`absolute z-10 flex items-center gap-2 backdrop-blur-sm text-white rounded-full shadow-lg transition-all ${
+            voiceActive
+              ? 'bottom-4 right-4 px-4 py-2.5 bg-black/60 hover:bg-black/80'
+              : 'bottom-6 right-6 px-5 py-3 bg-brand-red-600 hover:bg-brand-red-700 animate-pulse'
+          }`}
+        >
+          {voiceActive ? (
+            <><Volume2 className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Narration On</span></>
+          ) : (
+            <><VolumeX className="w-5 h-5" /><span className="text-sm font-bold">Tap for Narration</span></>
+          )}
+        </button>
+      )}
     </div>
   );
 }

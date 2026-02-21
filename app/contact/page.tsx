@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Mail, Phone, MapPin, Clock, Send, AlertCircle, Loader2 } from 'lucide-react';
-import PageAvatar from '@/components/PageAvatar';
 import Turnstile from '@/components/Turnstile';
 import { ZOOM_MEETING_URL } from '@/lib/config/zoom';
 
@@ -86,10 +85,6 @@ export default function ContactPage() {
       </div>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/orientation-guide.mp4" 
-        title="Contact Us" 
-      />
 
       <div className="max-w-7xl mx-auto px-4 py-8 sm:py-10 md:py-12">
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-8 sm:mb-10 md:mb-12">

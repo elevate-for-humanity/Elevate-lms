@@ -1,7 +1,4 @@
-import {
-  Scissors, Shield, Users, Briefcase, Heart,
-  ClipboardCheck, BookOpen, Wrench,
-} from 'lucide-react';
+
 
 export const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -45,14 +42,14 @@ export const CREDENTIALS = [
 ];
 
 export const CURRICULUM = [
-  { icon: Scissors, title: 'Haircutting Techniques', description: 'Fades, tapers, lineups, and precision cutting under licensed supervision in a real shop environment.' },
-  { icon: Wrench, title: 'Clipper & Shear Mastery', description: 'Tool selection, maintenance, guard systems, and advanced clipper-over-comb and shear techniques.' },
-  { icon: Shield, title: 'Sanitation & Safety', description: 'Indiana State Board sanitation standards, chemical safety, bloodborne pathogen protocols, and workstation compliance.' },
-  { icon: Heart, title: 'Shaving & Beard Grooming', description: 'Straight razor safety, beard shaping, lining, skin protection, and hot towel service techniques.' },
-  { icon: Users, title: 'Client Services & Professionalism', description: 'Client consultation, communication, time management, and building a repeat client base.' },
-  { icon: Briefcase, title: 'Shop Operations & Business', description: 'Booth rental basics, appointment management, business licensing, and shop ownership preparation.' },
-  { icon: BookOpen, title: 'License Exam Preparation', description: 'Indiana barber license exam prep including written test review, practical exam practice, and State Board requirements.' },
-  { icon: ClipboardCheck, title: 'Competency Evaluations', description: 'Monthly rubric-based assessments, tri-party verification (RTI + Employer + Program), and documented skill progression.' },
+  { title: 'Haircutting Techniques', description: 'Fades, tapers, lineups, and precision cutting under licensed supervision in a real shop environment.' },
+  { title: 'Clipper & Shear Mastery', description: 'Tool selection, maintenance, guard systems, and advanced clipper-over-comb and shear techniques.' },
+  { title: 'Sanitation & Safety', description: 'Indiana State Board sanitation standards, chemical safety, bloodborne pathogen protocols, and workstation compliance.' },
+  { title: 'Shaving & Beard Grooming', description: 'Straight razor safety, beard shaping, lining, skin protection, and hot towel service techniques.' },
+  { title: 'Client Services & Professionalism', description: 'Client consultation, communication, time management, and building a repeat client base.' },
+  { title: 'Shop Operations & Business', description: 'Booth rental basics, appointment management, business licensing, and shop ownership preparation.' },
+  { title: 'License Exam Preparation', description: 'Indiana barber license exam prep including written test review, practical exam practice, and State Board requirements.' },
+  { title: 'Competency Evaluations', description: 'Monthly rubric-based assessments, tri-party verification (RTI + Employer + Program), and documented skill progression.' },
 ];
 
 export const CAREERS = [

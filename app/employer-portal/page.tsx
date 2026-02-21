@@ -3,7 +3,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Building2 } from 'lucide-react';
-import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -37,10 +36,6 @@ export default function EmployerPortalLanding() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/orientation-guide.mp4" 
-        title="Employer Welcome" 
-      />
 
       <section className="py-16 bg-slate-50">
         <div className="max-w-6xl mx-auto px-4">

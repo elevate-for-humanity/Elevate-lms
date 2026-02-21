@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function CertificationsPage() {
   const certifications = [
     { name: 'Certified Medical Assistant (CMA)', industry: 'Healthcare', duration: '12 weeks', demand: 'High', image: '/images/healthcare/hero-program-medical-assistant.jpg' },
-    { name: 'Certified Phlebotomy Technician (CPT)', industry: 'Healthcare', duration: '6 weeks', demand: 'High', image: '/images/healthcare/hero-program-phlebotomy.jpg' },
+    { name: 'Certified Phlebotomy Technician (CPT)', industry: 'Healthcare', duration: '6 weeks', demand: 'High', image: '/images/healthcare/phlebotomy-hero.jpg' },
     { name: 'EPA 608 Certification', industry: 'HVAC', duration: '2 weeks', demand: 'High', image: '/images/hero/hero-certifications.jpg' },
     { name: 'OSHA 10/30 Safety', industry: 'Construction', duration: '1-3 days', demand: 'Required', image: '/images/trades/program-electrical-training.jpg' },
     { name: 'CompTIA A+', industry: 'Technology', duration: '8 weeks', demand: 'High', image: '/images/technology/hero-programs-technology.jpg' },

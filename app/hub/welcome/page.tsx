@@ -274,7 +274,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/heroes-hq/employer-hero.jpg"
+                    src="/images/heroes-hq/success-hero.jpg"
                     alt="Get enrolled"
                     fill
                     className="object-cover"

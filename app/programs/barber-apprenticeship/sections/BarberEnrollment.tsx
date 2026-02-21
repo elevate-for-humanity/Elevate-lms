@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { ArrowRight, Phone, Shield } from 'lucide-react';
 import { ProgramTutorCTA } from '@/components/ProgramTutorCTA';
 import { ENROLLMENT_STEPS, ELIGIBILITY } from '../barber-program-data';
 
@@ -95,12 +94,9 @@ export function BarberEnrollment() {
       <section className="py-12 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
-            <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-brand-blue-800 leading-relaxed">
-                This program is aligned with workforce training standards and apprenticeship-based learning models, incorporating structured RTI, employer-supervised OJT, mapped competencies, and documented progress reporting suitable for workforce partners and cohort training programs. Enrollment is contingent upon eligibility, funding availability, and employer participation.
-              </p>
-            </div>
+            <p className="text-sm text-brand-blue-800 leading-relaxed">
+              This program is aligned with workforce training standards and apprenticeship-based learning models, incorporating structured RTI, employer-supervised OJT, mapped competencies, and documented progress reporting suitable for workforce partners and cohort training programs. Enrollment is contingent upon eligibility, funding availability, and employer participation.
+            </p>
           </div>
         </div>
       </section>
@@ -116,10 +112,10 @@ export function BarberEnrollment() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/apply?program=barber-apprenticeship" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
-              Apply Now <ArrowRight className="w-5 h-5" />
+              Apply Now &rarr;
             </Link>
             <Link href="/support" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">
-              <Phone className="w-5 h-5" /> Get Help Online
+              Get Help Online
             </Link>
           </div>
           <div className="mt-6 flex justify-center">

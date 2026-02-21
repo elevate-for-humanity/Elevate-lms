@@ -20,48 +20,48 @@ export type ProgramEntry = {
 
 export const PROGRAMS: ProgramEntry[] = [
   // Healthcare
-  { slug: 'cna-certification', name: 'CNA (Certified Nursing Assistant)', category: 'Healthcare', formType: 'apply', active: true },
+  { slug: 'cna-cert', name: 'CNA (Certified Nursing Assistant)', category: 'Healthcare', formType: 'apply', active: true },
   { slug: 'medical-assistant', name: 'Medical Assistant', category: 'Healthcare', formType: 'apply', active: true },
   { slug: 'phlebotomy-technician', name: 'Phlebotomy Technician', category: 'Healthcare', formType: 'apply', active: true },
   { slug: 'home-health-aide', name: 'Home Health Aide', category: 'Healthcare', formType: 'apply', active: true },
-  { slug: 'emergency-health-safety-tech', name: 'Emergency Health & Safety Technician', category: 'Healthcare', formType: 'apply', active: true },
-  { slug: 'cpr-first-aid-hsi', name: 'CPR, AED & First Aid', category: 'Healthcare', formType: 'apply', active: true },
+  { slug: 'health-safety', name: 'Emergency Health & Safety Technician', category: 'Healthcare', formType: 'apply', active: true },
+  { slug: 'cpr-cert', name: 'CPR, AED & First Aid', category: 'Healthcare', formType: 'apply', active: true },
 
   // Skilled Trades
   { slug: 'hvac-technician', name: 'HVAC Technician', category: 'Skilled Trades', formType: 'apply', active: true },
   { slug: 'cdl-training', name: 'CDL (Commercial Driver License)', category: 'Skilled Trades', formType: 'apply', active: true },
-  { slug: 'building-maintenance-tech', name: 'Building Maintenance Technician', category: 'Skilled Trades', formType: 'apply', active: true },
+  { slug: 'building-maintenance-wrg', name: 'Building Maintenance Technician', category: 'Skilled Trades', formType: 'apply', active: true },
 
   // Barber & Beauty
   { slug: 'barber-apprenticeship', name: 'Barber Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true, dedicatedApplyPage: '/programs/barber-apprenticeship/apply' },
-  { slug: 'professional-esthetician', name: 'Esthetician & Skincare Specialist', category: 'Barber & Beauty', formType: 'apply', active: true },
+  { slug: 'esthetician', name: 'Esthetician & Skincare Specialist', category: 'Barber & Beauty', formType: 'apply', active: true },
   { slug: 'beauty-career-educator', name: 'Beauty & Career Educator', category: 'Barber & Beauty', formType: 'apply', active: true },
 
   // Business & Financial
-  { slug: 'tax-prep-financial-services', name: 'Financial Literacy Program', category: 'Business & Financial', formType: 'apply', active: true },
-  { slug: 'business-startup-marketing', name: 'Business Start-up & Marketing', category: 'Business & Financial', formType: 'apply', active: true },
+  { slug: 'tax-prep', name: 'Tax Preparation Program', category: 'Business & Financial', formType: 'apply', active: true },
+  { slug: 'business-startup', name: 'Business Start-up & Marketing', category: 'Business & Financial', formType: 'apply', active: true },
 
   // Human Services
-  { slug: 'certified-peer-recovery-coach', name: 'Certified Peer Recovery Coach', category: 'Human Services', formType: 'apply', active: true },
-  { slug: 'public-safety-reentry-specialist', name: 'Public Safety Reentry Specialist', category: 'Human Services', formType: 'apply', active: true },
+  { slug: 'peer-recovery-specialist-jri', name: 'Certified Peer Recovery Coach', category: 'Human Services', formType: 'apply', active: true },
+  { slug: 'reentry-specialist', name: 'Public Safety Reentry Specialist', category: 'Human Services', formType: 'apply', active: true },
   { slug: 'drug-alcohol-specimen-collector', name: 'Drug & Alcohol Specimen Collector', category: 'Human Services', formType: 'apply', active: true },
-  { slug: 'direct-support-professional', name: 'Direct Support Professional', category: 'Human Services', formType: 'apply', active: true },
+  { slug: 'dsp-training', name: 'Direct Support Professional', category: 'Human Services', formType: 'apply', active: true },
   { slug: 'sanitation-infection-control', name: 'Sanitation & Infection Control', category: 'Human Services', formType: 'apply', active: true },
 
   // Technology
-  { slug: 'it-support', name: 'IT Support Specialist', category: 'Technology', formType: 'apply', active: true },
-  { slug: 'cybersecurity', name: 'Cybersecurity Fundamentals', category: 'Technology', formType: 'apply', active: true },
+  { slug: 'it-support-specialist', name: 'IT Support Specialist', category: 'Technology', formType: 'apply', active: true },
+  { slug: 'cybersecurity-analyst', name: 'Cybersecurity Fundamentals', category: 'Technology', formType: 'apply', active: true },
 
   // Additional Skilled Trades
   { slug: 'electrical', name: 'Electrical Apprenticeship', category: 'Skilled Trades', formType: 'apply', active: true },
   { slug: 'plumbing', name: 'Plumbing Apprenticeship', category: 'Skilled Trades', formType: 'apply', active: true },
-  { slug: 'forklift', name: 'Forklift Operator Certification', category: 'Skilled Trades', formType: 'apply', active: true },
+  { slug: 'forklift-operator', name: 'Forklift Operator Certification', category: 'Skilled Trades', formType: 'apply', active: true },
   { slug: 'welding', name: 'Welding Certification', category: 'Skilled Trades', formType: 'apply', active: true },
   { slug: 'diesel-mechanic', name: 'Diesel Mechanic', category: 'Skilled Trades', formType: 'apply', active: true },
 
   // Additional Barber & Beauty
   { slug: 'cosmetology-apprenticeship', name: 'Cosmetology Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true, dedicatedApplyPage: '/programs/cosmetology-apprenticeship/apply' },
-  { slug: 'nail-technician-apprenticeship', name: 'Nail Technician Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true },
+  { slug: 'nail-tech-apprenticeship', name: 'Nail Technician Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true },
 
   // Additional Programs
   { slug: 'culinary-apprenticeship', name: 'Youth Culinary Apprenticeship', category: 'Skilled Trades', formType: 'apply', active: true },
@@ -73,41 +73,52 @@ export const VALID_SLUGS = new Set(PROGRAMS.map((p) => p.slug));
 /** Common aliases → canonical slugs */
 const SLUG_ALIASES: Record<string, string> = {
   'barber': 'barber-apprenticeship',
-  'cna': 'cna-certification',
+  'cna': 'cna-cert',
+  'cna-certification': 'cna-cert',
   'hvac': 'hvac-technician',
   'cdl': 'cdl-training',
-  'esthetician': 'professional-esthetician',
-  'esthetician-apprenticeship': 'professional-esthetician',
+  'esthetician-apprenticeship': 'esthetician',
+  'professional-esthetician': 'esthetician',
   'phlebotomy': 'phlebotomy-technician',
-  'tax-prep': 'tax-prep-financial-services',
-  'tax-preparation': 'tax-prep-financial-services',
-  'tax-entrepreneurship': 'tax-prep-financial-services',
-  'building-maintenance': 'building-maintenance-tech',
-  'building-services-technician': 'building-maintenance-tech',
-  'peer-recovery': 'certified-peer-recovery-coach',
-  'nail-technician': 'nail-technician-apprenticeship',
-  'cpr-first-aid': 'cpr-first-aid-hsi',
+  'tax-preparation': 'tax-prep',
+  'tax-entrepreneurship': 'tax-prep',
+  'tax-prep-financial-services': 'tax-prep',
+  'building-maintenance': 'building-maintenance-wrg',
+  'building-maintenance-tech': 'building-maintenance-wrg',
+  'building-services-technician': 'building-maintenance-wrg',
+  'peer-recovery': 'peer-recovery-specialist-jri',
+  'certified-peer-recovery-coach': 'peer-recovery-specialist-jri',
+  'nail-technician': 'nail-tech-apprenticeship',
+  'nail-technician-apprenticeship': 'nail-tech-apprenticeship',
+  'cpr-first-aid': 'cpr-cert',
+  'cpr-first-aid-hsi': 'cpr-cert',
   'cdl-transportation': 'cdl-training',
-  'web-development': 'it-support',
-  // Category-level aliases — map to most common program in category
-  // so Apply Now from category pages pre-selects something reasonable
-  'healthcare': 'cna-certification',
+  'web-development': 'it-support-specialist',
+  'it-support': 'it-support-specialist',
+  'cybersecurity': 'cybersecurity-analyst',
+  'direct-support-professional': 'dsp-training',
+  'forklift': 'forklift-operator',
+  'public-safety-reentry-specialist': 'reentry-specialist',
+  'emergency-health-safety-tech': 'health-safety',
+  'business-startup-marketing': 'business-startup',
+  // Category-level aliases
+  'healthcare': 'cna-cert',
   'skilled-trades': 'hvac-technician',
-  'technology': 'it-support',
+  'technology': 'it-support-specialist',
   'beauty': 'cosmetology-apprenticeship',
   'apprenticeship': 'barber-apprenticeship',
-  'federal-funded': 'cna-certification',
-  'micro-programs': 'cpr-first-aid-hsi',
-  'jri': 'certified-peer-recovery-coach',
+  'federal-funded': 'cna-cert',
+  'micro-programs': 'cpr-cert',
+  'jri': 'peer-recovery-specialist-jri',
   'drug-collector': 'drug-alcohol-specimen-collector',
-  'reentry': 'public-safety-reentry-specialist',
+  'reentry': 'reentry-specialist',
   'home-health': 'home-health-aide',
-  'cpr': 'cpr-first-aid-hsi',
-  'first-aid': 'cpr-first-aid-hsi',
+  'cpr': 'cpr-cert',
+  'first-aid': 'cpr-cert',
   'beauty-educator': 'beauty-career-educator',
-  'business': 'business-startup-marketing',
+  'business': 'business-startup',
   'cosmetology': 'cosmetology-apprenticeship',
-  'nail-tech': 'nail-technician-apprenticeship',
+  'nail-tech': 'nail-tech-apprenticeship',
 };
 
 /**

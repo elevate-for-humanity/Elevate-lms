@@ -5,7 +5,6 @@ import Image from 'next/image';
 
 
 import HomeHeroVideo from './HomeHeroVideo';
-
 import { InView } from '@/components/ui/InView';
 import { AuthorityBanner } from '@/components/InstitutionalAuthority';
 
@@ -14,7 +13,7 @@ import { AuthorityBanner } from '@/components/InstitutionalAuthority';
 const programs = [
   { name: 'Healthcare', href: '/programs/healthcare', image: '/images/programs-hq/healthcare-hero.webp', desc: 'CNA, Medical Assistant, Phlebotomy' },
   { name: 'Skilled Trades', href: '/programs/skilled-trades', image: '/images/programs-hq/skilled-trades-hero.webp', desc: 'HVAC, Electrical, Welding, Plumbing' },
-  { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.webp', desc: 'Paid apprenticeship — earn while you learn' },
+  { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.webp', desc: 'Earn while you learn' },
   { name: 'CDL Training', href: '/programs/cdl', image: '/images/cdl-vibrant.webp', desc: 'Class A & B — start earning $50K+' },
   { name: 'Technology', href: '/programs/technology', image: '/images/programs-hq/it-support.webp', desc: 'IT Support, Cybersecurity' },
   { name: 'CPR & First Aid', href: '/programs/cpr-first-aid-hsi', image: '/images/healthcare/healthcare-professional-portrait-1.webp', desc: 'HSI certified — same-day available' },
@@ -37,15 +36,11 @@ export default function HomePage() {
               Free Training Programs — Learn, Certify, Work
             </h1>
             <p className="text-lg sm:text-xl text-slate-300 mt-4 leading-relaxed max-w-2xl mx-auto">
-              WIOA-funded career training in healthcare, skilled trades, CDL, and technology. Zero tuition for eligible Indiana residents.
-            </p>
-            <p className="text-sm text-slate-400 mt-3 tracking-wide">
-              EPA Section 608 Certification Preparation &amp; Proctored Exam Access Available
+              WIOA-funded career training in healthcare, skilled trades, CDL, technology, and barbering. Zero tuition for eligible Indiana residents.
             </p>
           </div>
         </div>
       </section>
-
 
       {/* ===== AUDIENCE QUICK LINKS ===== */}
       <InView animation="fade-up">
@@ -64,7 +59,7 @@ export default function HomePage() {
                 image: '/images/artlist/cropped/hero-training-3-square.webp',
                 alt: 'Students in a hands-on training session',
                 label: 'I want to train',
-                desc: 'Browse programs in healthcare, trades, CDL, and tech. See schedules, requirements, and how to enroll.',
+                desc: 'Browse programs in healthcare, trades, CDL, tech, and barbering. See schedules, requirements, and how to enroll.',
                 cta: 'Browse Programs',
               },
               {
@@ -118,37 +113,7 @@ export default function HomePage() {
       {/* ===== INSTITUTIONAL AUTHORITY ===== */}
       <AuthorityBanner />
 
-      {/* ===== 3-CARD VALUE PROPS ===== */}
-      <InView animation="fade-up">
-      <section aria-label="Career opportunities" className="py-10 sm:py-14">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {[
-              { title: 'Career Opportunities', desc: 'We offer certification programs in healthcare (CNA, Medical Assistant, Phlebotomy), skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking, and IT/cybersecurity. Most programs are 4-16 weeks and include hands-on training.', href: '/programs', image: '/images/programs-hq/training-classroom.webp' },
-              { title: 'Funding Available', desc: 'Most students pay nothing out of pocket when they qualify for workforce funding. WIOA covers tuition, books, and supplies. The Workforce Ready Grant funds high-demand certifications. JRI provides paid apprenticeships for justice-involved individuals. Check your eligibility online in minutes.', href: '/funding', image: '/images/heroes-hq/funding-hero.webp' },
-              { title: 'Hire Our Graduates', desc: 'Employers: our graduates hold industry-recognized credentials and are ready to work. Access WOTC tax credits ($2,400-$9,600/hire), OJT wage reimbursements (50-75% of wages), and post jobs directly to our candidate pool.', href: '/employer', image: '/images/programs-hq/business-office.webp' },
-            ].map((card) => (
-              <Link key={card.title} href={card.href} className="group block">
-                <div className="relative aspect-[3/2] rounded-lg overflow-hidden">
-                  <Image
-                    src={card.image}
-                    alt={card.title}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="pt-4">
-                  <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">{card.title}</h3>
-                  <p className="text-base text-slate-700 mb-3">{card.desc}</p>
-                  <span className="inline-block bg-brand-red-600 text-white font-semibold text-sm px-5 py-2.5 rounded-lg group-hover:bg-brand-red-700 transition-colors">Learn More</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-      </InView>
+
 
       {/* ===== WHAT KIND OF WORK EXCITES YOU ===== */}
       <InView animation="fade-up">
@@ -236,7 +201,7 @@ export default function HomePage() {
       <section aria-label="Funding options" className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <Image
-            src="/images/hero-banner-new.webp"
+            src="/images/programs-hq/training-classroom.webp"
             alt="Students in funded training programs"
             width={1200}
             height={800}
@@ -283,34 +248,7 @@ export default function HomePage() {
       </section>
       </InView>
 
-      {/* ===== PARTNERS ===== */}
-      <InView animation="fade">
-      <section aria-label="Approved training partners" className="py-10 sm:py-14 border-t border-slate-100">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Approved Training Provider</h2>
-          <p className="text-slate-600 mb-10">Listed on Indiana&apos;s INTraining directory and approved by these workforce partners.</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center">
-            {[
-              { src: '/images/partners/usdol.webp', alt: 'U.S. Department of Labor', href: 'https://www.dol.gov', label: 'U.S. DOL' },
-              { src: '/images/partners/dwd.webp', alt: 'Indiana DWD', href: 'https://www.in.gov/dwd', label: 'Indiana DWD' },
-              { src: '/images/partners/workone.webp', alt: 'WorkOne Indiana', href: 'https://www.in.gov/dwd/workone', label: 'WorkOne' },
-              { src: '/images/partners/nextleveljobs.webp', alt: 'Next Level Jobs', href: 'https://nextleveljobs.org', label: 'Next Level Jobs' },
-            ].map((logo) => (
-              <a key={logo.alt} href={logo.href} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-3 p-4 bg-white border-2 border-slate-200 rounded-xl hover:border-brand-red-400 hover:shadow-md transition-all group">
-                <Image
-                  src={logo.src}
-                  alt={logo.alt}
-                  width={160}
-                  height={64}
-                  className="object-contain h-14 w-auto"
-                />
-                <span className="text-sm font-semibold text-brand-red-600 group-hover:text-brand-red-700">Visit {logo.label} &rarr;</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-      </InView>
+
 
       {/* ===== EMPLOYERS ===== */}
       <InView animation="fade-up">
@@ -405,6 +343,60 @@ export default function HomePage() {
         </div>
       </section>
       </InView>
+
+      {/* ===== AUTHORIZED · REGISTERED · CERTIFIED ===== */}
+      <section className="py-8 bg-slate-900 border-t border-slate-800">
+        <div className="max-w-6xl mx-auto px-6">
+          <p className="text-center text-xs font-bold text-brand-red-400 uppercase tracking-widest mb-5">Authorized · Registered · Certified</p>
+          <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 mb-5">
+            {[
+              { src: '/images/partners/usdol.webp', alt: 'U.S. Department of Labor' },
+              { src: '/images/partners/dwd.webp', alt: 'Indiana DWD' },
+              { src: '/images/partners/workone.webp', alt: 'WorkOne Indiana' },
+              { src: '/images/partners/nextleveljobs.webp', alt: 'Next Level Jobs' },
+            ].map((logo) => (
+              <Image key={logo.alt} src={logo.src} alt={logo.alt} width={100} height={40} className="object-contain h-8 w-auto opacity-80 hover:opacity-100 transition-opacity" />
+            ))}
+          </div>
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-slate-400">
+            {[
+              '501(c)(3) Nonprofit',
+              'DOL Registered Apprenticeship Sponsor',
+              'Rise Certified',
+              'Certiport Authorized Testing Site',
+              'Government Contractor',
+              'State Bidder',
+              'ITAP',
+              'UEI Registered',
+              'CAGE Code',
+              'Milady Authorized',
+              'Buy Black Certified',
+              'ETPL Listed',
+              'WIOA Approved',
+              'Workforce Ready Grant Provider',
+              'JRI Approved',
+              'OSHA Authorized',
+              'OSHA 10 Certification',
+              'HSI Training Center',
+              'CareerSafe',
+              'IRS Enrolled Agent (EFIN/PTIN)',
+              'CompTIA Authorized',
+              'EPA 608 Testing',
+              'Indiana PLA Licensed',
+              'NHA/ASCP Certified',
+              'Substitute Teacher Certification',
+              'Choice Medical CNA Partner',
+              'Barber License',
+              'Nail Technician License',
+              'Esthetician License',
+              'Nail Instructor License',
+              'Esthetician Instructor License',
+            ].map((cred) => (
+              <span key={cred} className="border border-slate-700 rounded-full px-3 py-1 whitespace-nowrap">{cred}</span>
+            ))}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

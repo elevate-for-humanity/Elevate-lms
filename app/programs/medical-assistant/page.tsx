@@ -8,12 +8,7 @@ import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import { createBrowserClient } from '@supabase/ssr';
-import { 
-  Clock, DollarSign, TrendingUp, ArrowRight, 
-  Stethoscope, Award, Users, Calendar, ChevronDown, ChevronUp, 
-  Play, Phone, GraduationCap, Briefcase, Heart, ClipboardList,
-  Syringe, Activity, Building, UserCheck
-} from 'lucide-react';
+import { ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
 
 export default function MedicalAssistantProgramPage() {
   const [dbRows, setDbRows] = useState<any[]>([]);
@@ -115,15 +110,15 @@ export default function MedicalAssistantProgramPage() {
   ];
 
   const stats = [
-    { value: "14%", label: "Job Growth Rate", icon: TrendingUp },
-    { value: "$38K", label: "Average Starting Salary", icon: DollarSign },
-    { value: "21 Days", label: "Program Duration", icon: Calendar },
-    { value: "92%", label: "Job Placement Rate*", icon: Briefcase }
+    { value: "14%", label: "Job Growth Rate" },
+    { value: "$38K", label: "Average Starting Salary" },
+    { value: "21 Days", label: "Program Duration" },
+    { value: "92%", label: "Job Placement Rate*" }
   ];
 
   return (
     <>
-      <ProgramHeroBanner videoSrc="/videos/healthcare-cna.mp4" />
+      <ProgramHeroBanner videoSrc="/videos/healthcare-cna.mp4" voiceoverSrc="/audio/heroes/medical-assistant.mp3" />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
@@ -145,8 +140,7 @@ export default function MedicalAssistantProgramPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <motion.div key={index} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="text-center">
-                <stat.icon className="w-8 h-8 text-rose-600 mx-auto mb-2" />
-                <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
+                <div className="text-3xl font-black text-rose-600">{stat.value}</div>
                 <div className="text-sm text-gray-500">{stat.label}</div>
               </motion.div>
             ))}
@@ -166,19 +160,21 @@ export default function MedicalAssistantProgramPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { icon: Heart, title: "Help Patients Daily", description: "Be the friendly face patients see. Comfort anxious patients, answer questions, and ensure they receive quality care." },
-              { icon: TrendingUp, title: "Rapid Job Growth", description: "14% projected growth through 2032. Healthcare expansion means consistent demand for qualified Medical Assistants." },
-              { icon: Building, title: "Work Anywhere", description: "Physician offices, clinics, hospitals, urgent care, specialty practices. Choose the setting that fits your lifestyle." },
-              { icon: ClipboardList, title: "Variety of Tasks", description: "No two days are the same. Mix of clinical procedures, patient interaction, and administrative work keeps things interesting." },
-              { icon: UserCheck, title: "Quick Entry to Healthcare", description: "Start your healthcare career in months, not years. MA is a proven pathway to nursing and other advanced roles." },
-              { icon: Activity, title: "Job Security", description: "Healthcare is recession-resistant. People always need medical care, ensuring stable employment opportunities." }
+              { img: "/images/healthcare/hero-program-medical-assistant.jpg", title: "Help Patients Daily", description: "Be the friendly face patients see. Comfort anxious patients, answer questions, and ensure they receive quality care." },
+              { img: "/images/healthcare/hero-healthcare-professionals.jpg", title: "Rapid Job Growth", description: "14% projected growth through 2032. Healthcare expansion means consistent demand for qualified Medical Assistants." },
+              { img: "/images/healthcare/program-healthcare-overview.jpg", title: "Work Anywhere", description: "Physician offices, clinics, hospitals, urgent care, specialty practices. Choose the setting that fits your lifestyle." },
+              { img: "/images/healthcare/healthcare-programs-cards.jpg", title: "Variety of Tasks", description: "No two days are the same. Mix of clinical procedures, patient interaction, and administrative work keeps things interesting." },
+              { img: "/images/healthcare/program-medical-assistant.jpg", title: "Quick Entry to Healthcare", description: "Start your healthcare career in months, not years. MA is a proven pathway to nursing and other advanced roles." },
+              { img: "/images/healthcare/cna-training.jpg", title: "Job Security", description: "Healthcare is recession-resistant. People always need medical care, ensuring stable employment opportunities." }
             ].map((item, index) => (
-              <motion.div key={index} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center mb-4">
-                  <item.icon className="w-6 h-6 text-rose-600" />
+              <motion.div key={index} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div className="relative h-44">
+                  <Image src={item.img} alt={item.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
+                  <p className="text-gray-600">{item.description}</p>
+                </div>
               </motion.div>
             ))}
           </div>

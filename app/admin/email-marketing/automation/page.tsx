@@ -103,7 +103,7 @@ export default function AutomationPage() {
 {/* Hero Section */}
       <section className="relative h-[300px] md:h-[380px] lg:h-[420px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/heroes-hq/success-stories-hero.jpg"
+          src="/images/programs-hq/business-training.jpg"
           alt="Automation"
           fill
           className="object-cover"

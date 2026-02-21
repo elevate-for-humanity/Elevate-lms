@@ -1,5 +1,6 @@
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Metadata } from 'next';
 import { Briefcase, Building2, TrendingUp, ArrowRight, Users, Target, Award, Search, Handshake } from 'lucide-react';
 import { CareerHero } from '../components/CareerHero';
@@ -57,34 +58,40 @@ export default function JobPlacementPage() {
         </p>
 
         <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-brand-orange-600 transition">
-            <div className="w-12 h-12 bg-brand-orange-100 rounded-xl flex items-center justify-center mb-4">
-              <Briefcase className="w-6 h-6 text-brand-orange-600" />
+          <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-brand-orange-600 transition">
+            <div className="relative h-40">
+              <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer connections" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
             </div>
-            <h3 className="text-xl font-bold text-black mb-3">Direct Employer Connections</h3>
-            <p className="text-gray-600">
-              We maintain relationships with pre-vetted hiring partners across Central Indiana. Our graduates get access to exclusive job postings and direct referrals to hiring managers — not just online applications. Employers in our network have agreed to interview qualified Elevate graduates as a priority.
-            </p>
+            <div className="p-8">
+              <h3 className="text-xl font-bold text-black mb-3">Direct Employer Connections</h3>
+              <p className="text-gray-600">
+                We maintain relationships with pre-vetted hiring partners across Central Indiana. Our graduates get access to exclusive job postings and direct referrals to hiring managers — not just online applications. Employers in our network have agreed to interview qualified Elevate graduates as a priority.
+              </p>
+            </div>
           </div>
 
-          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-brand-orange-600 transition">
-            <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
-              <Target className="w-6 h-6 text-brand-blue-600" />
+          <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-brand-orange-600 transition">
+            <div className="relative h-40">
+              <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Job matching" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
             </div>
-            <h3 className="text-xl font-bold text-black mb-3">Personalized Job Matching</h3>
-            <p className="text-gray-600">
-              Your career coach reviews your skills, certifications, location preferences, schedule needs, and long-term career goals. We then match you with open positions that fit — not just any job, but the right job for your situation and ambitions.
-            </p>
+            <div className="p-8">
+              <h3 className="text-xl font-bold text-black mb-3">Personalized Job Matching</h3>
+              <p className="text-gray-600">
+                Your career coach reviews your skills, certifications, location preferences, schedule needs, and long-term career goals. We then match you with open positions that fit — not just any job, but the right job for your situation and ambitions.
+              </p>
+            </div>
           </div>
 
-          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-brand-orange-600 transition">
-            <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center mb-4">
-              <Handshake className="w-6 h-6 text-brand-green-600" />
+          <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-brand-orange-600 transition">
+            <div className="relative h-40">
+              <Image src="/images/programs-hq/business-office.jpg" alt="Interview preparation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
             </div>
-            <h3 className="text-xl font-bold text-black mb-3">Interview Coordination</h3>
-            <p className="text-gray-600">
-              We handle interview scheduling with employers, prepare you with company-specific coaching so you know what to expect, and follow up with the employer after your interview. If you need transportation or professional attire, we can help with that too.
-            </p>
+            <div className="p-8">
+              <h3 className="text-xl font-bold text-black mb-3">Interview Coordination</h3>
+              <p className="text-gray-600">
+                We handle interview scheduling with employers, prepare you with company-specific coaching so you know what to expect, and follow up with the employer after your interview. If you need transportation or professional attire, we can help with that too.
+              </p>
+            </div>
           </div>
         </div>
 

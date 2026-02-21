@@ -1,54 +1,23 @@
-import { logger } from '@/lib/logger';
 /**
  * EMAIL SERVICE
  *
- * Centralized email sending using Resend
- * Falls back gracefully if email fails (non-blocking)
+ * Delegates to the canonical sendEmail in ./resend.
+ * Keeps helper functions for specific email scenarios.
  */
 
-import { Resend } from 'resend';
+import { sendEmail as coreSendEmail } from './resend';
+import type { EmailOptions as CoreEmailOptions } from './resend';
 
-// Lazy-load Resend to avoid build-time initialization
-let resend: Resend | null = null;
-function getResend() {
-  if (!resend && process.env.RESEND_API_KEY) {
-    resend = new Resend(process.env.RESEND_API_KEY);
-  }
-  return resend;
-}
-
-const FROM_EMAIL = 'Elevate for Humanity <noreply@elevateforhumanity.org>';
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export interface EmailOptions {
-  to: string | string[];
-  subject: string;
-  html: string;
-  text?: string;
-}
+export type EmailOptions = CoreEmailOptions;
 
 /**
- * Send email (non-blocking, logs errors)
+ * Send email (non-blocking, logs errors). Returns boolean for backward compat.
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
-  try {
-    if (!process.env.RESEND_API_KEY) {
-      return false;
-    }
-
-    await getResend()?.emails.send({
-      from: FROM_EMAIL,
-      to: options.to,
-      subject: options.subject,
-      html: options.html,
-      text: options.text,
-    });
-
-    return true;
-  } catch (error) { /* Error handled silently */ 
-    logger.error('❌ Email failed:', error);
-    return false;
-  }
+  const result = await coreSendEmail(options);
+  return result.success;
 }
 
 /**

@@ -24,7 +24,7 @@ export default function CosmetologyApprenticeshipPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <ProgramHeroBanner videoSrc="/videos/cosmetology-salon.mp4" />
+      <ProgramHeroBanner videoSrc="/videos/cosmetology-salon.mp4" voiceoverSrc="/audio/heroes/cosmetology.mp3" />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Cosmetology Apprenticeship' }]} />

@@ -112,7 +112,7 @@ const courses = (dbRows as any[]) || [];
       </section>
 
       {/* Avatar Guide */}
-      <ProgramHeroBanner videoSrc="/videos/avatars/healthcare-guide.mp4" />
+      <ProgramHeroBanner videoSrc="/videos/healthcare-cna.mp4" voiceoverSrc="/audio/heroes/cpr.mp3" />
 
       {/* Quick Stats */}
       <section className="py-8 bg-slate-900">

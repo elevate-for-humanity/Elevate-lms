@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 
 export function CareerHero() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const voiceoverRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const unmutedRef = useRef(false);
+  const [voiceActive, setVoiceActive] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -20,38 +20,29 @@ export function CareerHero() {
     return () => video.removeEventListener('canplay', play);
   }, []);
 
-  const unmute = useCallback(() => {
-    const video = videoRef.current;
-    if (!video || unmutedRef.current) return;
-    unmutedRef.current = true;
-    video.muted = false;
-    setIsMuted(false);
-    if (video.paused) video.play().then(() => setIsPlaying(true)).catch(() => {});
+  // Auto-start voiceover on page load — plays once, no loop
+  useEffect(() => {
+    const voiceover = voiceoverRef.current;
+    if (!voiceover) return;
+    voiceover.play().then(() => setVoiceActive(true)).catch(() => {});
   }, []);
 
-  useEffect(() => {
-    const h = () => { unmute(); window.removeEventListener('scroll', h); window.removeEventListener('touchstart', h); window.removeEventListener('click', h); };
-    window.addEventListener('scroll', h, { once: true, passive: true });
-    window.addEventListener('touchstart', h, { once: true, passive: true });
-    window.addEventListener('click', h, { once: true });
-    return () => { window.removeEventListener('scroll', h); window.removeEventListener('touchstart', h); window.removeEventListener('click', h); };
-  }, [unmute]);
-
-  const toggleMute = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (isMuted) { video.muted = false; setIsMuted(false); unmutedRef.current = true; if (video.paused) video.play().then(() => setIsPlaying(true)).catch(() => {}); }
-    else { video.muted = true; setIsMuted(true); }
+  const toggleVoiceover = () => {
+    const vo = voiceoverRef.current;
+    if (!vo) return;
+    if (!voiceActive) { vo.currentTime = 0; vo.play().catch(() => {}); setVoiceActive(true); }
+    else { vo.pause(); setVoiceActive(false); }
   };
 
   return (
     <section className="relative h-[50vh] min-h-[350px] overflow-hidden">
       <video ref={videoRef} autoPlay loop muted playsInline preload="auto" className="absolute inset-0 w-full h-full object-cover">
-        <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/career-services-hero.mp4" type="video/mp4" />
+        <source src="/videos/career-services-hero.mp4" type="video/mp4" />
       </video>
+      <audio ref={voiceoverRef} src="/audio/heroes/career-services.mp3" preload="auto" onEnded={() => setVoiceActive(false)} />
       {isPlaying && (
-        <button onClick={toggleMute} className="absolute bottom-4 right-4 z-20 flex items-center gap-2 px-4 py-2.5 bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white rounded-full transition-colors shadow-lg" aria-label={isMuted ? 'Unmute video' : 'Mute video'}>
-          {isMuted ? (<><VolumeX className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Tap for Sound</span></>) : (<><Volume2 className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Sound On</span></>)}
+        <button onClick={toggleVoiceover} className={`absolute z-20 flex items-center gap-2 backdrop-blur-sm text-white rounded-full shadow-lg transition-all ${voiceActive ? 'bottom-4 right-4 px-4 py-2.5 bg-black/60 hover:bg-black/80' : 'bottom-6 right-6 px-5 py-3 bg-brand-red-600 hover:bg-brand-red-700 animate-pulse'}`} aria-label={voiceActive ? 'Stop narration' : 'Play narration'}>
+          {voiceActive ? <><Volume2 className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Narration On</span></> : <><VolumeX className="w-5 h-5" /><span className="text-sm font-bold">Tap for Narration</span></>}
         </button>
       )}
     </section>

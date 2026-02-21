@@ -5,7 +5,6 @@ import Image from 'next/image';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
-import PageAvatar from '@/components/PageAvatar';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -25,7 +24,7 @@ export default function HealthcareProgramsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <ProgramHeroBanner videoSrc="/videos/healthcare-cna.mp4" />
+      <ProgramHeroBanner videoSrc="/videos/healthcare-cna.mp4" voiceoverSrc="/audio/heroes/healthcare.mp3" />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Healthcare' }]} />
@@ -49,7 +48,6 @@ export default function HealthcareProgramsPage() {
       {/* Avatar Guide */}
       <section className="py-8 bg-white">
         <div className="max-w-3xl mx-auto px-4">
-          <PageAvatar videoSrc="/videos/avatars/healthcare-guide.mp4" title="Healthcare Programs Guide" />
         </div>
       </section>
 
@@ -78,9 +76,9 @@ export default function HealthcareProgramsPage() {
             {[
               { name: 'CNA Certification', href: '/programs/cna-certification', img: '/images/healthcare/program-cna-training.jpg', duration: '4-6 weeks' },
               { name: 'Medical Assistant', href: '/programs/medical-assistant', img: '/images/healthcare/program-medical-assistant.jpg', duration: '8-12 weeks' },
-              { name: 'Phlebotomy', href: '/programs/phlebotomy-technician', img: '/images/healthcare/hero-program-phlebotomy.jpg', duration: '4-8 weeks' },
+              { name: 'Phlebotomy', href: '/programs/phlebotomy-technician', img: '/images/healthcare/phlebotomy-hero.jpg', duration: '4-8 weeks' },
               { name: 'Pharmacy Technician', href: '/programs/pharmacy-technician', img: '/images/healthcare/hero-program-medical-assistant.jpg', duration: '8-12 weeks' },
-              { name: 'Dental Assistant', href: '/programs/dental-assistant', img: '/images/healthcare/hero-program-patient-care.jpg', duration: '10-12 weeks' },
+              { name: 'Dental Assistant', href: '/programs/dental-assistant', img: '/images/healthcare/hero-program-dental-assistant.jpg', duration: '10-12 weeks' },
               { name: 'CPR & First Aid', href: '/programs/cpr-first-aid-hsi', img: '/images/healthcare/program-cpr-certification.jpg', duration: '1 day' },
             ].map((p) => (
               <Link key={p.name} href={p.href} className="group">

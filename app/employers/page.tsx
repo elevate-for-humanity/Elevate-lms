@@ -12,7 +12,6 @@ import {
   Phone,
   Building2,
 CheckCircle, } from 'lucide-react';
-import PageAvatar from '@/components/PageAvatar';
 import EmployerPartners from '@/components/EmployerPartners';
 
 export const metadata: Metadata = {
@@ -92,10 +91,6 @@ export default function EmployersPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/orientation-guide.mp4" 
-        title="Employer Partners" 
-      />
 
       {/* Quick Links */}
       <section className="py-6 bg-gray-50 border-b">

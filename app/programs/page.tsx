@@ -160,11 +160,7 @@ export default async function ProgramsPage() {
         <div className="absolute inset-0">
           <Image src="/images/programs-hero-vibrant.jpg" alt="Career training programs" fill sizes="100vw" className="object-cover" priority />
         </div>
-        <div className="absolute bottom-6 left-6 right-6 sm:bottom-8 sm:left-8 sm:right-8">
-          <span className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold">
-            Career Training Programs
-          </span>
-        </div>
+
       </section>
 
       {/* TEXT SECTION - Below hero, consistent sizing */}

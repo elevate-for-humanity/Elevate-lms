@@ -1,9 +1,9 @@
 /**
  * Email barrel export.
  *
- * sendEmail uses direct fetch to Resend API (no SDK init at import time).
- * emailTemplates provides pre-built HTML templates.
+ * All email in the app goes through sendEmail in ./resend (direct fetch, no SDK).
+ * Templates are split across legacy-templates (full HTML) and email-service (simple).
  */
 export { sendEmail, trySendEmail } from './resend';
 export type { EmailOptions } from './resend';
-export { emailTemplates } from './email-service';
+export { emailTemplates, sendWelcomeEmail, sendEnrollmentEmail } from './legacy-templates';

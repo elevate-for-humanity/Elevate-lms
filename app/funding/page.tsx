@@ -37,15 +37,7 @@ export default function FundingPage() {
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/heroes-hq/funding-hero.jpg" alt="Workforce funding options" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Workforce Funding</h1>
-            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
-              Multiple funding options are available to help cover your training costs. Many students qualify for state and federal programs that pay for tuition, books, and certifications.
-            </p>
-          </div>
-        </div>
+        <Image src="/images/trades/program-building-technology.jpg" alt="Workforce funding options" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       {/* Funding Options */}
@@ -58,7 +50,7 @@ export default function FundingPage() {
             {/* WIOA */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/heroes/workforce-partner-1.jpg" alt="WIOA funding" fill sizes="100vw" quality={90} className="object-cover" />
+                <Image src="/images/trades/program-cdl-overview.jpg" alt="WIOA funding" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Federal</div>
               </div>
               <div className="p-5">
@@ -83,7 +75,7 @@ export default function FundingPage() {
             {/* WRG */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/heroes/workforce-partner-2.jpg" alt="Workforce Ready Grant" fill sizes="100vw" quality={90} className="object-cover" />
+                <Image src="/images/programs-hq/phlebotomy.jpg" alt="Workforce Ready Grant" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-brand-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
@@ -108,7 +100,7 @@ export default function FundingPage() {
             {/* JRI */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/heroes/workforce-partner-3.jpg" alt="JRI funding" fill sizes="100vw" quality={90} className="object-cover" />
+                <Image src="/images/trades/program-building-construction.jpg" alt="JRI funding" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-brand-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
@@ -133,7 +125,7 @@ export default function FundingPage() {
             {/* OJT */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/homepage/funding-navigation.png" alt="On the job training" fill sizes="100vw" quality={90} className="object-cover" />
+                <Image src="/images/trades/hero-program-carpentry.jpg" alt="On the job training" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-brand-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">Earn & Learn</div>
               </div>
               <div className="p-5">
@@ -165,14 +157,17 @@ export default function FundingPage() {
           <p className="text-slate-800 text-sm text-center mb-6 sm:mb-8">If you don&apos;t qualify for state or federal funding, we offer flexible payment options.</p>
           <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4">
             {[
-              { title: 'Pay in Full', desc: 'One-time payment at enrollment. Some programs offer a discount for full payment.', tag: 'Best Value' },
-              { title: 'Payment Plan', desc: 'Split your tuition into monthly installments. No interest. Set up at enrollment.', tag: 'Flexible' },
-              { title: 'Sezzle / Affirm', desc: 'Buy now, pay later. Break payments into 4-6 installments with Sezzle or Affirm.', tag: 'BNPL' },
+              { title: 'Pay in Full', desc: 'One-time payment at enrollment. Some programs offer a discount for full payment.', tag: 'Best Value', href: '/apply', linkText: 'Apply Now →' },
+              { title: 'Payment Plan', desc: 'Split your tuition into monthly installments. No interest. Set up at enrollment.', tag: 'Flexible', href: '/apply', linkText: 'Apply Now →' },
+              { title: 'Sezzle / Affirm', desc: 'Buy now, pay later. Break payments into 4-6 installments with Sezzle or Affirm.', tag: 'BNPL', href: '/apply', linkText: 'Apply Now →' },
             ].map((item) => (
-              <div key={item.title} className="bg-white rounded-xl border border-slate-200 p-5">
-                <span className="text-xs font-bold text-brand-blue-600 bg-brand-blue-50 px-2 py-1 rounded-full">{item.tag}</span>
+              <div key={item.title} className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col">
+                <span className="text-xs font-bold text-brand-blue-600 bg-brand-blue-50 px-2 py-1 rounded-full self-start">{item.tag}</span>
                 <h3 className="font-bold text-slate-900 mt-3 mb-2">{item.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                <p className="text-slate-600 text-sm leading-relaxed mb-4">{item.desc}</p>
+                <Link href={item.href} className="mt-auto inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:underline">
+                  {item.linkText} <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             ))}
           </div>

@@ -105,7 +105,7 @@ export default function ExternalModulesPage() {
       {/* Hero Section */}
       <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/homepage/student-portal-interface.png"
+          src="/images/programs-hq/technology-hero.jpg"
           alt="External Modules Management"
           fill
           className="object-cover"

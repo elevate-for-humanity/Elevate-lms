@@ -5,7 +5,6 @@ import Image from 'next/image';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
-import PageAvatar from '@/components/PageAvatar';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -25,7 +24,7 @@ export default function SkilledTradesPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <ProgramHeroBanner videoSrc="/videos/electrician-trades.mp4" />
+      <ProgramHeroBanner videoSrc="/videos/electrician-trades.mp4" voiceoverSrc="/audio/heroes/skilled-trades.mp3" />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Skilled Trades' }]} />
@@ -48,7 +47,6 @@ export default function SkilledTradesPage() {
       {/* Avatar Guide */}
       <section className="py-8 bg-white">
         <div className="max-w-3xl mx-auto px-4">
-          <PageAvatar videoSrc="/videos/avatars/trades-guide.mp4" title="Skilled Trades Guide" />
         </div>
       </section>
 

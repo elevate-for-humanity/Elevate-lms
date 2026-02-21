@@ -35,7 +35,7 @@ export default function HealthcarePage() {
       </div>
 {/* Hero Section */}
       <section className="relative h-[450px] md:h-[500px] w-full overflow-hidden">
-        <Image src="/images/healthcare/cpr-group-training-session.jpg" alt="Healthcare Programs" fill className="object-cover" quality={85} loading="lazy" />
+        <Image src="/images/healthcare/cpr-group-training-session.jpg" alt="Healthcare Programs" fill sizes="100vw" className="object-cover" quality={85} loading="lazy" />
       </section>
 
       {/* Programs Grid */}

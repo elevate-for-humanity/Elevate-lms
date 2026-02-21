@@ -50,12 +50,7 @@ export default async function ApplyPage({
         <ApplyHeroVideo />
       </section>
 
-      {/* Elevate branding over hero */}
-      <div className="flex items-center justify-center -mt-8 relative z-20">
-        <div className="bg-white/90 backdrop-blur-sm px-5 py-2 rounded-lg shadow">
-          <span className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">Elevate for Humanity</span>
-        </div>
-      </div>
+
 
       {/* Heading */}
       <section className="pt-4 pb-8 px-4 bg-white">

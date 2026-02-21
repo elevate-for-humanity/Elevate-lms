@@ -4,7 +4,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
 import Image from "next/image";
 import { Building, Briefcase, Award } from 'lucide-react';
-import PageAvatar from '@/components/PageAvatar';
 
 export const metadata: Metadata = {
   title: 'Partners | Elevate Workforce OS',
@@ -129,10 +128,6 @@ export default function PartnersPage() {
       </header>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/orientation-guide.mp4" 
-        title="Partner With Us" 
-      />
 
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-6 py-14 grid gap-10 md:grid-cols-2">

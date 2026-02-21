@@ -58,7 +58,7 @@ export default function WorkforcePartnershipPacketPage() {
       {/* Hero — hidden on print */}
       <section className="relative h-[240px] sm:h-[300px] print:hidden">
         <Image
-          src="/images/heroes-hq/employer-hero.jpg"
+          src="/images/heroes-hq/how-it-works-hero.jpg"
           alt="Workforce partnership meeting"
           fill
           sizes="100vw"

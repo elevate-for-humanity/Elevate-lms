@@ -1,64 +1,9 @@
-// Email service integration
-// This uses Resend (https://resend.com) - a modern email API
-// Alternative: SendGrid, Mailgun, AWS SES, or Supabase Edge Functions
-
-import { logger } from '@/lib/logger';
-
-interface EmailOptions {
-  to: string;
-  subject: string;
-  html: string;
-  from?: string;
-  replyTo?: string;
-}
-
-const FROM_EMAIL = process.env.EMAIL_FROM || 'Elevate for Humanity <onboarding@resend.dev>';
-const REPLY_TO_EMAIL =
-  process.env.REPLY_TO_EMAIL || 'elevate4humanityedu@gmail.com';
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-
-export async function sendEmail({
-  to,
-  subject,
-  html,
-  from = FROM_EMAIL,
-  replyTo = REPLY_TO_EMAIL,
-}: EmailOptions) {
-  // PRODUCTION ENFORCEMENT: Fail if no API key
-  if (!RESEND_API_KEY) {
-    const error = new Error('RESEND_API_KEY is not configured. Email cannot be sent in production.');
-    logger.error('Email configuration error', error, { to, subject });
-    throw error;
-  }
-
-  try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from,
-        to,
-        subject,
-        html,
-        reply_to: replyTo,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Email API error: ${error}`);
-    }
-
-    const data = await response.json();
-    return { success: true, messageId: data.id };
-  } catch (error) {
-    logger.error('Failed to send email', error as Error, { to, subject });
-    return { success: false, error: (error as Error).message };
-  }
-}
+/**
+ * Legacy email templates — full HTML email templates used by cron jobs
+ * and the /api/emails/* routes. sendEmail is re-exported from ./resend.
+ */
+import { sendEmail } from './resend';
+export { sendEmail };
 
 // Email templates
 export const emailTemplates = {

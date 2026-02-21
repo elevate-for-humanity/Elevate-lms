@@ -3,7 +3,6 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import PageAvatar from '@/components/PageAvatar';
 import {
   BookOpen,
   Calendar,
@@ -274,10 +273,6 @@ export default function StudentPortalPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/ai-tutor.mp4" 
-        title="Student Welcome" 
-      />
 
       {/* My Enrollments - Shows for logged-in users */}
       <section className="py-8 bg-gray-50">

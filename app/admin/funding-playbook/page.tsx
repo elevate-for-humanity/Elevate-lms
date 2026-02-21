@@ -72,7 +72,7 @@ export default async function FundingPlaybookPage() {
       {/* Hero Section */}
       <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/homepage/student-portal-interface.png"
+          src="/images/heroes-hq/funding-hero.jpg"
           alt="Funding Playbook"
           fill
           className="object-cover"

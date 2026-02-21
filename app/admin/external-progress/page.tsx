@@ -72,7 +72,7 @@ export default async function ExternalProgressPage() {
       {/* Hero Section */}
       <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/homepage/student-portal-interface.png"
+          src="/images/programs-hq/it-support.jpg"
           alt="External Progress"
           fill
           className="object-cover"

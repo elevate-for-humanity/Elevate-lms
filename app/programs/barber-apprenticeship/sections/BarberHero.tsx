@@ -6,7 +6,7 @@ export function BarberHero() {
   return (
     <>
       {/* Hero Video Banner */}
-      <ProgramHeroBanner videoSrc="/videos/barber-hero-final.mp4" />
+      <ProgramHeroBanner videoSrc="/videos/barber-hero-final.mp4" voiceoverSrc="/audio/heroes/barber.mp3" />
 
       {/* Hero Image — no text overlay */}
       <section className="relative h-[55vh] min-h-[400px]">

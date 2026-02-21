@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import ModernLandingHero from '@/components/landing/ModernLandingHero';
-import PageAvatar from '@/components/PageAvatar';
 import {
   getActivePositions,
   formatSalaryRange,
@@ -131,10 +130,6 @@ export default async function CareersPage() {
       />
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/orientation-guide.mp4" 
-        title="Join Our Team" 
-      />
 
       {/* Mission Section */}
       <section className="py-16">

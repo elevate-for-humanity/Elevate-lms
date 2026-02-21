@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Settings } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageAvatar from '@/components/PageAvatar';
 
 export const dynamic = 'force-dynamic';
 
@@ -123,10 +122,6 @@ export default async function HsiPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/healthcare-guide.mp4" 
-        title="HSI Safety Training Guide" 
-      />
 
       {/* Stats Section */}
       <section className="py-12 bg-white border-b">

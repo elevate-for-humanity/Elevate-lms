@@ -73,7 +73,7 @@ export default async function Page() {
       </section>
 
       {/* Avatar Guide */}
-      <ProgramHeroBanner videoSrc="/videos/avatars/healthcare-guide.mp4" />
+      <ProgramHeroBanner videoSrc="/videos/healthcare-cna.mp4" voiceoverSrc="/audio/heroes/dsp.mp3" />
 
       {/* Program Overview */}
       <section className="max-w-7xl mx-auto px-4 py-16">

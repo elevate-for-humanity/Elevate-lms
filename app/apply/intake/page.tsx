@@ -16,7 +16,7 @@ function IntakeForm() {
     'hvac': 'hvac',
     'barber-apprenticeship': 'barbering',
     'barbering': 'barbering',
-    'cna-certification': 'cna',
+    'cna-cert': 'cna',
     'cna': 'cna',
     'cdl-training': 'cdl',
     'cdl': 'cdl',

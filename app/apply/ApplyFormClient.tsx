@@ -14,7 +14,7 @@ const APPRENTICESHIP_PROGRAMS = [
   'barber-apprenticeship',
   'cosmetology-apprenticeship',
   'esthetician-apprenticeship',
-  'nail-technician-apprenticeship',
+  'nail-tech-apprenticeship',
 ];
 
 export default function ApplyFormClient() {
@@ -369,7 +369,7 @@ export default function ApplyFormClient() {
                     <option value="barber-apprenticeship">Barber Apprenticeship</option>
                     <option value="cosmetology-apprenticeship">Cosmetology Apprenticeship</option>
                     <option value="esthetician-apprenticeship">Esthetician Apprenticeship</option>
-                    <option value="nail-technician-apprenticeship">Nail Technician Apprenticeship</option>
+                    <option value="nail-tech-apprenticeship">Nail Technician Apprenticeship</option>
                   </optgroup>
                   <optgroup label="Other Programs">
                     <option value="hvac">HVAC Technician</option>

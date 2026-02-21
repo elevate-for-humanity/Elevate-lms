@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { ClipboardCheck, CheckCircle, ArrowRight } from 'lucide-react';
 import { CAREERS, PARTNER_REQUIREMENTS, PARTNER_BENEFITS } from '../barber-program-data';
 
 export function BarberPartnership() {
@@ -55,7 +54,7 @@ export function BarberPartnership() {
               'Credential attainment records',
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3 bg-slate-50 rounded-lg p-4 border border-slate-200">
-                <ClipboardCheck className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
+                <span className="w-6 h-6 bg-brand-red-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">{i + 1}</span>
                 <span className="text-slate-700 text-sm">{item}</span>
               </div>
             ))}
@@ -78,7 +77,7 @@ export function BarberPartnership() {
               'Institutional hour calculator and evaluation process',
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3 bg-white rounded-lg p-4 border border-slate-200">
-                <CheckCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
+                <span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full flex-shrink-0 mt-2" />
                 <span className="text-slate-700 text-sm">{item}</span>
               </div>
             ))}
@@ -122,7 +121,7 @@ export function BarberPartnership() {
           </div>
           <div className="text-center">
             <Link href="/programs/barber-apprenticeship/host-shops" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-8 py-4 rounded-lg transition-colors">
-              Become a Partner Shop <ArrowRight className="w-5 h-5" />
+              Become a Partner Shop &rarr;
             </Link>
           </div>
         </div>

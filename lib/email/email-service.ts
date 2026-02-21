@@ -1,55 +1,9 @@
 /**
- * Email Service - Real implementation with Resend
+ * Email Service — delegates to the canonical sendEmail in ./resend.
+ * Kept for its emailTemplates export.
  */
-import { Resend } from 'resend';
-
-let resendInstance: Resend | null = null;
-
-function getResendInstance(): Resend | null {
-  if (!process.env.RESEND_API_KEY) {
-    return null;
-  }
-  if (!resendInstance) {
-    resendInstance = new Resend(process.env.RESEND_API_KEY);
-  }
-  return resendInstance;
-}
-
-export interface EmailOptions {
-  to: string | string[];
-  subject: string;
-  html: string;
-  text?: string;
-  from?: string;
-  replyTo?: string;
-}
-export async function sendEmail(
-  options: EmailOptions
-): Promise<{ success: boolean; messageId?: string; error?: string }> {
-  try {
-    const resend = getResendInstance();
-    if (!resend) {
-      return { success: false, error: 'Email service not configured' };
-    }
-    const { data, error } = await resend.emails.send({
-      from:
-        options.from ||
-        process.env.EMAIL_FROM ||
-        'Elevate For Humanity <noreply@elevateforhumanity.org>',
-      to: Array.isArray(options.to) ? options.to : [options.to],
-      subject: options.subject,
-      html: options.html,
-      text: options.text,
-      replyTo: options.replyTo,
-    });
-    if (error) {
-      return { success: false, error: 'Operation failed' };
-    }
-    return { success: true, messageId: data?.id };
-  } catch (error) { /* Error handled silently */ 
-    return { success: false, error: 'Operation failed' };
-  }
-}
+export { sendEmail } from './resend';
+export type { EmailOptions } from './resend';
 // Email templates
 export const emailTemplates = {
   welcome: (name: string) => ({

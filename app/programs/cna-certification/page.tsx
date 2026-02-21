@@ -37,7 +37,7 @@ export default function CNACertificationPage() {
       outcomes: ['Certified Nursing Assistant (CNA)', 'CPR/BLS Certification'],
     }} />
     <div className="min-h-screen bg-white">
-      <ProgramHeroBanner videoSrc="/videos/cna-hero.mp4" />
+      <ProgramHeroBanner videoSrc="/videos/cna-hero.mp4" voiceoverSrc="/audio/heroes/cna.mp3" />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Healthcare', href: '/programs/healthcare' }, { label: 'CNA Certification' }]} />

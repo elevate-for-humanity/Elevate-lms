@@ -183,7 +183,7 @@ export default function HVACProgramContent() {
             <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
               <div className="relative h-56">
                 <Image
-                  src="/images/programs-hq/students-learning.jpg"
+                  src="/images/programs/hvac-hero.jpg"
                   alt="Student completing HVAC coursework online at their own pace"
                   fill
                   quality={90} className="object-cover"
@@ -234,7 +234,7 @@ export default function HVACProgramContent() {
                 step: 3,
                 title: "Complete your onboarding",
                 description: "Log in and you'll see a simple checklist: upload your photo ID, sign the student agreement, and watch a 10-minute orientation video. That's it.",
-                image: "/images/programs-hq/students-learning.jpg",
+                image: "/images/skilled-trades-vibrant.jpg",
                 alt: "Student completing onboarding checklist on laptop"
               },
               {
@@ -304,7 +304,7 @@ export default function HVACProgramContent() {
           <div className="rounded-2xl border-2 border-brand-blue-200 bg-brand-blue-50/30 overflow-hidden mb-8">
             <div className="grid lg:grid-cols-2 gap-0">
               <div className="relative h-64 lg:h-auto">
-                <Image src="/images/trades/program-hvac-overview.jpg" alt="EPA Section 608 certification preparation and proctored exam" fill quality={90} className="object-cover" />
+                <Image src="/images/efh/programs/trades.jpg" alt="EPA Section 608 certification preparation and proctored exam" fill quality={90} className="object-cover" />
               </div>
               <div className="p-8">
                 <div className="flex items-center gap-2 mb-3">
@@ -357,7 +357,7 @@ export default function HVACProgramContent() {
 
             <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
               <div className="relative h-48">
-                <Image src="/images/hvac-technician-success.jpg" alt="Program completion certificate and apprenticeship portfolio" fill quality={90} className="object-cover" />
+                <Image src="/images/programs/building-technician-hero.jpg" alt="Program completion certificate and apprenticeship portfolio" fill quality={90} className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -370,6 +370,24 @@ export default function HVACProgramContent() {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mid-page CTA */}
+      <section className="py-8 bg-brand-red-600">
+        <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-white text-center sm:text-left">
+            <p className="font-bold text-lg">Ready to apply? It takes 5 minutes.</p>
+            <p className="text-white/80 text-sm">No payment required. We check your funding eligibility for you.</p>
+          </div>
+          <div className="flex gap-3">
+            <Link href="/apply?program=hvac-technician" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-full hover:bg-brand-red-50 transition-colors whitespace-nowrap">
+              Apply Now
+            </Link>
+            <Link href="/contact" className="bg-white/20 text-white font-bold px-6 py-3 rounded-full hover:bg-white/30 transition-colors whitespace-nowrap border border-white/40">
+              Ask a Question
+            </Link>
           </div>
         </div>
       </section>
@@ -477,21 +495,21 @@ export default function HVACProgramContent() {
                 role: "HVAC Service Technician",
                 salary: "$40,000 – $55,000/year",
                 description: "Diagnose and repair heating and cooling systems in homes and businesses. Year-round demand — busy in summer and winter.",
-                image: "/images/trades/program-hvac-technician.jpg",
+                image: "/images/heroes/programs-trades.jpg",
                 alt: "HVAC service technician repairing a residential unit"
               },
               {
                 role: "Installation Specialist",
                 salary: "$42,000 – $58,000/year",
                 description: "Install new HVAC systems in homes and commercial buildings. Strong growth driven by new construction and system upgrades.",
-                image: "/images/trades/program-hvac-overview.jpg",
+                image: "/images/pathways/trades-hero.jpg",
                 alt: "HVAC installer working on a new commercial system"
               },
               {
                 role: "Refrigeration Technician",
                 salary: "$50,000 – $70,000/year",
                 description: "Specialized work on commercial refrigeration and industrial cooling. Higher pay because fewer technicians have this skill set.",
-                image: "/images/programs-hq/hvac-technician.jpg",
+                image: "/images/prog-trades.jpg",
                 alt: "Refrigeration technician working on commercial equipment"
               }
             ].map((career, index) => (
@@ -550,7 +568,7 @@ export default function HVACProgramContent() {
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <div className="flex flex-col md:flex-row gap-8 items-center">
             <div className="relative w-full md:w-80 h-64 flex-shrink-0 rounded-2xl overflow-hidden">
-              <Image src="/images/hvac-hero.jpg" alt="Student meeting with a funding advisor" fill quality={90} className="object-cover" />
+              <Image src="/images/skilled-trades-hero-new.jpg" alt="Student meeting with a funding advisor" fill quality={90} className="object-cover" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">How Funding Works</h2>
@@ -613,7 +631,7 @@ export default function HVACProgramContent() {
 
       {/* Final CTA */}
       <section className="relative py-20">
-        <Image src="/images/trades/hero-program-hvac.jpg" alt="HVAC technician at work" fill quality={90} className="object-cover" />
+        <Image src="/images/programs-hq/skilled-trades-hero.jpg" alt="HVAC technician at work" fill quality={90} className="object-cover" />
         <div className="absolute inset-0 bg-brand-blue-900/85" />
         <div className="relative max-w-4xl mx-auto px-6 lg:px-8 text-center text-white">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Start?</h2>

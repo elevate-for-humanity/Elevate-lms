@@ -347,57 +347,22 @@ export default function HomePage() {
       </section>
       </InView>
 
-      {/* ===== AUTHORIZED · REGISTERED · CERTIFIED ===== */}
-      <section className="py-8 bg-slate-900 border-t border-slate-800">
+      {/* ===== CREDENTIALS ===== */}
+      <section className="py-6 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
-          <p className="text-center text-xs font-bold text-brand-red-400 uppercase tracking-widest mb-5">Authorized · Registered · Certified</p>
-          <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 mb-5">
+          <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 mb-4">
             {[
               { src: '/images/partners/usdol.webp', alt: 'U.S. Department of Labor' },
               { src: '/images/partners/dwd.webp', alt: 'Indiana DWD' },
               { src: '/images/partners/workone.webp', alt: 'WorkOne Indiana' },
               { src: '/images/partners/nextleveljobs.webp', alt: 'Next Level Jobs' },
             ].map((logo) => (
-              <Image key={logo.alt} src={logo.src} alt={logo.alt} width={100} height={40} className="object-contain h-8 w-auto opacity-80 hover:opacity-100 transition-opacity" />
+              <Image key={logo.alt} src={logo.src} alt={logo.alt} width={80} height={32} className="object-contain h-6 w-auto opacity-60 hover:opacity-100 transition-opacity" />
             ))}
           </div>
-          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-slate-400">
-            {[
-              '501(c)(3) Nonprofit',
-              'DOL Registered Apprenticeship Sponsor',
-              'Rise Certified',
-              'Certiport Authorized Testing Site',
-              'Government Contractor',
-              'State Bidder',
-              'ITAP',
-              'UEI Registered',
-              'CAGE Code',
-              'Milady Authorized',
-              'Buy Black Certified',
-              'ETPL Listed',
-              'WIOA Approved',
-              'Workforce Ready Grant Provider',
-              'JRI Approved',
-              'OSHA Authorized',
-              'OSHA 10 Certification',
-              'HSI Training Center',
-              'CareerSafe',
-              'IRS Enrolled Agent (EFIN/PTIN)',
-              'CompTIA Authorized',
-              'EPA 608 Testing',
-              'Indiana PLA Licensed',
-              'NHA/ASCP Certified',
-              'Substitute Teacher Certification',
-              'Choice Medical CNA Partner',
-              'Barber License',
-              'Nail Technician License',
-              'Esthetician License',
-              'Nail Instructor License',
-              'Esthetician Instructor License',
-            ].map((cred) => (
-              <span key={cred} className="border border-slate-700 rounded-full px-3 py-1 whitespace-nowrap">{cred}</span>
-            ))}
-          </div>
+          <p className="text-center text-[10px] leading-relaxed text-slate-400 max-w-4xl mx-auto">
+            501(c)(3) Nonprofit · DOL Registered Apprenticeship Sponsor · ETPL Listed · WIOA Approved · Workforce Ready Grant Provider · JRI Approved · Rise Certified · Certiport Authorized Testing Site · CompTIA Authorized · EPA 608 Testing · OSHA Authorized · OSHA 10/30 · HSI Training Center · CareerSafe · Government Contractor · State Bidder · ITAP · UEI Registered · CAGE Code · Milady Authorized · Buy Black Certified · IRS Enrolled Agent (EFIN/PTIN) · Indiana PLA Licensed · NHA/ASCP Certified · Choice Medical CNA Partner · Barber License · Nail Technician License · Esthetician License · Nail Instructor License · Esthetician Instructor License · Cosmetology Instructor License · Substitute Teacher Certification · NRF Rise Up · Intuit QuickBooks Certified
+          </p>
         </div>
       </section>
     </main>

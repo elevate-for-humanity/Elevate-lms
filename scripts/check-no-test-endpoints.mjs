@@ -28,6 +28,8 @@ const ALLOWLIST = [
   'content/testimonials',                 // actual testimonials endpoint
   'testimonials',                         // actual testimonials endpoint
   'drug-testing/checkout',               // actual drug testing checkout
+  'admin/test-email',                    // token-gated admin utility
+  'workone/seed',                        // gated behind NODE_ENV !== production
 ];
 
 function walkDir(dir) {

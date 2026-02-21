@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const navItems = [
   { href: '/student-portal', label: 'Dashboard' },
-  { href: '/student-portal/courses', label: 'Courses' },
+  { href: '/lms/courses', label: 'Courses' },
   { href: '/student-portal/assignments', label: 'Assignments' },
   { href: '/student-portal/grades', label: 'Grades' },
   { href: '/student-portal/schedule', label: 'Schedule' },

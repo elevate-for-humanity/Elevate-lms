@@ -40,7 +40,7 @@ export default function HeroSection() {
           className="absolute inset-0 w-full h-full object-cover opacity-30"
           poster="/images/hero-banner-new.jpg"
         >
-          <source src="/videos/hero-loop.mp4" type="video/mp4" />
+          <source src="/videos/hero-home.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/95 to-slate-950/70" />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />

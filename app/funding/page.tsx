@@ -50,7 +50,7 @@ export default function FundingPage() {
             {/* WIOA */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/trades/program-cdl-overview.jpg" alt="WIOA funding" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/heroes-hq/funding-hero.jpg" alt="WIOA workforce funding" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Federal</div>
               </div>
               <div className="p-5">
@@ -125,7 +125,7 @@ export default function FundingPage() {
             {/* OJT */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/trades/hero-program-carpentry.jpg" alt="On the job training" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/heroes-hq/employer-hero.jpg" alt="On-the-job training with employer" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-brand-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">Earn & Learn</div>
               </div>
               <div className="p-5">

@@ -56,14 +56,21 @@ async function resolveCourseId(supabase: any, programInterest: string): Promise<
  * Auto-approve: create auth user + profile on application submit.
  * Does NOT enroll — student must complete onboarding + WorkOne approval first.
  */
-async function autoApprove(
+/**
+ * Creates an auth account and profile so the student can log in and complete
+ * onboarding. Application stays 'pending' — approval happens after all
+ * onboarding steps (profile, agreements, documents, orientation) are done.
+ *
+ * Flow: pending → onboarding → approved → enrolled
+ */
+async function createStudentAccount(
   supabase: any,
   applicationId: string,
   email: string,
   firstName: string,
   lastName: string,
   programInterest: string,
-): Promise<{ userId?: string; approved: boolean }> {
+): Promise<{ userId?: string; accountCreated: boolean }> {
   try {
     const normalizedEmail = email.toLowerCase().trim();
     let userId: string | null = null;
@@ -125,11 +132,11 @@ async function autoApprove(
     }
 
     if (!userId) {
-      logger.error('Auto-approve: could not create user', { email: normalizedEmail });
-      return { approved: false };
+      logger.error('Account creation failed — could not create user', { email: normalizedEmail });
+      return { accountCreated: false };
     }
 
-    // Resolve course ID for tracking (but don't enroll yet)
+    // Resolve course ID for tracking
     const courseId = await resolveCourseId(supabase, programInterest);
 
     // Resolve program ID from programs table (used by enrollment system)
@@ -141,41 +148,43 @@ async function autoApprove(
       .maybeSingle();
     const programId = programRow?.id || courseId || null;
 
-    // Update application to approved — ready for onboarding
+    // Link user to application — keep status 'pending' until onboarding is complete
     await supabase
       .from('applications')
       .update({
-        status: 'approved',
+        status: 'pending',
         user_id: userId,
         program_id: programId,
       })
       .eq('id', applicationId);
 
-    // Create program_enrollments record to start the onboarding state machine.
-    // State starts at 'approved' (skipping 'applied' since auto-approve already ran).
-    // The student will proceed: approved → confirmed → orientation → documents → active.
-    const { error: enrollErr } = await supabase
-      .from('program_enrollments')
-      .insert({
-        user_id: userId,
-        program_id: programId,
-        email: normalizedEmail,
-        full_name: `${firstName} ${lastName}`,
-        amount_paid_cents: 0,
-        funding_source: 'pending',
-        status: 'pending',
-        enrollment_state: 'approved',
-        next_required_action: 'COMPLETE_PAYMENT',
-      });
-    if (enrollErr) {
-      logger.error('Failed to create program_enrollment record', { error: enrollErr.message, programId, programInterest });
+    // Create program_enrollments record in 'onboarding' state.
+    // Student must complete: profile → agreements → documents → orientation
+    // Only after all steps → admin reviews → status becomes 'approved' → 'enrolled'
+    try {
+      await supabase
+        .from('program_enrollments')
+        .insert({
+          user_id: userId,
+          program_id: programId,
+          email: normalizedEmail,
+          full_name: `${firstName} ${lastName}`,
+          amount_paid_cents: 0,
+          funding_source: 'pending',
+          status: 'pending',
+          enrollment_state: 'onboarding',
+          next_required_action: 'COMPLETE_PROFILE',
+        });
+    } catch (enrollErr) {
+      // Non-fatal — admin can create enrollment manually
+      logger.error('Failed to create program_enrollment record', enrollErr as Error);
     }
 
-    logger.info('Auto-approved student for onboarding', { applicationId, userId, email: normalizedEmail });
-    return { userId, approved: true };
+    logger.info('Student account created — pending onboarding', { applicationId, userId, email: normalizedEmail });
+    return { userId, accountCreated: true };
   } catch (err) {
-    logger.error('Auto-approve failed', err as Error);
-    return { approved: false };
+    logger.error('Account creation failed', err as Error);
+    return { accountCreated: false };
   }
 }
 
@@ -261,100 +270,110 @@ async function insertApplication(payload: {
   source: string;
 }): Promise<{ success: true; applicationId: string; referenceNumber: string } | { success: false; error: string }> {
   const supabase = createAdminClient();
-
-  if (!supabase) {
-    return { success: false, error: 'Application system is temporarily unavailable. Please try again later.' };
-  }
-
   const referenceNumber = generateReferenceNumber();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+  const programLabel = payload.programInterest.replace(/-/g, ' ');
 
-  try {
-    const { data, error } = await supabase
-      .from('applications')
-      .insert({
-        first_name: payload.firstName,
-        last_name: payload.lastName,
-        email: payload.email,
-        phone: payload.phone,
-        city: payload.city,
-        zip: payload.zip,
-        program_interest: payload.programInterest,
-        support_notes: `Reference: ${referenceNumber} | ${payload.supportNotes}`,
-        status: 'pending',
-        source: payload.source,
-      })
-      .select('id')
-      .single();
-
-    if (error) {
-      console.error(`[Application] Insert failed for ${payload.email}:`, error.message);
-      return { success: false, error: 'Failed to save application. Please try again or use our contact form at /contact.' };
-    }
-
-    // Auto-approve: create account, send to onboarding
-    const approveResult = await autoApprove(
-      supabase,
-      data.id,
+  // ── Helper: send both emails (student confirmation + admin notification) ──
+  async function sendApplicationEmails() {
+    // Student: application received — complete onboarding to get approved
+    await sendEmailDirect(
       payload.email,
-      payload.firstName,
-      payload.lastName,
-      payload.programInterest,
-    );
-
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-
-    // Send onboarding email to student
-    if (approveResult.approved) {
-      sendEmailDirect(
-        payload.email,
-        `Application Approved — Start Your Onboarding [${referenceNumber}]`,
-        [
-          `<h2>Welcome, ${payload.firstName}!</h2>`,
-          `<p>Your application for <strong>${payload.programInterest.replace(/-/g, ' ')}</strong> at Elevate for Humanity has been approved.</p>`,
-          `<h3>Complete Your Onboarding:</h3>`,
-          `<ol>`,
-          `<li><strong>Set your password:</strong> Go to <a href="${siteUrl}/forgot-password">${siteUrl}/forgot-password</a> and enter your email: <strong>${payload.email}</strong></li>`,
-          `<li><strong>Log in:</strong> Go to <a href="${siteUrl}/login">${siteUrl}/login</a></li>`,
-          `<li><strong>Complete onboarding:</strong> Once logged in, you'll be guided through your profile, agreements, handbook, and document uploads</li>`,
-          `<li><strong>WorkOne verification:</strong> If you're applying for WIOA funding, we'll coordinate with WorkOne on your behalf</li>`,
-          `</ol>`,
-          `<p>You must complete all onboarding steps before enrollment in your program.</p>`,
-          `<p>Your reference number: <strong>${referenceNumber}</strong></p>`,
-          `<p>Questions? Reply to this email or call us.</p>`,
-          `<p>— Elevate for Humanity</p>`,
-        ].join(''),
-      ).catch(() => {});
-    } else {
-      sendEmailDirect(
-        payload.email,
-        `Application Received [${referenceNumber}] - Elevate for Humanity`,
-        `<p>Hi ${payload.firstName},</p><p>We received your application (Ref: <strong>${referenceNumber}</strong>). Our team will review it and contact you within 2 business days.</p><p>— Elevate for Humanity</p>`,
-      ).catch(() => {});
-    }
-
-    // Notify admin (non-blocking)
-    sendEmailDirect(
-      ADMIN_EMAIL,
-      `${approveResult.approved ? '[APPROVED]' : '[PENDING]'} ${payload.firstName} ${payload.lastName} — ${payload.programInterest} [${referenceNumber}]`,
+      `Application Received — Complete Your Onboarding [${referenceNumber}]`,
       [
-        `<h3>New ${payload.source.replace(/-/g, ' ')} received</h3>`,
-        approveResult.approved ? `<p style="color:green"><strong>Account created — sent to onboarding</strong></p>` : `<p style="color:orange"><strong>Auto-approve failed — manual action needed</strong></p>`,
-        `<p><strong>Name:</strong> ${payload.firstName} ${payload.lastName}</p>`,
-        `<p><strong>Email:</strong> <a href="mailto:${payload.email}">${payload.email}</a></p>`,
-        `<p><strong>Phone:</strong> <a href="tel:${payload.phone}">${payload.phone}</a></p>`,
-        `<p><strong>Program:</strong> ${payload.programInterest}</p>`,
-        `<p><strong>City:</strong> ${payload.city} | <strong>ZIP:</strong> ${payload.zip}</p>`,
-        `<p><strong>Reference:</strong> ${referenceNumber}</p>`,
-        payload.supportNotes ? `<p><strong>Details:</strong> ${payload.supportNotes}</p>` : '',
-        `<p><a href="${siteUrl}/admin/applications">View in Admin Dashboard</a></p>`,
-      ].filter(Boolean).join(''),
+        `<h2>Hi ${payload.firstName},</h2>`,
+        `<p>We received your application for <strong>${programLabel}</strong> at Elevate for Humanity.</p>`,
+        `<p>Your reference number: <strong>${referenceNumber}</strong></p>`,
+        `<h3>Next Steps to Complete Your Enrollment:</h3>`,
+        `<ol>`,
+        `<li><strong>Set your password:</strong> Go to <a href="${siteUrl}/forgot-password">${siteUrl}/forgot-password</a> and enter your email: <strong>${payload.email}</strong></li>`,
+        `<li><strong>Log in:</strong> Go to <a href="${siteUrl}/login">${siteUrl}/login</a></li>`,
+        `<li><strong>Complete your profile:</strong> Fill in your full name, address, and contact info</li>`,
+        `<li><strong>Review and sign agreements:</strong> Student handbook, enrollment agreement, and code of conduct</li>`,
+        `<li><strong>Upload required documents:</strong> Government-issued ID and any supporting documents</li>`,
+        `<li><strong>Complete orientation:</strong> Watch the orientation video and acknowledge program expectations</li>`,
+        `</ol>`,
+        `<p><strong>Your application will be reviewed and approved after all onboarding steps are complete.</strong></p>`,
+        `<p>If you're applying for WIOA funding, register at <a href="https://indianacareerconnect.com">indianacareerconnect.com</a> — this is required for eligibility.</p>`,
+        `<p>Questions? Reply to this email or call us.</p>`,
+        `<p>— Elevate for Humanity</p>`,
+      ].join(''),
     ).catch(() => {});
 
-    revalidatePath('/admin/applications');
-    return { success: true, applicationId: data.id, referenceNumber };
-  } catch (error) {
-    console.error(`[Application] Unexpected error for ${payload.email}:`, error);
-    return { success: false, error: 'An error occurred' };
+    // Admin notification
+    await sendEmailDirect(
+      ADMIN_EMAIL,
+      `[PENDING] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`,
+      [
+        `<h3>New ${payload.source.replace(/-/g, ' ')}</h3>`,
+        `<p style="color:orange"><strong>Status: PENDING — awaiting onboarding completion</strong></p>`,
+        `<table style="border-collapse:collapse;width:100%;max-width:500px">`,
+        `<tr><td style="padding:6px;font-weight:bold">Name</td><td style="padding:6px">${payload.firstName} ${payload.lastName}</td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">Email</td><td style="padding:6px"><a href="mailto:${payload.email}">${payload.email}</a></td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">Phone</td><td style="padding:6px"><a href="tel:${payload.phone}">${payload.phone}</a></td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">Program</td><td style="padding:6px">${programLabel}</td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">City / ZIP</td><td style="padding:6px">${payload.city} ${payload.zip}</td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">Reference</td><td style="padding:6px">${referenceNumber}</td></tr>`,
+        payload.supportNotes ? `<tr><td style="padding:6px;font-weight:bold">Details</td><td style="padding:6px">${payload.supportNotes}</td></tr>` : '',
+        `</table>`,
+        `<p>Student account created — they can log in and begin onboarding.</p>`,
+        `<p>Approve after they complete: profile, agreements, documents, and orientation.</p>`,
+        supabase ? `<p><a href="${siteUrl}/admin/applications">View in Admin Dashboard</a></p>` : `<p style="color:orange"><em>Database unavailable — application received via email only.</em></p>`,
+      ].filter(Boolean).join(''),
+    ).catch(() => {});
+  }
+
+  // ── Path A: Supabase available — full DB + auto-approve flow ──
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('applications')
+        .insert({
+          first_name: payload.firstName,
+          last_name: payload.lastName,
+          email: payload.email,
+          phone: payload.phone,
+          city: payload.city,
+          zip: payload.zip,
+          program_interest: payload.programInterest,
+          support_notes: `Reference: ${referenceNumber} | ${payload.supportNotes}`,
+          status: 'pending',
+          source: payload.source,
+        })
+        .select('id')
+        .single();
+
+      if (error) {
+        logger.error(`[Application] DB insert failed for ${payload.email}`, new Error(error.message));
+        // Fall through to email-only path
+      } else {
+        const accountResult = await createStudentAccount(
+          supabase,
+          data.id,
+          payload.email,
+          payload.firstName,
+          payload.lastName,
+          payload.programInterest,
+        );
+
+        await sendApplicationEmails();
+        revalidatePath('/admin/applications');
+        return { success: true, applicationId: data.id, referenceNumber };
+      }
+    } catch (error) {
+      logger.error(`[Application] DB error for ${payload.email}`, error as Error);
+      // Fall through to email-only path
+    }
+  }
+
+  // ── Path B: Email-only — no Supabase or DB insert failed ──
+  try {
+    await sendApplicationEmails();
+    logger.info(`[Application] Email-only submission for ${payload.email} [${referenceNumber}]`);
+    return { success: true, applicationId: `email-${referenceNumber}`, referenceNumber };
+  } catch (emailError) {
+    logger.error(`[Application] Email send failed for ${payload.email}`, emailError as Error);
+    return { success: false, error: 'We could not process your application. Please email us directly at elevate4humanityedu@gmail.com with your name, phone number, and program interest.' };
   }
 }
 

@@ -58,7 +58,7 @@ export default async function DrugTestingTrainingPage() {
 
       {/* Hero */}
       <section className="relative h-[40vh] min-h-[300px]">
-        <Image 
+        <Image alt="Drug testing training" 
           src="/images/healthcare/drug-testing-training.jpg" 
           alt="Drug Testing Training" 
           fill 

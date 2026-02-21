@@ -276,7 +276,7 @@ export default async function BusinessFinancialPage() {
       </section>
 
       {/* Next Steps */}
-      <section className="bg-white text-white py-16">
+      <section className="bg-slate-900 text-white py-16">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <h2 className="text-3xl font-bold mb-6">Next Steps</h2>
           <div className="space-y-4 text-left max-w-2xl mx-auto mb-8">

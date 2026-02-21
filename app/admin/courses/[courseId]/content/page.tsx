@@ -21,8 +21,9 @@ export default async function CourseContentPage({ params }: { params: Promise<{ 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
-  const { data: course } = await supabase.from('courses').select('*').eq('id', courseId).single();
-  const { data: lessons } = await supabase.from('lessons').select('*').eq('course_id', courseId).order('order_index');
+  const { data: rawCourse } = await supabase.from('training_courses').select('*').eq('id', courseId).single();
+  const course = rawCourse ? { ...rawCourse, title: rawCourse.course_name } : null;
+  const { data: lessons } = await supabase.from('training_lessons').select('*').eq('course_id', courseId).order('lesson_number');
 
   return (
     <div className="min-h-screen bg-gray-50">

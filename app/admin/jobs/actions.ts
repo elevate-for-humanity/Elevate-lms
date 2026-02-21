@@ -24,7 +24,7 @@ export async function createJob(formData: FormData) {
     created_by: user.id,
   });
 
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Failed to process job action.');
 
   revalidatePath('/admin/jobs');
   redirect('/admin/jobs');

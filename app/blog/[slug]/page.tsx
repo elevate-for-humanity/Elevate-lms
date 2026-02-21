@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { createAdminClient } from '@/lib/supabase/server';
 import { SocialShare } from '@/components/blog/SocialShare';
 import { ArrowLeft, Calendar, User, Clock, Tag } from 'lucide-react';
+import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 
 export const dynamic = 'force-dynamic';
 
@@ -167,7 +168,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
         
         <div 
           className="prose prose-lg max-w-none prose-headings:text-black prose-p:text-gray-700 prose-a:text-brand-blue-600 prose-strong:text-black"
-          dangerouslySetInnerHTML={{ __html: formatContent(post.content) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(formatContent(post.content)) }}
         />
         
         {post.tags && post.tags.length > 0 && (

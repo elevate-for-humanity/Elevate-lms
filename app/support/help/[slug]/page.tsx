@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createAdminClient } from '@/lib/supabase/server';
 import { ArrowLeft, ThumbsUp, ThumbsDown, Eye } from 'lucide-react';
+import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 
 export const dynamic = 'force-dynamic';
 
@@ -107,7 +108,7 @@ export default async function HelpArticlePage({ params }: { params: Params }) {
           <div className="bg-white rounded-2xl p-8 shadow-sm">
             <div 
               className="prose prose-lg max-w-none prose-headings:text-black prose-p:text-gray-700 prose-a:text-brand-blue-600 prose-strong:text-black prose-li:text-gray-700"
-              dangerouslySetInnerHTML={{ __html: formatContent(article.content) }}
+              dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(formatContent(article.content)) }}
             />
             
             {/* Tags */}

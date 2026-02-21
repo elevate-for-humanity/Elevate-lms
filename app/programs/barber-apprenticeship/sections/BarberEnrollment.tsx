@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ArrowRight, Phone, Shield, CreditCard, DollarSign, Building2, Scissors } from 'lucide-react';
 import { ProgramTutorCTA } from '@/components/ProgramTutorCTA';
 import { ENROLLMENT_STEPS, ELIGIBILITY } from '../barber-program-data';
 
@@ -14,25 +15,95 @@ export function BarberEnrollment() {
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
             <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
+              <DollarSign className="w-8 h-8 text-brand-green-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Pay in Full</h3>
-              <p className="text-slate-600 text-sm">Visa, Mastercard, Amex, Discover via Stripe</p>
+              <p className="text-slate-600 text-sm mb-3">Visa, Mastercard, Amex, Discover via Stripe</p>
+              <Link href="/enroll/barber-apprenticeship" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
+                Enroll &amp; Pay &rarr;
+              </Link>
             </div>
             <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
+              <CreditCard className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Payment Plans</h3>
-              <p className="text-slate-600 text-sm">Weekly or monthly installments with down payment</p>
+              <p className="text-slate-600 text-sm mb-3">Weekly or monthly installments with down payment</p>
+              <Link href="/pay" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
+                View Plans &rarr;
+              </Link>
+            </div>
+            <div className="bg-white rounded-xl p-5 border-2 border-brand-blue-400 text-center relative">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">POPULAR</span>
+              <CreditCard className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
+              <h3 className="font-bold text-slate-900 mb-1">Buy Now, Pay Later</h3>
+              <p className="text-slate-600 text-sm mb-2">Split into 4 interest-free payments</p>
+              <div className="flex flex-wrap justify-center gap-1 mb-3">
+                <span className="px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">Klarna</span>
+                <span className="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">Afterpay</span>
+                <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">Affirm</span>
+              </div>
+              <Link href="/pay" className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition-colors">
+                Apply for BNPL
+              </Link>
             </div>
             <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
-              <h3 className="font-bold text-slate-900 mb-1">BNPL Options</h3>
-              <p className="text-slate-600 text-sm">Affirm, Sezzle, Klarna where eligible</p>
-            </div>
-            <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">
+              <Building2 className="w-8 h-8 text-brand-orange-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Employer Sponsorship</h3>
-              <p className="text-slate-600 text-sm">Invoice or sponsorship agreement available</p>
+              <p className="text-slate-600 text-sm mb-3">Invoice or sponsorship agreement available</p>
+              <Link href="/partners/barbershop-apprenticeship/apply" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
+                Partner Info &rarr;
+              </Link>
             </div>
           </div>
           <p className="mt-4 text-xs text-slate-500 text-center max-w-2xl mx-auto">
             Payment plans and financing availability are subject to provider approval and individual eligibility. Workforce partner referrals accepted when applicable.
           </p>
+        </div>
+      </section>
+
+      {/* Partner Shop Application CTA */}
+      <section className="py-12 bg-brand-orange-600">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className="text-white">
+              <div className="flex items-center gap-3 mb-4">
+                <Scissors className="w-8 h-8" />
+                <h2 className="text-2xl md:text-3xl font-black">Own a Barbershop?</h2>
+              </div>
+              <p className="text-white/90 text-lg mb-2">
+                Become a partner training site and host apprentices in your shop. We handle the paperwork — you train the next generation.
+              </p>
+              <ul className="text-white/80 text-sm space-y-1 mb-6">
+                <li>&#x2022; Get pre-screened, motivated apprentices</li>
+                <li>&#x2022; Zero administrative burden — we handle compliance</li>
+                <li>&#x2022; First pick to hire graduates</li>
+                <li>&#x2022; Recognition as an approved training site</li>
+              </ul>
+              <div className="flex flex-wrap gap-3">
+                <Link href="/partners/barbershop-apprenticeship/apply" className="inline-flex items-center gap-2 bg-white text-brand-orange-700 font-bold px-6 py-3 rounded-lg hover:bg-slate-50 transition-colors">
+                  Apply as Partner Shop <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link href="/programs/barber-apprenticeship/host-shops" className="inline-flex items-center gap-2 bg-white/20 text-white font-bold px-6 py-3 rounded-lg hover:bg-white/30 transition-colors border border-white/40">
+                  Learn More
+                </Link>
+              </div>
+            </div>
+            <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+              <h3 className="text-white font-bold text-lg mb-4">Quick Application Checklist</h3>
+              <div className="space-y-3">
+                {[
+                  'Active Indiana barbershop license',
+                  'Licensed supervising barber on staff',
+                  'Workers\' compensation insurance',
+                  'Physical shop location in Indiana',
+                  'Willingness to sign MOU',
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-2 text-white/90 text-sm">
+                    <span className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i + 1}</span>
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -94,9 +165,12 @@ export function BarberEnrollment() {
       <section className="py-12 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
-            <p className="text-sm text-brand-blue-800 leading-relaxed">
-              This program is aligned with workforce training standards and apprenticeship-based learning models, incorporating structured RTI, employer-supervised OJT, mapped competencies, and documented progress reporting suitable for workforce partners and cohort training programs. Enrollment is contingent upon eligibility, funding availability, and employer participation.
-            </p>
+            <div className="flex items-start gap-3">
+              <Shield className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-brand-blue-800 leading-relaxed">
+                This program is aligned with workforce training standards and apprenticeship-based learning models, incorporating structured RTI, employer-supervised OJT, mapped competencies, and documented progress reporting suitable for workforce partners and cohort training programs. Enrollment is contingent upon eligibility, funding availability, and employer participation.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -107,18 +181,29 @@ export function BarberEnrollment() {
           <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
             Start Your Barber Career
           </h2>
-          <p className="text-xl text-slate-300 mb-8">
+          <p className="text-xl text-slate-300 mb-4">
             2,000-hour apprenticeship with licensed shop training. Apply today to check your eligibility.
           </p>
-          <div className="flex flex-wrap gap-4 justify-center">
+          <p className="text-slate-400 mb-8">
+            Pay in full, use a payment plan, or apply for Buy Now Pay Later with Klarna, Afterpay, or Affirm.
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center mb-6">
             <Link href="/apply?program=barber-apprenticeship" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
-              Apply Now &rarr;
+              Apply as Student <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="/support" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">
-              Get Help Online
+            <Link href="/partners/barbershop-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+              <Building2 className="w-5 h-5" /> Apply as Partner Shop
             </Link>
           </div>
-          <div className="mt-6 flex justify-center">
+          <div className="flex flex-wrap gap-3 justify-center mb-6">
+            <Link href="/pay" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-full font-semibold transition-all border border-white/30">
+              <CreditCard className="w-4 h-4" /> BNPL Options
+            </Link>
+            <Link href="/support" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-full font-semibold transition-all border border-white/30">
+              <Phone className="w-4 h-4" /> Get Help Online
+            </Link>
+          </div>
+          <div className="mt-4 flex justify-center">
             <ProgramTutorCTA
               programSlug="barber-apprenticeship"
               programName="Barber Apprenticeship"

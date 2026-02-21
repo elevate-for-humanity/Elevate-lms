@@ -282,7 +282,7 @@ function LegalAgreementsContent() {
         router.push(nextUrl);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError('Failed to process agreement. Please try again.');
     } finally {
       setSubmitting(false);
     }

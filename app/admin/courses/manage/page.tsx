@@ -32,7 +32,7 @@ export default async function ManageCoursesPage() {
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const { data: courses, count } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .limit(20);

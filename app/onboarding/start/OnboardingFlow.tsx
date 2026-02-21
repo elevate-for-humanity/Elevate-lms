@@ -4,6 +4,7 @@ import React from 'react';
 
 import { useState } from 'react';
 import { Circle, Lock, FileText, DollarSign } from 'lucide-react';
+import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 
 interface OnboardingFlowProps {
   user: any;
@@ -304,7 +305,7 @@ function DocumentStep({
           <div
             className="bg-slate-50 border border-slate-200 rounded-lg p-6 max-h-96 overflow-y-auto"
             dangerouslySetInnerHTML={{
-              __html: document.content.replace(/\n/g, '<br />'),
+              __html: sanitizeRichHtml(document.content.replace(/\n/g, '<br />')),
             }}
           />
         </div>

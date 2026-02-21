@@ -103,17 +103,16 @@ const nextConfig = {
     '**.gitpod.dev',
   ],
 
-  serverActions: {
-    allowedOrigins: [
-      'localhost:3000',
-      '**.gitpod.dev',
-      'www.elevateforhumanity.org',
-      'elevateforhumanity.org',
-    ],
-  },
-
   // Experimental features for better performance
   experimental: {
+    serverActions: {
+      allowedOrigins: [
+        'localhost:3000',
+        '**.gitpod.dev',
+        'www.elevateforhumanity.org',
+        'elevateforhumanity.org',
+      ],
+    },
     optimizePackageImports: [
       'lucide-react',
       '@radix-ui/react-dialog',

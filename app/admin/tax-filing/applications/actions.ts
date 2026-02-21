@@ -22,7 +22,7 @@ export async function createTaxApplication(formData: FormData) {
     created_by: user.id,
   });
 
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Failed to process tax filing application.');
 
   revalidatePath('/admin/tax-filing/applications');
   redirect('/admin/tax-filing/applications');

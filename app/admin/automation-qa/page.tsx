@@ -97,7 +97,7 @@ export default function AutomationQAPage() {
       setTestResult(JSON.stringify(result, null, 2));
       await loadData();
     } catch (error) {
-      setTestResult(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setTestResult('Test failed. Check server logs for details.');
     }
 
     setTestRunning(false);
@@ -115,7 +115,7 @@ export default function AutomationQAPage() {
       setTestResult(JSON.stringify(result, null, 2));
       await loadData();
     } catch (error) {
-      setTestResult(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setTestResult('Test failed. Check server logs for details.');
     }
 
     setTestRunning(false);
@@ -133,7 +133,7 @@ export default function AutomationQAPage() {
       setTestResult(JSON.stringify(result, null, 2));
       await loadData();
     } catch (error) {
-      setTestResult(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setTestResult('Test failed. Check server logs for details.');
     }
 
     setTestRunning(false);

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const CONTACT_METHODS = [
   { title: 'Email', desc: 'our contact form', detail: 'Response within 1 business day', icon: Mail, href: 'mailto:our contact form' },
-  { title: 'Phone', desc: '(317) 555-1234', detail: 'Mon–Fri, 9 AM – 5 PM EST', icon: Phone, href: 'tel:+13175551234' },
+  { title: 'Phone', desc: '(317) 314-3757', detail: 'Mon–Fri, 9 AM – 5 PM EST', icon: Phone, href: 'tel:+13173143757' },
   { title: 'Location', desc: 'Indianapolis, Indiana', detail: 'By appointment only', icon: MapPin, href: '/contact' },
 ];
 

@@ -37,7 +37,7 @@ export default async function TrainingPage() {
       </div>
 {/* Hero */}
       <section className="relative h-[400px] w-full overflow-hidden">
-        <Image 
+        <Image alt="Tax preparation training" 
           src="/images/business/tax-prep-certification-optimized.jpg" 
           alt="Tax Preparer Training" 
           fill

@@ -70,7 +70,7 @@ export default function VideoHeroSection() {
         autoPlay
         preload="metadata"
       >
-        <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home.mp4" type="video/mp4" />
+        <source src="/videos/hero-home.mp4" type="video/mp4" />
       </video>
 
       {/* Subtle overlay for text readability */}

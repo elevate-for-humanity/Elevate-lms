@@ -46,7 +46,7 @@ const CREDENTIAL_PARTNERS = (dbRows as any[]) || [];
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[300px]">
         <Image
-          src="/images/heroes-hq/about-hero.jpg"
+          src="/images/business/collaboration-1.jpg"
           alt="Credential partners and training providers"
           fill
           sizes="100vw"

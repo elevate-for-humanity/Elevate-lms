@@ -1,12 +1,10 @@
-import { Metadata } from 'next';
+import { siteMetadata } from '@/lib/seo/siteMetadata';
 
-export const metadata: Metadata = {
-  title: 'Electrical Training Program | Elevate for Humanity',
-  description: 'Electrical training and certification program. Learn residential and commercial electrical work. WIOA funding available.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/programs/electrical',
-  },
-};
+export const metadata = siteMetadata({
+  title: 'Electrical Technician Training Program',
+  description: 'Electrical technician pathway built for workforce readiness — hands-on learning, safety fundamentals, and employer-aligned skills.',
+  path: '/programs/electrical',
+});
 
 export default function ElectricalLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;

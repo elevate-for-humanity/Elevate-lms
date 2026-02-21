@@ -40,7 +40,7 @@ const plans: Record<string, {
     priceDisplay: '$8,500',
     interval: 'month',
     description: 'For workforce boards, government agencies, and regional operators.',
-    image: '/images/heroes-hq/employer-hero.jpg',
+    image: '/images/efh/hero/hero-support.jpg',
   },
 };
 
@@ -118,7 +118,7 @@ export default function LicenseCheckoutPage() {
         throw new Error('No checkout URL returned');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setError('Payment processing failed. Please try again.');
       setIsSubmitting(false);
     }
   };

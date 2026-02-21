@@ -131,7 +131,7 @@ export function BlameGutter({ repo, path, branch, token, lineCount, visible }: B
                   flex: 1,
                 }}>
                   {group.info.avatar && (
-                    <Image 
+                    <Image alt="Contributor avatar" 
                       src={group.info.avatar} 
                       alt={group.info.author || 'Author'} 
                       width={14}

@@ -83,7 +83,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
     try {
       if (editingLesson) {
         const { data, error: updateError } = await supabase
-          .from('lessons')
+          .from('training_lessons')
           .update(lessonData)
           .eq('id', editingLesson.id)
           .select()
@@ -93,7 +93,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
         setLessons(lessons.map(l => l.id === editingLesson.id ? data : l));
       } else {
         const { data, error: insertError } = await supabase
-          .from('lessons')
+          .from('training_lessons')
           .insert(lessonData)
           .select()
           .single();
@@ -116,7 +116,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
 
     setLoading(true);
     try {
-      const { error: deleteError } = await supabase.from('lessons').delete().eq('id', lessonId);
+      const { error: deleteError } = await supabase.from('training_lessons').delete().eq('id', lessonId);
       if (deleteError) throw deleteError;
       setLessons(lessons.filter(l => l.id !== lessonId));
     } catch (err: any) {
@@ -136,8 +136,8 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
     // Update order_index for both lessons
     try {
       await Promise.all([
-        supabase.from('lessons').update({ order_index: newIndex }).eq('id', newLessons[newIndex].id),
-        supabase.from('lessons').update({ order_index: index }).eq('id', newLessons[index].id),
+        supabase.from('training_lessons').update({ order_index: newIndex }).eq('id', newLessons[newIndex].id),
+        supabase.from('training_lessons').update({ order_index: index }).eq('id', newLessons[index].id),
       ]);
       setLessons(newLessons.map((l, i) => ({ ...l, order_index: i })));
     } catch (err: any) {

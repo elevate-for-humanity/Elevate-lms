@@ -33,7 +33,7 @@ export function ProgramsGridSection({ title, programs }: ProgramsGridSectionProp
               {/* Image */}
               {program.heroImage && (
                 <div className="relative h-48 w-full overflow-hidden">
-                  <Image loading="lazy"
+                  <Image alt="Training program" loading="lazy"
                     src={program.heroImage}
                     alt={program.name}
                     fill

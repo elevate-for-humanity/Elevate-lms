@@ -131,7 +131,7 @@ export default function InstructionalFrameworkPage() {
       {/* Hero */}
       <section className="relative h-[260px] sm:h-[340px]">
         <Image
-          src="/images/programs-hq/training-classroom.jpg"
+          src="/images/efh/sections/classroom.jpg"
           alt="Instructor-led classroom training session"
           fill
           sizes="100vw"

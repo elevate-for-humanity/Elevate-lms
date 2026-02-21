@@ -68,7 +68,7 @@ export default async function MentorshipPage() {
           </div>
           <div className="bg-white rounded-xl overflow-hidden shadow-sm">
             <div className="relative h-32">
-              <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Networking" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/heroes-hq/employer-hero.jpg" alt="Networking" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-4">
               <h3 className="font-semibold mb-2">Networking</h3>
@@ -77,7 +77,7 @@ export default async function MentorshipPage() {
           </div>
           <div className="bg-white rounded-xl overflow-hidden shadow-sm">
             <div className="relative h-32">
-              <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Skill Development" fill sizes="100vw" className="object-cover" />
+              <Image src="/images/career-services/industry-mixer.jpg" alt="Skill Development" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-4">
               <h3 className="font-semibold mb-2">Skill Development</h3>

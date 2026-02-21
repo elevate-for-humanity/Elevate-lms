@@ -17,14 +17,14 @@ export const metadata: Metadata = {
     description: 'Apply for workforce training and career development programs. Most students begin training within 2-4 weeks.',
     url: 'https://www.elevateforhumanity.org/apply/student',
     siteName: 'Elevate for Humanity',
-    images: [{ url: '/images/heroes-hq/success-hero.jpg', width: 1200, height: 630, alt: 'Apply for career training' }],
+    images: [{ url: '/images/efh/hero/hero-support.jpg', width: 1200, height: 630, alt: 'Apply for career training' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Apply for Free Career Training | Elevate for Humanity',
     description: 'Apply for workforce training programs. Most students begin within 2-4 weeks.',
-    images: ['/images/heroes-hq/success-hero.jpg'],
+    images: ['/images/efh/hero/hero-support.jpg'],
   },
 };
 
@@ -39,7 +39,7 @@ export default async function StudentApplicationPage({
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
       <div className="relative h-[200px] sm:h-[260px]">
-        <Image src="/images/heroes-hq/success-hero.jpg" alt="Student application" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/efh/hero/hero-support.jpg" alt="Student application" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded">
           <span className="text-sm font-bold text-slate-900">Elevate for Humanity</span>
         </div>

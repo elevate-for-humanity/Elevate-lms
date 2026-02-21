@@ -86,7 +86,7 @@ export default async function CompanyProfilePage() {
     name: employer.business_name || 'Company Name',
     dba: employer.dba_name,
     logo: '/images/employers/partnership-meeting.jpg',
-    cover: '/images/heroes-hq/employer-hero.jpg',
+    cover: '/images/business/professional-1.jpg',
     industry: employer.industry || 'Not specified',
     size: employer.employee_count ? `${employer.employee_count} employees` : 'Not specified',
     founded: employer.year_established || 'Not specified',

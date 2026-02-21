@@ -92,7 +92,7 @@ export default function SearchPage() {
       {/* Hero */}
       <section className="relative h-[320px] sm:h-[400px] overflow-hidden">
         <Image
-          src="/images/heroes-hq/programs-hero.jpg"
+          src="/images/compare-programs-hero.jpg"
           alt="Workforce training programs"
           fill
           className="object-cover"

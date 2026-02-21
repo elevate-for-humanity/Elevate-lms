@@ -32,7 +32,7 @@ export default function SessionPage() {
       const data = await res.json();
       setSession(data.session);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load session');
+      setError('Failed to load session. Please refresh.');
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,7 @@ export default function SessionPage() {
       const data = await res.json();
       setSession(data.session);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError('An error occurred. Please try again.');
     } finally {
       setUpdating(false);
     }

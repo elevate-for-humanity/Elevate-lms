@@ -31,7 +31,7 @@ export async function createIncentive(formData: FormData) {
     created_by: user.id,
   });
 
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Failed to process incentive action.');
 
   revalidatePath('/admin/incentives');
   redirect('/admin/incentives');

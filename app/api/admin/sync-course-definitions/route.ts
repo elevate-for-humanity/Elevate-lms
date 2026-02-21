@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
 
       if (courseError) {
         logger.error(`[SyncDefs] Course upsert failed: ${course.slug}`, courseError);
-        results.push({ slug: course.slug, courseId, lessonsUpserted: 0, error: courseError.message });
+        results.push({ slug: course.slug, courseId, lessonsUpserted: 0, error: 'Course sync failed' });
         continue;
       }
 
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
 
       if (deleteError) {
         logger.error(`[SyncDefs] Lesson delete failed: ${course.slug}`, deleteError);
-        results.push({ slug: course.slug, courseId, lessonsUpserted: 0, error: deleteError.message });
+        results.push({ slug: course.slug, courseId, lessonsUpserted: 0, error: 'Lesson cleanup failed' });
         continue;
       }
 
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
             slug: course.slug,
             courseId,
             lessonsUpserted: inserted,
-            error: insertError.message,
+            error: 'Lesson insert failed',
           });
           break;
         }

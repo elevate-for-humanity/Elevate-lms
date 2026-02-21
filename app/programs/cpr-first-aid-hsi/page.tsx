@@ -81,7 +81,7 @@ const courses = (dbRows as any[]) || [];
 
       {/* Hero */}
       <section className="relative h-[50vh] min-h-[400px]">
-        <Image 
+        <Image alt="CPR and First Aid training" 
           src="/images/healthcare/program-cpr-certification.jpg" 
           alt="CPR First Aid Training" 
           fill sizes="100vw"
@@ -179,7 +179,7 @@ const courses = (dbRows as any[]) || [];
               </div>
             </div>
             <div className="relative h-80 lg:h-96 rounded-2xl overflow-hidden shadow-2xl">
-              <Image 
+              <Image alt="First aid certification" 
                 src="/images/healthcare/cna-poster.jpg" 
                 alt="CPR practice on mannequin" 
                 fill sizes="100vw"

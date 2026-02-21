@@ -45,7 +45,7 @@ export default function EmployerPage() {
           <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-4 sm:gap-5">
             {[
               { step: '1', title: 'Tell Us Your Needs', desc: 'Submit your hiring needs — roles, skills, and timeline.', image: '/images/employers/employer-meeting.jpg' },
-              { step: '2', title: 'We Train Candidates', desc: 'We recruit and train workers in your specific skill requirements.', image: '/images/programs-hq/training-classroom.jpg' },
+              { step: '2', title: 'We Train Candidates', desc: 'We recruit and train workers in your specific skill requirements.', image: '/images/business/partnership-1.jpg' },
               { step: '3', title: 'You Interview', desc: 'Meet pre-screened candidates. Only interview qualified people.', image: '/images/employers/partnership-hiring-event.jpg' },
               { step: '4', title: 'Hire & Save', desc: 'Hire with tax credits and wage reimbursements.', image: '/images/employers/partnership-handshake.jpg' },
             ].map((item) => (

@@ -18,6 +18,7 @@ import {
   ClipboardList,
 CheckCircle, } from 'lucide-react';
 import { QuizSystem } from '@/components/lms/QuizSystem';
+import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 import { NoteTaking } from '@/components/NoteTaking';
 import DigitalBinder from '@/components/DigitalBinder';
 
@@ -427,7 +428,7 @@ export default function LessonPage() {
                 {lesson.content ? (
                   <div
                     className="prose max-w-none"
-                    dangerouslySetInnerHTML={{ __html: lesson.content }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(lesson.content) }}
                   />
                 ) : (
                   <p className="text-slate-600">{lesson.description || 'No content available for this lesson.'}</p>

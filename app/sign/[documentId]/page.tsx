@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 
 interface Document {
   id: string;
@@ -187,7 +188,7 @@ export default function SignDocumentPage() {
         <div className="bg-white rounded-lg shadow-md p-8 mb-6">
           <div className="prose max-w-none">
             {document?.content ? (
-              <div dangerouslySetInnerHTML={{ __html: document.content }} />
+              <div dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(document.content) }} />
             ) : (
               <p className="text-gray-500 italic">Document content will appear here.</p>
             )}

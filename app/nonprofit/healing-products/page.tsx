@@ -151,7 +151,7 @@ export default async function HealingProductsPage() {
               <div key={product.id} className="bg-white border rounded-xl overflow-hidden hover:shadow-lg transition group">
                 <div className="aspect-square bg-amber-50 flex items-center justify-center relative">
                   {product.image_url ? (
-                    <Image 
+                    <Image alt="Healing product" 
                       src={product.image_url} 
                       alt={product.name}
                       fill

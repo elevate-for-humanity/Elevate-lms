@@ -1,12 +1,10 @@
-import { Metadata } from 'next';
+import { siteMetadata } from '@/lib/seo/siteMetadata';
 
-export const metadata: Metadata = {
-  title: 'Welding Training Program | Elevate for Humanity',
-  description: 'Welding training and certification program. MIG, TIG, and stick welding. AWS certification preparation. WIOA funding available.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/programs/welding',
-  },
-};
+export const metadata = siteMetadata({
+  title: 'Welding Training Program',
+  description: 'Welding pathway focused on employability — core welding concepts, safety, and structured training designed for workforce entry and advancement.',
+  path: '/programs/welding',
+});
 
 export default function WeldingLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;

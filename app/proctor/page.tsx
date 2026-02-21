@@ -30,7 +30,7 @@ export default function ProctorDashboard() {
       const data = await res.json();
       setSessions(data.sessions || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError('Failed to load proctor sessions. Please refresh.');
     } finally {
       setLoading(false);
     }

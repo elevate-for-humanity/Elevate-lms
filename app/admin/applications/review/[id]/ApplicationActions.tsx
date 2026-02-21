@@ -65,7 +65,7 @@ export default function ApplicationActions({
       );
       router.refresh();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError('Action failed. Please try again.');
     } finally {
       setLoading(null);
     }
@@ -91,7 +91,7 @@ export default function ApplicationActions({
       setSuccess(`Application ${newStatus === 'rejected' ? 'rejected' : 'updated'}.`);
       router.refresh();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError('Action failed. Please try again.');
     } finally {
       setLoading(null);
     }

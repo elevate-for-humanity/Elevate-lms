@@ -1,2 +1,5 @@
 import { redirect } from 'next/navigation';
-export default function Page() { redirect('/programs/barber-apprenticeship'); }
+
+export default function BarberRedirect() {
+  redirect('/programs/barber-apprenticeship');
+}

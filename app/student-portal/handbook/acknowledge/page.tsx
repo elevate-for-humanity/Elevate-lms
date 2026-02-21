@@ -190,7 +190,7 @@ export default function HandbookAcknowledgePage() {
         router.push('/student-portal/onboarding');
       }, 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError('Failed to submit acknowledgment. Please try again.');
     } finally {
       setSubmitting(false);
     }

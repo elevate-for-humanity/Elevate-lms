@@ -49,7 +49,7 @@ export default async function BulkOperationsPage() {
 
   // Fetch relevant data
   const { data: items, count } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .limit(20);

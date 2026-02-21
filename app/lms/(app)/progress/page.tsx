@@ -279,7 +279,7 @@ export default async function ProgressPage() {
                         <div className="flex items-start gap-4">
                           <div className="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0 relative overflow-hidden">
                             {enrollment.courses?.thumbnail_url ? (
-                              <Image 
+                              <Image alt="Progress indicator" 
                                 src={enrollment.courses.thumbnail_url} 
                                 alt={enrollment.courses.title || 'Course thumbnail'} 
                                 fill

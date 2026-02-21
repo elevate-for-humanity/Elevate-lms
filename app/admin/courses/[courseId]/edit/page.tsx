@@ -42,7 +42,7 @@ export default async function EditCoursePage({
   }
 
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('id', courseId)
     .single();

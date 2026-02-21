@@ -1,4 +1,11 @@
 import { redirect } from 'next/navigation';
+import { siteMetadata } from '@/lib/seo/siteMetadata';
+
+export const metadata = siteMetadata({
+  title: 'Verify a Credential',
+  description: 'Employer-facing credential verification. Confirm training completion and validate issued credentials quickly and securely.',
+  path: '/cert/verify',
+});
 
 export default async function CertVerifyRedirect({
   searchParams,

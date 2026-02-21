@@ -117,7 +117,7 @@ export default async function CartPage() {
                   <div className="flex gap-4">
                     <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative">
                       {item.product?.image_url ? (
-                        <Image 
+                        <Image alt="Product image" 
                           src={item.product.image_url} 
                           alt={item.product.name} 
                           fill

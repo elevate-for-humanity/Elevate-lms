@@ -87,7 +87,7 @@ export default async function TrainingPage() {
                   poster="/images/heroes/training-provider-3.jpg"
                 >
                   <source
-                    src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/training-providers-video-with-narration.mp4"
+                    src="/videos/training-providers-video-with-narration.mp4"
                     type="video/mp4"
                   />
                   Your browser does not support the video tag.

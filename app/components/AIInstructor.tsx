@@ -102,7 +102,7 @@ export default function AIInstructor({
               isSpeaking ? 'border-brand-blue-500 animate-pulse' : 'border-gray-300'
             }`}
           >
-            <Image loading="lazy"
+            <Image alt="AI instructor avatar" loading="lazy"
               src={avatarUrl}
               alt={instructorName}
               fill

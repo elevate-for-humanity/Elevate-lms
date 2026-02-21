@@ -93,7 +93,7 @@ export default function CourseDiscussionsPage() {
         {/* Hero Section */}
         <section className="relative h-[300px] md:h-[380px] lg:h-[420px] flex items-center justify-center text-white overflow-hidden">
           <Image
-            src="/images/programs-hq/students-learning.jpg"
+            src="/images/community/community-hero.jpg"
             alt="Discussions"
             fill
             className="object-cover"

@@ -21,7 +21,7 @@ export default async function CourseQuizzesPage({ params }: { params: Promise<{ 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
-  const { data: course } = await supabase.from('courses').select('*').eq('id', courseId).single();
+  const { data: course } = await supabase.from('training_courses').select('*').eq('id', courseId).single();
   const { data: quizzes } = await supabase.from('quizzes').select('*').eq('course_id', courseId).order('created_at', { ascending: false });
 
   return (

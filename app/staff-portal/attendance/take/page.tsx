@@ -150,7 +150,7 @@ export default async function TakeAttendancePage() {
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                         {student.profiles?.avatar_url ? (
-                          <Image 
+                          <Image alt="Student photo" 
                             src={student.profiles.avatar_url} 
                             alt="Student photo"
                             width={40}

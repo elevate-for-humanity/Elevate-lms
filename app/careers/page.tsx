@@ -181,7 +181,7 @@ export default async function CareersPage() {
                   className="bg-white text-center p-8 rounded-lg border-2 border-gray-200 hover:border-brand-blue-500 hover:shadow-lg transition"
                 >
                   <div className="w-16 h-16 mx-auto mb-4">
-                    <Image 
+                    <Image alt="Career opportunity" 
                       src={benefit.image} 
                       alt={benefit.title} 
                       width={64} 

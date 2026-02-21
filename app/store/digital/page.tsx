@@ -36,7 +36,7 @@ export default function StoreDigitalPage() {
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" >
-            <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home.mp4" type="video/mp4" />
+            <source src="/videos/hero-home.mp4" type="video/mp4" />
           </video>
         </div>
         <div className="bg-slate-900 py-10">
@@ -101,7 +101,7 @@ export default function StoreDigitalPage() {
             </div>
             <div className="bg-white rounded-2xl overflow-hidden group">
               <div className="relative aspect-video bg-slate-100">
-                <Image src="/images/programs-hq/training-classroom.jpg" alt="AI Tutor Demo" fill sizes="100vw" quality={85} className="object-cover" />
+                <Image src="/images/technology/hero-programs-technology.jpg" alt="AI Tutor Demo" fill sizes="100vw" quality={85} className="object-cover" />
                 <div className="absolute inset-0 bg-white/40 flex items-center justify-center group-hover:bg-white/60 transition-all">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                     <Play className="w-8 h-8 text-slate-900 ml-1" />

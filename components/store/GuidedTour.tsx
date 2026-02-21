@@ -96,7 +96,6 @@ export default function GuidedTour({ tourId, onComplete, onSkip, autoStart = fal
   const startTour = useCallback(() => {
     setIsActive(true);
     setCurrentStep(0);
-    // console.log(GUIDE_ANALYTICS.TOUR_STARTED, { tourId });
   }, [tourId]);
 
   const endTour = useCallback((completed: boolean) => {
@@ -108,7 +107,6 @@ export default function GuidedTour({ tourId, onComplete, onSkip, autoStart = fal
       if (typeof window !== 'undefined') {
         localStorage.setItem(GUIDE_STORAGE_KEYS.TOUR_COMPLETED(tourId), 'true');
       }
-      // console.log(GUIDE_ANALYTICS.TOUR_COMPLETED, { tourId });
       onComplete?.();
     } else {
       onSkip?.();

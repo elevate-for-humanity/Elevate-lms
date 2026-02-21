@@ -29,7 +29,7 @@ export default function Page() {
             preload="none"
             className="w-full h-full object-cover"
           >
-            <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/getting-started-hero.mp4" type="video/mp4" />
+            <source src="/videos/getting-started-hero.mp4" type="video/mp4" />
           </video>
         </div>
 
@@ -212,7 +212,7 @@ export default function Page() {
                 </ul>
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
-                <Image priority
+                <Image alt="Getting started with Elevate" priority
                   src="/images/heroes/blog-post-5.jpg"
                   alt="Training Facility"
                   fill

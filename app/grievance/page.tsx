@@ -107,7 +107,7 @@ export default function GrievancePage() {
               <Phone className="w-6 h-6 text-brand-blue-600 mb-3" />
               <h3 className="font-bold text-gray-900 mb-2">By Phone</h3>
               <p className="text-gray-600 text-sm mb-2">Call to discuss your concern or request a grievance form:</p>
-              <a href="tel:+13175551234" className="text-brand-blue-600 font-medium">(317) 555-1234</a>
+              <a href="tel:+13173143757" className="text-brand-blue-600 font-medium">(317) 314-3757</a>
             </div>
           </div>
         </div>

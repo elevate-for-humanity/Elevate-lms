@@ -115,7 +115,7 @@ export default async function WorkforceBoardPage() {
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <video autoPlay muted loop playsInline preload="none" className="absolute inset-0 w-full h-full object-cover">
-            <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/staff-portal-hero.mp4" type="video/mp4" />
+            <source src="/videos/staff-portal-hero.mp4" type="video/mp4" />
           </video>
         </div>
         <div className="bg-slate-900 py-10">

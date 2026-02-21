@@ -40,12 +40,18 @@ function LoginForm() {
 
       if (error) throw error;
 
+      if (!data?.user) throw new Error('Login succeeded but no user returned');
+
       // Check user role
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', data.user.id)
         .single();
+
+      if (profileError) {
+        console.warn('Profile query failed:', profileError.message);
+      }
 
       // Redirect to next parameter if provided, otherwise based on role
       if (next) {
@@ -70,7 +76,9 @@ function LoginForm() {
         router.push('/lms/dashboard');
       }
     } catch (err: any) {
-      setError(err?.message || 'Invalid email or password');
+      const msg = err?.message || 'Invalid email or password';
+      console.error('Login error:', err);
+      setError(msg);
     } finally {
       setLoading(false);
     }

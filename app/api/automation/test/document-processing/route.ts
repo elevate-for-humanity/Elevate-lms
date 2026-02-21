@@ -123,7 +123,7 @@ export async function POST() {
         results.push({
           testCase: testCase.name,
           success: false,
-          error: docError.message,
+          error: 'Document processing failed',
         });
         continue;
       }

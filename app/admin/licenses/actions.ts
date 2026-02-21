@@ -18,7 +18,7 @@ export async function createLicense(formData: FormData) {
     expires_at: formData.get('expires_at') as string || null,
   });
 
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Failed to process license action.');
 
   revalidatePath('/admin/licenses');
   redirect('/admin/licenses');

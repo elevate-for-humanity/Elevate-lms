@@ -39,7 +39,7 @@ export default async function ProgramHolderApplicationPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
       <div className="relative h-[200px] sm:h-[260px]">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Program holder application" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/training-providers-hero.jpg" alt="Program holder application" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded">
           <span className="text-sm font-bold text-slate-900">Elevate for Humanity</span>
         </div>

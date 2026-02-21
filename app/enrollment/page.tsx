@@ -40,7 +40,7 @@ export default async function EnrollmentPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-64 md:h-80 overflow-hidden">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Elevate for Humanity enrollment" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/getting-started-hero.jpg" alt="Elevate for Humanity enrollment" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-900/50" />
         <div className="relative z-10 h-full flex flex-col justify-center px-6 md:px-10 max-w-5xl mx-auto">
           <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Enrollment' }]} />
@@ -86,7 +86,7 @@ export default async function EnrollmentPage() {
             {featured.map((p) => (
               <Link key={p.name} href={p.href} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all group">
                 <div className="relative h-40">
-                  <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
+                  <Image src={p.image} alt={p.name} fill className="object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <div className="absolute bottom-3 left-4">
                     <h3 className="text-lg font-bold text-white">{p.name}</h3>

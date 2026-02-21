@@ -127,7 +127,7 @@ export default function NewExamSession() {
       const data = await res.json();
       router.push(`/proctor/session/${data.session.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError('Failed to create session. Please try again.');
       setSubmitting(false);
     }
   }

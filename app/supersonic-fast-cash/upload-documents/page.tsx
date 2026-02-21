@@ -240,7 +240,7 @@ export default function UploadDocumentsPage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                placeholder="(317) 555-0123"
+                placeholder="(317) 314-3757"
                 required
               />
             </div>

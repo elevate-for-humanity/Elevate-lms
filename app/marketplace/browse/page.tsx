@@ -84,7 +84,7 @@ export default async function MarketplaceBrowsePage() {
             {itemList.map((item: any) => (
               <div key={item.id} className="bg-white rounded-xl border overflow-hidden hover:shadow-lg transition">
                 <div className="relative h-40">
-                  <Image 
+                  <Image alt="Product listing" 
                     src={item.image_url || '/images/gallery/image4.jpg'} 
                     alt={item.title} 
                     fill 

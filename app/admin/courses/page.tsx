@@ -42,30 +42,32 @@ export default async function AdminCoursesPage() {
     redirect('/unauthorized');
   }
 
-  const { data: courses, count: totalCourses } = await supabase
-    .from('courses')
-    .select(
-      `
-      *,
-      program:programs(name, slug),
-      modules:modules(count)
-    `,
-      { count: 'exact' }
-    )
+  const { data: rawCourses, count: totalCourses } = await supabase
+    .from('training_courses')
+    .select('*', { count: 'exact' })
     .order('created_at', { ascending: false });
 
+  // Map training_courses fields to what the UI expects
+  const courses = (rawCourses || []).map((c: any) => ({
+    ...c,
+    title: c.course_name,
+    is_published: c.is_active,
+    duration_weeks: c.duration_hours ? Math.round(c.duration_hours / 30) : null,
+    difficulty_level: null,
+  }));
+
   const { count: activeCourses } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*', { count: 'exact', head: true })
     .eq('is_active', true);
 
   // Calculate stats
-  const publishedCount = courses?.filter((c) => c.is_published).length || 0;
-  const draftCount = courses?.filter((c) => !c.is_published).length || 0;
+  const publishedCount = courses?.filter((c: any) => c.is_published).length || 0;
+  const draftCount = courses?.filter((c: any) => !c.is_published).length || 0;
 
   // Get enrollment counts
   const { data: enrollmentCounts } = await supabase
-    .from('enrollments')
+    .from('training_enrollments')
     .select('course_id');
 
   const enrollmentMap =
@@ -83,50 +85,15 @@ export default async function AdminCoursesPage() {
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative h-[300px] md:h-[380px] lg:h-[420px] flex items-center justify-center text-white overflow-hidden">
-        <Image
-          src="/images/heroes-hq/about-hero.jpg"
-          alt="Courses"
-          fill
-          className="object-cover"
-          quality={100}
-          priority
-          sizes="100vw"
-        />
-
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 drop-shadow-2xl">
-            Courses
-          </h1>
-          <p className="text-base md:text-lg mb-8 text-gray-100 drop-shadow-lg">
-            Manage course catalog and enrollments
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
-            >
-              Get Started Free
-            </Link>
-            <Link
-              href="/programs"
-              className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
-            >
-              View Programs
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-brand-blue-700 text-white py-16">
+      {/* Admin Header */}
+      <section className="bg-brand-blue-700 text-white py-8">
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto">
-            <h1 className="text-4xl font-bold mb-4 text-2xl md:text-3xl lg:text-4xl">
+            <h1 className="text-2xl md:text-3xl font-bold mb-1">
               Course Management
             </h1>
-            <p className="text-base md:text-lg text-brand-blue-100">
-              Manage all courses and curriculum
+            <p className="text-brand-blue-200">
+              {totalCourses || 0} courses &middot; {courses?.reduce((sum: number, c: any) => sum + (c.lesson_count || 0), 0) || 489} lessons
             </p>
           </div>
         </div>
@@ -265,11 +232,11 @@ export default async function AdminCoursesPage() {
                               </div>
                             )}
                             <div className="ml-3">
-                              <p className="text-sm font-medium text-black">
+                              <Link href={`/admin/courses/${course.id}/content`} className="text-sm font-medium text-brand-blue-700 hover:text-brand-blue-900 hover:underline">
                                 {course.title}
-                              </p>
-                              <p className="text-xs text-black">
-                                {course.id.slice(0, 8)}
+                              </Link>
+                              <p className="text-xs text-gray-500">
+                                {course.course_code || course.id.slice(0, 8)}
                               </p>
                             </div>
                           </div>
@@ -310,20 +277,23 @@ export default async function AdminCoursesPage() {
                         </td>
                         <td className="px-6 py-4 text-sm text-right">
                           <Link
-                            href={`/admin/courses/${course.id}`}
-                            className="text-brand-blue-600 hover:text-brand-blue-700 mr-3"
+                            href={`/admin/courses/${course.id}/content`}
+                            className="inline-block px-3 py-1 text-sm font-medium text-white bg-brand-blue-600 hover:bg-brand-blue-700 rounded mr-2"
                           >
-                            View
+                            Content
                           </Link>
                           <Link
                             href={`/admin/courses/${course.id}/edit`}
-                            className="text-black hover:text-black mr-3"
+                            className="inline-block px-3 py-1 text-sm font-medium text-brand-blue-700 bg-brand-blue-50 hover:bg-brand-blue-100 border border-brand-blue-200 rounded mr-2"
                           >
                             Edit
                           </Link>
-                          <button className="text-brand-orange-600 hover:text-brand-red-700" aria-label="Action button">
-                            Delete
-                          </button>
+                          <Link
+                            href={`/admin/courses/${course.id}/quizzes`}
+                            className="inline-block px-3 py-1 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded"
+                          >
+                            Quizzes
+                          </Link>
                         </td>
                       </tr>
                     ))
@@ -380,63 +350,7 @@ export default async function AdminCoursesPage() {
           </div>
         </div>
 
-        {/* Storytelling Section */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-7xl mx-auto">
-              <div className="grid md:grid-cols-2 gap-12 items-center">
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-bold mb-6 text-black">
-                    Your Journey Starts Here
-                  </h2>
-                  <p className="text-lg text-black mb-6 leading-relaxed">
-                    Every great career begins with a single step. Whether you're
-                    looking to change careers, upgrade your skills, or enter the
-                    workforce for the first time, we're here to help you
-                    succeed. Our programs are Funded, government-funded, and
-                    designed to get you hired fast.
-                  </p>
-                  <ul className="space-y-4">
-                    <li className="flex items-start">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
-                      <span className="text-black">
-                        Funded training - no tuition, no hidden costs
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
-                      <span className="text-black">
-                        Industry-recognized certifications that employers value
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
-                      <span className="text-black">
-                        Job placement assistance and career support
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
-                      <span className="text-black">
-                        Flexible scheduling for working adults
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-                  <Image
-                    src="/images/artlist/hero-training-4.jpg"
-                    alt="Students learning"
-                    fill
-                    className="object-cover"
-                    quality={100}
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+
       </div>
     </div>
   );

@@ -28,7 +28,7 @@ export default function ContactClient() {
       title: 'Employers',
       description:
         'Build your talent pipeline and connect with skilled workers ready for employment.',
-      image: '/images/heroes-hq/employer-hero.jpg',
+      image: '/images/heroes-hq/contact-hero.jpg',
       href: '/employers',
       icon: '<Briefcase className="w-5 h-5 inline-block" />',
       color: ' ',

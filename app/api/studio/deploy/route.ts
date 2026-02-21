@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     logger.error('Deploy error:', error);
     return NextResponse.json(
-      { error: 'Deployment failed', message: String(error) },
+      { error: 'Deployment failed', message: 'Deployment failed' },
       { status: 500 }
     );
   }

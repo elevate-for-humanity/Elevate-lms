@@ -30,7 +30,7 @@ export function HomeHero() {
           autoPlay
           preload="auto"
         >
-          <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home.mp4" type="video/mp4" />
+          <source src="/videos/hero-home.mp4" type="video/mp4" />
         </video>
       </div>
       <div className="bg-slate-900 py-10">

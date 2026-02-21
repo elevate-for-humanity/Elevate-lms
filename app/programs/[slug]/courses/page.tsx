@@ -164,7 +164,7 @@ export default function ProgramCoursesPage() {
               return (
                 <div key={course.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
                   <div className="relative aspect-video overflow-hidden bg-gray-100">
-                    <Image 
+                    <Image alt="Course lesson" 
                       src={courseImage} 
                       alt={course.title}
                       fill sizes="100vw"

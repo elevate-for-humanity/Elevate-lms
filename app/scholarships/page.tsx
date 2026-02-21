@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Scholarships & Financial Aid | Free Training Funding',
     description: 'Explore scholarships, grants, and funding options for career training.',
-    images: [`${SITE_URL}/images/heroes-hq/success-hero.jpg`],
+    images: [`${SITE_URL}/images/heroes-hq/funding-hero.jpg`],
   },
 };
 
@@ -74,8 +74,8 @@ const scholarshipTypes = (dbRows as any[]) || [];
 
       {/* Hero */}
       <section className="relative h-[50vh] min-h-[400px]">
-        <Image 
-          src="/images/heroes-hq/success-hero.jpg" 
+        <Image alt="Scholarship opportunities" 
+          src="/images/heroes-hq/funding-hero.jpg" 
           alt="Scholarships and Financial Aid" 
           fill 
           className="object-cover" 

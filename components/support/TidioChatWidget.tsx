@@ -47,12 +47,10 @@ export function TidioChatWidget({
         // Track when chat is opened for analytics
         window.tidioChatApi.on('open', () => {
           // Could send analytics event here
-          // console.log('[Tidio] Chat opened');
         });
 
         // Track when chat is closed
         window.tidioChatApi.on('close', () => {
-          // console.log('[Tidio] Chat closed');
         });
       }
     };
@@ -81,7 +79,6 @@ export function TidioChatWidget({
       src={`//code.tidio.co/${tidioKey}.js`}
       strategy="lazyOnload"
       onLoad={() => {
-        // console.log('[Tidio] Script loaded');
       }}
       onError={() => {
         console.error('[Tidio] Failed to load script');

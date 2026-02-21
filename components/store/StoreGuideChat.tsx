@@ -105,7 +105,6 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
     setCurrentQuestionId('main');
     setSelectedChoice(null);
     setShowConfirmation(false);
-    // console.log(GUIDE_ANALYTICS.GUIDE_OPENED, { auto: false });
     
     const mainQuestion = storeGuideFlow.questions.find(q => q.id === 'main');
     if (mainQuestion) {
@@ -121,7 +120,6 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
   }, [stop]);
 
   const handleChoiceSelect = useCallback((choice: GuideChoice) => {
-    // console.log(GUIDE_ANALYTICS.ROUTE_SELECTED, { choice: choice.id, route: choice.route });
     stop();
 
     if (choice.id === 'not-sure') {
@@ -149,7 +147,6 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
     if (typeof window !== 'undefined') {
       localStorage.setItem(GUIDE_STORAGE_KEYS.COMPLETED, 'true');
     }
-    // console.log(GUIDE_ANALYTICS.GUIDE_COMPLETED, { route: selectedChoice.route });
 
     setIsOpen(false);
 

@@ -501,7 +501,7 @@ export default function CNAEnrollPage() {
             <div className="text-center text-sm text-gray-600">
               <p>Questions? Contact us:</p>
               <p className="font-medium">Contact Us</p>
-              <p className="font-medium">(317) 555-0123</p>
+              <p className="font-medium">(317) 314-3757</p>
             </div>
           </div>
         </div>

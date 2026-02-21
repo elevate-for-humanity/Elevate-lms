@@ -54,7 +54,7 @@ export default function ApprenticeshipStructurePage() {
       {/* Hero — hidden on print */}
       <section className="relative h-[240px] sm:h-[300px] print:hidden">
         <Image
-          src="/images/heroes-hq/programs-hero.jpg"
+          src="/images/apprenticeships-card.jpg"
           alt="Workforce training program overview"
           fill
           sizes="100vw"

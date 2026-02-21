@@ -39,7 +39,7 @@ export default function UpdatePasswordPage() {
         if (error.message.includes('session')) {
           setError('Your reset link has expired. Please request a new one.');
         } else {
-          setError(error.message);
+          setError('Password update failed. Please try again.');
         }
         return;
       }

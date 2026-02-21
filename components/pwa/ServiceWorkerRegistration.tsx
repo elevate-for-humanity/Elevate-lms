@@ -30,11 +30,9 @@ export function ServiceWorkerRegistration({
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               // New content available
-              // console.log('[PWA] New content available');
               onUpdate?.();
             } else if (newWorker.state === 'installed') {
               // Content cached for offline
-              // console.log('[PWA] Content cached for offline use');
               onSuccess?.();
             }
           });
@@ -48,7 +46,6 @@ export function ServiceWorkerRegistration({
           window.location.reload();
         });
 
-        // console.log('[PWA] Service Worker registered');
       } catch (error) {
         console.error('[PWA] Service Worker registration failed:', error);
       }

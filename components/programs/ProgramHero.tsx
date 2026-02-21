@@ -86,7 +86,7 @@ export function ProgramHero({ program }: { program: Program }) {
                 className="absolute inset-0 w-full h-full object-cover"
               >
                 <source
-                  src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home.mp4"
+                  src="/videos/hero-home.mp4"
                   type="video/mp4"
                 />
               </video>
@@ -94,7 +94,7 @@ export function ProgramHero({ program }: { program: Program }) {
                 ref={audioRef}
                 autoPlay
                 loop
-                src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/voiceover.mp3"
+                src="/videos/voiceover.mp3"
                 className="hidden"
               />
             </>

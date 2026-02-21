@@ -97,7 +97,7 @@ export async function POST() {
         results.push({
           testCase: testCase.name,
           success: false,
-          error: partnerError.message,
+          error: 'Partner approval failed',
         });
         continue;
       }

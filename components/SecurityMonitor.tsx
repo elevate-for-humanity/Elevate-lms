@@ -199,7 +199,6 @@ function logSecurityEvent(eventType: string, data: any) {
   // Check if already logged for this route
   if (loggedRoutes.has(routeKey)) {
     if (process.env.NODE_ENV === 'development') {
-      // console.log('[Security] Already logged for route:', routeKey);
     }
     return; // Skip - already logged for this route
   }
@@ -228,7 +227,6 @@ function logSecurityEvent(eventType: string, data: any) {
 
   // Log to console in development
   if (process.env.NODE_ENV === 'development') {
-    // console.log('[Security Event]', eventType, data);
   }
 
   // Send to analytics/monitoring service

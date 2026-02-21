@@ -3,8 +3,8 @@
 import React from 'react';
 
 import { useState } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
 import Link from 'next/link';
+import { sendRecoveryEmail } from './actions';
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
@@ -18,23 +18,15 @@ export default function ForgotPasswordForm() {
     setError(null);
 
     try {
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-        email,
-        {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/auth/reset-password`,
-        }
-      );
-
-      if (resetError) throw resetError;
-
-      setSuccess(true);
-    } catch (err: any) {
-      setError((err as Error).message || 'Failed to send reset email');
+      const result = await sendRecoveryEmail(email);
+      if (!result.success && result.error) {
+        setError(result.error);
+        setLoading(false);
+      } else {
+        setSuccess(true);
+      }
+    } catch {
+      setError('Failed to send reset email');
       setLoading(false);
     }
   };

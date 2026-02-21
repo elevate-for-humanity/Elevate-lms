@@ -56,7 +56,7 @@ export default function ContactClient() {
       description:
         'Have a question? Get in touch with our team for any other inquiries.',
       image: '/images/heroes-hq/contact-hero.jpg',
-      href: '/contact#contact-form',
+      href: '/inquiry',
       icon: '✉️',
       color: ' ',
     },
@@ -178,15 +178,22 @@ export default function ContactClient() {
                 Send us an email
               </h2>
               <p className="text-black mb-6 leading-relaxed">
-                Have a detailed question? Fill out our contact form and we&apos;ll respond within 24
-                hours with the information you need.
+                Have a detailed question? Email us directly or fill out our inquiry form and we&apos;ll respond within 24 hours.
               </p>
-              <a
-                href="/contact#contact-form"
-                className="inline-flex items-center justify-center bg-zinc-900   text-white px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-xl hover:scale-105 transition-all"
-              >
-                Contact Us
-              </a>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <a
+                  href="mailto:elevate4humanityedu@gmail.com"
+                  className="inline-flex items-center justify-center bg-zinc-900 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-xl hover:scale-105 transition-all"
+                >
+                  Email Us
+                </a>
+                <Link
+                  href="/inquiry"
+                  className="inline-flex items-center justify-center bg-white border-2 border-zinc-900 text-zinc-900 px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-xl hover:scale-105 transition-all"
+                >
+                  Inquiry Form
+                </Link>
+              </div>
             </div>
           </div>
         </div>

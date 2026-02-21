@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Lock, Eye, EyeOff } from 'lucide-react';
+import { Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
@@ -14,7 +14,31 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
+  const [checking, setChecking] = useState(true);
   const router = useRouter();
+
+  // Wait for Supabase to exchange the recovery token (hash fragments) for a session
+  useEffect(() => {
+    const supabase = createClient();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
+        setAuthorized(true);
+        setChecking(false);
+      }
+    });
+
+    // Also check if there's already an active session (e.g. user navigated here directly)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setAuthorized(true);
+      }
+      setChecking(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,8 +56,6 @@ export default function ResetPasswordPage() {
     setLoading(true);
     try {
       const supabase = createClient();
-      if (!supabase) throw new Error('Service unavailable.');
-
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
 
@@ -48,10 +70,9 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Hero Banner */}
       <section className="relative h-[180px] w-full overflow-hidden">
         <Image
-          src="/images/heroes/success-story-4.jpg"
+          src="/images/heroes-hq/success-hero.jpg"
           alt="Reset password"
           fill
           className="object-cover"
@@ -64,9 +85,14 @@ export default function ResetPasswordPage() {
       <section className="py-12">
         <div className="max-w-md mx-auto px-4">
           <div className="bg-white rounded-lg shadow-lg p-8">
-            {success ? (
+            {checking ? (
+              <div className="text-center py-8">
+                <Loader2 className="w-8 h-8 text-brand-blue-600 mx-auto mb-4 animate-spin" />
+                <p className="text-gray-600">Verifying your reset link...</p>
+              </div>
+            ) : success ? (
               <div className="text-center">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <Lock className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Password Updated</h1>
                 <p className="text-gray-600 mb-6">
                   Your password has been changed. Redirecting to login...
@@ -76,6 +102,20 @@ export default function ResetPasswordPage() {
                   className="text-brand-blue-600 font-semibold hover:text-brand-blue-700"
                 >
                   Go to Login
+                </Link>
+              </div>
+            ) : !authorized ? (
+              <div className="text-center">
+                <Lock className="w-12 h-12 text-brand-red-500 mx-auto mb-4" />
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">Invalid or Expired Link</h1>
+                <p className="text-gray-600 mb-6">
+                  This password reset link is invalid or has expired. Please request a new one.
+                </p>
+                <Link
+                  href="/auth/forgot-password"
+                  className="inline-block px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition-all"
+                >
+                  Request New Link
                 </Link>
               </div>
             ) : (

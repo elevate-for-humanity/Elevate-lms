@@ -2,8 +2,8 @@
 
 import React from 'react';
 
-import { useState } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -14,6 +14,23 @@ export default function ResetPasswordForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
+        setAuthorized(true);
+        setChecking(false);
+      }
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setAuthorized(true);
+      setChecking(false);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,11 +50,7 @@ export default function ResetPasswordForm() {
     }
 
     try {
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-
+      const supabase = createClient();
       const { error: updateError } = await supabase.auth.updateUser({
         password: password,
       });
@@ -53,6 +66,26 @@ export default function ResetPasswordForm() {
       setLoading(false);
     }
   };
+
+  if (checking) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
+        <p className="text-black">Verifying your reset link...</p>
+      </div>
+    );
+  }
+
+  if (!authorized) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
+        <h2 className="text-2xl font-bold text-black mb-4">Invalid or Expired Link</h2>
+        <p className="text-black mb-6">This password reset link is invalid or has expired.</p>
+        <Link href="/auth/forgot-password" className="inline-block px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
+          Request New Link
+        </Link>
+      </div>
+    );
+  }
 
   if (success) {
     return (

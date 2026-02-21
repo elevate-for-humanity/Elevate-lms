@@ -90,11 +90,11 @@ export async function signOut() {
 }
 
 export async function resetPassword(email: string) {
-  const { data, error } = await supa.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/auth/reset-password`,
-  });
-  if (error) throw error;
-  return data;
+  // Uses server action — Supabase built-in SMTP is not configured
+  const { sendRecoveryEmail } = await import('@/app/auth/forgot-password/actions');
+  const result = await sendRecoveryEmail(email);
+  if (!result.success && result.error) throw new Error(result.error);
+  return null;
 }
 
 export async function updatePassword(newPassword: string) {

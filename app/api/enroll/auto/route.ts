@@ -198,19 +198,27 @@ export async function POST(req: Request) {
       .select('id')
       .single();
 
-    // STEP 7: Send password reset email for new users
+    // STEP 7: Send password reset email for new users via Resend
     if (isNewUser) {
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-        emailLower,
-        {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/reset-password`,
+      try {
+        const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+          type: 'recovery',
+          email: emailLower,
+          options: { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/reset-password` },
+        });
+        if (linkError) {
+          logger.warn('Recovery link generation failed', linkError);
+        } else if (linkData?.properties?.action_link) {
+          const { sendEmail } = await import('@/lib/email/resend');
+          await sendEmail({
+            to: emailLower,
+            subject: 'Set Your Password — Elevate for Humanity',
+            html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2>Welcome to Elevate for Humanity!</h2><p>Your account has been created. Click below to set your password:</p><p style="text-align:center;margin:24px 0"><a href="${linkData.properties.action_link}" style="background:#dc2626;color:#fff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:bold">Set Password</a></p><p style="color:#64748b;font-size:13px">This link expires in 24 hours.</p></div>`,
+          });
+          logger.info('Password setup email sent', { email: emailLower });
         }
-      );
-
-      if (resetError) {
-        logger.warn('Password reset email failed', resetError);
-      } else {
-        logger.info('Password reset email sent', { email: emailLower });
+      } catch (err) {
+        logger.warn('Password reset email failed', err);
       }
     }
 

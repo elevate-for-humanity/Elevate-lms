@@ -4,8 +4,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/client';
 import { Mail, ArrowLeft, AlertCircle } from 'lucide-react';
+import { sendRecoveryEmail } from '@/app/auth/forgot-password/actions';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
@@ -19,15 +19,14 @@ export default function ResetPasswordPage() {
     setError('');
 
     try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=/update-password`,
-      });
-
-      if (error) throw error;
-      setSuccess(true);
-    } catch (err: any) {
-      setError(err?.message || 'Unable to send reset link. Please try again or contact support.');
+      const result = await sendRecoveryEmail(email);
+      if (!result.success && result.error) {
+        setError(result.error);
+      } else {
+        setSuccess(true);
+      }
+    } catch {
+      setError('Unable to send reset link. Please try again or contact support.');
     } finally {
       setLoading(false);
     }

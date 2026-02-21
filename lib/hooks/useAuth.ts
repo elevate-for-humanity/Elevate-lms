@@ -69,11 +69,10 @@ export function useAuth() {
   };
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
-    });
-
-    if (error) throw error;
+    // Uses server action — Supabase built-in SMTP is not configured
+    const { sendRecoveryEmail } = await import('@/app/auth/forgot-password/actions');
+    const result = await sendRecoveryEmail(email);
+    if (!result.success && result.error) throw new Error(result.error);
   };
 
   return {

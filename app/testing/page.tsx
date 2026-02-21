@@ -16,7 +16,7 @@ const examCategories = [
   {
     name: 'Certiport Authorized Testing',
     provider: 'Certiport (Pearson VUE)',
-    image: '/images/programs-hq/technology-hero.jpg',
+    image: '/images/Content_PATHWAY_BUSINESS.jpg',
     description: 'Proctor-supervised exams administered on-site through our Certiport Authorized Testing Center designation.',
     exams: [
       'Microsoft Office Specialist (Word, Excel, PowerPoint, Outlook, Access)',
@@ -30,7 +30,7 @@ const examCategories = [
   {
     name: 'EPA Section 608 Certification',
     provider: 'EPA-approved proctor',
-    image: '/images/programs-hq/hvac-technician.jpg',
+    image: '/images/Content_PATHWAY_TRADES.jpg',
     description: 'Universal certification exam covering Core, Type I, II, and III refrigerant handling. Required by federal law for HVAC technicians.',
     exams: [
       'EPA 608 Universal Certification Exam',
@@ -40,7 +40,7 @@ const examCategories = [
   {
     name: 'OSHA Safety Certifications',
     provider: 'CareerSafe / OSHA',
-    image: '/images/trades/program-electrical-training.jpg',
+    image: '/images/apprenticeships-card.jpg',
     description: 'OSHA-authorized safety training and certification through our CareerSafe partnership.',
     exams: [
       'OSHA 10-Hour General Industry',
@@ -53,7 +53,7 @@ const examCategories = [
   {
     name: 'Rise Up — National Retail Federation',
     provider: 'NRF Foundation',
-    image: '/images/programs-hq/business-training.jpg',
+    image: '/images/business/tax-prep-certification.jpg',
     description: 'Workforce credentials in customer service, retail, and business fundamentals. Stackable credentials recognized by national employers.',
     exams: [
       'Customer Service & Sales Credential',
@@ -65,7 +65,7 @@ const examCategories = [
   {
     name: 'CareerSafe Safety Training',
     provider: 'CareerSafe',
-    image: '/images/trades/program-construction-training.jpg',
+    image: '/images/Content_PATHWAY_CDL.jpg',
     description: 'Online safety training courses with certification upon completion. Accepted by employers in construction, manufacturing, and general industry.',
     exams: [
       'Bloodborne Pathogens',
@@ -89,7 +89,7 @@ export default function TestingPage() {
       {/* Hero */}
       <section className="relative min-h-[350px] flex items-center overflow-hidden">
         <Image
-          src="/images/heroes-hq/programs-hero.jpg"
+          src="/images/artlist/cropped/hero-training-2-wide.jpg"
           alt="Workforce credential testing"
           fill sizes="100vw"
           className="object-cover"

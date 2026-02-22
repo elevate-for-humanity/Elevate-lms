@@ -76,6 +76,20 @@ export async function generateStaticParams() {
     programSlugs.push(...jsonSlugs);
   }
 
+  // Get all active slugs from DB
+  try {
+    const supabase = createAdminClient();
+    const { data: dbPrograms } = await supabase
+      .from('programs')
+      .select('slug')
+      .eq('status', 'active');
+    if (dbPrograms) {
+      programSlugs.push(...dbPrograms.map((p: { slug: string }) => p.slug));
+    }
+  } catch {
+    // DB unavailable at build time — static data only
+  }
+
   // Remove duplicates
   const uniqueSlugs = [...new Set(programSlugs)];
 
@@ -89,7 +103,23 @@ export async function generateMetadata({
   params: Params;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const program = await loadProgram(slug);
+  let program = await loadProgram(slug);
+
+  // Fallback to DB if no static data
+  if (!program) {
+    try {
+      const supabase = createAdminClient();
+      if (supabase) {
+        const { data } = await supabase
+          .from('programs')
+          .select('name, description')
+          .eq('slug', slug)
+          .eq('status', 'active')
+          .single();
+        program = data;
+      }
+    } catch { /* DB unavailable */ }
+  }
 
   if (!program) {
     return {
@@ -100,7 +130,7 @@ export async function generateMetadata({
 
   return {
     title: `${program.name} | Free Training | Elevate for Humanity`,
-    description: program.shortDescription,
+    description: program.shortDescription || program.description,
     alternates: {
       canonical: `https://www.elevateforhumanity.org/programs/${slug}`,
     },
@@ -132,18 +162,18 @@ export default async function ProgramDetailPage({
     return notFound();
   }
 
-  // Slugs that have dedicated page.tsx files — skip to avoid shadowing them
+  // Slugs that have dedicated page.tsx files (real content, not redirects).
+  // The catch-all must skip these to avoid shadowing them.
+  // Redirect-only pages (cdl, cna, hvac, beauty, etc.) are NOT listed here
+  // because Next.js serves the redirect page first, not the catch-all.
   const DEDICATED_PAGES = [
-    'hvac-technician', 'hvac', 'electrical', 'plumbing', 'forklift',
-    'welding', 'cdl-training', 'cdl-transportation', 'cdl',
-    'cna-certification', 'cna', 'medical-assistant', 'healthcare',
+    'hvac-technician', 'electrical', 'plumbing', 'welding',
+    'cdl-training', 'medical-assistant', 'diesel-mechanic',
     'barber-apprenticeship', 'cosmetology-apprenticeship',
-    'nail-technician-apprenticeship', 'culinary-apprenticeship',
-    'beauty', 'business', 'business-financial', 'skilled-trades',
-    'technology', 'tax-preparation', 'tax-entrepreneurship',
-    'drug-collector', 'direct-support-professional', 'diesel-mechanic',
-    'cpr-first-aid-hsi', 'sanitation-infection-control',
-    'micro-programs', 'federal-funded', 'jri', 'apprenticeships',
+    'culinary-apprenticeship', 'sanitation-infection-control',
+    // Category landing pages (not individual programs)
+    'healthcare', 'skilled-trades', 'technology',
+    'micro-programs', 'federal-funded', 'apprenticeships',
   ];
   if (DEDICATED_PAGES.includes(slug)) {
     return notFound();
@@ -154,30 +184,39 @@ export default async function ProgramDetailPage({
   let dbOutcomes: { outcome: string }[] = [];
   let dbRequirements: { requirement: string }[] = [];
 
-  try {
-    const supabase = createPublicClient();
+  // Try static data first (fast, no network)
+  program = await loadProgram(slug);
 
-    if (!supabase) {
-      // Fallback to static data if Supabase unavailable
-      program = await loadProgram(slug);
-    } else {
-      // Try database first
-      const { data: dbProgram } = await supabase
-        .from('programs')
-        .select('*')
-        .eq('slug', slug)
-        .single();
+  // If no static data, query DB
+  if (!program) {
+    try {
+      const supabase = createAdminClient();
+      if (supabase) {
+        const { data: dbProgram } = await supabase
+          .from('programs')
+          .select('*')
+          .eq('slug', slug)
+          .eq('status', 'active')
+          .single();
 
-      program = dbProgram || await loadProgram(slug);
+        program = dbProgram;
+      }
+    } catch {
+      // DB unavailable — static-only
+    }
+  }
 
-      // Fetch outcomes from DB if program found
-      if (program?.id) {
+  // Fetch outcomes/requirements from DB if program has an ID
+  if (program?.id) {
+    try {
+      const supabase = createAdminClient();
+      if (supabase) {
         const { data: outcomes } = await supabase
           .from('program_outcomes')
           .select('outcome')
           .eq('program_id', program.id)
           .order('outcome_order', { ascending: true });
-        
+
         const { data: requirements } = await supabase
           .from('program_requirements')
           .select('requirement')
@@ -187,14 +226,8 @@ export default async function ProgramDetailPage({
         dbOutcomes = outcomes || [];
         dbRequirements = requirements || [];
       }
-    }
-  } catch (err) {
-    // Database error - try static fallback
-    try {
-      program = await loadProgram(slug);
     } catch {
-      // Both failed - return 404 instead of 502
-      return notFound();
+      // Non-fatal — page renders without outcomes/requirements
     }
   }
 

@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Save to database
-    const { data: liveSession, error } = await db
+    const { data: liveSession, error } = await supabase
       .from('live_sessions')
       .insert({
         course_id: courseId,

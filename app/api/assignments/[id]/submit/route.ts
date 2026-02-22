@@ -30,7 +30,7 @@ export async function POST(
     const supabase = await createServerSupabaseClient();
 
     // Check if submission already exists
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('assignment_submissions')
       .select('id')
       .eq('assignment_id', id)
@@ -42,7 +42,7 @@ export async function POST(
 
     if (existing) {
       // Update existing submission
-      const result = await db
+      const result = await supabase
         .from('assignment_submissions')
         .update({
           submission_text: submissionText,
@@ -60,7 +60,7 @@ export async function POST(
       error = result.error;
     } else {
       // Create new submission
-      const result = await db
+      const result = await supabase
         .from('assignment_submissions')
         .insert({
           assignment_id: id,

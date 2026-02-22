@@ -132,7 +132,7 @@ export async function POST(req: Request) {
 
     // Check for duplicate submissions (same email + license in last 24 hours)
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('barbershop_partner_applications')
       .select('id')
       .eq('contact_email', body.contactEmail.toLowerCase())
@@ -148,7 +148,7 @@ export async function POST(req: Request) {
     }
 
     // Insert application
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('barbershop_partner_applications')
       .insert({
         shop_legal_name: body.shopLegalName.trim(),

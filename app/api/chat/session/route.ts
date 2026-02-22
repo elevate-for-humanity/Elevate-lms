@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from("live_chat_sessions")
     .insert({
       status: "open",

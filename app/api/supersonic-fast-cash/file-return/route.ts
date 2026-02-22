@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     const ssnData = prepareSSNForStorage(taxReturn.ssn);
 
     // Create client record
-    const { data: client, error: clientError } = await db
+    const { data: client, error: clientError } = await supabase
       .from('clients')
       .insert({
         first_name: taxReturn.firstName,
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
     const calculation = await supersonicTaxEngine.calculateTax(supersonicReturn.returnId);
 
     // Save tax return record
-    const { data: taxReturnRecord, error: returnError } = await db
+    const { data: taxReturnRecord, error: returnError } = await supabase
       .from('tax_returns')
       .insert({
         user_id: client.id,

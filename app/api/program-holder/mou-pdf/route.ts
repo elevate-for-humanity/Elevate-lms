@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     // Get the user's MOU signature
-    const { data: signature, error: sigError } = await db
+    const { data: signature, error: sigError } = await supabase
       .from('mou_signatures')
       .select('id, signer_name, signer_title, signed_at')
       .eq('user_id', user.id)
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get the active MOU template
-    const { data: template } = await db
+    const { data: template } = await supabase
       .from('mou_templates')
       .select('id, title, content, version')
       .eq('is_active', true)

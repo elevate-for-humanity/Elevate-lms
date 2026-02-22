@@ -93,7 +93,7 @@ async function generateEnrollmentReport(
   startDate: string | null,
   endDate: string | null
 ) {
-  let query = db.from('program_enrollments').select('*, profiles(*)');
+  let query = supabase.from('program_enrollments').select('*, profiles(*)');
 
   if (startDate) query = query.gte('enrollment_date', startDate);
   if (endDate) query = query.lte('enrollment_date', endDate);
@@ -113,7 +113,7 @@ async function generateOutcomesReport(
   startDate: string | null,
   endDate: string | null
 ) {
-  let query = db.from('employment_outcomes').select('*');
+  let query = supabase.from('employment_outcomes').select('*');
 
   if (startDate) query = query.gte('start_date', startDate);
   if (endDate) query = query.lte('start_date', endDate);
@@ -162,7 +162,7 @@ async function generateDemographicsReport(
   startDate: string | null,
   endDate: string | null
 ) {
-  const { data, error }: any = await db
+  const { data, error }: any = await supabase
     .from('participant_eligibility')
     .select('*');
 
@@ -186,7 +186,7 @@ async function generateServicesReport(
   startDate: string | null,
   endDate: string | null
 ) {
-  let query = db.from('supportive_services').select('*');
+  let query = supabase.from('supportive_services').select('*');
 
   if (startDate) query = query.gte('request_date', startDate);
   if (endDate) query = query.lte('request_date', endDate);

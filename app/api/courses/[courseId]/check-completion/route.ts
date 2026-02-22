@@ -29,7 +29,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   }
 
   // 2) Get enrollment row (using program_id since that's what the table uses)
-  const { data: enrollment, error: enrollError } = await db
+  const { data: enrollment, error: enrollError } = await supabase
     .from('program_enrollments')
     .select('*')
     .eq('program_id', courseId)
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   }
 
   // 5) If both internal + external are complete, mark course completed
-  const { error: updateError } = await db
+  const { error: updateError } = await supabase
     .from('program_enrollments')
     .update({
       status: 'completed',

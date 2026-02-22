@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     // Find student by email in our system
     let student = null;
     if (studentEmail) {
-      const { data } = await db
+      const { data } = await supabase
         .from('profiles')
         .select('id, email, full_name')
         .eq('email', studentEmail.toLowerCase())
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
     }
 
     // Log the inbound email
-    await db.from('milady_email_logs').insert({
+    await supabase.from('milady_email_logs').insert({
       from_email: from,
       to_email: to,
       subject,
@@ -135,7 +135,7 @@ export async function POST(request: Request) {
       });
 
       // Update student record to mark Milady email received
-      await db
+      await supabase
         .from('student_onboarding')
         .upsert({
           student_id: student.id,

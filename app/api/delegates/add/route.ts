@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return new Response('Unauthorized', { status: 401 });
 
-  const { data: prof } = await db
+  const { data: prof } = await supabase
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create delegate record
-    const { error: delError } = await db.from('delegates').insert({
+    const { error: delError } = await supabase.from('delegates').insert({
       program_holder_id,
       user_id: u.id,
     });
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Update user profile with program holder and partner role
-    await db.from('user_profiles').upsert(
+    await supabase.from('user_profiles').upsert(
       {
         user_id: u.id,
         program_holder_id: program_holder_id,

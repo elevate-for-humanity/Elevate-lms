@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
     const supabase = await createServerSupabaseClient();
 
-    let query = db
+    let query = supabase
       .from('assignments')
       .select(
         `
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
 
     const supabase = await createServerSupabaseClient();
 
-    const { data: assignment, error } = await db
+    const { data: assignment, error } = await supabase
       .from('assignments')
       .insert({
         course_id: courseId,

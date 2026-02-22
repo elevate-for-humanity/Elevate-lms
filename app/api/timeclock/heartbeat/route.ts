@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Load progress_entries row with apprentice ownership check
-    const { data: entry, error: entryError } = await db
+    const { data: entry, error: entryError } = await supabase
       .from('progress_entries')
       .select(`
         id, clock_in_at, clock_out_at, site_id, auto_clocked_out, auto_clock_out_reason,
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Load site geofence
-    const { data: site, error: siteError } = await db
+    const { data: site, error: siteError } = await supabase
       .from('partner_sites')
       .select('id, center_lat, center_lng, radius_m')
       .eq('id', entry.site_id)
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Reload row to get updated state
-    const { data: updatedEntry, error: reloadError } = await db
+    const { data: updatedEntry, error: reloadError } = await supabase
       .from('progress_entries')
       .select('clock_out_at, auto_clocked_out, auto_clock_out_reason')
       .eq('id', progress_entry_id)

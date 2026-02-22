@@ -66,7 +66,7 @@ export async function POST(req: Request) {
     );
 
     // Verify session exists and is open
-    const { data: session } = await db
+    const { data: session } = await supabase
       .from("live_chat_sessions")
       .select("id, status")
       .eq("id", session_id)
@@ -80,7 +80,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Session is closed" }, { status: 410 });
     }
 
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from("live_chat_messages")
       .insert({
         session_id,
@@ -95,7 +95,7 @@ export async function POST(req: Request) {
     }
 
     // Audit log (fire-and-forget)
-    db
+    supabase
       .from("analytics_events")
       .insert([
         {

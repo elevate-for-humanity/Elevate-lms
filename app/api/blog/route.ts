@@ -36,7 +36,7 @@ export async function GET(request: Request) {
 
     // If slug is provided, get single post
     if (slug) {
-      const { data: post, error } = await db
+      const { data: post, error } = await supabase
         .from('blog_posts')
         .select('*')
         .eq('slug', slug)
@@ -54,7 +54,7 @@ export async function GET(request: Request) {
     }
 
     // Build query for multiple posts
-    let query = db
+    let query = supabase
       .from('blog_posts')
       .select('*', { count: 'exact' })
       .eq('published', true)

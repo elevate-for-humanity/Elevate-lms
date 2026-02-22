@@ -40,6 +40,7 @@ const checks: Record<string, any> = {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     ) {
       const supabase = createSupabaseClient();
+  const db = supabase;
 
       const { error } = await db
         .from('programs')

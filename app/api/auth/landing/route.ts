@@ -53,7 +53,7 @@ const cookieStore = await cookies();
       return NextResponse.json({ redirectTo: '/auth/login' });
     }
 
-    const { data: profile, error } = await db
+    const { data: profile, error } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)

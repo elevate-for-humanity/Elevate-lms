@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Missing thread_id' }, { status: 400 });
     }
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('forum_posts')
       .select(
         `
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('forum_posts')
       .insert({
         thread_id,
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
 
     // Update thread updated_at
-    await db
+    await supabase
       .from('forum_threads')
       .update({ updated_at: new Date().toISOString() })
       .eq('id', thread_id);

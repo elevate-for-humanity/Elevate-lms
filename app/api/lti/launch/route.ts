@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
   // Use issuer + client_id to find platform config
   const clientId = decoded.aud;
-  const { data: platform } = await db
+  const { data: platform } = await supabase
     .from('lti_platforms')
     .select('*')
     .eq('issuer', issuer)
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
   }
 
   // Find / create student user based on email or sub
-  const { data: user } = await db
+  const { data: user } = await supabase
     .from('users')
     .upsert(
       {
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
   const courseTitle = context?.title || 'LTI Course';
   const contextId = context?.id || '';
 
-  const { data: course } = await db
+  const { data: course } = await supabase
     .from('training_courses')
     .upsert(
       {

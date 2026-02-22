@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     }
 
     // Get total amount being paid out
-    const { data: salesData } = await db
+    const { data: salesData } = await supabase
       .from('marketplace_sales')
       .select('creator_earnings_cents')
       .eq('creator_id', creatorId)
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       0;
 
     // Mark all unpaid sales for this creator as paid
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('marketplace_sales')
       .update({
         paid_out: true,

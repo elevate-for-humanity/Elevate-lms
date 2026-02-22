@@ -33,7 +33,7 @@ export async function POST(
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('supportive_services')
       .update(updateData)
       .eq('id', id)

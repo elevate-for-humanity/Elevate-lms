@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
     const ssnData = prepareSSNForStorage(body.ssn);
     
     // Create client record
-    const { data: client, error: clientError } = await db
+    const { data: client, error: clientError } = await supabase
       .from('tax_clients')
       .upsert({
         first_name: body.firstName,
@@ -208,7 +208,7 @@ export async function POST(request: NextRequest) {
     const submission = createMeFSubmission(taxReturn, SOFTWARE_ID);
     
     // Store submission in database
-    const { error: submissionError } = await db
+    const { error: submissionError } = await supabase
       .from('mef_submissions')
       .insert({
         submission_id: submission.submissionId,
@@ -229,7 +229,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Create tax return record
-    const { data: taxReturnRecord, error: returnError } = await db
+    const { data: taxReturnRecord, error: returnError } = await supabase
       .from('tax_returns')
       .insert({
         user_id: client?.user_id,
@@ -252,7 +252,7 @@ export async function POST(request: NextRequest) {
     // Store W2 income
     if (taxReturn.w2Income && taxReturn.w2Income.length > 0) {
       for (const w2 of taxReturn.w2Income) {
-        await db.from('tax_w2_income').insert({
+        await supabase.from('tax_w2_income').insert({
           tax_return_id: taxReturnRecord?.id,
           employer_ein: w2.employerEIN,
           employer_name: w2.employerName,
@@ -277,7 +277,7 @@ export async function POST(request: NextRequest) {
     if (taxReturn.dependents && taxReturn.dependents.length > 0) {
       for (const dep of taxReturn.dependents) {
         const depSsn = prepareSSNForStorage(dep.ssn);
-        await db.from('tax_dependents').insert({
+        await supabase.from('tax_dependents').insert({
           tax_return_id: taxReturnRecord?.id,
           client_id: client?.id,
           first_name: dep.firstName,
@@ -304,7 +304,7 @@ export async function POST(request: NextRequest) {
       transmissionResult = await transmitter.transmit(submission);
       
       // Update status based on transmission result
-      await db
+      await supabase
         .from('tax_returns')
         .update({
           status: transmissionResult.success ? 'transmitted' : 'transmission_failed',

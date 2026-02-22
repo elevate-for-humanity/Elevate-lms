@@ -18,7 +18,7 @@ async function getWIOAData() {
   }
   
   // Get enrollments with WIOA funding
-  const { data: enrollments, count } = await db
+  const { data: enrollments, count } = await supabase
     .from('program_enrollments')
     .select(`
       *,

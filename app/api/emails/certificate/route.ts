@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     );
 
     // Fetch certificate details
-    const { data: certificate } = await db
+    const { data: certificate } = await supabase
       .from('certificates')
       .select(
         `

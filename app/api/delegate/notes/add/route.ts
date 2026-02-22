@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return new Response('Unauthorized', { status: 401 });
 
-  const { data: prof } = await db
+  const { data: prof } = await supabase
     .from('user_profiles')
     .select('role, program_holder_id')
     .eq('user_id', user.id)
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Must be delegate or partner
-  const { data: del } = await db
+  const { data: del } = await supabase
     .from('delegates')
     .select('can_view_reports')
     .eq('user_id', user.id)
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     return new Response('Missing fields', { status: 400 });
   }
 
-  const { error } = await db.from('program_holder_notes').insert({
+  const { error } = await supabase.from('program_holder_notes').insert({
     program_holder_id: prof.program_holder_id,
     user_id,
     course_id,

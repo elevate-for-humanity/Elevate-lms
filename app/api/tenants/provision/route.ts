@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { data: tenant, error } = await db
+  const { data: tenant, error } = await supabase
     .from('tenants')
     .insert({
       name,

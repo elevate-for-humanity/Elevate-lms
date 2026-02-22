@@ -47,9 +47,9 @@ export default async function LicensePage() {
     const supabase = createPublicClient();
     if (supabase) {
       const [tiersResult, testimonialsResult, partnersResult] = await Promise.allSettled([
-        db.from('license_tiers').select('*').eq('is_active', true).order('price', { ascending: true }),
-        db.from('testimonials').select('*').eq('is_featured', true).limit(3),
-        db.from('partners').select('id, name').eq('is_active', true).limit(6),
+        supabase.from('license_tiers').select('*').eq('is_active', true).order('price', { ascending: true }),
+        supabase.from('testimonials').select('*').eq('is_featured', true).limit(3),
+        supabase.from('partners').select('id, name').eq('is_active', true).limit(6),
       ]);
       if (tiersResult.status === 'fulfilled') licenseTiers = tiersResult.value.data;
       if (testimonialsResult.status === 'fulfilled') testimonials = testimonialsResult.value.data;

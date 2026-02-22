@@ -24,6 +24,7 @@ export async function GET(request: Request) {
     }
 
     const supabase = createSupabaseClient();
+  const db = supabase;
     const { data: user, error: userError } = await db
       .from('users')
       .select('*')

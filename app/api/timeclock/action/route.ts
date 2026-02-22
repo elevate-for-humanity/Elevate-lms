@@ -51,7 +51,7 @@ async function raiseAdminAlert(
   details: Record<string, any>
 ) {
   try {
-    await db.from('admin_alerts').insert({
+    await supabase.from('admin_alerts').insert({
       alert_type: alertType,
       severity: 'warning',
       details,
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Load site geofence
-    const { data: site, error: siteError } = await db
+    const { data: site, error: siteError } = await supabase
       .from('partner_sites')
       .select('id, center_lat, center_lng, radius_m, name')
       .eq('id', site_id)
@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
     switch (action) {
       case 'clock_in': {
         // Insert new progress_entries row
-        const { data: newEntry, error: insertError } = await db
+        const { data: newEntry, error: insertError } = await supabase
           .from('progress_entries')
           .insert({
             apprentice_id,
@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Verify open shift exists
-        const { data: entry, error: entryError } = await db
+        const { data: entry, error: entryError } = await supabase
           .from('progress_entries')
           .select('id, clock_in_at, clock_out_at, lunch_start_at')
           .eq('id', progress_entry_id)
@@ -237,7 +237,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        const { error: updateError } = await db
+        const { error: updateError } = await supabase
           .from('progress_entries')
           .update({ lunch_start_at: serverNow })
           .eq('id', progress_entry_id);
@@ -266,7 +266,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Verify lunch was started
-        const { data: entry, error: entryError } = await db
+        const { data: entry, error: entryError } = await supabase
           .from('progress_entries')
           .select('id, clock_in_at, clock_out_at, lunch_start_at, lunch_end_at')
           .eq('id', progress_entry_id)
@@ -298,7 +298,7 @@ export async function POST(request: NextRequest) {
         const lunchEnd = new Date(serverNow);
         const lunchMinutes = (lunchEnd.getTime() - lunchStart.getTime()) / (1000 * 60);
 
-        const { error: updateError } = await db
+        const { error: updateError } = await supabase
           .from('progress_entries')
           .update({ lunch_end_at: serverNow })
           .eq('id', progress_entry_id);
@@ -340,7 +340,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Verify open shift exists
-        const { data: entry, error: entryError } = await db
+        const { data: entry, error: entryError } = await supabase
           .from('progress_entries')
           .select('id, clock_in_at, clock_out_at, lunch_start_at, lunch_end_at')
           .eq('id', progress_entry_id)
@@ -375,7 +375,7 @@ export async function POST(request: NextRequest) {
         }
 
         // DB trigger will derive hours_worked and enforce weekly cap
-        const { error: updateError } = await db
+        const { error: updateError } = await supabase
           .from('progress_entries')
           .update({ clock_out_at: serverNow })
           .eq('id', progress_entry_id);
@@ -388,7 +388,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Reload to get derived hours
-        const { data: updatedEntry } = await db
+        const { data: updatedEntry } = await supabase
           .from('progress_entries')
           .select('hours_worked')
           .eq('id', progress_entry_id)

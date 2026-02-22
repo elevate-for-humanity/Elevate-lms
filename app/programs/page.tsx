@@ -90,7 +90,7 @@ async function getCategories() {
   }
   
   // Get active programs grouped by category
-  const { data: programs, error } = await db
+  const { data: programs, error } = await supabase
     .from('programs')
     .select('id, name, slug, category, description')
     .eq('is_active', true)

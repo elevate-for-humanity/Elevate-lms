@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
     const supabase = await createServerSupabaseClient();
 
-    let query = db
+    let query = supabase
       .from('messages')
       .select(
         `
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
 
     const supabase = await createServerSupabaseClient();
 
-    const { data: message, error } = await db
+    const { data: message, error } = await supabase
       .from('messages')
       .insert({
         sender_id: user.id,

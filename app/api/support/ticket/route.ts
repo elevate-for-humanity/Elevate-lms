@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         { status: 503 }
       );
     }
-  const { error: dbError } = await db
+  const { error: dbError } = await supabase
     .from('customer_service_tickets')
     .insert({
       student_id: userId,

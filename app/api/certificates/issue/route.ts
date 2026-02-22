@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       .getPublicUrl(filePath);
 
     // Save certificate record to database
-    const { data: certRecord, error: dbError } = await db
+    const { data: certRecord, error: dbError } = await supabase
       .from("certificates")
       .insert({
         student_id: studentId,

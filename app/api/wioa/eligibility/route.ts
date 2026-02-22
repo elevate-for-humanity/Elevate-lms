@@ -21,7 +21,7 @@ const supabase = createSupabaseClient();
     const status = searchParams.get('status');
     const pending = searchParams.get('pending');
 
-    let query = db.from('participant_eligibility').select('*');
+    let query = supabase.from('participant_eligibility').select('*');
 
     if (userId) {
       query = query.eq('user_id', userId);
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Check if eligibility record already exists
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('participant_eligibility')
       .select('id')
       .eq('user_id', userId)
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
       notes,
     };
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('participant_eligibility')
       .insert(eligibilityData)
       .select()

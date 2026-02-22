@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     const supabase = await createServerSupabaseClient();
 
     // Verify lead exists and is eligible
-    const { data: lead, error: leadError } = await db
+    const { data: lead, error: leadError } = await supabase
       .from('leads')
       .select('id, stage, eligibility_data')
       .eq('id', data.leadId)
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify program exists and is active
-    const { data: program, error: programError } = await db
+    const { data: program, error: programError } = await supabase
       .from('programs')
       .select('id, title, status')
       .eq('id', data.programId)
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Update lead with application data
-    const { error: updateError } = await db
+    const { error: updateError } = await supabase
       .from('leads')
       .update({
         stage: 'APPLICATION_SUBMITTED',
@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Log event
-    await db.from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       event_type: 'application_submitted',
       resource_type: 'lead',
       resource_id: data.leadId,

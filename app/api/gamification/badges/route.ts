@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
     if (userId) {
       // Get user's earned badges
-      const { data, error }: any = await db
+      const { data, error }: any = await supabase
         .from('user_badges')
         .select(
           `
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ badges: data });
     } else {
       // Get all available badges
-      const { data, error }: any = await db
+      const { data, error }: any = await supabase
         .from('badges')
         .select('*')
         .order('points', { ascending: false });
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     const { badge_id, user_id } = body;
 
     // Check if user is admin
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Award badge
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('user_badges')
       .insert({
         user_id,
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
 
     // Update leaderboard
-    const { data: badge } = await db
+    const { data: badge } = await supabase
       .from('badges')
       .select('points')
       .eq('id', badge_id)

@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   const userAgent = req.headers.get('user-agent') || null;
   const referrer = req.headers.get('referer') || null;
 
-  await db.from('user_activity_events').insert({
+  await supabase.from('user_activity_events').insert({
     tenant_id: tenantId,
     user_id: userId,
     event_type: eventType,

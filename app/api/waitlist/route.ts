@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for duplicate
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('waitlist')
       .select('id')
       .eq('email', email.toLowerCase())
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get current position
-    const { count } = await db
+    const { count } = await supabase
       .from('waitlist')
       .select('id', { count: 'exact', head: true })
       .eq('program_slug', programSlug)
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     const position = (count || 0) + 1;
 
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('waitlist')
       .insert({
         first_name: firstName,
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Get upcoming cohorts for this program
-  const { data: cohorts } = await db
+  const { data: cohorts } = await supabase
     .from('cohorts')
     .select('id, name, start_date, end_date, max_capacity, current_enrollment, status, location')
     .eq('status', 'active')
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
     .order('start_date', { ascending: true });
 
   // Get waitlist count
-  const { count } = await db
+  const { count } = await supabase
     .from('waitlist')
     .select('id', { count: 'exact', head: true })
     .eq('program_slug', programSlug)

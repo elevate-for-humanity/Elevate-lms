@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Find user
-  const { data: user, error } = await db
+  const { data: user, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('email', email)
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   // Soft-delete pattern: anonymize personal identifiers, keep compliance data
   const anonymizedEmail = `deleted+${user.id}@example.local`;
 
-  await db
+  await supabase
     .from('profiles')
     .update({
       email: anonymizedEmail,

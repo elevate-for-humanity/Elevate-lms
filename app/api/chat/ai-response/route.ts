@@ -140,7 +140,7 @@ Keep responses concise but helpful. Use bullet points for clarity when listing i
           process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
         
-        await db.from('ai_chat_context').insert({
+        await supabase.from('ai_chat_context').insert({
           conversation_id,
           context_data: {
             messages: conversationHistory,

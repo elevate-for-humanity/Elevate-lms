@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role, full_name')
       .eq('id', user.id)
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing module certificate
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('module_certificates')
       .select('id')
       .eq('user_id', user_id)
@@ -46,13 +46,13 @@ export async function POST(request: NextRequest) {
 
     const certNumber = `MOD-${Date.now().toString(36).toUpperCase()}`;
 
-    const { data: studentProfile } = await db
+    const { data: studentProfile } = await supabase
       .from('profiles')
       .select('full_name')
       .eq('id', user_id)
       .single();
 
-    const { data: cert, error: certError } = await db
+    const { data: cert, error: certError } = await supabase
       .from('module_certificates')
       .insert({
         user_id,

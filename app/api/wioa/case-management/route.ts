@@ -22,7 +22,7 @@ const supabase = createSupabaseClient();
     const status = searchParams.get('status');
     const priority = searchParams.get('priority');
 
-    let query = db
+    let query = supabase
       .from('case_management')
       .select('*')
       .order('priority', { ascending: false })
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       referrals: [],
     };
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('case_management')
       .insert(caseData)
       .select()

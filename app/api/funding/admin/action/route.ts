@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Check role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
   const { id, action } = await req.json();
 
   // Fetch the application
-  const { data: app, error: fetchError } = await db
+  const { data: app, error: fetchError } = await supabase
     .from('funding_applications')
     .select('id, user_id, course_id, program_id, status')
     .eq('id', id)
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   // Process action
   if (action === 'approve') {
     // Update application status
-    await db
+    await supabase
       .from('funding_applications')
       .update({
         status: 'approved',
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
       .eq('id', id);
 
     // Auto-enroll the user
-    await db.from('program_enrollments').upsert({
+    await supabase.from('program_enrollments').upsert({
       user_id: app.user_id,
       course_id: app.course_id,
       status: 'active',
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Log the action
-    await db.from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       who: user.id,
       action: 'APPROVE_APP',
       subject: id,
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     });
   } else if (action === 'deny') {
     // Update application status
-    await db
+    await supabase
       .from('funding_applications')
       .update({
         status: 'denied',
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
       .eq('id', id);
 
     // Log the action
-    await db.from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       who: user.id,
       action: 'DENY_APP',
       subject: id,

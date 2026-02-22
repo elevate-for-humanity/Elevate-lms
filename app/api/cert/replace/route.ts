@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return new Response('Unauthorized', { status: 401 });
-  const { data: prof } = await db
+  const { data: prof } = await supabase
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
   const { old_serial, reason } = await req.json();
   if (!old_serial) return new Response('Missing serial', { status: 400 });
 
-  const { data: old } = await db
+  const { data: old } = await supabase
     .from('certificates')
     .select('user_id, course_id, student_name, course_name')
     .eq('serial', old_serial)
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
   });
 
   // Log certification event
-  const { data: en } = await db
+  const { data: en } = await supabase
     .from('program_enrollments')
     .select('funding_program_id')
     .eq('user_id', old.user_id)

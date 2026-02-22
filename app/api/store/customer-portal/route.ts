@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get Stripe customer ID
-    const { data: billing, error: billingError } = await db
+    const { data: billing, error: billingError } = await supabase
       .from('customer_billing')
       .select('stripe_customer_id')
       .eq('user_id', userId)

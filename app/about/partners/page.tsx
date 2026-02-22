@@ -20,7 +20,7 @@ export default async function PartnersPage() {
   const supabase = createPublicClient();
 
   // Fetch partners by type
-  const { data: allPartners } = await db
+  const { data: allPartners } = await supabase
     .from('partners')
     .select('*')
     .eq('is_active', true)

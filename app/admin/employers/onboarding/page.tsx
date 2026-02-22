@@ -14,7 +14,7 @@ export default async function EmployerOnboardingReview() {
   
   let onboardings: any[] = [];
   if (supabase) {
-    const { data } = await db
+    const { data } = await supabase
       .from('employer_onboarding')
       .select('*')
       .order('created_at', { ascending: false });

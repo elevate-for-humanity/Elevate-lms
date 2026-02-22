@@ -21,7 +21,7 @@ export async function GET(
     const supabase = supabaseServer();
     const { id } = await params;
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('cash_advance_applications')
       .select('*')
       .eq('id', id)
@@ -49,7 +49,7 @@ export async function PATCH(
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('cash_advance_applications')
       .update(body)
       .eq('id', id)

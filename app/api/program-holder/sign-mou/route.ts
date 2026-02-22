@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already signed
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('mou_signatures')
       .select('id')
       .eq('user_id', user.id)
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Store signature
-    const { data: signature, error: sigError } = await db
+    const { data: signature, error: sigError } = await supabase
       .from('mou_signatures')
       .insert({
         user_id: user.id,
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update program holder onboarding status
-    await db
+    await supabase
       .from('profiles')
       .update({ mou_signed: true, mou_signed_at: new Date().toISOString() })
       .eq('id', user.id);

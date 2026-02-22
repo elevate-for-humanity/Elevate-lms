@@ -40,7 +40,7 @@ const supabase = getSupabaseServerClient();
     return NextResponse.json({ enrollments: [] }, { status: 200 });
   }
 
-  const { data, error }: any = await db
+  const { data, error }: any = await supabase
     .from('partner_lms_enrollments')
     .select(
       `

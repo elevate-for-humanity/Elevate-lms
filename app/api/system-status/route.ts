@@ -117,7 +117,7 @@ async function auditTables(supabase: any): Promise<TableAudit[]> {
   
   for (const table of CRITICAL_TABLES) {
     try {
-      const { count, error } = await db
+      const { count, error } = await supabase
         .from(table)
         .select('*', { count: 'exact', head: true });
       

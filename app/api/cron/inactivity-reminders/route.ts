@@ -27,7 +27,7 @@ export async function GET(request: Request) {
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     // Get all active enrollments
-    const { data: enrollments } = await db
+    const { data: enrollments } = await supabase
       .from('program_enrollments')
       .select(
         `
@@ -52,7 +52,7 @@ export async function GET(request: Request) {
     const studentIds = enrollments.map((e) => e.student_id);
 
     // Get last login for each student
-    const { data: lastLogins } = await db
+    const { data: lastLogins } = await supabase
       .from('attendance_log')
       .select('student_id, login_time')
       .in('student_id', studentIds)

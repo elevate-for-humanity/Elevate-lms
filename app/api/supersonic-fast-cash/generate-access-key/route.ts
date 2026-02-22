@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Check if user already has an active key
-    const { data: existingKey } = await db
+    const { data: existingKey } = await supabase
       .from('training_access_keys')
       .select('*')
       .eq('email', email.toLowerCase())

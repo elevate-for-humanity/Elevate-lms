@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     }
 
     const supabase = await createServerSupabaseClient();
-    const { data: enrollments, error } = await db
+    const { data: enrollments, error } = await supabase
       .from('training_enrollments')
       .select(
         `
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
     const supabase = await createServerSupabaseClient();
 
     // Check if already enrolled
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('training_enrollments')
       .select('id')
       .eq('user_id', user.id)
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     }
 
     // Create enrollment
-    const { data: enrollment, error } = await db
+    const { data: enrollment, error } = await supabase
       .from('training_enrollments')
       .insert({
         user_id: user.id,

@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify enrollment belongs to user
-    const { data: enrollment } = await db
+    const { data: enrollment } = await supabase
       .from('program_enrollments')
       .select('id, user_id, course_id')
       .eq('id', enrollment_id)
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Record module completion in lesson_progress or similar
-    const { error: progressError } = await db
+    const { error: progressError } = await supabase
       .from('lesson_progress')
       .upsert({
         user_id: user.id,

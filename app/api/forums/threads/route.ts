@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     const categoryId = searchParams.get('category_id');
     const courseId = searchParams.get('course_id');
 
-    let query = db
+    let query = supabase
       .from('forum_threads')
       .select(
         `
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('forum_threads')
       .insert({
         category_id,

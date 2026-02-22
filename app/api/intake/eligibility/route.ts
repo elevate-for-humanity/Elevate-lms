@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
     const supabase = await createServerSupabaseClient();
 
     // Verify lead exists
-    const { data: lead, error: leadError } = await db
+    const { data: lead, error: leadError } = await supabase
       .from('leads')
       .select('id, stage')
       .eq('id', data.leadId)
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
     const eligibility = checkEligibility(data);
 
     // Update lead
-    const { error: updateError } = await db
+    const { error: updateError } = await supabase
       .from('leads')
       .update({
         stage: eligibility.eligible ? 'ELIGIBLE' : 'INELIGIBLE',
@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Log event
-    await db.from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       event_type: 'eligibility_checked',
       resource_type: 'lead',
       resource_id: data.leadId,

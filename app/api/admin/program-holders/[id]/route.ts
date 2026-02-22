@@ -25,7 +25,7 @@ const { id } = await params;
   }
 
   // Check if user is admin
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -36,7 +36,7 @@ const { id } = await params;
   }
 
   // Get program holder details
-  const { data: ph, error } = await db
+  const { data: ph, error } = await supabase
     .from('program_holders')
     .select(
       `

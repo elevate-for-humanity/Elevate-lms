@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.json();
 
     // Save learner onboarding data to database
-    const { error: insertError } = await db
+    const { error: insertError } = await supabase
       .from('learner_onboarding')
       .insert({
         user_id: session.user.id,
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     if (insertError) throw insertError;
 
     // Update profile to mark onboarding as started
-    await db
+    await supabase
       .from('profiles')
       .update({
         onboarding_started: true,

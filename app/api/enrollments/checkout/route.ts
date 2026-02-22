@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 1. Load enrollment with lock
-    const { data: enrollment, error: enrollmentError } = await db
+    const { data: enrollment, error: enrollmentError } = await supabase
       .from('program_enrollments')
       .select(
         'id, partner_course_id, payment_status, payment_mode, billing_lock'
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Load partner course pricing
-    const { data: partnerCourse, error: courseError } = await db
+    const { data: partnerCourse, error: courseError } = await supabase
       .from('partner_courses')
       .select('id, course_name, retail_price_cents, stripe_price_id')
       .eq('id', enrollment.partner_course_id)
@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
     const session = await stripe.checkout.sessions.create(sessionParams);
 
     // 6. Update enrollment with session ID
-    await db
+    await supabase
       .from('program_enrollments')
       .update({
         stripe_checkout_session_id: session.id,

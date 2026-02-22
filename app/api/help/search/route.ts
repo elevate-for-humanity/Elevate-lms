@@ -23,7 +23,7 @@ const supabase = createSupabaseClient();
 
   const sanitizedQ = sanitizeSearchInput(q);
 
-  const { data: results, error } = await db
+  const { data: results, error } = await supabase
     .from('help_articles')
     .select('*')
     .or(`title.ilike.%${sanitizedQ}%,body.ilike.%${sanitizedQ}%`)

@@ -48,7 +48,7 @@ export async function GET(request: Request) {
     };
 
     // 1. Get all active subscriptions from database
-    const { data: subscriptions, error: subError } = await db
+    const { data: subscriptions, error: subError } = await supabase
       .from('student_subscriptions')
       .select(`
         *,
@@ -73,7 +73,7 @@ export async function GET(request: Request) {
           
           // Update local status if changed
           if (stripeSub.status !== sub.status) {
-            await db
+            await supabase
               .from('student_subscriptions')
               .update({
                 status: stripeSub.status,
@@ -110,7 +110,7 @@ export async function GET(request: Request) {
     }
 
     // 2. Check for completed subscriptions
-    const { data: completedSubs } = await db
+    const { data: completedSubs } = await supabase
       .from('student_subscriptions')
       .select('*')
       .eq('status', 'active')
@@ -120,7 +120,7 @@ export async function GET(request: Request) {
       for (const sub of completedSubs) {
         if (sub.weeks_paid >= sub.total_weeks) {
           // Mark as completed
-          await db
+          await supabase
             .from('student_subscriptions')
             .update({
               status: 'completed',

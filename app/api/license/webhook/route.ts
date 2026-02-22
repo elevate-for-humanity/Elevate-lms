@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         };
         if (customerId) updateData.stripe_customer_id = customerId;
 
-        const { error } = await db
+        const { error } = await supabase
           .from('licenses')
           .update(updateData)
           .eq('id', licenseId)

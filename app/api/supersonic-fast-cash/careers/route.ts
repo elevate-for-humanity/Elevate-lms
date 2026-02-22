@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Save application to database
-    const { data: application, error: appError } = await db
+    const { data: application, error: appError } = await supabase
       .from('career_applications')
       .insert({
         first_name: body.firstName,
@@ -205,7 +205,7 @@ export async function GET(request: NextRequest) {
       const { data: { user } } = await supabase.auth.getUser(token);
       if (user) {
         userEmail = user.email || null;
-        const { data: profile } = await db
+        const { data: profile } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', user.id)
@@ -231,7 +231,7 @@ export async function GET(request: NextRequest) {
       }
       // For unauthenticated users, only return limited status info
       if (!userEmail) {
-        const { data, error } = await db
+        const { data, error } = await supabase
           .from('career_applications')
           .select('id, status, created_at')
           .eq('email', email.toLowerCase())
@@ -251,7 +251,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    let query = db
+    let query = supabase
       .from('career_applications')
       .select('*')
       .order('created_at', { ascending: false });

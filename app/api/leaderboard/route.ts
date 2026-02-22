@@ -44,7 +44,7 @@ export async function GET(request: Request) {
     }
 
     // Get leaderboard data from achievements
-    const { data: leaderboard, error } = await db
+    const { data: leaderboard, error } = await supabase
       .from('achievements')
       .select(
         `

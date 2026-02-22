@@ -22,7 +22,7 @@ const userId = req.headers.get('x-user-id');
   try {
     const supabase = supabaseServer();
     
-    let query = db
+    let query = supabase
       .from('studio_workflow_tracking')
       .select('*')
       .eq('user_id', userId)
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     const supabase = supabaseServer();
 
     // Upsert tracking record
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('studio_workflow_tracking')
       .upsert(
         {
@@ -126,7 +126,7 @@ const userId = req.headers.get('x-user-id');
     if (last_status !== undefined) updates.last_status = last_status;
     if (notifications_enabled !== undefined) updates.notifications_enabled = notifications_enabled;
 
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('studio_workflow_tracking')
       .update(updates)
       .eq('id', id)
@@ -165,7 +165,7 @@ const userId = req.headers.get('x-user-id');
   try {
     const supabase = supabaseServer();
 
-    const { error } = await db
+    const { error } = await supabase
       .from('studio_workflow_tracking')
       .delete()
       .eq('id', id)

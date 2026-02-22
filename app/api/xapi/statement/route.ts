@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    const { error } = await db
+    const { error } = await supabase
       .from('xapi_statements')
       .insert(records);
 
@@ -82,7 +82,7 @@ const supabase = createSupabaseClient();
     const verb = searchParams.get('verb');
     const limit = parseInt(searchParams.get('limit') || '100');
 
-    let query = db
+    let query = supabase
       .from('xapi_statements')
       .select('*')
       .order('stored_at', { ascending: false })

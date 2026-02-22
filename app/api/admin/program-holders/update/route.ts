@@ -31,7 +31,7 @@ export const POST = withAuth(
       }
     }
 
-    const { error } = await db
+    const { error } = await supabase
       .from('program_holders')
       .update(updates)
       .eq('id', id);

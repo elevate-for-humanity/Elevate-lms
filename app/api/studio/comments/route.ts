@@ -21,7 +21,7 @@ const userId = req.headers.get('x-user-id');
 
   const supabase = supabaseServer();
   
-  let query = db
+  let query = supabase
     .from('studio_comments')
     .select('*')
     .eq('user_id', userId)
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = supabaseServer();
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('studio_comments')
     .insert({
       user_id: userId,
@@ -95,7 +95,7 @@ const userId = req.headers.get('x-user-id');
   if (content !== undefined) updates.content = content;
   if (resolved !== undefined) updates.resolved = resolved;
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('studio_comments')
     .update(updates)
     .eq('id', id)
@@ -125,7 +125,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   const supabase = supabaseServer();
-  const { error } = await db
+  const { error } = await supabase
     .from('studio_comments')
     .delete()
     .eq('id', id)

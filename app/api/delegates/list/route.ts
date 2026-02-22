@@ -18,7 +18,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   } = await supabase.auth.getUser();
   if (!user) return new Response('Unauthorized', { status: 401 });
 
-  const { data: prof } = await db
+  const { data: prof } = await supabase
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -27,7 +27,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   if (prof?.role !== 'admin') return new Response('Forbidden', { status: 403 });
 
   // Get delegates with program holder and user info
-  const { data: delegates, error } = await db
+  const { data: delegates, error } = await supabase
     .from('delegates')
     .select(
       `

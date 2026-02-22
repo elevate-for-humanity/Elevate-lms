@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
     try {
       const supabase = createAdminClient();
       if (!supabase) return;
-      await db.from('public_ai_tutor_logs').insert({
+      await supabase.from('public_ai_tutor_logs').insert({
         ip_hash: ipHash,
         question_length: message.length,
         response_length: responseLength,

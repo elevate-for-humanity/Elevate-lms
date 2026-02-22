@@ -16,7 +16,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   const supabase = supabaseServer();
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('studio_settings')
     .select('*')
     .eq('user_id', userId)
@@ -48,7 +48,7 @@ const userId = req.headers.get('x-user-id');
   const body = await req.json();
   const supabase = supabaseServer();
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('studio_settings')
     .upsert({
       user_id: userId,

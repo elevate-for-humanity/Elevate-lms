@@ -14,7 +14,7 @@ export async function GET(request: Request) {
 const supabase = await createServerSupabaseClient();
 
   // Get DOL/DWD reporting data
-  const { data: enrollments } = await db
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select(
       `

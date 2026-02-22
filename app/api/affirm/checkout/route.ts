@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         { status: 503 }
       );
     }
-    const { data: context, error: contextError } = await db
+    const { data: context, error: contextError } = await supabase
       .from('checkout_contexts')
       .insert({
         provider: 'affirm',

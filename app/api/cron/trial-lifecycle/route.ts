@@ -54,7 +54,7 @@ export async function GET(request: Request) {
     const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
     const threeDaysStart = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
 
-    const { data: expiringIn3 } = await db
+    const { data: expiringIn3 } = await supabase
       .from('licenses')
       .select('id, organization_id, expires_at')
       .eq('tier', 'trial')
@@ -65,7 +65,7 @@ export async function GET(request: Request) {
     if (expiringIn3?.length) {
       results.expiring_3_days = expiringIn3.length;
       for (const license of expiringIn3) {
-        await db.from('license_events').insert({
+        await supabase.from('license_events').insert({
           license_id: license.id,
           organization_id: license.organization_id,
           event_type: 'trial_expiring_soon',
@@ -77,7 +77,7 @@ export async function GET(request: Request) {
     // 2. Trials expiring in 1 day
     const oneDayFromNow = new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000);
 
-    const { data: expiringIn1 } = await db
+    const { data: expiringIn1 } = await supabase
       .from('licenses')
       .select('id, organization_id, expires_at')
       .eq('tier', 'trial')
@@ -88,7 +88,7 @@ export async function GET(request: Request) {
     if (expiringIn1?.length) {
       results.expiring_1_day = expiringIn1.length;
       for (const license of expiringIn1) {
-        await db.from('license_events').insert({
+        await supabase.from('license_events').insert({
           license_id: license.id,
           organization_id: license.organization_id,
           event_type: 'trial_expiring_urgent',
@@ -100,7 +100,7 @@ export async function GET(request: Request) {
     // 3. Abandoned trials: created > 7 days ago, org has no onboarding_started_at
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    const { data: oldTrials } = await db
+    const { data: oldTrials } = await supabase
       .from('licenses')
       .select('id, organization_id, created_at')
       .eq('tier', 'trial')
@@ -109,7 +109,7 @@ export async function GET(request: Request) {
 
     if (oldTrials?.length) {
       for (const license of oldTrials) {
-        const { data: org } = await db
+        const { data: org } = await supabase
           .from('organizations')
           .select('onboarding_started_at')
           .eq('id', license.organization_id)
@@ -117,7 +117,7 @@ export async function GET(request: Request) {
 
         if (org && !org.onboarding_started_at) {
           results.abandoned++;
-          await db.from('license_events').insert({
+          await supabase.from('license_events').insert({
             license_id: license.id,
             organization_id: license.organization_id,
             event_type: 'trial_abandoned',
@@ -131,7 +131,7 @@ export async function GET(request: Request) {
     }
 
     // 4. Expire overdue trials
-    const { data: overdue } = await db
+    const { data: overdue } = await supabase
       .from('licenses')
       .select('id, organization_id')
       .eq('tier', 'trial')
@@ -140,7 +140,7 @@ export async function GET(request: Request) {
 
     if (overdue?.length) {
       for (const license of overdue) {
-        const { error } = await db
+        const { error } = await supabase
           .from('licenses')
           .update({ status: 'expired' })
           .eq('id', license.id);
@@ -149,7 +149,7 @@ export async function GET(request: Request) {
           results.errors.push('Failed to expire license: see logs');
         } else {
           results.expired++;
-          await db.from('license_events').insert({
+          await supabase.from('license_events').insert({
             license_id: license.id,
             organization_id: license.organization_id,
             event_type: 'trial_expired',

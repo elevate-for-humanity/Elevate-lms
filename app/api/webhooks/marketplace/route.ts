@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     const amountTotal = session.amount_total || 0;
 
     // Fetch creator to get revenue split
-    const { data: creator } = await db
+    const { data: creator } = await supabase
       .from('marketplace_creators')
       .select('revenue_split')
       .eq('id', creatorId)
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
     downloadExpiresAt.setDate(downloadExpiresAt.getDate() + 30); // 30 days
 
     // Record sale
-    const { error } = await db.from('marketplace_sales').insert({
+    const { error } = await supabase.from('marketplace_sales').insert({
       product_id: productId,
       creator_id: creatorId,
       buyer_email: session.customer_details?.email || '',

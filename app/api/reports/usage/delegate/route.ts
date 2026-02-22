@@ -18,7 +18,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   } = await supabase.auth.getUser();
   if (!user) return new Response('Unauthorized', { status: 401 });
 
-  const { data: prof } = await db
+  const { data: prof } = await supabase
     .from('user_profiles')
     .select('role, program_holder_id')
     .eq('user_id', user.id)
@@ -29,7 +29,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Check if user is a delegate with view permissions
-  const { data: del } = await db
+  const { data: del } = await supabase
     .from('delegates')
     .select('can_view_reports')
     .eq('user_id', user.id)
@@ -41,7 +41,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Get enrollments for courses belonging to this program holder
-  const { data: enrolls, error } = await db
+  const { data: enrolls, error } = await supabase
     .from('program_enrollments')
     .select(
       `
@@ -75,7 +75,7 @@ const supabase = await createRouteHandlerClient({ cookies });
     }
   > = {};
   if (userIds.length) {
-    const { data: notes } = await db
+    const { data: notes } = await supabase
       .from('program_holder_notes')
       .select(
         'user_id, course_id, status, note, created_at, follow_up_date, follow_up_done'

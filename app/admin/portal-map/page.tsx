@@ -663,7 +663,7 @@ export default function AdminPortalMapPage() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    db.from('pages').select('*').limit(50)
+    supabase.from('pages').select('*').limit(50)
       .then(({ data }) => { if (data) setDbRows(data); });
   }, []);
 

@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   if (!user) return new Response('Unauthorized', { status: 401 });
 
   // Check role permissions
-  const { data: prof } = await db
+  const { data: prof } = await supabase
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Fetch course details for expiry calculation
-  const { data: course } = await db
+  const { data: course } = await supabase
     .from('training_courses')
     .select('id, title, cert_valid_days')
     .eq('id', course_id)
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Mark enrollment as completed
-  await db.from('program_enrollments').upsert({
+  await supabase.from('program_enrollments').upsert({
     user_id,
     course_id,
     status: 'completed',
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
   });
 
   // Get enrollment for funding program
-  const { data: en } = await db
+  const { data: en } = await supabase
     .from('program_enrollments')
     .select('funding_program_id')
     .eq('user_id', user_id)
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
 
   // Log completion event for KPIs
-  await db.from('enrollment_events').insert({
+  await supabase.from('enrollment_events').insert({
     user_id,
     course_id,
     funding_program_id: en?.funding_program_id || null,

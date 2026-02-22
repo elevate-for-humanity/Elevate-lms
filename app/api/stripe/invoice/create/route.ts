@@ -71,7 +71,7 @@ export async function POST(req: Request) {
         { status: 503 }
       );
     }
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('invoices')
       .insert([
         {
@@ -108,7 +108,7 @@ export async function GET(request: Request) {
 
     const supabase = createAdminClient();
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('invoices')
       .select('*');
 

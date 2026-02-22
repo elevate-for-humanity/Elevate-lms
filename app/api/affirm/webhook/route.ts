@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate the order_id exists in our system before processing
-    const { data: existingApp } = await db
+    const { data: existingApp } = await supabase
       .from('applications')
       .select('id, affirm_order_id')
       .eq('affirm_order_id', event.data.order_id)
@@ -110,7 +110,7 @@ async function handleChargeAuthorized(event: AffirmWebhookEvent, supabase: any) 
 
   // Update application status
   if (order_id) {
-    await db
+    await supabase
       .from('applications')
       .update({
         affirm_charge_id: id,
@@ -131,7 +131,7 @@ async function handleChargeCaptured(event: AffirmWebhookEvent, supabase: any) {
 
   // Update application status
   if (order_id) {
-    await db
+    await supabase
       .from('applications')
       .update({
         payment_status: 'completed',
@@ -142,14 +142,14 @@ async function handleChargeCaptured(event: AffirmWebhookEvent, supabase: any) {
 
     // Also update barber_subscriptions if this is a barber enrollment
     // Match by customer_email from the application record for reliable lookup
-    const { data: app } = await db
+    const { data: app } = await supabase
       .from('applications')
       .select('customer_email')
       .eq('affirm_order_id', order_id)
       .single();
 
     if (app?.customer_email) {
-      await db
+      await supabase
         .from('barber_subscriptions')
         .update({
           status: 'active',
@@ -170,7 +170,7 @@ async function handleChargeVoided(event: AffirmWebhookEvent, supabase: any) {
   });
 
   if (order_id) {
-    await db
+    await supabase
       .from('applications')
       .update({
         payment_status: 'voided',
@@ -189,7 +189,7 @@ async function handleChargeRefunded(event: AffirmWebhookEvent, supabase: any) {
   });
 
   if (order_id) {
-    await db
+    await supabase
       .from('applications')
       .update({
         payment_status: 'refunded',

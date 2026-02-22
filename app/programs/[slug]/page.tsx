@@ -161,7 +161,7 @@ export default async function ProgramDetailPage({
       program = await loadProgram(slug);
     } else {
       // Try database first
-      const { data: dbProgram } = await db
+      const { data: dbProgram } = await supabase
         .from('programs')
         .select('*')
         .eq('slug', slug)
@@ -171,13 +171,13 @@ export default async function ProgramDetailPage({
 
       // Fetch outcomes from DB if program found
       if (program?.id) {
-        const { data: outcomes } = await db
+        const { data: outcomes } = await supabase
           .from('program_outcomes')
           .select('outcome')
           .eq('program_id', program.id)
           .order('outcome_order', { ascending: true });
         
-        const { data: requirements } = await db
+        const { data: requirements } = await supabase
           .from('program_requirements')
           .select('requirement')
           .eq('program_id', program.id)

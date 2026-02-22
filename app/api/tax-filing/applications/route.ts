@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
     // Build query
-    let query = db
+    let query = supabase
       .from('tax_filing_applications')
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     const supabase = supabaseServer();
     const body = await parseBody<Record<string, any>>(request);
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('tax_filing_applications')
       .insert(body)
       .select()

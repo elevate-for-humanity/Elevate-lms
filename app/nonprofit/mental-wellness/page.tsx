@@ -24,12 +24,12 @@ export default async function MentalWellnessPage() {
     const supabase = createPublicClient();
     if (supabase) {
       const [servicesRes, workshopsRes] = await Promise.all([
-        db.from('nonprofit_services').select('*').eq('category', 'mental-wellness').eq('is_active', true).order('order', { ascending: true }),
-        db.from('workshops').select('*').eq('category', 'mental-wellness').eq('is_active', true).gte('date', new Date().toISOString()).order('date', { ascending: true }).limit(3),
+        supabase.from('nonprofit_services').select('*').eq('category', 'mental-wellness').eq('is_active', true).order('order', { ascending: true }),
+        supabase.from('workshops').select('*').eq('category', 'mental-wellness').eq('is_active', true).gte('date', new Date().toISOString()).order('date', { ascending: true }).limit(3),
       ]);
       services = servicesRes.data;
       workshops = workshopsRes.data;
-      const testimonialsRes = await db.from('testimonials').select('*').eq('category', 'mental-wellness').eq('is_featured', true).limit(2);
+      const testimonialsRes = await supabase.from('testimonials').select('*').eq('category', 'mental-wellness').eq('is_featured', true).limit(2);
       testimonials = testimonialsRes.data;
     }
   } catch {

@@ -21,6 +21,7 @@ export async function POST(request: Request) {
   }
 
   const supabase = createSupabaseClient();
+  const db = supabase;
   const { data: user, error: userError } = await db
     .from('users')
     .select('id, email')

@@ -71,7 +71,7 @@ export async function POST(req: Request) {
 
     // Log upload for tracking (optional - store in database)
     try {
-      await db.from('tax_document_uploads').insert([
+      await supabase.from('tax_document_uploads').insert([
         {
           name: contactInfo.name,
           email: contactInfo.email,

@@ -69,7 +69,7 @@ export async function POST(req: Request) {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      const { error: dbError } = await db
+      const { error: dbError } = await supabase
         .from('marketing_contacts')
         .insert({
           first_name: firstName,

@@ -19,7 +19,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
     }
 
-    const { data: promoCodes, error } = await db
+    const { data: promoCodes, error } = await supabase
       .from('promo_codes')
       .select('*')
       .order('created_at', { ascending: false });
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
     }
 
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('promo_codes')
       .insert({
         code: body.code.toUpperCase().trim(),
@@ -105,7 +105,7 @@ export async function PUT(req: Request) {
     if (body.is_active !== undefined) updateData.is_active = body.is_active;
     updateData.updated_at = new Date().toISOString();
 
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('promo_codes')
       .update(updateData)
       .eq('id', body.id)
@@ -142,7 +142,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
     }
 
-    const { error } = await db
+    const { error } = await supabase
       .from('promo_codes')
       .delete()
       .eq('id', id);

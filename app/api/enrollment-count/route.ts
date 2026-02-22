@@ -22,10 +22,10 @@ export async function GET(request: Request) {
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
 
     const [totalRes, monthRes, todayRes, activeRes] = await Promise.all([
-      db.from('program_enrollments').select('id', { count: 'exact', head: true }),
-      db.from('program_enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfMonth),
-      db.from('program_enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfDay),
-      db.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+      supabase.from('program_enrollments').select('id', { count: 'exact', head: true }),
+      supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfMonth),
+      supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfDay),
+      supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     ]);
 
     return NextResponse.json({

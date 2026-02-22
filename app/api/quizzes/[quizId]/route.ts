@@ -22,7 +22,7 @@ export async function GET(
     const { quizId } = await params;
 
     // Fetch quiz details
-    const { data: quiz, error: quizError } = await db
+    const { data: quiz, error: quizError } = await supabase
       .from('interactive_quizzes')
       .select('*')
       .eq('id', quizId)
@@ -31,7 +31,7 @@ export async function GET(
     if (quizError) throw quizError;
 
     // Fetch questions
-    const { data: questions, error: questionsError } = await db
+    const { data: questions, error: questionsError } = await supabase
       .from('quiz_questions')
       .select('*')
       .eq('quiz_id', quizId)
@@ -71,13 +71,13 @@ export async function POST(
     const { userId, enrollmentId, answers, timeTakenSeconds } = body;
 
     // Fetch quiz and questions
-    const { data: quiz } = await db
+    const { data: quiz } = await supabase
       .from('interactive_quizzes')
       .select('*')
       .eq('id', quizId)
       .single();
 
-    const { data: questions } = await db
+    const { data: questions } = await supabase
       .from('quiz_questions')
       .select('*')
       .eq('quiz_id', quizId);
@@ -115,7 +115,7 @@ export async function POST(
     const passed = percentage >= quiz.passing_score;
 
     // Get attempt number
-    const { data: previousAttempts } = await db
+    const { data: previousAttempts } = await supabase
       .from('quiz_attempts')
       .select('attempt_number')
       .eq('user_id', userId)
@@ -137,7 +137,7 @@ export async function POST(
     }
 
     // Save attempt
-    const { data: attempt, error: attemptError } = await db
+    const { data: attempt, error: attemptError } = await supabase
       .from('quiz_attempts')
       .insert({
         user_id: userId,

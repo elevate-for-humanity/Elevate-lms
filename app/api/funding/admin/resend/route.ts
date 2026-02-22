@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Check role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
   const { application_id } = await req.json();
 
   // Get application details
-  const { data: app, error } = await db
+  const { data: app, error } = await supabase
     .from('funding_applications')
     .select('id, user_id, course_id, program_id, status')
     .eq('id', application_id)
@@ -59,12 +59,12 @@ export async function POST(req: NextRequest) {
   try {
     const [learnerUser, courseResult, programResult] = await Promise.all([
       getUserById(app.user_id),
-      db
+      supabase
         .from('training_courses')
         .select('title')
         .eq('id', app.course_id)
         .maybeSingle(),
-      db
+      supabase
         .from('funding_programs')
         .select('code, name')
         .eq('id', app.program_id)
@@ -96,7 +96,7 @@ Welcome to Elevate for Humanity!`
     );
 
     // Log the action
-    await db.from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       who: user.id,
       action: 'RESEND_WELCOME',
       subject: application_id,

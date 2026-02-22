@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data: pendingUsage, error } = await db
+  const { data: pendingUsage, error } = await supabase
     .from('tenant_usage')
     .select('*, tenant:tenants(*, billing:tenant_billing(*))')
     .eq('reported_to_stripe', false);
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
   const updates = [];
 
   for (const u of pendingUsage) {
-    const { data: billing } = await db
+    const { data: billing } = await supabase
       .from('tenant_billing')
       .select('*')
       .eq('tenant_id', u.tenant_id)
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
       );
 
       updates.push(
-        db
+        supabase
           .from('tenant_usage')
           .update({
             reported_to_stripe: true,

@@ -18,14 +18,14 @@ async function getAffiliateData() {
   }
   
   // Get affiliates from database
-  const { data: affiliates, count } = await db
+  const { data: affiliates, count } = await supabase
     .from('affiliate_applications')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .limit(10);
 
   // Get payouts
-  const { data: payouts } = await db
+  const { data: payouts } = await supabase
     .from('affiliate_payouts')
     .select('amount')
     .eq('status', 'paid');

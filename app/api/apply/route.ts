@@ -69,7 +69,7 @@ export const POST = withRateLimit(
       // Try with new columns first, fall back without them
       let application, error;
       if (pathway_slug || source) {
-        const result = await db.from('applications').insert({
+        const result = await supabase.from('applications').insert({
           ...insertData,
           pathway_slug: pathway_slug || null,
           source: source || 'direct',
@@ -77,7 +77,7 @@ export const POST = withRateLimit(
         
         if (result.error?.message?.includes('column') || result.error?.code === '42703') {
           // Columns don't exist yet, insert without them
-          const fallback = await db.from('applications').insert(insertData).select('id').single();
+          const fallback = await supabase.from('applications').insert(insertData).select('id').single();
           application = fallback.data;
           error = fallback.error;
         } else {
@@ -85,7 +85,7 @@ export const POST = withRateLimit(
           error = result.error;
         }
       } else {
-        const result = await db.from('applications').insert(insertData).select('id').single();
+        const result = await supabase.from('applications').insert(insertData).select('id').single();
         application = result.data;
         error = result.error;
       }

@@ -17,7 +17,7 @@ const supabase = await createRouteHandlerClient({ cookies });
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return new Response('Unauthorized', { status: 401 });
-  const { data: prof } = await db
+  const { data: prof } = await supabase
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -25,7 +25,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   if (!['admin', 'partner'].includes(prof?.role))
     return new Response('Forbidden', { status: 403 });
 
-  const { data, error }: any = await db
+  const { data, error }: any = await supabase
     .from('cert_revocation_log')
     .select('*');
   if (error) return new Response(toErrorMessage(error), { status: 500 });

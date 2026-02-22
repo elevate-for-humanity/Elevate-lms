@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Mark onboarding as complete
-    const { error: updateError } = await db
+    const { error: updateError } = await supabase
       .from('profiles')
       .update({
         onboarding_completed: true,
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     if (updateError) throw updateError;
 
     // Get user profile for email
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('full_name, email')
       .eq('id', session.user.id)

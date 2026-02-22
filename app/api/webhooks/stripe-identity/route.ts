@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
   // Idempotency check
   if (supabase) {
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('stripe_webhook_events')
       .select('id')
       .eq('stripe_event_id', event.id)
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true, duplicate: true });
     }
 
-    await db
+    await supabase
       .from('stripe_webhook_events')
       .insert({ stripe_event_id: event.id, event_type: event.type, status: 'processing' })
       .catch(() => {});
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
 
     try {
       // Update verification record
-      await db
+      await supabase
         .from('program_holder_verification')
         .update({
           status: 'verified',
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
         .eq('stripe_verification_session_id', session.id);
 
       // Update program holder status
-      await db
+      await supabase
         .from('program_holders')
         .update({
           verification_status: 'verified',
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
 
     try {
       // Update verification record
-      await db
+      await supabase
         .from('program_holder_verification')
         .update({
           status: 'failed',
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
         .eq('stripe_verification_session_id', session.id);
 
       // Update program holder status
-      await db
+      await supabase
         .from('program_holders')
         .update({
           verification_status: 'failed',

@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get('limit') || '10');
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('leaderboard')
       .select(
         `

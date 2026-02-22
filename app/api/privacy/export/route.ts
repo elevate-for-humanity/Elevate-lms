@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Find user by email
-  const { data: user, error: userError } = await db
+  const { data: user, error: userError } = await supabase
     .from('profiles')
     .select('*')
     .eq('email', email)
@@ -36,10 +36,10 @@ export async function POST(req: NextRequest) {
 
   // Pull key data from multiple tables
   const [enrollments, completions, activity, grades] = await Promise.all([
-    db.from('course_enrollments').select('*').eq('user_id', userId),
-    db.from('course_completions').select('*').eq('user_id', userId),
-    db.from('user_activity_events').select('*').eq('user_id', userId),
-    db.from('grades').select('*').eq('user_id', userId)
+    supabase.from('course_enrollments').select('*').eq('user_id', userId),
+    supabase.from('course_completions').select('*').eq('user_id', userId),
+    supabase.from('user_activity_events').select('*').eq('user_id', userId),
+    supabase.from('grades').select('*').eq('user_id', userId)
   ]);
 
   const exportPayload = {

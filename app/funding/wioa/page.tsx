@@ -22,7 +22,7 @@ export default async function WioaPage() {
   try {
     const supabase = createPublicClient();
     if (supabase) {
-      const { data } = await db
+      const { data } = await supabase
         .from('funding_options')
         .select('*')
         .eq('type', 'wioa')

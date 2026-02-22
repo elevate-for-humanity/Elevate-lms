@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if org with this email already exists
-    const { data: existingOrg } = await db
+    const { data: existingOrg } = await supabase
       .from('organizations')
       .select('id, slug')
       .eq('contact_email', email)
@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
 
     // Generate subdomain
     let subdomain = slugify(orgName.trim());
-    const { data: slugTaken } = await db
+    const { data: slugTaken } = await supabase
       .from('organizations')
       .select('id')
       .eq('slug', subdomain)
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create organization
-    const { data: org, error: orgError } = await db
+    const { data: org, error: orgError } = await supabase
       .from('organizations')
       .insert({
         name: orgName.trim(),
@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
     const trialEndsAt = new Date();
     trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DURATION_DAYS);
 
-    const { data: license, error: licenseError } = await db
+    const { data: license, error: licenseError } = await supabase
       .from('managed_licenses')
       .insert({
         organization_id: org.id,
@@ -227,12 +227,12 @@ export async function POST(request: NextRequest) {
     if (licenseError) {
       logger.error(`[trial] ${correlationId} — License creation error:`, licenseError);
       // Rollback org
-      await db.from('organizations').delete().eq('id', org.id);
+      await supabase.from('organizations').delete().eq('id', org.id);
       return NextResponse.json({ error: 'Failed to create trial license', correlationId }, { status: 500 });
     }
 
     // Log provisioning event
-    await db.from('license_events').insert({
+    await supabase.from('license_events').insert({
       license_id: license.id,
       organization_id: org.id,
       event_type: 'trial_self_service_start',

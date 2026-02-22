@@ -21,7 +21,7 @@ const supabase = createSupabaseClient();
   const { attemptId } = await params;
   const session = await requireApiAuth();
 
-  const { data: attempt } = await db
+  const { data: attempt } = await supabase
     .from('scorm_attempts')
     .select('*')
     .eq('id', attemptId)
@@ -32,7 +32,7 @@ const supabase = createSupabaseClient();
     return NextResponse.json({ error: 'Attempt not found' }, { status: 404 });
   }
 
-  const { data: cmiData } = await db
+  const { data: cmiData } = await supabase
     .from('scorm_cmi_data')
     .select('*')
     .eq('attempt_id', attemptId);
@@ -57,7 +57,7 @@ export async function POST(
   const session = await requireApiAuth();
   const { data } = await request.json();
 
-  const { data: attempt } = await db
+  const { data: attempt } = await supabase
     .from('scorm_attempts')
     .select('*')
     .eq('id', attemptId)
@@ -72,7 +72,7 @@ export async function POST(
   const updates = [];
   for (const [key, value] of Object.entries(data)) {
     updates.push(
-      db.from('scorm_cmi_data').upsert({
+      supabase.from('scorm_cmi_data').upsert({
         attempt_id: attemptId,
         cmi_key: key,
         cmi_value: value as string,
@@ -88,7 +88,7 @@ export async function POST(
   const score = data['cmi.core.score.raw'] || data['cmi.score.raw'];
 
   if (status || score) {
-    await db
+    await supabase
       .from('scorm_attempts')
       .update({
         status,

@@ -20,7 +20,7 @@ export const GET = withAuth(
     }
 
     // Get program holder details
-    const { data: holder, error } = await db
+    const { data: holder, error } = await supabase
       .from('program_holders')
       .select(
         `
@@ -56,7 +56,7 @@ export const GET = withAuth(
 
     // Update MOU status to 'sent' if not already
     if (holder.mou_status === 'not_sent') {
-      await db
+      await supabase
         .from('program_holders')
         .update({ mou_status: 'sent' })
         .eq('id', id);

@@ -15,6 +15,7 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = createSupabaseClient();
+  const db = supabase;
   const session = await requireApiAuth();
   const { attemptId, answers } = await request.json();
 

@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   const body = await parseBody<Record<string, any>>(request);
   const supabase = await createServerSupabaseClient();
 
-  const { data, error }: any = await db
+  const { data, error }: any = await supabase
     .from('funding_tracking')
     .insert({
       student_id: body.student_id,
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 const supabase = await createServerSupabaseClient();
 
-  const { data }: any = await db
+  const { data }: any = await supabase
     .from('funding_tracking')
     .select('*')
     .order('created_at', { ascending: false })

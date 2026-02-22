@@ -16,7 +16,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   const supabase = supabaseServer();
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('studio_repos')
     .select('*')
     .eq('user_id', userId)
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = supabaseServer();
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('studio_repos')
     .upsert({
       user_id: userId,
@@ -77,7 +77,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   const supabase = supabaseServer();
-  const { error } = await db
+  const { error } = await supabase
     .from('studio_repos')
     .delete()
     .eq('id', repo_id)

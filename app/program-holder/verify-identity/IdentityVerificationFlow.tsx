@@ -105,7 +105,7 @@ export default function IdentityVerificationFlow({
       if (ssnUploadError) throw ssnUploadError;
 
       // Create document records
-      await db.from('program_holder_documents').insert([
+      await supabase.from('program_holder_documents').insert([
         {
           program_holder_id: userId,
           document_type: 'id',
@@ -123,7 +123,7 @@ export default function IdentityVerificationFlow({
       ]);
 
       // Create verification record
-      await db.from('program_holder_verification').insert({
+      await supabase.from('program_holder_verification').insert({
         program_holder_id: userId,
         verification_type: 'manual',
         status: 'pending',
@@ -131,7 +131,7 @@ export default function IdentityVerificationFlow({
       });
 
       // Update program holder status
-      await db
+      await supabase
         .from('program_holders')
         .update({
           verification_status: 'pending',

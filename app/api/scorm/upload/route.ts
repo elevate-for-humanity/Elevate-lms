@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check admin/instructor role
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
     const scormVersion = findScormVersion(manifestObj);
 
     // Create DB record first to get the package ID
-    const { data: scormData, error: scormError } = await db
+    const { data: scormData, error: scormError } = await supabase
       .from('scorm_packages')
       .insert({
         course_id: courseId,
@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
 
     // Update DB with launch path and internal URL
     const internalLaunchUrl = `/api/scorm/content/${packageId}/${launchHref}`;
-    await db
+    await supabase
       .from('scorm_packages')
       .update({
         launch_path: launchHref,

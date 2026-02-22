@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   });
   const source = body.source || 'LMS_DASHBOARD';
 
-  await db.from('login_events').insert({
+  await supabase.from('login_events').insert({
     user_id: user.id,
     source,
   });

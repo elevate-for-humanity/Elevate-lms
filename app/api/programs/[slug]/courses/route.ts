@@ -42,7 +42,7 @@ export async function GET(
     const category = categoryMap[slug] || slug;
 
     // Fetch courses matching the category
-    const { data: courses, error } = await db
+    const { data: courses, error } = await supabase
       .from('training_courses')
       .select('*')
       .eq('published', true)

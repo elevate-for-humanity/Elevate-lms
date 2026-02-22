@@ -60,7 +60,7 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    const { error } = await db
+    const { error } = await supabase
       .from("newsletter_subscribers")
       .insert([{ email: normalized, source: source ?? "website" }]);
 
@@ -71,7 +71,7 @@ export async function POST(req: Request) {
     }
 
     // Lightweight audit log (fire-and-forget)
-    db
+    supabase
       .from("analytics_events")
       .insert([
         {

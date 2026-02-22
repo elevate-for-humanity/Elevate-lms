@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     const supabase = await createServerSupabaseClient();
 
     // Check for existing lead
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('leads')
       .select('id, stage')
       .eq('email', data.email)
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     if (existing) {
       // Update existing lead
-      const { data: lead, error } = await db
+      const { data: lead, error } = await supabase
         .from('leads')
         .update({
           first_name: data.firstName,
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create new lead
-    const { data: lead, error } = await db
+    const { data: lead, error } = await supabase
       .from('leads')
       .insert({
         first_name: data.firstName,
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Log event
-    await db.from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       event_type: 'lead_created',
       resource_type: 'lead',
       resource_id: lead.id,

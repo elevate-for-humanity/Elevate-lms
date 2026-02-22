@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('wotc_tracking')
       .upsert(
         {
@@ -59,7 +59,7 @@ export async function GET(request: Request) {
 
     const supabase = createAdminClient();
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('wotc_tracking')
       .select('*')
       .order('hire_date', { ascending: false });

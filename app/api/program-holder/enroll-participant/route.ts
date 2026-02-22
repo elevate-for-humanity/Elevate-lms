@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Get user's program holder ID
-  const { data: prof } = await db
+  const { data: prof } = await supabase
     .from('user_profiles')
     .select('program_holder_id')
     .eq('user_id', user.id)

@@ -13,7 +13,7 @@ export const GET = withAuth(
     const { user } = context;
     const supabase = await createRouteHandlerClient({ cookies });
 
-    const { data: holders, error } = await db
+    const { data: holders, error } = await supabase
       .from('program_holders')
       .select(
         `

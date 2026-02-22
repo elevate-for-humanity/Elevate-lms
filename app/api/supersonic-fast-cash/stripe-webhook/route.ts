@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
   // Idempotency check
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
   if (supabase) {
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('stripe_webhook_events')
       .select('id')
       .eq('stripe_event_id', event.id)
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true, duplicate: true });
     }
 
-    await db
+    await supabase
       .from('stripe_webhook_events')
       .insert({ stripe_event_id: event.id, event_type: event.type, status: 'processing' })
       .catch(() => {});
@@ -97,7 +97,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
 
     // Check if customer already has an access key
-    const { data: existingKey } = await db
+    const { data: existingKey } = await supabase
       .from('training_access_keys')
       .select('*')
       .eq('email', customerEmail.toLowerCase())
@@ -126,7 +126,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
 
     // Record the purchase
-    await db
+    await supabase
       .from('training_purchases')
       .insert({
         email: customerEmail.toLowerCase(),

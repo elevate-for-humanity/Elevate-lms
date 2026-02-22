@@ -19,7 +19,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   } = await supabase.auth.getUser();
   if (!user) return new Response('Unauthorized', { status: 401 });
 
-  const { data: prof } = await db
+  const { data: prof } = await supabase
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -37,7 +37,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   const format = (url.searchParams.get('format') || 'json').toLowerCase();
 
   // Build query for enrollments
-  let query = db.from('program_enrollments').select(`
+  let query = supabase.from('program_enrollments').select(`
       user_id,
       course_id,
       status,
@@ -50,7 +50,7 @@ const supabase = await createRouteHandlerClient({ cookies });
 
   if (program) {
     // Filter by funding program code
-    const { data: prog } = await db
+    const { data: prog } = await supabase
       .from('funding_programs')
       .select('id')
       .eq('code', program)
@@ -87,7 +87,7 @@ const supabase = await createRouteHandlerClient({ cookies });
     }
   > = {};
   if (userIds.length) {
-    const { data: notes } = await db
+    const { data: notes } = await supabase
       .from('program_holder_notes')
       .select('user_id, course_id, status, note, created_at, program_holder_id')
       .in('user_id', userIds)
@@ -116,7 +116,7 @@ const supabase = await createRouteHandlerClient({ cookies });
     )
   ) as string[];
   if (phIds.length) {
-    const { data: phs } = await db
+    const { data: phs } = await supabase
       .from('program_holders')
       .select('id, name')
       .in('id', phIds);

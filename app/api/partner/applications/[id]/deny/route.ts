@@ -26,7 +26,7 @@ export async function POST(
     }
 
     // Get the application
-    const { data: application, error: fetchError } = await db
+    const { data: application, error: fetchError } = await supabase
       .from('partner_applications')
       .select('*')
       .eq('id', id)
@@ -41,7 +41,7 @@ export async function POST(
     }
 
     // Update application status
-    await db
+    await supabase
       .from('partner_applications')
       .update({
         status: 'denied',

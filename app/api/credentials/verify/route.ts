@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getSession();
 
     // Lookup credential
-    const { data: credential, error } = await db
+    const { data: credential, error } = await supabase
       .from('credentials')
       .select(
         `
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     const isValid = !isExpired && !isRevoked;
 
     // Log verification attempt
-    await db.from('audit_logs').insert({
+    await supabase.from('audit_logs').insert({
       event_type: 'credential_viewed',
       resource_type: 'credential',
       resource_id: credential.id,

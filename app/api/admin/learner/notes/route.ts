@@ -25,7 +25,7 @@ async function getHandler(
     return new Response('Missing user_id', { status: 400 });
   }
 
-  const { data: notes, error } = await db
+  const { data: notes, error } = await supabase
     .from('program_holder_notes')
     .select(
       `

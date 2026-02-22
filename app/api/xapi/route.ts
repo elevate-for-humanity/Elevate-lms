@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No statements' }, { status: 400 });
   }
 
-  const { error } = await db.from('xapi_statements').insert(data);
+  const { error } = await supabase.from('xapi_statements').insert(data);
 
   if (error) {
     logger.error('xAPI insert error:', error);
@@ -57,7 +57,7 @@ const supabase = createSupabaseClient();
   const verb = searchParams.get('verb');
   const limit = parseInt(searchParams.get('limit') || '100');
 
-  let query = db
+  let query = supabase
     .from('xapi_statements')
     .select('*')
     .order('stored_at', { ascending: false })

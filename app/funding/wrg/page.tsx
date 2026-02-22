@@ -31,7 +31,7 @@ export default async function WrgPage() {
   }
   
   // Fetch WRG funding info
-  const { data: wrgInfo } = await db
+  const { data: wrgInfo } = await supabase
     .from('funding_options')
     .select('*')
     .eq('type', 'wrg')

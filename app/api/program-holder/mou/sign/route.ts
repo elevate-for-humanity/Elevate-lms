@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Get user's program holder ID
-  const { data: prof } = await db
+  const { data: prof } = await supabase
     .from('user_profiles')
     .select('program_holder_id')
     .eq('user_id', user.id)
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
   const sigUrl = path; // store path; you can build public URL when needed
 
   const now = new Date().toISOString();
-  const { data: updated, error } = await db
+  const { data: updated, error } = await supabase
     .from('program_holders')
     .update({
       mou_status: 'signed_by_holder',

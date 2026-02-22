@@ -25,7 +25,7 @@ export async function GET(
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Fetch program
-    const { data: program, error: programError } = await db
+    const { data: program, error: programError } = await supabase
       .from('programs')
       .select(`
         id,
@@ -61,14 +61,14 @@ export async function GET(
     }
 
     // Fetch outcomes
-    const { data: outcomes } = await db
+    const { data: outcomes } = await supabase
       .from('program_outcomes')
       .select('id, outcome, outcome_order')
       .eq('program_id', program.id)
       .order('outcome_order', { ascending: true });
 
     // Fetch requirements
-    const { data: requirements } = await db
+    const { data: requirements } = await supabase
       .from('program_requirements')
       .select('id, requirement, requirement_order')
       .eq('program_id', program.id)

@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     // Check for duplicate by email
     const supabase = supabaseServer();
     // Check for duplicate by email
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('applications')
       .select('id, status')
       .eq('email', body.contactEmail.toLowerCase())
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert into canonical applications table
-    const { data: application, error: insertError } = await db
+    const { data: application, error: insertError } = await supabase
       .from('applications')
       .insert({
         first_name: body.contactName?.split(' ')[0] || body.contactName,

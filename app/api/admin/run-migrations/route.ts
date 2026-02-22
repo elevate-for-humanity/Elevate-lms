@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     
     for (const table of tables) {
       try {
-        const { error: checkError } = await db
+        const { error: checkError } = await supabase
           .from(table)
           .select('id')
           .limit(1);

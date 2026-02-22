@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if subdomain is taken
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('organizations')
       .select('id')
       .eq('slug', tenantSubdomain)
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create organization
-    const { data: org, error: orgError } = await db
+    const { data: org, error: orgError } = await supabase
       .from('organizations')
       .insert({
         name: organizationName,
@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
     const trialEndsAt = new Date();
     trialEndsAt.setDate(trialEndsAt.getDate() + 14);
 
-    const { data: license, error: licenseError } = await db
+    const { data: license, error: licenseError } = await supabase
       .from('licenses')
       .insert({
         organization_id: org.id,
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
     if (licenseError) {
       logger.error('License creation error:', licenseError);
       // Rollback org creation
-      await db.from('organizations').delete().eq('id', org.id);
+      await supabase.from('organizations').delete().eq('id', org.id);
       return NextResponse.json(
         { error: 'Failed to create license' },
         { status: 500 }
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log provisioning event
-    await db.from('license_events').insert({
+    await supabase.from('license_events').insert({
       license_id: license.id,
       organization_id: org.id,
       event_type: 'tenant_provisioned',
@@ -275,7 +275,7 @@ const subdomain = request.nextUrl.searchParams.get('subdomain');
     return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
   }
 
-  const { data } = await db
+  const { data } = await supabase
     .from('organizations')
     .select('id')
     .eq('slug', normalized)

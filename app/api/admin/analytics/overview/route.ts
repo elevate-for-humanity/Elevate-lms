@@ -13,6 +13,7 @@ export const GET = withAuth(
   async (req: NextRequest, user) => {
 
   const supabase = createSupabaseClient();
+  const db = supabase;
   const tenantId = req.headers.get('x-tenant-id');
 
   if (!tenantId) {

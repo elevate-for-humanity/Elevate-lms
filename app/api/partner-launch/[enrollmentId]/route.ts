@@ -37,7 +37,7 @@ export async function GET(_req: Request, { params }: Params) {
 const supabase = getSupabaseServerClient();
   const { enrollmentId } = await params;
 
-  const { data: enrollment, error } = await db
+  const { data: enrollment, error } = await supabase
     .from('partner_lms_enrollments')
     .select(
       `

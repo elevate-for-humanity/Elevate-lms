@@ -23,7 +23,7 @@ export default async function OnboardingLayout({
 
   // Check user role - onboarding is for authenticated users only
   // Different onboarding paths for different roles
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', session.user.id)

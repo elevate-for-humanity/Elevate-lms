@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     // Idempotency check - prevent duplicate processing
     let existingEvent = null;
     try {
-      const { data } = await db
+      const { data } = await supabase
         .from('stripe_webhook_events')
         .select('id, status')
         .eq('stripe_event_id', event.id)
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
 
     // Record webhook event before processing
     try {
-      const { error: insertError } = await db
+      const { error: insertError } = await supabase
         .from('stripe_webhook_events')
         .insert({
           stripe_event_id: event.id,
@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
 
           // UPSERT student_enrollments - idempotent on (student_id, program_slug)
           // Safe against Stripe retries and double-submissions
-          const { data: enrollment, error: enrollError } = await db
+          const { data: enrollment, error: enrollError } = await supabase
             .from('student_enrollments')
             .upsert({
               student_id: studentId,
@@ -241,7 +241,7 @@ export async function POST(request: NextRequest) {
           const amount = parseFloat(session.metadata.amount || '0');
           const donorEmail = session.customer_email || session.customer_details?.email;
 
-          await db.from('donations').insert({
+          await supabase.from('donations').insert({
             stripe_session_id: session.id,
             amount: amount,
             donor_email: donorEmail,
@@ -279,7 +279,7 @@ export async function POST(request: NextRequest) {
           });
 
           // Update application status
-          const { error: appError } = await db
+          const { error: appError } = await supabase
             .from('applications')
             .update({ 
               status: 'payment_received',
@@ -293,7 +293,7 @@ export async function POST(request: NextRequest) {
 
           // Create or update enrollment with enrolled_pending_approval status
           // CRITICAL: Status is NOT 'active' - training access is locked
-          const { data: enrollment, error: enrollError } = await db
+          const { data: enrollment, error: enrollError } = await supabase
             .from('program_enrollments')
             .upsert({
               user_id: studentId,
@@ -339,7 +339,7 @@ export async function POST(request: NextRequest) {
           }
 
           // Update payment log
-          await db
+          await supabase
             .from('payment_logs')
             .update({ 
               status: 'completed',
@@ -379,7 +379,7 @@ export async function POST(request: NextRequest) {
           const currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
 
           // 1. Create new subscription license
-          const { data: newLicense, error: createError } = await db
+          const { data: newLicense, error: createError } = await supabase
             .from('licenses')
             .insert({
               tenant_id: tenantId,
@@ -407,7 +407,7 @@ export async function POST(request: NextRequest) {
           logger.info('[webhook] Created subscription license', { newLicenseId: newLicense.id });
 
           // 2. Mark trial license as expired
-          const { error: expireError } = await db
+          const { error: expireError } = await supabase
             .from('licenses')
             .update({
               status: 'expired',
@@ -483,7 +483,7 @@ export async function POST(request: NextRequest) {
           });
 
           // UPSERT student_enrollments - canonical enrollment table
-          const { data: enrollment, error: enrollError } = await db
+          const { data: enrollment, error: enrollError } = await supabase
             .from('student_enrollments')
             .upsert({
               student_id: studentId,
@@ -540,7 +540,7 @@ export async function POST(request: NextRequest) {
 
           // Log payment (non-critical - don't fail enrollment if this fails)
           try {
-            await db.from('payment_logs').insert({
+            await supabase.from('payment_logs').insert({
               stripe_session_id: session.id,
               stripe_payment_id: session.payment_intent as string,
               amount: (session.amount_total || 0) / 100,
@@ -669,7 +669,7 @@ export async function POST(request: NextRequest) {
           // Get user by email
           let userId: string | null = null;
           if (customerEmail) {
-            const { data: profile } = await db
+            const { data: profile } = await supabase
               .from('profiles')
               .select('id')
               .eq('email', customerEmail)
@@ -679,7 +679,7 @@ export async function POST(request: NextRequest) {
 
           // Record purchases for each course
           for (const courseId of courseIds) {
-            const { error } = await db
+            const { error } = await supabase
               .from('career_course_purchases')
               .upsert({
                 user_id: userId,
@@ -701,14 +701,14 @@ export async function POST(request: NextRequest) {
 
           // Record promo code use if applicable
           if (promoCode) {
-            const { data: promo } = await db
+            const { data: promo } = await supabase
               .from('promo_codes')
               .select('id')
               .eq('code', promoCode)
               .single();
 
             if (promo) {
-              await db.from('promo_code_uses').insert({
+              await supabase.from('promo_code_uses').insert({
                 promo_code_id: promo.id,
                 user_id: userId,
                 email: customerEmail,
@@ -722,7 +722,7 @@ export async function POST(request: NextRequest) {
           if (customerEmail) {
             try {
               const { getWelcomeEmail } = await import('@/lib/email/career-course-sequences');
-              const { data: courseData } = await db
+              const { data: courseData } = await supabase
                 .from('career_courses')
                 .select('title, slug')
                 .in('id', courseIds)
@@ -766,7 +766,7 @@ export async function POST(request: NextRequest) {
       ) {
         try {
           // Log the purchase
-          const { error: logError } = await db
+          const { error: logError } = await supabase
             .from('payment_logs')
             .insert({
               stripe_session_id: session.id,
@@ -788,7 +788,7 @@ export async function POST(request: NextRequest) {
           }
 
           // Create order record
-          const { error: orderError } = await db
+          const { error: orderError } = await supabase
             .from('drug_testing_orders')
             .insert({
               product_name: session.metadata.productName,
@@ -835,7 +835,7 @@ export async function POST(request: NextRequest) {
           
           // Update application status to paid if applicationId exists
           if (applicationId) {
-            const { error: appError } = await db
+            const { error: appError } = await supabase
               .from('applications')
               .update({
                 status: 'paid',
@@ -851,7 +851,7 @@ export async function POST(request: NextRequest) {
           }
 
           // Update RAPIDS registration status
-          await db
+          await supabase
             .from('rapids_registrations')
             .update({
               status: 'active',
@@ -862,7 +862,7 @@ export async function POST(request: NextRequest) {
           // Get application or create enrollment directly from checkout metadata
           let application = null;
           if (applicationId) {
-            const { data } = await db
+            const { data } = await supabase
               .from('applications')
               .select('*')
               .eq('id', applicationId)
@@ -883,7 +883,7 @@ export async function POST(request: NextRequest) {
             
             if (!userId && email) {
               // Check if profile exists
-              const { data: existingProfile } = await db
+              const { data: existingProfile } = await supabase
                 .from('profiles')
                 .select('id')
                 .eq('email', email)
@@ -893,7 +893,7 @@ export async function POST(request: NextRequest) {
                 userId = existingProfile.id;
               } else {
                 // Create profile for new user
-                const { data: profile } = await db
+                const { data: profile } = await supabase
                   .from('profiles')
                   .insert({
                     email,
@@ -914,7 +914,7 @@ export async function POST(request: NextRequest) {
                 ((session.amount_total || 0) > 0 ? 'self_pay' : 'unknown');
 
               // Idempotent upsert on (student_id, program_slug)
-              const { data: enrollment } = await db.from('student_enrollments').upsert({
+              const { data: enrollment } = await supabase.from('student_enrollments').upsert({
                 student_id: userId,
                 program_slug: 'barber-apprenticeship',
                 stripe_checkout_session_id: session.id,
@@ -941,7 +941,7 @@ export async function POST(request: NextRequest) {
 
               if (enrollmentCase && enrollment) {
                 // Link enrollment to case
-                await db.from('student_enrollments')
+                await supabase.from('student_enrollments')
                   .update({ case_id: enrollmentCase.id })
                   .eq('id', enrollment.id);
 
@@ -969,7 +969,7 @@ export async function POST(request: NextRequest) {
           }
 
           // Log payment
-          await db.from('payment_logs').insert({
+          await supabase.from('payment_logs').insert({
             stripe_session_id: session.id,
             stripe_payment_id: session.payment_intent as string,
             amount: (session.amount_total || 0) / 100,
@@ -1013,7 +1013,7 @@ export async function POST(request: NextRequest) {
             ((session.amount_total || 0) > 0 ? 'self_pay' : 'unknown');
 
           // Create partner enrollment record
-          const { error: enrollmentError } = await db
+          const { error: enrollmentError } = await supabase
             .from('partner_lms_enrollments')
             .insert({
               provider_id: session.metadata.provider_id,
@@ -1044,7 +1044,7 @@ export async function POST(request: NextRequest) {
           }
 
           // Log payment
-          await db.from('payment_logs').insert({
+          await supabase.from('payment_logs').insert({
             stripe_session_id: session.id,
             stripe_payment_id: session.payment_intent as string,
             amount: (session.amount_total || 0) / 100,
@@ -1067,7 +1067,7 @@ export async function POST(request: NextRequest) {
       if (session.metadata?.provider === 'hsi') {
         try {
           // Get course details
-          const { data: course } = await db
+          const { data: course } = await supabase
             .from('hsi_course_products')
             .select('*')
             .eq('course_type', session.metadata.course_type)
@@ -1083,7 +1083,7 @@ export async function POST(request: NextRequest) {
             ((session.amount_total || 0) > 0 ? 'self_pay' : 'unknown');
 
           // Create enrollment queue entry
-          const { error: queueError } = await db
+          const { error: queueError } = await supabase
             .from('hsi_enrollment_queue')
             .insert({
               student_id: session.metadata.student_id,
@@ -1110,14 +1110,14 @@ export async function POST(request: NextRequest) {
           }
 
           // Create partner enrollment record
-          const { data: provider } = await db
+          const { data: provider } = await supabase
             .from('partner_lms_providers')
             .select('id')
             .eq('provider_type', 'hsi')
             .single();
 
           if (provider) {
-            await db.from('partner_lms_enrollments').insert({
+            await supabase.from('partner_lms_enrollments').insert({
               provider_id: provider.id,
               student_id: session.metadata.student_id,
               status: 'payment_pending',
@@ -1131,7 +1131,7 @@ export async function POST(request: NextRequest) {
           }
 
           // Log payment
-          await db.from('payment_logs').insert({
+          await supabase.from('payment_logs').insert({
             stripe_session_id: session.id,
             stripe_payment_id: session.payment_intent as string,
             amount: (session.amount_total || 0) / 100,
@@ -1201,7 +1201,7 @@ export async function POST(request: NextRequest) {
           ((session.amount_total || 0) > 0 ? 'self_pay' : 'unknown');
 
         // Idempotent upsert (legacy path) — safe against webhook retries
-        await db.from('program_enrollments').upsert({
+        await supabase.from('program_enrollments').upsert({
           user_id: userId,
           course_id: courseId,
           status: 'active',
@@ -1220,14 +1220,14 @@ export async function POST(request: NextRequest) {
 
         // Create partner payment record if applicable
         if (partnerOwedCents > 0) {
-          const { data: course } = await db
+          const { data: course } = await supabase
             .from('training_courses')
             .select('partner_id')
             .eq('id', courseId)
             .single();
 
           if (course?.partner_id) {
-            await db.from('partner_course_payments').insert({
+            await supabase.from('partner_course_payments').insert({
               enrollment_id: enrollmentId,
               course_id: courseId,
               partner_id: course.partner_id,
@@ -1351,7 +1351,7 @@ export async function POST(request: NextRequest) {
 
         // Find or create user profile
         let studentId: string | null = null;
-        const { data: existingProfile } = await db
+        const { data: existingProfile } = await supabase
           .from('profiles')
           .select('id')
           .eq('email', customerEmail.toLowerCase())
@@ -1361,7 +1361,7 @@ export async function POST(request: NextRequest) {
           studentId = existingProfile.id;
         } else {
           // Create a new profile for the student
-          const { data: newProfile, error: profileError } = await db
+          const { data: newProfile, error: profileError } = await supabase
             .from('profiles')
             .insert({
               email: customerEmail.toLowerCase(),
@@ -1385,7 +1385,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Get program ID from training_programs table
-        const { data: program } = await db
+        const { data: program } = await supabase
           .from('training_programs')
           .select('id')
           .eq('slug', enrollmentConfig.program_slug)
@@ -1660,7 +1660,7 @@ export async function POST(request: NextRequest) {
           });
 
           // Update enrollment status to paused
-          const { error: pauseError } = await db
+          const { error: pauseError } = await supabase
             .from('program_enrollments')
             .update({
               status: 'paused',
@@ -1716,7 +1716,7 @@ export async function POST(request: NextRequest) {
           // Try to find user by customer ID
           const customerId = charge.customer as string;
           if (customerId) {
-            const { data: profile } = await db
+            const { data: profile } = await supabase
               .from('profiles')
               .select('id')
               .eq('stripe_customer_id', customerId)
@@ -1724,7 +1724,7 @@ export async function POST(request: NextRequest) {
             
             if (profile) {
               // Revoke all recent entitlements for this user from this charge
-              const { error: revokeError } = await db
+              const { error: revokeError } = await supabase
                 .from('store_entitlements')
                 .update({ 
                   revoked_at: new Date().toISOString(),
@@ -1744,7 +1744,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Revoke entitlements for this payment
-        const { error: revokeError } = await db
+        const { error: revokeError } = await supabase
           .from('store_entitlements')
           .update({ 
             revoked_at: new Date().toISOString(),
@@ -1763,7 +1763,7 @@ export async function POST(request: NextRequest) {
 
         // If there's an enrollment, mark it as refunded
         if (enrollmentId) {
-          const { error: enrollError } = await db
+          const { error: enrollError } = await supabase
             .from('program_enrollments')
             .update({ 
               status: 'refunded',
@@ -1780,14 +1780,14 @@ export async function POST(request: NextRequest) {
 
         // Revoke LMS access if product grants course access
         if (productId) {
-          const { data: product } = await db
+          const { data: product } = await supabase
             .from('store_products')
             .select('grants_course_access, course_id')
             .eq('id', productId)
             .single();
 
           if (product?.grants_course_access && product.course_id) {
-            const { error: lmsError } = await db
+            const { error: lmsError } = await supabase
               .from('course_enrollments')
               .update({ 
                 status: 'revoked',
@@ -1840,7 +1840,7 @@ export async function POST(request: NextRequest) {
 
     // Update webhook event status to processed
     try {
-      await db
+      await supabase
         .from('stripe_webhook_events')
         .update({ status: 'processed', processed_at: new Date().toISOString() })
         .eq('stripe_event_id', event.id);
@@ -1858,7 +1858,7 @@ export async function POST(request: NextRequest) {
     
     // Try to update webhook event status to failed
     try {
-      await db
+      await supabase
         .from('stripe_webhook_events')
         .update({ 
           status: 'failed', 

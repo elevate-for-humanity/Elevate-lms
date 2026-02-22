@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     const programId = body.program || 'general-inquiry';
 
     // Check for existing application (prevent duplicates)
-    const { data: existing } = await db
+    const { data: existing } = await supabase
       .from('applications')
       .select('id, status, created_at')
       .eq('email', body.email.toLowerCase())
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
       contact_preference: body.contactPreference || 'email',
     };
 
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('applications')
       .insert(insertData)
       .select()

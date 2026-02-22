@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     // View exposes: public_tracking_code, status (mapped), rejection_reason (sanitized),
     // created_at, updated_at, client_first_name, client_last_initial.
     // Does NOT expose: efile_submission_id, raw last_error, user_id, email, phone, notes.
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('sfc_tax_return_public_status')
       .select('public_tracking_code, status, rejection_reason, created_at, updated_at, client_first_name, client_last_initial')
       .eq('public_tracking_code', trackingCode)

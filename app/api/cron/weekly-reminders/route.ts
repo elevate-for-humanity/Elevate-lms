@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     weekStart.setHours(0, 0, 0, 0);
 
     // Get apprentices with push subscriptions
-    const { data: subscriptions, error: subError } = await db
+    const { data: subscriptions, error: subError } = await supabase
       .from('push_subscriptions')
       .select(`
         id,
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get users who are apprentices
-    const { data: apprentices } = await db
+    const { data: apprentices } = await supabase
       .from('partner_users')
       .select('user_id')
       .eq('role', 'apprentice');
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
     const apprenticeIds = new Set(apprentices?.map(a => a.user_id) || []);
 
     // Get users who have logged hours this week
-    const { data: recentLogs } = await db
+    const { data: recentLogs } = await supabase
       .from('progress_entries')
       .select('apprentice_id')
       .gte('created_at', weekStart.toISOString());
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
 
         // Remove invalid subscriptions
         if (error.statusCode === 410 || error.statusCode === 404) {
-          await db
+          await supabase
             .from('push_subscriptions')
             .delete()
             .eq('id', subscription.id);

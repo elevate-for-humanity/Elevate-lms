@@ -45,6 +45,7 @@ export const GET = withAuth(
     since.setDate(since.getDate() - (isNaN(days) ? 7 : days));
 
     const supabase = await getSupabaseServerClient();
+  const db = supabase;
 
     const { data, error }: any = await db
       .from("partner_certificates")

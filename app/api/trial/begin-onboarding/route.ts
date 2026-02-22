@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the org by slug
-    const { data: org } = await db
+    const { data: org } = await supabase
       .from('organizations')
       .select('id, onboarding_started_at')
       .eq('slug', subdomain)
@@ -59,14 +59,14 @@ export async function POST(request: NextRequest) {
 
     // Only set onboarding_started_at once (idempotent)
     if (!org.onboarding_started_at) {
-      await db
+      await supabase
         .from('organizations')
         .update({ onboarding_started_at: new Date().toISOString() })
         .eq('id', org.id);
     }
 
     // Log the event with correlation ID for end-to-end tracing
-    const { data: license } = await db
+    const { data: license } = await supabase
       .from('licenses')
       .select('id')
       .eq('organization_id', org.id)
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (license) {
-      await db.from('license_events').insert({
+      await supabase.from('license_events').insert({
         license_id: license.id,
         organization_id: org.id,
         event_type: 'trial_onboarding_started',

@@ -35,7 +35,7 @@ export default function LoginForm() {
       if (signInError) throw signInError;
 
       // Get user profile to determine redirect
-      const { data: profile } = await db
+      const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', data.user.id)

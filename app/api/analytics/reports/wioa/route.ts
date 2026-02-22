@@ -35,7 +35,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const { data: records, error } = await db
+  const { data: records, error } = await supabase
     .from('wioa_participant_records')
     .select('*')
     .gte('reporting_period_start', periodStart)

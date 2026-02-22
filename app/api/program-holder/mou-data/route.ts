@@ -21,7 +21,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Get user's program holder
-  const { data: prof } = await db
+  const { data: prof } = await supabase
     .from('user_profiles')
     .select('program_holder_id')
     .eq('user_id', user.id)
@@ -32,7 +32,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Get program holder details with application
-  const { data: holder, error } = await db
+  const { data: holder, error } = await supabase
     .from('program_holders')
     .select(
       `

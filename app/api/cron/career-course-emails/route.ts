@@ -31,7 +31,7 @@ export async function GET(req: Request) {
 
   try {
     // Get all purchases with user info
-    const { data: purchases } = await db
+    const { data: purchases } = await supabase
       .from('career_course_purchases')
       .select(`
         *,

@@ -26,7 +26,7 @@ const { id } = await params;
     const supabase = await createServerSupabaseClient();
 
     // Update message (RLS ensures user can only update their own received messages)
-    const { data: message, error } = await db
+    const { data: message, error } = await supabase
       .from('messages')
       .update({ read: true, updated_at: new Date().toISOString() })
       .eq('id', id)
@@ -74,7 +74,7 @@ const { id } = await params;
     const supabase = await createServerSupabaseClient();
 
     // Delete message (user can delete messages they sent or received)
-    const { error } = await db
+    const { error } = await supabase
       .from('messages')
       .delete()
       .eq('id', id)

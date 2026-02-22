@@ -112,7 +112,7 @@ export async function POST(req: Request) {
       .join('\n');
 
     // Insert into applications table
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('applications')
       .insert({
         first_name: body.firstName,
@@ -176,7 +176,7 @@ export async function POST(req: Request) {
 
       if (userId) {
         // Upsert profile
-        await db.from('profiles').upsert({
+        await supabase.from('profiles').upsert({
           id: userId,
           email: body.email,
           full_name: `${body.firstName} ${body.lastName}`,
@@ -186,14 +186,14 @@ export async function POST(req: Request) {
         }, { onConflict: 'id' });
 
         // Resolve program ID
-        const { data: programRow } = await db
+        const { data: programRow } = await supabase
           .from('programs')
           .select('id')
           .eq('slug', body.programSlug || 'barber-apprenticeship')
           .maybeSingle();
 
         // Create enrollment record
-        await db.from('program_enrollments').insert({
+        await supabase.from('program_enrollments').insert({
           user_id: userId,
           program_id: programRow?.id || null,
           email: body.email,
@@ -206,7 +206,7 @@ export async function POST(req: Request) {
         });
 
         // Update application with user_id and approved status
-        await db
+        await supabase
           .from('applications')
           .update({ status: 'approved', user_id: userId, program_id: programRow?.id || null })
           .eq('id', data.id);

@@ -48,7 +48,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data: product } = await db
+    const { data: product } = await supabase
       .from('marketplace_products')
       .select('id')
       .eq('id', product_id)
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
-    const { error } = await db.from('product_reports').insert({
+    const { error } = await supabase.from('product_reports').insert({
       product_id,
       reporter_email: reporter_email || null,
       reason,

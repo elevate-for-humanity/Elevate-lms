@@ -29,7 +29,7 @@ export default async function CredentialSharePage({ params }: PageProps) {
   const supabase = await createServerSupabaseClient();
 
   // Lookup share token
-  const { data: shareLink, error } = await db
+  const { data: shareLink, error } = await supabase
     .from('credential_share_links')
     .select('*')
     .eq('token', token)
@@ -57,14 +57,14 @@ export default async function CredentialSharePage({ params }: PageProps) {
 
   // Mark as used if one-time
   if (shareLink.one_time_use) {
-    await db
+    await supabase
       .from('credential_share_links')
       .update({ used_at: new Date().toISOString() })
       .eq('id', shareLink.id);
   }
 
   // Log access
-  await db.from('audit_logs').insert({
+  await supabase.from('audit_logs').insert({
     event_type: 'credential_shared',
     resource_type: 'credential',
     resource_id: shareLink.credential_id,

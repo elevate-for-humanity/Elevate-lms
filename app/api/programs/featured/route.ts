@@ -25,7 +25,7 @@ const supabase = createSupabaseClient();
   }
 
   // Fetch from database
-  const { data, error }: any = await db
+  const { data, error }: any = await supabase
     .from('programs')
     .select('*')
     .eq('is_featured', true)

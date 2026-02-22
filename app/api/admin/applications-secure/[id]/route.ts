@@ -23,7 +23,7 @@ export const GET = withAuth(
     }
 
     try {
-      const { data: application, error } = await db
+      const { data: application, error } = await supabase
         .from('applications')
         .select('*')
         .eq('id', id)

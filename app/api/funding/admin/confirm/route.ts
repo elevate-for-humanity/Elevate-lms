@@ -22,7 +22,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Validate token
-  const { data: tokenData } = await db
+  const { data: tokenData } = await supabase
     .from('approval_tokens')
     .select('token, application_id, used_at')
     .eq('token', token)
@@ -66,7 +66,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Get application
-  const { data: app } = await db
+  const { data: app } = await supabase
     .from('funding_applications')
     .select('id, user_id, course_id, program_id, status')
     .eq('id', tokenData.application_id)
@@ -77,13 +77,13 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Mark token as used
-  await db
+  await supabase
     .from('approval_tokens')
     .update({ used_at: new Date().toISOString() })
     .eq('token', token);
 
   // Approve application
-  await db
+  await supabase
     .from('funding_applications')
     .update({
       status: 'approved',
@@ -92,7 +92,7 @@ const supabase = await createRouteHandlerClient({ cookies });
     .eq('id', app.id);
 
   // Create enrollment
-  await db.from('program_enrollments').upsert({
+  await supabase.from('program_enrollments').upsert({
     user_id: app.user_id,
     course_id: app.course_id,
     status: 'active',
@@ -101,7 +101,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   });
 
   // Log the action
-  await db.from('audit_logs').insert({
+  await supabase.from('audit_logs').insert({
     who: null, // Case manager approval (no user session)
     action: 'APPROVE_APP_TOKEN',
     subject: app.id,

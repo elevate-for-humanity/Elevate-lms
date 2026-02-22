@@ -21,7 +21,7 @@ const supabase = createSupabaseClient();
     const status = searchParams.get('status');
     const serviceType = searchParams.get('serviceType');
 
-    let query = db
+    let query = supabase
       .from('supportive_services')
       .select('*')
       .order('request_date', { ascending: false });
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('supportive_services')
       .insert(serviceData)
       .select()

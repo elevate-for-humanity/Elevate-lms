@@ -21,7 +21,7 @@ export async function GET(request: Request) {
 
     const supabase = await createServerSupabaseClient();
 
-    const { data: certificates, error } = await db
+    const { data: certificates, error } = await supabase
       .from('certificates')
       .select(
         `
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
 
     const supabase = await createServerSupabaseClient();
 
-    const { data: certificate, error } = await db
+    const { data: certificate, error } = await supabase
       .from('certificates')
       .insert({
         student_id: user.id,

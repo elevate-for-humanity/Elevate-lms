@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     }
 
     // Get current status to validate transition
-    const { data: current } = await db
+    const { data: current } = await supabase
       .from('rapids_tracking')
       .select('status')
       .eq('apprentice_id', apprentice_id)
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
       updateData.completion_date = new Date().toISOString().split('T')[0];
     }
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('rapids_tracking')
       .upsert(updateData, { onConflict: 'apprentice_id' })
       .select()

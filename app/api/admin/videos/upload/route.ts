@@ -41,7 +41,7 @@ export const POST = withAuth(
     } = supabase.storage.from('videos').getPublicUrl(fileName);
 
     // Save video metadata to database
-    const { data: videoData, error: dbError } = await db
+    const { data: videoData, error: dbError } = await supabase
       .from('videos')
       .insert({
         title,

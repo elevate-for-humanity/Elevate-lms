@@ -20,7 +20,7 @@ const supabase = createSupabaseClient();
     const userId = searchParams.get('userId');
     const status = searchParams.get('status');
 
-    let query = db
+    let query = supabase
       .from('employment_outcomes')
       .select('*')
       .order('start_date', { ascending: false });
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('employment_outcomes')
       .insert(employmentData)
       .select()

@@ -27,7 +27,7 @@ async function processTenantSetup(job: ProvisioningJob): Promise<void> {
   const supabase = getSupabaseAdmin();
 
   // Create default settings for the tenant
-  await db.from('organization_settings').upsert({
+  await supabase.from('organization_settings').upsert({
     organization_id: organizationId,
     settings: {
       branding: {
@@ -52,7 +52,7 @@ async function processTenantSetup(job: ProvisioningJob): Promise<void> {
   // Create default roles for the organization
   const defaultRoles = ['admin', 'instructor', 'student'];
   for (const role of defaultRoles) {
-    await db.from('organization_roles').upsert({
+    await supabase.from('organization_roles').upsert({
       organization_id: organizationId,
       role_name: role,
       permissions: getDefaultPermissions(role),
@@ -60,7 +60,7 @@ async function processTenantSetup(job: ProvisioningJob): Promise<void> {
   }
 
   // Log setup completion
-  await db.from('license_events').insert({
+  await supabase.from('license_events').insert({
     organization_id: organizationId,
     event_type: 'tenant_setup_complete',
     event_data: { subdomain, planId },

@@ -20,7 +20,7 @@ const userId = req.headers.get('x-user-id');
 
   const supabase = supabaseServer();
   
-  let query = db
+  let query = supabase
     .from('studio_recent_files')
     .select('*, studio_repos(repo_full_name)')
     .eq('user_id', userId)
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   const supabase = supabaseServer();
   
   // Upsert with increment
-  const { data: existing } = await db
+  const { data: existing } = await supabase
     .from('studio_recent_files')
     .select('id, access_count')
     .eq('user_id', userId)
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     .eq('branch', branch || '')
     .single();
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('studio_recent_files')
     .upsert({
       id: existing?.id,

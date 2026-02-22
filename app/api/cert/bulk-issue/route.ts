@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return new Response('Unauthorized', { status: 401 });
-  const { data: prof } = await db
+  const { data: prof } = await supabase
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -78,14 +78,14 @@ export async function POST(req: NextRequest) {
       // course
       let course;
       if (r.course_id) {
-        const { data }: any = await db
+        const { data }: any = await supabase
           .from('training_courses')
           .select('id,title,slug,cert_valid_days')
           .eq('id', r.course_id)
           .maybeSingle();
         course = data;
       } else if (r.course_slug) {
-        const { data }: any = await db
+        const { data }: any = await supabase
           .from('training_courses')
           .select('id,title,slug,cert_valid_days')
           .eq('slug', r.course_slug)
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
       });
 
       // KPI event
-      const { data: en } = await db
+      const { data: en } = await supabase
         .from('program_enrollments')
         .select('funding_program_id')
         .eq('user_id', u.id)

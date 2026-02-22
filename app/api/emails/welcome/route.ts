@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     );
 
     // Fetch enrollment details
-    const { data: enrollment } = await db
+    const { data: enrollment } = await supabase
       .from('program_enrollments')
       .select(
         `

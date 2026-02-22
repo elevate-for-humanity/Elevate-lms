@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return new Response('Unauthorized', { status: 401 });
 
-  const { data: prof } = await db
+  const { data: prof } = await supabase
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     return new Response('Missing fields', { status: 400 });
   }
 
-  const { error } = await db
+  const { error } = await supabase
     .from('delegates')
     .update({ [field]: value })
     .eq('id', id);

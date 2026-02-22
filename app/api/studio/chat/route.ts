@@ -27,7 +27,7 @@ const userId = req.headers.get('x-user-id');
 
   const supabase = supabaseServer();
   
-  let query = db
+  let query = supabase
     .from('studio_chat_history')
     .select('*')
     .eq('user_id', userId)
@@ -106,7 +106,7 @@ Be concise, direct, and provide working code. Focus on the task at hand.`;
               const updatedMessages = [...messages, { role: 'assistant', content: fullContent }];
               
               if (session_id) {
-                await db
+                await supabase
                   .from('studio_chat_history')
                   .update({ 
                     messages: updatedMessages,
@@ -114,7 +114,7 @@ Be concise, direct, and provide working code. Focus on the task at hand.`;
                   })
                   .eq('id', session_id);
               } else {
-                await db
+                await supabase
                   .from('studio_chat_history')
                   .insert({
                     user_id: userId,
@@ -161,7 +161,7 @@ Be concise, direct, and provide working code. Focus on the task at hand.`;
         const updatedMessages = [...messages, { role: 'assistant', content }];
         
         if (session_id) {
-          await db
+          await supabase
             .from('studio_chat_history')
             .update({ 
               messages: updatedMessages,
@@ -169,7 +169,7 @@ Be concise, direct, and provide working code. Focus on the task at hand.`;
             })
             .eq('id', session_id);
         } else {
-          await db
+          await supabase
             .from('studio_chat_history')
             .insert({
               user_id: userId,

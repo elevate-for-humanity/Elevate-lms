@@ -31,7 +31,7 @@ async function logAudit(
   result: 'ok' | 'not_found' | 'blocked' | 'error'
 ) {
   if (!supabase) return;
-  await db
+  await supabase
     .from('verify_audit')
     .insert({ ip_hash: ipHash, credential_id: credentialId, result })
     .catch(() => null); // fail silently
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data: certificate, error } = await db
+    const { data: certificate, error } = await supabase
       .from('certificates')
       .select(`
         id,
@@ -123,10 +123,10 @@ export async function POST(req: NextRequest) {
 
     const [profileResult, courseResult] = await Promise.all([
       certificate.user_id
-        ? db.from('profiles').select('full_name').eq('id', certificate.user_id).maybeSingle()
+        ? supabase.from('profiles').select('full_name').eq('id', certificate.user_id).maybeSingle()
         : Promise.resolve({ data: null }),
       certificate.course_id
-        ? db.from('training_courses').select('title').eq('id', certificate.course_id).maybeSingle()
+        ? supabase.from('training_courses').select('title').eq('id', certificate.course_id).maybeSingle()
         : Promise.resolve({ data: null }),
     ]);
 

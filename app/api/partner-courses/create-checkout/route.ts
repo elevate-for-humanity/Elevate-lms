@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     } = await request.json();
 
     // Get course details
-    const { data: course, error: courseError } = await db
+    const { data: course, error: courseError } = await supabase
       .from('partner_courses')
       .select(
         `

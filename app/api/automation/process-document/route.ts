@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { data: profile } = await db
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'document_id required' }, { status: 400 });
     }
 
-    const { data: doc, error: docError } = await db
+    const { data: doc, error: docError } = await supabase
       .from('documents')
       .select('id, document_type, file_url, status')
       .eq('id', document_id)
@@ -47,13 +47,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Update status to processing
-    await db
+    await supabase
       .from('documents')
       .update({ status: 'processing' })
       .eq('id', document_id);
 
     // Mark as processed (actual OCR/extraction would be added per document type)
-    const { error: updateError } = await db
+    const { error: updateError } = await supabase
       .from('documents')
       .update({
         status: 'processed',

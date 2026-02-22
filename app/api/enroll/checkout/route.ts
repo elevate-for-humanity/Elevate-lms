@@ -70,7 +70,7 @@ export async function POST(req: Request) {
     }
 
     // Get program details
-    const { data: program, error: programError } = await db
+    const { data: program, error: programError } = await supabase
       .from('programs')
       .select('id, name, slug, total_cost')
       .eq('slug', programSlug)
@@ -89,7 +89,7 @@ export async function POST(req: Request) {
     let userId: string | null = null;
 
     // Check if user exists
-    const { data: existingProfile } = await db
+    const { data: existingProfile } = await supabase
       .from('profiles')
       .select('id')
       .eq('email', email.toLowerCase())
@@ -100,7 +100,7 @@ export async function POST(req: Request) {
     }
 
     // Create application record
-    const { data: application, error: appError } = await db
+    const { data: application, error: appError } = await supabase
       .from('applications')
       .insert({
         first_name: firstName,
@@ -128,7 +128,7 @@ export async function POST(req: Request) {
     let enrollmentId = application.id; // Default to application ID
     
     if (userId) {
-      const { data: enrollment } = await db
+      const { data: enrollment } = await supabase
         .from('program_enrollments')
         .insert({
           student_id: userId,
@@ -195,7 +195,7 @@ export async function POST(req: Request) {
     }
 
     // Update application with stripe session ID
-    await db
+    await supabase
       .from('applications')
       .update({
         stripe_session_id: session.id,

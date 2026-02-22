@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Save application to database
-    const { data: application, error: appError } = await db
+    const { data: application, error: appError } = await supabase
       .from('refund_advance_applications')
       .insert({
         first_name: body.firstName,
@@ -180,7 +180,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    let query = db
+    let query = supabase
       .from('refund_advance_applications')
       .select('*')
       .order('created_at', { ascending: false });

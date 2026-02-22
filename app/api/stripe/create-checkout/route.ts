@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     const supabase = await createServerSupabaseClient();
     
     // Get course details
-    const { data: course, error: courseError } = await db
+    const { data: course, error: courseError } = await supabase
       .from('training_courses')
       .select('*')
       .eq('id', courseId)

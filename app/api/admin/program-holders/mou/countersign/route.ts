@@ -47,7 +47,7 @@ export const POST = withAuth(
     const sigUrl = path;
     const now = new Date().toISOString();
 
-    const { data: updated, error } = await db
+    const { data: updated, error } = await supabase
       .from('program_holders')
       .update({
         mou_status: 'fully_executed',

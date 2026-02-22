@@ -23,7 +23,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Check role
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -39,7 +39,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   const format = (url.searchParams.get('format') || 'json').toLowerCase();
 
   // Get program
-  const { data: program } = await db
+  const { data: program } = await supabase
     .from('funding_programs')
     .select('id')
     .eq('code', code)

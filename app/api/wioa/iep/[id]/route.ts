@@ -21,7 +21,7 @@ const supabase = createSupabaseClient();
   try {
     const { id } = await params;
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('individual_employment_plans')
       .select('*')
       .eq('id', id)
@@ -59,7 +59,7 @@ const supabase = createSupabaseClient();
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('individual_employment_plans')
       .update(updateData)
       .eq('id', id)
@@ -94,7 +94,7 @@ export async function POST(
     const body = await parseBody<Record<string, any>>(request);
     const { approvedBy, approvalNotes } = body;
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('individual_employment_plans')
       .update({
         status: 'approved',

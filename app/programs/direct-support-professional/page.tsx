@@ -47,7 +47,7 @@ export default async function Page() {
   }
   
   // Fetch DSP program info
-  const { data: program } = await db
+  const { data: program } = await supabase
     .from('programs')
     .select('*')
     .eq('slug', 'direct-support-professional')

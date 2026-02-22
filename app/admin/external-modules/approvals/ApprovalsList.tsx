@@ -58,7 +58,7 @@ export default function ApprovalsList({
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("Not authenticated");
 
-      const { error } = await db
+      const { error } = await supabase
         .from("external_partner_progress")
         .update({
           status: "approved",
@@ -96,7 +96,7 @@ export default function ApprovalsList({
         throw new Error("Supabase client not initialized");
       }
 
-      const { error } = await db
+      const { error } = await supabase
         .from("external_partner_progress")
         .update({
           status: "in_progress",

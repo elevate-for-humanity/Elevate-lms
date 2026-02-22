@@ -20,7 +20,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   if (!serial) return new Response('Missing serial', { status: 400 });
 
   // Fetch certificate data
-  const { data: cert } = await db
+  const { data: cert } = await supabase
     .from('certificates')
     .select('*')
     .eq('serial', serial)
@@ -36,7 +36,7 @@ const supabase = await createRouteHandlerClient({ cookies });
       logger.error("Unhandled error", error instanceof Error ? error : undefined);
     }
 
-  const { data: c } = await db
+  const { data: c } = await supabase
     .from('training_courses')
     .select('title')
     .eq('id', cert.course_id)

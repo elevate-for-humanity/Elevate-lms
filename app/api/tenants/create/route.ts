@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     // Create tenant
-    const { data: tenant, error: tenantError } = await db
+    const { data: tenant, error: tenantError } = await supabase
       .from('tenants')
       .insert({
         name,
@@ -90,7 +90,7 @@ export async function GET(request: Request) {
 
     const supabase = createAdminClient();
 
-    const { data, error }: any = await db
+    const { data, error }: any = await supabase
       .from('tenants')
       .select('*, tenant_licenses(*)')
       .order('created_at', { ascending: false });

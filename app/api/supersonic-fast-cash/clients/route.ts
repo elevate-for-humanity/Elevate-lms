@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get all clients with their tax returns
-    const { data: clients, error } = await db
+    const { data: clients, error } = await supabase
       .from('clients')
       .select(`
         *,
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     // Securely hash SSN - never store plain text
     const ssnData = body.ssn ? prepareSSNForStorage(body.ssn) : {};
 
-    const { data, error } = await db
+    const { data, error } = await supabase
       .from('clients')
       .insert({
         first_name: body.firstName,

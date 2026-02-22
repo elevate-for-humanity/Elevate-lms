@@ -37,7 +37,7 @@ export default async function TaxEntrepreneurshipPage() {
   }
   
   // Fetch tax entrepreneurship program
-  const { data: program } = await db
+  const { data: program } = await supabase
     .from('programs')
     .select('*')
     .eq('slug', 'tax-entrepreneurship')

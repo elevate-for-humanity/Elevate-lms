@@ -36,14 +36,6 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
     return () => observer.disconnect();
   }, []);
 
-  // Auto-start voiceover on page load — plays once, no loop
-  useEffect(() => {
-    if (!voiceoverSrc) return;
-    const voiceover = voiceoverRef.current;
-    if (!voiceover) return;
-    voiceover.play().then(() => setVoiceActive(true)).catch(() => {});
-  }, [voiceoverSrc]);
-
   const toggleVoiceover = () => {
     const voiceover = voiceoverRef.current;
     if (!voiceover) return;
@@ -71,7 +63,7 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
       />
 
       {voiceoverSrc && (
-        <audio ref={voiceoverRef} src={voiceoverSrc} preload="auto" onEnded={() => setVoiceActive(false)} />
+        <audio ref={voiceoverRef} src={voiceoverSrc} preload="none" onEnded={() => setVoiceActive(false)} />
       )}
 
       {voiceoverSrc && (

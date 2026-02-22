@@ -22,12 +22,7 @@ export default function HomeHeroVideo() {
     return () => video.removeEventListener('loadeddata', play);
   }, []);
 
-  // Auto-start voiceover on page load — plays once, no loop
-  useEffect(() => {
-    const voiceover = voiceoverRef.current;
-    if (!voiceover) return;
-    voiceover.play().then(() => setVoiceActive(true)).catch(() => {});
-  }, []);
+  // Voiceover plays on user tap only — browsers block autoplay with audio
 
   const toggleVoiceover = () => {
     const voiceover = voiceoverRef.current;
@@ -47,12 +42,12 @@ export default function HomeHeroVideo() {
     <>
       <Image src="/images/hero-poster.webp" alt="Elevate for Humanity career training" fill priority sizes="100vw" className="object-cover z-0" />
       {/* Video has no audio track — purely visual */}
-      <video ref={videoRef} className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${isPlaying ? 'opacity-100' : 'opacity-0'}`} loop muted playsInline autoPlay preload="auto">
+      <video ref={videoRef} className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${isPlaying ? 'opacity-100' : 'opacity-0'}`} loop muted playsInline autoPlay preload="metadata">
         <source src="/videos/homepage-hero-montage.mp4" type="video/mp4" />
       </video>
 
       {/* Voiceover narration — plays on tap */}
-      <audio ref={voiceoverRef} src="/audio/welcome-voiceover.mp3" preload="auto" onEnded={() => setVoiceActive(false)} />
+      <audio ref={voiceoverRef} src="/audio/welcome-voiceover.mp3" preload="none" onEnded={() => setVoiceActive(false)} />
 
       {isPlaying && (
         <button

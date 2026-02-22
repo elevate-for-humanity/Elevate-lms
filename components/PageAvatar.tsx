@@ -103,7 +103,7 @@ export default function PageAvatar({ videoSrc, title, position = 'default' }: Pa
   if (position === 'inline') {
     return (
       <div ref={containerRef} className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-slate-900">
-        <video ref={videoRef} className="w-full h-full object-cover" src={videoSrc} playsInline preload="auto" />
+        <video ref={videoRef} className="w-full h-full object-cover" src={videoSrc} playsInline preload="metadata" />
       </div>
     );
   }

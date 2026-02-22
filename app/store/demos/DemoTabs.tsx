@@ -142,7 +142,7 @@ export default function DemoTabs() {
               src={active.video}
               muted
               playsInline
-              preload="auto"
+              preload="metadata"
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
               onEnded={() => setIsPlaying(false)}

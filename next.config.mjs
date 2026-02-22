@@ -261,6 +261,12 @@ const nextConfig = {
   async redirects() {
     return [
       // ============================================
+      // DELETED PAGE REDIRECTS
+      // ============================================
+      { source: '/programs/technology/it-support', destination: '/programs/it-help-desk', permanent: true },
+      { source: '/programs/technology/cybersecurity', destination: '/programs/cybersecurity-analyst', permanent: true },
+
+      // ============================================
       // APP ALIAS REDIRECTS (Rule B: auth/app path renames)
       // Centralized here instead of scattered in-page redirect() calls.
       // proxy.ts handles auth; these are pure path consolidation.

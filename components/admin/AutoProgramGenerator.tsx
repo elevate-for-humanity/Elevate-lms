@@ -177,7 +177,7 @@ export function AutoProgramGenerator() {
         ],
         certifications: [
           'CCNP Enterprise',
-          'CompTIA Network+',
+          'Certiport IT Specialist — Networking',
           'Cisco CyberOps',
         ],
         jobOutcomes: [
@@ -220,7 +220,7 @@ export function AutoProgramGenerator() {
         level: 'intermediate',
         duration: '12 weeks',
         modules: [],
-        certifications: ['AWS Security', 'Azure Security', 'CompTIA Security+'],
+        certifications: ['AWS Security', 'Azure Security', 'Certiport IT Specialist — Cybersecurity'],
         jobOutcomes: ['Cloud Security Engineer', 'Network Security Analyst'],
         salaryRange: '$70,000 - $105,000',
         demandScore: 97,

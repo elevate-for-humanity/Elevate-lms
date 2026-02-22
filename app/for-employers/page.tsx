@@ -151,7 +151,7 @@ export default async function ForEmployersPage() {
               {
                 icon: Award,
                 title: 'Industry Certifications',
-                description: 'Candidates earn recognized credentials — EPA 608, CDL, CNA, CompTIA, barber license, and more — before day one.',
+                description: 'Candidates earn recognized credentials — EPA 608, CDL, CNA, Certiport IT Specialist, barber license, and more — before day one.',
                 color: 'bg-amber-50 text-amber-600',
               },
               {

@@ -97,7 +97,7 @@ const industries = [
     icon: Laptop,
     description:
       'Get certified in IT support, networking, cybersecurity, and more.',
-    programs: ['CompTIA A+', 'Network+', 'Security+', 'IT Support'],
+    programs: ['IT Specialist — Device Config', 'IT Specialist — Networking', 'IT Specialist — Cybersecurity', 'IT Help Desk'],
     href: '/programs',
   },
   {

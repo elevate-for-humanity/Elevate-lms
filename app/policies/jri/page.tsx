@@ -97,7 +97,7 @@ export default function JRIPage() {
               <li>Barber Apprenticeship (2,000 hours)</li>
               <li>HVAC Technician Training (12-16 weeks)</li>
               <li>CDL Commercial Driving (4-8 weeks)</li>
-              <li>IT Support / CompTIA A+ (8-12 weeks)</li>
+              <li>IT Help Desk / Certiport IT Specialist (8 weeks)</li>
               <li>Healthcare certifications (CNA, Medical Assistant)</li>
               <li>Skilled trades (Welding, Electrical, Plumbing)</li>
             </ul>

@@ -23,7 +23,7 @@ export default function Programs() {
     },
     {
       title: 'Technology',
-      description: 'Build skills in IT support, cybersecurity, or web development. Training covers industry-standard tools and prepares you for recognized certifications like CompTIA A+.',
+      description: 'Build skills in IT support, cybersecurity, or web development. Training covers industry-standard tools and prepares you for recognized certifications like Certiport IT Specialist.',
       href: '/programs/technology',
       image: '/hero-images/technology-hero.jpg',
     },

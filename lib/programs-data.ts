@@ -200,9 +200,9 @@ export const PROGRAMS: ProgramData[] = [
     etplApproved: true,
   },
   {
-    slug: 'it-support',
-    name: 'IT Support Specialist',
-    blurb: 'Launch your tech career with CompTIA A+ certification! Learn computer hardware, software, networking, troubleshooting, and customer service. Our 12-20 week program prepares you for help desk, desktop support, and IT technician roles. No prior experience needed. Tech jobs start at $40K+ with room for growth.',
+    slug: 'it-help-desk',
+    name: 'IT Help Desk Technician',
+    blurb: 'Launch your tech career with Certiport IT Specialist certification. Learn computer hardware, software, networking, troubleshooting, and customer service. Our 8-week program prepares you for help desk, desktop support, and IT technician roles. No prior experience needed. Tech jobs start at $40K+ with room for growth.',
     funding: 'Workforce Grants • WIOA • Employer Sponsors',
     duration: '12–20 Weeks • Online + Hands-On Labs',
     image: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=600&q=80',

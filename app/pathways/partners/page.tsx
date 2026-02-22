@@ -87,7 +87,7 @@ export default function PartnersPage() {
                 title: 'Participants earn credentials',
                 time: 'End of program',
                 image: '/images/heroes-hq/success-hero.jpg',
-                desc: 'Participants take their certification exams. We report results to you: who passed, what credential was issued, and by which authority. Certification pathways include EPA Section 608 preparation with proctored exam administration through an approved testing partner. Credentials are issued by recognized third parties (Indiana ISDH, Indiana BMV, EPA, OSHA, CompTIA, AWS, Indiana PLA) — not by Elevate.',
+                desc: 'Participants take their certification exams. We report results to you: who passed, what credential was issued, and by which authority. Certification pathways include EPA Section 608 preparation with proctored exam administration through an approved testing partner. Credentials are issued by recognized third parties (Indiana ISDH, Indiana BMV, EPA, OSHA, Certiport, AWS, Indiana PLA) — not by Elevate.',
               },
               {
                 step: 6,
@@ -272,8 +272,8 @@ export default function PartnersPage() {
                   { name: 'Building Technician with HVAC Fundamentals', href: '/programs/hvac-technician', duration: '12–16 weeks', credential: 'EPA 608 + OSHA 30', funding: 'WIOA, WRG, Employer' },
                   { name: 'Electrical', href: '/programs/electrical', duration: '12–16 weeks', credential: 'OSHA 10 + NCCER Level 1', funding: 'WIOA, WRG, Employer' },
                   { name: 'Welding', href: '/programs/welding', duration: '12–16 weeks', credential: 'AWS + OSHA 10', funding: 'WIOA, WRG, Employer' },
-                  { name: 'IT Support', href: '/programs/technology/it-support', duration: '8–12 weeks', credential: 'CompTIA A+', funding: 'WIOA, JRI, Self-Pay' },
-                  { name: 'Cybersecurity', href: '/programs/technology/cybersecurity', duration: '12–16 weeks', credential: 'CompTIA Security+', funding: 'WIOA, JRI, Self-Pay' },
+                  { name: 'IT Help Desk Technician', href: '/programs/it-help-desk', duration: '8 weeks', credential: 'Certiport IT Specialist', funding: 'WIOA, JRI, Self-Pay' },
+                  { name: 'Cybersecurity Analyst', href: '/programs/cybersecurity-analyst', duration: '12 weeks', credential: 'Certiport IT Specialist — Cybersecurity', funding: 'WIOA, JRI, Self-Pay' },
                   { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', duration: '~18 months', credential: 'Indiana Barber License', funding: 'State Grant, Employer' },
                 ].map((r) => (
                   <tr key={r.name} className="hover:bg-gray-50">

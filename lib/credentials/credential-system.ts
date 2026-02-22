@@ -28,7 +28,7 @@ export type CredentialProvider =
   | 'National Association for Healthcare Quality (NAHQ)'
   | 'Indiana Commission on Peer Recovery (ICPR)'
   | 'Certiport'
-  | 'CompTIA'
+  | 'Certiport'
   | 'AWS'
   | 'Google'
   | 'Cisco'

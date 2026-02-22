@@ -16,7 +16,7 @@ export default function CertificationsPage() {
     { name: 'Certified Phlebotomy Technician (CPT)', industry: 'Healthcare', duration: '6 weeks', demand: 'High', image: '/images/healthcare/phlebotomy-hero.jpg' },
     { name: 'EPA 608 Certification', industry: 'HVAC', duration: '2 weeks', demand: 'High', image: '/images/hero/hero-certifications.jpg' },
     { name: 'OSHA 10/30 Safety', industry: 'Construction', duration: '1-3 days', demand: 'Required', image: '/images/trades/program-electrical-training.jpg' },
-    { name: 'CompTIA A+', industry: 'Technology', duration: '8 weeks', demand: 'High', image: '/images/technology/hero-programs-technology.jpg' },
+    { name: 'Certiport IT Specialist', industry: 'Technology', duration: '8 weeks', demand: 'High', image: '/images/programs-hq/technology-hero.jpg' },
     { name: 'Barber License', industry: 'Beauty', duration: '2000 hours', demand: 'Required', image: '/images/barber/training.jpg' },
   ];
 

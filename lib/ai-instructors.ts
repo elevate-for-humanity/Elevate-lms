@@ -54,7 +54,7 @@ export const AI_INSTRUCTORS: AIInstructor[] = [
     specialty: 'IT & Technology',
     voice: 'shimmer',
     avatar: '/images/team/instructors/instructor-tech.jpg',
-    bio: 'Lisa is a CompTIA certified IT professional who transitioned from help desk to training. She makes technology accessible and prepares students for IT careers.',
+    bio: 'Lisa is a Certiport-certified IT professional who transitioned from help desk to training. She makes technology accessible and prepares students for IT careers.',
     categories: ['it', 'tech', 'computer', 'software', 'cybersecurity', 'network', 'data'],
   },
   {

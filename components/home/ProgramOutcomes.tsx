@@ -52,12 +52,12 @@ const PROGRAMS = [
     category: 'Skilled Trades',
   },
   {
-    title: 'IT Support',
+    title: 'IT Help Desk',
     image: '/images/programs-hq/it-support.jpg',
-    duration: '10 weeks',
-    salary: '$38K–$52K',
+    duration: '8 weeks',
+    salary: '$38K–$60K',
     placement: '80%',
-    href: '/programs/technology/it-support',
+    href: '/programs/it-help-desk',
     category: 'Technology',
   },
 ];

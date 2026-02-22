@@ -48,7 +48,7 @@ export default function TechnologyPage() {
         <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
           {[
             { val: '8-16 Weeks', label: 'Program Length' },
-            { val: 'CompTIA+', label: 'Certifications' },
+            { val: 'Certiport', label: 'Certifications' },
             { val: '$40K-$85K', label: 'Salary Range' },
             { val: 'Remote OK', label: 'Work Options' },
           ].map((s) => (
@@ -98,7 +98,7 @@ export default function TechnologyPage() {
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What You&apos;ll Learn</h2>
               <p className="text-slate-600 text-sm leading-relaxed mb-3">Hands-on labs and coursework aligned with industry certification exams.</p>
               <div className="space-y-2">
-                {['Hardware and software troubleshooting', 'Network configuration and administration', 'Operating systems (Windows, Linux, macOS)', 'Cybersecurity fundamentals and threat analysis', 'Cloud computing basics (AWS, Azure)', 'CompTIA A+, Network+, and Security+ exam prep'].map((item) => (
+                {['Hardware and software troubleshooting', 'Network configuration and administration', 'Operating systems (Windows, Linux, macOS)', 'Cybersecurity fundamentals and threat analysis', 'Cloud computing basics (AWS, Azure)', 'Certiport IT Specialist and industry certification exam prep'].map((item) => (
                   <div key={item} className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-brand-blue-600 rounded-full flex-shrink-0" />
                     <span className="text-slate-700 text-sm">{item}</span>
@@ -139,7 +139,7 @@ export default function TechnologyPage() {
               { step: '1', title: 'Apply Online', desc: 'Submit your student application.' },
               { step: '2', title: 'Check Funding', desc: 'Register at indianacareerconnect.com for WIOA/JRI eligibility.' },
               { step: '3', title: 'Complete Training', desc: 'Hands-on labs and coursework.' },
-              { step: '4', title: 'Get Certified & Hired', desc: 'Pass your CompTIA exam and connect with employers.' },
+              { step: '4', title: 'Get Certified & Hired', desc: 'Pass your Certiport certification exam and connect with employers.' },
             ].map((s) => (
               <div key={s.step} className="flex items-start gap-4 bg-white rounded-lg p-4">
                 <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>

@@ -543,10 +543,10 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     socCode: '29-9011.00',
   },
   {
-    slug: 'cybersecurity-fundamentals',
-    name: 'Cybersecurity Fundamentals',
+    slug: 'cybersecurity-analyst',
+    name: 'Cybersecurity Analyst',
     tagline: 'Launch your career in cybersecurity',
-    description: 'The Cybersecurity Fundamentals program provides entry-level training in information security, network defense, and cyber threat awareness. Students learn security principles, risk management, encryption, firewalls, and incident response. This program prepares graduates for entry-level cybersecurity positions and provides a foundation for advanced certifications like CompTIA Security+ and CEH.',
+    description: 'The Cybersecurity Fundamentals program provides entry-level training in information security, network defense, and cyber threat awareness. Students learn security principles, risk management, encryption, firewalls, and incident response. This program prepares graduates for entry-level cybersecurity positions and provides a foundation for advanced certifications like Certiport IT Specialist — Cybersecurity.',
     summary: 'Build foundational cybersecurity skills for entry-level IT security careers.',
     bullets: [
       '8-12 week program',
@@ -557,7 +557,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
       'Firewall and VPN configuration',
       'Security policies and compliance',
       'Hands-on lab exercises',
-      'CompTIA Security+ exam prep',
+      'Certiport IT Specialist — Cybersecurity exam prep',
       'Career coaching and job placement'
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
@@ -566,11 +566,11 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     etplApproved: true,
   },
   {
-    slug: 'it-support-specialist',
-    name: 'IT Support Specialist',
+    slug: 'it-help-desk',
+    name: 'IT Help Desk Technician',
     tagline: 'Start your IT career with hands-on training',
-    description: 'The IT Support Specialist program prepares students for entry-level positions in technical support and help desk roles. Training covers computer hardware, operating systems, networking basics, troubleshooting, and customer service. Students gain hands-on experience with real equipment and scenarios. Graduates are prepared for CompTIA A+ certification and immediate employment in IT support.',
-    summary: 'Become an IT Support Specialist with CompTIA A+ certification preparation.',
+    description: 'The IT Support Specialist program prepares students for entry-level positions in technical support and help desk roles. Training covers computer hardware, operating systems, networking basics, troubleshooting, and customer service. Students gain hands-on experience with real equipment and scenarios. Graduates are prepared for Certiport IT Specialist certification and immediate employment in IT support.',
+    summary: 'Become an IT Support Specialist with Certiport IT Specialist certification preparation.',
     bullets: [
       '8-12 week comprehensive program',
       'Computer hardware and software',
@@ -579,7 +579,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
       'Troubleshooting techniques',
       'Help desk and customer service',
       'Mobile device support',
-      'CompTIA A+ exam preparation',
+      'Certiport IT Specialist exam preparation',
       'Hands-on lab practice',
       'Job placement assistance'
     ],

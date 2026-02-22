@@ -74,7 +74,7 @@ const FEATURED_CATEGORIES = [
   {
     id: 'technology',
     name: 'Technology & IT',
-    description: 'CompTIA study guides, lab equipment, practice exams, software tools',
+    description: 'Certiport study guides, lab equipment, practice exams, software tools',
     icon: Monitor,
     color: 'bg-brand-blue-100 text-brand-blue-600',
   },

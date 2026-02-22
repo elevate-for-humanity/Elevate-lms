@@ -715,7 +715,7 @@ export default async function ProgramsPage() {
               { q: 'Do I need prior experience or education?', a: 'Most programs require only a high school diploma or GED. No prior experience needed. We start from the basics and build your skills.' },
               { q: 'What if I have a criminal record?', a: 'We specialize in serving justice-involved individuals. Many programs are specifically designed for people with records. JRI funding covers training for eligible participants.' },
               { q: 'Will I get help finding a job?', a: 'Yes. Every program includes career services: resume writing, interview preparation, and direct connections to 50+ employer partners actively hiring our graduates.' },
-              { q: 'What certifications will I earn?', a: 'Depends on your program. Examples: CNA, OSHA 10/30, CompTIA A+, CDL Class A, Phlebotomy, Medical Assistant, HVAC EPA 608, and more.' },
+              { q: 'What certifications will I earn?', a: 'Depends on your program. Examples: CNA, OSHA 10/30, Certiport IT Specialist, CDL Class A, Phlebotomy, Medical Assistant, HVAC EPA 608, Adobe Certified Professional, and more.' },
               { q: 'Where are classes held?', a: 'Training locations vary by program. Most are in the Indianapolis/Marion County area. Some programs offer hybrid or online options. Contact us for specific locations.' },
             ].map((faq, i) => (
               <details key={i} className="group bg-slate-50 rounded-2xl overflow-hidden">

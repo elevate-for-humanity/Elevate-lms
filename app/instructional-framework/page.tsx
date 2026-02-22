@@ -74,7 +74,7 @@ const PROVIDER_TIERS = [
       'Subject to Elevate curriculum standards and assessment protocols',
       'Credential must match the occupation being supported',
     ],
-    examples: 'Licensed master barbers, EPA-certified HVAC technicians, CompTIA-certified IT professionals, AWS-certified welders',
+    examples: 'Licensed master barbers, EPA-certified HVAC technicians, Certiport-certified IT professionals, AWS-certified welders',
   },
   {
     tier: 4,
@@ -100,8 +100,8 @@ const RTI_PROGRAMS = [
   { program: 'CNA Certification', totalHours: 150, rtiHours: 105, ojtHours: 45, method: 'Hybrid', credential: 'CNA Certification', credentialIssuer: 'Indiana ISDH' },
   { program: 'CDL Commercial Driving', totalHours: 160, rtiHours: 40, ojtHours: 120, method: 'In-Person', credential: 'CDL Class A/B', credentialIssuer: 'Indiana BMV' },
   { program: 'Building Technician with HVAC Fundamentals', totalHours: 400, rtiHours: 200, ojtHours: 200, method: 'Hybrid', credential: 'EPA 608 + OSHA 10', credentialIssuer: 'EPA / OSHA' },
-  { program: 'IT Support', totalHours: 320, rtiHours: 280, ojtHours: 40, method: 'Online + Labs', credential: 'CompTIA A+', credentialIssuer: 'CompTIA' },
-  { program: 'Cybersecurity', totalHours: 400, rtiHours: 360, ojtHours: 40, method: 'Online + Labs', credential: 'CompTIA Security+', credentialIssuer: 'CompTIA' },
+  { program: 'IT Help Desk', totalHours: 320, rtiHours: 280, ojtHours: 40, method: 'In-Person + Labs', credential: 'IT Specialist — Device Config', credentialIssuer: 'Certiport' },
+  { program: 'Cybersecurity Analyst', totalHours: 480, rtiHours: 440, ojtHours: 40, method: 'In-Person + Labs', credential: 'IT Specialist — Cybersecurity', credentialIssuer: 'Certiport' },
   { program: 'Welding', totalHours: 400, rtiHours: 160, ojtHours: 240, method: 'In-Person', credential: 'AWS D1.1 + OSHA 10', credentialIssuer: 'AWS / OSHA' },
   { program: 'Electrical', totalHours: 400, rtiHours: 200, ojtHours: 200, method: 'Hybrid', credential: 'OSHA 10 + NCCER Core', credentialIssuer: 'OSHA / NCCER' },
 ];
@@ -112,8 +112,8 @@ const RTI_REGISTRY = [
   { program: 'CNA Certification', credentialPartner: 'Accredited Nursing Program', partnerType: 'State-Approved School', programHolder: 'Healthcare Training Manager', rtiHours: 105, mouStatus: 'Required', credentialIssued: 'CNA Certification (ISDH)' },
   { program: 'CDL Commercial Driving', credentialPartner: 'ELDT-Compliant CDL School', partnerType: 'State-Approved School', programHolder: 'CDL Program Coordinator', rtiHours: 40, mouStatus: 'Required', credentialIssued: 'CDL Class A/B (BMV)' },
   { program: 'Building Technician with HVAC Fundamentals', credentialPartner: 'Authorized Testing Partner', partnerType: 'Industry Partner', programHolder: 'Trades Program Lead', rtiHours: 200, mouStatus: 'Required', credentialIssued: 'EPA 608 + OSHA 10' },
-  { program: 'IT Support', credentialPartner: 'Authorized CompTIA Academy', partnerType: 'Authorized Training Center', programHolder: 'Technology Program Lead', rtiHours: 280, mouStatus: 'Required', credentialIssued: 'CompTIA A+' },
-  { program: 'Cybersecurity', credentialPartner: 'Authorized CompTIA Academy', partnerType: 'Authorized Training Center', programHolder: 'Technology Program Lead', rtiHours: 360, mouStatus: 'Required', credentialIssued: 'CompTIA Security+' },
+  { program: 'IT Help Desk', credentialPartner: 'Certiport Authorized Testing Center', partnerType: 'Authorized Testing Center', programHolder: 'Technology Program Lead', rtiHours: 280, mouStatus: 'Required', credentialIssued: 'IT Specialist — Device Config' },
+  { program: 'Cybersecurity Analyst', credentialPartner: 'Certiport Authorized Testing Center', partnerType: 'Authorized Testing Center', programHolder: 'Technology Program Lead', rtiHours: 440, mouStatus: 'Required', credentialIssued: 'IT Specialist — Cybersecurity' },
   { program: 'Welding', credentialPartner: 'AWS-Accredited Testing Facility', partnerType: 'State-Approved School', programHolder: 'Trades Program Lead', rtiHours: 160, mouStatus: 'Required', credentialIssued: 'AWS D1.1 + OSHA 10' },
   { program: 'Electrical', credentialPartner: 'Authorized Testing Partner', partnerType: 'Industry Partner', programHolder: 'Trades Program Lead', rtiHours: 200, mouStatus: 'Required', credentialIssued: 'OSHA 10 + NCCER Core' },
 ];
@@ -499,7 +499,7 @@ export default function InstructionalFrameworkPage() {
                 type: 'Industry Credential',
                 issuer: 'Credential Partner or Certifying Body',
                 color: 'bg-brand-blue-50 border-brand-blue-200',
-                examples: 'CNA certification (Indiana ISDH), CDL license (Indiana BMV), CompTIA A+ (CompTIA), EPA 608 (EPA), Indiana Barber License (PLA), AWS D1.1 (AWS)',
+                examples: 'CNA certification (Indiana ISDH), CDL license (Indiana BMV), IT Specialist (Certiport), EPA 608 (EPA), Indiana Barber License (PLA), AWS D1.1 (AWS)',
                 note: 'Issued by the licensed authority — not by Elevate. Elevate facilitates enrollment, training, and exam preparation.',
               },
               {

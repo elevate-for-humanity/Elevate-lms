@@ -369,7 +369,7 @@ export default function HomePage() {
             ))}
           </div>
           <p className="text-center text-[10px] leading-relaxed text-slate-400 max-w-4xl mx-auto">
-            501(c)(3) Nonprofit · ETPL Listed · WIOA Eligible Training Provider · Workforce Ready Grant Provider · JRI Approved · Rise Certified · Certiport Authorized Testing Site · CompTIA Authorized · EPA 608 Approved Testing Site · OSHA Safety Training · OSHA 10/30 · HSI Training Center · CareerSafe · Government Contractor · State Bidder · ITAP · UEI Registered · CAGE Code · Milady Authorized · Buy Black Certified · IRS Enrolled Agent (EFIN/PTIN) · Indiana PLA Licensed · NHA/ASCP Certified · Choice Medical CNA Partner · Barber License · Nail Technician License · Esthetician License · Nail Instructor License · Esthetician Instructor License · Cosmetology Instructor License · Substitute Teacher Certification · NRF Rise Up · Intuit QuickBooks Certified
+            501(c)(3) Nonprofit · ETPL Listed · WIOA Eligible Training Provider · Workforce Ready Grant Provider · JRI Approved · Rise Certified · Certiport Authorized Testing Center · EPA 608 Approved Testing Site · OSHA Safety Training · OSHA 10/30 · HSI Training Center · CareerSafe · Government Contractor · State Bidder · ITAP · UEI Registered · CAGE Code · Milady Authorized · Buy Black Certified · IRS Enrolled Agent (EFIN/PTIN) · Indiana PLA Licensed · NHA/ASCP Certified · Choice Medical CNA Partner · Barber License · Nail Technician License · Esthetician License · Nail Instructor License · Esthetician Instructor License · Cosmetology Instructor License · Substitute Teacher Certification · NRF Rise Up · Intuit QuickBooks Certified
           </p>
         </div>
       </section>

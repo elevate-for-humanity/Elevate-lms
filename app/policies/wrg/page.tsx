@@ -101,7 +101,7 @@ export default function WRGPage() {
             <p>WRG covers certificates in high-demand fields including:</p>
             <ul>
               <li>Healthcare (CNA, Medical Assistant, Phlebotomy)</li>
-              <li>Information Technology (CompTIA A+, Network+, Security+)</li>
+              <li>Information Technology (Certiport IT Specialist, Cisco CCST, Cybersecurity)</li>
               <li>Skilled Trades (HVAC, Welding, Electrical, Plumbing)</li>
               <li>Transportation (CDL Commercial Driving)</li>
               <li>Business (Accounting, Office Administration)</li>

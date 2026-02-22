@@ -1733,7 +1733,7 @@ export const programs: Program[] = [
     clockHours: 960,
     schedule: '960 hours',
     delivery: 'Hybrid (Classroom + Lab)',
-    credential: 'CompTIA Security+, CEH',
+    credential: 'Certiport IT Specialist — Cybersecurity',
     approvals: ['Elevate for Humanity'],
     fundingOptions: [
       'WIOA',
@@ -1744,7 +1744,7 @@ export const programs: Program[] = [
     highlights: [
       '24 weeks program',
       '960 training hours',
-      'Earn: CompTIA Security+, CEH',
+      'Earn: Certiport IT Specialist — Cybersecurity',
       'Salary range: $60,000-$110,000/year',
       'Funding: WIOA, Pell Grant'
     ],
@@ -2202,19 +2202,19 @@ export const programs: Program[] = [
     ctaSecondary: { label: 'Learn More', href: '/funding' },
   },
     {
-    slug: 'it-support-specialist',
-    name: 'IT Support Specialist',
-    heroTitle: 'IT Support Specialist',
+    slug: 'it-help-desk',
+    name: 'IT Help Desk Technician',
+    heroTitle: 'IT Help Desk Technician',
     heroSubtitle: 'Launch your IT career. Provide technical support and troubleshoot computer systems.',
     shortDescription: 'Launch your IT career. Provide technical support and troubleshoot computer systems.',
-    longDescription: `Our IT Support Specialist program prepares you for entry into the technology field. You'll learn computer hardware, software, networking, and troubleshooting. The program covers help desk operations, customer service, and technical problem-solving. You'll gain hands-on experience with real systems and prepare for CompTIA A+ certification. IT support roles offer stable employment with clear advancement paths.`,
+    longDescription: `Our IT Support Specialist program prepares you for entry into the technology field. You'll learn computer hardware, software, networking, and troubleshooting. The program covers help desk operations, customer service, and technical problem-solving. You'll gain hands-on experience with real systems and prepare for Certiport IT Specialist certification. IT support roles offer stable employment with clear advancement paths.`,
     heroImage: '/images/programs-hq/it-support.jpg',
-    heroImageAlt: 'IT Support Specialist training at Elevate for Humanity',
-    duration: '16 weeks',
-    clockHours: 640,
-    schedule: '640 hours',
+    heroImageAlt: 'IT Help Desk Technician training at Elevate for Humanity',
+    duration: '8 weeks',
+    clockHours: 320,
+    schedule: '320 hours',
     delivery: 'Hybrid (Classroom + Lab)',
-    credential: 'CompTIA A+',
+    credential: 'Certiport IT Specialist — Device Configuration',
     approvals: ['Elevate for Humanity'],
     fundingOptions: [
       'WIOA',
@@ -2223,9 +2223,9 @@ export const programs: Program[] = [
       'Payment Plans'
     ],
     highlights: [
-      '16 weeks program',
-      '640 training hours',
-      'Earn: CompTIA A+',
+      '8 weeks program',
+      '320 training hours',
+      'Earn: Certiport IT Specialist',
       'Salary range: $38,000-$60,000/year',
       'Funding: WIOA, Pell Grant'
     ],

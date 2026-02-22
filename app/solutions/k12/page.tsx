@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const PATHWAYS = [
   { title: 'Healthcare Careers', desc: 'CNA, Medical Assistant, and Phlebotomy pathways for students interested in healthcare.', icon: Stethoscope },
   { title: 'Skilled Trades', desc: 'Pre-apprenticeship programs in welding, HVAC, electrical, and construction.', icon: Wrench },
-  { title: 'Information Technology', desc: 'CompTIA IT Fundamentals, cybersecurity basics, and coding foundations.', icon: Monitor },
+  { title: 'Information Technology', desc: 'Certiport IT Specialist, cybersecurity basics, and coding foundations.', icon: Monitor },
   { title: 'Industry Certifications', desc: 'Students can earn recognized credentials before graduation, giving them a head start.', icon: Award },
   { title: 'Career Exploration', desc: 'Job shadowing, industry tours, and career assessments to help students find their path.', icon: GraduationCap },
   { title: 'Dual Credit', desc: 'Partner with us to offer dual-credit CTE courses that count toward both high school and postsecondary credentials.', icon: Users },

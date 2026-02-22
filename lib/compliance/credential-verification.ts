@@ -54,10 +54,10 @@ export const STATE_DATABASES: Record<string, StateDatabase> = {
     verification_method: 'manual',
   },
 
-  // CompTIA
-  COMPTIA: {
-    name: 'CompTIA Certification',
-    url: 'https://www.certmetrics.com/comptia/',
+  // Certiport
+  CERTIPORT: {
+    name: 'Certiport IT Specialist Certification',
+    url: 'https://certiport.pearsonvue.com/',
     verification_method: 'manual',
   },
 };

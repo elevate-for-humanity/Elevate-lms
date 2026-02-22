@@ -237,17 +237,17 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
   },
   
   // IT Support
-  '/programs/technology/it-support': {
+  '/programs/it-help-desk': {
     title: 'IT Support Training',
-    subtitle: 'CompTIA A+ certification training. Launch your career in technology.',
+    subtitle: 'Certiport IT Specialist certification training. Launch your career in technology.',
     image: '/images/heroes/program-technology-it-support.jpg',
     variant: 'split',
     height: 'medium',
-    badge: 'CompTIA Partner',
+    badge: 'Certiport Authorized',
     metadata: [
       { label: 'Duration', value: '8-12 weeks' },
       { label: 'Format', value: 'Hybrid' },
-      { label: 'Certification', value: 'CompTIA A+' },
+      { label: 'Certification', value: 'Certiport IT Specialist' },
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=it-support' },
     ctaSecondary: { label: 'Check Eligibility', href: '/wioa-eligibility' },

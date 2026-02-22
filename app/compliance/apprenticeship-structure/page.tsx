@@ -31,8 +31,8 @@ const PROGRAM_HOURS = [
   { program: 'CNA Certification', occupation: 'Nursing Assistant', rtiHours: 105, ojtHours: 45, totalHours: 150, rtiMethod: 'Hybrid', credential: 'CNA Certification', issuer: 'Indiana ISDH', registered: false },
   { program: 'CDL Commercial Driving', occupation: 'Commercial Driver', rtiHours: 40, ojtHours: 120, totalHours: 160, rtiMethod: 'In-Person', credential: 'CDL Class A/B', issuer: 'Indiana BMV', registered: false },
   { program: 'HVAC Technician', occupation: 'HVAC Installer/Technician', rtiHours: 200, ojtHours: 200, totalHours: 400, rtiMethod: 'Hybrid', credential: 'EPA 608 + OSHA 10', issuer: 'EPA / OSHA', registered: false },
-  { program: 'IT Support', occupation: 'IT Support Specialist', rtiHours: 280, ojtHours: 40, totalHours: 320, rtiMethod: 'Online + Labs', credential: 'CompTIA A+', issuer: 'CompTIA', registered: false },
-  { program: 'Cybersecurity', occupation: 'Cybersecurity Analyst', rtiHours: 360, ojtHours: 40, totalHours: 400, rtiMethod: 'Online + Labs', credential: 'CompTIA Security+', issuer: 'CompTIA', registered: false },
+  { program: 'IT Help Desk', occupation: 'IT Support Specialist', rtiHours: 280, ojtHours: 40, totalHours: 320, rtiMethod: 'In-Person + Labs', credential: 'Certiport IT Specialist', issuer: 'Certiport', registered: false },
+  { program: 'Cybersecurity Analyst', occupation: 'Cybersecurity Analyst', rtiHours: 440, ojtHours: 40, totalHours: 480, rtiMethod: 'In-Person + Labs', credential: 'IT Specialist — Cybersecurity', issuer: 'Certiport', registered: false },
   { program: 'Welding', occupation: 'Welder', rtiHours: 160, ojtHours: 240, totalHours: 400, rtiMethod: 'In-Person', credential: 'AWS D1.1 + OSHA 10', issuer: 'AWS / OSHA', registered: false },
   { program: 'Electrical', occupation: 'Electrician', rtiHours: 200, ojtHours: 200, totalHours: 400, rtiMethod: 'Hybrid', credential: 'OSHA 10 + NCCER Core', issuer: 'OSHA / NCCER', registered: false },
 ];
@@ -222,7 +222,7 @@ export default function ApprenticeshipStructurePage() {
                 <span className="text-xs text-gray-500 ml-auto">Issued by: Credential Partner or Certifying Body</span>
               </div>
               <p className="text-sm text-gray-700 mb-2">
-                CNA (ISDH), CDL (BMV), CompTIA A+ (CompTIA), CompTIA Security+ (CompTIA),
+                CNA (ISDH), CDL (BMV), IT Specialist (Certiport), IT Specialist — Cybersecurity (Certiport),
                 EPA 608 (EPA), AWS D1.1 (AWS), Indiana Barber License (PLA), OSHA 10/30 (OSHA),
                 NCCER Core (NCCER)
               </p>

@@ -110,7 +110,7 @@ export default function AboutPage() {
                 <p className="text-sm text-gray-700 mb-2">
                   We run certification programs in healthcare (CNA, Medical Assistant, Phlebotomy),
                   skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking (Class A and B),
-                  IT and cybersecurity (CompTIA A+, Security+), barbering (DOL Registered Apprenticeship),
+                  IT and cybersecurity (Certiport IT Specialist, Cisco CCST), barbering (DOL Registered Apprenticeship),
                   and CPR/First Aid. Most programs run 4 to 16 weeks and include hands-on training,
                   certification exam preparation, and job placement assistance.
                 </p>
@@ -191,7 +191,7 @@ export default function AboutPage() {
             </p>
             <p>
               All credentials are issued by recognized third-party authorities (Indiana ISDH,
-              Indiana BMV, EPA, OSHA, CompTIA, AWS, NCCER, Indiana PLA) — not by Elevate.
+              Indiana BMV, EPA, OSHA, Certiport, AWS, NCCER, Indiana PLA) — not by Elevate.
               Apprenticeship programs are DOL Registered Apprenticeships with Elevate as the
               registered sponsor.
             </p>

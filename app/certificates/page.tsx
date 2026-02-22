@@ -154,9 +154,9 @@ export default function CertificatesPage() {
               {
                 title: 'Technology Certifications',
                 items: [
-                  'CompTIA A+',
-                  'CompTIA Network+',
-                  'CompTIA Security+',
+                  'Certiport IT Specialist — Device Configuration',
+                  'Certiport IT Specialist — Networking',
+                  'Certiport IT Specialist — Cybersecurity',
                   'Microsoft Office Specialist',
                 ],
               },

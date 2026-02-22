@@ -150,26 +150,26 @@ const PROGRAMS = [
   {
     name: 'IT Support',
     image: '/images/programs-hq/it-support.jpg',
-    href: '/programs/technology/it-support',
+    href: '/programs/it-help-desk',
     duration: '8–12 weeks',
-    credential: 'CompTIA A+',
-    issuer: 'CompTIA',
+    credential: 'IT Specialist — Device Configuration & Management',
+    issuer: 'Certiport',
     salary: '$35K–$60K (remote work available)',
     jobs: 'Help desk, desktop support, IT support specialist, field technician',
     funding: 'No cost for eligible WIOA/JRI participants',
-    desc: 'Hardware and software troubleshooting, network configuration, Windows/Linux/macOS, cloud computing basics. Online-friendly with live virtual instructor sessions. Includes CompTIA A+ exam prep and practice tests.',
+    desc: 'Hardware and software troubleshooting, network configuration, Windows/Linux/macOS, and cloud computing basics. Includes Certiport IT Specialist exam prep and practice tests.',
   },
   {
     name: 'Cybersecurity',
     image: '/images/programs-hq/cybersecurity.jpg',
-    href: '/programs/technology/cybersecurity',
+    href: '/programs/cybersecurity-analyst',
     duration: '12–16 weeks',
-    credential: 'CompTIA Security+',
-    issuer: 'CompTIA',
+    credential: 'IT Specialist — Cybersecurity',
+    issuer: 'Certiport',
     salary: '$55K–$85K entry ($100K+ penetration testing)',
     jobs: 'Security analyst, SOC analyst, penetration tester, security engineer',
     funding: 'No cost for eligible WIOA/JRI participants',
-    desc: 'Network security, threat analysis, vulnerability assessment, incident response, cryptography, and compliance frameworks. Online-friendly with live virtual sessions. Includes Security+ exam prep. CompTIA A+ or equivalent experience recommended.',
+    desc: 'Network security, threat analysis, vulnerability assessment, incident response, cryptography, and compliance frameworks. Includes Certiport IT Specialist — Cybersecurity exam prep.',
   },
 ];
 
@@ -343,7 +343,7 @@ export default function PathwaysPage() {
             </p>
             <p>
               In all cases, credentials are issued by recognized third-party authorities (Indiana
-              ISDH, Indiana BMV, EPA, OSHA, CompTIA, AWS, NCCER, Indiana PLA) — not by Elevate.
+              ISDH, Indiana BMV, EPA, OSHA, Certiport, AWS, NCCER, Indiana PLA) — not by Elevate.
               Elevate prepares participants for certification exams. The credential itself comes
               from the issuing authority.
             </p>
@@ -401,7 +401,7 @@ export default function PathwaysPage() {
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">Your credential is issued by a recognized authority — not by us</h3>
-                <p className="text-sm">CNA from Indiana ISDH. CDL from Indiana BMV. EPA 608 from the EPA. CompTIA A+ from CompTIA. Barber license from Indiana PLA. These credentials are recognized nationwide.</p>
+                <p className="text-sm">CNA from Indiana ISDH. CDL from Indiana BMV. EPA 608 from the EPA. IT Specialist from Certiport. Barber license from Indiana PLA. These credentials are recognized nationwide.</p>
               </div>
             </div>
             <div className="flex gap-4 items-start">

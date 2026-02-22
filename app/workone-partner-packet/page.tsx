@@ -288,7 +288,7 @@ export default function WorkOnePartnerPacketPage() {
             {[
               { title: 'Barber Apprenticeship', duration: '18 months', credential: 'Indiana Barber License', funding: 'WIOA, WRG, Apprenticeship', image: '/images/barber-hero.jpg' },
               { title: 'Healthcare Certifications', duration: '4-12 weeks', credential: 'Medical Assistant, Phlebotomy, Home Health Aide', funding: 'WIOA, WRG', image: '/images/healthcare-highlight.jpg' },
-              { title: 'IT & Cybersecurity', duration: '8-16 weeks', credential: 'CompTIA, Microsoft, Cisco', funding: 'WIOA, WRG', image: '/images/heroes/lms-analytics.jpg' },
+              { title: 'IT & Cybersecurity', duration: '8-12 weeks', credential: 'Certiport IT Specialist, Cisco CCST', funding: 'WIOA, WRG', image: '/images/programs-hq/technology-hero.jpg' },
               { title: 'CDL Training', duration: '4-6 weeks', credential: 'Class A CDL', funding: 'WIOA, WRG', image: '/images/healthcare/hero-programs-healthcare.jpg' },
               { title: 'Skilled Trades', duration: '8-24 weeks', credential: 'OSHA, NCCER, Industry Certs', funding: 'WIOA, WRG, Apprenticeship', image: '/images/hvac-technician-success.jpg' },
               { title: 'Business & Office', duration: '4-8 weeks', credential: 'Microsoft Office, QuickBooks', funding: 'WIOA, WRG', image: '/images/business-highlight.jpg' },

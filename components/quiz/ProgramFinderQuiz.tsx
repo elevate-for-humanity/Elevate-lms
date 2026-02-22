@@ -96,8 +96,8 @@ const programResults: Record<string, ProgramResult[]> = {
     { title: 'CDL Class A Training', description: 'Get your Commercial Driver\'s License and start earning immediately. Over-the-road and local routes available.', href: '/programs/cdl-training', duration: '3-4 weeks', salary: '$50K-$80K', funding: 'WIOA / WRG' },
   ],
   tech: [
-    { title: 'IT Support', description: 'CompTIA A+ and Network+ preparation. Help desk and system administration roles.', href: '/programs/technology/it-support', duration: '8-12 weeks', salary: '$38K-$55K', funding: 'WIOA / WRG' },
-    { title: 'Cybersecurity', description: 'Security+ certification prep. Protect networks and data for organizations.', href: '/programs/technology/cybersecurity', duration: '12-16 weeks', salary: '$50K-$75K', funding: 'WIOA / WRG' },
+    { title: 'IT Help Desk', description: 'Certiport IT Specialist certification. Help desk and system administration roles.', href: '/programs/it-help-desk', duration: '8 weeks', salary: '$38K-$55K', funding: 'WIOA / WRG' },
+    { title: 'Cybersecurity Analyst', description: 'Certiport IT Specialist — Cybersecurity certification. Protect networks and data for organizations.', href: '/programs/cybersecurity-analyst', duration: '12 weeks', salary: '$55K-$100K', funding: 'WIOA / WRG' },
   ],
   barber: [
     { title: 'Barber Apprenticeship', description: 'Earn while you learn in a licensed barbershop. 1,500 hours toward your Indiana barber license.', href: '/programs/barber-apprenticeship', duration: '12-18 months', salary: '$30K-$60K+', funding: 'JRI / WIOA' },

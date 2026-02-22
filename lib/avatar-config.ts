@@ -216,16 +216,16 @@ export const PAGE_AVATAR_CONFIGS: Record<string, AvatarContext> = {
     maxMessages: 1,
   },
   
-  '/programs/technology/it-support': {
+  '/programs/it-help-desk': {
     enabled: true,
     speakOnLoad: true,
     role: 'guide',
     intent: 'explain',
-    message: "IT Support training prepares you for CompTIA A+ certification. 8-12 weeks, hybrid format.",
+    message: "IT Help Desk training prepares you for Certiport IT Specialist certification. 8 weeks, in-person at our Indianapolis Training Center.",
     maxMessages: 1,
   },
   
-  '/programs/technology/cybersecurity': {
+  '/programs/cybersecurity-analyst': {
     enabled: true,
     speakOnLoad: true,
     role: 'guide',

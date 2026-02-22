@@ -35,8 +35,8 @@ const PROGRAMS = [
   { name: 'CNA Certification', duration: '4–6 weeks', format: 'Hybrid', rtiHours: 105, ojtHours: 45, credential: 'CNA Certification (ISDH)', funding: 'WIOA / JRI / Self-Pay', registered: false },
   { name: 'CDL Commercial Driving', duration: '4–6 weeks', format: 'In-Person', rtiHours: 40, ojtHours: 120, credential: 'CDL Class A/B (BMV)', funding: 'WIOA / WRG / Self-Pay', registered: false },
   { name: 'HVAC Technician', duration: '8–16 weeks', format: 'Hybrid', rtiHours: 200, ojtHours: 200, credential: 'EPA 608 + OSHA 10', funding: 'WIOA / WRG / Employer', registered: false },
-  { name: 'IT Support', duration: '8–12 weeks', format: 'Online + Labs', rtiHours: 280, ojtHours: 40, credential: 'CompTIA A+', funding: 'WIOA / JRI / Self-Pay', registered: false },
-  { name: 'Cybersecurity', duration: '10–14 weeks', format: 'Online + Labs', rtiHours: 360, ojtHours: 40, credential: 'CompTIA Security+', funding: 'WIOA / JRI / Self-Pay', registered: false },
+  { name: 'IT Help Desk', duration: '8 weeks', format: 'In-Person + Labs', rtiHours: 280, ojtHours: 40, credential: 'Certiport IT Specialist', funding: 'WIOA / JRI / Self-Pay', registered: false },
+  { name: 'Cybersecurity Analyst', duration: '12 weeks', format: 'In-Person + Labs', rtiHours: 440, ojtHours: 40, credential: 'Certiport IT Specialist — Cybersecurity', funding: 'WIOA / JRI / Self-Pay', registered: false },
   { name: 'Welding', duration: '10–16 weeks', format: 'In-Person', rtiHours: 160, ojtHours: 240, credential: 'AWS D1.1 + OSHA 10', funding: 'WIOA / WRG / Employer', registered: false },
   { name: 'Electrical', duration: '10–16 weeks', format: 'Hybrid', rtiHours: 200, ojtHours: 200, credential: 'OSHA 10 + NCCER Core', funding: 'WIOA / WRG / Employer', registered: false },
 ];

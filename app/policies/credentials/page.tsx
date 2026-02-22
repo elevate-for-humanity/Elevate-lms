@@ -58,7 +58,7 @@ export default function CredentialsPage() {
                   <li>State CNA Certification</li>
                   <li>Commercial Driver's License</li>
                   <li>IRS PTIN Certification</li>
-                  <li>CompTIA Certifications</li>
+                  <li>Certiport IT Specialist Certifications</li>
                   <li>Industry-specific licenses</li>
                 </ul>
               </div>

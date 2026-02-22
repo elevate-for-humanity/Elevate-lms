@@ -18,7 +18,7 @@ export const NAV_ITEMS = [
       { name: 'Phlebotomy', href: '/programs/healthcare' },
       { name: 'HVAC Technician', href: '/programs/hvac-technician' },
       { name: 'CDL Training', href: '/programs/cdl-training' },
-      { name: 'IT Support', href: '/programs/technology/it-support' },
+      { name: 'IT Help Desk', href: '/programs/it-help-desk' },
       { name: '— Apprenticeships —', href: '/apprenticeships', isHeader: true },
       { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
       { name: 'Cosmetology Apprenticeship', href: '/programs/cosmetology-apprenticeship' },

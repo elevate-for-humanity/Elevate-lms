@@ -1,13 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Send, Paperclip, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/client';
 
 export default function NewMessagePage() {
   const router = useRouter();
+  const supabase = createClient();
+  const [userId, setUserId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     to: '',
     subject: '',
@@ -16,12 +19,19 @@ export default function NewMessagePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) router.push('/login?redirect=/messages/new');
+      else setUserId(user.id);
+    });
+  }, []);
+
   const recipients = [
-    { id: '1', name: 'Career Services', email: 'our contact form' },
-    { id: '2', name: 'Financial Aid', email: 'our contact form' },
-    { id: '3', name: 'Admissions', email: 'our contact form' },
-    { id: '4', name: 'Student Support', email: 'our contact form' },
-    { id: '5', name: 'My Instructor', email: 'our contact form' },
+    { id: 'career-services', name: 'Career Services' },
+    { id: 'financial-aid', name: 'Financial Aid' },
+    { id: 'admissions', name: 'Admissions' },
+    { id: 'student-support', name: 'Student Support' },
+    { id: 'instructor', name: 'My Instructor' },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,14 +43,34 @@ export default function NewMessagePage() {
       return;
     }
 
+    if (!userId) {
+      setError('You must be logged in to send messages.');
+      return;
+    }
+
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    router.push('/messages/sent');
+
+    try {
+      const { error: insertErr } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: userId,
+          subject: formData.subject,
+          body: `[To: ${formData.to}]\n\n${formData.message}`,
+          read: false,
+        });
+
+      if (insertErr) throw new Error(insertErr.message);
+      router.push('/messages?sent=true');
+    } catch (err: any) {
+      setError(err.message || 'Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Messages', href: '/messages' }, { label: 'New Message' }]} />
@@ -73,7 +103,7 @@ export default function NewMessagePage() {
               >
                 <option value="">Select recipient</option>
                 {recipients.map((r) => (
-                  <option key={r.id} value={r.email}>{r.name}</option>
+                  <option key={r.id} value={r.id}>{r.name}</option>
                 ))}
               </select>
             </div>

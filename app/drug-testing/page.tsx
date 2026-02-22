@@ -1,9 +1,10 @@
 
 import { Metadata } from 'next';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Phone, ArrowRight, Clock, MapPin, Shield, Beaker, Truck, Building2, Users } from 'lucide-react';
+import { Phone, ArrowRight, Clock, MapPin, Shield, Beaker, Truck, Building2, Users, Award } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Drug Testing Services | Elevate for Humanity',
@@ -80,7 +81,21 @@ const features = [
   },
 ];
 
-export default function DrugTestingLandingPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function DrugTestingLandingPage() {
+  let program: any = null;
+  try {
+    const db = createAdminClient();
+    const { data } = await db
+      .from('programs')
+      .select('id, name, description, full_description, training_hours, tuition, credential_name, career_outcomes, what_you_learn, salary_min, salary_max, industry_demand, wioa_approved')
+      .eq('slug', 'drug-alcohol-specimen-collector')
+      .single();
+    program = data;
+  } catch {
+    // DB may not be available
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -314,6 +329,73 @@ export default function DrugTestingLandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Certification Program from DB */}
+      {program && (
+        <section className="py-16 bg-slate-50">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-100 rounded-full text-brand-green-700 text-sm font-medium mb-4">
+                <Award className="w-4 h-4" />
+                {program.wioa_approved ? 'WIOA Approved' : 'Certification Program'}
+              </div>
+              <h2 className="text-3xl font-bold mb-4">Become a Certified Specimen Collector</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">{program.full_description || program.description}</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6 mb-10">
+              <div className="bg-white rounded-xl border p-6 text-center">
+                <Clock className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
+                <p className="text-2xl font-bold">{program.training_hours} Hours</p>
+                <p className="text-gray-500 text-sm">Training Program</p>
+              </div>
+              <div className="bg-white rounded-xl border p-6 text-center">
+                <Shield className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
+                <p className="text-2xl font-bold">{program.credential_name}</p>
+                <p className="text-gray-500 text-sm">Credential Earned</p>
+              </div>
+              <div className="bg-white rounded-xl border p-6 text-center">
+                <Building2 className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
+                <p className="text-2xl font-bold">${program.salary_min?.toLocaleString()} – ${program.salary_max?.toLocaleString()}</p>
+                <p className="text-gray-500 text-sm">Salary Range</p>
+              </div>
+            </div>
+            {program.what_you_learn && program.what_you_learn.length > 0 && (
+              <div className="bg-white rounded-xl border p-8 mb-8">
+                <h3 className="text-xl font-bold mb-4">What You&apos;ll Learn</h3>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {program.what_you_learn.map((item: string) => (
+                    <div key={item} className="flex items-start gap-2">
+                      <Beaker className="w-4 h-4 text-brand-green-500 mt-1 flex-shrink-0" />
+                      <span className="text-gray-700">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {program.career_outcomes && program.career_outcomes.length > 0 && (
+              <div className="bg-white rounded-xl border p-8">
+                <h3 className="text-xl font-bold mb-4">Career Outcomes</h3>
+                <div className="flex flex-wrap gap-3">
+                  {program.career_outcomes.map((role: string) => (
+                    <span key={role} className="px-4 py-2 bg-brand-blue-50 text-brand-blue-700 rounded-full text-sm font-medium">{role}</span>
+                  ))}
+                </div>
+                {program.industry_demand && (
+                  <p className="mt-4 text-gray-600 text-sm">{program.industry_demand}</p>
+                )}
+              </div>
+            )}
+            <div className="text-center mt-8">
+              <Link href="/apply/student" className="inline-flex items-center gap-2 px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition text-lg">
+                Apply for This Program <ArrowRight className="w-5 h-5" />
+              </Link>
+              {program.tuition && (
+                <p className="text-gray-500 text-sm mt-3">Tuition: ${program.tuition.toLocaleString()} · WIOA funding may cover full cost</p>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="py-16 bg-brand-blue-600 text-white">

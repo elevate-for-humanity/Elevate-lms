@@ -62,6 +62,19 @@ export const NAV_ITEMS = [
       { name: 'Add-Ons & Tools', href: '/store/add-ons' },
     ]
   },
+  {
+    name: 'Rise Foundation',
+    href: '/rise-foundation',
+    subItems: [
+      { name: 'Mental Wellness', href: '/rise-foundation/trauma-recovery' },
+      { name: 'CurvatureBody Sculpting', href: '/rise-foundation#curvature' },
+      { name: 'Meri-Go-Round Products', href: '/rise-foundation#products' },
+      { name: 'Free VITA Tax Prep', href: '/tax/rise-up-foundation' },
+      { name: 'Events', href: '/rise-foundation/events' },
+      { name: 'Donate', href: '/rise-foundation/donate' },
+      { name: 'Get Involved', href: '/rise-foundation/get-involved' },
+    ]
+  },
   { 
     name: 'Support', 
     href: '/support',

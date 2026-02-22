@@ -4,197 +4,208 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { Award, Plus, Users, Search, Shield, Download } from 'lucide-react';
+import { revokeCertificate } from './actions';
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/certificates',
-  },
-  title: 'Certificates | Elevate For Humanity',
-  description: 'Manage certificates, credentials, and certifications',
+  robots: { index: false, follow: false },
+  title: 'Certificates | Admin | Elevate For Humanity',
+  description: 'Issue, manage, and verify certificates and credentials.',
 };
 
-export default async function CertificatesPage() {
+export default async function CertificatesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ success?: string; cert?: string; error?: string; search?: string }>;
+}) {
+  const params = await searchParams;
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const db = createAdminClient() || supabase;
+  if (!supabase) redirect('/login');
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Fetch certificates from both tables
+  let certificates: any[] = [];
+  const searchTerm = params.search || '';
 
-  if (!user) {
-    redirect('/login');
-  }
-
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/unauthorized');
-  }
-
-  const { data: certificates, count: totalCertificates } = await db
-    .from('certificates')
-    .select(
-      `
-      *,
-      student:profiles(full_name, email),
-      program:programs(name)
-    `,
-      { count: 'exact' }
-    )
-    .order('issued_at', { ascending: false })
+  const { data: issuedCerts } = await db
+    .from('issued_certificates')
+    .select('id, certificate_number, recipient_name, recipient_email, issue_date, status, signed_by, created_at')
+    .order('created_at', { ascending: false })
     .limit(50);
 
-  const { count: activeItems } = await db
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'active');
-
-  const { count: issuedCertificates } = await db
+  const { data: legacyCerts } = await db
     .from('certificates')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'issued');
+    .select('id, certificate_number, student_name, student_email, issued_date, status, signed_by, created_at')
+    .order('created_at', { ascending: false })
+    .limit(50);
 
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/unauthorized');
+  // Merge and normalize
+  certificates = [
+    ...(issuedCerts || []).map((c: any) => ({
+      id: c.id, number: c.certificate_number, name: c.recipient_name,
+      email: c.recipient_email, date: c.issue_date, status: c.status,
+      signedBy: c.signed_by, source: 'issued',
+    })),
+    ...(legacyCerts || []).map((c: any) => ({
+      id: c.id, number: c.certificate_number, name: c.student_name,
+      email: c.student_email, date: c.issued_date, status: c.status,
+      signedBy: c.signed_by, source: 'legacy',
+    })),
+  ].sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
+
+  if (searchTerm) {
+    const q = searchTerm.toLowerCase();
+    certificates = certificates.filter(c =>
+      c.name?.toLowerCase().includes(q) || c.email?.toLowerCase().includes(q) || c.number?.toLowerCase().includes(q)
+    );
   }
 
-  // Fetch relevant data
-  const { data: items, count: totalItems } = await db
-    .from('certificates')
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .limit(20);
+  const totalCount = certificates.length;
+  const activeCount = certificates.filter(c => c.status === 'issued' || c.status === 'active').length;
+  const revokedCount = certificates.filter(c => c.status === 'revoked').length;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Certificates' }]} />
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <nav className="text-sm mb-4">
+            <ol className="flex items-center space-x-2 text-gray-500">
+              <li><Link href="/admin" className="hover:text-primary">Admin</Link></li>
+              <li>/</li>
+              <li className="text-gray-900 font-medium">Certificates</li>
+            </ol>
+          </nav>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Certificate Management</h1>
+              <p className="text-gray-600 mt-1">Issue, verify, and manage certificates</p>
+            </div>
+            <div className="flex gap-3">
+              <Link href="/admin/certificates/issue"
+                className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium">
+                <Plus className="w-4 h-4" /> Issue Certificate
+              </Link>
+              <Link href="/admin/certificates/bulk"
+                className="flex items-center gap-2 border px-4 py-2 rounded-lg hover:bg-gray-50 text-sm font-medium">
+                <Users className="w-4 h-4" /> Bulk Issue
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Success/Error Messages */}
+        {params.success === 'issued' && (
+          <div className="mb-6 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg text-brand-green-800">
+            Certificate <strong>{params.cert}</strong> issued successfully.
+          </div>
+        )}
+        {params.success === 'revoked' && (
+          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800">
+            Certificate revoked.
+          </div>
+        )}
+        {params.error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+            Error: {params.error.replace(/_/g, ' ')}
+          </div>
+        )}
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="bg-white rounded-xl border p-5">
+            <Award className="w-5 h-5 text-brand-blue-600 mb-2" />
+            <p className="text-2xl font-bold">{totalCount}</p>
+            <p className="text-sm text-gray-500">Total Certificates</p>
+          </div>
+          <div className="bg-white rounded-xl border p-5">
+            <Shield className="w-5 h-5 text-brand-green-600 mb-2" />
+            <p className="text-2xl font-bold">{activeCount}</p>
+            <p className="text-sm text-gray-500">Active</p>
+          </div>
+          <div className="bg-white rounded-xl border p-5">
+            <Shield className="w-5 h-5 text-red-600 mb-2" />
+            <p className="text-2xl font-bold">{revokedCount}</p>
+            <p className="text-sm text-gray-500">Revoked</p>
+          </div>
+        </div>
+
+        {/* Search */}
+        <form className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input name="search" type="text" defaultValue={searchTerm}
+              placeholder="Search by name, email, or certificate number..."
+              className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" />
+          </div>
+        </form>
+
+        {/* Quick Links */}
+        <div className="flex gap-3 mb-6">
+          <Link href="/verify-credential" className="text-sm text-brand-blue-600 hover:underline flex items-center gap-1">
+            <Shield className="w-4 h-4" /> Public Verification Portal
+          </Link>
+          <Link href="/admin/certificates/bulk" className="text-sm text-brand-blue-600 hover:underline flex items-center gap-1">
+            <Users className="w-4 h-4" /> Bulk Issue
+          </Link>
+        </div>
+
+        {/* Certificates Table */}
+        <div className="bg-white rounded-xl border overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-sm font-semibold">Certificate #</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold">Recipient</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold">Email</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold">Issued</th>
+                <th className="px-6 py-3 text-center text-sm font-semibold">Status</th>
+                <th className="px-6 py-3 text-right text-sm font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {certificates.length > 0 ? certificates.map((c) => (
+                <tr key={c.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 font-mono text-sm">{c.number || c.id.slice(0, 8)}</td>
+                  <td className="px-6 py-4 font-medium text-sm">{c.name || '—'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{c.email || '—'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{c.date ? new Date(c.date).toLocaleDateString() : '—'}</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      c.status === 'issued' || c.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' :
+                      c.status === 'revoked' ? 'bg-red-100 text-red-700' :
+                      c.status === 'expired' ? 'bg-gray-100 text-gray-700' :
+                      'bg-brand-blue-100 text-brand-blue-700'
+                    }`}>{c.status || 'unknown'}</span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    {(c.status === 'issued' || c.status === 'active') && (
+                      <form action={revokeCertificate} className="inline">
+                        <input type="hidden" name="certId" value={c.id} />
+                        <input type="hidden" name="reason" value="Admin revocation" />
+                        <button type="submit"
+                          className="text-red-600 hover:text-red-800 text-sm font-medium"
+                          onClick={(e) => { if (!confirm('Revoke this certificate?')) e.preventDefault(); }}>
+                          Revoke
+                        </button>
+                      </form>
+                    )}
+                  </td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    No certificates found. <Link href="/admin/certificates/issue" className="text-brand-blue-600 hover:underline">Issue your first certificate</Link>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
-
-      {/* Hero Section */}
-      <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
-          src="/images/hero/hero-certifications.jpg"
-          alt="Certificates"
-          fill
-          className="object-cover"
-          quality={100}
-          priority
-          sizes="100vw"
-        />
-
-      </section>
-
-      {/* Content Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-sm font-medium text-black mb-2">
-                  Total Items
-                </h3>
-                <p className="text-3xl font-bold text-brand-blue-600">
-                  {totalCertificates || 0}
-                </p>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-sm font-medium text-black mb-2">
-                  Active
-                </h3>
-                <p className="text-3xl font-bold text-brand-green-600">
-                  {activeItems || 0}
-                </p>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-sm font-medium text-black mb-2">
-                  Recent
-                </h3>
-                <p className="text-3xl font-bold text-brand-blue-600">
-                  {items?.filter((i) => {
-                    const created = new Date(i.created_at);
-                    const weekAgo = new Date();
-                    weekAgo.setDate(weekAgo.getDate() - 7);
-                    return created > weekAgo;
-                  }).length || 0}
-                </p>
-              </div>
-            </div>
-
-            {/* Data Display */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h2 className="text-2xl font-bold mb-4">Items</h2>
-              {certificates && certificates.length > 0 ? (
-                <div className="space-y-4">
-                  {certificates.map((item: any) => (
-                    <div
-                      key={item.id}
-                      className="p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <p className="font-semibold">
-                        {item.title || item.name || item.id}
-                      </p>
-                      <p className="text-sm text-black">
-                        {new Date(item.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-black text-center py-8">No items found</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-700">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Issue and Track Certificates
-                        </h2>
-            <p className="text-base md:text-lg text-brand-blue-100 mb-8">
-              Generate certificates for program completers and verify credentials.
-                        </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link
-                href="/admin/certificates"
-                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
-              >
-                View Certificates
-              </Link>
-              <Link
-                href="/verify-credential"
-                className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
-              >
-                Verify Credential
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

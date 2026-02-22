@@ -62,6 +62,14 @@ const PUBLIC_DASHBOARD_LANDINGS = [
 // Routes restricted to specific admin emails only (sub-routes, not landing)
 const ADMIN_ONLY_ROUTES = ['/admin/dashboard', '/admin/users', '/admin/settings', '/admin/crm'];
 
+// Internal paths that should not be indexed by search engines
+const NOINDEX_PREFIXES = [
+  '/admin', '/staff-portal', '/instructor', '/partner-portal', '/partner/',
+  '/employer-portal', '/employer/', '/program-holder', '/workforce-board',
+  '/student-portal', '/client-portal', '/lms/', '/dashboard', '/settings',
+  '/api/', '/enrollment/', '/onboarding',
+];
+
 // Partner routes that require active partner status
 const PARTNER_ROUTES = ['/partner/dashboard', '/partner/programs'];
 // Partner routes allowed even without active status (for document upload)
@@ -610,6 +618,14 @@ export async function proxy(request: NextRequest) {
   }
   response.headers.set('x-user-id', user.id);
   response.headers.set('x-user-role', userRole);
+
+  // ============================================
+  // NOINDEX FOR INTERNAL PAGES
+  // Prevent search engines from indexing portals, admin, and auth-gated routes
+  // ============================================
+  if (NOINDEX_PREFIXES.some(prefix => pathname.startsWith(prefix))) {
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  }
 
   return response;
 }

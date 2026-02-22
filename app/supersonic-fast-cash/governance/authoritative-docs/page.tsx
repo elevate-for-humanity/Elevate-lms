@@ -7,7 +7,7 @@ import {
   ArrowLeft, FileText, Shield, Scale, BookOpen, 
   CreditCard, Receipt, Users, Download, ExternalLink, Zap
 } from 'lucide-react';
-import { QuickSummary } from '@/app/governance/_content/QuickSummary';
+import { QuickSummary } from '@/app/admin/governance/_content/QuickSummary';
 
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -52,7 +52,7 @@ const documents = (dbRows as any[]) || [];
       <div className="bg-emerald-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <Link 
-            href="/governance" 
+            href="/admin/governance" 
             className="inline-flex items-center text-emerald-300 hover:text-white mb-6 text-sm"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -177,7 +177,7 @@ const documents = (dbRows as any[]) || [];
             contact our governance team.
           </p>
           <Link
-            href="/governance/contact"
+            href="/admin/governance/contact"
             className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
           >
             <Download className="w-5 h-5" />

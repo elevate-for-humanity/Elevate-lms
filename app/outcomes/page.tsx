@@ -23,7 +23,7 @@ export default function OutcomesMethodologyPage() {
       <div className="bg-slate-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <Link
-            href="/governance"
+            href="/admin/governance"
             className="inline-flex items-center text-slate-400 hover:text-white mb-6 text-sm"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -214,9 +214,9 @@ export default function OutcomesMethodologyPage() {
         <div className="border-t pt-8 mt-8">
           <h3 className="font-bold text-slate-900 mb-4">Related Documents</h3>
           <div className="flex flex-wrap gap-4">
-            <Link href="/governance/legal" className="text-brand-blue-600 hover:underline">Legal &amp; Entity Information</Link>
+            <Link href="/admin/governance/legal" className="text-brand-blue-600 hover:underline">Legal &amp; Entity Information</Link>
             <Link href="/privacy-policy" className="text-brand-blue-600 hover:underline">Privacy Policy</Link>
-            <Link href="/governance" className="text-brand-blue-600 hover:underline">Governance Overview</Link>
+            <Link href="/admin/governance" className="text-brand-blue-600 hover:underline">Governance Overview</Link>
           </div>
         </div>
       </div>

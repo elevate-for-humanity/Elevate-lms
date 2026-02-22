@@ -68,7 +68,7 @@ export default function StoreLicensesPage() {
           ]} />
           <p className="text-sm text-slate-600 mt-1">
             Licensing for the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>.
-            {' '}<a href="/platform/how-it-works" className="hover:underline">How it works →</a>
+            {' '}<a href="/platform/overview" className="hover:underline">How it works →</a>
           </p>
         </div>
       </div>

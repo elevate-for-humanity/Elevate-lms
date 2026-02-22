@@ -48,7 +48,7 @@ export function MOUStatusBadge({
       label: 'Fully Executed',
       color: 'text-brand-green-700',
       bgColor: 'bg-brand-green-100',
-      icon: CheckCircle2,
+      icon: CheckCircle,
     },
   };
 

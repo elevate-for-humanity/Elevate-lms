@@ -6,7 +6,7 @@ import { Heart, Shield, Phone, Calendar } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Addiction Rehabilitation | Rise Forward Foundation',
+  title: 'Addiction Rehabilitation | Rise Foundation',
   description: 'Support and resources for addiction recovery and rehabilitation',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/rise-foundation/addiction-rehabilitation',
@@ -86,7 +86,7 @@ export default async function AddictionRehabilitationPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-12">
         <Link href="/rise-foundation" className="text-brand-blue-600 hover:text-brand-blue-700 mb-8 inline-block">
-          ← Back to Rise Forward Foundation
+          ← Back to Rise Foundation
         </Link>
 
         {/* Introduction */}

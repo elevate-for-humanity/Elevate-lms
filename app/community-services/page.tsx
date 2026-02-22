@@ -75,7 +75,7 @@ const services = (dbRows as any[]) || [];
               Free Training
             </Link>
             <Link
-              href="/nonprofit"
+              href="/rise-foundation"
               className="px-8 py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition"
             >
               Mental Wellness

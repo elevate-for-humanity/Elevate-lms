@@ -1,114 +1,147 @@
-
 import { Metadata } from 'next';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Building2 } from 'lucide-react';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import {
+  Users, Briefcase, FileText, BarChart3, ArrowRight,
+  Building2, CheckCircle, Clock, TrendingUp, PlusCircle,
+} from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Employer Portal | Elevate For Humanity',
+  title: 'Dashboard | Employer Portal',
   description: 'Manage apprentices, track training progress, and access employer tools.',
+  robots: { index: false, follow: false },
 };
 
-export default function EmployerPortalLanding() {
+export const dynamic = 'force-dynamic';
+
+export default async function EmployerPortalDashboard() {
+  const supabase = await createClient();
+  if (!supabase) redirect('/login?redirect=/employer-portal');
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/employer-portal');
+
+  const db = createAdminClient() || supabase;
+
+  // Fetch employer profile
+  const { data: profile } = await db.from('profiles').select('full_name, role').eq('id', user.id).single();
+  const { data: employer } = await db.from('employer_profiles').select('*').eq('user_id', user.id).single();
+
+  // Stats
+  const [jobPostings, applications, placements, interviews] = await Promise.all([
+    db.from('job_postings').select('id', { count: 'exact', head: true }).eq('employer_id', user.id),
+    db.from('job_applications').select('id', { count: 'exact', head: true }),
+    db.from('job_placements').select('id', { count: 'exact', head: true }),
+    db.from('job_applications').select('id', { count: 'exact', head: true }).eq('status', 'interview'),
+  ]);
+
+  const stats = [
+    { label: 'Active Postings', value: jobPostings.count ?? 0, icon: Briefcase, color: 'text-brand-blue-600 bg-brand-blue-50' },
+    { label: 'Applications', value: applications.count ?? 0, icon: FileText, color: 'text-amber-600 bg-amber-50' },
+    { label: 'Interviews', value: interviews.count ?? 0, icon: Clock, color: 'text-purple-600 bg-purple-50' },
+    { label: 'Placements', value: placements.count ?? 0, icon: CheckCircle, color: 'text-brand-green-600 bg-brand-green-50' },
+  ];
+
+  // Recent applications
+  const { data: recentApps } = await db
+    .from('job_applications')
+    .select('id, status, applied_at, notes')
+    .order('applied_at', { ascending: false })
+    .limit(5);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Employer Portal' }]} />
+    <div>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Employer Dashboard</h1>
+          <p className="text-gray-600 mt-1">
+            {employer?.company_name || profile?.full_name || user.email}
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <Link href="/employer-portal/jobs/new"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition text-sm font-medium">
+            <PlusCircle className="w-4 h-4" /> Post a Job
+          </Link>
+          <Link href="/employer-portal/analytics"
+            className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50 transition text-sm">
+            <BarChart3 className="w-4 h-4" /> Analytics
+          </Link>
         </div>
       </div>
 
-      {/* Hero with Image */}
-      {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/hero/hero-business.jpg" alt="Employer Portal" fill className="object-cover" priority sizes="100vw" />
-        </div>
-        <div className="bg-slate-900 py-10">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Employer Partner Portal</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Manage your apprentices, track their training progress, and access employer resources.</p>
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {stats.map((s) => (
+          <div key={s.label} className="bg-white rounded-xl border p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${s.color}`}>
+                <s.icon className="w-5 h-5" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold">{s.value}</p>
+            <p className="text-gray-500 text-sm">{s.label}</p>
           </div>
+        ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {[
+          { title: 'Post a Job', href: '/employer-portal/jobs/new', icon: PlusCircle, desc: 'Create a new job posting', color: 'border-l-brand-blue-500' },
+          { title: 'View Candidates', href: '/employer-portal/candidates', icon: Users, desc: 'Browse qualified candidates', color: 'border-l-brand-green-500' },
+          { title: 'Company Profile', href: '/employer-portal/company', icon: Building2, desc: 'Update company information', color: 'border-l-amber-500' },
+          { title: 'WOTC Credits', href: '/employer-portal/wotc', icon: TrendingUp, desc: 'Work Opportunity Tax Credits', color: 'border-l-purple-500' },
+        ].map((a) => (
+          <Link key={a.title} href={a.href}
+            className={`bg-white rounded-xl border border-l-4 ${a.color} p-5 hover:shadow-md transition`}>
+            <a.icon className="w-6 h-6 text-gray-700 mb-3" />
+            <h3 className="font-bold mb-1">{a.title}</h3>
+            <p className="text-gray-500 text-sm">{a.desc}</p>
+          </Link>
+        ))}
+      </div>
+
+      {/* Recent Applications */}
+      <div className="bg-white rounded-xl border p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold">Recent Applications</h2>
+          <Link href="/employer-portal/applications" className="text-brand-blue-600 text-sm font-medium hover:underline inline-flex items-center gap-1">
+            View all <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
-      </section>
-
-      {/* Avatar Guide */}
-
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">Portal Features</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
-              <div className="relative h-32">
-                <Image src="/images/heroes/employer-partner-2.jpg" alt="Apprentice Management" fill sizes="100vw" className="object-cover" />
+        {(recentApps && recentApps.length > 0) ? (
+          <div className="space-y-3">
+            {recentApps.map((app: any) => (
+              <div key={app.id} className="flex items-center justify-between py-3 border-b last:border-0">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{app.notes?.split('\n')[0] || 'Application'}</p>
+                  <p className="text-xs text-gray-500">
+                    {app.applied_at ? new Date(app.applied_at).toLocaleDateString() : 'Recent'}
+                  </p>
+                </div>
+                <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                  app.status === 'submitted' ? 'bg-brand-blue-100 text-brand-blue-700' :
+                  app.status === 'interview' ? 'bg-purple-100 text-purple-700' :
+                  app.status === 'hired' ? 'bg-brand-green-100 text-brand-green-700' :
+                  'bg-gray-100 text-gray-700'
+                }`}>
+                  {(app.status || 'pending').replace(/_/g, ' ')}
+                </span>
               </div>
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Apprentice Management</h3>
-                <p className="text-slate-600">View and manage your apprentices and their progress.</p>
-              </div>
-            </div>
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
-              <div className="relative h-32">
-                <Image src="/images/hero/hero-business.jpg" alt="Training Progress" fill sizes="100vw" className="object-cover" />
-              </div>
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Training Progress</h3>
-                <p className="text-slate-600">Track training completion and skill development.</p>
-              </div>
-            </div>
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
-              <div className="relative h-32">
-                <Image src="/images/homepage/employers.jpg" alt="Documents" fill sizes="100vw" className="object-cover" />
-              </div>
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Documents</h3>
-                <p className="text-slate-600">Access agreements, reports, and compliance documents.</p>
-              </div>
-            </div>
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
-              <div className="relative h-32">
-                <Image src="/images/programs-hq/business-office.jpg" alt="Payroll" fill sizes="100vw" className="object-cover" />
-              </div>
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Payroll</h3>
-                <p className="text-slate-600">Manage apprentice wages and payroll information.</p>
-              </div>
-            </div>
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
-              <div className="relative h-32">
-                <Image src="/images/hero/hero-business.jpg" alt="Job Postings" fill sizes="100vw" className="object-cover" />
-              </div>
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Job Postings</h3>
-                <p className="text-slate-600">Post positions and find qualified candidates.</p>
-              </div>
-            </div>
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
-              <div className="relative h-32">
-                <Image src="/images/hero/hero-business.jpg" alt="Company Profile" fill sizes="100vw" className="object-cover" />
-              </div>
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Company Profile</h3>
-                <p className="text-slate-600">Manage your company information and settings.</p>
-              </div>
-            </div>
+            ))}
           </div>
-        </div>
-      </section>
-
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">Partner With Us</h2>
-          <p className="text-lg text-slate-600 mb-8">Already a partner? Sign in. New employer? Start onboarding today.</p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/login?redirect=/employer-portal" className="px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700">Sign In</Link>
-            <Link href="/onboarding/employer" className="px-8 py-4 bg-slate-100 text-slate-900 font-bold rounded-lg hover:bg-slate-200">Employer Onboarding</Link>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-400 text-sm mb-3">No applications yet.</p>
+            <Link href="/employer-portal/jobs/new" className="text-brand-blue-600 text-sm font-medium hover:underline inline-flex items-center gap-1">
+              Post your first job <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
-        </div>
-      </section>
+        )}
+      </div>
     </div>
   );
 }

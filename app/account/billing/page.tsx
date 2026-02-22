@@ -167,7 +167,7 @@ export default function BillingPage() {
           <div className="bg-white rounded-xl shadow-sm p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
             <h1 className="text-xl font-bold text-gray-900 mb-2">{error}</h1>
-            <Link href="/auth/login" className="text-brand-blue-600 hover:underline">
+            <Link href="/login" className="text-brand-blue-600 hover:underline">
               Sign in to continue
             </Link>
           </div>

@@ -1,10 +1,11 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Clock, XCircle, AlertCircle, TrendingUp } from 'lucide-react';
+import { Clock, XCircle, AlertCircle, TrendingUp, Briefcase, CheckCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { getUnverifiedHours, type OJTHoursLog } from '@/lib/blended-learning/ojt-tracking';
 
 export const metadata: Metadata = {
   title: 'Hours Management | Partner Portal',
@@ -62,6 +63,22 @@ export default async function PartnerHoursPage() {
     .gte('approved_at', startOfMonth.toISOString());
 
   const totalMonthlyHours = monthlyHours?.reduce((sum, h) => sum + (h.hours || 0), 0) || 0;
+
+  // OJT placements and unverified hours
+  let ojtPlacements: any[] = [];
+  let unverifiedOJT: OJTHoursLog[] = [];
+  try {
+    const { data: placements } = await db
+      .from('ojt_placements')
+      .select('id, student_id, employer_name, position_title, status, total_hours_required, total_hours_completed')
+      .eq('status', 'active')
+      .limit(10);
+    ojtPlacements = placements || [];
+
+    unverifiedOJT = await getUnverifiedHours(user.email || '');
+  } catch {
+    // OJT tables may not exist
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -177,6 +194,73 @@ export default async function PartnerHoursPage() {
             </div>
           </Link>
         </div>
+
+        {/* OJT Placements */}
+        {ojtPlacements.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Briefcase className="w-5 h-5" /> On-the-Job Training Placements
+            </h2>
+            <div className="bg-white rounded-xl border overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Student</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Employer</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Position</th>
+                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">Progress</th>
+                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {ojtPlacements.map((p: any) => {
+                    const pct = p.total_hours_required > 0
+                      ? Math.round((p.total_hours_completed / p.total_hours_required) * 100)
+                      : 0;
+                    return (
+                      <tr key={p.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 text-sm font-medium">{p.student_id?.slice(0, 8)}...</td>
+                        <td className="px-6 py-4 text-sm text-gray-700">{p.employer_name}</td>
+                        <td className="px-6 py-4 text-sm text-gray-700">{p.position_title}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="h-full bg-brand-blue-500 rounded-full" style={{ width: `${pct}%` }} />
+                            </div>
+                            <span className="text-xs text-gray-500 w-10 text-right">{pct}%</span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1">{p.total_hours_completed}/{p.total_hours_required}h</p>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            p.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' :
+                            p.status === 'completed' ? 'bg-brand-blue-100 text-brand-blue-700' :
+                            'bg-gray-100 text-gray-700'
+                          }`}>{p.status}</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Unverified OJT Hours */}
+        {unverifiedOJT.length > 0 && (
+          <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-amber-800">Unverified OJT Hours</h3>
+                <p className="text-amber-700 text-sm mt-1">
+                  {unverifiedOJT.length} OJT hour{unverifiedOJT.length > 1 ? ' entries' : ' entry'} awaiting supervisor verification.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

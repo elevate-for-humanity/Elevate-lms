@@ -6,7 +6,7 @@ import { Heart, Users, Calendar, Phone, Mail, ArrowRight, HandHeart, Briefcase }
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Get Involved | Rise Forward Foundation',
+  title: 'Get Involved | Rise Foundation',
   description: 'Join our mission to support healing and recovery. Volunteer, donate, or become a partner.',
 };
 

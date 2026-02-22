@@ -3,8 +3,8 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { ArrowLeft, Scale, AlertTriangle, Zap } from 'lucide-react';
-import { QuickSummary } from '@/app/governance/_content/QuickSummary';
-import { SupersonicScopeSection } from '@/app/governance/_content/SupersonicScopeSection';
+import { QuickSummary } from '@/app/admin/governance/_content/QuickSummary';
+import { SupersonicScopeSection } from '@/app/admin/governance/_content/SupersonicScopeSection';
 
 export const metadata: Metadata = {
   title: 'Compliance & Disclosure Framework | Supersonic Fast Cash',
@@ -43,7 +43,7 @@ export default function SupersonicCompliancePage() {
       <div className="bg-emerald-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <Link 
-            href="/governance" 
+            href="/admin/governance" 
             className="inline-flex items-center text-emerald-300 hover:text-white mb-6 text-sm"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -263,13 +263,13 @@ export default function SupersonicCompliancePage() {
           <p className="text-center text-slate-500 text-sm mb-6">End of Document</p>
           <div className="flex justify-center gap-4">
             <Link 
-              href="/governance"
+              href="/admin/governance"
               className="px-6 py-3 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors"
             >
               Back to Index
             </Link>
             <Link 
-              href="/governance/contact"
+              href="/admin/governance/contact"
               className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
             >
               Contact Compliance

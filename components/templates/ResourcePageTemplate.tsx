@@ -192,13 +192,13 @@ export function ResourcePageTemplate({
             </p>
             <div className="flex flex-wrap gap-3">
               <Link 
-                href="/governance"
+                href="/admin/governance"
                 className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
               >
                 Governance Documents →
               </Link>
               <Link 
-                href="/governance/security"
+                href="/admin/governance/security"
                 className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
               >
                 Security & Data Protection →

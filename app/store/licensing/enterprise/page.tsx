@@ -377,8 +377,8 @@ export default function SourceUseLicensePage() {
             <ul className="text-slate-600 text-sm space-y-2">
               <li>• <Link href="/terms-of-service" className="text-brand-blue-600 hover:text-slate-700 underline">Terms of Service</Link></li>
               <li>• <Link href="/privacy-policy" className="text-brand-blue-600 hover:text-slate-700 underline">Privacy Policy</Link></li>
-              <li>• <Link href="/governance/data" className="text-brand-blue-600 hover:text-slate-700 underline">Data Processing & Privacy</Link></li>
-              <li>• <Link href="/governance/security" className="text-brand-blue-600 hover:text-slate-700 underline">Security Policy</Link></li>
+              <li>• <Link href="/admin/governance/data" className="text-brand-blue-600 hover:text-slate-700 underline">Data Processing & Privacy</Link></li>
+              <li>• <Link href="/admin/governance/security" className="text-brand-blue-600 hover:text-slate-700 underline">Security Policy</Link></li>
               <li>• <Link href="/accessibility" className="text-brand-blue-600 hover:text-slate-700 underline">Accessibility Statement</Link></li>
               <li>• Enterprise License Agreement (provided during procurement)</li>
             </ul>

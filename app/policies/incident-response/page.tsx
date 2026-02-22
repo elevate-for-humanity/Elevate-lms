@@ -172,7 +172,7 @@ export default function IncidentResponsePage() {
             <ul className="list-disc pl-6 mb-6 text-black space-y-2">
               <li><Link href="/policies/sla" className="text-brand-blue-600 hover:underline">Service Level Agreement</Link></li>
               <li><Link href="/policies/disaster-recovery" className="text-brand-blue-600 hover:underline">Disaster Recovery Plan</Link></li>
-              <li><Link href="/governance/security" className="text-brand-blue-600 hover:underline">Security Policy</Link></li>
+              <li><Link href="/admin/governance/security" className="text-brand-blue-600 hover:underline">Security Policy</Link></li>
             </ul>
           </div>
         </article>

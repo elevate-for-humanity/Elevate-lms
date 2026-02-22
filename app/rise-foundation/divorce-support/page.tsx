@@ -4,7 +4,7 @@ import { Heart, Phone } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Divorce Support | Rise Forward Foundation',
+  title: 'Divorce Support | Rise Foundation',
   description: 'Support and resources for individuals navigating divorce and separation',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/rise-foundation/divorce-support',
@@ -45,7 +45,7 @@ export default function DivorceSupportPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-12">
         <Link href="/rise-foundation" className="text-brand-blue-600 hover:text-brand-blue-700 mb-8 inline-block">
-          ← Back to Rise Forward Foundation
+          ← Back to Rise Foundation
         </Link>
 
         {/* Introduction */}

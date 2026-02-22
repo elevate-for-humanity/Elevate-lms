@@ -216,7 +216,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <Link
-                    href="/platform/licensing"
+                    href="/store/licensing"
                     className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
                   >
                     View License Terms →

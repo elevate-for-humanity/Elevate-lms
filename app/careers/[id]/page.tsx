@@ -3,7 +3,8 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { use, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Upload, Briefcase, MapPin, Clock } from 'lucide-react';
+import { ArrowLeft, Upload, Briefcase, MapPin, Clock, AlertCircle } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 export default function CareerApplicationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -23,16 +24,59 @@ export default function CareerApplicationPage({ params }: { params: Promise<{ id
   const [resume, setResume] = useState<File | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    
-    // Simulate submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setSubmitted(true);
-    setSubmitting(false);
+    setError('');
+
+    try {
+      const supabase = createClient();
+      let resumeUrl = '';
+
+      // Upload resume if provided
+      if (resume) {
+        const ext = resume.name.split('.').pop();
+        const path = `job-applications/${id}/${Date.now()}.${ext}`;
+        const { error: uploadErr } = await supabase.storage
+          .from('documents')
+          .upload(path, resume);
+        if (uploadErr) throw new Error('Resume upload failed: ' + uploadErr.message);
+        const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path);
+        resumeUrl = urlData.publicUrl;
+      }
+
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { error: insertErr } = await supabase
+        .from('job_applications')
+        .insert({
+          job_posting_id: id,
+          student_id: user?.id || null,
+          resume_url: resumeUrl,
+          cover_letter: formData.coverLetter,
+          notes: [
+            `Name: ${formData.firstName} ${formData.lastName}`,
+            `Email: ${formData.email}`,
+            `Phone: ${formData.phone}`,
+            formData.linkedIn ? `LinkedIn: ${formData.linkedIn}` : '',
+            formData.portfolio ? `Portfolio: ${formData.portfolio}` : '',
+            `Experience: ${formData.experience}`,
+            `Availability: ${formData.availability}`,
+            formData.salary ? `Salary: ${formData.salary}` : '',
+            formData.heardAbout ? `Source: ${formData.heardAbout}` : '',
+          ].filter(Boolean).join('\n'),
+          status: 'submitted',
+        });
+
+      if (insertErr) throw new Error(insertErr.message);
+      setSubmitted(true);
+    } catch (err: any) {
+      setError(err.message || 'Submission failed. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {

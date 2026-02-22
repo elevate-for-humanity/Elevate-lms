@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { issueCertificate } from '../actions';
 
 export const metadata: Metadata = {
   alternates: {
@@ -79,7 +80,7 @@ export default async function IssueCertificatePage() {
 
         {/* Form */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
-          <form className="space-y-6">
+          <form action={issueCertificate} className="space-y-6">
             {/* Recipient Section */}
             <div>
               <h2 className="text-lg font-semibold mb-4">Recipient Information</h2>
@@ -89,6 +90,7 @@ export default async function IssueCertificatePage() {
                     Recipient Name *
                   </label>
                   <input 
+                    name="recipientName"
                     type="text" 
                     className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="Full name as it appears on certificate"
@@ -100,6 +102,7 @@ export default async function IssueCertificatePage() {
                     Email Address *
                   </label>
                   <input 
+                    name="email"
                     type="email" 
                     className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="recipient@email.com"
@@ -118,6 +121,7 @@ export default async function IssueCertificatePage() {
                     Certificate Template *
                   </label>
                   <select 
+                    name="templateId"
                     className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     required
                   >
@@ -137,7 +141,7 @@ export default async function IssueCertificatePage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Course / Program
                   </label>
-                  <select className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500">
+                  <select name="courseId" className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500">
                     <option value="">Select a course (optional)</option>
                     {courses?.map((course: any) => (
                       <option key={course.id} value={course.id}>
@@ -153,6 +157,7 @@ export default async function IssueCertificatePage() {
                       Issue Date *
                     </label>
                     <input 
+                      name="issueDate"
                       type="date" 
                       className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       defaultValue={new Date().toISOString().split('T')[0]}
@@ -164,6 +169,7 @@ export default async function IssueCertificatePage() {
                       Expiration Date
                     </label>
                     <input 
+                      name="expirationDate"
                       type="date" 
                       className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     />
@@ -175,6 +181,7 @@ export default async function IssueCertificatePage() {
                     Signed By
                   </label>
                   <input 
+                    name="signedBy"
                     type="text" 
                     className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="Director or authorized signer name"
@@ -186,6 +193,7 @@ export default async function IssueCertificatePage() {
                     Additional Notes
                   </label>
                   <textarea 
+                    name="notes"
                     className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     rows={3}
                     placeholder="Any additional information to include"
@@ -199,7 +207,7 @@ export default async function IssueCertificatePage() {
               <h2 className="text-lg font-semibold mb-4">Notification</h2>
               <div className="space-y-2">
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" className="w-4 h-4 text-brand-blue-600 rounded" defaultChecked />
+                  <input name="sendEmail" type="checkbox" className="w-4 h-4 text-brand-blue-600 rounded" defaultChecked />
                   <span className="text-sm text-gray-700">Send email notification to recipient</span>
                 </label>
                 <label className="flex items-center gap-2">

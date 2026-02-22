@@ -6,7 +6,7 @@ import {
   FileText, Shield, Scale, Search, Settings, Mail, 
   ArrowRight, Building2, Zap
 } from 'lucide-react';
-import { QuickSummary } from '@/app/governance/_content/QuickSummary';
+import { QuickSummary } from '@/app/admin/governance/_content/QuickSummary';
 
 export const metadata: Metadata = {
   title: 'Governance | Supersonic Fast Cash',
@@ -228,7 +228,7 @@ export default function SupersonicGovernancePage() {
             For diligence inquiries or governance questions, contact our team.
           </p>
           <Link
-            href="/governance/contact"
+            href="/admin/governance/contact"
             className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
           >
             <Mail className="w-5 h-5" />

@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { ArrowLeft, Search, XCircle, Code, Zap } from 'lucide-react';
-import { QuickSummary } from '@/app/governance/_content/QuickSummary';
+import { QuickSummary } from '@/app/admin/governance/_content/QuickSummary';
 
 export const metadata: Metadata = {
   title: 'SEO & Indexing Governance | Supersonic Fast Cash',
@@ -78,7 +78,7 @@ export default function SupersonicSeoIndexingPage() {
       <div className="bg-emerald-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <Link 
-            href="/governance" 
+            href="/admin/governance" 
             className="inline-flex items-center text-emerald-300 hover:text-white mb-6 text-sm"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -210,13 +210,13 @@ export default function SupersonicSeoIndexingPage() {
           <h2 className="text-xl font-bold text-slate-900 mb-4">Related Documentation</h2>
           <div className="flex flex-wrap justify-center gap-3">
             <Link
-              href="/governance/operational-controls"
+              href="/admin/governance/operational-controls"
               className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
             >
               Operational Controls
             </Link>
             <Link
-              href="/governance/authoritative-docs"
+              href="/admin/governance/authoritative-docs"
               className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
             >
               Authoritative Documents

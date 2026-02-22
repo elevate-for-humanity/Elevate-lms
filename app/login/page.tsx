@@ -157,7 +157,7 @@ function LoginForm() {
                   <span className="text-black">Remember me</span>
                 </label>
                 <Link
-                  href="/auth/forgot-password"
+                  href="/reset-password"
                   className="text-brand-blue-600 hover:text-brand-blue-700"
                 >
                   Forgot password?

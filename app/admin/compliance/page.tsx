@@ -7,6 +7,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import WIOAComplianceDashboard from '@/components/admin/WIOAComplianceDashboard';
+import {
+  getAllGuardrails,
+  getCriticalGuardrails,
+  shouldAutoEnforce,
+  type GuardrailPolicy,
+} from '@/lib/compliance/guardrails';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -176,6 +182,77 @@ export default async function CompliancePage() {
                 View FERPA Log
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Automated Guardrails */}
+      <section className="py-8 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Automated Compliance Guardrails</h2>
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            {(['critical', 'major', 'minor'] as const).map((severity) => {
+              const all = getAllGuardrails();
+              const filtered = all.filter((g) => g.severity === severity);
+              const autoCount = filtered.filter(shouldAutoEnforce).length;
+              const colors = {
+                critical: 'border-brand-red-500 bg-brand-red-50',
+                major: 'border-amber-500 bg-amber-50',
+                minor: 'border-brand-blue-500 bg-brand-blue-50',
+              };
+              return (
+                <div key={severity} className={`rounded-xl border-l-4 p-5 ${colors[severity]}`}>
+                  <h3 className="font-bold capitalize text-gray-900">{severity} Guardrails</h3>
+                  <p className="text-3xl font-bold mt-2">{filtered.length}</p>
+                  <p className="text-sm text-gray-600 mt-1">{autoCount} auto-enforced</p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="bg-white rounded-xl border overflow-hidden">
+            <div className="px-6 py-4 border-b">
+              <h3 className="font-semibold">Active Policies</h3>
+            </div>
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-semibold">Policy</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold">Type</th>
+                  <th className="px-6 py-3 text-center text-sm font-semibold">Severity</th>
+                  <th className="px-6 py-3 text-center text-sm font-semibold">Auto-Enforce</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold">Action</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold">MOU Ref</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {getAllGuardrails().map((g: GuardrailPolicy) => (
+                  <tr key={g.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-3">
+                      <p className="font-medium text-sm">{g.name}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{g.description}</p>
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-700 capitalize">{g.violationType.replace(/_/g, ' ')}</td>
+                    <td className="px-6 py-3 text-center">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        g.severity === 'critical' ? 'bg-brand-red-100 text-brand-red-700' :
+                        g.severity === 'major' ? 'bg-amber-100 text-amber-700' :
+                        'bg-brand-blue-100 text-brand-blue-700'
+                      }`}>{g.severity}</span>
+                    </td>
+                    <td className="px-6 py-3 text-center">
+                      {shouldAutoEnforce(g) ? (
+                        <span className="text-brand-green-600 text-sm font-medium">Yes</span>
+                      ) : (
+                        <span className="text-gray-400 text-sm">Manual</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-700 capitalize">{g.enforcementAction.replace(/_/g, ' ')}</td>
+                    <td className="px-6 py-3 text-xs text-gray-500">{g.mouSection}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>

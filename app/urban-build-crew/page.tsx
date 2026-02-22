@@ -20,14 +20,8 @@ export default function UrbanBuildCrewPage() {
           { label: 'Urban Build Crew' },
         ]}
       />
-      <section className="relative h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image src="/images/trades/program-construction-training.jpg" alt="Urban Build Crew" fill className="object-cover" priority sizes="100vw" />
-        
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <Hammer className="w-16 h-16 mx-auto mb-4 text-white/80" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Urban Build Crew</h1>
-          <p className="text-xl text-brand-orange-100">Building skills. Building careers. Building communities.</p>
-        </div>
       </section>
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">

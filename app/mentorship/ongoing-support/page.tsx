@@ -30,14 +30,8 @@ export default function OngoingSupportPage() {
         </div>
       </div>
 
-      <section className="relative h-[350px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image src="/images/efh/sections/coaching.jpg" alt="Ongoing Support" fill className="object-cover" priority sizes="100vw" />
-        
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <Heart className="w-16 h-16 mx-auto mb-4 text-white/80" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Ongoing Support</h1>
-          <p className="text-xl text-teal-100">We are with you every step of the way</p>
-        </div>
       </section>
 
       <section className="py-16 bg-white">

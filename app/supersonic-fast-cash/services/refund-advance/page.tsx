@@ -2,6 +2,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   DollarSign,
   Clock,
@@ -97,37 +98,8 @@ export default function RefundAdvancePage() {
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Refund Advance" }]} />
       </div>
 {/* Hero */}
-      <section className="relative bg-slate-700 text-white py-20">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold mb-6">
-              <Zap className="w-4 h-4" />
-              Same Day Cash Available
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
-              Get Up to $7,500
-              <span className="block text-brand-green-300">Today</span>
-            </h1>
-            <p className="text-xl text-brand-green-100 mb-8">
-              Don&apos;t wait weeks for your refund. Get a 0% interest advance on your tax refund and walk out with cash in your pocket.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/supersonic-fast-cash/apply"
-                className="inline-flex items-center justify-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-green-50 transition-colors"
-              >
-                Apply Now
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/supersonic-fast-cash/locations"
-                className="inline-flex items-center justify-center gap-2 bg-brand-green-500/30 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-green-500/40 transition-colors border border-white/30"
-              >
-                Find a Location
-              </Link>
-            </div>
-          </div>
-        </div>
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image src="/images/heroes-hq/tax-refund-hero.jpg" alt="Refund Advance" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Benefits */}

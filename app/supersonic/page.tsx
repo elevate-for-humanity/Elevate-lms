@@ -56,26 +56,13 @@ export default function SupersonicPage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Supersonic" }]} />
       </div>
-<div className="relative bg-gray-900 py-20">
+<div className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/heroes/training-provider-2.jpg"
           alt="Supersonic Program"
           fill
-          className="object-cover opacity-30"
+          className="object-cover"
         />
-        <div className="relative max-w-7xl mx-auto px-4 text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Zap className="w-10 h-10 text-brand-red-500" />
-            <span className="text-brand-red-500 font-bold text-xl">SUPERSONIC</span>
-          </div>
-          <h1 className="text-5xl font-bold text-white mb-6">Accelerate Your Career</h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
-            Our intensive fast-track programs get you certified and job-ready in half the time.
-          </p>
-          <Link href="/supersonic/apply" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-red-700 transition-colors">
-            Apply Now <ArrowRight className="w-5 h-5" />
-          </Link>
-        </div>
       </div>
       <div className="max-w-7xl mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-white text-center mb-12">Why Supersonic?</h2>

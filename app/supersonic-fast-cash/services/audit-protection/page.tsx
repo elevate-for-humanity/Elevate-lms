@@ -2,6 +2,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Shield,
   ArrowRight,
@@ -79,37 +80,8 @@ export default function AuditProtectionPage() {
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Audit Protection" }]} />
       </div>
 {/* Hero */}
-      <section className="relative bg-slate-700 text-white py-20">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold mb-6">
-              <Shield className="w-4 h-4" />
-              Peace of Mind Protection
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
-              Audit Protection
-              <span className="block text-brand-red-300">We&apos;ve Got Your Back</span>
-            </h1>
-            <p className="text-xl text-brand-red-100 mb-8">
-              If the IRS comes knocking, you won&apos;t face them alone. Our tax professionals handle everything so you don&apos;t have to.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/supersonic-fast-cash/apply"
-                className="inline-flex items-center justify-center gap-2 bg-white text-brand-red-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-red-50 transition-colors"
-              >
-                Get Protected
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/supersonic-fast-cash/contact"
-                className="inline-flex items-center justify-center gap-2 bg-brand-red-500/30 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-red-500/40 transition-colors border border-white/30"
-              >
-                Get a Free Consultation
-              </Link>
-            </div>
-          </div>
-        </div>
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image src="/images/heroes-hq/tax-refund-hero.jpg" alt="Audit Protection" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Why You Need It */}

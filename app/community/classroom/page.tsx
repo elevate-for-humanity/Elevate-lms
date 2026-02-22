@@ -60,36 +60,8 @@ export default async function ClassroomPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-brand-green-800 text-white py-20">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-4">
-              <BookOpen className="w-6 h-6 text-brand-green-300" />
-              <span className="text-brand-green-200 font-medium">Community Classroom</span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold mb-6">
-              Learn New Skills,<br />Advance Your Career
-            </h1>
-            <p className="text-xl text-brand-green-100 mb-8">
-              Access exclusive courses, tutorials, and resources designed to help you succeed in your career journey.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="#courses"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-brand-green-800 font-semibold rounded-full hover:bg-brand-green-50 transition-colors"
-              >
-                Browse Courses
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/community"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-700 text-white font-semibold rounded-full hover:bg-brand-green-600 transition-colors"
-              >
-                Back to Community
-              </Link>
-            </div>
-          </div>
-        </div>
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image src="/images/programs-hq/training-classroom.jpg" alt="Community Classroom" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Stats */}

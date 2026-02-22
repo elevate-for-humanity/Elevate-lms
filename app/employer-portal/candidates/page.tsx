@@ -67,25 +67,13 @@ export default async function CandidatesPage() {
     <div className="min-h-screen bg-gray-50">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Candidates" }]} />
 {/* Hero */}
-      <section className="relative bg-brand-green-800 text-white py-16">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/heroes/employer-partner-3.jpg"
-            alt="Candidates"
-            fill
-            className="object-cover opacity-20"
-          />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Users className="w-8 h-8 text-brand-green-200" />
-            <span className="text-brand-green-200 font-medium">Candidate Pool</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-4">Find Qualified Candidates</h1>
-          <p className="text-brand-green-100 text-lg max-w-2xl">
-            Browse our pool of trained and certified candidates ready to join your team.
-          </p>
-        </div>
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image
+          src="/images/heroes/employer-partner-3.jpg"
+          alt="Candidates"
+          fill
+          className="object-cover"
+        />
       </section>
 
       {/* Search & Filters */}

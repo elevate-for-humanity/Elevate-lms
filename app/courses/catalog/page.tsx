@@ -4,6 +4,7 @@ import React from 'react';
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 import {
   Search,
@@ -404,29 +405,15 @@ export default function CoursesCatalogPage() {
         ]}
       />
       {/* Hero */}
-      <section className="bg-slate-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Partner Course Catalog
-          </h1>
-          <p className="text-base md:text-lg text-brand-blue-100 mb-6">
-            130+ industry certifications from leading training providers
-          </p>
-          <div className="flex flex-wrap gap-4 text-sm">
-            <div className="flex items-center gap-2 bg-brand-blue-700 px-4 py-2 rounded-lg">
-              <Award className="w-5 h-5" />
-              <span>Industry Recognized</span>
-            </div>
-            <div className="flex items-center gap-2 bg-brand-blue-700 px-4 py-2 rounded-lg">
-              <Clock className="w-5 h-5" />
-              <span>Self-Paced Learning</span>
-            </div>
-            <div className="flex items-center gap-2 bg-brand-blue-700 px-4 py-2 rounded-lg">
-              <DollarSign className="w-5 h-5" />
-              <span>Affordable Pricing</span>
-            </div>
-          </div>
-        </div>
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image
+          src="/images/programs-hq/training-classroom.jpg"
+          alt="Partner Course Catalog"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
       </section>
 
       {/* Filters */}

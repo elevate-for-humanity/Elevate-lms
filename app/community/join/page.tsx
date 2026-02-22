@@ -45,16 +45,8 @@ export default async function JoinCommunityPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative py-20 bg-brand-blue-800 text-white overflow-hidden">
-        <div className="relative max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Join the Elevate Community</h1>
-          <p className="text-xl text-brand-blue-100 mb-8 max-w-2xl mx-auto">
-            Connect with fellow learners, access exclusive resources, and accelerate your career growth.
-          </p>
-          <Link href="/apply" className="inline-flex items-center gap-2 bg-white text-brand-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-50 transition">
-            Get Started <ArrowRight className="w-5 h-5" />
-          </Link>
-        </div>
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image src="/images/heroes-hq/success-hero.jpg" alt="Join the Elevate Community" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Benefits */}

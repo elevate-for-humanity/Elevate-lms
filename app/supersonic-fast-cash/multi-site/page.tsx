@@ -2,6 +2,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Building2,
   DollarSign,
@@ -136,37 +137,8 @@ export default function MultiSitePage() {
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Multi Site" }]} />
       </div>
 {/* Hero */}
-      <section className="relative bg-slate-700 text-white py-20">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold mb-6">
-              <Building2 className="w-4 h-4" />
-              Partnership Opportunity
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
-              Own Your Own
-              <span className="block text-brand-blue-300">Tax Preparation Office</span>
-            </h1>
-            <p className="text-xl text-brand-blue-100 mb-8">
-              Join the Supersonic Fast Cash network and build a profitable tax business with our proven systems, training, and support.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/supersonic-fast-cash/multi-site/apply"
-                className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-blue-50 transition-colors"
-              >
-                Apply Now
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/supersonic-fast-cash/contact"
-                className="inline-flex items-center justify-center gap-2 bg-brand-blue-500/30 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-blue-500/40 transition-colors border border-white/30"
-              >
-                Get Started
-              </Link>
-            </div>
-          </div>
-        </div>
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image src="/images/programs-hq/tax-preparation.jpg" alt="Multi-Site Tax Office" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Stats */}

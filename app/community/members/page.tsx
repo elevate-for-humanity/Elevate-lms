@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Users, Search, Filter, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -56,37 +57,8 @@ export default async function MembersPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-brand-orange-600 text-white py-20">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-4">
-              <Users className="w-6 h-6 text-brand-orange-200" />
-              <span className="text-brand-orange-100 font-medium">Member Directory</span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold mb-6">
-              Connect With<br />{(count || 0).toLocaleString()} Members
-            </h1>
-            <p className="text-xl text-brand-orange-100 mb-8">
-              Find mentors, study partners, and industry professionals who can help you on your journey.
-            </p>
-            
-            {/* Search */}
-            <div className="flex gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search members by name or role..."
-                  className="w-full pl-12 pr-4 py-4 rounded-full text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-orange-300"
-                />
-              </div>
-              <button className="px-6 py-4 bg-brand-orange-800 text-white font-semibold rounded-full hover:bg-brand-orange-900 transition-colors flex items-center gap-2">
-                <Filter className="w-5 h-5" />
-                Filters
-              </button>
-            </div>
-          </div>
-        </div>
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Community Members" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Categories */}

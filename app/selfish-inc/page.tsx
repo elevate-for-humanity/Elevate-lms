@@ -18,14 +18,8 @@ export default function SelfishIncPage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Selfish Inc" }]} />
       </div>
-<section className="relative h-[400px] flex items-center justify-center text-white overflow-hidden">
+<section className="relative h-48 md:h-64 overflow-hidden">
         <Image src="/images/programs-hq/business-office.jpg" alt="Selfish Inc" fill className="object-cover" priority sizes="100vw" />
-        
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <Sparkles className="w-16 h-16 mx-auto mb-4 text-white/80" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Selfish Inc</h1>
-          <p className="text-xl text-pink-100">Invest in yourself. Create the life you deserve.</p>
-        </div>
       </section>
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">

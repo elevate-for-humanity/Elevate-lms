@@ -110,40 +110,14 @@ export default function PlatformPage() {
       <Breadcrumbs items={[{ label: 'Platform' }]} />
 
       {/* ===== HERO ===== */}
-      <section className="relative min-h-[420px] flex items-center bg-slate-900">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/team-vibrant.jpg"
           alt="Elevate Workforce Operating System"
           fill
-          className="object-cover opacity-25"
+          className="object-cover"
           priority
         />
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-          <p className="text-brand-red-400 font-bold text-sm uppercase tracking-widest mb-4">
-            Workforce Operating System
-          </p>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-            One System. Every Stage.
-          </h1>
-          <p className="mt-6 text-lg sm:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-            Intake, training, compliance, placement, and reporting — connected in one platform
-            built for workforce funding realities.
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/platform/partners"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-brand-red-600 rounded-lg hover:bg-brand-red-700 transition-colors"
-            >
-              Become a Platform Partner <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/store/demo"
-              className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white border-2 border-white rounded-lg hover:bg-white/10 transition-colors"
-            >
-              Request a Platform Demo
-            </Link>
-          </div>
-        </div>
       </section>
 
       {/* ===== PIPELINE DIAGRAM ===== */}

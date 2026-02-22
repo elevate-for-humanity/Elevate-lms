@@ -69,27 +69,14 @@ export default async function HelpArticlesPage() {
         </div>
       </div>
 
-      <div className="relative bg-brand-blue-800 text-white py-16">
+      <div className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/misc/help-hero.jpg"
           alt="Help Center"
           fill
-          className="object-cover opacity-30"
+          className="object-cover"
           priority
         />
-        <div className="relative max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold mb-4">Help Center</h1>
-          <p className="text-xl text-brand-blue-100 mb-8">Find answers to your questions</p>
-          <div className="relative max-w-xl mx-auto">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input 
-              type="text" 
-              placeholder="Search for articles..." 
-              className="w-full pl-12 pr-4 py-4 rounded-lg text-gray-900"
-              aria-label="Search help articles"
-            />
-          </div>
-        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-12">

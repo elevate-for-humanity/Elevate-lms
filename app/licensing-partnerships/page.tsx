@@ -96,59 +96,9 @@ export default function LicensingPartnershipsPage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Licensing Partnerships" }]} />
       </div>
-{/* Hero Section */}
-      <section className="relative bg-brand-blue-600 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-grid-white/10" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl">
-            {/* Logo */}
-            <div className="mb-8">
-              <Image
-                src="/logo.png"
-                alt="Elevate for Humanity"
-                width={200}
-                height={80}
-                className="brightness-0 invert"
-              />
-            </div>
-
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full mb-6">
-              <Handshake className="w-5 h-5" />
-              <span className="text-sm font-bold">
-                Partnership Opportunities
-              </span>
-            </div>
-
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight">
-              Licensing & Partnerships
-              <br />
-              <span className="text-brand-blue-300">Grow Together</span>
-            </h1>
-
-            <p className="text-2xl md:text-3xl text-white/90 mb-8 leading-relaxed font-medium">
-              Partner with Elevate for Humanity to expand your impact in
-              workforce development. Become a licensed training provider,
-              employer partner, or community organization.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 hover:bg-gray-100 px-8 py-4 rounded-xl font-bold text-lg transition shadow-2xl hover:scale-105"
-              >
-                Become a Partner
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="#types"
-                className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-md hover:bg-white/20 border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg transition"
-              >
-                Explore Options
-              </Link>
-            </div>
-          </div>
-        </div>
+{/* Hero */}
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Licensing Partnerships" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Section 1: For Students */}

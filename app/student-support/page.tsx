@@ -54,20 +54,14 @@ export default function StudentSupportPage() {
         </div>
       </div>
 
-      <div className="relative bg-brand-green-800 text-white py-16">
+      <div className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/heroes/learners.jpg"
           alt="Student Support"
           fill
-          className="object-cover opacity-30"
+          className="object-cover"
           priority
         />
-        <div className="relative max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-4">Student Support Services</h1>
-          <p className="text-xl text-brand-green-100 max-w-2xl">
-            We&apos;re here to help you succeed. Access resources and support throughout your educational journey.
-          </p>
-        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-12">

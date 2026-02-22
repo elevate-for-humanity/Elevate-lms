@@ -50,7 +50,7 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      <header className="relative min-h-[350px] flex items-center">
+      <header className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src={`/images/pathways/${pathway.slug}.jpg`}
           alt={pathway.title}
@@ -58,25 +58,6 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
           className="object-cover"
           priority
         />
-        
-        <div className="relative z-10 mx-auto max-w-6xl px-6 py-14 text-white">
-          <p className="text-white/80">
-            <Link href="/pathways" className="underline hover:text-white">Workforce Pathways</Link> / {pathway.title}
-          </p>
-          <h1 className="mt-3 text-4xl md:text-5xl font-bold">{pathway.title}</h1>
-          <p className="mt-4 max-w-3xl text-lg text-white/90">
-            Credential-backed training aligned to employer demand and funding pathways.
-          </p>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={`/apply?pathway=${encodeURIComponent(pathway.slug)}`} className="rounded-md bg-white px-6 py-3 text-black font-semibold hover:bg-gray-200">
-              Apply / Check Eligibility
-            </Link>
-            <Link href="/partners" className="rounded-md border border-white px-6 py-3 font-semibold hover:bg-white hover:text-black">
-              Employer Partner Interest
-            </Link>
-          </div>
-        </div>
       </header>
 
       <section className="bg-white">

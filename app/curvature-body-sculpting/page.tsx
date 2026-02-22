@@ -82,58 +82,14 @@ export default function CurvatureBodySculptingPage() {
         <Breadcrumbs items={[{ label: "Curvature Body Sculpting" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 min-h-[600px] flex items-center overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <Image
-            src="/images/beauty/esthetician.jpg"
-            alt="Curvature Body Sculpting"
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
-        <div className="relative max-w-6xl mx-auto px-4 text-center text-white">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium mb-6">
-            <Heart className="w-4 h-4 text-pink-300" />
-            VITA & Selfish Inc. Partner
-          </div>
-          <h1 className="text-4xl md:text-6xl font-black mb-6">
-            Curvature Body Sculpting
-          </h1>
-          <p className="text-xl text-pink-100 max-w-2xl mx-auto mb-8">
-            Transform your body. Nurture your mind. Professional body contouring services 
-            and mental health wellness products.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href="/curvature-body-sculpting/book-appointment"
-              className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-pink-50 transition"
-            >
-              Book Appointment
-            </Link>
-            <Link
-              href="/curvature-body-sculpting/shop"
-              className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition"
-            >
-              Shop Wellness Products
-            </Link>
-          </div>
-          <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-pink-200">
-            <span className="flex items-center gap-2">
-              <Phone className="w-4 h-4" />
-              Get Help Online
-            </span>
-            <span className="flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
-              8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
-            </span>
-            <span className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              Mon-Sat 9am-7pm
-            </span>
-          </div>
-        </div>
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image
+          src="/images/beauty/esthetician.jpg"
+          alt="Curvature Body Sculpting"
+          fill
+          className="object-cover"
+          priority
+        />
       </section>
 
       {/* Services */}

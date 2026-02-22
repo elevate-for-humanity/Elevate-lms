@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Trophy, Medal, Crown, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -60,35 +61,8 @@ export default async function LeaderboardPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-amber-500 text-white py-20">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Trophy className="w-8 h-8 text-yellow-200" />
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold mb-6">
-              Community Leaderboard
-            </h1>
-            <p className="text-xl text-yellow-100 mb-8">
-              Earn points by completing courses, logging hours, and achieving milestones.
-            </p>
-            
-            {/* Your Stats */}
-            {user && (
-              <div className="inline-flex items-center gap-8 bg-white/10 backdrop-blur-sm rounded-2xl px-8 py-4">
-                <div className="text-center">
-                  <p className="text-3xl font-bold">{userRank >= 0 ? `#${userRank + 1}` : '--'}</p>
-                  <p className="text-yellow-200 text-sm">Your Rank</p>
-                </div>
-                <div className="w-px h-12 bg-white/20" />
-                <div className="text-center">
-                  <p className="text-3xl font-bold">{userPoints.toLocaleString()}</p>
-                  <p className="text-yellow-200 text-sm">Points</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image src="/images/heroes-hq/success-stories-hero.jpg" alt="Community Leaderboard" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Top 3 Podium */}

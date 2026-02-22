@@ -70,23 +70,14 @@ export default async function ShopPage() {
         </div>
       </div>
 
-      <div className="relative bg-slate-900 text-white py-16">
+      <div className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/shop/shop-hero.jpg"
           alt="Shop"
           fill
-          className="object-cover opacity-40"
+          className="object-cover"
           priority
         />
-        <div className="relative max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-3 mb-4">
-            <ShoppingBag className="w-10 h-10" />
-            <h1 className="text-4xl font-bold">Elevate Shop</h1>
-          </div>
-          <p className="text-xl text-gray-200 max-w-2xl">
-            Get the tools and gear you need for your training programs
-          </p>
-        </div>
       </div>
 
       <ShopClient products={products} categories={categories} />

@@ -110,43 +110,14 @@ export default function CurvatureCareersPage() {
         <Breadcrumbs items={[{ label: "Curvature Body Sculpting", href: "/curvature-body-sculpting" }, { label: "Careers" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 min-h-[400px] flex items-center">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/beauty/cosmetology.jpg"
-            alt="Careers at Curvature Body Sculpting"
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
-        <div className="relative max-w-6xl mx-auto px-4 text-center text-white">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium mb-6">
-            <Briefcase className="w-4 h-4" />
-            We're Hiring
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black mb-6">
-            Join Curvature Body Sculpting
-          </h1>
-          <p className="text-xl text-pink-100 max-w-2xl mx-auto mb-8">
-            Start your career in body sculpting and wellness. We hire graduates from 
-            Elevate for Humanity's esthetician and beauty programs.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <a
-              href="#positions"
-              className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-pink-50 transition"
-            >
-              View Open Positions
-            </a>
-            <Link
-              href="/programs/esthetician-apprenticeship"
-              className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition"
-            >
-              Get Trained First
-            </Link>
-          </div>
-        </div>
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image
+          src="/images/beauty/cosmetology.jpg"
+          alt="Careers at Curvature Body Sculpting"
+          fill
+          className="object-cover"
+          priority
+        />
       </section>
 
       {/* Why Work Here */}

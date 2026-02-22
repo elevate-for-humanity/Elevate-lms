@@ -47,54 +47,14 @@ export default function EPA608CoursePage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-slate-900">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/trades/program-hvac-overview.jpg"
-            alt="HVAC technician working with refrigerant gauges"
-            fill
-            quality={90}
-            className="object-cover opacity-30"
-          />
-        </div>
-        <div className="relative max-w-5xl mx-auto px-6 py-16 sm:py-20">
-          <div className="flex flex-wrap gap-3 mb-4">
-            <span className="bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-              Included with HVAC Program
-            </span>
-            <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">
-              Also Available Standalone
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white leading-tight mb-4">
-            EPA Section 608 Universal<br />Certification Prep
-          </h1>
-          <p className="text-lg text-slate-300 max-w-2xl mb-8">
-            15-week structured certification prep course using industry-aligned curriculum.
-            Covers Core, Type I, Type II, and Type III — everything you need to pass the
-            EPA 608 Universal certification exam.
-          </p>
-          <div className="flex flex-wrap gap-6 text-sm text-slate-300 mb-8">
-            <span className="flex items-center gap-2"><Clock className="w-4 h-4" /> 15 Weeks</span>
-            <span className="flex items-center gap-2"><BookOpen className="w-4 h-4" /> 16 Lessons</span>
-            <span className="flex items-center gap-2"><Award className="w-4 h-4" /> EPA 608 Universal</span>
-            <span className="flex items-center gap-2"><Users className="w-4 h-4" /> Proctored Exam Access</span>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link
-              href="/apply/student"
-              className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors text-center"
-            >
-              Enroll Now
-            </Link>
-            <Link
-              href="/programs/hvac"
-              className="border-2 border-white text-white font-bold px-8 py-4 rounded-lg hover:bg-white/10 transition-colors text-center"
-            >
-              View Full HVAC Program
-            </Link>
-          </div>
-        </div>
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image
+          src="/images/trades/program-hvac-overview.jpg"
+          alt="HVAC technician working with refrigerant gauges"
+          fill
+          quality={90}
+          className="object-cover"
+        />
       </section>
 
       {/* What's Included */}

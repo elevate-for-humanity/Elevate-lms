@@ -72,32 +72,14 @@ export default async function MarketplacePage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Marketplace" }]} />
       </div>
-<div className="relative bg-indigo-900 text-white py-16">
+<div className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/community/community-hero.jpg"
           alt="Marketplace"
           fill
-          className="object-cover opacity-30"
+          className="object-cover"
           priority
         />
-        <div className="relative max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-3 mb-4">
-            <Store className="w-10 h-10" />
-            <h1 className="text-4xl font-bold">Course Marketplace</h1>
-          </div>
-          <p className="text-xl text-indigo-100 max-w-2xl mb-8">
-            Discover courses from expert creators and expand your skills
-          </p>
-          <div className="relative max-w-xl" data-tour="marketplace-search">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input 
-              type="text" 
-              placeholder="Search courses..." 
-              className="w-full pl-12 pr-4 py-4 rounded-lg text-gray-900"
-              aria-label="Search courses"
-            />
-          </div>
-        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">

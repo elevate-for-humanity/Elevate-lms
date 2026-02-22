@@ -12,6 +12,7 @@ const nextConfig = {
     'pdfkit',
     'pdf-lib',
     'jspdf',
+    'jspdf-autotable',
     '@react-pdf/renderer',
     '@aws-sdk/client-s3',
     '@aws-sdk/s3-request-presigner',
@@ -20,6 +21,7 @@ const nextConfig = {
     'stripe',
     'ioredis',
     'redis',
+    '@upstash/redis',
     'socket.io',
     'socket.io-client',
     '@sendgrid/mail',
@@ -29,10 +31,16 @@ const nextConfig = {
     '@sentry/core',
     '@opentelemetry/api',
     '@opentelemetry/sdk-node',
+    '@opentelemetry/exporter-trace-otlp-http',
+    '@opentelemetry/resources',
+    '@opentelemetry/semantic-conventions',
     'puppeteer',
     'puppeteer-core',
     'playwright',
     'chromium-bidi',
+    'jsdom',
+    'typescript',
+    'core-js',
   ],
 
   // Disable dev indicators (static route indicator, build indicator)
@@ -206,8 +214,16 @@ const nextConfig = {
   // See: https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
   outputFileTracingExcludes: {
     '/api/accreditation/report': ['**/*'],
-    // Exclude heavy test/browser packages from ALL routes to reduce Lambda size
+    // Exclude heavy/dev files from ALL routes to reduce Netlify handler size
     '*': [
+      // Generated media — served by CDN, not the server function
+      'public/generated/**',
+      'public/generated-images/**',
+      // Dev artifacts
+      'reports/**',
+      'audit-packet/**',
+      'playwright-report/**',
+      // Browser automation
       '**/node_modules/playwright/**',
       '**/node_modules/puppeteer/**',
       '**/node_modules/@playwright/**',
@@ -216,6 +232,28 @@ const nextConfig = {
       '**/node_modules/**/chromium/**',
       '**/node_modules/@sparticuz/**',
       '**/node_modules/chrome-aws-lambda/**',
+      // Dev-only tools
+      '**/node_modules/typescript/**',
+      '**/node_modules/jsdom/**',
+      '**/node_modules/core-js/**',
+      // Sharp native binaries
+      '**/node_modules/@img/sharp-libvips-*/**',
+      '**/node_modules/@img/sharp-linux-*/**',
+      '**/node_modules/@img/sharp-darwin-*/**',
+      '**/node_modules/@img/sharp-win32-*/**',
+      // Heavy PDF dist bundles
+      '**/node_modules/jspdf/dist/**',
+      '**/node_modules/pdf-lib/**',
+      '**/node_modules/.pnpm/pdf-lib*/**',
+      '**/node_modules/@apm-js-collab/**',
+      '**/node_modules/.pnpm/@apm-js-collab*/**',
+      // Source files not needed at runtime
+      'app/**/*.tsx',
+      'app/**/*.ts',
+      'components/**/*.tsx',
+      'components/**/*.ts',
+      'lib/**/*.ts',
+      'lib/**/*.tsx',
     ],
   },
 

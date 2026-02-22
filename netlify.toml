@@ -51,10 +51,49 @@
 
 [functions]
   node_bundler = "esbuild"
-  # Minimal externals for the main Next.js handler - keep it small!
-  # Heavy libs (sharp, tesseract, pdf) are in dedicated Netlify functions
   external_node_modules = [
     "pg"
+  ]
+
+# Externalize heavy deps from the Next.js SSR handler to stay under 50MB zip limit
+[functions."___netlify-server-handler"]
+  external_node_modules = [
+    "tesseract.js",
+    "tesseract.js-core",
+    "sharp",
+    "pdf-parse",
+    "pdfkit",
+    "pdf-lib",
+    "jspdf",
+    "jspdf-autotable",
+    "@react-pdf/renderer",
+    "@aws-sdk/client-s3",
+    "@aws-sdk/s3-request-presigner",
+    "pg",
+    "openai",
+    "stripe",
+    "ioredis",
+    "redis",
+    "@upstash/redis",
+    "socket.io",
+    "socket.io-client",
+    "@sendgrid/mail",
+    "nodemailer",
+    "@sentry/nextjs",
+    "@sentry/node",
+    "@sentry/core",
+    "@opentelemetry/api",
+    "@opentelemetry/sdk-node",
+    "@opentelemetry/exporter-trace-otlp-http",
+    "@opentelemetry/resources",
+    "@opentelemetry/semantic-conventions",
+    "puppeteer",
+    "puppeteer-core",
+    "playwright",
+    "chromium-bidi",
+    "jsdom",
+    "typescript",
+    "core-js",
   ]
 
 # PDF export function - isolated bundle with PDF libraries

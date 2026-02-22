@@ -143,3 +143,11 @@ reports/ats-evidence/
 audit_http.json
 audit_crawl.json
 artifacts/
+
+# Netlify handler size: exclude generated media and dev artifacts
+public/generated/
+public/generated-images/
+reports/
+audit-packet/
+lighthouse-*.json
+deno.lock

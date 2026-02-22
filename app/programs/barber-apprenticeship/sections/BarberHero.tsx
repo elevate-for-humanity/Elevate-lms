@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
-import { ArrowRight, Building2, CreditCard } from 'lucide-react';
+import { ArrowRight, Building2 } from 'lucide-react';
 import { QUICK_STATS } from '../barber-program-data';
 
 export function BarberHero() {
@@ -10,8 +10,8 @@ export function BarberHero() {
       {/* Hero Video Banner */}
       <ProgramHeroBanner videoSrc="/videos/barber-hero-final.mp4" voiceoverSrc="/audio/heroes/barber.mp3" />
 
-      {/* Hero Image with CTA overlay */}
-      <section className="relative h-[55vh] min-h-[400px]">
+      {/* Hero Image — no text overlay */}
+      <section className="relative h-[300px] sm:h-[400px] overflow-hidden">
         <Image
           src="/images/barber-hero-new.webp"
           alt="Barber apprentice cutting hair in a licensed barbershop"
@@ -19,22 +19,23 @@ export function BarberHero() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
-          <div className="max-w-5xl mx-auto">
-            <h1 className="text-3xl md:text-5xl font-black text-white mb-3 drop-shadow-lg">Barber Apprenticeship Program</h1>
-            <p className="text-lg text-white/90 mb-6 max-w-2xl">2,000-hour licensed training. Earn while you learn. BNPL and funding available.</p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/apply?program=barber-apprenticeship" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
-                Apply Now <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link href="/partners/barbershop-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
-                <Building2 className="w-4 h-4" /> Partner Shop Application
-              </Link>
-              <Link href="/pay" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white font-bold px-6 py-3 rounded-lg transition-colors border border-white/40 backdrop-blur-sm">
-                <CreditCard className="w-4 h-4" /> Buy Now, Pay Later
-              </Link>
-            </div>
+      </section>
+
+      {/* Title + CTAs below hero */}
+      <section className="py-8 bg-white border-b">
+        <div className="max-w-5xl mx-auto px-4">
+          <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-3">Barber Apprenticeship Program</h1>
+          <p className="text-lg text-slate-600 mb-6 max-w-2xl">2,000-hour licensed training. Earn while you learn. Funding and payment options available.</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/inquiry?subject=Barber+Apprenticeship" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
+              Apply Now <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link href="/programs/barber-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
+              Enroll Now <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link href="/partners/barbershop-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
+              <Building2 className="w-4 h-4" /> Partner Shop Application
+            </Link>
           </div>
         </div>
       </section>

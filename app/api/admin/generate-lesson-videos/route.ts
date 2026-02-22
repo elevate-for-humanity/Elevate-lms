@@ -183,7 +183,8 @@ async function generateForLesson(
     return { success: true, videoUrl: audioUrl, method: 'tts-1-hd' };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'unknown';
-    return { success: false, error: msg };
+    logger.error('[VideoGen] generateForLesson failed:', msg);
+    return { success: false, error: 'Video generation failed' };
   }
 }
 

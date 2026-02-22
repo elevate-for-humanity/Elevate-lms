@@ -41,7 +41,7 @@ export const POST = withAuth(
 
     if (uploadError) {
       logger.error('Upload error:', uploadError);
-      return new Response(uploadError.message, { status: 500 });
+      return new Response('Failed to upload signature', { status: 500 });
     }
 
     const sigUrl = path;

@@ -44,7 +44,21 @@ export const toError = (error: any): Error => {
   return new Error(String(error));
 };
 
+/**
+ * Returns a safe error message for API responses.
+ * In production, returns a generic message to avoid leaking internals.
+ * In development, returns the actual error for debugging.
+ */
 export const toErrorMessage = (error: any): string => {
+  if (process.env.NODE_ENV === 'development') {
+    if (error instanceof Error) return error.message;
+    return String(error);
+  }
+  return 'An unexpected error occurred';
+};
+
+/** Returns the real error message regardless of environment. Use only for server-side logging. */
+export const toErrorDetail = (error: any): string => {
   if (error instanceof Error) return error.message;
   return String(error);
 };

@@ -123,7 +123,7 @@ export async function POST(req: Request) {
     .eq('id', entry_id)
     .single();
 
-  if (readErr) return jsonError(readErr.message, 500);
+  if (readErr) return jsonError('Failed to read time entry', 500);
   if (!entry) return jsonError('Entry not found', 404);
   if (entry.status === 'LOCKED')
     return jsonError('Entry is locked and cannot be modified', 409);

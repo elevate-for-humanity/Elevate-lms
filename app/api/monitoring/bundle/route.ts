@@ -38,7 +38,7 @@ async function safeQuery(supabase: any, table: string, select = '*', options?: {
     if (options?.order) query = query.order(options.order, { ascending: false });
     if (options?.limit) query = query.limit(options.limit);
     const { data, error, count } = await query;
-    return { data: data || [], count: count || 0, error: error?.message || null };
+    return { data: data || [], count: count || 0, error: error ? 'Query failed' : null };
   } catch {
     return { data: [], count: 0, error: `Table "${table}" not accessible` };
   }

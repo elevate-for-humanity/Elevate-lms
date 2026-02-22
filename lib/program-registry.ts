@@ -61,10 +61,32 @@ export const PROGRAMS: ProgramEntry[] = [
 
   // Additional Barber & Beauty
   { slug: 'cosmetology-apprenticeship', name: 'Cosmetology Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true, dedicatedApplyPage: '/programs/cosmetology-apprenticeship/apply' },
-  { slug: 'nail-tech-apprenticeship', name: 'Nail Technician Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true },
+  { slug: 'nail-technician', name: 'Nail Technician Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true },
 
   // Additional Programs
   { slug: 'culinary-apprenticeship', name: 'Youth Culinary Apprenticeship', category: 'Skilled Trades', formType: 'apply', active: true },
+
+  // DB-synced programs (active in Supabase)
+  { slug: 'administrative-assistant', name: 'Administrative Assistant', category: 'Business & Financial', formType: 'apply', active: true },
+  { slug: 'automotive-technician', name: 'Automotive Technician', category: 'Skilled Trades', formType: 'apply', active: true },
+  { slug: 'bookkeeping', name: 'Bookkeeping', category: 'Business & Financial', formType: 'apply', active: true },
+  { slug: 'chw-cert', name: 'Community Health Worker', category: 'Healthcare', formType: 'apply', active: true },
+  { slug: 'customer-service-representative', name: 'Customer Service Representative', category: 'Business & Financial', formType: 'apply', active: true },
+  { slug: 'data-analytics', name: 'Data Analytics', category: 'Technology', formType: 'apply', active: true },
+  { slug: 'dental-assistant', name: 'Dental Assistant', category: 'Healthcare', formType: 'apply', active: true },
+  { slug: 'emt-apprenticeship', name: 'EMT Apprenticeship', category: 'Healthcare', formType: 'apply', active: true },
+  { slug: 'entrepreneurship-small-business', name: 'Entrepreneurship & Small Business', category: 'Business & Financial', formType: 'apply', active: true },
+  { slug: 'insurance-agent', name: 'Insurance Agent', category: 'Business & Financial', formType: 'apply', active: true },
+  { slug: 'life-coach-certification-wioa', name: 'Life Coach Certification (WIOA)', category: 'Human Services', formType: 'apply', active: true },
+  { slug: 'manufacturing-technician', name: 'Manufacturing Technician', category: 'Skilled Trades', formType: 'apply', active: true },
+  { slug: 'nrf-riseup', name: 'NRF RiseUp Retail Certification', category: 'Business & Financial', formType: 'apply', active: true },
+  { slug: 'peer-support', name: 'Peer Support Specialist', category: 'Human Services', formType: 'apply', active: true },
+  { slug: 'pharmacy-technician', name: 'Pharmacy Technician', category: 'Healthcare', formType: 'apply', active: true },
+  { slug: 'real-estate-agent', name: 'Real Estate Agent', category: 'Business & Financial', formType: 'apply', active: true },
+  { slug: 'recovery-coach', name: 'Recovery Coach', category: 'Human Services', formType: 'apply', active: true },
+  { slug: 'solar-panel-installation', name: 'Solar Panel Installation', category: 'Skilled Trades', formType: 'apply', active: true },
+  { slug: 'web-development', name: 'Web Development', category: 'Technology', formType: 'apply', active: true },
+  { slug: 'youth-culinary-apprenticeship', name: 'Youth Culinary Apprenticeship', category: 'Skilled Trades', formType: 'apply', active: true },
 ];
 
 /** All valid canonical slugs */
@@ -88,12 +110,12 @@ const SLUG_ALIASES: Record<string, string> = {
   'building-services-technician': 'building-maintenance-wrg',
   'peer-recovery': 'peer-recovery-specialist-jri',
   'certified-peer-recovery-coach': 'peer-recovery-specialist-jri',
-  'nail-technician': 'nail-tech-apprenticeship',
-  'nail-technician-apprenticeship': 'nail-tech-apprenticeship',
+  'nail-technician-apprenticeship': 'nail-technician',
+  'nail-tech-apprenticeship': 'nail-technician',
   'cpr-first-aid': 'cpr-cert',
   'cpr-first-aid-hsi': 'cpr-cert',
   'cdl-transportation': 'cdl-training',
-  'web-development': 'it-support-specialist',
+  // web-development is its own program in DB, no alias needed
   'it-support': 'it-support-specialist',
   'cybersecurity': 'cybersecurity-analyst',
   'direct-support-professional': 'dsp-training',

@@ -223,7 +223,7 @@ export const programs: Program[] = [
     price: 4980, // Self-pay option price
   },
   {
-    slug: 'cna-certification',
+    slug: 'cna-cert',
     averageSalary: '$35,000/year',
     salaryRange: '$28,000 - $42,000',
     jobGrowth: '+8% (Faster than average)',
@@ -364,7 +364,7 @@ export const programs: Program[] = [
     },
   },
   {
-    slug: 'building-maintenance-tech',
+    slug: 'building-maintenance-wrg',
     name: 'Building Maintenance Technician',
     heroTitle:
       '2Exclusive Apprenticeship Program - Advanced Sanitation & Infection Control',
@@ -524,7 +524,7 @@ export const programs: Program[] = [
     price: 4730,
   },
   {
-    slug: 'business-startup-marketing',
+    slug: 'business-startup',
     name: 'Business Start-up & Marketing',
     heroTitle: 'Business Start-up & Marketing Program with Rise Forward',
     heroSubtitle:
@@ -605,7 +605,7 @@ export const programs: Program[] = [
     price: 4550,
   },
   {
-    slug: 'emergency-health-safety-tech',
+    slug: 'health-safety',
     name: 'Emergency Health & Safety Technician',
     heroTitle: 'Emergency Health & Safety Technician Registered Apprenticeship',
     heroSubtitle:
@@ -687,7 +687,7 @@ export const programs: Program[] = [
     price: 4950,
   },
   {
-    slug: 'professional-esthetician',
+    slug: 'esthetician',
     name: 'Esthetics and Skincare Specialist Certificate',
     heroTitle: 'Esthetics and Skincare Specialist Certificate Program',
     heroSubtitle:
@@ -777,7 +777,7 @@ export const programs: Program[] = [
     price: 4575,
   },
   {
-    slug: 'certified-peer-recovery-coach',
+    slug: 'peer-recovery-specialist-jri',
     name: 'Public Safety Reentry Specialist',
     heroTitle: 'Public Safety Reentry Specialist Program',
     heroSubtitle:
@@ -869,7 +869,7 @@ export const programs: Program[] = [
     price: 4750,
   },
   {
-    slug: 'tax-prep-financial-services',
+    slug: 'tax-prep',
     name: 'Tax Preparation & Financial Services Certificate',
     heroTitle: 'Tax Preparation & Financial Services Certificate Program',
     heroSubtitle:
@@ -1041,7 +1041,7 @@ export const programs: Program[] = [
     price: 2800,
   },
   {
-    slug: 'cpr-first-aid-hsi',
+    slug: 'cpr-cert',
     name: 'CPR, AED & First Aid Certification',
     heroTitle: 'CPR, AED & First Aid Certification',
     heroSubtitle:
@@ -1228,7 +1228,7 @@ export const programs: Program[] = [
     price: 4325,
   },
   {
-    slug: 'public-safety-reentry-specialist',
+    slug: 'reentry-specialist',
     name: 'Public Safety Reentry Specialist Program',
     heroTitle: 'Public Safety Reentry Specialist Program',
     heroSubtitle:

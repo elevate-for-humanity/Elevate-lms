@@ -396,38 +396,43 @@ const nextConfig = {
       { source: '/program-finder/:path*', destination: '/programs/:path*', permanent: true },
       { source: '/compare-programs/:path*', destination: '/programs/:path*', permanent: true },
 
-      // Program alias → canonical slug (one URL per program)
-      { source: '/programs/barber', destination: '/programs/barber-apprenticeship', permanent: true },
-      { source: '/programs/cybersecurity/:path*', destination: '/programs/technology/cybersecurity', permanent: true },
-      { source: '/programs/cybersecurity', destination: '/programs/technology/cybersecurity', permanent: true },
-      { source: '/programs/it-support/:path*', destination: '/programs/technology/it-support', permanent: true },
-      { source: '/programs/it-support', destination: '/programs/technology/it-support', permanent: true },
-      { source: '/programs/business-financial/:path*', destination: '/programs/business', permanent: true },
-      { source: '/programs/business-financial', destination: '/programs/business', permanent: true },
-      { source: '/programs/cna/:path*', destination: '/programs/cna-certification/:path*', permanent: true },
-      { source: '/programs/cna', destination: '/programs/cna-certification', permanent: true },
-      { source: '/programs/cdl/:path*', destination: '/programs/cdl-training/:path*', permanent: true },
+      // Program alias → DB canonical slug (one URL per program)
+      // CDL
       { source: '/programs/cdl', destination: '/programs/cdl-training', permanent: true },
-      { source: '/programs/hvac/:path*', destination: '/programs/hvac-technician/:path*', permanent: true },
+      { source: '/programs/cdl-transportation', destination: '/programs/cdl-training', permanent: true },
+      // CNA
+      { source: '/programs/cna', destination: '/programs/cna-cert', permanent: true },
+      { source: '/programs/cna-certification', destination: '/programs/cna-cert', permanent: true },
+      // HVAC
       { source: '/programs/hvac', destination: '/programs/hvac-technician', permanent: true },
-      { source: '/programs/phlebotomy/:path*', destination: '/programs/healthcare', permanent: true },
-      { source: '/programs/phlebotomy', destination: '/programs/healthcare', permanent: true },
-      { source: '/programs/phlebotomy-technician/:path*', destination: '/programs/healthcare', permanent: true },
-      { source: '/programs/phlebotomy-technician', destination: '/programs/healthcare', permanent: true },
-      { source: '/programs/building-services-technician/:path*', destination: '/programs/skilled-trades', permanent: true },
-      { source: '/programs/building-services-technician', destination: '/programs/skilled-trades', permanent: true },
-      { source: '/programs/building-maintenance-tech/:path*', destination: '/programs/skilled-trades', permanent: true },
-      { source: '/programs/building-maintenance-tech', destination: '/programs/skilled-trades', permanent: true },
-      { source: '/programs/drug-collector', destination: '/programs/healthcare', permanent: true },
-      { source: '/programs/drug-alcohol-specimen-collector', destination: '/programs/healthcare', permanent: true },
-      { source: '/programs/esthetician-apprenticeship/:path*', destination: '/programs/beauty', permanent: true },
-      { source: '/programs/esthetician-apprenticeship', destination: '/programs/beauty', permanent: true },
-      { source: '/programs/professional-esthetician/:path*', destination: '/programs/beauty', permanent: true },
-      { source: '/programs/professional-esthetician', destination: '/programs/beauty', permanent: true },
-      { source: '/programs/tax-preparation/:path*', destination: '/programs/tax-entrepreneurship', permanent: true },
-      { source: '/programs/tax-preparation', destination: '/programs/tax-entrepreneurship', permanent: true },
-      { source: '/programs/tax-prep-financial-services/:path*', destination: '/programs/tax-entrepreneurship', permanent: true },
-      { source: '/programs/tax-prep-financial-services', destination: '/programs/tax-entrepreneurship', permanent: true },
+      // Barber & Beauty
+      { source: '/programs/barber', destination: '/programs/barber-apprenticeship', permanent: true },
+      { source: '/programs/beauty', destination: '/programs/barber-apprenticeship', permanent: true },
+      { source: '/programs/esthetician-apprenticeship', destination: '/programs/esthetician', permanent: true },
+      { source: '/programs/professional-esthetician', destination: '/programs/esthetician', permanent: true },
+      { source: '/programs/nail-technician-apprenticeship', destination: '/programs/nail-technician', permanent: true },
+      // Business
+      { source: '/programs/business', destination: '/programs/business-startup', permanent: true },
+      { source: '/programs/business-financial', destination: '/programs/business-startup', permanent: true },
+      // Tax
+      { source: '/programs/tax-preparation', destination: '/programs/tax-prep', permanent: true },
+      { source: '/programs/tax-entrepreneurship', destination: '/programs/tax-prep', permanent: true },
+      { source: '/programs/tax-prep-financial-services', destination: '/programs/tax-prep', permanent: true },
+      // Healthcare aliases
+      { source: '/programs/drug-collector', destination: '/programs/drug-alcohol-specimen-collector', permanent: true },
+      { source: '/programs/phlebotomy', destination: '/programs/phlebotomy-technician', permanent: true },
+      { source: '/programs/cpr-first-aid-hsi', destination: '/programs/cpr-cert', permanent: true },
+      { source: '/programs/cpr-first-aid', destination: '/programs/cpr-cert', permanent: true },
+      // Human Services
+      { source: '/programs/jri', destination: '/programs/peer-recovery-specialist-jri', permanent: true },
+      { source: '/programs/direct-support-professional', destination: '/programs/dsp-training', permanent: true },
+      // Skilled Trades aliases
+      { source: '/programs/forklift', destination: '/programs/forklift-operator', permanent: true },
+      { source: '/programs/building-maintenance-tech', destination: '/programs/building-maintenance-wrg', permanent: true },
+      { source: '/programs/building-services-technician', destination: '/programs/building-maintenance-wrg', permanent: true },
+      // Technology aliases
+      { source: '/programs/cybersecurity', destination: '/programs/cybersecurity-analyst', permanent: true },
+      { source: '/programs/it-support', destination: '/programs/it-support-specialist', permanent: true },
 
       // Career consolidation — /career-center handled by Netlify (Rule A)
       { source: '/career-fair/:path*', destination: '/career-services/:path*', permanent: true },

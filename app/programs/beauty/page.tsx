@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
-export default function BeautyPage() {
+export default function Redirect() {
   redirect('/programs/barber-apprenticeship');
 }

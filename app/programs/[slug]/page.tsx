@@ -16,21 +16,22 @@ import { EligibilityNotice } from '@/components/EligibilityNotice';
 import { ProgramTutorCTA } from '@/components/ProgramTutorCTA';
 import { PROGRAMS } from '@/lib/ai/programRegistry';
 
-// Programs that use the new visual-first template
+// Programs that use the new visual-first template (DB canonical slugs + aliases)
 const VISUAL_TEMPLATE_PROGRAMS = [
-  'barber',
   'barber-apprenticeship',
-  'cna',
-  'cna-certification',
-  'healthcare',
-  'beauty',
-  'esthetician-apprenticeship',
-  'hvac',
-  'skilled-trades',
-  'business',
-  'tax-preparation',
-  'cdl',
-  'jri',
+  'cna-cert',
+  'esthetician',
+  'hvac-technician',
+  'cdl-training',
+  'tax-prep',
+  'business-startup',
+  'peer-recovery-specialist-jri',
+  'beauty-career-educator',
+  'phlebotomy-technician',
+  // Aliases that may still be hit before redirect
+  'barber', 'cna', 'cna-certification', 'healthcare', 'beauty',
+  'esthetician-apprenticeship', 'hvac', 'skilled-trades', 'business',
+  'tax-preparation', 'cdl', 'jri',
 ];
 
 // Cache program pages for 10 minutes - eliminates 21s+ load times

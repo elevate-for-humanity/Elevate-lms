@@ -31,7 +31,7 @@ export default function HVACProgramContent() {
     },
     {
       question: "What certifications do I get?",
-      answer: "You'll earn your EPA Section 608 Certification (required by law to work with refrigerants), OSHA 30 Safety Certification, and a program completion certificate. These are the credentials HVAC employers look for when hiring."
+      answer: "You'll earn your EPA 608 Universal Certification (required by federal law to purchase and handle all refrigerant types — the highest level covering all four categories), OSHA 30 Safety Certification, and a program completion certificate. The EPA 608 Universal is what employers require."
     },
     {
       question: "What jobs can I get after this?",
@@ -80,12 +80,14 @@ export default function HVACProgramContent() {
             <FundingBadge type="funded" />
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mt-6 mb-6 leading-tight">
-              Become an HVAC Technician
+              HVAC Technician Training<br />
+              <span className="text-green-300">EPA 608 Universal Certification</span>
             </h1>
 
             <p className="text-xl text-gray-200 mb-4 leading-relaxed">
-              HVAC fundamentals, EPA Section 608 certification prep, and hands-on
-              employer site experience. Graduate with the credentials employers require.
+              400-hour program covering HVAC fundamentals, refrigerant handling, and hands-on
+              employer site experience. Graduate with your EPA 608 Universal Certification,
+              OSHA 30, and the credentials employers require.
             </p>
 
             <p className="text-lg text-green-300 font-semibold mb-8">
@@ -93,6 +95,9 @@ export default function HVACProgramContent() {
             </p>
 
             <div className="flex flex-wrap gap-4 mb-8 text-sm text-gray-300">
+              <span className="flex items-center gap-2 bg-green-500/20 backdrop-blur px-4 py-2 rounded-full text-green-300 font-semibold border border-green-400/30">
+                <Award className="w-4 h-4" /> EPA 608 Universal Certification
+              </span>
               <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
                 <Clock className="w-4 h-4" /> 400 Hours
               </span>

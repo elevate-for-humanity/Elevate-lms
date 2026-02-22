@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Mail, Phone, MapPin, Clock, Send, AlertCircle, Loader2 } from 'lucide-react';
@@ -17,6 +18,9 @@ const contactInfo = [
 ];
 
 export default function ContactPage() {
+  const searchParams = useSearchParams();
+  const prefillProgram = searchParams.get('program') || '';
+  const prefillSubject = searchParams.get('subject') || '';
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -198,6 +202,7 @@ export default function ContactPage() {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     required
                     disabled={formState === 'submitting'}
+                    defaultValue={prefillSubject}
                   >
                     <option value="">Select a topic...</option>
                     <option value="enrollment">Enrollment Questions</option>
@@ -221,6 +226,7 @@ export default function ContactPage() {
                     rows={5}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="How can we help you?"
+                    defaultValue={prefillProgram ? `I'm interested in the ${prefillProgram.replace(/-/g, ' ')} program and would like more information.` : ''}
                     required
                     minLength={10}
                     disabled={formState === 'submitting'}

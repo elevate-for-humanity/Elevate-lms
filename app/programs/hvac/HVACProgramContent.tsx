@@ -385,7 +385,7 @@ export default function HVACProgramContent() {
             <Link href="/apply?program=hvac-technician" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-full hover:bg-brand-red-50 transition-colors whitespace-nowrap">
               Apply Now
             </Link>
-            <Link href="/contact" className="bg-white/20 text-white font-bold px-6 py-3 rounded-full hover:bg-white/30 transition-colors whitespace-nowrap border border-white/40">
+            <Link href="/contact?program=hvac-technician&subject=programs" className="bg-white/20 text-white font-bold px-6 py-3 rounded-full hover:bg-white/30 transition-colors whitespace-nowrap border border-white/40">
               Ask a Question
             </Link>
           </div>
@@ -647,7 +647,7 @@ export default function HVACProgramContent() {
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link
-              href="/contact"
+              href="/contact?program=hvac-technician&subject=programs"
               className="inline-flex items-center justify-center px-8 py-4 bg-white/15 hover:bg-white/25 text-white font-semibold rounded-full transition-all"
             >
               Talk to Someone First

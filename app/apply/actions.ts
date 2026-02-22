@@ -301,24 +301,20 @@ async function insertApplication(payload: {
 
   // ── Helper: send both emails (student confirmation + admin notification) ──
   async function sendApplicationEmails() {
-    // Student: application received — complete onboarding to get approved
+    // Student: enrolled — instant LMS access
     await sendEmailDirect(
       payload.email,
-      `Application Received — Complete Your Onboarding [${referenceNumber}]`,
+      `You're Enrolled — Welcome to ${programLabel} [${referenceNumber}]`,
       [
         `<h2>Hi ${payload.firstName},</h2>`,
-        `<p>We received your application for <strong>${programLabel}</strong> at Elevate for Humanity.</p>`,
+        `<p>You're enrolled in <strong>${programLabel}</strong> at Elevate for Humanity. Your LMS access is active now.</p>`,
         `<p>Your reference number: <strong>${referenceNumber}</strong></p>`,
-        `<h3>Next Steps to Complete Your Enrollment:</h3>`,
+        `<h3>Get Started:</h3>`,
         `<ol>`,
         `<li><strong>Set your password:</strong> Go to <a href="${siteUrl}/forgot-password">${siteUrl}/forgot-password</a> and enter your email: <strong>${payload.email}</strong></li>`,
         `<li><strong>Log in:</strong> Go to <a href="${siteUrl}/login">${siteUrl}/login</a></li>`,
-        `<li><strong>Complete your profile:</strong> Fill in your full name, address, and contact info</li>`,
-        `<li><strong>Review and sign agreements:</strong> Student handbook, enrollment agreement, and code of conduct</li>`,
-        `<li><strong>Upload required documents:</strong> Government-issued ID and any supporting documents</li>`,
-        `<li><strong>Complete orientation:</strong> Watch the orientation video and acknowledge program expectations</li>`,
+        `<li><strong>Start learning:</strong> Your courses are ready in the dashboard</li>`,
         `</ol>`,
-        `<p><strong>Your application will be reviewed and approved after all onboarding steps are complete.</strong></p>`,
         `<p>If you're applying for WIOA funding, register at <a href="https://indianacareerconnect.com">indianacareerconnect.com</a> — this is required for eligibility.</p>`,
         `<p>Questions? Reply to this email or call us.</p>`,
         `<p>— Elevate for Humanity</p>`,
@@ -328,10 +324,10 @@ async function insertApplication(payload: {
     // Admin notification
     await sendEmailDirect(
       ADMIN_EMAIL,
-      `[PENDING] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`,
+      `[ENROLLED] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`,
       [
         `<h3>New ${payload.source.replace(/-/g, ' ')}</h3>`,
-        `<p style="color:orange"><strong>Status: PENDING — awaiting onboarding completion</strong></p>`,
+        `<p style="color:green"><strong>Status: ENROLLED — instant LMS access granted</strong></p>`,
         `<table style="border-collapse:collapse;width:100%;max-width:500px">`,
         `<tr><td style="padding:6px;font-weight:bold">Name</td><td style="padding:6px">${payload.firstName} ${payload.lastName}</td></tr>`,
         `<tr><td style="padding:6px;font-weight:bold">Email</td><td style="padding:6px"><a href="mailto:${payload.email}">${payload.email}</a></td></tr>`,
@@ -341,8 +337,7 @@ async function insertApplication(payload: {
         `<tr><td style="padding:6px;font-weight:bold">Reference</td><td style="padding:6px">${referenceNumber}</td></tr>`,
         payload.supportNotes ? `<tr><td style="padding:6px;font-weight:bold">Details</td><td style="padding:6px">${payload.supportNotes}</td></tr>` : '',
         `</table>`,
-        `<p>Student account created — they can log in and begin onboarding.</p>`,
-        `<p>Approve after they complete: profile, agreements, documents, and orientation.</p>`,
+        `<p>Student account created — LMS access is active. Courses auto-enrolled.</p>`,
         supabase ? `<p><a href="${siteUrl}/admin/applications">View in Admin Dashboard</a></p>` : `<p style="color:orange"><em>Database unavailable — application received via email only.</em></p>`,
       ].filter(Boolean).join(''),
     ).catch(() => {});

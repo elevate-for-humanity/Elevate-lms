@@ -93,15 +93,27 @@ const ROLE_CONFIG: Record<string, {
   },
 };
 
+const ENROLLED_CONFIG = {
+  title: "You're Enrolled!",
+  message: "Your account is set up and your courses are ready. Check your email for a one-click login link to access your dashboard.",
+  steps: [
+    { icon: <Mail className="w-5 h-5 text-brand-blue-600" />, title: 'Check your email', description: 'We sent you a login link. Click "Open My Dashboard" in the email to sign in instantly — no password needed.' },
+    { icon: <BookOpen className="w-5 h-5 text-brand-blue-600" />, title: 'Start learning', description: 'Your courses are loaded and ready. Begin your first lesson right away.' },
+  ],
+  primaryLink: '/login',
+  primaryLabel: 'Or Sign In Here',
+};
+
 export default async function ApplicationSuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ role?: string; ref?: string }>;
+  searchParams: Promise<{ role?: string; ref?: string; enrolled?: string }>;
 }) {
   const params = await searchParams;
   const role = params.role || 'student';
   const referenceNumber = params.ref || null;
-  const config = ROLE_CONFIG[role] || ROLE_CONFIG.student;
+  const isEnrolled = params.enrolled === 'true';
+  const config = isEnrolled ? ENROLLED_CONFIG : (ROLE_CONFIG[role] || ROLE_CONFIG.student);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -131,9 +143,9 @@ export default async function ApplicationSuccessPage({
             )}
           </div>
 
-          {/* Onboarding Steps */}
+          {/* Next Steps */}
           <div className="bg-white rounded-xl shadow-sm border p-6 sm:p-8 mb-6">
-            <h2 className="text-xl font-bold mb-6">Complete Your Onboarding</h2>
+            <h2 className="text-xl font-bold mb-6">{isEnrolled ? 'Next Steps' : 'Complete Your Onboarding'}</h2>
             <ol className="space-y-5">
               {config.steps.map((step, index) => (
                 <li key={index} className="flex items-start gap-4">
@@ -161,7 +173,7 @@ export default async function ApplicationSuccessPage({
           </div>
 
           {/* Timeline Notice */}
-          {role === 'student' && (
+          {role === 'student' && !isEnrolled && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
               <h3 className="font-semibold text-amber-900 mb-1">WorkOne / Funding Verification</h3>
               <p className="text-amber-800 text-sm leading-relaxed">

@@ -70,7 +70,7 @@ async function createStudentAccount(
   firstName: string,
   lastName: string,
   programInterest: string,
-): Promise<{ userId?: string; accountCreated: boolean }> {
+): Promise<{ userId?: string; accountCreated: boolean; magicLink?: string | null }> {
   try {
     const normalizedEmail = email.toLowerCase().trim();
     let userId: string | null = null;
@@ -205,8 +205,23 @@ async function createStudentAccount(
       }
     }
 
+    // Generate a magic link so the student can log in without setting a password
+    let magicLink: string | null = null;
+    try {
+      const { data: linkData } = await supabase.auth.admin.generateLink({
+        type: 'magiclink',
+        email: normalizedEmail,
+        options: { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/lms/dashboard?welcome=true` },
+      });
+      if (linkData?.properties?.action_link) {
+        magicLink = linkData.properties.action_link;
+      }
+    } catch (linkErr) {
+      logger.warn('Could not generate magic link — student will use forgot-password', linkErr as Error);
+    }
+
     logger.info('Student account created — instant LMS access', { applicationId, userId, email: normalizedEmail });
-    return { userId, accountCreated: true };
+    return { userId, accountCreated: true, magicLink };
   } catch (err) {
     logger.error('Account creation failed', err as Error);
     return { accountCreated: false };
@@ -300,7 +315,15 @@ async function insertApplication(payload: {
   const programLabel = payload.programInterest.replace(/-/g, ' ');
 
   // ── Helper: send both emails (student confirmation + admin notification) ──
-  async function sendApplicationEmails() {
+  async function sendApplicationEmails(magicLink?: string | null) {
+    // Build the login step based on whether we have a magic link
+    const loginStep = magicLink
+      ? `<li><strong>Log in now:</strong> <a href="${magicLink}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;margin:8px 0">Open My Dashboard</a></li>`
+      : [
+          `<li><strong>Set your password:</strong> Go to <a href="${siteUrl}/forgot-password">${siteUrl}/forgot-password</a> and enter your email: <strong>${payload.email}</strong></li>`,
+          `<li><strong>Log in:</strong> Go to <a href="${siteUrl}/login">${siteUrl}/login</a></li>`,
+        ].join('');
+
     // Student: enrolled — instant LMS access
     await sendEmailDirect(
       payload.email,
@@ -311,8 +334,7 @@ async function insertApplication(payload: {
         `<p>Your reference number: <strong>${referenceNumber}</strong></p>`,
         `<h3>Get Started:</h3>`,
         `<ol>`,
-        `<li><strong>Set your password:</strong> Go to <a href="${siteUrl}/forgot-password">${siteUrl}/forgot-password</a> and enter your email: <strong>${payload.email}</strong></li>`,
-        `<li><strong>Log in:</strong> Go to <a href="${siteUrl}/login">${siteUrl}/login</a></li>`,
+        loginStep,
         `<li><strong>Start learning:</strong> Your courses are ready in the dashboard</li>`,
         `</ol>`,
         `<p>If you're applying for WIOA funding, register at <a href="https://indianacareerconnect.com">indianacareerconnect.com</a> — this is required for eligibility.</p>`,
@@ -376,7 +398,7 @@ async function insertApplication(payload: {
           payload.programInterest,
         );
 
-        await sendApplicationEmails();
+        await sendApplicationEmails(accountResult.magicLink);
         revalidatePath('/admin/applications');
         return { success: true, applicationId: data.id, referenceNumber };
       }
@@ -418,7 +440,7 @@ export async function submitStudentApplication(data: StudentApplicationData) {
   });
 
   if (result.success) {
-    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/lms/dashboard?welcome=true` };
+    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/apply/success?ref=${result.referenceNumber}&enrolled=true` };
   }
   return result;
 }

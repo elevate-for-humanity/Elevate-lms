@@ -223,29 +223,39 @@ export default function RootLayout({
       >
         <SkipToContent />
         <GoogleAnalytics />
-        {/* Sezzle Price Widget — loads only when target elements exist */}
+        {/* Sezzle Price Widget — waits for React hydration before checking targets */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                var targets = ['.sezzle-hero-price', '.sezzle-price-target', '.product-price', '.cart-total'];
-                var hasTarget = targets.some(function(sel) { return document.querySelector(sel); });
-                if (!hasTarget) return;
-                document.sezzleConfig = {
-                  configGroups: [
-                    { targetXPath: ".sezzle-hero-price", renderToPath: ".sezzle-hero-widget", theme: "dark", alignment: "left" },
-                    { targetXPath: ".sezzle-price-target", renderToPath: ".sezzle-widget-container", theme: "light", alignment: "left" },
-                    { targetXPath: ".product-price", theme: "light", alignment: "left" },
-                    { targetXPath: ".cart-total", renderToPath: ".sezzle-cart-widget", theme: "light", alignment: "right" }
-                  ],
-                  language: "en",
-                  minPrice: 35,
-                  maxPrice: 2500
-                };
-                var s = document.createElement('script');
-                s.src = 'https://widget.sezzle.com/v1/javascript/price-widget?uuid=8ac76455-16d3-44f4-9b11-64b85a80184c';
-                s.async = true;
-                document.head.appendChild(s);
+                function loadSezzle() {
+                  var targets = ['.sezzle-hero-price', '.sezzle-price-target', '.product-price', '.cart-total'];
+                  var hasTarget = targets.some(function(sel) { return document.querySelector(sel); });
+                  if (!hasTarget) return;
+                  if (window.__sezzleLoaded) return;
+                  window.__sezzleLoaded = true;
+                  document.sezzleConfig = {
+                    configGroups: [
+                      { targetXPath: ".sezzle-hero-price", renderToPath: ".sezzle-hero-widget", theme: "dark", alignment: "left" },
+                      { targetXPath: ".sezzle-price-target", renderToPath: ".sezzle-widget-container", theme: "light", alignment: "left" },
+                      { targetXPath: ".product-price", theme: "light", alignment: "left" },
+                      { targetXPath: ".cart-total", renderToPath: ".sezzle-cart-widget", theme: "light", alignment: "right" }
+                    ],
+                    language: "en",
+                    minPrice: 35,
+                    maxPrice: 2500
+                  };
+                  var s = document.createElement('script');
+                  s.src = 'https://widget.sezzle.com/v1/javascript/price-widget?uuid=8ac76455-16d3-44f4-9b11-64b85a80184c';
+                  s.async = true;
+                  document.head.appendChild(s);
+                }
+                // Check after hydration — retry a few times for client-rendered content
+                var attempts = 0;
+                var interval = setInterval(function() {
+                  loadSezzle();
+                  if (++attempts >= 10 || window.__sezzleLoaded) clearInterval(interval);
+                }, 500);
               })();
             `,
           }}

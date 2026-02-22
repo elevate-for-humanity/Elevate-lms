@@ -34,7 +34,7 @@ export default function ApplyHeroVideo() {
         ref={videoRef}
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
         poster="/hero-images/programs-hero.jpg"
-        loop muted playsInline autoPlay preload="auto"
+        loop muted playsInline autoPlay preload="metadata"
       >
         <source src="/videos/hero-home-fast.mp4" type="video/mp4" />
       </video>

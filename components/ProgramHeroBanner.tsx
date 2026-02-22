@@ -59,6 +59,7 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
         muted
         loop
         playsInline
+        autoPlay
         preload="metadata"
       />
 

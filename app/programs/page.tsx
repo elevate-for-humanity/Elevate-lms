@@ -247,6 +247,7 @@ export default async function ProgramsPage() {
             {[
               {
                 name: 'HVAC Technician',
+                image: '/images/programs-hq/hvac-technician.jpg',
                 slug: 'hvac-technician',
                 href: '/programs/hvac-technician',
                 programId: '#10004322',
@@ -264,6 +265,7 @@ export default async function ProgramsPage() {
               },
               {
                 name: 'Barber Apprenticeship Program',
+                image: '/images/programs-hq/barber-training.jpg',
                 slug: 'barber-apprenticeship',
                 href: '/programs/barber-apprenticeship',
                 programId: '#10004637',
@@ -278,6 +280,7 @@ export default async function ProgramsPage() {
               },
               {
                 name: 'Emergency Health & Safety Technician',
+                image: '/images/programs-hq/healthcare-hero.jpg',
                 slug: 'emergency-health-safety-tech',
                 href: '/programs/healthcare',
                 programId: '#10004621',
@@ -293,6 +296,7 @@ export default async function ProgramsPage() {
               },
               {
                 name: 'Home Health Aide Certification',
+                image: '/images/programs-hq/cna-training.jpg',
                 slug: 'home-health-aide',
                 href: '/programs/healthcare',
                 programId: '#10004626',
@@ -309,6 +313,7 @@ export default async function ProgramsPage() {
               },
               {
                 name: 'Medical Assistant',
+                image: '/images/programs-hq/medical-assistant.jpg',
                 slug: 'medical-assistant',
                 href: '/programs/medical-assistant',
                 programId: '#10004639',
@@ -325,6 +330,7 @@ export default async function ProgramsPage() {
 
               {
                 name: 'Professional Esthetician & Client Services',
+                image: '/images/programs-hq/barber-hero.jpg',
                 slug: 'professional-esthetician',
                 href: '/programs/barber-apprenticeship',
                 programId: '#10004628',
@@ -340,6 +346,7 @@ export default async function ProgramsPage() {
               },
               {
                 name: 'Business Start-up & Marketing Program',
+                image: '/images/programs-hq/business-training.jpg',
                 slug: 'business-startup-marketing',
                 href: '/programs/business',
                 programId: '#10004645',
@@ -355,6 +362,7 @@ export default async function ProgramsPage() {
               },
               {
                 name: 'Financial Literacy Program',
+                image: '/images/programs-hq/business-office.jpg',
                 slug: 'tax-prep-financial-services',
                 href: '/programs/tax-entrepreneurship',
                 programId: '#10004627',
@@ -371,6 +379,7 @@ export default async function ProgramsPage() {
               },
               {
                 name: 'Public Safety Reentry Specialist',
+                image: '/images/programs-hq/students-learning.jpg',
                 slug: 'public-safety-reentry-specialist',
                 href: '/programs/healthcare',
                 programId: '#10004666',
@@ -388,6 +397,7 @@ export default async function ProgramsPage() {
               },
               {
                 name: 'CPR, AED & First Aid Certification',
+                image: '/images/programs-hq/healthcare-hero.jpg',
                 slug: 'cpr-first-aid-hsi',
                 href: '/programs/healthcare',
                 programId: '#10004674',
@@ -401,6 +411,7 @@ export default async function ProgramsPage() {
               },
               {
                 name: 'Electrical Technology',
+                image: '/images/programs-hq/electrical.jpg',
                 slug: 'electrical',
                 href: '/programs/electrical',
                 programId: '#10004700',
@@ -416,6 +427,7 @@ export default async function ProgramsPage() {
               },
               {
                 name: 'Plumbing Technology',
+                image: '/images/trades/program-plumbing-training.jpg',
                 slug: 'plumbing',
                 href: '/programs/plumbing',
                 programId: '#10004701',
@@ -430,6 +442,7 @@ export default async function ProgramsPage() {
               },
               {
                 name: 'Forklift Operator Certification',
+                image: '/images/trades/program-construction-training.jpg',
                 slug: 'forklift',
                 href: '/programs/forklift',
                 programId: '#10004702',
@@ -443,6 +456,11 @@ export default async function ProgramsPage() {
               },
             ].map((program) => (
               <div key={program.programId} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 overflow-hidden">
+                {program.image && (
+                  <Link href={program.href} className="block relative h-40 overflow-hidden">
+                    <Image src={program.image} alt={program.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  </Link>
+                )}
                 <Link href={program.href} className="block p-6 pb-3 group">
                   <div className="flex items-start justify-between mb-3">
                     <div>

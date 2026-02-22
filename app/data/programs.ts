@@ -1374,7 +1374,1597 @@ export const programs: Program[] = [
     },
     price: 504,
   },
-];
+
+  // ============================================
+  // DB-synced programs — generated from Supabase programs table
+  // ============================================
+
+    {
+    slug: 'administrative-assistant',
+    name: 'Administrative Assistant',
+    heroTitle: 'Administrative Assistant',
+    heroSubtitle: 'Support business operations. Office management and organizational skills.',
+    shortDescription: 'Support business operations. Office management and organizational skills.',
+    longDescription: `Our Administrative Assistant program prepares you for a professional office career. You'll learn Microsoft Office Suite, business communication, scheduling, and office procedures. The program covers document preparation, meeting coordination, travel arrangements, and professional etiquette. You'll develop organizational skills and attention to detail. Administrative assistants are essential in every industry with stable employment.`,
+    heroImage: '/images/programs-hq/business-office.jpg',
+    heroImageAlt: 'Administrative Assistant training at Elevate for Humanity',
+    duration: '12 weeks',
+    clockHours: 480,
+    schedule: '480 hours',
+    delivery: 'Hybrid (Classroom + Practice)',
+    credential: 'Certified Administrative Professional',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Pell Grant',
+      'Workforce Ready Grant',
+      'Payment Plans'
+    ],
+    highlights: [
+      '12 weeks program',
+      '480 training hours',
+      'Earn: Certified Administrative Professional',
+      'Salary range: $32,000-$50,000/year',
+      'Funding: WIOA, Pell Grant'
+    ],
+    whatYouLearn: [
+      'Microsoft Office Suite (Word, Excel, PowerPoint, Outlook)',
+      'Business writing and communication',
+      'Calendar and schedule management',
+      'Meeting and event coordination',
+      'Travel arrangements and expense reports',
+      'File organization and record keeping',
+      'Professional phone and email etiquette',
+      'Office equipment and technology'
+    ],
+    outcomes: [
+      'Administrative assistant',
+      'Executive assistant',
+      'Office manager',
+      'Operations coordinator',
+      'Chief of staff'
+    ],
+    requirements: [
+      'High school diploma or GED, organizational skills, attention to detail'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=administrative-assistant' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'automotive-technician',
+    name: 'Automotive Technician',
+    heroTitle: 'Automotive Technician',
+    heroSubtitle: 'Repair and maintain vehicles. ASE certification and hands-on training.',
+    shortDescription: 'Repair and maintain vehicles. ASE certification and hands-on training.',
+    longDescription: `Our Automotive Technician program prepares you for a career servicing vehicles. You'll learn engine repair, electrical systems, brakes, suspension, and diagnostics. The program covers modern vehicle technology, computer diagnostics, and customer service. You'll gain extensive hands-on experience with real vehicles and prepare for ASE certification. Automotive technicians are always in demand with stable employment.`,
+    heroImage: '/images/programs-hq/skilled-trades-hero.jpg',
+    heroImageAlt: 'Automotive Technician training at Elevate for Humanity',
+    duration: '32 weeks',
+    clockHours: 1280,
+    schedule: '1280 hours',
+    delivery: 'Hybrid (Classroom + Shop)',
+    credential: 'ASE Certified Technician',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Pell Grant',
+      'Workforce Ready Grant',
+      'Payment Plans'
+    ],
+    highlights: [
+      '32 weeks program',
+      '1280 training hours',
+      'Earn: ASE Certified Technician',
+      'Salary range: $35,000-$70,000/year',
+      'Funding: WIOA, Pell Grant'
+    ],
+    whatYouLearn: [
+      'Engine repair and maintenance',
+      'Electrical and electronic systems',
+      'Brake systems and ABS',
+      'Steering and suspension',
+      'Heating and air conditioning',
+      'Computer diagnostics and scan tools',
+      'Hybrid and electric vehicle basics',
+      'Customer service and estimates'
+    ],
+    outcomes: [
+      'Entry-level technician',
+      'Certified technician',
+      'Master technician',
+      'Shop foreman',
+      'Service manager or shop owner'
+    ],
+    requirements: [
+      'High school diploma or GED, mechanical aptitude, problem-solving skills'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=automotive-technician' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'barber-2024',
+    name: 'Barber Training',
+    heroTitle: 'Barber Training',
+    heroSubtitle: 'State-licensed barber training program covering cutting, styling, shaving, and business management.',
+    shortDescription: 'State-licensed barber training program covering cutting, styling, shaving, and business management.',
+    longDescription: `State-licensed barber training program covering cutting, styling, shaving, and business management.`,
+    heroImage: '/images/heroes-hq/programs-hero.jpg',
+    heroImageAlt: 'Barber Training training at Elevate for Humanity',
+    duration: '52 weeks',
+    clockHours: 0,
+    schedule: 'Contact for schedule',
+    delivery: 'In-Person',
+    credential: 'Certificate of Completion',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans'
+    ],
+    highlights: [
+      '52 weeks program',
+      'Earn: Certificate of Completion',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'Barber Training fundamentals',
+      'Hands-on practical training',
+      'Industry certification preparation',
+      'Job readiness and placement support'
+    ],
+    outcomes: [
+      'Barber Training',
+      'Entry-level positions in the field'
+    ],
+    requirements: [
+      'High school diploma or GED'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=barber-2024' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'bookkeeping',
+    name: 'Bookkeeping',
+    heroTitle: 'Bookkeeping',
+    heroSubtitle: 'Manage financial records for businesses. Learn QuickBooks and accounting principles.',
+    shortDescription: 'Manage financial records for businesses. Learn QuickBooks and accounting principles.',
+    longDescription: `Our Bookkeeping program teaches you to maintain accurate financial records for businesses. You'll learn accounting principles, QuickBooks software, accounts payable/receivable, and payroll processing. The program covers bank reconciliation, financial reporting, and tax preparation basics. You'll work with real business scenarios and prepare for QuickBooks certification. Bookkeepers are essential to every business with stable, year-round employment.`,
+    heroImage: '/images/programs-hq/business-office.jpg',
+    heroImageAlt: 'Bookkeeping training at Elevate for Humanity',
+    duration: '16 weeks',
+    clockHours: 640,
+    schedule: '640 hours',
+    delivery: 'Hybrid (Classroom + Practice)',
+    credential: 'QuickBooks Certified User',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Pell Grant',
+      'Workforce Ready Grant',
+      'Payment Plans'
+    ],
+    highlights: [
+      '16 weeks program',
+      '640 training hours',
+      'Earn: QuickBooks Certified User',
+      'Salary range: $35,000-$55,000/year',
+      'Funding: WIOA, Pell Grant'
+    ],
+    whatYouLearn: [
+      'Accounting principles and concepts',
+      'QuickBooks Online and Desktop',
+      'Accounts payable and receivable',
+      'Bank reconciliation',
+      'Payroll processing',
+      'Financial statement preparation',
+      'Tax basics and compliance',
+      'Business financial management'
+    ],
+    outcomes: [
+      'Bookkeeper',
+      'Full-charge bookkeeper',
+      'Accounting clerk',
+      'Accounting manager',
+      'Controller or CFO with additional education'
+    ],
+    requirements: [
+      'High school diploma or GED, strong math skills, attention to detail'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=bookkeeping' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'chw-cert',
+    name: 'Community Healthcare Worker Program',
+    heroTitle: 'Community Healthcare Worker Program',
+    heroSubtitle: 'Bridge healthcare gaps',
+    shortDescription: 'Bridge healthcare gaps',
+    longDescription: `Training to bridge gaps between healthcare systems and underserved communities.`,
+    heroImage: '/images/programs-hq/healthcare-hero.jpg',
+    heroImageAlt: 'Community Healthcare Worker Program training at Elevate for Humanity',
+    duration: 'Varies',
+    clockHours: 160,
+    schedule: '160 hours',
+    delivery: 'In-Person',
+    credential: 'Certificate of Completion',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'WRG'
+    ],
+    highlights: [
+      '160 training hours',
+      'Earn: Certificate of Completion',
+      'Funding: WIOA, WRG'
+    ],
+    whatYouLearn: [
+      'Health education',
+      'Care navigation',
+      'Community outreach',
+      'Cultural competency'
+    ],
+    outcomes: [
+      'Community Healthcare Worker Program',
+      'Entry-level positions in the field'
+    ],
+    requirements: [
+      'High school diploma or GED'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=chw-cert' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'cosmetology-apprenticeship',
+    name: 'Cosmetology Apprenticeship',
+    heroTitle: 'Cosmetology Apprenticeship',
+    heroSubtitle: 'State-licensed cosmetology apprenticeship program covering hair styling, coloring, skincare, nail care, and salon busine',
+    shortDescription: 'State-licensed cosmetology apprenticeship program covering hair styling, coloring, skincare, nail care, and salon business management. Combines hands-on training with classroom instruction.',
+    longDescription: `Our Cosmetology Apprenticeship program provides comprehensive training in all aspects of beauty services. Students learn hair cutting, coloring, chemical treatments, skincare, makeup application, and nail services while gaining hands-on experience in a real salon environment. The program meets Indiana State Board of Cosmetology requirements for licensure.`,
+    heroImage: '/images/heroes-hq/programs-hero.jpg',
+    heroImageAlt: 'Cosmetology Apprenticeship training at Elevate for Humanity',
+    duration: '52 weeks',
+    clockHours: 1500,
+    schedule: '1500 hours',
+    delivery: 'hybrid',
+    credential: 'Indiana Cosmetology License',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans'
+    ],
+    highlights: [
+      '52 weeks program',
+      '1500 training hours',
+      'Earn: Indiana Cosmetology License',
+      'Salary range: $28,000-$55,000/year',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'Hair cutting and styling techniques',
+      'Hair coloring and chemical services',
+      'Skincare and facial treatments',
+      'Makeup application',
+      'Manicure and pedicure services',
+      'Salon sanitation and safety',
+      'Client consultation skills',
+      'Business and retail management'
+    ],
+    outcomes: [
+      'Licensed Cosmetologist',
+      'Salon Stylist',
+      'Color Specialist',
+      'Salon Manager',
+      'Platform Artist',
+      'Salon Owner'
+    ],
+    requirements: [
+      '{"High school diploma or GED","At least 16 years of age","Valid government-issued ID","Background check clearance"}'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=cosmetology-apprenticeship' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'culinary-apprenticeship',
+    name: 'Culinary Apprenticeship',
+    heroTitle: 'Culinary Apprenticeship',
+    heroSubtitle: 'Professional cooking.',
+    shortDescription: 'Professional cooking.',
+    longDescription: `Learn culinary arts through hands-on apprenticeship training. Master cooking techniques, food safety, menu planning, and kitchen management.`,
+    heroImage: '/images/heroes-hq/programs-hero.jpg',
+    heroImageAlt: 'Culinary Apprenticeship training at Elevate for Humanity',
+    duration: '40 weeks',
+    clockHours: 1000,
+    schedule: '1000 hours',
+    delivery: 'apprenticeship',
+    credential: 'Culinary Arts Certificate',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans'
+    ],
+    highlights: [
+      '40 weeks program',
+      '1000 training hours',
+      'Earn: Culinary Arts Certificate',
+      'Salary range: $28,000-$55,000/year',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'Knife skills',
+      'Cooking methods',
+      'Food safety and sanitation',
+      'Menu planning',
+      'Inventory management',
+      'Kitchen operations'
+    ],
+    outcomes: [
+      'Line Cook',
+      'Prep Cook',
+      'Sous Chef',
+      'Kitchen Manager',
+      'Catering Chef'
+    ],
+    requirements: [
+      '{"High school diploma or GED","At least 17 years of age","Food handlers permit"}'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=culinary-apprenticeship' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'customer-service-representative',
+    name: 'Customer Service Representative',
+    heroTitle: 'Customer Service Representative',
+    heroSubtitle: 'Help customers and build relationships. Communication and problem-solving skills.',
+    shortDescription: 'Help customers and build relationships. Communication and problem-solving skills.',
+    longDescription: `Our Customer Service Representative program prepares you for a people-focused career. You'll learn communication skills, conflict resolution, and customer relationship management. The program covers phone etiquette, email communication, CRM software, and handling difficult situations. You'll practice real scenarios and develop professional soft skills. Customer service roles offer stable employment with advancement opportunities.`,
+    heroImage: '/images/programs-hq/business-office.jpg',
+    heroImageAlt: 'Customer Service Representative training at Elevate for Humanity',
+    duration: '8 weeks',
+    clockHours: 320,
+    schedule: '320 hours',
+    delivery: 'Hybrid (Classroom + Practice)',
+    credential: 'Customer Service Professional',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Workforce Ready Grant',
+      'Payment Plans',
+      'Employer Sponsorship'
+    ],
+    highlights: [
+      '8 weeks program',
+      '320 training hours',
+      'Earn: Customer Service Professional',
+      'Salary range: $28,000-$42,000/year',
+      'Funding: WIOA, Workforce Ready Grant'
+    ],
+    whatYouLearn: [
+      'Professional communication skills',
+      'Active listening and empathy',
+      'Conflict resolution techniques',
+      'CRM software and tools',
+      'Phone and email etiquette',
+      'Problem-solving strategies',
+      'Time management and organization',
+      'Product knowledge and sales basics'
+    ],
+    outcomes: [
+      'Customer service representative',
+      'Senior customer service rep',
+      'Team lead or supervisor',
+      'Customer success manager',
+      'Operations or service manager'
+    ],
+    requirements: [
+      'High school diploma or GED, good communication skills, patience'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=customer-service-representative' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'cybersecurity-analyst',
+    name: 'Cybersecurity Analyst',
+    heroTitle: 'Cybersecurity Analyst',
+    heroSubtitle: 'Protect organizations from cyber threats. Learn security analysis and threat detection.',
+    shortDescription: 'Protect organizations from cyber threats. Learn security analysis and threat detection.',
+    longDescription: `Our Cybersecurity Analyst program prepares you for a high-demand career protecting digital assets. You'll learn network security, threat analysis, incident response, and security tools. The program covers ethical hacking, vulnerability assessment, and security best practices. You'll gain hands-on experience with real security scenarios and prepare for Security+ and CEH certifications. Cybersecurity offers excellent pay and job security.`,
+    heroImage: '/images/programs-hq/technology-hero.jpg',
+    heroImageAlt: 'Cybersecurity Analyst training at Elevate for Humanity',
+    duration: '24 weeks',
+    clockHours: 960,
+    schedule: '960 hours',
+    delivery: 'Hybrid (Classroom + Lab)',
+    credential: 'CompTIA Security+, CEH',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Pell Grant',
+      'Workforce Ready Grant',
+      'Payment Plans'
+    ],
+    highlights: [
+      '24 weeks program',
+      '960 training hours',
+      'Earn: CompTIA Security+, CEH',
+      'Salary range: $60,000-$110,000/year',
+      'Funding: WIOA, Pell Grant'
+    ],
+    whatYouLearn: [
+      'Network security fundamentals',
+      'Threat detection and analysis',
+      'Security tools and technologies',
+      'Ethical hacking and penetration testing',
+      'Incident response and forensics',
+      'Security policies and compliance',
+      'Cryptography and encryption',
+      'Risk assessment and management'
+    ],
+    outcomes: [
+      'Entry-level security analyst',
+      'Security operations center (SOC) analyst',
+      'Penetration tester',
+      'Security engineer',
+      'Chief Information Security Officer (CISO)'
+    ],
+    requirements: [
+      'High school diploma or GED, strong analytical skills, IT fundamentals helpful'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=cybersecurity-analyst' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'data-analytics',
+    name: 'Data Analytics',
+    heroTitle: 'Data Analytics',
+    heroSubtitle: 'Analyze data to drive business decisions. Learn SQL, Excel, and visualization tools.',
+    shortDescription: 'Analyze data to drive business decisions. Learn SQL, Excel, and visualization tools.',
+    longDescription: `Our Data Analytics program teaches you to transform raw data into actionable insights. You'll learn SQL for database queries, Excel for analysis, and tools like Tableau and Power BI for visualization. The program covers statistics, data cleaning, and storytelling with data. You'll work with real datasets and build a portfolio of analysis projects. Data analysts are in high demand across all industries.`,
+    heroImage: '/images/programs-hq/business-office.jpg',
+    heroImageAlt: 'Data Analytics training at Elevate for Humanity',
+    duration: '20 weeks',
+    clockHours: 800,
+    schedule: '800 hours',
+    delivery: 'Hybrid (Classroom + Online)',
+    credential: 'Data Analyst',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Pell Grant',
+      'Workforce Ready Grant',
+      'Payment Plans'
+    ],
+    highlights: [
+      '20 weeks program',
+      '800 training hours',
+      'Earn: Data Analyst',
+      'Salary range: $55,000-$90,000/year',
+      'Funding: WIOA, Pell Grant'
+    ],
+    whatYouLearn: [
+      'SQL and database querying',
+      'Advanced Excel and spreadsheet analysis',
+      'Data visualization with Tableau/Power BI',
+      'Statistics and probability',
+      'Data cleaning and preparation',
+      'Business intelligence concepts',
+      'Python for data analysis',
+      'Presenting insights to stakeholders'
+    ],
+    outcomes: [
+      'Junior data analyst',
+      'Business intelligence analyst',
+      'Data analyst',
+      'Senior data analyst',
+      'Data scientist'
+    ],
+    requirements: [
+      'High school diploma or GED, strong analytical skills, comfort with numbers'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=data-analytics' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'dental-assistant',
+    name: 'Dental Assistant',
+    heroTitle: 'Dental Assistant',
+    heroSubtitle: 'Train to become a dental assistant. Chairside support and patient care in dental offices.',
+    shortDescription: 'Train to become a dental assistant. Chairside support and patient care in dental offices.',
+    longDescription: `Our Dental Assistant program prepares you for a rewarding career in dental healthcare. You'll learn chairside assisting, dental radiography, infection control, and patient management.`,
+    heroImage: '/images/programs-hq/healthcare-hero.jpg',
+    heroImageAlt: 'Dental Assistant training at Elevate for Humanity',
+    duration: '12 weeks',
+    clockHours: 480,
+    schedule: '480 hours',
+    delivery: 'Hybrid (Classroom + Clinical)',
+    credential: 'Certified Dental Assistant (CDA)',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Pell Grant',
+      'Workforce Ready Grant',
+      'Payment Plans'
+    ],
+    highlights: [
+      '12 weeks program',
+      '480 training hours',
+      'Earn: Certified Dental Assistant (CDA)',
+      'Salary range: $32,000-$46,000/year',
+      'Funding: WIOA, Pell Grant'
+    ],
+    whatYouLearn: [
+      'Chairside assisting techniques',
+      'Dental radiography and imaging',
+      'Infection control and sterilization',
+      'Dental materials and instruments',
+      'Patient scheduling and records',
+      'Dental terminology and anatomy',
+      'Four-handed dentistry',
+      'Patient education and communication'
+    ],
+    outcomes: [
+      'Entry-level dental assistant',
+      'Lead or senior dental assistant',
+      'Specialty dental assistant',
+      'Office manager',
+      'Advancement to dental hygienist with additional education'
+    ],
+    requirements: [
+      'High school diploma or GED, background check, immunizations'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=dental-assistant' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'diesel-mechanic',
+    name: 'Diesel Mechanic',
+    heroTitle: 'Diesel Mechanic',
+    heroSubtitle: 'Service heavy trucks and equipment. High-paying career with strong demand.',
+    shortDescription: 'Service heavy trucks and equipment. High-paying career with strong demand.',
+    longDescription: `Our Diesel Mechanic program prepares you to service heavy-duty trucks and equipment. You'll learn diesel engines, air brakes, hydraulics, and electrical systems. The program covers preventive maintenance, diagnostics, and major repairs. You'll gain hands-on experience with trucks, buses, and construction equipment. Diesel mechanics earn higher wages than automotive technicians with excellent job security.`,
+    heroImage: '/images/programs-hq/skilled-trades-hero.jpg',
+    heroImageAlt: 'Diesel Mechanic training at Elevate for Humanity',
+    duration: '32 weeks',
+    clockHours: 1280,
+    schedule: '1280 hours',
+    delivery: 'Hybrid (Classroom + Shop)',
+    credential: 'ASE Diesel Certification',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Pell Grant',
+      'Workforce Ready Grant',
+      'Payment Plans'
+    ],
+    highlights: [
+      '32 weeks program',
+      '1280 training hours',
+      'Earn: ASE Diesel Certification',
+      'Salary range: $40,000-$75,000/year',
+      'Funding: WIOA, Pell Grant'
+    ],
+    whatYouLearn: [
+      'Diesel engine theory and repair',
+      'Air brake systems',
+      'Hydraulic systems',
+      'Electrical and electronic systems',
+      'Preventive maintenance',
+      'Computer diagnostics',
+      'Welding and fabrication basics',
+      'DOT regulations and safety'
+    ],
+    outcomes: [
+      'Entry-level diesel technician',
+      'Certified diesel mechanic',
+      'Master technician',
+      'Shop supervisor',
+      'Fleet manager or shop owner'
+    ],
+    requirements: [
+      'High school diploma or GED, mechanical aptitude, physical strength'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=diesel-mechanic' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'dsp-training',
+    name: 'Direct Support Professional Training',
+    heroTitle: 'Direct Support Professional Training',
+    heroSubtitle: 'Support individuals with disabilities',
+    shortDescription: 'Support individuals with disabilities',
+    longDescription: `DSP certification training preparing students to support individuals with disabilities.`,
+    heroImage: '/images/programs-hq/healthcare-hero.jpg',
+    heroImageAlt: 'Direct Support Professional Training training at Elevate for Humanity',
+    duration: 'Varies',
+    clockHours: 120,
+    schedule: '120 hours',
+    delivery: 'In-Person',
+    credential: 'Certificate of Completion',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'WRG'
+    ],
+    highlights: [
+      '120 training hours',
+      'Earn: Certificate of Completion',
+      'Funding: WIOA, WRG'
+    ],
+    whatYouLearn: [
+      'DSP certification',
+      'CPR/First Aid',
+      'Person-centered care',
+      'Field placement'
+    ],
+    outcomes: [
+      'Direct Support Professional Training',
+      'Entry-level positions in the field'
+    ],
+    requirements: [
+      'High school diploma or GED'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=dsp-training' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'electrical',
+    name: 'Electrical Apprenticeship',
+    heroTitle: 'Electrical Apprenticeship',
+    heroSubtitle: 'DOL-registered electrical apprenticeship.',
+    shortDescription: 'DOL-registered electrical apprenticeship.',
+    longDescription: `DOL-registered electrical apprenticeship.`,
+    heroImage: '/images/programs-hq/skilled-trades-hero.jpg',
+    heroImageAlt: 'Electrical Apprenticeship training at Elevate for Humanity',
+    duration: 'Varies',
+    clockHours: 0,
+    schedule: 'Contact for schedule',
+    delivery: 'In-Person',
+    credential: 'Certificate of Completion',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans'
+    ],
+    highlights: [
+      'Earn: Certificate of Completion',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'Electrical Apprenticeship fundamentals',
+      'Hands-on practical training',
+      'Industry certification preparation',
+      'Job readiness and placement support'
+    ],
+    outcomes: [
+      'Electrical Apprenticeship',
+      'Entry-level positions in the field'
+    ],
+    requirements: [
+      'High school diploma or GED'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=electrical' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'emt-apprenticeship',
+    name: 'Emergency Medical Technician Apprenticeship',
+    heroTitle: 'Emergency Medical Technician Apprenticeship',
+    heroSubtitle: 'DOL Registered Apprenticeship - Indiana. Healthcare Specialist pathway. RAPIDS Program: 2025-IN-132301.',
+    shortDescription: 'DOL Registered Apprenticeship - Indiana. Healthcare Specialist pathway. RAPIDS Program: 2025-IN-132301.',
+    longDescription: `Train to become an Emergency Medical Technician. Learn patient assessment, emergency care, trauma response, and ambulance operations.`,
+    heroImage: '/images/programs-hq/healthcare-hero.jpg',
+    heroImageAlt: 'Emergency Medical Technician Apprenticeship training at Elevate for Humanity',
+    duration: '12 weeks',
+    clockHours: 180,
+    schedule: '180 hours',
+    delivery: 'hybrid',
+    credential: 'Indiana EMT Certification',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans'
+    ],
+    highlights: [
+      '12 weeks program',
+      '180 training hours',
+      'Earn: Indiana EMT Certification',
+      'Salary range: $32,000-$48,000/year',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'Patient assessment',
+      'Airway management',
+      'CPR and AED',
+      'Trauma care',
+      'Medical emergencies',
+      'Ambulance operations'
+    ],
+    outcomes: [
+      'EMT-Basic',
+      'Ambulance Technician',
+      'ER Technician',
+      'Firefighter EMT'
+    ],
+    requirements: [
+      '{"High school diploma or GED","At least 18 years of age","CPR certification","Background check"}'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=emt-apprenticeship' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'entrepreneurship-small-business',
+    name: 'Entrepreneurship / Small Business',
+    heroTitle: 'Entrepreneurship / Small Business',
+    heroSubtitle: 'Start and grow your own business. Business planning, marketing, and management skills.',
+    shortDescription: 'Start and grow your own business. Business planning, marketing, and management skills.',
+    longDescription: `Our Entrepreneurship program teaches you to start and run a successful small business. You'll learn business planning, marketing, financial management, and operations.`,
+    heroImage: '/images/programs-hq/business-office.jpg',
+    heroImageAlt: 'Entrepreneurship / Small Business training at Elevate for Humanity',
+    duration: '16 weeks',
+    clockHours: 640,
+    schedule: '640 hours',
+    delivery: 'Hybrid (Classroom + Mentorship)',
+    credential: 'Small Business Owner',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Small business grants',
+      'SBA loans',
+      'Self-funded'
+    ],
+    highlights: [
+      '16 weeks program',
+      '640 training hours',
+      'Earn: Small Business Owner',
+      'Funding: WIOA, Small business grants'
+    ],
+    whatYouLearn: [
+      'Business planning and strategy',
+      'Market research and analysis',
+      'Marketing and customer acquisition',
+      'Financial management and accounting',
+      'Legal structures and compliance',
+      'Funding and financing options',
+      'Operations and systems',
+      'Scaling and growth strategies'
+    ],
+    outcomes: [
+      'Startup founder',
+      'Small business owner',
+      'Growing business',
+      'Multiple locations',
+      'Franchise or acquisition'
+    ],
+    requirements: [
+      'High school diploma or GED, business idea or passion, determination and resilience'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=entrepreneurship-small-business' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'forklift-operator',
+    name: 'Forklift Operator',
+    heroTitle: 'Forklift Operator',
+    heroSubtitle: 'Operate forklifts and material handling equipment. Quick certification with immediate employment.',
+    shortDescription: 'Operate forklifts and material handling equipment. Quick certification with immediate employment.',
+    longDescription: `Our Forklift Operator program provides OSHA-compliant certification to operate forklifts safely. You'll learn equipment operation, load handling, safety procedures, and warehouse practices.`,
+    heroImage: '/images/programs-hq/skilled-trades-hero.jpg',
+    heroImageAlt: 'Forklift Operator training at Elevate for Humanity',
+    duration: '1 weeks',
+    clockHours: 40,
+    schedule: '40 hours',
+    delivery: 'Hybrid (Classroom + Practice)',
+    credential: 'OSHA Forklift Operator',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Workforce Ready Grant',
+      'Payment Plans',
+      'Employer-paid'
+    ],
+    highlights: [
+      '1 weeks program',
+      '40 training hours',
+      'Earn: OSHA Forklift Operator',
+      'Salary range: $30,000-$45,000/year',
+      'Funding: WIOA, Workforce Ready Grant'
+    ],
+    whatYouLearn: [
+      'Forklift operation and controls',
+      'Load handling and stacking',
+      'Safety procedures and OSHA standards',
+      'Pre-operation inspection',
+      'Warehouse operations',
+      'Different forklift types',
+      'Hazard recognition',
+      'Emergency procedures'
+    ],
+    outcomes: [
+      'Forklift operator',
+      'Lead operator',
+      'Warehouse supervisor',
+      'Logistics coordinator',
+      'Warehouse manager'
+    ],
+    requirements: [
+      'Age 18+, physical fitness, pass drug test, clean driving record helpful'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=forklift-operator' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'hvac-2024',
+    name: 'HVAC Technician Training',
+    heroTitle: 'HVAC Technician Training',
+    heroSubtitle: 'Comprehensive HVAC training covering installation, maintenance, and repair of heating and cooling systems.',
+    shortDescription: 'Comprehensive HVAC training covering installation, maintenance, and repair of heating and cooling systems.',
+    longDescription: `Comprehensive HVAC training covering installation, maintenance, and repair of heating and cooling systems.`,
+    heroImage: '/images/programs-hq/skilled-trades-hero.jpg',
+    heroImageAlt: 'HVAC Technician Training training at Elevate for Humanity',
+    duration: '24 weeks',
+    clockHours: 0,
+    schedule: 'Contact for schedule',
+    delivery: 'In-Person',
+    credential: 'Certificate of Completion',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans'
+    ],
+    highlights: [
+      '24 weeks program',
+      'Earn: Certificate of Completion',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'HVAC Technician Training fundamentals',
+      'Hands-on practical training',
+      'Industry certification preparation',
+      'Job readiness and placement support'
+    ],
+    outcomes: [
+      'HVAC Technician Training',
+      'Entry-level positions in the field'
+    ],
+    requirements: [
+      'High school diploma or GED'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=hvac-2024' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'insurance-agent',
+    name: 'Insurance Agent',
+    heroTitle: 'Insurance Agent',
+    heroSubtitle: 'Sell insurance products and protect clients. Commission-based income with residual earnings.',
+    shortDescription: 'Sell insurance products and protect clients. Commission-based income with residual earnings.',
+    longDescription: `Our Insurance Agent program prepares you for your state licensing exam and insurance sales career. You'll learn insurance products (life, health, property, casualty), underwriting, and risk assessment. The program covers sales techniques, client needs analysis, and policy servicing. You'll understand regulations, ethics, and building a client base. Insurance agents earn commission plus residual income from policy renewals.`,
+    heroImage: '/images/heroes-hq/programs-hero.jpg',
+    heroImageAlt: 'Insurance Agent training at Elevate for Humanity',
+    duration: '8 weeks',
+    clockHours: 320,
+    schedule: '320 hours',
+    delivery: 'Hybrid (Classroom + Online)',
+    credential: 'Licensed Insurance Agent',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans',
+      'Self-funded',
+      'Agency sponsorship'
+    ],
+    highlights: [
+      '8 weeks program',
+      '320 training hours',
+      'Earn: Licensed Insurance Agent',
+      'Salary range: $35,000-$90,000/year',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'Insurance products and coverage types',
+      'Life and health insurance',
+      'Property and casualty insurance',
+      'Underwriting and risk assessment',
+      'Sales and prospecting techniques',
+      'Client needs analysis',
+      'Policy servicing and claims',
+      'Insurance regulations and ethics'
+    ],
+    outcomes: [
+      'Licensed insurance agent',
+      'Senior agent or producer',
+      'Agency manager',
+      'Independent agency owner',
+      'Regional director'
+    ],
+    requirements: [
+      'High school diploma or GED, age 18+, pass state exam, background check'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=insurance-agent' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'it-support-specialist',
+    name: 'IT Support Specialist',
+    heroTitle: 'IT Support Specialist',
+    heroSubtitle: 'Launch your IT career. Provide technical support and troubleshoot computer systems.',
+    shortDescription: 'Launch your IT career. Provide technical support and troubleshoot computer systems.',
+    longDescription: `Our IT Support Specialist program prepares you for entry into the technology field. You'll learn computer hardware, software, networking, and troubleshooting. The program covers help desk operations, customer service, and technical problem-solving. You'll gain hands-on experience with real systems and prepare for CompTIA A+ certification. IT support roles offer stable employment with clear advancement paths.`,
+    heroImage: '/images/programs-hq/technology-hero.jpg',
+    heroImageAlt: 'IT Support Specialist training at Elevate for Humanity',
+    duration: '16 weeks',
+    clockHours: 640,
+    schedule: '640 hours',
+    delivery: 'Hybrid (Classroom + Lab)',
+    credential: 'CompTIA A+',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Pell Grant',
+      'Workforce Ready Grant',
+      'Payment Plans'
+    ],
+    highlights: [
+      '16 weeks program',
+      '640 training hours',
+      'Earn: CompTIA A+',
+      'Salary range: $38,000-$60,000/year',
+      'Funding: WIOA, Pell Grant'
+    ],
+    whatYouLearn: [
+      'Computer hardware and software troubleshooting',
+      'Operating systems (Windows, macOS, Linux)',
+      'Networking fundamentals',
+      'Help desk and customer service',
+      'Remote support tools',
+      'Security basics and best practices',
+      'Mobile device support',
+      'Cloud services and applications'
+    ],
+    outcomes: [
+      'Entry-level IT support technician',
+      'Help desk analyst',
+      'Desktop support specialist',
+      'Network administrator',
+      'Systems administrator'
+    ],
+    requirements: [
+      'High school diploma or GED, basic computer skills, problem-solving aptitude'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=it-support-specialist' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'life-coach-certification-wioa',
+    name: 'Life Coach Certification',
+    heroTitle: 'Life Coach Certification',
+    heroSubtitle: 'Professional life coaching certification program. Help others achieve their goals while building a rewarding career.',
+    shortDescription: 'Professional life coaching certification program. Help others achieve their goals while building a rewarding career.',
+    longDescription: `Become a certified life coach. Learn coaching methodologies, communication techniques, goal setting, and how to build a coaching practice.`,
+    heroImage: '/images/heroes-hq/programs-hero.jpg',
+    heroImageAlt: 'Life Coach Certification training at Elevate for Humanity',
+    duration: '12 weeks',
+    clockHours: 60,
+    schedule: '60 hours',
+    delivery: 'online',
+    credential: 'Certified Life Coach',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans'
+    ],
+    highlights: [
+      '12 weeks program',
+      '60 training hours',
+      'Earn: Certified Life Coach',
+      'Salary range: $35,000-$80,000/year',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'Coaching fundamentals',
+      'Active listening',
+      'Powerful questioning',
+      'Goal setting frameworks',
+      'Accountability structures',
+      'Ethics and boundaries',
+      'Business development'
+    ],
+    outcomes: [
+      'Life Coach',
+      'Career Coach',
+      'Executive Coach',
+      'Wellness Coach'
+    ],
+    requirements: [
+      '{"High school diploma or GED","At least 21 years of age"}'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=life-coach-certification-wioa' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'manufacturing-technician',
+    name: 'Manufacturing Technician',
+    heroTitle: 'Manufacturing Technician',
+    heroSubtitle: 'Operate production equipment and ensure quality. Essential manufacturing skills.',
+    shortDescription: 'Operate production equipment and ensure quality. Essential manufacturing skills.',
+    longDescription: `Our Manufacturing Technician program prepares you for production and quality roles in manufacturing. You'll learn machine operation, quality control, lean manufacturing, and safety procedures.`,
+    heroImage: '/images/programs-hq/skilled-trades-hero.jpg',
+    heroImageAlt: 'Manufacturing Technician training at Elevate for Humanity',
+    duration: '12 weeks',
+    clockHours: 480,
+    schedule: '480 hours',
+    delivery: 'Hybrid (Classroom + Shop)',
+    credential: 'Manufacturing Technician Level 1',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Pell Grant',
+      'Workforce Ready Grant',
+      'Payment Plans'
+    ],
+    highlights: [
+      '12 weeks program',
+      '480 training hours',
+      'Earn: Manufacturing Technician Level 1',
+      'Salary range: $35,000-$60,000/year',
+      'Funding: WIOA, Pell Grant'
+    ],
+    whatYouLearn: [
+      'Machine operation and setup',
+      'Quality control and inspection',
+      'Blueprint reading and interpretation',
+      'Measurement tools and techniques',
+      'Lean manufacturing principles',
+      'Safety procedures and OSHA standards',
+      'Production processes',
+      'Problem-solving and troubleshooting'
+    ],
+    outcomes: [
+      'Production operator',
+      'Manufacturing technician',
+      'Quality technician',
+      'Production supervisor',
+      'Manufacturing engineer'
+    ],
+    requirements: [
+      'High school diploma or GED, mechanical aptitude, attention to detail'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=manufacturing-technician' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'nail-technician',
+    name: 'Nail Technician',
+    heroTitle: 'Nail Technician',
+    heroSubtitle: 'Professional nail technician training covering manicures, pedicures, nail art, acrylics, and salon sanitation.',
+    shortDescription: 'Professional nail technician training covering manicures, pedicures, nail art, acrylics, and salon sanitation.',
+    longDescription: `Our Nail Technician program prepares students for a rewarding career in nail care. Learn manicures, pedicures, acrylic and gel nails, nail art, and proper sanitation techniques. Graduate ready to pass the state board exam and start working in salons or open your own business.`,
+    heroImage: '/images/heroes-hq/programs-hero.jpg',
+    heroImageAlt: 'Nail Technician training at Elevate for Humanity',
+    duration: '16 weeks',
+    clockHours: 450,
+    schedule: '450 hours',
+    delivery: 'in-person',
+    credential: 'Indiana Nail Technician License',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans'
+    ],
+    highlights: [
+      '16 weeks program',
+      '450 training hours',
+      'Earn: Indiana Nail Technician License',
+      'Salary range: $25,000-$45,000/year',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'Manicure and pedicure techniques',
+      'Acrylic nail application',
+      'Gel nail systems',
+      'Nail art and design',
+      'Sanitation and safety protocols',
+      'Client consultation',
+      'Salon business basics'
+    ],
+    outcomes: [
+      'Licensed Nail Technician',
+      'Salon Nail Tech',
+      'Nail Artist',
+      'Salon Owner',
+      'Mobile Nail Tech'
+    ],
+    requirements: [
+      '{"High school diploma or GED","At least 16 years of age","Valid ID"}'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=nail-technician' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'nrf-riseup',
+    name: 'NRF Rise Up Program',
+    heroTitle: 'NRF Rise Up Program',
+    heroSubtitle: 'Retail fundamentals',
+    shortDescription: 'Retail fundamentals',
+    longDescription: `National Retail Federation training covering retail fundamentals and customer service.`,
+    heroImage: '/images/heroes-hq/programs-hero.jpg',
+    heroImageAlt: 'NRF Rise Up Program training at Elevate for Humanity',
+    duration: 'Varies',
+    clockHours: 40,
+    schedule: '40 hours',
+    delivery: 'In-Person',
+    credential: 'Certificate of Completion',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'WRG'
+    ],
+    highlights: [
+      '40 training hours',
+      'Earn: Certificate of Completion',
+      'Funding: WIOA, WRG'
+    ],
+    whatYouLearn: [
+      'Customer service',
+      'Retail operations',
+      'Sales techniques',
+      'NRF certification'
+    ],
+    outcomes: [
+      'NRF Rise Up Program',
+      'Entry-level positions in the field'
+    ],
+    requirements: [
+      'High school diploma or GED'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=nrf-riseup' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'peer-support',
+    name: 'Peer Support Professional Program',
+    heroTitle: 'Peer Support Professional Program',
+    heroSubtitle: 'Support individuals in recovery',
+    shortDescription: 'Support individuals in recovery',
+    longDescription: `Training for individuals with lived experience to support others in recovery.`,
+    heroImage: '/images/heroes-hq/programs-hero.jpg',
+    heroImageAlt: 'Peer Support Professional Program training at Elevate for Humanity',
+    duration: 'Varies',
+    clockHours: 80,
+    schedule: '80 hours',
+    delivery: 'In-Person',
+    credential: 'Certificate of Completion',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'WRG'
+    ],
+    highlights: [
+      '80 training hours',
+      'Earn: Certificate of Completion',
+      'Funding: WIOA, WRG'
+    ],
+    whatYouLearn: [
+      'Recovery principles',
+      'Active listening',
+      'Resource connection',
+      'Ethical boundaries'
+    ],
+    outcomes: [
+      'Peer Support Professional Program',
+      'Entry-level positions in the field'
+    ],
+    requirements: [
+      'High school diploma or GED'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=peer-support' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'pharmacy-technician',
+    name: 'Pharmacy Technician',
+    heroTitle: 'Pharmacy Technician',
+    heroSubtitle: 'Become a certified pharmacy technician. Prepare and dispense medications under pharmacist supervision.',
+    shortDescription: 'Become a certified pharmacy technician. Prepare and dispense medications under pharmacist supervision.',
+    longDescription: `Our Pharmacy Technician program prepares you for a rewarding career in pharmacy settings. You'll learn medication preparation, prescription processing, inventory management, and pharmacy law.`,
+    heroImage: '/images/programs-hq/healthcare-hero.jpg',
+    heroImageAlt: 'Pharmacy Technician training at Elevate for Humanity',
+    duration: '16 weeks',
+    clockHours: 640,
+    schedule: '640 hours',
+    delivery: 'Hybrid (Classroom + Clinical)',
+    credential: 'Certified Pharmacy Technician (CPhT)',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Pell Grant',
+      'Workforce Ready Grant',
+      'Payment Plans'
+    ],
+    highlights: [
+      '16 weeks program',
+      '640 training hours',
+      'Earn: Certified Pharmacy Technician (CPhT)',
+      'Salary range: $30,000-$45,000/year',
+      'Funding: WIOA, Pell Grant'
+    ],
+    whatYouLearn: [
+      'Medication preparation and compounding',
+      'Prescription processing and verification',
+      'Pharmacy calculations and measurements',
+      'Drug classifications and interactions',
+      'Inventory management and ordering',
+      'Insurance billing and claims',
+      'Pharmacy law and ethics',
+      'Sterile and non-sterile compounding'
+    ],
+    outcomes: [
+      'Entry-level pharmacy technician',
+      'Senior or lead pharmacy technician',
+      'Specialty pharmacy technician',
+      'Pharmacy supervisor or manager',
+      'Advancement to pharmacist with additional education'
+    ],
+    requirements: [
+      'High school diploma or GED, background check, drug screen, basic math skills'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=pharmacy-technician' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'plumbing',
+    name: 'Plumbing Apprenticeship',
+    heroTitle: 'Plumbing Apprenticeship',
+    heroSubtitle: 'DOL-registered plumbing apprenticeship.',
+    shortDescription: 'DOL-registered plumbing apprenticeship.',
+    longDescription: `DOL-registered plumbing apprenticeship.`,
+    heroImage: '/images/programs-hq/skilled-trades-hero.jpg',
+    heroImageAlt: 'Plumbing Apprenticeship training at Elevate for Humanity',
+    duration: 'Varies',
+    clockHours: 0,
+    schedule: 'Contact for schedule',
+    delivery: 'In-Person',
+    credential: 'Certificate of Completion',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans'
+    ],
+    highlights: [
+      'Earn: Certificate of Completion',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'Plumbing Apprenticeship fundamentals',
+      'Hands-on practical training',
+      'Industry certification preparation',
+      'Job readiness and placement support'
+    ],
+    outcomes: [
+      'Plumbing Apprenticeship',
+      'Entry-level positions in the field'
+    ],
+    requirements: [
+      'High school diploma or GED'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=plumbing' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'real-estate-agent',
+    name: 'Real Estate Agent',
+    heroTitle: 'Real Estate Agent',
+    heroSubtitle: 'Help people buy and sell properties. Earn commission-based income with unlimited potential.',
+    shortDescription: 'Help people buy and sell properties. Earn commission-based income with unlimited potential.',
+    longDescription: `Our Real Estate Agent program prepares you for your state licensing exam and a successful real estate career. You'll learn property law, contracts, financing, and market analysis. The program covers listing properties, working with buyers, negotiation, and closing transactions. You'll understand ethics, fair housing, and professional practices. Real estate offers flexible schedules and unlimited income potential.`,
+    heroImage: '/images/heroes-hq/programs-hero.jpg',
+    heroImageAlt: 'Real Estate Agent training at Elevate for Humanity',
+    duration: '12 weeks',
+    clockHours: 480,
+    schedule: '480 hours',
+    delivery: 'Hybrid (Classroom + Online)',
+    credential: 'Licensed Real Estate Agent',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans',
+      'Self-funded',
+      'Brokerage sponsorship'
+    ],
+    highlights: [
+      '12 weeks program',
+      '480 training hours',
+      'Earn: Licensed Real Estate Agent',
+      'Salary range: $30,000-$100,000/year',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'Real estate law and regulations',
+      'Property valuation and pricing',
+      'Contracts and legal documents',
+      'Financing and mortgages',
+      'Marketing and lead generation',
+      'Negotiation techniques',
+      'Client relationship management',
+      'Ethics and professional standards'
+    ],
+    outcomes: [
+      'Licensed real estate agent',
+      'Top-producing agent',
+      'Team leader',
+      'Real estate broker',
+      'Brokerage owner'
+    ],
+    requirements: [
+      'High school diploma or GED, age 18+, pass state exam, background check'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=real-estate-agent' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'recovery-coach',
+    name: 'Recovery Coach Program',
+    heroTitle: 'Recovery Coach Program',
+    heroSubtitle: 'Guide recovery journey',
+    shortDescription: 'Guide recovery journey',
+    longDescription: `Training to guide and support individuals through their recovery journey.`,
+    heroImage: '/images/heroes-hq/programs-hero.jpg',
+    heroImageAlt: 'Recovery Coach Program training at Elevate for Humanity',
+    duration: 'Varies',
+    clockHours: 80,
+    schedule: '80 hours',
+    delivery: 'In-Person',
+    credential: 'Certificate of Completion',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'WRG'
+    ],
+    highlights: [
+      '80 training hours',
+      'Earn: Certificate of Completion',
+      'Funding: WIOA, WRG'
+    ],
+    whatYouLearn: [
+      'Motivational interviewing',
+      'Recovery planning',
+      'Relapse prevention',
+      'Community resources'
+    ],
+    outcomes: [
+      'Recovery Coach Program',
+      'Entry-level positions in the field'
+    ],
+    requirements: [
+      'High school diploma or GED'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=recovery-coach' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'sanitation-infection-control',
+    name: 'Sanitation & Infection Control',
+    heroTitle: 'Sanitation & Infection Control',
+    heroSubtitle: 'Infection prevention and sanitation protocols.',
+    shortDescription: 'Infection prevention and sanitation protocols.',
+    longDescription: `Infection prevention and sanitation protocols.`,
+    heroImage: '/images/heroes-hq/career-services-hero.jpg',
+    heroImageAlt: 'Sanitation & Infection Control training at Elevate for Humanity',
+    duration: 'Varies',
+    clockHours: 0,
+    schedule: 'Contact for schedule',
+    delivery: 'In-Person',
+    credential: 'Certificate of Completion',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans'
+    ],
+    highlights: [
+      'Earn: Certificate of Completion',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'Sanitation & Infection Control fundamentals',
+      'Hands-on practical training',
+      'Industry certification preparation',
+      'Job readiness and placement support'
+    ],
+    outcomes: [
+      'Sanitation & Infection Control',
+      'Entry-level positions in the field'
+    ],
+    requirements: [
+      'High school diploma or GED'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=sanitation-infection-control' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'solar-panel-installation',
+    name: 'Solar Panel Installation',
+    heroTitle: 'Solar Panel Installation',
+    heroSubtitle: 'Install solar energy systems. Green career in renewable energy with strong growth.',
+    shortDescription: 'Install solar energy systems. Green career in renewable energy with strong growth.',
+    longDescription: `Our Solar Panel Installation program prepares you for a career in renewable energy. You'll learn photovoltaic system design, electrical wiring, roof work, and safety procedures. The program covers system sizing, equipment selection, installation techniques, and maintenance. You'll gain hands-on experience with real solar installations and prepare for NABCEP certification. Solar installers are in high demand as clean energy adoption accelerates.`,
+    heroImage: '/images/programs-hq/skilled-trades-hero.jpg',
+    heroImageAlt: 'Solar Panel Installation training at Elevate for Humanity',
+    duration: '12 weeks',
+    clockHours: 480,
+    schedule: '480 hours',
+    delivery: 'Hybrid (Classroom + Field)',
+    credential: 'NABCEP PV Installation Professional',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Workforce Ready Grant',
+      'Payment Plans',
+      'Green jobs funding'
+    ],
+    highlights: [
+      '12 weeks program',
+      '480 training hours',
+      'Earn: NABCEP PV Installation Professional',
+      'Salary range: $38,000-$65,000/year',
+      'Funding: WIOA, Workforce Ready Grant'
+    ],
+    whatYouLearn: [
+      'Photovoltaic system fundamentals',
+      'Electrical theory and wiring',
+      'Roof assessment and mounting',
+      'System design and sizing',
+      'Equipment installation and connection',
+      'Safety procedures and fall protection',
+      'System testing and commissioning',
+      'Maintenance and troubleshooting'
+    ],
+    outcomes: [
+      'Solar installer',
+      'Lead installer',
+      'Solar technician',
+      'Project manager',
+      'Solar company owner'
+    ],
+    requirements: [
+      'High school diploma or GED, physical fitness, comfort with heights, basic electrical knowledge helpful'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=solar-panel-installation' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'web-development',
+    name: 'Web Development',
+    heroTitle: 'Web Development',
+    heroSubtitle: 'Build modern websites and web applications. Full-stack development training.',
+    shortDescription: 'Build modern websites and web applications. Full-stack development training.',
+    longDescription: `Our Web Development program teaches you to create professional websites and web applications. You'll learn HTML, CSS, JavaScript, and modern frameworks like React. The program covers both front-end design and back-end programming, databases, and deployment. You'll build a portfolio of real projects and learn industry-standard tools. Web developers are in high demand with flexible work options including remote positions.`,
+    heroImage: '/images/programs-hq/technology-hero.jpg',
+    heroImageAlt: 'Web Development training at Elevate for Humanity',
+    duration: '24 weeks',
+    clockHours: 960,
+    schedule: '960 hours',
+    delivery: 'Hybrid (Classroom + Online)',
+    credential: 'Full-Stack Web Developer',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Pell Grant',
+      'Workforce Ready Grant',
+      'Payment Plans'
+    ],
+    highlights: [
+      '24 weeks program',
+      '960 training hours',
+      'Earn: Full-Stack Web Developer',
+      'Salary range: $50,000-$95,000/year',
+      'Funding: WIOA, Pell Grant'
+    ],
+    whatYouLearn: [
+      'HTML, CSS, and JavaScript fundamentals',
+      'Responsive web design',
+      'React and modern frameworks',
+      'Back-end development with Node.js',
+      'Database design and SQL',
+      'API development and integration',
+      'Version control with Git',
+      'Deployment and hosting'
+    ],
+    outcomes: [
+      'Junior web developer',
+      'Front-end developer',
+      'Back-end developer',
+      'Full-stack developer',
+      'Lead developer or architect'
+    ],
+    requirements: [
+      'High school diploma or GED, logical thinking, creativity, basic computer skills'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=web-development' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'welding',
+    name: 'Welding Certification',
+    heroTitle: 'Welding Certification',
+    heroSubtitle: 'Welding certification covering MIG, TIG, and stick.',
+    shortDescription: 'Welding certification covering MIG, TIG, and stick.',
+    longDescription: `Welding certification covering MIG, TIG, and stick.`,
+    heroImage: '/images/programs-hq/skilled-trades-hero.jpg',
+    heroImageAlt: 'Welding Certification training at Elevate for Humanity',
+    duration: 'Varies',
+    clockHours: 0,
+    schedule: 'Contact for schedule',
+    delivery: 'In-Person',
+    credential: 'Certificate of Completion',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans'
+    ],
+    highlights: [
+      'Earn: Certificate of Completion',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'Welding Certification fundamentals',
+      'Hands-on practical training',
+      'Industry certification preparation',
+      'Job readiness and placement support'
+    ],
+    outcomes: [
+      'Welding Certification',
+      'Entry-level positions in the field'
+    ],
+    requirements: [
+      'High school diploma or GED'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=welding' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  },
+    {
+    slug: 'youth-culinary-apprenticeship',
+    name: 'Youth Culinary Apprenticeship',
+    heroTitle: 'Youth Culinary Apprenticeship',
+    heroSubtitle: 'DOL Registered Apprenticeship - Indiana. 144 hours classroom + OJT. RAPIDS Program: 2025-IN-132301.',
+    shortDescription: 'DOL Registered Apprenticeship - Indiana. 144 hours classroom + OJT. RAPIDS Program: 2025-IN-132301.',
+    longDescription: `Youth culinary program for ages 16-24. Learn cooking fundamentals, food safety, and kitchen skills while earning industry credentials.`,
+    heroImage: '/images/heroes-hq/programs-hero.jpg',
+    heroImageAlt: 'Youth Culinary Apprenticeship training at Elevate for Humanity',
+    duration: '8 weeks',
+    clockHours: 200,
+    schedule: '200 hours',
+    delivery: 'in-person',
+    credential: 'ServSafe Food Handler',
+    approvals: ['Elevate for Humanity'],
+    fundingOptions: [
+      'WIOA',
+      'Payment Plans'
+    ],
+    highlights: [
+      '8 weeks program',
+      '200 training hours',
+      'Earn: ServSafe Food Handler',
+      'Salary range: $24,000-$35,000/year',
+      'Funding: WIOA, Payment Plans'
+    ],
+    whatYouLearn: [
+      'Basic cooking techniques',
+      'Food safety',
+      'Kitchen sanitation',
+      'Recipe reading',
+      'Teamwork',
+      'Time management'
+    ],
+    outcomes: [
+      'Prep Cook',
+      'Line Cook',
+      'Food Service Worker',
+      'Kitchen Assistant'
+    ],
+    requirements: [
+      '{"Ages 16-24","Enrolled in school or GED program"}'
+    ],
+    ctaPrimary: { label: 'Apply Now', href: '/apply?program=youth-culinary-apprenticeship' },
+    ctaSecondary: { label: 'Learn More', href: '/funding' },
+  }];
 
 /**
  * Get program by slug

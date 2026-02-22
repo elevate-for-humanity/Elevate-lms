@@ -27,14 +27,11 @@ export function BarberHero() {
           <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-3">Barber Apprenticeship Program</h1>
           <p className="text-lg text-slate-600 mb-6 max-w-2xl">2,000-hour licensed training. Earn while you learn. Funding and payment options available.</p>
           <div className="flex flex-wrap gap-3">
+            <a href="#program-overview" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
+              Learn More <ArrowRight className="w-4 h-4" />
+            </a>
             <Link href="/inquiry?subject=Barber+Apprenticeship" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
               Apply Now <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link href="/programs/barber-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
-              Enroll Now <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link href="/partners/barbershop-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold px-6 py-3 rounded-lg transition-colors">
-              <Building2 className="w-4 h-4" /> Partner Shop Application
             </Link>
           </div>
         </div>
@@ -55,7 +52,7 @@ export function BarberHero() {
       </section>
 
       {/* Section 1 — Program Overview */}
-      <section className="py-16 bg-white">
+      <section id="program-overview" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>

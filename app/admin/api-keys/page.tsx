@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Key, Plus, Copy, Eye, Trash2 } from 'lucide-react';
@@ -20,6 +21,7 @@ const statusColors: Record<string, string> = {
 
 export default async function AdminApiKeysPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -33,7 +35,7 @@ export default async function AdminApiKeysPage() {
   let activeKeys = 0;
 
   try {
-    const result = await supabase
+    const result = await db
       .from('api_keys')
       .select('*')
       .order('created_at', { ascending: false });
@@ -41,12 +43,12 @@ export default async function AdminApiKeysPage() {
     error = result.error;
 
     if (!error) {
-      const { count: total } = await supabase
+      const { count: total } = await db
         .from('api_keys')
         .select('*', { count: 'exact', head: true });
       totalKeys = total || 0;
 
-      const { count: active } = await supabase
+      const { count: active } = await db
         .from('api_keys')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'active');

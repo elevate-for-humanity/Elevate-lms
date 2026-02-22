@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -30,9 +31,10 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get student profile
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await db
       .from('profiles')
       .select('id, email, full_name, first_name, last_name')
       .eq('id', studentId)
@@ -50,7 +52,7 @@ export async function POST(req: Request) {
     }
 
     // Get program details
-    const { data: program } = await supabase
+    const { data: program } = await db
       .from('programs')
       .select('id, name, slug, total_cost')
       .eq('id', programId)
@@ -106,7 +108,7 @@ export async function POST(req: Request) {
     });
 
     // Store funding payment record for audit
-    const { error: paymentError } = await supabase
+    const { error: paymentError } = await db
       .from('funding_payments')
       .insert({
         student_id: studentId,

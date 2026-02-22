@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { 
   Shield, AlertTriangle, Clock, FileText, 
@@ -89,11 +90,12 @@ function getDaysUntilExpiration(date: string) {
 
 export default async function FinancialAssurancePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   let assurances = defaultAssurances;
   
   if (supabase) {
-    const { data } = await supabase
+    const { data } = await db
       .from('financial_assurances')
       .select('*')
       .order('expiration_date', { ascending: true });

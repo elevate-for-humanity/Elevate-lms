@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const VALID_ROLES = ['student', 'staff', 'instructor', 'admin', 'super_admin'];
@@ -18,6 +19,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
     }
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: currentProfile } = await supabase
+    const { data: currentProfile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -51,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update the user's role
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('profiles')
       .update({ role, updated_at: new Date().toISOString() })
       .eq('email', email)
@@ -89,6 +91,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
     }
@@ -99,7 +102,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: currentProfile } = await supabase
+    const { data: currentProfile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -110,7 +113,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all admin/staff users
-    const { data: admins, error } = await supabase
+    const { data: admins, error } = await db
       .from('profiles')
       .select('id, email, full_name, role, created_at')
       .in('role', ['admin', 'super_admin', 'staff', 'instructor'])

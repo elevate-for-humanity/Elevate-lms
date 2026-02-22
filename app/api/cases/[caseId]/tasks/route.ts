@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCaseTasks, completeTask, initializeCaseTasks } from '@/lib/workflow/case-management';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -35,6 +37,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ caseId:
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -63,6 +66,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -84,7 +88,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
       return NextResponse.json({ success: true });
     }
 
-    const { error } = await supabase
+    const { error } = await db
       .from('case_tasks')
       .update({ status, updated_at: new Date().toISOString() })
       .eq('id', taskId);

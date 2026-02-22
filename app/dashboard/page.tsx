@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 export default async function DashboardPage() {
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -31,7 +33,7 @@ export default async function DashboardPage() {
     }
 
     // Get user profile to determine role
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)

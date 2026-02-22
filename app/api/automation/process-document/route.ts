@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'document_id required' }, { status: 400 });
     }
 
-    const { data: doc, error: docError } = await supabase
+    const { data: doc, error: docError } = await db
       .from('documents')
       .select('id, document_type, file_url, status')
       .eq('id', document_id)
@@ -46,13 +47,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Update status to processing
-    await supabase
+    await db
       .from('documents')
       .update({ status: 'processing' })
       .eq('id', document_id);
 
     // Mark as processed (actual OCR/extraction would be added per document type)
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('documents')
       .update({
         status: 'processed',

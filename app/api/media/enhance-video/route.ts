@@ -11,6 +11,7 @@ import { promisify } from 'util';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const execFileAsync = promisify(execFile);
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
 
     // Authentication check - require admin role
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
@@ -45,7 +47,7 @@ export async function POST(request: Request) {
     }
 
     // Check admin role
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -160,6 +162,7 @@ export async function GET(request: Request) {
 
     // Authentication check
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {

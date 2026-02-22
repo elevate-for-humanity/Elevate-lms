@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCaseTimeline, getCaseTasks, transitionCaseStatus, checkSignatureCompleteness } from '@/lib/workflow/case-management';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -21,7 +23,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
 
     const { caseId } = await params;
 
-    const { data: enrollmentCase, error } = await supabase
+    const { data: enrollmentCase, error } = await db
       .from('enrollment_cases')
       .select('*')
       .eq('id', caseId)
@@ -34,7 +36,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
     if (enrollmentCase.student_id !== user.id && 
         enrollmentCase.program_holder_id !== user.id && 
         enrollmentCase.employer_id !== user.id) {
-      const { data: profile } = await supabase
+      const { data: profile } = await db
         .from('profiles')
         .select('role')
         .eq('id', user.id)
@@ -69,6 +71,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -83,7 +86,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
       return NextResponse.json({ error: 'status is required' }, { status: 400 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)

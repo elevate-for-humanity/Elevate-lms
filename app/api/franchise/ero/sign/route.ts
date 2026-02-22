@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { eroService } from '@/lib/franchise/ero-service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -10,6 +11,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -24,7 +26,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check access - only ERO or office owner can view pending signatures
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -33,7 +35,7 @@ export async function GET(request: NextRequest) {
     const isAdmin = profile?.role === 'super_admin' || profile?.role === 'franchise_admin';
 
     if (!isAdmin) {
-      const { data: office } = await supabase
+      const { data: office } = await db
         .from('franchise_offices')
         .select('owner_id')
         .eq('id', officeId)
@@ -43,7 +45,7 @@ export async function GET(request: NextRequest) {
         // Check if user is the designated ERO
         const config = await eroService.getEROConfig(officeId);
         if (config) {
-          const { data: eroPreparer } = await supabase
+          const { data: eroPreparer } = await db
             .from('franchise_preparers')
             .select('user_id')
             .eq('id', config.ero_preparer_id)
@@ -76,6 +78,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -92,7 +95,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check access - only ERO or office owner can sign
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -101,7 +104,7 @@ export async function POST(request: NextRequest) {
     const isAdmin = profile?.role === 'super_admin' || profile?.role === 'franchise_admin';
 
     if (!isAdmin) {
-      const { data: office } = await supabase
+      const { data: office } = await db
         .from('franchise_offices')
         .select('owner_id')
         .eq('id', body.officeId)
@@ -111,7 +114,7 @@ export async function POST(request: NextRequest) {
         // Check if user is the designated ERO
         const config = await eroService.getEROConfig(body.officeId);
         if (config) {
-          const { data: eroPreparer } = await supabase
+          const { data: eroPreparer } = await db
             .from('franchise_preparers')
             .select('user_id')
             .eq('id', config.ero_preparer_id)

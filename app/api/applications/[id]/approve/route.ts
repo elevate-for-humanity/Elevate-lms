@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { sendEmail } from '@/lib/email/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -24,9 +25,10 @@ export async function POST(
 
     const { id } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check if user is admin
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -37,7 +39,7 @@ export async function POST(
     }
 
     // Get application
-    const { data: application, error: appError } = await supabase
+    const { data: application, error: appError } = await db
       .from('applications')
       .select('*')
       .eq('id', id)
@@ -55,7 +57,7 @@ export async function POST(
     const { courseId, programId } = body;
 
     // Update application status
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('applications')
       .update({
         status: 'approved',
@@ -69,7 +71,7 @@ export async function POST(
 
     // Check if user profile exists, create if not
     let studentId = null;
-    const { data: existingProfile } = await supabase
+    const { data: existingProfile } = await db
       .from('profiles')
       .select('id')
       .eq('email', application.email)
@@ -91,7 +93,7 @@ export async function POST(
       if (!authError && authData.user) {
         studentId = authData.user.id;
         
-        await supabase.from('profiles').insert({
+        await db.from('profiles').insert({
           id: studentId,
           email: application.email,
           first_name: application.first_name,
@@ -104,7 +106,7 @@ export async function POST(
     // Create enrollment if courseId provided
     let enrollment = null;
     if (studentId && courseId) {
-      const { data: enrollData } = await supabase
+      const { data: enrollData } = await db
         .from('enrollments')
         .insert({
           user_id: studentId,

@@ -4,6 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import {
   Users,
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
 
 export default async function GroupsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -44,7 +46,7 @@ export default async function GroupsPage() {
   if (!user) redirect('/login?next=/lms/groups');
 
   // Fetch user's group memberships
-  const { data: memberships } = await supabase
+  const { data: memberships } = await db
     .from('study_group_members')
     .select(`
       *,
@@ -65,7 +67,7 @@ export default async function GroupsPage() {
   // Fetch member counts for each group
   const groups = await Promise.all(
     (memberships || []).map(async (membership) => {
-      const { count } = await supabase
+      const { count } = await db
         .from('study_group_members')
         .select('*', { count: 'exact', head: true })
         .eq('study_group_id', membership.study_group_id);
@@ -81,7 +83,7 @@ export default async function GroupsPage() {
 
   // Fetch recent group messages
   const groupIds = groups.map(g => g.id);
-  const { data: recentMessages } = await supabase
+  const { data: recentMessages } = await db
     .from('group_messages')
     .select('*, profiles (first_name, last_name)')
     .in('group_id', groupIds.length > 0 ? groupIds : ['00000000-0000-0000-0000-000000000000'])

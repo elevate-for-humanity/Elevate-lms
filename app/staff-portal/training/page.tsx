@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { PlayCircle, Clock, Award, BookOpen } from 'lucide-react';
@@ -34,6 +35,7 @@ export default async function StaffTrainingPage() {
   ]);
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -47,13 +49,13 @@ export default async function StaffTrainingPage() {
   }
 
   // Get all training modules
-  const { data: modules, error: modulesError } = await supabase
+  const { data: modules, error: modulesError } = await db
     .from('training_modules')
     .select('*')
     .order('order_index', { ascending: true });
 
   // Get user's progress
-  const { data: progress, error: progressError } = await supabase
+  const { data: progress, error: progressError } = await db
     .from('staff_training_progress')
     .select('*')
     .eq('user_id', user.id);

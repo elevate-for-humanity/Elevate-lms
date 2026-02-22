@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
 import { createServerSupabaseClient } from '@/lib/auth';
@@ -49,7 +50,7 @@ export async function POST(req: Request) {
     const supabase = await createServerSupabaseClient();
     
     // Get course details
-    const { data: course, error: courseError } = await supabase
+    const { data: course, error: courseError } = await db
       .from('courses')
       .select('*')
       .eq('id', courseId)

@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
 
@@ -183,6 +184,7 @@ export async function GET(request: NextRequest) {
     await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/reports/rapids/export' } });
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     // Check auth
     const { data: { user } } = await supabase.auth.getUser();
@@ -191,7 +193,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Check admin role
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -211,7 +213,7 @@ export async function GET(request: NextRequest) {
     let apprentices: any[] = [];
     
     // 1. Try rapids_apprentices first (new dedicated table)
-    const { data: rapidsData, error: rapidsError } = await supabase
+    const { data: rapidsData, error: rapidsError } = await db
       .from('rapids_apprentices')
       .select('*')
       .order('created_at', { ascending: false });
@@ -220,7 +222,7 @@ export async function GET(request: NextRequest) {
       apprentices = rapidsData;
     } else {
       // 2. Try student_enrollments with profiles
-      const { data: enrollments, error: enrollError } = await supabase
+      const { data: enrollments, error: enrollError } = await db
         .from('student_enrollments')
         .select(`
           *,
@@ -238,7 +240,7 @@ export async function GET(request: NextRequest) {
         apprentices = enrollments;
       } else {
         // 3. Try rapids_registrations
-        const { data: registrations, error: regError } = await supabase
+        const { data: registrations, error: regError } = await db
           .from('rapids_registrations')
           .select('*')
           .order('created_at', { ascending: false });
@@ -247,7 +249,7 @@ export async function GET(request: NextRequest) {
           apprentices = registrations;
         } else {
           // 4. Try enrollments table with users
-          const { data: basicEnrollments } = await supabase
+          const { data: basicEnrollments } = await db
             .from('enrollments')
             .select(`
               *,

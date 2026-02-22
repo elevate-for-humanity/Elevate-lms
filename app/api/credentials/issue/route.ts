@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
       : null;
 
     // Create credential
-    const { data: credential, error } = await supabase
+    const { data: credential, error } = await db
       .from('credentials')
       .insert({
         code,
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Log issuance
-    await supabase.from('audit_logs').insert({
+    await db.from('audit_logs').insert({
       event_type: 'credential_issued',
       resource_type: 'credential',
       resource_id: credential.id,

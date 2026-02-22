@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, FileText, Users, Clock, AlertCircle, Search } from 'lucide-react';
@@ -14,13 +15,14 @@ export const dynamic = 'force-dynamic';
 
 export default async function TaxIntakePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/dashboard/tax-intake');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -31,7 +33,7 @@ export default async function TaxIntakePage() {
   }
 
   // Fetch tax intake records
-  const { data: intakes } = await supabase
+  const { data: intakes } = await db
     .from('tax_intake')
     .select(`
       id,
@@ -47,22 +49,22 @@ export default async function TaxIntakePage() {
 
   // Stats
   const today = new Date().toISOString().split('T')[0];
-  const { count: todayCount } = await supabase
+  const { count: todayCount } = await db
     .from('tax_intake')
     .select('*', { count: 'exact', head: true })
     .eq('appointment_date', today);
 
-  const { count: pendingCount } = await supabase
+  const { count: pendingCount } = await db
     .from('tax_intake')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
-  const { count: completedCount } = await supabase
+  const { count: completedCount } = await db
     .from('tax_intake')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
 
-  const { count: totalCount } = await supabase
+  const { count: totalCount } = await db
     .from('tax_intake')
     .select('*', { count: 'exact', head: true });
 

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { MapPin, Phone, Mail, Clock, Navigation } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -31,6 +32,7 @@ interface Location {
 
 export default async function LocationsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -43,7 +45,7 @@ export default async function LocationsPage() {
     );
   }
 
-  const { data: locations, error } = await supabase
+  const { data: locations, error } = await db
     .from('locations')
     .select('*')
     .eq('is_active', true)

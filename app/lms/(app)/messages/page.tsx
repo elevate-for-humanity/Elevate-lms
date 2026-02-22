@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -24,6 +25,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function MessagesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) { redirect("/login"); }
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -35,7 +37,7 @@ export default async function MessagesPage() {
   let unreadCount = 0;
 
   try {
-    const { data: messageData } = await supabase
+    const { data: messageData } = await db
       .from('messages')
       .select(`
         *,

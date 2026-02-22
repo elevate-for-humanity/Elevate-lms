@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const metadata: Metadata = {
   title: 'Analytics | Elevate for Humanity',
@@ -17,6 +18,7 @@ export default async function CreatorAnalyticsPage() {
 
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -35,7 +37,7 @@ export default async function CreatorAnalyticsPage() {
       if (!authError && authData.user) {
         user = authData.user;
         
-        const { data: courses, error: coursesError } = await supabase
+        const { data: courses, error: coursesError } = await db
           .from('courses')
           .select('id')
           .eq('creator_id', user.id);
@@ -44,20 +46,20 @@ export default async function CreatorAnalyticsPage() {
           const courseIds = courses.map(c => c.id);
 
           if (courseIds.length > 0) {
-            const { count: total } = await supabase
+            const { count: total } = await db
               .from('enrollments')
               .select('*', { count: 'exact', head: true })
               .in('course_id', courseIds);
             totalEnrollments = total || 0;
 
-            const { count: active } = await supabase
+            const { count: active } = await db
               .from('enrollments')
               .select('*', { count: 'exact', head: true })
               .in('course_id', courseIds)
               .eq('status', 'active');
             activeEnrollments = active || 0;
 
-            const { count: completed } = await supabase
+            const { count: completed } = await db
               .from('enrollments')
               .select('*', { count: 'exact', head: true })
               .in('course_id', courseIds)

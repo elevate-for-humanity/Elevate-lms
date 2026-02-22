@@ -6,6 +6,7 @@ export const maxDuration = 60;
 // app/api/videos/[videoId]/meta/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -18,9 +19,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
     const { videoId } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get video chapters
-    const { data: chapters, error: chaptersError } = await supabase
+    const { data: chapters, error: chaptersError } = await db
       .from("video_chapters")
       .select("*")
       .eq("video_id", videoId)
@@ -31,7 +33,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     }
 
     // Get video transcript
-    const { data: transcript, error: transcriptError } = await supabase
+    const { data: transcript, error: transcriptError } = await db
       .from("video_transcripts")
       .select("*")
       .eq("video_id", videoId)
@@ -61,6 +63,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 
     const { videoId } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -71,7 +74,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
 
     // Check if user is admin
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from("user_profiles")
       .select("role")
       .eq("user_id", user.id)
@@ -87,11 +90,11 @@ export async function POST(req: NextRequest, { params }: Params) {
     // Update chapters if provided
     if (chapters && Array.isArray(chapters)) {
       // Delete existing chapters
-      await supabase.from("video_chapters").delete().eq("video_id", videoId);
+      await db.from("video_chapters").delete().eq("video_id", videoId);
 
       // Insert new chapters
       if (chapters.length > 0) {
-        const { error: chaptersError } = await supabase
+        const { error: chaptersError } = await db
           .from("video_chapters")
           .insert(
             chapters.map((item: any) => ({
@@ -115,7 +118,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     // Update transcript if provided
     if (transcript) {
       // Check if transcript exists
-      const { data: existing } = await supabase
+      const { data: existing } = await db
         .from("video_transcripts")
         .select("id")
         .eq("video_id", videoId)
@@ -123,7 +126,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 
       if (existing) {
         // Update existing
-        const { error: transcriptError } = await supabase
+        const { error: transcriptError } = await db
           .from("video_transcripts")
           .update({
             content: transcript.content,
@@ -140,7 +143,7 @@ export async function POST(req: NextRequest, { params }: Params) {
         }
       } else {
         // Insert new
-        const { error: transcriptError } = await supabase
+        const { error: transcriptError } = await db
           .from("video_transcripts")
           .insert({
             video_id: videoId,

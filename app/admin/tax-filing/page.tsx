@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
 
 export default async function TaxFilingAdminPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -40,7 +42,7 @@ export default async function TaxFilingAdminPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -50,26 +52,26 @@ export default async function TaxFilingAdminPage() {
     redirect('/unauthorized');
   }
 
-  const { data: items, count: totalItems } = await supabase
+  const { data: items, count: totalItems } = await db
     .from('profiles')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .limit(50);
 
-  const { count: activeItems } = await supabase
+  const { count: activeItems } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
   // Fetch applications
-  const { data: applications, error } = await supabase
+  const { data: applications, error } = await db
     .from('tax_filing_applications')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(100);
 
   // Fetch preparers
-  const { data: preparers } = await supabase
+  const { data: preparers } = await db
     .from('tax_preparers')
     .select('*')
     .order('created_at', { ascending: false });

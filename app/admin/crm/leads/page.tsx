@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -18,6 +19,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function LeadsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/admin/crm/leads');
@@ -30,7 +32,7 @@ export default async function LeadsPage() {
   }
 
   // Fetch real leads from CRM
-  const { data: leadData } = await supabase
+  const { data: leadData } = await db
     .from('leads')
     .select('*')
     .order('created_at', { ascending: false })

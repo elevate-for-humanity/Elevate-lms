@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { IDVerificationForm } from '@/components/verification/IDVerificationForm';
 import { Shield } from 'lucide-react';
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 
 export default async function VerifyIdentityPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -33,7 +35,7 @@ export default async function VerifyIdentityPage() {
   if (!user) redirect('/login');
 
   // Check if verification already exists
-  const { data: verification } = await supabase
+  const { data: verification } = await db
     .from('id_verifications')
     .select('*')
     .eq('user_id', user.id)

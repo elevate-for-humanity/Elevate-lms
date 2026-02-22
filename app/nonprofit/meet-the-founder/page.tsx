@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 
 export default async function MeetTheFounderPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -28,7 +30,7 @@ export default async function MeetTheFounderPage() {
   }
   
   // Fetch founder info
-  const { data: founder } = await supabase
+  const { data: founder } = await db
     .from('team_members')
     .select('*')
     .eq('role', 'founder')

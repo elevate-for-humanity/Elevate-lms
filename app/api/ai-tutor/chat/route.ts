@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -83,6 +84,7 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -114,7 +116,7 @@ export async function POST(request: NextRequest) {
     // Get conversation history if exists
     let messages: Array<{ role: string; content: string }> = [];
     if (conversationId) {
-      const { data: history } = await supabase
+      const { data: history } = await db
         .from('conversations')
         .select('messages')
         .eq('id', conversationId)
@@ -180,7 +182,7 @@ export async function POST(request: NextRequest) {
     // Save or update conversation
     let newConversationId = conversationId;
     if (!conversationId) {
-      const { data: newConv } = await supabase
+      const { data: newConv } = await db
         .from('conversations')
         .insert({
           user_id: user.id,
@@ -193,7 +195,7 @@ export async function POST(request: NextRequest) {
 
       newConversationId = newConv?.id;
     } else {
-      await supabase
+      await db
         .from('conversations')
         .update({ messages })
         .eq('id', conversationId)

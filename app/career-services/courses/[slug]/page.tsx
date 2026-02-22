@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -28,10 +29,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) return { title: 'Course Not Found' };
 
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('career_courses')
     .select('title, description')
     .eq('slug', slug)
@@ -52,12 +54,13 @@ export default async function CourseDetailPage({
 }) {
   const { slug } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     notFound();
   }
 
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('career_courses')
     .select(`
       *,

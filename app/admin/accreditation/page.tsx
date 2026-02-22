@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -25,6 +26,7 @@ export const metadata: Metadata = {
 
 export default async function AccreditationPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -45,7 +47,7 @@ export default async function AccreditationPage() {
   }
 
   // Check admin role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -56,12 +58,12 @@ export default async function AccreditationPage() {
   }
 
   // Get compliance metrics
-  const { data: programs } = await supabase
+  const { data: programs } = await db
     .from('programs')
     .select('*')
     .eq('status', 'active');
 
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select('*, program:programs(name)')
     .gte(
@@ -69,7 +71,7 @@ export default async function AccreditationPage() {
       new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString()
     );
 
-  const { data: completions } = await supabase
+  const { data: completions } = await db
     .from('enrollments')
     .select('*')
     .eq('status', 'completed')
@@ -78,7 +80,7 @@ export default async function AccreditationPage() {
       new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString()
     );
 
-  const { data: placements } = await supabase
+  const { data: placements } = await db
     .from('job_placements')
     .select('*')
     .gte(

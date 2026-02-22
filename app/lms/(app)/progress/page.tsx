@@ -66,7 +66,7 @@ export default async function ProgressPage() {
 
   try {
     // Get enrollments with course details
-    const { data: enrollmentData } = await supabase
+    const { data: enrollmentData } = await db
       .from('enrollments')
       .select(`
         *,
@@ -95,7 +95,7 @@ export default async function ProgressPage() {
     }
 
     // Get recent progress activity
-    const { data: progressData } = await supabase
+    const { data: progressData } = await db
       .from('student_progress')
       .select(`
         *,
@@ -111,7 +111,7 @@ export default async function ProgressPage() {
     }
 
     // Calculate streak (days of consecutive activity)
-    const { data: activityDates } = await supabase
+    const { data: activityDates } = await db
       .from('student_progress')
       .select('updated_at')
       .eq('student_id', user.id)

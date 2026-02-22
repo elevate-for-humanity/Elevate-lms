@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import {
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 export default async function ProgramHolderVerificationPage() {
   const { user, profile } = await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -33,7 +35,7 @@ export default async function ProgramHolderVerificationPage() {
   }
 
   // Get pending verifications
-  const { data: pendingHolders } = await supabase
+  const { data: pendingHolders } = await db
     .from('program_holders')
     .select(
       `
@@ -52,13 +54,13 @@ export default async function ProgramHolderVerificationPage() {
   // Get documents for each holder
   const holdersWithDocs = await Promise.all(
     (pendingHolders || []).map(async (holder) => {
-      const { data: documents } = await supabase
+      const { data: documents } = await db
         .from('program_holder_documents')
         .select('*')
         .eq('program_holder_id', holder.user_id)
         .order('uploaded_at', { ascending: false });
 
-      const { data: banking } = await supabase
+      const { data: banking } = await db
         .from('program_holder_banking')
         .select('*')
         .eq('program_holder_id', holder.user_id)
@@ -73,7 +75,7 @@ export default async function ProgramHolderVerificationPage() {
   );
 
   // Get recently verified
-  const { data: recentlyVerified } = await supabase
+  const { data: recentlyVerified } = await db
     .from('program_holders')
     .select(
       `

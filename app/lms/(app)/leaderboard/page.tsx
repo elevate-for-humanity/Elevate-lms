@@ -58,31 +58,31 @@ export default async function LeaderboardPage() {
   if (!user) redirect('/login?next=/lms/leaderboard');
 
   // Fetch all profiles
-  const { data: profiles } = await supabase
+  const { data: profiles } = await db
     .from('profiles')
     .select('id, first_name, last_name, avatar_url')
     .limit(100);
 
   // Fetch enrollment data for completed courses
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select('user_id, status, completed_lessons')
     .eq('status', 'completed');
 
   // Fetch quiz attempts
-  const { data: quizAttempts } = await supabase
+  const { data: quizAttempts } = await db
     .from('quiz_attempts')
     .select('user_id, score, status')
     .eq('status', 'completed');
 
   // Fetch student progress for lesson completions
-  const { data: progressData } = await supabase
+  const { data: progressData } = await db
     .from('student_progress')
     .select('student_id, completed')
     .eq('completed', true);
 
   // Fetch badges earned
-  const { data: userBadges } = await supabase
+  const { data: userBadges } = await db
     .from('user_badges')
     .select('user_id, badge_id');
 

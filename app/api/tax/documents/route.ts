@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,6 +13,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -22,7 +24,7 @@ export async function GET(request: Request) {
     }
 
     // Get user's documents
-    const { data: documents, error } = await supabase
+    const { data: documents, error } = await db
       .from('tax_documents')
       .select('*')
       .eq('email', user.email)

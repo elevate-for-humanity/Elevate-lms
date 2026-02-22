@@ -5,6 +5,7 @@ export const maxDuration = 60;
 // app/api/forums/[forumId]/threads/[threadId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getUserIdFromRequest } from "@/lib/getUserIdFromRequest";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -19,9 +20,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
     const { threadId } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get thread details
-    const { data: thread, error: threadError } = await supabase
+    const { data: thread, error: threadError } = await db
       .from("discussion_threads")
       .select(`
         id,
@@ -44,20 +46,20 @@ export async function GET(_req: NextRequest, { params }: Params) {
     }
 
     // Increment view count
-    await supabase
+    await db
       .from("discussion_threads")
       .update({ view_count: (thread.view_count || 0) + 1 })
       .eq("id", threadId);
 
     // Get thread creator profile
-    const { data: creatorProfile } = await supabase
+    const { data: creatorProfile } = await db
       .from("profiles")
       .select("full_name, avatar_url")
       .eq("id", thread.user_id)
       .single();
 
     // Get posts
-    const { data: posts, error: postsError } = await supabase
+    const { data: posts, error: postsError } = await db
       .from("discussion_posts")
       .select(`
         id,
@@ -80,7 +82,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
     // Get profiles for all post authors
     const userIds = [...new Set(posts?.map((p) => p.user_id) || [])];
-    const { data: profiles } = await supabase
+    const { data: profiles } = await db
       .from("profiles")
       .select("id, full_name, avatar_url")
       .in("id", userIds);
@@ -134,6 +136,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = (await req.json()) as { content?: string };
 
     if (!body.content) {
@@ -144,7 +147,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
 
     // Check if thread is locked
-    const { data: thread } = await supabase
+    const { data: thread } = await db
       .from("discussion_threads")
       .select("is_locked")
       .eq("id", threadId)
@@ -160,7 +163,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     const now = new Date().toISOString();
 
     // 1) Insert post
-    const { error: postError } = await supabase
+    const { error: postError } = await db
       .from("discussion_posts")
       .insert({
         thread_id: threadId,
@@ -178,7 +181,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
 
     // 2) Update last_post_at on thread
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from("discussion_threads")
       .update({ last_post_at: now })
       .eq("id", threadId);

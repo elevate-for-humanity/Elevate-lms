@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
 
 export default async function OnboardingPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -40,7 +42,7 @@ export default async function OnboardingPage() {
 
   let profile = null;
   if (user) {
-    const { data }: any = await supabase
+    const { data }: any = await db
       .from('profiles')
       .select('role, full_name')
       .eq('id', user.id)

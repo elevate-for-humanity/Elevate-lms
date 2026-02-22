@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 // AUTH: Intentionally public — returns aggregate counts only
@@ -21,10 +22,10 @@ export async function GET(request: Request) {
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
 
     const [totalRes, monthRes, todayRes, activeRes] = await Promise.all([
-      supabase.from('enrollments').select('id', { count: 'exact', head: true }),
-      supabase.from('enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfMonth),
-      supabase.from('enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfDay),
-      supabase.from('enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+      db.from('enrollments').select('id', { count: 'exact', head: true }),
+      db.from('enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfMonth),
+      db.from('enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfDay),
+      db.from('enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     ]);
 
     return NextResponse.json({

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ProgramsTable } from './programs-table';
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 
 export default async function ProgramsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -36,7 +38,7 @@ export default async function ProgramsPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -46,7 +48,7 @@ export default async function ProgramsPage() {
     redirect('/unauthorized');
   }
 
-  const { data: programs, count: totalPrograms } = await supabase
+  const { data: programs, count: totalPrograms } = await db
     .from('programs')
     .select(
       `
@@ -57,12 +59,12 @@ export default async function ProgramsPage() {
     )
     .order('created_at', { ascending: false });
 
-  const { count: activePrograms } = await supabase
+  const { count: activePrograms } = await db
     .from('programs')
     .select('*', { count: 'exact', head: true })
     .eq('is_active', true);
 
-  const { count: featuredPrograms } = await supabase
+  const { count: featuredPrograms } = await db
     .from('programs')
     .select('*', { count: 'exact', head: true })
     .eq('featured', true);

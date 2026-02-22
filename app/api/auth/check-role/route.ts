@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
@@ -15,6 +16,7 @@ const searchParams = request.nextUrl.searchParams;
   }
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -23,7 +25,7 @@ const searchParams = request.nextUrl.searchParams;
     return NextResponse.json({ hasRole: false, authenticated: false }, { status: 401 });
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)

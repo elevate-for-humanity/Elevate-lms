@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 import { requireAdmin } from '@/lib/authGuards';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { BarChart, DollarSign, Gift } from 'lucide-react';
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 
 export default async function CashAdvancesAdminPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -37,7 +39,7 @@ export default async function CashAdvancesAdminPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -47,13 +49,13 @@ export default async function CashAdvancesAdminPage() {
     redirect('/unauthorized');
   }
 
-  const { data: items, count: totalItems } = await supabase
+  const { data: items, count: totalItems } = await db
     .from('profiles')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .limit(50);
 
-  const { count: activeItems } = await supabase
+  const { count: activeItems } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
@@ -61,7 +63,7 @@ export default async function CashAdvancesAdminPage() {
   await requireAdmin();
 
   // Fetch applications
-  const { data: applications, error } = await supabase
+  const { data: applications, error } = await db
     .from('cash_advance_applications')
     .select('*')
     .order('created_at', { ascending: false })

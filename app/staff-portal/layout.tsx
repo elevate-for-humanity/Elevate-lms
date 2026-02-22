@@ -2,6 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
 
 
@@ -26,6 +27,7 @@ export default async function StaffPortalLayout({
   // proxy.ts handles redirect for protected sub-routes; this layout adds
   // defense-in-depth by verifying role for authenticated users.
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -34,7 +36,7 @@ export default async function StaffPortalLayout({
     return <>{children}</>;
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)

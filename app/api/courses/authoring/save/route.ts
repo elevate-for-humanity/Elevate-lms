@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
@@ -15,6 +16,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -29,7 +31,7 @@ export async function POST(request: NextRequest) {
     // Save or update course structure
     for (const module of modules) {
       // Upsert module
-      const { data: moduleData, error: moduleError } = await supabase
+      const { data: moduleData, error: moduleError } = await db
         .from('modules')
         .upsert({
           id: module.id.startsWith('module-') ? undefined : module.id,
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
 
       // Save lessons
       for (const lesson of module.lessons) {
-        const { data: lessonData, error: lessonError } = await supabase
+        const { data: lessonData, error: lessonError } = await db
           .from('lessons')
           .upsert({
             id: lesson.id.startsWith('lesson-') ? undefined : lesson.id,
@@ -60,7 +62,7 @@ export async function POST(request: NextRequest) {
         if (lessonError) throw lessonError;
 
         // Delete existing blocks for this lesson
-        await supabase
+        await db
           .from('lesson_content_blocks')
           .delete()
           .eq('lesson_id', lessonData.id);
@@ -77,7 +79,7 @@ export async function POST(request: NextRequest) {
             })
           );
 
-          const { error: blocksError } = await supabase
+          const { error: blocksError } = await db
             .from('lesson_content_blocks')
             .insert(blocks);
 

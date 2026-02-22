@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import {
   Mail,
@@ -23,6 +24,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function EnrollSuccessPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -36,7 +38,7 @@ export default async function EnrollSuccessPage() {
   }
 
   // Get next steps content
-  const { data: nextSteps } = await supabase
+  const { data: nextSteps } = await db
     .from('content_blocks')
     .select('*')
     .eq('page', 'enroll-success')
@@ -44,7 +46,7 @@ export default async function EnrollSuccessPage() {
     .order('order', { ascending: true });
 
   // Get contact info
-  const { data: contactInfo } = await supabase
+  const { data: contactInfo } = await db
     .from('settings')
     .select('value')
     .eq('key', 'enrollment_contact')

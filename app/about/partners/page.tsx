@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -19,7 +20,7 @@ export default async function PartnersPage() {
   const supabase = createPublicClient();
 
   // Fetch partners by type
-  const { data: allPartners } = await supabase
+  const { data: allPartners } = await db
     .from('partners')
     .select('*')
     .eq('is_active', true)

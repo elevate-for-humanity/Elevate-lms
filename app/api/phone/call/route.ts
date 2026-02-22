@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -30,7 +31,8 @@ export async function POST(req: Request) {
 
     // Log the call request
     const supabase = await createClient();
-    await supabase.from('phone_logs').insert({
+  const _admin = createAdminClient(); const db = _admin || supabase;
+    await db.from('phone_logs').insert({
       action,
       phone_number: phoneNumber,
       message,
@@ -75,8 +77,9 @@ async function handleClickToCall(phoneNumber: string) {
 // Option 2: Schedule callback (saves to database, your team calls them)
 async function handleScheduleCallback(phoneNumber: string, message: string) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  const { data, error }: any = await supabase
+  const { data, error }: any = await db
     .from('callback_requests')
     .insert({
       phone_number: phoneNumber,
@@ -105,8 +108,9 @@ async function handleScheduleCallback(phoneNumber: string, message: string) {
 // Option 3: Voicemail (saves audio/text message)
 async function handleVoicemail(phoneNumber: string, message: string) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  await supabase.from('voicemails').insert({
+  await db.from('voicemails').insert({
     phone_number: phoneNumber,
     message,
     status: 'new',

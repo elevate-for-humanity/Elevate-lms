@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('ojt_reimbursements')
       .insert([
         {
@@ -65,7 +65,7 @@ export async function GET(request: Request) {
 
     const supabase = createAdminClient();
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('ojt_reimbursements')
       .select('*')
       .order('created_at', { ascending: false });
@@ -93,7 +93,7 @@ export async function PATCH(req: Request) {
 
     const supabase = createAdminClient();
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('ojt_reimbursements')
       .update({ status })
       .eq('id', id)

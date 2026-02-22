@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -16,6 +17,7 @@ export async function GET(
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const user = await getCurrentUser();
 
   if (!user) {
@@ -24,7 +26,7 @@ const supabase = await createClient();
 
   const { lessonId } = await params;
 
-  const { data, error }: any = await supabase
+  const { data, error }: any = await db
     .from("lesson_notes")
     .select("id, position_seconds, body, created_at")
     .eq("lesson_id", lessonId)
@@ -47,6 +49,7 @@ export async function POST(
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const user = await getCurrentUser();
 
   if (!user) {
@@ -63,7 +66,7 @@ export async function POST(
     return NextResponse.json({ error: "text required" }, { status: 400 });
   }
 
-  const { error } = await supabase.from("lesson_notes").insert({
+  const { error } = await db.from("lesson_notes").insert({
     user_id: user.id,
     lesson_id: lessonId,
     body: noteText,

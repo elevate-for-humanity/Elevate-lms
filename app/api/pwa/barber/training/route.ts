@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCourseBySlug } from '@/lib/courses/definitions';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
@@ -32,7 +34,7 @@ export async function GET(request: Request) {
     }
 
     // Get user's lesson progress from database
-    const { data: lessonProgress } = await supabase
+    const { data: lessonProgress } = await db
       .from('lesson_progress')
       .select('lesson_id, completed, completed_at')
       .eq('user_id', user.id)
@@ -43,7 +45,7 @@ export async function GET(request: Request) {
     );
 
     // Get user's total hours to determine unlocked modules
-    const { data: progressEntries } = await supabase
+    const { data: progressEntries } = await db
       .from('progress_entries')
       .select('hours_worked')
       .eq('apprentice_id', user.id)
@@ -126,6 +128,7 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
@@ -143,7 +146,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Lesson ID required' }, { status: 400 });
     }
 
-    const { error } = await supabase
+    const { error } = await db
       .from('lesson_progress')
       .upsert({
         user_id: user.id,

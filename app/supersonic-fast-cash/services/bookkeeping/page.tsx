@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -29,6 +30,7 @@ export const metadata = {
 
 export default async function BookkeepingPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -42,7 +44,7 @@ export default async function BookkeepingPage() {
   }
   
   // Fetch bookkeeping services from database (if available)
-  const { data: dbServices } = await supabase
+  const { data: dbServices } = await db
     .from('tax_services')
     .select('*')
     .eq('type', 'bookkeeping');

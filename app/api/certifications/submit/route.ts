@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
@@ -8,6 +9,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   // Get current user
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -32,7 +34,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Check for existing pending submission
-  const { data: existing } = await supabase
+  const { data: existing } = await db
     .from('certification_submissions')
     .select('id, status')
     .eq('user_id', user.id)
@@ -48,7 +50,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Create submission
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('certification_submissions')
     .insert({
       user_id: user.id,

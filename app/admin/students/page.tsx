@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
 
 export default async function StudentsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -45,7 +47,7 @@ export default async function StudentsPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -56,7 +58,7 @@ export default async function StudentsPage() {
   }
 
   // Fetch students with enrollment data
-  const { data: students, count: totalStudents } = await supabase
+  const { data: students, count: totalStudents } = await db
     .from('profiles')
     .select(
       `
@@ -75,13 +77,13 @@ export default async function StudentsPage() {
     .limit(50);
 
   // Get active enrollments count
-  const { count: activeEnrollments } = await supabase
+  const { count: activeEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
   // Get completed enrollments count
-  const { count: completedEnrollments } = await supabase
+  const { count: completedEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
@@ -89,7 +91,7 @@ export default async function StudentsPage() {
   // Get recent students (last 7 days)
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
-  const { count: recentStudents } = await supabase
+  const { count: recentStudents } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'student')

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 export default async function ContactsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -33,7 +35,7 @@ export default async function ContactsPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -44,18 +46,18 @@ export default async function ContactsPage() {
   }
 
   // Fetch contact submissions
-  const { data: contacts, count: totalContacts } = await supabase
+  const { data: contacts, count: totalContacts } = await db
     .from('contact_submissions')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .limit(20);
 
-  const { count: unreadContacts } = await supabase
+  const { count: unreadContacts } = await db
     .from('contact_submissions')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'unread');
 
-  const { count: pendingContacts } = await supabase
+  const { count: pendingContacts } = await db
     .from('contact_submissions')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');

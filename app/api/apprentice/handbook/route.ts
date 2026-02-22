@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -17,6 +18,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -27,14 +29,14 @@ export async function GET(request: NextRequest) {
     const programSlug = searchParams.get('program') || 'barber-apprenticeship';
 
     // Get acknowledged sections
-    const { data: acknowledgments } = await supabase
+    const { data: acknowledgments } = await db
       .from('handbook_acknowledgments')
       .select('section_id')
       .eq('student_id', user.id)
       .eq('program_slug', programSlug);
 
     // Get signed agreement
-    const { data: agreement } = await supabase
+    const { data: agreement } = await db
       .from('apprentice_agreements')
       .select('*')
       .eq('student_id', user.id)
@@ -64,6 +66,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -75,7 +78,7 @@ export async function POST(request: NextRequest) {
 
     if (action === 'acknowledge') {
       // Acknowledge a section
-      const { error } = await supabase
+      const { error } = await db
         .from('handbook_acknowledgments')
         .upsert({
           student_id: user.id,
@@ -97,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     if (action === 'sign') {
       // Sign the agreement
-      const { error } = await supabase
+      const { error } = await db
         .from('apprentice_agreements')
         .upsert({
           student_id: user.id,
@@ -121,7 +124,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Update student enrollment to mark handbook complete
-      await supabase
+      await db
         .from('student_enrollments')
         .update({ handbook_signed: true, handbook_signed_at: new Date().toISOString() })
         .eq('student_id', user.id);

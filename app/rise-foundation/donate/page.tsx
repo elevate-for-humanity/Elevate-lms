@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Heart, Target, Users, TrendingUp } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 
 export default async function DonatePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -27,7 +29,7 @@ export default async function DonatePage() {
     );
   }
 
-  const { data: campaigns } = await supabase
+  const { data: campaigns } = await db
     .from('campaigns')
     .select('*')
     .eq('is_active', true)

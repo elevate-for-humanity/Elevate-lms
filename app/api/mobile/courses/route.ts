@@ -6,6 +6,7 @@ export const maxDuration = 60;
 // app/api/mobile/courses/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -24,6 +25,7 @@ export async function GET(request: NextRequest) {
 
     const token = authHeader.substring(7);
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify token and get user
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
@@ -36,7 +38,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's enrolled courses
-    const { data: enrollments, error: enrollError } = await supabase
+    const { data: enrollments, error: enrollError } = await db
       .from("enrollments")
       .select(`
         id,
@@ -69,14 +71,14 @@ export async function GET(request: NextRequest) {
         if (!course) return null;
 
         // Get total lessons in course
-        const { data: modules } = await supabase
+        const { data: modules } = await db
           .from("modules")
           .select("id")
           .eq("course_id", courseId);
 
         const moduleIds = modules?.map((m) => m.id) || [];
 
-        const { data: lessons } = await supabase
+        const { data: lessons } = await db
           .from("lessons")
           .select("id")
           .in("module_id", moduleIds);
@@ -84,7 +86,7 @@ export async function GET(request: NextRequest) {
         const totalLessons = lessons?.length || 0;
 
         // Get completed lessons
-        const { data: progress } = await supabase
+        const { data: progress } = await db
           .from("lesson_progress")
           .select("lesson_id, completed")
           .eq("user_id", user.id)
@@ -100,7 +102,7 @@ export async function GET(request: NextRequest) {
         let nextLessonTitle = undefined;
 
         if (nextLesson) {
-          const { data: lessonData } = await supabase
+          const { data: lessonData } = await db
             .from("lessons")
             .select("title")
             .eq("id", nextLesson.id)

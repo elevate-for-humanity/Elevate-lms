@@ -4,6 +4,7 @@ import { Phone } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 import ReelsFeed from '@/components/reels/ReelsFeed';
 
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
 async function getReels() {
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -32,7 +34,7 @@ async function getReels() {
       </div>
     );
   }
-    const { data }: any = await supabase
+    const { data }: any = await db
       .from('reels')
       .select('*')
       .eq('published', true)

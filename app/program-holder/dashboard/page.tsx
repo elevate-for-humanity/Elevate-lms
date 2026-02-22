@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { LayoutDashboard, Users, BookOpen, TrendingUp, Settings, BarChart3, Calendar } from 'lucide-react';
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ProgramHolderDashboardPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/program-holder/dashboard');
@@ -26,7 +28,7 @@ export default async function ProgramHolderDashboardPage() {
   }
 
   // Fetch programs owned by this user
-  const { data: programsData } = await supabase
+  const { data: programsData } = await db
     .from('programs')
     .select('id, name, title, is_active, enrolled_count, completion_rate, created_at')
     .eq('created_by', user.id)

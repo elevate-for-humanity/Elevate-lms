@@ -1,11 +1,13 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function createWOTCApplication(formData: FormData) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -33,7 +35,7 @@ export async function createWOTCApplication(formData: FormData) {
     submitted_at: formData.get('saveAsDraft') ? null : new Date().toISOString(),
   };
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('wotc_applications')
     .insert(applicationData)
     .select()
@@ -50,6 +52,7 @@ export async function createWOTCApplication(formData: FormData) {
 
 export async function updateWOTCApplication(id: string, formData: FormData) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -74,7 +77,7 @@ export async function updateWOTCApplication(id: string, formData: FormData) {
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await supabase
+  const { error } = await db
     .from('wotc_applications')
     .update(updateData)
     .eq('id', id);
@@ -90,8 +93,9 @@ export async function updateWOTCApplication(id: string, formData: FormData) {
 
 export async function submitWOTCApplication(id: string) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
-  const { error } = await supabase
+  const { error } = await db
     .from('wotc_applications')
     .update({ 
       status: 'submitted',
@@ -110,6 +114,7 @@ export async function submitWOTCApplication(id: string) {
 
 export async function updateWOTCStatus(id: string, status: string, notes?: string) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const updateData: Record<string, unknown> = {
     status,
@@ -124,7 +129,7 @@ export async function updateWOTCStatus(id: string, status: string, notes?: strin
     updateData.reviewer_notes = notes;
   }
 
-  const { error } = await supabase
+  const { error } = await db
     .from('wotc_applications')
     .update(updateData)
     .eq('id', id);
@@ -140,8 +145,9 @@ export async function updateWOTCStatus(id: string, status: string, notes?: strin
 
 export async function deleteWOTCApplication(id: string) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
-  const { error } = await supabase
+  const { error } = await db
     .from('wotc_applications')
     .delete()
     .eq('id', id);

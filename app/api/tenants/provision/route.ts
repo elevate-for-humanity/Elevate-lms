@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { data: tenant, error } = await supabase
+  const { data: tenant, error } = await db
     .from('tenants')
     .insert({
       name,

@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { jsonOk, jsonErr } from '@/lib/http/apiResponse';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -18,6 +19,7 @@ export async function POST(
   const params = await context.params;
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current user
     const {
@@ -57,7 +59,7 @@ export async function POST(
     }
 
     // Check if user is already a member
-    const { data: existingMember } = await supabase
+    const { data: existingMember } = await db
       .from('organization_members')
       .select('id')
       .eq('organization_id', invite.organization_id)
@@ -69,7 +71,7 @@ export async function POST(
     }
 
     // Accept invite: add to organization_members
-    const { error: memberError } = await supabase
+    const { error: memberError } = await db
       .from('organization_members')
       .insert({
         organization_id: invite.organization_id,
@@ -82,7 +84,7 @@ export async function POST(
     }
 
     // Mark invite as accepted
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('org_invites')
       .update({ accepted_at: new Date().toISOString() })
       .eq('token', params.token);

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { ProgramUpdateSchema } from '@/lib/validators/course';
 import { getProgram, updateProgram, deleteProgram } from '@/lib/db/courses';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -9,10 +10,11 @@ export const dynamic = 'force-dynamic';
 
 async function requireAdmin() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return { error: 'Database unavailable', status: 500 };
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Unauthorized', status: 401 };
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 };
   }
@@ -59,7 +61,7 @@ const { id } = await params;
     const data = await updateProgram(id, parsed.data);
     
     // Log audit
-    await auth.supabase.from('audit_logs').insert({
+    await auth.db.from('audit_logs').insert({
       actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action: 'update',
@@ -90,7 +92,7 @@ const { id } = await params;
     const data = await deleteProgram(id);
     
     // Log audit (soft delete = status change to archived)
-    await auth.supabase.from('audit_logs').insert({
+    await auth.db.from('audit_logs').insert({
       actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action: 'delete',

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,8 +17,9 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    const { data: departments, error } = await supabase
+    const { data: departments, error } = await db
       .from('departments')
       .select(
         `
@@ -52,6 +54,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await parseBody<Record<string, any>>(request);
 
     const {
@@ -71,7 +74,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: department, error } = await supabase
+    const { data: department, error } = await db
       .from('departments')
       .insert({
         name,

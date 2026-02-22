@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get authenticated user
     const {
@@ -44,7 +46,7 @@ export async function POST(request: Request) {
     }
 
     // 1) Load enrollment + course + program
-    const { data: enrollment, error: enrollmentError } = await supabase
+    const { data: enrollment, error: enrollmentError } = await db
       .from('enrollments')
       .select(
         `
@@ -96,7 +98,7 @@ export async function POST(request: Request) {
     }
 
     // 2) Check course completion via view
-    const { data: completionRow, error: completionError } = await supabase
+    const { data: completionRow, error: completionError } = await db
       .from('course_completion_status')
       .select(
         `
@@ -129,7 +131,7 @@ export async function POST(request: Request) {
     }
 
     // 3) Check if certificate already exists
-    const { data: existingCert } = await supabase
+    const { data: existingCert } = await db
       .from('certificates')
       .select('id, certificate_number, verification_code')
       .eq('student_id', enrollment.user_id)
@@ -145,7 +147,7 @@ export async function POST(request: Request) {
     }
 
     // 4) Load student profile
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('user_profiles')
       .select('full_name, email')
       .eq('user_id', enrollment.user_id)
@@ -157,7 +159,7 @@ export async function POST(request: Request) {
     const totalHours = course?.duration_hours || 0;
 
     // 6) Insert certificate
-    const { data: cert, error: certError } = await supabase
+    const { data: cert, error: certError } = await db
       .from('certificates')
       .insert({
         student_id: enrollment.user_id,
@@ -185,7 +187,7 @@ export async function POST(request: Request) {
 
     // 7) Update enrollment status to completed and record certificate issuance timestamp
     const now = new Date().toISOString();
-    await supabase
+    await db
       .from('enrollments')
       .update({
         status: 'completed',

@@ -4,10 +4,12 @@ import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { Play, Lock } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export default async function DemoCoursesPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('courses').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('courses').select('*').limit(50);
 const courses = (dbRows as any[]) || [];
 
   return (

@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { AdminLicenseWrapper } from '@/components/licensing/AdminLicenseWrapper';
 import { getLicenseAccessMode } from '@/lib/licensing/billing-authority';
 import { reconcileTrialOnboarding } from '@/lib/trial/reconcile-onboarding';
@@ -38,13 +39,14 @@ export const metadata: Metadata = {
 async function getLicenseContext() {
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) return null;
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null;
 
     // Get user profile with role and tenant
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role, tenant_id')
       .eq('id', user.id)
@@ -53,7 +55,7 @@ async function getLicenseContext() {
     if (!profile?.tenant_id) return null;
 
     // Get license for tenant
-    const { data: license } = await supabase
+    const { data: license } = await db
       .from('licenses')
       .select('id, tier, status, expires_at, current_period_end, stripe_subscription_id, stripe_customer_id, canceled_at, suspended_at')
       .eq('tenant_id', profile.tenant_id)
@@ -91,6 +93,7 @@ export default async function AdminLayout({
   // Reconcile trial onboarding state if the fire-and-forget call missed
   if (context?.tenantId) {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (supabase) {
       reconcileTrialOnboarding(supabase, context.tenantId).catch(() => {});
     }

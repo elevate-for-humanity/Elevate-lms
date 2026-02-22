@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -32,8 +33,9 @@ export default async function PayrollPage() {
   
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (supabase) {
-      const { data } = await supabase
+      const { data } = await db
         .from('tax_services')
         .select('*')
         .eq('type', 'payroll');

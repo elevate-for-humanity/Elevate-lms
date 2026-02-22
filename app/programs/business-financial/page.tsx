@@ -6,6 +6,7 @@ import type { Metadata } from 'next';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Briefcase, Clock, DollarSign, Shield, Award, CheckCircle, Users } from 'lucide-react';
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
 
 export default async function BusinessFinancialPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -37,7 +39,7 @@ export default async function BusinessFinancialPage() {
   }
   
   // Fetch business financial programs
-  const { data: programs } = await supabase
+  const { data: programs } = await db
     .from('programs')
     .select('*')
     .eq('category', 'business_financial');

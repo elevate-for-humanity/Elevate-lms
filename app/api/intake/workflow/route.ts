@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { validateIntakeCompletion } from '@/lib/enrollment/funding-enforcement';
 import { IntakeStatus, FundingPathway } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -17,6 +18,7 @@ export async function GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -27,7 +29,7 @@ const supabase = await createClient();
   const programId = searchParams.get('programId');
   const intakeId = searchParams.get('intakeId');
   
-  let query = supabase
+  let query = db
     .from('intake_records')
     .select('*');
   
@@ -54,6 +56,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -68,7 +71,7 @@ export async function POST(request: NextRequest) {
   }
   
   // Check for existing intake
-  const { data: existing } = await supabase
+  const { data: existing } = await db
     .from('intake_records')
     .select('id, status')
     .eq('user_id', user.id)
@@ -84,7 +87,7 @@ export async function POST(request: NextRequest) {
   }
   
   // Create new intake
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('intake_records')
     .insert({
       user_id: user.id,
@@ -112,6 +115,7 @@ export async function PATCH(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -126,7 +130,7 @@ const supabase = await createClient();
   }
   
   // Verify ownership or staff role
-  const { data: intake } = await supabase
+  const { data: intake } = await db
     .from('intake_records')
     .select('user_id, status')
     .eq('id', intakeId)
@@ -137,7 +141,7 @@ const supabase = await createClient();
   }
   
   // Check user role for staff operations
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -273,7 +277,7 @@ const supabase = await createClient();
   }
   
   // Update intake record
-  const { error } = await supabase
+  const { error } = await db
     .from('intake_records')
     .update(updateData)
     .eq('id', intakeId);
@@ -287,7 +291,7 @@ const supabase = await createClient();
     const validation = await validateIntakeCompletion(intakeId);
     if (!validation.valid) {
       // Revert status
-      await supabase
+      await db
         .from('intake_records')
         .update({ status: 'pending_signature' })
         .eq('id', intakeId);

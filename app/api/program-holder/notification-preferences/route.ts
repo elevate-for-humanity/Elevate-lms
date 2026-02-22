@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -32,7 +34,7 @@ export async function POST(req: Request) {
     } = body;
 
     // Verify user owns this program holder
-    const { data: programHolder } = await supabase
+    const { data: programHolder } = await db
       .from('program_holders')
       .select('id')
       .eq('id', program_holder_id)
@@ -44,7 +46,7 @@ export async function POST(req: Request) {
     }
 
     // Update or insert preferences
-    const { data: preferences, error } = await supabase
+    const { data: preferences, error } = await db
       .from('notification_preferences')
       .upsert(
         {

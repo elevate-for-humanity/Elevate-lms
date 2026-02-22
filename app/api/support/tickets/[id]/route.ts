@@ -16,6 +16,7 @@ export async function GET(request: NextRequest, { params }: { params: Params }) 
 
     const { id } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     const adminClient = createAdminClient();
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest, { params }: { params: Params }) 
     
     // Check access
     if (user) {
-      const { data: profile } = await supabase
+      const { data: profile } = await db
         .from('profiles')
         .select('role')
         .eq('id', user.id)
@@ -67,13 +68,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Params }
 
     const { id } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
 
 export default async function ProgramHolderOnboarding() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -39,7 +41,7 @@ export default async function ProgramHolderOnboarding() {
   }
   
   // Fetch onboarding resources
-  const { data: resources } = await supabase
+  const { data: resources } = await db
     .from('onboarding_resources')
     .select('*')
     .eq('role', 'program_holder')

@@ -1,6 +1,7 @@
 // app/tax-self-prep/page.tsx - Self-Preparation Tax Software (TurboTax Style)
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ScrollReveal } from '@/components/animations/ScrollReveal';
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
 
 export default async function TaxSelfPrepPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -35,7 +37,7 @@ export default async function TaxSelfPrepPage() {
   }
   
   // Fetch tax prep pricing
-  const { data: pricing } = await supabase
+  const { data: pricing } = await db
     .from('tax_services')
     .select('*')
     .eq('type', 'self_prep');

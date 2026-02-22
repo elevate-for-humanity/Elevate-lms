@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -189,8 +190,9 @@ async function logUnauthorizedAccess(data: {
   /*
   const { createClient } = require('@/lib/supabase/server');
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  await supabase.from('unauthorized_access_log').insert({
+  await db.from('unauthorized_access_log').insert({
     domain: data.domain,
     url: data.url,
     referrer: data.referrer,

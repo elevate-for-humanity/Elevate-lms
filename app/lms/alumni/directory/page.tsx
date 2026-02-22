@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -39,6 +40,7 @@ interface AlumniProfile {
 
 export default async function AlumniDirectoryPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -55,7 +57,7 @@ export default async function AlumniDirectoryPage() {
   if (!user) redirect('/login?next=/lms/alumni/directory');
 
   // Fetch alumni profiles (users who have completed at least one program)
-  const { data: alumni } = await supabase
+  const { data: alumni } = await db
     .from('profiles')
     .select(`
       id,
@@ -73,7 +75,7 @@ export default async function AlumniDirectoryPage() {
     .limit(50);
 
   // Get count of alumni who are mentors
-  const { count: mentorCount } = await supabase
+  const { count: mentorCount } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('is_mentor', true);

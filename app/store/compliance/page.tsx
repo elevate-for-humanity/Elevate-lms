@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Shield, Circle, FileText, Lock, Download, ExternalLink } from 'lucide-react';
 
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 
 export default async function CompliancePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function CompliancePage() {
   }
   
   // Fetch compliance documents
-  const { data: documents } = await supabase
+  const { data: documents } = await db
     .from('compliance_documents')
     .select('*')
     .order('category');

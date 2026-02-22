@@ -25,6 +25,7 @@ export async function POST(req: Request) {
 
     // 1. Authentication
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
     }
 
     // 2. Authorization - check for admin or super_admin
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)

@@ -1,4 +1,5 @@
 "use client";
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
@@ -27,7 +28,7 @@ export default function GrantProgramsPage() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    supabase.from('funding_sources').select('*').limit(50)
+    db.from('funding_sources').select('*').limit(50)
       .then(({ data }) => { if (data) setDbRows(data); });
   }, []);
 

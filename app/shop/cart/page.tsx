@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ShoppingCart, CreditCard, Lock } from 'lucide-react';
@@ -15,6 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ShoppingCartPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/shop/cart');
@@ -27,7 +29,7 @@ export default async function ShoppingCartPage() {
   }
 
   // Fetch cart items with product details
-  const { data: cartData } = await supabase
+  const { data: cartData } = await db
     .from('cart_items')
     .select('id, quantity, product_id, products(id, name, description, price, image_url)')
     .eq('user_id', user.id)

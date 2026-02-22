@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -22,7 +23,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Check role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -38,7 +39,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   const format = (url.searchParams.get('format') || 'json').toLowerCase();
 
   // Get program
-  const { data: program } = await supabase
+  const { data: program } = await db
     .from('funding_programs')
     .select('id')
     .eq('code', code)

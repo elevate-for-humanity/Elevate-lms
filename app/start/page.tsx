@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { 
   ArrowRight, 
@@ -57,6 +58,7 @@ const DEFAULT_PATHWAYS = [
 
 export default async function StartPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -70,14 +72,14 @@ export default async function StartPage() {
   }
 
   // Get pathways from database
-  const { data: pathways } = await supabase
+  const { data: pathways } = await db
     .from('pathways')
     .select('*')
     .eq('is_active', true)
     .order('order', { ascending: true });
 
   // Get featured programs
-  const { data: featuredPrograms } = await supabase
+  const { data: featuredPrograms } = await db
     .from('programs')
     .select('id, name, slug, description, duration')
     .eq('is_active', true)
@@ -85,7 +87,7 @@ export default async function StartPage() {
     .limit(4);
 
   // Get quick stats
-  const { data: stats } = await supabase
+  const { data: stats } = await db
     .from('statistics')
     .select('*')
     .eq('category', 'homepage')

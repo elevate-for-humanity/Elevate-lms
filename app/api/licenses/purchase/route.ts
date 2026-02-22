@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -10,6 +11,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
     const amount = pricing[lms_model] || 0;
 
     // Get program details
-    const { data: program } = await supabase
+    const { data: program } = await db
       .from('programs')
       .select('title')
       .eq('id', program_id)
@@ -55,7 +57,7 @@ export async function POST(request: NextRequest) {
     if (amount === 0) {
       const licenseKey = `FREE-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
-      const { data: license, error: licenseError } = await supabase
+      const { data: license, error: licenseError } = await db
         .from('program_licenses')
         .insert({
           program_id,
@@ -109,7 +111,7 @@ export async function POST(request: NextRequest) {
     // Create pending license
     const licenseKey = `PEND-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
-    const { data: license, error: licenseError } = await supabase
+    const { data: license, error: licenseError } = await db
       .from('program_licenses')
       .insert({
         program_id,
@@ -141,7 +143,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create payment record
-    await supabase.from('payment_records').insert({
+    await db.from('payment_records').insert({
       user_id: user.id,
       amount: amount / 100,
       currency: 'usd',
@@ -177,6 +179,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -187,7 +190,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's licenses
-    const { data: licenses, error } = await supabase
+    const { data: licenses, error } = await db
       .from('program_licenses')
       .select(
         `

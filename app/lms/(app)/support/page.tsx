@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -77,6 +78,7 @@ const SUPPORT_CATEGORIES = [
 
 export default async function SupportPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -100,7 +102,7 @@ export default async function SupportPage() {
   let tickets: any[] = [];
 
   try {
-    const { data: ticketData } = await supabase
+    const { data: ticketData } = await db
       .from('support_tickets')
       .select('*')
       .eq('user_id', user.id)

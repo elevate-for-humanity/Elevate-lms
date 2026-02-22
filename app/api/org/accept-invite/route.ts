@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { bindUserToOrg } from '@/lib/org/bindUserToOrg';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
       error: authError,
@@ -30,7 +32,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch invite
-    const { data: invite, error: inviteError } = await supabase
+    const { data: invite, error: inviteError } = await db
       .from('org_invites')
       .select('*')
       .eq('token', token)
@@ -45,7 +47,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if user already member
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('organization_users')
       .select('id')
       .eq('organization_id', invite.organization_id)
@@ -60,7 +62,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Add user to organization
-    const { error: memberError } = await supabase
+    const { error: memberError } = await db
       .from('organization_users')
       .insert({
         organization_id: invite.organization_id,
@@ -76,7 +78,7 @@ export async function POST(req: NextRequest) {
     await bindUserToOrg(supabase, user.id, invite.organization_id);
 
     // Delete invite
-    await supabase.from('org_invites').delete().eq('id', invite.id);
+    await db.from('org_invites').delete().eq('id', invite.id);
 
     return NextResponse.json({
       message: 'Invite accepted successfully',
@@ -106,6 +108,7 @@ export async function GET(req: NextRequest) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Use secure function to fetch invite by token
     const { data: invites, error } = await supabase.rpc('get_invite_by_token', {

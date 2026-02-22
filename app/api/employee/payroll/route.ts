@@ -5,6 +5,7 @@ export const maxDuration = 60;
 // app/api/employee/payroll/route.ts
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -15,6 +16,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -24,7 +26,7 @@ export async function GET(request: Request) {
     }
 
     // Get employee record
-    const { data: employee } = await supabase
+    const { data: employee } = await db
       .from('employees')
       .select('id')
       .eq('profile_id', user.id)
@@ -38,7 +40,7 @@ export async function GET(request: Request) {
     }
 
     // Get payroll records
-    const { data: payrolls, error } = await supabase
+    const { data: payrolls, error } = await db
       .from('payroll')
       .select('*')
       .eq('employee_id', employee.id)

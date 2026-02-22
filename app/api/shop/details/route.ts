@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
@@ -9,6 +10,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -17,7 +19,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get shop for this user
-    const { data: shop, error: shopError } = await supabase
+    const { data: shop, error: shopError } = await db
       .from('shops')
       .select('*')
       .eq('owner_id', user.id)
@@ -50,6 +52,7 @@ export async function PUT(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -61,7 +64,7 @@ export async function PUT(request: NextRequest) {
     const { name, address, city, state, zip, phone, email, licenseNumber, ownerName } = body;
 
     // Get shop for this user
-    const { data: shop, error: shopError } = await supabase
+    const { data: shop, error: shopError } = await db
       .from('shops')
       .select('id')
       .eq('owner_id', user.id)
@@ -72,7 +75,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Update shop
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('shops')
       .update({
         name: name,

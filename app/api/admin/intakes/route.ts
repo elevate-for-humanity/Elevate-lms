@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -11,6 +12,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -18,7 +20,7 @@ export async function GET(request: Request) {
     }
 
     // Get intakes/applications
-    const { data: intakes, error } = await supabase
+    const { data: intakes, error } = await db
       .from('applications')
       .select(`
         id,
@@ -52,6 +54,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -60,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     
-    const { data: intake, error } = await supabase
+    const { data: intake, error } = await db
       .from('applications')
       .insert({
         ...body,

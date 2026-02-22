@@ -25,12 +25,12 @@ const getCachedUserData = unstable_cache(
   async (userId: string, supabase: any) => {
     // Run queries in parallel instead of sequentially
     const [profileResult, enrollmentsResult, activeResult, completedResult, progressResult] = await Promise.all([
-      supabase
+      db
         .from('profiles')
         .select('id, full_name, role, avatar_url')
         .eq('id', userId)
         .single(),
-      supabase
+      db
         .from('enrollments')
         .select(`
           id, status, progress, created_at,
@@ -39,17 +39,17 @@ const getCachedUserData = unstable_cache(
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(10),
-      supabase
+      db
         .from('enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
         .eq('status', 'active'),
-      supabase
+      db
         .from('enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
         .eq('status', 'completed'),
-      supabase
+      db
         .from('student_progress')
         .select(`id, updated_at, courses (title)`)
         .eq('student_id', userId)

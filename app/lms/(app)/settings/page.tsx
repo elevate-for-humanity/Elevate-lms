@@ -98,7 +98,7 @@ export default async function SettingsPage() {
   let profile: any = null;
 
   try {
-    const { data: profileData } = await supabase
+    const { data: profileData } = await db
       .from('profiles')
       .select('*')
       .eq('id', user.id)

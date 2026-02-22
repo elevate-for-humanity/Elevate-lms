@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BookOpen, Users, Clock } from 'lucide-react';
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function InstructorProgramsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -28,7 +30,7 @@ export default async function InstructorProgramsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -39,7 +41,7 @@ export default async function InstructorProgramsPage() {
   }
 
   // Get programs
-  const { data: programs } = await supabase
+  const { data: programs } = await db
     .from('programs')
     .select('*')
     .eq('is_active', true)

@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
@@ -12,6 +13,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
@@ -28,7 +30,7 @@ export async function GET(request: NextRequest) {
     const period = searchParams.get('period') || 'month';
 
     // Get user's partner association
-    const { data: partnerUser } = await supabase
+    const { data: partnerUser } = await db
       .from('partner_users')
       .select('partner_id, role')
       .eq('user_id', user.id)
@@ -66,7 +68,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get apprentices assigned to this partner
-    const { data: apprenticeUsers } = await supabase
+    const { data: apprenticeUsers } = await db
       .from('partner_users')
       .select('user_id')
       .eq('partner_id', partnerUser.partner_id)
@@ -89,13 +91,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Get apprentice profiles
-    const { data: profiles } = await supabase
+    const { data: profiles } = await db
       .from('profiles')
       .select('id, full_name, first_name, created_at')
       .in('id', apprenticeIds);
 
     // Get all progress entries for the period
-    const { data: allProgress } = await supabase
+    const { data: allProgress } = await db
       .from('progress_entries')
       .select('*')
       .eq('partner_id', partnerUser.partner_id)
@@ -104,7 +106,7 @@ export async function GET(request: NextRequest) {
       .order('week_ending', { ascending: false });
 
     // Get total hours (all time) for each apprentice
-    const { data: totalProgressAll } = await supabase
+    const { data: totalProgressAll } = await db
       .from('progress_entries')
       .select('apprentice_id, hours_worked')
       .eq('partner_id', partnerUser.partner_id)

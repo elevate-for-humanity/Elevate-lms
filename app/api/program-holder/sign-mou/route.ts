@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already signed
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('mou_signatures')
       .select('id')
       .eq('user_id', user.id)
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Store signature
-    const { data: signature, error: sigError } = await supabase
+    const { data: signature, error: sigError } = await db
       .from('mou_signatures')
       .insert({
         user_id: user.id,
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update program holder onboarding status
-    await supabase
+    await db
       .from('profiles')
       .update({ mou_signed: true, mou_signed_at: new Date().toISOString() })
       .eq('id', user.id);

@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { returnService } from '@/lib/franchise/return-service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -10,6 +11,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
 
     // Check if user is admin
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -38,7 +40,7 @@ export async function GET(request: NextRequest) {
     // Non-admins must specify an office they own or be a preparer
     if (!isAdmin && !officeId && !preparerId) {
       // Check if user is a preparer
-      const { data: preparer } = await supabase
+      const { data: preparer } = await db
         .from('franchise_preparers')
         .select('id')
         .eq('user_id', user.id)
@@ -62,7 +64,7 @@ export async function GET(request: NextRequest) {
 
     // Verify office ownership for non-admins
     if (!isAdmin && officeId) {
-      const { data: office } = await supabase
+      const { data: office } = await db
         .from('franchise_offices')
         .select('owner_id')
         .eq('id', officeId)
@@ -75,7 +77,7 @@ export async function GET(request: NextRequest) {
 
     // Verify preparer access for non-admins
     if (!isAdmin && preparerId) {
-      const { data: preparer } = await supabase
+      const { data: preparer } = await db
         .from('franchise_preparers')
         .select('user_id, office_id')
         .eq('id', preparerId)
@@ -85,7 +87,7 @@ export async function GET(request: NextRequest) {
       
       let isOwner = false;
       if (preparer?.office_id) {
-        const { data: office } = await supabase
+        const { data: office } = await db
           .from('franchise_offices')
           .select('owner_id')
           .eq('id', preparer.office_id)
@@ -119,7 +121,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Admin without filters - return all
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('franchise_return_submissions')
       .select('*')
       .order('created_at', { ascending: false })
@@ -143,6 +145,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -160,7 +163,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is admin, office owner, or the preparer
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -170,7 +173,7 @@ export async function POST(request: NextRequest) {
 
     if (!isAdmin) {
       // Check if user is the preparer
-      const { data: preparer } = await supabase
+      const { data: preparer } = await db
         .from('franchise_preparers')
         .select('user_id, office_id')
         .eq('id', body.preparerId)
@@ -180,7 +183,7 @@ export async function POST(request: NextRequest) {
 
       // Check if user owns the office
       let isOwner = false;
-      const { data: office } = await supabase
+      const { data: office } = await db
         .from('franchise_offices')
         .select('owner_id')
         .eq('id', body.officeId)

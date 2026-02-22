@@ -6,6 +6,7 @@ export const maxDuration = 10;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -46,7 +47,8 @@ export async function POST(request: NextRequest) {
       try {
         // Log to database
         const supabase = await createClient();
-        await supabase.from('scraping_attempts').insert({
+  const _admin = createAdminClient(); const db = _admin || supabase;
+        await db.from('scraping_attempts').insert({
           detection_type: type,
           url,
           ip_address: ip,

@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -23,7 +25,7 @@ const supabase = await createClient();
 
   const folder = request.nextUrl.searchParams.get('folder') || 'inbox';
 
-  const { data: emails, error } = await supabase
+  const { data: emails, error } = await db
     .from('emails')
     .select('*')
     .eq('user_id', user.id)
@@ -42,6 +44,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -55,7 +58,7 @@ export async function POST(request: NextRequest) {
 
   if (action === 'send') {
     // Send email
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('emails')
       .insert({
         user_id: user.id,
@@ -78,7 +81,7 @@ export async function POST(request: NextRequest) {
 
   if (action === 'star' || action === 'unstar') {
     const { id } = body;
-    const { error } = await supabase
+    const { error } = await db
       .from('emails')
       .update({ starred: action === 'star' })
       .eq('id', id)
@@ -93,7 +96,7 @@ export async function POST(request: NextRequest) {
 
   if (action === 'mark-read' || action === 'mark-unread') {
     const { id } = body;
-    const { error } = await supabase
+    const { error } = await db
       .from('emails')
       .update({ read: action === 'mark-read' })
       .eq('id', id)
@@ -108,7 +111,7 @@ export async function POST(request: NextRequest) {
 
   if (action === 'delete') {
     const { id } = body;
-    const { error } = await supabase
+    const { error } = await db
       .from('emails')
       .update({ folder: 'trash' })
       .eq('id', id)

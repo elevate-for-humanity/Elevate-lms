@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: Request) {
@@ -12,8 +13,9 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    const { data: templates, error } = await supabase
+    const { data: templates, error } = await db
       .from('campaign_templates')
       .select('*')
       .eq('is_active', true)

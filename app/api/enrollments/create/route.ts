@@ -20,6 +20,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -68,11 +69,12 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Idempotency check (graceful if table doesn't exist)
     if (idempotencyKey) {
       try {
-        const { data: existingByKey } = await supabase
+        const { data: existingByKey } = await db
           .from('enrollment_idempotency')
           .select('enrollment_id, created_at')
           .eq('idempotency_key', idempotencyKey)
@@ -93,7 +95,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate course exists and is available
-    const { data: course, error: courseError } = await supabase
+    const { data: course, error: courseError } = await db
       .from('courses')
       .select('id, title, status, is_published')
       .eq('id', courseId)
@@ -114,7 +116,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check existing enrollment
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('enrollments')
       .select('user_id, course_id, status')
       .eq('user_id', user.id)
@@ -131,7 +133,7 @@ export async function POST(request: NextRequest) {
       }
       
       // Reactivate expired/withdrawn enrollment
-      const { data: reactivated, error: reactivateError } = await supabase
+      const { data: reactivated, error: reactivateError } = await db
         .from('enrollments')
         .update({ 
           status: 'active', 
@@ -158,7 +160,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create new enrollment
-    const { data: enrollment, error } = await supabase
+    const { data: enrollment, error } = await db
       .from('enrollments')
       .insert({
         user_id: user.id,
@@ -182,7 +184,7 @@ export async function POST(request: NextRequest) {
 
     // Record idempotency key if provided (graceful if table doesn't exist)
     if (idempotencyKey) {
-      supabase
+      db
         .from('enrollment_idempotency')
         .insert({
           idempotency_key: idempotencyKey,

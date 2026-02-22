@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -9,6 +10,7 @@ export async function GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
@@ -25,7 +27,7 @@ const supabase = await createClient();
 
   if (conversationWith) {
     // Get messages in a specific conversation
-    const { data: messages, error } = await supabase
+    const { data: messages, error } = await db
       .from('messages')
       .select(`
         *,
@@ -41,7 +43,7 @@ const supabase = await createClient();
     }
 
     // Mark messages as read
-    await supabase
+    await db
       .from('messages')
       .update({ read_at: new Date().toISOString() })
       .eq('recipient_id', user.id)
@@ -52,7 +54,7 @@ const supabase = await createClient();
   }
 
   // Get all conversations (grouped by other participant)
-  const { data: messages, error } = await supabase
+  const { data: messages, error } = await db
     .from('messages')
     .select(`
       *,
@@ -97,6 +99,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
@@ -122,7 +125,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Verify recipient exists
-  const { data: recipient } = await supabase
+  const { data: recipient } = await db
     .from('profiles')
     .select('id')
     .eq('id', recipientId)
@@ -133,7 +136,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Create message
-  const { data: message, error } = await supabase
+  const { data: message, error } = await db
     .from('messages')
     .insert({
       sender_id: user.id,

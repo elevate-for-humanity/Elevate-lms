@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const metadata: Metadata = { 
   title: 'Compliance & Credentials | Elevate for Humanity',
   description: 'Compliance posture, credential disclosure, and program-to-credential mapping for Elevate for Humanity workforce programs.',
@@ -15,7 +16,8 @@ export const metadata: Metadata = {
 
 export default async function CompliancePage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('compliance_records').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('compliance_records').select('*').limit(50);
 
   const programCredentials = (dbRows as any[]) || [];
 

@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing application with same email
-    const { data: existingApp } = await supabase
+    const { data: existingApp } = await db
       .from('partner_applications')
       .select('id, status')
       .eq('contact_email', email.toLowerCase())
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the application
-    const { data: application, error: insertError } = await supabase
+    const { data: application, error: insertError } = await db
       .from('partner_applications')
       .insert({
         shop_name: shopName,
@@ -225,7 +225,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Check admin role
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -238,7 +238,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || 'pending';
 
-    const { data: applications, error } = await supabase
+    const { data: applications, error } = await db
       .from('partner_applications')
       .select('*')
       .eq('status', status)

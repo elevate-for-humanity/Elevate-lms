@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -15,11 +16,12 @@ async function completeOrientation() {
   'use server';
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) throw new Error('Database unavailable');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  await supabase.from('profiles').update({
+  await db.from('profiles').update({
     orientation_completed: true,
     orientation_completed_at: new Date().toISOString(),
   }).eq('id', user.id);
@@ -29,6 +31,7 @@ async function completeOrientation() {
 
 export default async function OrientationPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');

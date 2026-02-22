@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
@@ -9,6 +10,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     if (!supabase) {
       return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
@@ -23,7 +25,7 @@ export async function POST(req: Request) {
     const { program } = await req.json();
 
     // Update enrollment to mark orientation complete
-    const { error } = await supabase
+    const { error } = await db
       .from('enrollments')
       .update({ 
         orientation_completed_at: new Date().toISOString(),
@@ -34,7 +36,7 @@ export async function POST(req: Request) {
       .is('orientation_completed_at', null);
 
     // Also update program_enrollments state machine if exists
-    await supabase
+    await db
       .from('program_enrollments')
       .update({ enrollment_state: 'orientation_complete', updated_at: new Date().toISOString() })
       .eq('user_id', user.id)

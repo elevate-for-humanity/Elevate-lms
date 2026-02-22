@@ -24,7 +24,7 @@ export default async function StudentPortalSchedulePage() {
   }
 
   // Fetch enrollments to get program/course info
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('training_enrollments')
     .select(`
       id,
@@ -37,7 +37,7 @@ export default async function StudentPortalSchedulePage() {
     .in('status', ['active', 'enrolled', 'in_progress']);
 
   // Fetch upcoming appointments/sessions
-  const { data: appointments } = await supabase
+  const { data: appointments } = await db
     .from('crm_appointments')
     .select('*')
     .eq('contact_id', user.id)

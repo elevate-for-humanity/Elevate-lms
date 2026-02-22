@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import MessagesClient from './MessagesClient';
 
@@ -15,6 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function MessagesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -22,7 +24,7 @@ export default async function MessagesPage() {
   }
 
   // Fetch conversations
-  const { data: conversations } = await supabase
+  const { data: conversations } = await db
     .from('direct_message_conversations')
     .select(`
       id,
@@ -43,7 +45,7 @@ export default async function MessagesPage() {
 
   const participants: Record<string, any> = {};
   if (participantIds.size > 0) {
-    const { data: users } = await supabase
+    const { data: users } = await db
       .from('users')
       .select('id, full_name, avatar_url')
       .in('id', Array.from(participantIds));

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { safeFormatDate } from '@/lib/format-utils';
@@ -33,6 +34,7 @@ export default async function ProgramHolderDashboard() {
   ]);
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -46,7 +48,7 @@ export default async function ProgramHolderDashboard() {
   }
 
   // Fetch courses assigned to this instructor, then get their enrollments
-  const { data: myCourses } = await supabase
+  const { data: myCourses } = await db
     .from('training_courses')
     .select('id')
     .eq('instructor_id', user.id);
@@ -54,7 +56,7 @@ export default async function ProgramHolderDashboard() {
   const courseIds = (myCourses || []).map((c: any) => c.id);
 
   const { data: students } = courseIds.length > 0
-    ? await supabase
+    ? await db
         .from('training_enrollments')
         .select(`*, profiles (id, full_name, email), programs (id, title, name, training_hours)`)
         .in('course_id', courseIds)

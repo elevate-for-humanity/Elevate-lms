@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
     );
 
     // Fetch enrollment details
-    const { data: enrollment } = await supabase
+    const { data: enrollment } = await db
       .from('enrollments')
       .select(
         `

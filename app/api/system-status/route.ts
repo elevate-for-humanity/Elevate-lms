@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -116,7 +117,7 @@ async function auditTables(supabase: any): Promise<TableAudit[]> {
   
   for (const table of CRITICAL_TABLES) {
     try {
-      const { count, error } = await supabase
+      const { count, error } = await db
         .from(table)
         .select('*', { count: 'exact', head: true });
       

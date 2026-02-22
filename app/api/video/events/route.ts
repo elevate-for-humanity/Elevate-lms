@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { getVideoById, VideoPlaybackEvent } from '@/lib/video/registry';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -56,9 +57,10 @@ export async function POST(request: NextRequest) {
 
     // Store in database if available
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (supabase) {
       try {
-        await supabase.from('video_playback_events').insert({
+        await db.from('video_playback_events').insert({
           event_type: event.event_type,
           video_id: event.video_id,
           page_slug: event.page_slug,

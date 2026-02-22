@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { error } = await supabase.from("applications").insert({
+    const { error } = await db.from("applications").insert({
       name: data.get("name"),
       email: data.get("email"),
       phone: data.get("phone"),

@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -14,6 +15,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -24,7 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is admin or instructor
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', session.user.id)
@@ -46,7 +48,7 @@ export async function POST(request: NextRequest) {
       .replace(/(^-|-$)/g, '');
 
     // Insert course
-    const { data: course, error: courseError } = await supabase
+    const { data: course, error: courseError } = await db
       .from('courses')
       .insert({
         slug,
@@ -86,7 +88,7 @@ export async function POST(request: NextRequest) {
       ) {
         const lessonData = moduleData.lessons[lessonIndex];
 
-        const { error: lessonError } = await supabase.from('lessons').insert({
+        const { error: lessonError } = await db.from('lessons').insert({
           course_id: course.id,
           title: lessonData.title,
           description: moduleData.description || '',

@@ -5,6 +5,7 @@ export const maxDuration = 60;
 // app/api/reports/run/route.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const {
     data: { user },
@@ -23,7 +25,7 @@ export async function POST(request: Request) {
   }
 
   // Check if user is admin
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from("profiles")
     .select("role")
     .eq("id", user.id)
@@ -36,7 +38,7 @@ export async function POST(request: Request) {
   const { type, tenantId } = await request.json();
 
   if (type === "enrollments_by_program") {
-    const query = supabase
+    const query = db
       .from("enrollments")
       .select("program_id, count")
       .order("count", { ascending: false });
@@ -67,7 +69,7 @@ export async function POST(request: Request) {
   }
 
   if (type === "user_activity") {
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from("profiles")
       .select(
         `

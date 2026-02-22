@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import {
   OnboardingData,
   generateCompleteOnboardingPackage,
@@ -27,6 +28,7 @@ export async function POST(request: NextRequest) {
 
     const data: OnboardingData = await request.json();
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get authenticated user
     const {
@@ -56,7 +58,7 @@ export async function POST(request: NextRequest) {
     const onboardingPackage = generateCompleteOnboardingPackage(data);
 
     // Store onboarding data in database
-    const { data: onboardingRecord, error: onboardingError } = await supabase
+    const { data: onboardingRecord, error: onboardingError } = await db
       .from('onboarding_submissions')
       .insert({
         user_id: user.id,
@@ -245,6 +247,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -254,7 +257,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's onboarding status
-    const { data: onboarding, error } = await supabase
+    const { data: onboarding, error } = await db
       .from('onboarding_submissions')
       .select('*')
       .eq('user_id', user.id)

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -11,6 +12,7 @@ export const metadata = {
 
 export default async function CampaignsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -28,7 +30,7 @@ export default async function CampaignsPage() {
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -39,7 +41,7 @@ export default async function CampaignsPage() {
   }
 
   // Get all campaigns
-  const { data: campaigns } = await supabase
+  const { data: campaigns } = await db
     .from('campaigns')
     .select('*')
     .order('created_at', { ascending: false });

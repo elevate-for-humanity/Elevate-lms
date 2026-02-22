@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -11,6 +12,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -18,7 +20,7 @@ export async function GET(request: Request) {
     }
     
     // Get apprentice data for hiring trends
-    const { data: apprentices } = await supabase
+    const { data: apprentices } = await db
       .from('apprentices')
       .select('created_at, status')
       .gte('created_at', new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString());

@@ -26,7 +26,7 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
       );
     }
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('employer_onboarding')
       .update({ status, notes })
       .eq('id', id)

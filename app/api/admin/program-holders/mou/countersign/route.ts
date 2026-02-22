@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -46,7 +47,7 @@ export const POST = withAuth(
     const sigUrl = path;
     const now = new Date().toISOString();
 
-    const { data: updated, error } = await supabase
+    const { data: updated, error } = await db
       .from('program_holders')
       .update({
         mou_status: 'fully_executed',

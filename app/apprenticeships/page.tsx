@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { 
   DollarSign, Briefcase, Building2, ArrowRight, 
   Users, Clock, Award, GraduationCap, Zap, Phone 
@@ -33,7 +34,8 @@ const steps = [
 
 export default async function ApprenticeshipsPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('apprenticeships').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('apprenticeships').select('*').limit(50);
 const apprenticeships = (dbRows as any[]) || [];
 
   return (

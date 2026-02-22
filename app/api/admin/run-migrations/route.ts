@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
     
     for (const table of tables) {
       try {
-        const { error: checkError } = await supabase
+        const { error: checkError } = await db
           .from(table)
           .select('id')
           .limit(1);

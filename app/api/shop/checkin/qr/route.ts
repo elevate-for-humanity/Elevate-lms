@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import crypto from 'crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -14,6 +15,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -22,7 +24,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get shop for this user
-    const { data: shop, error: shopError } = await supabase
+    const { data: shop, error: shopError } = await db
       .from('shops')
       .select('id, name')
       .eq('owner_id', user.id)
@@ -33,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check for existing valid code
-    const { data: existingCode } = await supabase
+    const { data: existingCode } = await db
       .from('shop_checkin_codes')
       .select('code, expires_at')
       .eq('shop_id', shop.id)
@@ -45,7 +47,7 @@ export async function GET(request: NextRequest) {
     if (existingCode) {
       // Get today's check-ins
       const today = new Date().toISOString().split('T')[0];
-      const { count } = await supabase
+      const { count } = await db
         .from('checkin_sessions')
         .select('id', { count: 'exact', head: true })
         .eq('shop_id', shop.id)
@@ -64,7 +66,7 @@ export async function GET(request: NextRequest) {
     const code = generateCode();
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
 
-    const { error: insertError } = await supabase
+    const { error: insertError } = await db
       .from('shop_checkin_codes')
       .insert({
         shop_id: shop.id,
@@ -98,6 +100,7 @@ export async function POST(request: NextRequest) {
   // Force generate new code
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -106,7 +109,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get shop for this user
-    const { data: shop, error: shopError } = await supabase
+    const { data: shop, error: shopError } = await db
       .from('shops')
       .select('id, name')
       .eq('owner_id', user.id)
@@ -117,7 +120,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Invalidate existing codes
-    await supabase
+    await db
       .from('shop_checkin_codes')
       .update({ expires_at: new Date().toISOString() })
       .eq('shop_id', shop.id)
@@ -127,7 +130,7 @@ export async function POST(request: NextRequest) {
     const code = generateCode();
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
-    const { error: insertError } = await supabase
+    const { error: insertError } = await db
       .from('shop_checkin_codes')
       .insert({
         shop_id: shop.id,

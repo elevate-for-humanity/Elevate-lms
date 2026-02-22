@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,6 +13,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -22,7 +24,7 @@ export async function GET(request: Request) {
     }
 
     // Verify user is staff/admin
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -39,7 +41,7 @@ export async function GET(request: Request) {
     const category = searchParams.get('category');
     const search = searchParams.get('search');
 
-    let query = supabase.from('processes').select('*, process_steps(*)');
+    let query = db.from('processes').select('*, process_steps(*)');
 
     if (category) {
       query = query.eq('category', category);

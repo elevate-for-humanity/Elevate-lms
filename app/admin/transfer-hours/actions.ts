@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 export async function approveTransferHours(
@@ -9,13 +10,14 @@ export async function approveTransferHours(
   notes?: string
 ) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     throw new Error('Unauthorized');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -25,7 +27,7 @@ export async function approveTransferHours(
     throw new Error('Unauthorized');
   }
 
-  const { error } = await supabase
+  const { error } = await db
     .from('transfer_hours')
     .update({
       status: 'approved',
@@ -46,13 +48,14 @@ export async function approveTransferHours(
 
 export async function denyTransferHours(requestId: string, notes?: string) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     throw new Error('Unauthorized');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -62,7 +65,7 @@ export async function denyTransferHours(requestId: string, notes?: string) {
     throw new Error('Unauthorized');
   }
 
-  const { error } = await supabase
+  const { error } = await db
     .from('transfer_hours')
     .update({
       status: 'denied',

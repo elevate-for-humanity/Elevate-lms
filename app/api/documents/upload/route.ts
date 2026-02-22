@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
@@ -10,6 +11,7 @@ export const maxDuration = 60;
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Check authentication
   const {
@@ -90,7 +92,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   }
 
   // Save document record to database
-  const { data: document, error: dbError } = await supabase
+  const { data: document, error: dbError } = await db
     .from('documents')
     .insert({
       user_id: user.id,
@@ -138,6 +140,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
 export const GET = withErrorHandling(async (request: NextRequest) => {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Check authentication
   const {
@@ -154,7 +157,7 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   const status = searchParams.get('status');
 
   // Build query
-  let query = supabase
+  let query = db
     .from('documents')
     .select('*')
     .eq('user_id', user.id)

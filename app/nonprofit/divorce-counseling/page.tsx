@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Heart, Users, Phone } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -16,6 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function DivorceCounselingPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function DivorceCounselingPage() {
   }
 
   // Get divorce counseling services
-  const { data: services } = await supabase
+  const { data: services } = await db
     .from('nonprofit_services')
     .select('*')
     .eq('category', 'divorce-counseling')
@@ -37,14 +39,14 @@ export default async function DivorceCounselingPage() {
     .order('order', { ascending: true });
 
   // Get support groups
-  const { data: supportGroups } = await supabase
+  const { data: supportGroups } = await db
     .from('support_groups')
     .select('*')
     .eq('category', 'divorce')
     .eq('is_active', true);
 
   // Get testimonials
-  const { data: testimonials } = await supabase
+  const { data: testimonials } = await db
     .from('testimonials')
     .select('*')
     .eq('category', 'divorce-counseling')

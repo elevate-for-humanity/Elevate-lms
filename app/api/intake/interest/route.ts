@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
     const supabase = await createServerSupabaseClient();
 
     // Check for existing lead
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('leads')
       .select('id, stage')
       .eq('email', data.email)
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     if (existing) {
       // Update existing lead
-      const { data: lead, error } = await supabase
+      const { data: lead, error } = await db
         .from('leads')
         .update({
           first_name: data.firstName,
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create new lead
-    const { data: lead, error } = await supabase
+    const { data: lead, error } = await db
       .from('leads')
       .insert({
         first_name: data.firstName,
@@ -106,7 +107,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Log event
-    await supabase.from('audit_logs').insert({
+    await db.from('audit_logs').insert({
       event_type: 'lead_created',
       resource_type: 'lead',
       resource_id: lead.id,

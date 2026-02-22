@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
@@ -20,6 +21,7 @@ export const metadata = {
 
 export default async function CRMHubPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -43,7 +45,7 @@ export default async function CRMHubPage() {
   }
 
   // Check admin access
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -62,22 +64,22 @@ export default async function CRMHubPage() {
     { data: recentCampaigns },
     { data: openDeals },
   ] = await Promise.all([
-    supabase.from('profiles').select('*', { count: 'exact', head: true }),
-    supabase.from('leads').select('*', { count: 'exact', head: true }),
-    supabase
+    db.from('profiles').select('*', { count: 'exact', head: true }),
+    db.from('leads').select('*', { count: 'exact', head: true }),
+    db
       .from('follow_ups')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'pending'),
-    supabase
+    db
       .from('appointments')
       .select('*', { count: 'exact', head: true })
       .gte('created_at', new Date().toISOString()),
-    supabase
+    db
       .from('campaigns')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(5),
-    supabase
+    db
       .from('leads')
       .select('*')
       .in('status', ['new', 'contacted', 'qualified', 'proposal'])

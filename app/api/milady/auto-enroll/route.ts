@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { createAccount, enrollInCourse } from '@/lib/partners/milady';
 import { toErrorMessage } from '@/lib/safe';
@@ -23,9 +24,10 @@ export async function POST(request: Request) {
     const { studentId, programId } = await request.json();
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get student profile
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('*')
       .eq('id', studentId)
@@ -36,7 +38,7 @@ export async function POST(request: Request) {
     }
 
     // Get Milady provider
-    const { data: provider } = await supabase
+    const { data: provider } = await db
       .from('partner_lms_providers')
       .select('*')
       .eq('provider_type', 'milady')
@@ -50,7 +52,7 @@ export async function POST(request: Request) {
     }
 
     // Get required RISE courses for this program
-    const { data: requiredCourses } = await supabase
+    const { data: requiredCourses } = await db
       .from('partner_lms_courses')
       .select('*')
       .eq('provider_id', provider.id)
@@ -87,7 +89,7 @@ export async function POST(request: Request) {
         externalStudentId = miladyAccount.id;
 
         // Update profile with external ID
-        await supabase
+        await db
           .from('profiles')
           .update({ external_lms_id: externalStudentId })
           .eq('id', studentId);
@@ -105,7 +107,7 @@ export async function POST(request: Request) {
     for (const course of requiredCourses) {
       try {
         // Check if already enrolled
-        const { data: existing } = await supabase
+        const { data: existing } = await db
           .from('partner_lms_enrollments')
           .select('id')
           .eq('student_id', studentId)
@@ -125,7 +127,7 @@ export async function POST(request: Request) {
         );
 
         // Create enrollment record
-        const { data: enrollment } = await supabase
+        const { data: enrollment } = await db
           .from('partner_lms_enrollments')
           .insert({
             student_id: studentId,

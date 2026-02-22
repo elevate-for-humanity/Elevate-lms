@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 import Link from 'next/link';
 
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
 
 export default async function SupportiveServicesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -34,7 +36,7 @@ export default async function SupportiveServicesPage() {
   }
   
   // Fetch supportive services
-  const { data: services } = await supabase
+  const { data: services } = await db
     .from('supportive_services')
     .select('*')
     .eq('status', 'active');

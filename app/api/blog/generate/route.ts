@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/openai-client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -18,6 +19,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check if user is admin
     const {
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -46,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     if (programSlug) {
       // Get program details
-      const { data: program } = await supabase
+      const { data: program } = await db
         .from('programs')
         .select('*')
         .eq('slug', programSlug)
@@ -118,7 +120,7 @@ export async function POST(request: NextRequest) {
     const readingTime = Math.ceil(wordCount / 200);
 
     // Save to database
-    const { data: blogPost, error } = await supabase
+    const { data: blogPost, error } = await db
       .from('blog_posts')
       .insert({
         title: meta.title,

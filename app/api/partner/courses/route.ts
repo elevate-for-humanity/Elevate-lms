@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -9,6 +10,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -19,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is a partner
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -51,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     // Validate license if provided
     if (license_id) {
-      const { data: license } = await supabase
+      const { data: license } = await db
         .from('program_licenses')
         .select('*')
         .eq('id', license_id)
@@ -85,7 +87,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create course (trigger will validate license)
-    const { data: course, error } = await supabase
+    const { data: course, error } = await db
       .from('partner_lms_courses')
       .insert({
         partner_id: user.id,
@@ -125,6 +127,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -135,7 +138,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get partner's courses
-    const { data: courses, error } = await supabase
+    const { data: courses, error } = await db
       .from('partner_lms_courses')
       .select('*')
       .eq('partner_id', user.id)

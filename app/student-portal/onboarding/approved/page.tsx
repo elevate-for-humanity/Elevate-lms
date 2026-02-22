@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, XCircle, ArrowRight, Shield } from 'lucide-react';
@@ -23,6 +24,7 @@ interface VerificationResult {
 
 export default async function ApprovedPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?next=/student-portal/onboarding/approved');
 
@@ -51,7 +53,7 @@ export default async function ApprovedPage() {
 
   // Send approval emails (idempotent — only sends once)
   try {
-    const { data: progress } = await supabase
+    const { data: progress } = await db
       .from('onboarding_progress')
       .select('status')
       .eq('user_id', user.id)
@@ -59,7 +61,7 @@ export default async function ApprovedPage() {
 
     if (progress?.status !== 'approval_emailed') {
       // Get application details for the email
-      const { data: app } = await supabase
+      const { data: app } = await db
         .from('applications')
         .select('first_name, last_name, email, program_interest')
         .eq('user_id', user.id)
@@ -112,7 +114,7 @@ export default async function ApprovedPage() {
         }).catch((err) => logger.error('Admin approval email failed', err as Error));
 
         // Mark as emailed
-        await supabase
+        await db
           .from('onboarding_progress')
           .update({ status: 'approval_emailed' })
           .eq('user_id', user.id);

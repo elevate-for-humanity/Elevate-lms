@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { ShieldAlert, Home } from 'lucide-react';
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 export default async function UnauthorizedPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -27,7 +29,7 @@ export default async function UnauthorizedPage() {
   }
   
   // Log unauthorized access attempt
-  await supabase.from('security_logs').insert({ event: 'unauthorized_access' }).select();
+  await db.from('security_logs').insert({ event: 'unauthorized_access' }).select();
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
       <div className="max-w-2xl w-full bg-white border border-slate-200 rounded-lg p-8 sm:p-12 text-center">

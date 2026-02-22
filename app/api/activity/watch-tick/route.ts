@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -16,7 +17,7 @@ async function awardAchievement(
   description: string
 ) {
   // Safe upsert: unique (user_id, code) in DB
-  const { error } = await supabase.from("achievements").upsert(
+  const { error } = await db.from("achievements").upsert(
     {
       user_id: userId,
       code,
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const user = await getCurrentUser();
 
   if (!user) {
@@ -56,7 +58,7 @@ export async function POST(req: NextRequest) {
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
   // 1) Upsert today's activity
-  const { error: activityError } = await supabase
+  const { error: activityError } = await db
     .from("learning_activity")
     .upsert(
       {
@@ -75,7 +77,7 @@ export async function POST(req: NextRequest) {
   }
 
   // 2) Fetch updated total seconds for today
-  const { data: activityToday, error: activityTodayError } = await supabase
+  const { data: activityToday, error: activityTodayError } = await db
     .from("learning_activity")
     .select("seconds_watched")
     .eq("user_id", user.id)
@@ -90,7 +92,7 @@ export async function POST(req: NextRequest) {
   const secondsToday = activityToday?.seconds_watched || 0;
 
   // 3) Get goal (default 20 minutes if none)
-  const { data: goalRow } = await supabase
+  const { data: goalRow } = await db
     .from("learning_goals")
     .select("daily_minutes")
     .eq("user_id", user.id)
@@ -100,7 +102,7 @@ export async function POST(req: NextRequest) {
   const dailyGoalSeconds = dailyMinutes * 60;
 
   // 4) Get or init streak
-  const { data: streakRow } = await supabase
+  const { data: streakRow } = await db
     .from("daily_streaks")
     .select("id, current_streak, longest_streak, last_active_date")
     .eq("user_id", user.id)
@@ -123,7 +125,7 @@ export async function POST(req: NextRequest) {
     longestStreak = currentStreak;
     lastActiveDate = reachedGoalToday ? today : null;
 
-    const { error: insertError } = await supabase.from("daily_streaks").insert({
+    const { error: insertError } = await db.from("daily_streaks").insert({
       user_id: user.id,
       current_streak: currentStreak,
       longest_streak: longestStreak,
@@ -154,7 +156,7 @@ export async function POST(req: NextRequest) {
         longestStreak = currentStreak;
       }
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await db
         .from("daily_streaks")
         .update({
           current_streak: currentStreak,

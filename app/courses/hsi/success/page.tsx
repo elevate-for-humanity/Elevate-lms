@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Mail, Phone, Calendar, ArrowRight, Heart, Shield, Award, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -21,14 +22,16 @@ export default async function HSISuccessPage({
 }) {
   const { session_id } = await searchParams;
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
   let enrollment = null;
 
   if (supabase) {
-    await supabase.from('page_views').insert({ page: 'hsi_course_success' }).select();
+    await db.from('page_views').insert({ page: 'hsi_course_success' }).select();
     
     // Try to fetch enrollment details if session_id provided
     if (session_id) {
-      const { data } = await supabase
+      const { data } = await db
         .from('hsi_enrollment_queue')
         .select('*, course:hsi_course_products(*)')
         .eq('stripe_session_id', session_id)

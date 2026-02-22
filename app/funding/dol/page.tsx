@@ -7,6 +7,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const metadata: Metadata = {
   title: 'DOL Registered Apprenticeship Programs | Elevate for Humanity',
   description:
@@ -26,7 +27,8 @@ const benefits = [
 
 export default async function DOLFundingPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('funding_sources').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('funding_sources').select('*').limit(50);
 const programs = (dbRows as any[]) || [];
 
   return (

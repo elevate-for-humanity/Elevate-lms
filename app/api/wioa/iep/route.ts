@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,7 +20,7 @@ const supabase = createSupabaseClient();
     const userId = searchParams.get('userId');
     const status = searchParams.get('status');
 
-    let query = supabase
+    let query = db
       .from('individual_employment_plans')
       .select('*')
       .order('created_at', { ascending: false });
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('individual_employment_plans')
       .insert(iepData)
       .select()

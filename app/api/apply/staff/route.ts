@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,6 +20,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Extract form data
     const data = {
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get default tenant (for now - will be replaced with tenant resolution)
-    const { data: defaultTenant } = await supabase
+    const { data: defaultTenant } = await db
       .from('tenants')
       .select('id')
       .eq('slug', 'efh-core')
@@ -64,7 +66,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create staff application in canonical applications table
-    const { data: application, error: appError } = await supabase
+    const { data: application, error: appError } = await db
       .from('applications')
       .insert({
         first_name: data.first_name,

@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
     // Deduplicate by order_uuid + event_type: if we already have a
     // captured payment for this order, skip re-processing
     if (supabase && event.data.order_uuid && event.event_type === 'order.captured') {
-      const { data: existing } = await supabase
+      const { data: existing } = await db
         .from('payments')
         .select('id')
         .eq('provider_order_id', event.data.order_uuid)
@@ -199,7 +199,7 @@ async function handleOrderAuthorized(event: SezzleWebhookEvent, supabase: any) {
   if (!supabase) return;
 
   // Update payment record
-  await supabase
+  await db
     .from('payments')
     .update({
       status: 'authorized',
@@ -210,7 +210,7 @@ async function handleOrderAuthorized(event: SezzleWebhookEvent, supabase: any) {
 
   // Update application if exists
   if (reference_id) {
-    await supabase
+    await db
       .from('applications')
       .update({
         payment_status: 'authorized',
@@ -241,7 +241,7 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
   if (!supabase) return;
 
   // Update payment record with resolution data
-  await supabase
+  await db
     .from('payments')
     .update({
       status: 'captured',
@@ -273,7 +273,7 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
         // Remaining balance: full tuition minus what was paid
         const remainingBalance = Math.max(0, (BARBER_PRICING.fullPrice * 100 - paidAmountCents) / 100);
 
-        await supabase.from('barber_subscriptions').insert({
+        await db.from('barber_subscriptions').insert({
           customer_email: customer.email,
           customer_name: `${customer.first_name || ''} ${customer.last_name || ''}`.trim(),
           status: 'active',
@@ -327,7 +327,7 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
 
       // Update payment record with enrollment ID
       if (result.enrollmentId) {
-        await supabase
+        await db
           .from('payments')
           .update({ enrollment_id: result.enrollmentId })
           .eq('provider_order_id', order_uuid);
@@ -341,7 +341,7 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
   } else {
     // No program info - just update application status
     if (reference_id) {
-      await supabase
+      await db
         .from('applications')
         .update({
           payment_status: 'completed',
@@ -351,14 +351,14 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
     }
 
     // Check if there's an existing enrollment to activate
-    const { data: payment } = await supabase
+    const { data: payment } = await db
       .from('payments')
       .select('enrollment_id')
       .eq('provider_order_id', order_uuid)
       .single();
 
     if (payment?.enrollment_id) {
-      await supabase
+      await db
         .from('enrollments')
         .update({
           status: 'active',
@@ -387,7 +387,7 @@ async function handleOrderRefunded(event: SezzleWebhookEvent, supabase: any) {
   if (!supabase) return;
 
   // Update payment record
-  await supabase
+  await db
     .from('payments')
     .update({
       status: 'refunded',
@@ -398,7 +398,7 @@ async function handleOrderRefunded(event: SezzleWebhookEvent, supabase: any) {
 
   // Update application
   if (reference_id) {
-    await supabase
+    await db
       .from('applications')
       .update({
         payment_status: 'refunded',
@@ -407,14 +407,14 @@ async function handleOrderRefunded(event: SezzleWebhookEvent, supabase: any) {
   }
 
   // Deactivate enrollment
-  const { data: payment } = await supabase
+  const { data: payment } = await db
     .from('payments')
     .select('enrollment_id')
     .eq('provider_order_id', order_uuid)
     .single();
 
   if (payment?.enrollment_id) {
-    await supabase
+    await db
       .from('enrollments')
       .update({
         status: 'refunded',
@@ -435,7 +435,7 @@ async function handleOrderReleased(event: SezzleWebhookEvent, supabase: any) {
   if (!supabase) return;
 
   // Update payment record
-  await supabase
+  await db
     .from('payments')
     .update({
       status: 'released',
@@ -445,7 +445,7 @@ async function handleOrderReleased(event: SezzleWebhookEvent, supabase: any) {
 
   // Update application
   if (reference_id) {
-    await supabase
+    await db
       .from('applications')
       .update({
         payment_status: 'released',
@@ -468,7 +468,7 @@ async function handleCheckoutCompleted(event: SezzleWebhookEvent, supabase: any)
   if (!supabase) return;
 
   // Update payment record with virtual card info
-  await supabase
+  await db
     .from('payments')
     .update({
       status: 'checkout_completed',
@@ -479,7 +479,7 @@ async function handleCheckoutCompleted(event: SezzleWebhookEvent, supabase: any)
 
   // Update application
   if (reference_id) {
-    await supabase
+    await db
       .from('applications')
       .update({
         payment_status: 'checkout_completed',

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, Clock, MapPin, Users, Video, ArrowRight, Plus } from 'lucide-react';
@@ -15,9 +16,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function EventsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch events from database
-  const { data: events, error } = await supabase
+  const { data: events, error } = await db
     .from('community_events')
     .select(`
       id,
@@ -50,7 +52,7 @@ export default async function EventsPage() {
   const rsvpCounts: Record<string, number> = {};
   
   if (eventIds.length > 0) {
-    const { data: rsvps } = await supabase
+    const { data: rsvps } = await db
       .from('community_event_rsvps')
       .select('event_id')
       .in('event_id', eventIds)
@@ -68,7 +70,7 @@ export default async function EventsPage() {
   let userRsvps: string[] = [];
   
   if (user && eventIds.length > 0) {
-    const { data: myRsvps } = await supabase
+    const { data: myRsvps } = await db
       .from('community_event_rsvps')
       .select('event_id')
       .eq('user_id', user.id)

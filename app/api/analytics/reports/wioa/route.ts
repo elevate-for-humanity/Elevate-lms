@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -34,7 +35,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const { data: records, error } = await supabase
+  const { data: records, error } = await db
     .from('wioa_participant_records')
     .select('*')
     .gte('reporting_period_start', periodStart)

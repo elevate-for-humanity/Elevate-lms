@@ -3,10 +3,12 @@ export const dynamic = 'force-dynamic';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export default async function DemoApprenticeshipsPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('apprenticeships').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('apprenticeships').select('*').limit(50);
 const apprentices = (dbRows as any[]) || [];
 
   return (

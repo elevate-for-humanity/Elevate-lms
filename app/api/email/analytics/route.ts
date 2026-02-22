@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -17,6 +18,7 @@ export async function GET(req: Request) {
     const range = searchParams.get('range') || '30d';
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Calculate date range
     const now = new Date();
@@ -38,7 +40,7 @@ export async function GET(req: Request) {
     }
 
     // Get campaign stats
-    const { data: campaigns, error: campaignsError } = await supabase
+    const { data: campaigns, error: campaignsError } = await db
       .from('email_campaigns')
       .select('*')
       .eq('status', 'sent')
@@ -48,7 +50,7 @@ export async function GET(req: Request) {
     if (campaignsError) throw campaignsError;
 
     // Get email logs for detailed stats
-    const { data: logs, error: logsError } = await supabase
+    const { data: logs, error: logsError } = await db
       .from('email_logs')
       .select('*')
       .gte('sent_at', startDate.toISOString());

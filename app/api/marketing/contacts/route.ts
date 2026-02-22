@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -15,6 +16,7 @@ export async function GET(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const searchParams = req.nextUrl.searchParams;
     const search = searchParams.get('search');
     const unsubscribed = searchParams.get('unsubscribed');
@@ -22,7 +24,7 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50', 10);
     const offset = (page - 1) * limit;
 
-    let query = supabase
+    let query = db
       .from('marketing_contacts')
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
@@ -70,6 +72,7 @@ export async function POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await req.json();
 
     const { email, full_name, phone, source, tags } = body;
@@ -78,7 +81,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('marketing_contacts')
       .insert({
         email,

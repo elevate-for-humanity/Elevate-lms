@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -17,7 +18,7 @@ export async function GET(req: NextRequest) {
     const courseId = searchParams.get('course_id');
     const upcoming = searchParams.get('upcoming') === 'true';
 
-    let query = supabase
+    let query = db
       .from('live_classes')
       .select(
         `
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if user is admin or instructor
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -93,7 +94,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('live_classes')
       .insert({
         course_id,

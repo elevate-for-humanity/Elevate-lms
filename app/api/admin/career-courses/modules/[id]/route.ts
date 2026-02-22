@@ -7,10 +7,11 @@ export const dynamic = 'force-dynamic';
 
 async function guardAdmin() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -49,7 +50,7 @@ const denied = await guardAdmin();
     if (body.duration_minutes !== undefined) updateData.duration_minutes = body.duration_minutes;
     if (body.is_preview !== undefined) updateData.is_preview = body.is_preview;
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('career_course_modules')
       .update(updateData)
       .eq('id', id)

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { LifeBuoy, MessageSquare, Phone, Mail, FileText, Clock } from 'lucide-react';
 import SupportForm from '@/components/support/SupportForm';
@@ -18,6 +19,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function SupportPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -31,7 +33,7 @@ export default async function SupportPage() {
   }
   const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: tickets } = user ? await supabase
+  const { data: tickets } = user ? await db
     .from('support_tickets')
     .select('*')
     .eq('user_id', user.id)

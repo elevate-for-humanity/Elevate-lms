@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { bindUserToOrg } from '@/lib/org/bindUserToOrg';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
       error: authError,
@@ -41,7 +43,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create organization
-    const { data: org, error: orgError } = await supabase
+    const { data: org, error: orgError } = await db
       .from('organizations')
       .insert({
         name,
@@ -63,7 +65,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Seed default settings
-    const { error: settingsError } = await supabase
+    const { error: settingsError } = await db
       .from('organization_settings')
       .insert({
         organization_id: org.id,
@@ -74,7 +76,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Assign creator as org_admin
-    const { error: memberError } = await supabase
+    const { error: memberError } = await db
       .from('organization_users')
       .insert({
         organization_id: org.id,

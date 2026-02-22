@@ -53,11 +53,12 @@ export async function POST(req: Request) {
     try {
       await requireApiAuth();
       const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
-      const { data: profile } = await supabase
+      const { data: profile } = await db
         .from('profiles')
         .select('role')
         .eq('id', user.id)
@@ -89,7 +90,7 @@ export async function POST(req: Request) {
     }
 
     // Get application details
-    const { data: app, error: appError } = await supabase
+    const { data: app, error: appError } = await db
       .from('applications')
       .select(
         `
@@ -155,7 +156,7 @@ export async function POST(req: Request) {
     const sent = await sendSMS(app.phone, message);
 
     // Log reminder
-    await supabase.from('sms_reminders').insert({
+    await db.from('sms_reminders').insert({
       application_id: app.id,
       reminder_type,
       status: sent ? 'sent' : 'failed',

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { DollarSign, Phone, XCircle } from 'lucide-react';
 
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 
 export default async function PaymentCancelPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function PaymentCancelPage() {
   }
   
   // Log payment cancellation
-  await supabase.from('page_views').insert({ page: 'payment_cancel' }).select();
+  await db.from('page_views').insert({ page: 'payment_cancel' }).select();
   return (
     <div className="min-h-screen bg-zinc-900  to-white py-20">
             <div className="max-w-7xl mx-auto px-4 py-4">

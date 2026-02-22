@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import MessagesClient from './MessagesClient';
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 export default async function EmployerMessagesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -21,7 +23,7 @@ export default async function EmployerMessagesPage() {
   }
 
   // Fetch conversations where this user is a participant
-  const { data: conversations } = await supabase
+  const { data: conversations } = await db
     .from('conversations')
     .select('*')
     .contains('participant_ids', [user.id])
@@ -37,7 +39,7 @@ export default async function EmployerMessagesPage() {
   });
 
   const { data: profiles } = participantIds.size > 0
-    ? await supabase
+    ? await db
         .from('profiles')
         .select('id, full_name, avatar_url, role')
         .in('id', Array.from(participantIds))

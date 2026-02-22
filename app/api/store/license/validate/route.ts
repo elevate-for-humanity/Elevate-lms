@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     const licenseHash = hashLicenseKey(licenseKey);
 
     // Find license by hashed key
-    const { data: license, error } = await supabase
+    const { data: license, error } = await db
       .from('licenses')
       .select('id, customer_email, domain, tier, status, features, max_deployments, max_users, expires_at, created_at')
       .eq('license_key', licenseHash)
@@ -112,7 +112,7 @@ export async function POST(req: Request) {
     }
 
     // Log successful validation
-    await supabase.from('license_validations').insert({
+    await db.from('license_validations').insert({
       license_id: license.id,
       ip_address: clientIp,
       user_agent: req.headers.get('user-agent') || 'unknown',

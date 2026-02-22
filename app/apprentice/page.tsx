@@ -32,14 +32,14 @@ export default async function ApprenticePortalPage() {
     redirect('/login?redirect=/apprentice');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('full_name')
     .eq('id', user.id)
     .single();
 
   // Get active enrollment with program info
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from('training_enrollments')
     .select('*, programs(slug, name)')
     .eq('user_id', user.id)
@@ -67,14 +67,14 @@ export default async function ApprenticePortalPage() {
     program_slug: enrollment.programs?.slug,
   }) : { label: 'Apply to a Program', href: '/programs', description: 'Start your journey' };
 
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('training_enrollments')
     .select('id, status, progress, course_id')
     .eq('user_id', user.id)
     .limit(5);
 
   // Get real hours from attendance_hours table
-  const { data: hoursData } = await supabase
+  const { data: hoursData } = await db
     .from('attendance_hours')
     .select('hours_logged')
     .eq('enrollment_id', enrollment?.id);

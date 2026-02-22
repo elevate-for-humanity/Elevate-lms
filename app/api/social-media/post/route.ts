@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
@@ -18,6 +19,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -63,7 +65,7 @@ export async function POST(request: NextRequest) {
     // Post immediately or schedule
     if (scheduled_for) {
       // Schedule post
-      const { data: scheduledPost, error: scheduleError } = await supabase
+      const { data: scheduledPost, error: scheduleError } = await db
         .from('social_media_posts')
         .insert({
           platform,
@@ -119,7 +121,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Save to database
-      const { data: savedPost } = await supabase
+      const { data: savedPost } = await db
         .from('social_media_posts')
         .insert({
           platform,
@@ -159,8 +161,9 @@ async function postToLinkedIn(data: any) {
     // Get LinkedIn credentials from database
     const { createClient } = await import('@/lib/supabase/server');
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    const { data: settings, error: settingsError } = await supabase
+    const { data: settings, error: settingsError } = await db
       .from('social_media_settings')
       .select('*')
       .eq('platform', 'linkedin')
@@ -512,6 +515,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -525,7 +529,7 @@ export async function GET(request: NextRequest) {
     const platform = searchParams.get('platform');
     const status = searchParams.get('status');
 
-    let query = supabase
+    let query = db
       .from('social_media_posts')
       .select('*')
       .order('created_at', { ascending: false });

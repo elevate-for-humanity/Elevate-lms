@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -20,6 +21,7 @@ export default async function EnrollmentSuccessPage({
   params: { courseId: string };
 }) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -41,7 +43,7 @@ export default async function EnrollmentSuccessPage({
   }
 
   // Fetch enrollment details
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from('partner_enrollments')
     .select(
       '*, partner_courses(course_name, partner_lms_providers(provider_name))'

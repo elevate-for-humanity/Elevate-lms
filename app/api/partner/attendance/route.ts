@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -13,6 +14,7 @@ export async function GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -22,7 +24,7 @@ const supabase = await createClient();
   }
 
   // Check if user is partner
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from("profiles")
     .select("role, tenant_id")
     .eq("id", user.id)
@@ -33,7 +35,7 @@ const supabase = await createClient();
   }
 
   // Get attendance records for this partner's enrollments
-  const { data: records, error } = await supabase
+  const { data: records, error } = await db
     .from("attendance_records")
     .select(`
       *,
@@ -60,6 +62,7 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -69,7 +72,7 @@ export async function POST(request: Request) {
   }
 
   // Check if user is partner
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from("profiles")
     .select("role, tenant_id")
     .eq("id", user.id)
@@ -89,7 +92,7 @@ export async function POST(request: Request) {
   }
 
   // Verify enrollment belongs to this partner's tenant
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from("enrollments")
     .select("id, tenant_id")
     .eq("id", enrollmentId)
@@ -107,7 +110,7 @@ export async function POST(request: Request) {
   }
 
   // Create attendance record
-  const { data: record, error } = await supabase
+  const { data: record, error } = await db
     .from("attendance_records")
     .insert({
       enrollment_id: enrollmentId,
@@ -135,7 +138,7 @@ export async function POST(request: Request) {
   }
 
   // Log the attendance record
-  await supabase.from("audit_logs").insert({
+  await db.from("audit_logs").insert({
     actor_id: user.id,
     actor_email: user.email,
     action: "partner_recorded_attendance",

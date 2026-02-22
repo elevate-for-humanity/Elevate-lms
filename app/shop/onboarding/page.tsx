@@ -10,6 +10,7 @@ export const metadata: Metadata = generateInternalMetadata({
 });
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Clock, Upload, FileText } from 'lucide-react';
@@ -18,6 +19,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default async function ShopOnboardingPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -38,7 +40,7 @@ export default async function ShopOnboardingPage() {
   }
 
   // Get shop for this user
-  const { data: staff } = await supabase
+  const { data: staff } = await db
     .from('shop_staff')
     .select('shop_id, shops(*)')
     .eq('user_id', user.id);
@@ -50,14 +52,14 @@ export default async function ShopOnboardingPage() {
   }
 
   // Get onboarding status
-  const { data: onboarding } = await supabase
+  const { data: onboarding } = await db
     .from('shop_onboarding')
     .select('*')
     .eq('shop_id', shop.id)
     .single();
 
   // Get required documents status
-  const { data: docsStatus } = await supabase
+  const { data: docsStatus } = await db
     .from('shop_required_docs_status')
     .select('*')
     .eq('shop_id', shop.id)

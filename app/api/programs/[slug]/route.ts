@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -24,7 +25,7 @@ export async function GET(
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Fetch program
-    const { data: program, error: programError } = await supabase
+    const { data: program, error: programError } = await db
       .from('programs')
       .select(`
         id,
@@ -60,14 +61,14 @@ export async function GET(
     }
 
     // Fetch outcomes
-    const { data: outcomes } = await supabase
+    const { data: outcomes } = await db
       .from('program_outcomes')
       .select('id, outcome, outcome_order')
       .eq('program_id', program.id)
       .order('outcome_order', { ascending: true });
 
     // Fetch requirements
-    const { data: requirements } = await supabase
+    const { data: requirements } = await db
       .from('program_requirements')
       .select('id, requirement, requirement_order')
       .eq('program_id', program.id)

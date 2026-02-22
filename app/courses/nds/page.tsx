@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ExternalLink, Clock, Award, Truck } from 'lucide-react';
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
 
 export default async function NdsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -31,7 +33,7 @@ export default async function NdsPage() {
   }
   
   // Fetch NDS courses
-  const { data: ndsCourses } = await supabase
+  const { data: ndsCourses } = await db
     .from('training_courses')
     .select('*')
     .eq('provider', 'nds');

@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -26,12 +27,13 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     let data: any[] = [];
 
     switch (reportType) {
       case 'access-log': {
-        const { data: logs } = await supabase
+        const { data: logs } = await db
           .from('ferpa_access_logs')
           .select('*')
           .gte('created_at', startDate)
@@ -42,7 +44,7 @@ export async function POST(request: NextRequest) {
         break;
       }
       case 'disclosure': {
-        const { data: logs } = await supabase
+        const { data: logs } = await db
           .from('ferpa_access_logs')
           .select('*')
           .eq('action', 'disclosure')
@@ -53,7 +55,7 @@ export async function POST(request: NextRequest) {
         break;
       }
       case 'request-summary': {
-        const { data: logs } = await supabase
+        const { data: logs } = await db
           .from('ferpa_access_logs')
           .select('action, record_type, created_at')
           .gte('created_at', startDate)
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest) {
       }
       case 'annual': {
         // Full annual report: access counts, unique users, record types
-        const { data: logs } = await supabase
+        const { data: logs } = await db
           .from('ferpa_access_logs')
           .select('user_id, student_id, action, record_type, created_at')
           .gte('created_at', startDate)

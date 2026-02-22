@@ -2,6 +2,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { Users, BookOpen, AlertCircle, Clock } from 'lucide-react';
@@ -35,6 +36,7 @@ export default async function StaffDashboard() {
   ]);
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -48,31 +50,31 @@ export default async function StaffDashboard() {
   }
 
   // Get student counts
-  const { count: totalStudents } = await supabase
+  const { count: totalStudents } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'student');
 
   // Get active enrollments
-  const { count: activeEnrollments } = await supabase
+  const { count: activeEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
   // Get at-risk students
-  const { count: atRiskCount } = await supabase
+  const { count: atRiskCount } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('at_risk', true);
 
   // Get pending enrollments
-  const { count: pendingEnrollments } = await supabase
+  const { count: pendingEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
   // Get recent enrollments for activity feed
-  const { data: recentEnrollments } = await supabase
+  const { data: recentEnrollments } = await db
     .from('enrollments')
     .select(
       `

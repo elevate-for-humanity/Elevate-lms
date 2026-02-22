@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/authGuards';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   try {
     const body = await request.json();
@@ -52,7 +54,7 @@ export async function POST(request: NextRequest) {
     const { enrollment_id, total_amount, payment_method, transaction_id } = parsed.data;
 
     // Get enrollment details
-    const { data: enrollment, error: enrollError } = await supabase
+    const { data: enrollment, error: enrollError } = await db
       .from('enrollments')
       .select('*, programs(*)')
       .eq('id', enrollment_id)
@@ -76,7 +78,7 @@ export async function POST(request: NextRequest) {
     const elevateAmount = total_amount - vendorAmount;
 
     // Create payment split record
-    const { data: split, error: splitError } = await supabase
+    const { data: split, error: splitError } = await db
       .from('payment_splits')
       .insert({
         enrollment_id,
@@ -113,7 +115,7 @@ export async function POST(request: NextRequest) {
     // No additional action needed - BNPL provider pays full amount to Stripe
 
     // Log to audit trail
-    await supabase.from('ai_audit_log').insert({
+    await db.from('ai_audit_log').insert({
       student_id: enrollment.user_id,
       program_slug: programSlug,
       action: 'PAYMENT_SPLIT',
@@ -153,6 +155,7 @@ async function processVendorPayment(params: {
   programId: string;
 }) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   try {
     if (params.vendorName === 'milady') {
@@ -172,7 +175,7 @@ async function processVendorPayment(params: {
 
       if (response.ok) {
         // Update split record with vendor payment confirmation
-        await supabase
+        await db
           .from('payment_splits')
           .update({
             vendor_paid_at: new Date().toISOString(),

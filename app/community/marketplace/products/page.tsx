@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
   FileText, Download, Star, Tag, Search, Package,
@@ -20,8 +21,9 @@ export const metadata: Metadata = {
 
 export default async function MarketplaceProductsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  const { data: products } = await supabase
+  const { data: products } = await db
     .from('marketplace_products')
     .select('*')
     .eq('status', 'active')

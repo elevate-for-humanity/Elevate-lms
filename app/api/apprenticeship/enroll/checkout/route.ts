@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Barber Apprenticeship pricing (configured in Stripe Dashboard)
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     // Verify user is authenticated
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -61,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     // CRITICAL: Verify application exists and is submitted
-    const { data: application, error: appError } = await supabase
+    const { data: application, error: appError } = await db
       .from('applications')
       .select('id, status, program_slug, user_id')
       .eq('id', application_id)
@@ -92,7 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already enrolled
-    const { data: existingEnrollment } = await supabase
+    const { data: existingEnrollment } = await db
       .from('enrollments')
       .select('id, status')
       .eq('application_id', application_id)
@@ -106,7 +108,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user email for Stripe
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('email, full_name')
       .eq('id', user.id)
@@ -153,7 +155,7 @@ export async function POST(request: NextRequest) {
     const session = await stripe.checkout.sessions.create(sessionConfig);
 
     // Log the checkout attempt
-    await supabase.from('payment_logs').insert({
+    await db.from('payment_logs').insert({
       user_id: user.id,
       application_id: application_id,
       stripe_session_id: session.id,

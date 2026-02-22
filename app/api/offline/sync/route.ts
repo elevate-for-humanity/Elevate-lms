@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -13,6 +14,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -30,14 +32,14 @@ export async function POST(req: Request) {
         // Handle different action types
         switch (action.type) {
           case 'progress_update':
-            await supabase
+            await db
               .from('enrollments')
               .update({ progress: action.progress })
               .eq('id', action.enrollmentId);
             break;
 
           case 'lesson_complete':
-            await supabase.from('lesson_completions').insert({
+            await db.from('lesson_completions').insert({
               user_id: user.id,
               lesson_id: action.lessonId,
               completed_at: action.timestamp,
@@ -45,7 +47,7 @@ export async function POST(req: Request) {
             break;
 
           case 'quiz_submission':
-            await supabase.from('quiz_submissions').insert({
+            await db.from('quiz_submissions').insert({
               user_id: user.id,
               quiz_id: action.quizId,
               answers: action.answers,

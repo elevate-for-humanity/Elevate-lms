@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
@@ -18,6 +19,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get real metrics from database
     const [
@@ -31,10 +33,10 @@ export async function GET(request: Request) {
       totalCertificates,
     ] = await Promise.all([
       // Total registered users
-      supabase.from('profiles').select('id', { count: 'exact', head: true }),
+      db.from('profiles').select('id', { count: 'exact', head: true }),
 
       // Active students (enrolled in last 30 days)
-      supabase
+      db
         .from('enrollments')
         .select('user_id', { count: 'exact', head: true })
         .gte(
@@ -44,21 +46,21 @@ export async function GET(request: Request) {
         .eq('status', 'active'),
 
       // Total enrollments
-      supabase.from('enrollments').select('id', { count: 'exact', head: true }),
+      db.from('enrollments').select('id', { count: 'exact', head: true }),
 
       // Completed courses
-      supabase
+      db
         .from('enrollments')
         .select('id', { count: 'exact', head: true })
         .eq('status', 'completed'),
 
       // Total applications
-      supabase
+      db
         .from('applications')
         .select('id', { count: 'exact', head: true }),
 
       // Recent logins (last 24 hours)
-      supabase
+      db
         .from('profiles')
         .select('last_sign_in_at', { count: 'exact', head: true })
         .gte(
@@ -67,13 +69,13 @@ export async function GET(request: Request) {
         ),
 
       // Active courses
-      supabase
+      db
         .from('courses')
         .select('id', { count: 'exact', head: true })
         .eq('is_published', true),
 
       // Total certificates issued
-      supabase
+      db
         .from('certificates')
         .select('id', { count: 'exact', head: true }),
     ]);
@@ -87,7 +89,7 @@ export async function GET(request: Request) {
         : 0;
 
     // Get recent activity (last 10 enrollments - public data only)
-    const { data: recentActivity } = await supabase
+    const { data: recentActivity } = await db
       .from('enrollments')
       .select('created_at, courses(title)')
       .order('created_at', { ascending: false })

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,6 +20,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function TakeAttendancePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) {
     redirect('/login');
@@ -31,7 +33,7 @@ export default async function TakeAttendancePage() {
   }
 
   // Fetch active cohorts
-  const { data: cohorts } = await supabase
+  const { data: cohorts } = await db
     .from('cohorts')
     .select('id, name, start_date, end_date')
     .eq('status', 'active')
@@ -40,7 +42,7 @@ export default async function TakeAttendancePage() {
   const cohortList = cohorts || [];
 
   // Fetch students (apprentices) for attendance
-  const { data: students } = await supabase
+  const { data: students } = await db
     .from('apprentices')
     .select(`
       id,

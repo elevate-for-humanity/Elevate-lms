@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -21,7 +22,7 @@ const supabase = createSupabaseClient();
     const status = searchParams.get('status');
     const priority = searchParams.get('priority');
 
-    let query = supabase
+    let query = db
       .from('case_management')
       .select('*')
       .order('priority', { ascending: false })
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
       referrals: [],
     };
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('case_management')
       .insert(caseData)
       .select()

@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { stripe } from '@/lib/stripe/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -27,6 +28,7 @@ export async function POST(request: NextRequest) {
 
     // Verify user is authenticated
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -36,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user email
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('email')
       .eq('id', userId)
@@ -64,7 +66,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Store verification session in database
-    await supabase.from('program_holder_verification').insert({
+    await db.from('program_holder_verification').insert({
       program_holder_id: userId,
       verification_type: 'stripe_identity',
       status: 'pending',
@@ -73,7 +75,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Update program holder status
-    await supabase
+    await db
       .from('program_holders')
       .update({
         verification_status: 'pending',

@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -27,7 +28,7 @@ const code = req.nextUrl.searchParams.get('code');
   const supabase = supabaseServer();
   
   // Get share and increment view count
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('studio_shares')
     .select('*, studio_repos(repo_full_name)')
     .eq('share_code', code)
@@ -43,7 +44,7 @@ const code = req.nextUrl.searchParams.get('code');
   }
 
   // Increment view count
-  await supabase
+  await db
     .from('studio_shares')
     .update({ view_count: (data.view_count || 0) + 1 })
     .eq('id', data.id);
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
     ? new Date(Date.now() + expires_in_hours * 60 * 60 * 1000).toISOString()
     : null;
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('studio_shares')
     .insert({
       user_id: userId,
@@ -108,7 +109,7 @@ const userId = req.headers.get('x-user-id');
   }
 
   const supabase = supabaseServer();
-  const { error } = await supabase
+  const { error } = await db
     .from('studio_shares')
     .delete()
     .eq('id', id)

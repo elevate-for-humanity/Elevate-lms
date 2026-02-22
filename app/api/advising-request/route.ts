@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -25,9 +26,10 @@ export async function POST(request: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Store in database (you may need to create this table)
-    const { error: dbError } = await supabase
+    const { error: dbError } = await db
       .from('advising_requests')
       .insert({
         name,

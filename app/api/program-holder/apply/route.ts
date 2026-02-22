@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
     // Check for duplicate by email
     const supabase = supabaseServer();
     // Check for duplicate by email
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('applications')
       .select('id, status')
       .eq('email', body.contactEmail.toLowerCase())
@@ -80,7 +81,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert into canonical applications table
-    const { data: application, error: insertError } = await supabase
+    const { data: application, error: insertError } = await db
       .from('applications')
       .insert({
         first_name: body.contactName?.split(' ')[0] || body.contactName,

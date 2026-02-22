@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FileText, Search, ChevronRight, Eye } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
@@ -36,8 +37,9 @@ export default async function HelpArticlesPage() {
   
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (supabase) {
-      const { data: catData } = await supabase
+      const { data: catData } = await db
         .from('help_categories')
         .select('name, slug, article_count')
         .eq('is_active', true)
@@ -45,7 +47,7 @@ export default async function HelpArticlesPage() {
       
       categories = catData || [];
 
-      const { data: artData } = await supabase
+      const { data: artData } = await db
         .from('help_articles')
         .select('id, title, slug, view_count, category')
         .eq('is_published', true)

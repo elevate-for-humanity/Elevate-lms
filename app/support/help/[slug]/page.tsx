@@ -14,7 +14,7 @@ async function getArticle(slug: string) {
   const supabase = createAdminClient();
   if (!supabase) return null;
   
-  const { data: article, error } = await supabase
+  const { data: article, error } = await db
     .from('support_articles')
     .select('*')
     .eq('slug', slug)
@@ -24,7 +24,7 @@ async function getArticle(slug: string) {
   if (error || !article) return null;
   
   // Increment views
-  await supabase
+  await db
     .from('support_articles')
     .update({ views: (article.views || 0) + 1 })
     .eq('id', article.id);
@@ -36,7 +36,7 @@ async function getRelatedArticles(category: string, currentSlug: string) {
   const supabase = createAdminClient();
   if (!supabase) return [];
   
-  const { data: articles } = await supabase
+  const { data: articles } = await db
     .from('support_articles')
     .select('title, slug, excerpt')
     .eq('published', true)

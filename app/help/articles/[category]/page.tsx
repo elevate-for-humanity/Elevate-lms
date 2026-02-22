@@ -6,6 +6,7 @@ import { FileText, Clock, ChevronRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const metadata: Metadata = { title: 'Help Articles | Elevate LMS' };
 
 interface Props {
@@ -14,7 +15,8 @@ interface Props {
 
 export default async function HelpCategoryPage({ params }: Props) {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('help_articles').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('help_articles').select('*').limit(50);
 
   const { category } = await params;
   const categoryName = category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');

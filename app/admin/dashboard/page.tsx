@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import DashboardClient from './DashboardClient';
 
 export const metadata: Metadata = {
@@ -25,21 +26,21 @@ async function getDashboardData(supabase: any) {
     recentStudentsRes,
     topCoursesRes,
   ] = await Promise.all([
-    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
-    supabase.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-    supabase.from('training_courses').select('id', { count: 'exact', head: true }).eq('is_active', true),
-    supabase.from('enrollments').select('id', { count: 'exact', head: true }),
-    supabase.from('certificates').select('id', { count: 'exact', head: true }),
-    supabase.from('training_lessons').select('id', { count: 'exact', head: true }),
-    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'partner'),
-    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student').eq('enrollment_status', 'at_risk'),
+    db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
+    db.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    db.from('training_courses').select('id', { count: 'exact', head: true }).eq('is_active', true),
+    db.from('enrollments').select('id', { count: 'exact', head: true }),
+    db.from('certificates').select('id', { count: 'exact', head: true }),
+    db.from('training_lessons').select('id', { count: 'exact', head: true }),
+    db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'partner'),
+    db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student').eq('enrollment_status', 'at_risk'),
     // Full data for charts
-    supabase.from('profiles').select('enrollment_status').eq('role', 'student'),
-    supabase.from('enrollments').select('status, enrolled_at, progress, course_id'),
-    supabase.from('programs').select('id, name, status'),
-    supabase.from('training_courses').select('id, course_name, is_active'),
-    supabase.from('profiles').select('id, full_name, email, enrollment_status, created_at').eq('role', 'student').order('created_at', { ascending: false }).limit(10),
-    supabase.from('enrollments').select('course_id, status').limit(500),
+    db.from('profiles').select('enrollment_status').eq('role', 'student'),
+    db.from('enrollments').select('status, enrolled_at, progress, course_id'),
+    db.from('programs').select('id, name, status'),
+    db.from('training_courses').select('id, course_name, is_active'),
+    db.from('profiles').select('id, full_name, email, enrollment_status, created_at').eq('role', 'student').order('created_at', { ascending: false }).limit(10),
+    db.from('enrollments').select('course_id, status').limit(500),
   ]);
 
   // Build enrollment trend by month
@@ -102,7 +103,7 @@ async function getDashboardData(supabase: any) {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      const { data } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).single();
+      const { data } = await db.from('profiles').select('full_name, role').eq('id', user.id).single();
       profile = data;
     }
   } catch { /* non-fatal */ }
@@ -132,6 +133,7 @@ async function getDashboardData(supabase: any) {
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) {
     return (
       <div className="p-8 text-center">

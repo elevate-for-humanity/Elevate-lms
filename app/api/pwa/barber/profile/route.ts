@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getAchievedMilestones, BARBER_MILESTONES } from '@/lib/pwa/milestones';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
@@ -25,7 +27,7 @@ export async function GET(request: Request) {
     }
 
     // Get user profile
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('id, full_name, first_name, email, phone')
       .eq('id', user.id)
@@ -36,7 +38,7 @@ export async function GET(request: Request) {
     }
 
     // Get partner assignment
-    const { data: partnerUser } = await supabase
+    const { data: partnerUser } = await db
       .from('partner_users')
       .select(`
         created_at,
@@ -51,7 +53,7 @@ export async function GET(request: Request) {
       .single();
 
     // Get total hours
-    const { data: progressEntries } = await supabase
+    const { data: progressEntries } = await db
       .from('progress_entries')
       .select('hours_worked')
       .eq('apprentice_id', user.id)

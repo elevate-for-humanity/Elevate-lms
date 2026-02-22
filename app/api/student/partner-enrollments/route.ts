@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -39,7 +40,7 @@ const supabase = getSupabaseServerClient();
     return NextResponse.json({ enrollments: [] }, { status: 200 });
   }
 
-  const { data, error }: any = await supabase
+  const { data, error }: any = await db
     .from('partner_lms_enrollments')
     .select(
       `

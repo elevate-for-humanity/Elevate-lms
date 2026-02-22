@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, FileText, Download, Eye, Search, FolderOpen, Upload } from 'lucide-react';
@@ -25,27 +26,28 @@ const getFileIcon = (type: string) => {
 
 export default async function DocumentsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/documents');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .single();
 
   // Fetch user's documents
-  const { data: userDocuments } = await supabase
+  const { data: userDocuments } = await db
     .from('documents')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
   // Fetch shared/public documents based on role
-  const { data: sharedDocuments } = await supabase
+  const { data: sharedDocuments } = await db
     .from('documents')
     .select('*')
     .eq('is_public', true)

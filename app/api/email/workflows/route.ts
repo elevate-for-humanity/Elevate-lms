@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -14,8 +15,9 @@ export async function GET(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    const { data: workflows, error } = await supabase
+    const { data: workflows, error } = await db
       .from('email_workflows')
       .select('*')
       .order('created_at', { ascending: false });
@@ -41,9 +43,10 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await req.json();
 
-    const { data: workflow, error } = await supabase
+    const { data: workflow, error } = await db
       .from('email_workflows')
       .insert({
         name: body.name,

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { ArrowLeft, DollarSign, FileText, Clock } from 'lucide-react';
 
@@ -12,21 +13,22 @@ export const metadata: Metadata = {
 
 export default async function FinancialReportPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const [
     { data: wotcApps },
     { data: grantApps },
     { data: grants },
   ] = await Promise.all([
-    supabase
+    db
       .from('wotc_applications')
       .select('*')
       .order('created_at', { ascending: false }),
-    supabase
+    db
       .from('grant_applications')
       .select('*, grant_opportunities(title)')
       .order('created_at', { ascending: false }),
-    supabase
+    db
       .from('grant_opportunities')
       .select('*')
       .eq('status', 'open'),

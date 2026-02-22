@@ -51,14 +51,14 @@ export default async function GradesPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
   // Fetch enrollments with course details
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select(`
       *,
@@ -73,7 +73,7 @@ export default async function GradesPage() {
     .order('created_at', { ascending: false });
 
   // Fetch assignment submissions with grades
-  const { data: assignmentSubmissions } = await supabase
+  const { data: assignmentSubmissions } = await db
     .from('assignment_submissions')
     .select(`
       *,
@@ -90,7 +90,7 @@ export default async function GradesPage() {
     .order('graded_at', { ascending: false });
 
   // Fetch quiz attempts with scores
-  const { data: quizAttempts } = await supabase
+  const { data: quizAttempts } = await db
     .from('quiz_attempts')
     .select(`
       *,

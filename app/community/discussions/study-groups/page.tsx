@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Users, MessageSquare, ThumbsUp, Clock, User, Plus, Pin } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -14,10 +15,11 @@ export const dynamic = 'force-dynamic';
 
 export default async function StudyGroupsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   // Fetch study group discussions
-  const { data: discussions } = await supabase
+  const { data: discussions } = await db
     .from('discussions')
     .select(`
       id,

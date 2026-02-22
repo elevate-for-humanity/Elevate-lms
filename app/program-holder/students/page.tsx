@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Users, Search, Filter, Download, Mail, Eye } from 'lucide-react';
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ProgramHolderStudentsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/program-holder/students');
@@ -26,7 +28,7 @@ export default async function ProgramHolderStudentsPage() {
   }
 
   // Get programs owned by this user
-  const { data: myPrograms } = await supabase
+  const { data: myPrograms } = await db
     .from('programs')
     .select('id, name, title')
     .eq('created_by', user.id);
@@ -49,7 +51,7 @@ export default async function ProgramHolderStudentsPage() {
   }> = [];
 
   if (programIds.length > 0) {
-    const { data: enrollments } = await supabase
+    const { data: enrollments } = await db
       .from('student_enrollments')
       .select('id, student_id, program_id, progress, status, created_at, profiles!student_enrollments_student_id_fkey(full_name, email)')
       .in('program_id', programIds)

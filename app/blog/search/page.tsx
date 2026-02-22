@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Search } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ async function searchBlogPosts(query: string) {
 
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -31,7 +33,7 @@ async function searchBlogPosts(query: string) {
       </div>
     );
   }
-    const { data: posts } = await supabase
+    const { data: posts } = await db
       .from('blog_posts')
       .select('*')
       .eq('published', true)

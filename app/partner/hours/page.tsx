@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Clock, XCircle, AlertCircle, TrendingUp } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function PartnerHoursPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -21,7 +23,7 @@ export default async function PartnerHoursPage() {
   }
 
   // Get partner info
-  const { data: partnerUser } = await supabase
+  const { data: partnerUser } = await db
     .from('partner_users')
     .select('partner_id, role')
     .eq('user_id', user.id)
@@ -32,18 +34,18 @@ export default async function PartnerHoursPage() {
   }
 
   // Get hours statistics
-  const { data: pendingHours, count: pendingCount } = await supabase
+  const { data: pendingHours, count: pendingCount } = await db
     .from('training_hours')
     .select('*', { count: 'exact' })
     .eq('status', 'pending')
     .order('created_at', { ascending: false });
 
-  const { count: approvedCount } = await supabase
+  const { count: approvedCount } = await db
     .from('training_hours')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'approved');
 
-  const { count: rejectedCount } = await supabase
+  const { count: rejectedCount } = await db
     .from('training_hours')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'rejected');
@@ -53,7 +55,7 @@ export default async function PartnerHoursPage() {
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
 
-  const { data: monthlyHours } = await supabase
+  const { data: monthlyHours } = await db
     .from('training_hours')
     .select('hours')
     .eq('status', 'approved')

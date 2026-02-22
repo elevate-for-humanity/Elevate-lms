@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Smartphone, Zap, Download, Wifi, Bell, Lock } from 'lucide-react';
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
 
 export default async function MobileAppPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -37,7 +39,7 @@ export default async function MobileAppPage() {
   }
   
   // Fetch app info
-  const { data: appInfo } = await supabase
+  const { data: appInfo } = await db
     .from('site_settings')
     .select('*')
     .eq('key', 'mobile_app')

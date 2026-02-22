@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,6 +13,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -22,7 +24,7 @@ export async function GET(request: Request) {
     }
 
     // Verify user is staff/admin
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -36,7 +38,7 @@ export async function GET(request: Request) {
     }
 
     // Get all protocols
-    const { data: protocols, error: protocolsError } = await supabase
+    const { data: protocols, error: protocolsError } = await db
       .from('customer_service_protocols')
       .select('*')
       .order('category');
@@ -49,7 +51,7 @@ export async function GET(request: Request) {
     }
 
     // Get active tickets (assigned to user or unassigned)
-    const { data: tickets, error: ticketsError } = await supabase
+    const { data: tickets, error: ticketsError } = await db
       .from('service_tickets')
       .select(
         `

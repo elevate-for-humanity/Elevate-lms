@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -23,10 +24,11 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) return { title: 'Assignment | Elevate LMS' };
   
-  const { data: assignment } = await supabase
+  const { data: assignment } = await db
     .from('assignments')
     .select('title')
     .eq('id', id)
@@ -40,6 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function AssignmentDetailPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -55,7 +58,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
   if (!user) redirect('/login?redirect=/lms/assignments/' + id);
 
   // Fetch assignment
-  const { data: assignment, error } = await supabase
+  const { data: assignment, error } = await db
     .from('assignments')
     .select(`
       *,
@@ -67,7 +70,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
   if (error || !assignment) notFound();
 
   // Fetch user's submission
-  const { data: submission } = await supabase
+  const { data: submission } = await db
     .from('assignment_submissions')
     .select('*')
     .eq('assignment_id', id)

@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 // Using Node.js runtime for email compatibility
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import {
   rateLimit,
@@ -36,6 +37,7 @@ export async function POST(req: Request) {
 
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -58,7 +60,7 @@ export async function POST(req: Request) {
     }
 
     // Check if user already has a creator profile
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('marketplace_creators')
       .select('id, status')
       .eq('user_id', user.id)
@@ -77,7 +79,7 @@ export async function POST(req: Request) {
     }
 
     // Create creator application
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('marketplace_creators')
       .insert({
         user_id: user.id,

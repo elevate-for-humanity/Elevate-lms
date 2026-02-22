@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 
 export default async function ModerationPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -27,7 +29,7 @@ export default async function ModerationPage() {
   }
   
   // Fetch flagged posts from database
-  const { data: flaggedPosts } = await supabase
+  const { data: flaggedPosts } = await db
     .from('forum_posts')
     .select('id, title, content, created_at, user_id, status')
     .eq('status', 'flagged')

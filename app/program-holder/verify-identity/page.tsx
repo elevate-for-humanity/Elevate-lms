@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import IdentityVerificationFlow from './IdentityVerificationFlow';
 
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 
 export default async function IdentityVerificationPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -37,7 +39,7 @@ export default async function IdentityVerificationPage() {
     redirect('/login?next=/program-holder/verify-identity');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -48,7 +50,7 @@ export default async function IdentityVerificationPage() {
   }
 
   // Get program holder record
-  const { data: programHolder } = await supabase
+  const { data: programHolder } = await db
     .from('program_holders')
     .select('*')
     .eq('user_id', user.id)
@@ -64,7 +66,7 @@ export default async function IdentityVerificationPage() {
   }
 
   // Get verification status
-  const { data: verification } = await supabase
+  const { data: verification } = await db
     .from('program_holder_verification')
     .select('*')
     .eq('program_holder_id', user.id)
@@ -73,7 +75,7 @@ export default async function IdentityVerificationPage() {
     .single();
 
   // Get uploaded documents
-  const { data: documents } = await supabase
+  const { data: documents } = await db
     .from('program_holder_documents')
     .select('*')
     .eq('program_holder_id', user.id);

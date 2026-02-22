@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { headers } from 'next/headers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -26,6 +27,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
     const user_agent = headersList.get('user-agent') || 'unknown';
 
     // Get current versions for each agreement type
-    const { data: versions, error: versionsError } = await supabase
+    const { data: versions, error: versionsError } = await db
       .from('agreement_versions')
       .select('agreement_type, current_version, document_url')
       .in('agreement_type', agreements);
@@ -78,7 +80,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Insert acceptances (upsert to handle re-acceptance of same version)
-    const { data: inserted, error: insertError } = await supabase
+    const { data: inserted, error: insertError } = await db
       .from('license_agreement_acceptances')
       .upsert(acceptances, { 
         onConflict: 'user_id,agreement_type,document_version',
@@ -114,6 +116,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -124,12 +127,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all current versions
-    const { data: versions } = await supabase
+    const { data: versions } = await db
       .from('agreement_versions')
       .select('agreement_type, current_version');
 
     // Get user's acceptances
-    const { data: acceptances } = await supabase
+    const { data: acceptances } = await db
       .from('license_agreement_acceptances')
       .select('agreement_type, document_version, accepted_at')
       .eq('user_id', user.id);

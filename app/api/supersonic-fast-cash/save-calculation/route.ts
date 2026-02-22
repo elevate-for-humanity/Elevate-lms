@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
@@ -16,12 +17,13 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get user if authenticated, otherwise use email
     const { data: { user } } = await supabase.auth.getUser();
 
     // Save calculation
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('tax_calculations')
       .insert({
         user_id: user?.id || null,
@@ -71,6 +73,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -80,7 +83,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('tax_calculations')
       .select('*')
       .eq('user_id', user.id)

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -25,6 +26,7 @@ export default async function CourseLearnPage({
 }) {
   const { slug } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login');
@@ -37,7 +39,7 @@ export default async function CourseLearnPage({
   }
 
   // Get course with modules
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('career_courses')
     .select(`
       *,
@@ -51,7 +53,7 @@ export default async function CourseLearnPage({
   }
 
   // Check if user has purchased this course
-  const { data: purchase } = await supabase
+  const { data: purchase } = await db
     .from('career_course_purchases')
     .select('id')
     .eq('user_id', user.id)
@@ -62,7 +64,7 @@ export default async function CourseLearnPage({
   // If bundle, check if user purchased the bundle
   let hasBundleAccess = false;
   if (!purchase) {
-    const { data: bundlePurchase } = await supabase
+    const { data: bundlePurchase } = await db
       .from('career_course_purchases')
       .select(`
         id,

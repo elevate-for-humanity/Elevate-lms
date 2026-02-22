@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import { submitWeeklyReport } from './_actions/submit-weekly-report';
@@ -18,6 +19,7 @@ export default async function NewWeeklyReportPage({
   params: { placement_id: string };
 }) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -33,7 +35,7 @@ export default async function NewWeeklyReportPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -44,7 +46,7 @@ export default async function NewWeeklyReportPage({
   }
 
   // Get placement and verify access
-  const { data: placement } = await supabase
+  const { data: placement } = await db
     .from('apprentice_placements')
     .select('id, student_id, shop_id, program_slug, shops(name)')
     .eq('id', params.placement_id)
@@ -55,7 +57,7 @@ export default async function NewWeeklyReportPage({
   }
 
   // Verify employer has access to this shop
-  const { data: shopAccess } = await supabase
+  const { data: shopAccess } = await db
     .from('shop_staff')
     .select('shop_id')
     .eq('user_id', user.id)

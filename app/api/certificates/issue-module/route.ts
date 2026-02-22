@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role, full_name')
       .eq('id', user.id)
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing module certificate
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('module_certificates')
       .select('id')
       .eq('user_id', user_id)
@@ -45,13 +46,13 @@ export async function POST(request: NextRequest) {
 
     const certNumber = `MOD-${Date.now().toString(36).toUpperCase()}`;
 
-    const { data: studentProfile } = await supabase
+    const { data: studentProfile } = await db
       .from('profiles')
       .select('full_name')
       .eq('id', user_id)
       .single();
 
-    const { data: cert, error: certError } = await supabase
+    const { data: cert, error: certError } = await db
       .from('module_certificates')
       .insert({
         user_id,

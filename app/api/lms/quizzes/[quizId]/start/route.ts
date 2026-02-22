@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { redirect } from 'next/navigation';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -13,6 +14,7 @@ export async function POST(
 
   const { quizId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
@@ -25,7 +27,7 @@ export async function POST(
   }
 
   // Check if quiz exists
-  const { data: quiz, error: quizError } = await supabase
+  const { data: quiz, error: quizError } = await db
     .from('quizzes')
     .select('id, max_attempts')
     .eq('id', quizId)
@@ -36,7 +38,7 @@ export async function POST(
   }
 
   // Check existing attempts
-  const { data: existingAttempts } = await supabase
+  const { data: existingAttempts } = await db
     .from('quiz_attempts')
     .select('id, completed_at')
     .eq('quiz_id', quizId)
@@ -58,7 +60,7 @@ export async function POST(
   }
 
   // Create new attempt
-  const { data: newAttempt, error: attemptError } = await supabase
+  const { data: newAttempt, error: attemptError } = await db
     .from('quiz_attempts')
     .insert({
       quiz_id: quizId,

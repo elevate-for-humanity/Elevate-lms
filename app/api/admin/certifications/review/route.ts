@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
@@ -8,6 +9,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   // Get current user and verify admin role
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -17,7 +19,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Check if user is admin
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -40,7 +42,7 @@ export async function POST(request: NextRequest) {
 
   const newStatus = action === 'approve' ? 'approved' : 'rejected';
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('certification_submissions')
     .update({
       status: newStatus,
@@ -69,6 +71,7 @@ export async function GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   // Get current user and verify admin role
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -78,7 +81,7 @@ const supabase = await createClient();
   }
 
   // Check if user is admin
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -91,7 +94,7 @@ const supabase = await createClient();
   const { searchParams } = new URL(request.url);
   const status = searchParams.get('status');
 
-  let query = supabase
+  let query = db
     .from('certification_submissions')
     .select(`
       *,

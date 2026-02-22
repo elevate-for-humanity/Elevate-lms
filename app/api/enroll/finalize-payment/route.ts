@@ -19,6 +19,7 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -41,6 +42,7 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -63,7 +65,7 @@ export async function POST(req: Request) {
     }
 
     // Get enrollment details
-    const { data: enrollment, error: enrollmentError } = await supabase
+    const { data: enrollment, error: enrollmentError } = await db
       .from('enrollments')
       .select(
         `
@@ -140,7 +142,7 @@ export async function POST(req: Request) {
       description = `Enrollment: ${enrollment.course.course_name}`;
     } else if (paymentMode === 'scholarship') {
       // No charge - mark as paid immediately
-      const { error: updateError } = await supabase
+      const { error: updateError } = await db
         .from('enrollments')
         .update({
           status: 'active',
@@ -167,7 +169,7 @@ export async function POST(req: Request) {
       });
     } else {
       // employer mode - create invoice for employer
-      const { data: enrollment } = await supabase
+      const { data: enrollment } = await db
         .from('enrollments')
         .select('*, programs(*), users(*)')
         .eq('id', enrollmentId)
@@ -206,7 +208,7 @@ export async function POST(req: Request) {
       await stripe.invoices.finalizeInvoice(invoice.id);
 
       // Update enrollment with invoice ID
-      await supabase
+      await db
         .from('enrollments')
         .update({
           stripe_invoice_id: invoice.id,
@@ -284,7 +286,7 @@ export async function POST(req: Request) {
 
     if (!session.url) {
       // Unlock enrollment if session creation failed
-      await supabase
+      await db
         .from('enrollments')
         .update({
           billing_lock: false,
@@ -299,7 +301,7 @@ export async function POST(req: Request) {
     }
 
     // Update enrollment with stripe session ID
-    await supabase
+    await db
       .from('enrollments')
       .update({
         stripe_checkout_session_id: session.id,

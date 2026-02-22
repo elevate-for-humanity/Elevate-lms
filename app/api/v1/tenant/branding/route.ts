@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { validateApiKey } from '@/lib/licensing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -41,7 +42,8 @@ const apiKey = request.headers.get('x-api-key');
   }
 
   const supabase = await createClient();
-  const { data: tenant, error } = await supabase
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: tenant, error } = await db
     .from('tenants')
     .select('*')
     .eq('id', validation.tenantId)
@@ -96,6 +98,7 @@ const apiKey = request.headers.get('x-api-key');
 
   const body: BrandingSettings = await request.json();
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Validate colors
   const colorRegex = /^#[0-9A-Fa-f]{6}$/;
@@ -148,7 +151,7 @@ const apiKey = request.headers.get('x-api-key');
     updateData.domain_verified = false; // Requires verification
   }
 
-  const { error } = await supabase
+  const { error } = await db
     .from('tenants')
     .update(updateData)
     .eq('id', validation.tenantId);
@@ -194,6 +197,7 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const bucket = 'tenant-assets';
   const path = `${validation.tenantId}/${file_type}/${file_name || `${file_type}.png`}`;
 

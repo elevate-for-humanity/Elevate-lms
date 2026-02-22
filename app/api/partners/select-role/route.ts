@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -13,6 +14,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already has a partner profile
-    const { data: existingProfile } = await supabase
+    const { data: existingProfile } = await db
       .from('partner_profiles')
       .select('id, role, status')
       .eq('user_id', user.id)
@@ -47,7 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create partner profile
-    const { error: profileError } = await supabase
+    const { error: profileError } = await db
       .from('partner_profiles')
       .insert({
         user_id: user.id,
@@ -76,7 +78,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log audit trail
-    await supabase.from('audit_logs').insert({
+    await db.from('audit_logs').insert({
       actor_user_id: user.id,
       action: 'partner_role_selected',
       entity: 'partner_profiles',

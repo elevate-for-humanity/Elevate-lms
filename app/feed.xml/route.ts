@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function GET() {
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Fetch published blog posts
-    const { data: posts } = await supabase
+    const { data: posts } = await db
       .from('blog_posts')
       .select('*')
       .eq('published', true)

@@ -56,14 +56,14 @@ export default async function AchievementsPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
   // Fetch enrollments
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select(`
       *,
@@ -78,34 +78,34 @@ export default async function AchievementsPage() {
     .order('created_at', { ascending: false });
 
   // Fetch completed courses
-  const { count: completedCourses } = await supabase
+  const { count: completedCourses } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .eq('status', 'completed');
 
   // Fetch lesson progress
-  const { count: completedLessons } = await supabase
+  const { count: completedLessons } = await db
     .from('student_progress')
     .select('*', { count: 'exact', head: true })
     .eq('student_id', user.id)
     .eq('completed', true);
 
   // Fetch quiz attempts
-  const { data: quizAttempts } = await supabase
+  const { data: quizAttempts } = await db
     .from('quiz_attempts')
     .select('score, status')
     .eq('user_id', user.id)
     .eq('status', 'completed');
 
   // Fetch certificates
-  const { count: certificatesEarned } = await supabase
+  const { count: certificatesEarned } = await db
     .from('certificates')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id);
 
   // Fetch badges
-  const { data: userBadges } = await supabase
+  const { data: userBadges } = await db
     .from('user_badges')
     .select('*, badges (*)')
     .eq('user_id', user.id);

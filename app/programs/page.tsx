@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 // Programs page - pulls from database with ISR caching
 import { Metadata } from 'next';
@@ -89,7 +90,7 @@ async function getCategories() {
   }
   
   // Get active programs grouped by category
-  const { data: programs, error } = await supabase
+  const { data: programs, error } = await db
     .from('programs')
     .select('id, name, slug, category, description')
     .eq('is_active', true)

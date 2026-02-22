@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Gift, ShoppingBag, Heart, Star } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -17,6 +18,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function HealingProductsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -30,7 +32,7 @@ export default async function HealingProductsPage() {
   }
 
   // Get products
-  const { data: products } = await supabase
+  const { data: products } = await db
     .from('products')
     .select('*')
     .eq('category', 'healing')
@@ -38,7 +40,7 @@ export default async function HealingProductsPage() {
     .order('name', { ascending: true });
 
   // Get product categories
-  const { data: categories } = await supabase
+  const { data: categories } = await db
     .from('product_categories')
     .select('*')
     .eq('parent_category', 'healing')

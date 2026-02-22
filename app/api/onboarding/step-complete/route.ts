@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 
@@ -16,6 +17,7 @@ const STEP_LABELS: Record<string, string> = {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -29,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get student info from application
-    const { data: app } = await supabase
+    const { data: app } = await db
       .from('applications')
       .select('first_name, last_name, email, program_interest')
       .eq('user_id', user.id)
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
     const stepLabel = STEP_LABELS[step];
 
     // Check remaining steps from onboarding_progress
-    const { data: progress } = await supabase
+    const { data: progress } = await db
       .from('onboarding_progress')
       .select('profile_completed, agreements_completed, handbook_acknowledged, documents_uploaded')
       .eq('user_id', user.id)

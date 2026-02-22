@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Check if access key exists and matches email
-    const { data: keyData, error: keyError } = await supabase
+    const { data: keyData, error: keyError } = await db
       .from('training_access_keys')
       .select('*')
       .eq('access_key', accessKey.toUpperCase())
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update last used timestamp
-    await supabase
+    await db
       .from('training_access_keys')
       .update({ last_used_at: new Date().toISOString() })
       .eq('id', keyData.id);

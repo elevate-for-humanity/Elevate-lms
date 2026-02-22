@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Briefcase, Plus, Eye, Edit, Clock, MapPin, DollarSign } from 'lucide-react';
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function EmployerJobsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -30,7 +32,7 @@ export default async function EmployerJobsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role, verified')
     .eq('id', user.id)
@@ -41,7 +43,7 @@ export default async function EmployerJobsPage() {
   }
 
   // Get job postings
-  const { data: jobs } = await supabase
+  const { data: jobs } = await db
     .from('job_postings')
     .select('*')
     .eq('employer_id', user.id)

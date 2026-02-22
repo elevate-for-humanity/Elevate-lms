@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 // Using Node.js runtime for email compatibility
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -16,9 +17,10 @@ export async function POST(req: Request) {
     await requireAdmin();
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { productId, reason } = await req.json();
 
-    const { error } = await supabase
+    const { error } = await db
       .from('marketplace_products')
       .update({
         status: 'rejected',

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Heart, Users, Sparkles, BookOpen, Calendar, Gift,
   Phone
 } from 'lucide-react';
@@ -20,6 +21,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function NonprofitPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -33,14 +35,14 @@ export default async function NonprofitPage() {
   }
 
   // Get nonprofit programs/services
-  const { data: services } = await supabase
+  const { data: services } = await db
     .from('nonprofit_services')
     .select('*')
     .eq('is_active', true)
     .order('order', { ascending: true });
 
   // Get upcoming workshops
-  const { data: workshops } = await supabase
+  const { data: workshops } = await db
     .from('workshops')
     .select('*')
     .eq('is_active', true)
@@ -49,7 +51,7 @@ export default async function NonprofitPage() {
     .limit(3);
 
   // Get testimonials
-  const { data: testimonials } = await supabase
+  const { data: testimonials } = await db
     .from('testimonials')
     .select('*')
     .eq('category', 'nonprofit')

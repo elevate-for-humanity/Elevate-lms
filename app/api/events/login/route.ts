@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
   });
   const source = body.source || 'LMS_DASHBOARD';
 
-  await supabase.from('login_events').insert({
+  await db.from('login_events').insert({
     user_id: user.id,
     source,
   });

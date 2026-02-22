@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -20,6 +21,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     if (!supabase) {
       return NextResponse.json(
@@ -39,7 +41,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user profile
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('id, role, full_name')
       .eq('id', user.id)
@@ -52,7 +54,7 @@ export async function GET(request: NextRequest) {
     let apprentice = null;
     
     // First try direct user_id match
-    const { data: apprenticeByUserId } = await supabase
+    const { data: apprenticeByUserId } = await db
       .from('apprentices')
       .select(`
         id,
@@ -70,7 +72,7 @@ export async function GET(request: NextRequest) {
       apprentice = apprenticeByUserId;
     } else if (user.email) {
       // Fallback: match by email if user_id not set
-      const { data: apprenticeByEmail } = await supabase
+      const { data: apprenticeByEmail } = await db
         .from('apprentices')
         .select(`
           id,
@@ -88,7 +90,7 @@ export async function GET(request: NextRequest) {
       if (apprenticeByEmail) {
         apprentice = apprenticeByEmail;
         // Update the apprentice record with user_id for future lookups
-        await supabase
+        await db
           .from('apprentices')
           .update({ user_id: user.id })
           .eq('id', apprenticeByEmail.id);
@@ -99,7 +101,7 @@ export async function GET(request: NextRequest) {
     let shopId: string | null = null;
     let shopName: string | null = null;
     if (apprentice?.employer_id) {
-      const { data: shop } = await supabase
+      const { data: shop } = await db
         .from('shops')
         .select('id, name')
         .eq('id', apprentice.employer_id)
@@ -111,7 +113,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build site query based on role
-    let sitesQuery = supabase
+    let sitesQuery = db
       .from('apprentice_sites')
       .select(`
         id,
@@ -151,7 +153,7 @@ export async function GET(request: NextRequest) {
     let activeShift = null;
     if (apprentice) {
       try {
-        const { data: shift } = await supabase
+        const { data: shift } = await db
           .from('timeclock_shifts')
           .select('id, clock_in_at, lunch_start_at, lunch_end_at, site_id')
           .eq('apprentice_id', apprentice.id)

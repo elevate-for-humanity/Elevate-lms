@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
 
 export default async function CreatePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -37,7 +39,7 @@ export default async function CreatePage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -48,7 +50,7 @@ export default async function CreatePage() {
   }
 
   // Fetch relevant data
-  const { data: items, count } = await supabase
+  const { data: items, count } = await db
     .from('courses')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })

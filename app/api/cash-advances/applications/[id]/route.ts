@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -20,7 +21,7 @@ export async function GET(
     const supabase = supabaseServer();
     const { id } = await params;
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('cash_advance_applications')
       .select('*')
       .eq('id', id)
@@ -48,7 +49,7 @@ export async function PATCH(
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('cash_advance_applications')
       .update(body)
       .eq('id', id)

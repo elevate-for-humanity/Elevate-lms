@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { cloneRepository } from '@/lib/store/stripe-products';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -22,7 +23,8 @@ export async function POST(req: NextRequest) {
 
     // Get product details
     const supabase = await createClient();
-    const { data: product, error } = await supabase
+  const _admin = createAdminClient(); const db = _admin || supabase;
+    const { data: product, error } = await db
       .from('products')
       .select('*')
       .eq('id', productId)
@@ -40,7 +42,7 @@ export async function POST(req: NextRequest) {
     const clonedRepo = await cloneRepository(product.repo, newRepoName);
 
     // Log the clone (optional - could save to database)
-    await supabase.from('product_clones').insert({
+    await db.from('product_clones').insert({
       product_id: productId,
       cloned_repo: clonedRepo,
       cloned_at: new Date().toISOString(),

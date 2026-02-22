@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Circle, Building, FileText, Settings } from 'lucide-react';
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function LicenseeOnboardingPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) redirect('/login');
 
@@ -21,7 +23,7 @@ export default async function LicenseeOnboardingPage() {
   if (!user) redirect('/login?redirect=/license/onboarding');
 
   // Check if user has a license
-  const { data: license } = await supabase
+  const { data: license } = await db
     .from('licenses')
     .select(`
       id,
@@ -34,7 +36,7 @@ export default async function LicenseeOnboardingPage() {
     .single();
 
   // Check agreement acceptance status
-  const { data: acceptances } = await supabase
+  const { data: acceptances } = await db
     .from('license_agreement_acceptances')
     .select('agreement_type')
     .eq('user_id', user.id);

@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -54,9 +55,10 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Insert appointment into database
-    const { data: appointment, error } = await supabase
+    const { data: appointment, error } = await db
       .from('appointments')
       .insert({
         service_type: serviceType,
@@ -110,7 +112,7 @@ export async function POST(request: NextRequest) {
       });
 
       // Mark confirmation as sent
-      await supabase
+      await db
         .from('appointments')
         .update({ confirmation_sent: true })
         .eq('id', appointment.id);
@@ -157,10 +159,11 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { searchParams } = new URL(request.url);
     const email = searchParams.get('email');
 
-    let query = supabase
+    let query = db
       .from('appointments')
       .select('*')
       .order('appointment_date', { ascending: true });

@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -12,6 +13,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -31,14 +33,14 @@ export async function GET(request: NextRequest) {
       scheduleResult
     ] = await Promise.all([
       // Profile
-      supabase
+      db
         .from('profiles')
         .select('id, full_name, email, avatar_url, phone')
         .eq('id', user.id)
         .single(),
       
       // Active enrollment
-      supabase
+      db
         .from('student_enrollments')
         .select(`
           id,
@@ -63,7 +65,7 @@ export async function GET(request: NextRequest) {
         .maybeSingle(),
       
       // Hours log
-      supabase
+      db
         .from('apprentice_hours_log')
         .select('id, minutes, hour_type, funding_phase, status, logged_date, description, verified_by')
         .eq('student_id', user.id)
@@ -71,28 +73,28 @@ export async function GET(request: NextRequest) {
         .limit(10),
       
       // Achievements
-      supabase
+      db
         .from('achievements')
         .select('id, code, label, description, earned_at, icon')
         .eq('user_id', user.id)
         .order('earned_at', { ascending: false }),
       
       // Streak
-      supabase
+      db
         .from('daily_streaks')
         .select('current_streak, longest_streak, last_active_date')
         .eq('user_id', user.id)
         .maybeSingle(),
       
       // Points
-      supabase
+      db
         .from('user_points')
         .select('total_points, level, level_name, points_to_next_level')
         .eq('user_id', user.id)
         .maybeSingle(),
       
       // Schedule
-      supabase
+      db
         .from('calendar_events')
         .select('id, title, date, time, duration, description, color, event_type')
         .eq('user_id', user.id)
@@ -116,7 +118,7 @@ export async function GET(request: NextRequest) {
     const progressPercentage = Math.min((effectiveTotal / requiredHours) * 100, 100);
 
     // Get current module
-    const { data: modules } = await supabase
+    const { data: modules } = await db
       .from('modules')
       .select(`
         id,
@@ -134,7 +136,7 @@ export async function GET(request: NextRequest) {
       .order('order_index', { ascending: true })
       .limit(1);
 
-    const { data: completedLessons } = await supabase
+    const { data: completedLessons } = await db
       .from('lesson_completions')
       .select('lesson_id')
       .eq('user_id', user.id);

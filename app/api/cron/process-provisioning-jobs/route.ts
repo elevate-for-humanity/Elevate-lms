@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { claimJobs, completeJob, failJob, ProvisioningJob } from '@/lib/jobs/queue';
 import { logger } from '@/lib/logger';
 import { processLicenseProvision } from '@/lib/jobs/handlers/license-provision';
@@ -26,7 +27,7 @@ async function processTenantSetup(job: ProvisioningJob): Promise<void> {
   const supabase = getSupabaseAdmin();
 
   // Create default settings for the tenant
-  await supabase.from('organization_settings').upsert({
+  await db.from('organization_settings').upsert({
     organization_id: organizationId,
     settings: {
       branding: {
@@ -51,7 +52,7 @@ async function processTenantSetup(job: ProvisioningJob): Promise<void> {
   // Create default roles for the organization
   const defaultRoles = ['admin', 'instructor', 'student'];
   for (const role of defaultRoles) {
-    await supabase.from('organization_roles').upsert({
+    await db.from('organization_roles').upsert({
       organization_id: organizationId,
       role_name: role,
       permissions: getDefaultPermissions(role),
@@ -59,7 +60,7 @@ async function processTenantSetup(job: ProvisioningJob): Promise<void> {
   }
 
   // Log setup completion
-  await supabase.from('license_events').insert({
+  await db.from('license_events').insert({
     organization_id: organizationId,
     event_type: 'tenant_setup_complete',
     event_data: { subdomain, planId },

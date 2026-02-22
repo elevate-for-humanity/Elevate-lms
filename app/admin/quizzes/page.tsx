@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function QuizzesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -28,7 +30,7 @@ export default async function QuizzesPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -38,7 +40,7 @@ export default async function QuizzesPage() {
     redirect('/unauthorized');
   }
 
-  const { data: quizzes, count: totalQuizzes } = await supabase
+  const { data: quizzes, count: totalQuizzes } = await db
     .from('quizzes')
     .select('id, title, course_id, passing_score, time_limit, created_at, updated_at', { count: 'exact' })
     .order('updated_at', { ascending: false })
@@ -47,13 +49,13 @@ export default async function QuizzesPage() {
   // Get courses for display names
   const courseIds = [...new Set((quizzes || []).map(q => q.course_id).filter(Boolean))];
   const { data: courses } = courseIds.length > 0
-    ? await supabase.from('courses').select('id, title').in('id', courseIds)
+    ? await db.from('courses').select('id, title').in('id', courseIds)
     : { data: [] };
 
   const courseMap = new Map((courses || []).map(c => [c.id, c.title]));
 
   // Count questions per quiz
-  const { data: questionCounts } = await supabase
+  const { data: questionCounts } = await db
     .from('quiz_questions')
     .select('quiz_id');
 
@@ -63,7 +65,7 @@ export default async function QuizzesPage() {
   });
 
   // Count attempts
-  const { count: totalAttempts } = await supabase
+  const { count: totalAttempts } = await db
     .from('quiz_attempts')
     .select('*', { count: 'exact', head: true });
 

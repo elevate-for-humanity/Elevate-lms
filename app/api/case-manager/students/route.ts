@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -21,7 +23,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('user_profiles')
       .select('role')
       .eq('user_id', user.id)
@@ -35,7 +37,7 @@ export async function GET(request: Request) {
     }
 
     // Get students assigned to this case manager
-    const { data: students, error } = await supabase
+    const { data: students, error } = await db
       .from('user_profiles')
       .select(
         `
@@ -62,7 +64,7 @@ export async function GET(request: Request) {
     const studentsWithData = await Promise.all(
       (students || []).map(async (student) => {
         // Get enrollments
-        const { data: enrollments } = await supabase
+        const { data: enrollments } = await db
           .from('enrollments')
           .select(
             `
@@ -75,7 +77,7 @@ export async function GET(request: Request) {
           .eq('student_id', student.user_id);
 
         // Get hours summary
-        const { data: hours } = await supabase
+        const { data: hours } = await db
           .from('apprenticeship_hours')
           .select('hours, approved')
           .eq('student_id', student.user_id);
@@ -88,7 +90,7 @@ export async function GET(request: Request) {
             .reduce((sum, h) => sum + parseFloat(h.hours || 0), 0) || 0;
 
         // Get exam readiness
-        const { data: readiness } = await supabase
+        const { data: readiness } = await db
           .from('exam_readiness')
           .select('*')
           .eq('student_id', student.user_id)

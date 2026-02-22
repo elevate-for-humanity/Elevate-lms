@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import {
   Heart,
@@ -112,6 +113,7 @@ const industries = [
 
 export default async function IndustriesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -125,7 +127,7 @@ export default async function IndustriesPage() {
   }
   
   // Fetch industries
-  const { data: dbIndustries } = await supabase
+  const { data: dbIndustries } = await db
     .from('industries')
     .select('*')
     .order('name');

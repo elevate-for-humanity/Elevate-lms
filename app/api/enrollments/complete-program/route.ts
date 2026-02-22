@@ -15,6 +15,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { issueCertificate } from '@/lib/certificates/issue-certificate';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -49,7 +51,7 @@ export async function POST(req: NextRequest) {
     logger.info('Starting program completion', { enrollment_id, user_id: user.id });
 
     // Get enrollment with program and student details
-    const { data: enrollment, error: enrollmentError } = await supabase
+    const { data: enrollment, error: enrollmentError } = await db
       .from('enrollments')
       .select(`
         id,
@@ -74,7 +76,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify user owns this enrollment or is admin
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -86,7 +88,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Get student profile
-    const { data: studentProfile } = await supabase
+    const { data: studentProfile } = await db
       .from('profiles')
       .select('full_name, first_name, last_name, email')
       .eq('id', enrollment.user_id)

@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -17,9 +18,10 @@ export async function GET(
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { courseId } = await params;
 
-  const { data, error }: any = await supabase
+  const { data, error }: any = await db
     .from('course_announcements')
     .select('id, title, body, created_at')
     .eq('course_id', courseId)
@@ -41,6 +43,7 @@ export async function POST(
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const user = await getCurrentUser();
 
   if (!user) {
@@ -59,7 +62,7 @@ export async function POST(
   }
 
   // Optional: verify user is instructor for this course
-  const { data: course, error: courseError } = await supabase
+  const { data: course, error: courseError } = await db
     .from('courses')
     .select('instructor_id')
     .eq('id', courseId)
@@ -78,7 +81,7 @@ export async function POST(
   }
 
   // Insert announcement
-  const { error: insertError } = await supabase
+  const { error: insertError } = await db
     .from('course_announcements')
     .insert({
       course_id: courseId,
@@ -93,7 +96,7 @@ export async function POST(
   }
 
   // Optional: create notifications for enrolled students
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select('user_id')
     .eq('course_id', courseId);
@@ -107,7 +110,7 @@ export async function POST(
       url: `/lms/courses/${courseId}`,
     }));
 
-    const { error: notifError } = await supabase
+    const { error: notifError } = await db
       .from('notifications')
       .insert(notifications);
 

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { BookOpen, ChevronRight, Download, Search } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -14,10 +15,11 @@ export const dynamic = 'force-dynamic';
 
 export default async function ApprenticeHandbookPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) { redirect('/login'); }
 
   // Get handbook sections
-  const { data: sections } = await supabase
+  const { data: sections } = await db
     .from('handbook_sections')
     .select('*')
     .eq('handbook_type', 'apprentice')
@@ -25,7 +27,7 @@ export default async function ApprenticeHandbookPage() {
     .order('order', { ascending: true });
 
   // Get handbook PDF
-  const { data: handbookPdf } = await supabase
+  const { data: handbookPdf } = await db
     .from('documents')
     .select('url')
     .eq('document_type', 'apprentice-handbook')

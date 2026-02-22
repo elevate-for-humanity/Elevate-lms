@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from "@supabase/supabase-js";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
@@ -59,7 +60,7 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    const { error } = await supabase
+    const { error } = await db
       .from("newsletter_subscribers")
       .insert([{ email: normalized, source: source ?? "website" }]);
 
@@ -70,7 +71,7 @@ export async function POST(req: Request) {
     }
 
     // Lightweight audit log (fire-and-forget)
-    supabase
+    db
       .from("analytics_events")
       .insert([
         {

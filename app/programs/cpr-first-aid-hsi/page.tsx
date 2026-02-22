@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { 
   Clock, Award, ArrowRight, Heart, 
   Users, Shield, Phone, Calendar, Building, Briefcase
@@ -63,7 +64,8 @@ const whoNeeds = [
 
 export default async function CPRFirstAidPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('programs').select('*').limit(50);
 const courses = (dbRows as any[]) || [];
 
   return (

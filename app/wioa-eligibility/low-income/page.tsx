@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { DollarSign, Phone, Users } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function LowIncomePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -26,7 +28,7 @@ export default async function LowIncomePage() {
   }
 
   // Get programs
-  const { data: programs } = await supabase
+  const { data: programs } = await db
     .from('programs')
     .select('id, name, slug, description')
     .eq('is_active', true)

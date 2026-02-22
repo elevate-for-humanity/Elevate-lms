@@ -5,6 +5,7 @@ import { ShoppingBag,
   Phone
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { ShopClient } from './ShopClient';
 import { PageTracker } from '@/components/analytics/PageTracker';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -42,8 +43,9 @@ export default async function ShopPage() {
   
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (supabase) {
-      const { data } = await supabase
+      const { data } = await db
         .from('shop_products')
         .select('id, name, slug, price, rating, review_count, category, image_url')
         .eq('is_active', true)

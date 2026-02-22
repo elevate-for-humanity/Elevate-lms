@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: Request) {
@@ -9,8 +10,9 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
-    const { data: reviews, error } = await supabase
+    const { data: reviews, error } = await db
       .from('curvature_reviews')
       .select('id, name, rating, text, date, service')
       .eq('is_approved', true)

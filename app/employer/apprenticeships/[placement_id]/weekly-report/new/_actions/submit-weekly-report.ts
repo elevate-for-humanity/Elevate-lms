@@ -1,10 +1,12 @@
 'use server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
 export async function submitWeeklyReport(formData: FormData) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Get authenticated user
   const { data: { user } } = await supabase.auth.getUser();
@@ -14,7 +16,7 @@ export async function submitWeeklyReport(formData: FormData) {
   }
 
   // Verify employer role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -36,7 +38,7 @@ export async function submitWeeklyReport(formData: FormData) {
   const hours_total = hours_ojt + hours_related;
 
   // Get placement and verify access
-  const { data: placement } = await supabase
+  const { data: placement } = await db
     .from('apprentice_placements')
     .select('shop_id')
     .eq('id', placement_id)
@@ -47,7 +49,7 @@ export async function submitWeeklyReport(formData: FormData) {
   }
 
   // Verify employer has access to this shop
-  const { data: shopAccess } = await supabase
+  const { data: shopAccess } = await db
     .from('shop_staff')
     .select('shop_id')
     .eq('user_id', user.id)
@@ -59,7 +61,7 @@ export async function submitWeeklyReport(formData: FormData) {
   }
 
   // Create weekly report
-  const { error: reportError } = await supabase
+  const { error: reportError } = await db
     .from('apprentice_weekly_reports')
     .insert({
       placement_id,

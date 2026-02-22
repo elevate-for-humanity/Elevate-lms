@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 
 export default async function PortfolioPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -38,21 +40,21 @@ export default async function PortfolioPage() {
     redirect('/login?redirect=/lms/portfolio');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
   // Fetch certificates
-  const { data: certificates } = await supabase
+  const { data: certificates } = await db
     .from('certificates')
     .select('*')
     .eq('user_id', user.id)
     .order('issued_at', { ascending: false });
 
   // Fetch completed courses
-  const { data: completedCourses } = await supabase
+  const { data: completedCourses } = await db
     .from('enrollments')
     .select('*, course:courses(*)')
     .eq('user_id', user.id)

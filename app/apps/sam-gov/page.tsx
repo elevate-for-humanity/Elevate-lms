@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { SamGovApp } from './SamGovApp';
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 export default async function SamGovPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   // Must have database connection
   if (!supabase) {
@@ -27,7 +29,7 @@ export default async function SamGovPage() {
   }
 
   // Check subscription status
-  const { data: subscription } = await supabase
+  const { data: subscription } = await db
     .from('user_app_subscriptions')
     .select('*')
     .eq('user_id', user.id)
@@ -60,7 +62,7 @@ export default async function SamGovPage() {
   }
 
   // Fetch user's SAM entities from database
-  const { data: entities, error: entitiesError } = await supabase
+  const { data: entities, error: entitiesError } = await db
     .from('sam_entities')
     .select('*')
     .eq('user_id', user.id)
@@ -74,7 +76,7 @@ export default async function SamGovPage() {
   const entityIds = entities?.map(e => e.id) || [];
   let documents: any[] = [];
   if (entityIds.length > 0) {
-    const { data: docs } = await supabase
+    const { data: docs } = await db
       .from('sam_documents')
       .select('*')
       .in('entity_id', entityIds)
@@ -85,7 +87,7 @@ export default async function SamGovPage() {
   // Fetch alerts
   let alerts: any[] = [];
   if (entityIds.length > 0) {
-    const { data: alertData } = await supabase
+    const { data: alertData } = await db
       .from('sam_alerts')
       .select('*')
       .in('entity_id', entityIds)

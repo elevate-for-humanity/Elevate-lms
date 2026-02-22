@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,6 +15,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -25,7 +27,7 @@ export async function POST(request: NextRequest) {
     const quiz = await request.json();
 
     // Save quiz
-    const { data: quizData, error: quizError } = await supabase
+    const { data: quizData, error: quizError } = await db
       .from('quizzes')
       .upsert({
         id: quiz.id,
@@ -47,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     // Delete existing questions
     if (quiz.id) {
-      await supabase.from('quiz_questions').delete().eq('quiz_id', quizData.id);
+      await db.from('quiz_questions').delete().eq('quiz_id', quizData.id);
     }
 
     // Save questions
@@ -68,7 +70,7 @@ export async function POST(request: NextRequest) {
         })
       );
 
-      const { error: questionsError } = await supabase
+      const { error: questionsError } = await db
         .from('quiz_questions')
         .insert(questions);
 

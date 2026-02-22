@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
 
 export default async function GovernmentPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -31,7 +33,7 @@ export default async function GovernmentPage() {
   }
   
   // Fetch government partners
-  const { data: partners } = await supabase
+  const { data: partners } = await db
     .from('partners')
     .select('*')
     .eq('type', 'government');

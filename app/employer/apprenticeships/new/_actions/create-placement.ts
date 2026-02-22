@@ -1,10 +1,12 @@
 'use server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
 export async function createPlacement(formData: FormData) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Get authenticated user
   const { data: { user } } = await supabase.auth.getUser();
@@ -14,7 +16,7 @@ export async function createPlacement(formData: FormData) {
   }
 
   // Verify employer role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -32,7 +34,7 @@ export async function createPlacement(formData: FormData) {
   const end_date = formData.get('end_date') as string;
 
   // Verify employer has access to this shop
-  const { data: shopAccess } = await supabase
+  const { data: shopAccess } = await db
     .from('shop_staff')
     .select('shop_id')
     .eq('user_id', user.id)
@@ -44,7 +46,7 @@ export async function createPlacement(formData: FormData) {
   }
 
   // Look up student by email
-  const { data: student } = await supabase
+  const { data: student } = await db
     .from('profiles')
     .select('id')
     .eq('email', student_email)
@@ -56,7 +58,7 @@ export async function createPlacement(formData: FormData) {
   }
 
   // Create apprentice placement
-  const { data: placement, error: placementError } = await supabase
+  const { data: placement, error: placementError } = await db
     .from('apprentice_placements')
     .insert({
       shop_id,

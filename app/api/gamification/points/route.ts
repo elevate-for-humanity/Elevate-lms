@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -23,14 +24,14 @@ const supabase = getSupabaseServerClient();
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data: userPoints } = await supabase
+  const { data: userPoints } = await db
     .from("user_points")
     .select("*")
     .eq("user_id", user.id)
     .single();
 
   if (!userPoints) {
-    const { data: newPoints } = await supabase
+    const { data: newPoints } = await db
       .from("user_points")
       .insert({
         user_id: user.id,
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
   const body = await parseBody<Record<string, any>>(request);
   const { points, action_type, description, reference_id, reference_type } = body;
 
-  await supabase.from("point_transactions").insert({
+  await db.from("point_transactions").insert({
     user_id: user.id,
     points,
     action_type,
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
     reference_type,
   });
 
-  const { data: currentPoints } = await supabase
+  const { data: currentPoints } = await db
     .from("user_points")
     .select("*")
     .eq("user_id", user.id)
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
   const levelName = newLevel === 1 ? "Beginner" : newLevel <= 5 ? "Intermediate" : "Advanced";
   const pointsToNext = 1000 - (newTotal % 1000);
 
-  const { data: updatedPoints } = await supabase
+  const { data: updatedPoints } = await db
     .from("user_points")
     .update({
       total_points: newTotal,

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { DollarSign, Clock, Circle, FileText, Plus, Calendar } from 'lucide-react';
 
@@ -13,15 +14,16 @@ export const metadata: Metadata = {
 
 export default async function GrantsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch grant opportunities
-  const { data: grants } = await supabase
+  const { data: grants } = await db
     .from('grant_opportunities')
     .select('*')
     .order('deadline', { ascending: true });
 
   // Fetch grant applications
-  const { data: applications } = await supabase
+  const { data: applications } = await db
     .from('grant_applications')
     .select('*')
     .order('created_at', { ascending: false })

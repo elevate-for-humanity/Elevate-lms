@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest) {
     // Save deployment to database
     if (userId) {
       const supabase = supabaseServer();
-      await supabase.from('studio_deployments').insert({
+      await db.from('studio_deployments').insert({
         user_id: userId,
         provider,
         repo,
@@ -130,7 +131,7 @@ const userId = req.headers.get('x-user-id');
     // Update database
     if (userId) {
       const supabase = supabaseServer();
-      await supabase
+      await db
         .from('studio_deployments')
         .update({ status, url, updated_at: new Date().toISOString() })
         .eq('deployment_id', deploymentId);
@@ -165,7 +166,7 @@ const userId = req.headers.get('x-user-id');
     const { repo } = await req.json();
     
     const supabase = supabaseServer();
-    let query = supabase
+    let query = db
       .from('studio_deployments')
       .select('*')
       .eq('user_id', userId)

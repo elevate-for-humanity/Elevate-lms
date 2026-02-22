@@ -89,7 +89,7 @@ export default async function OrientationPage() {
       </div>
     );
   }
-                await supabase
+                await db
                   .from('profiles')
                   .update({ orientation_completed: true })
                   .eq('id', user.id);

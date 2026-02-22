@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import TransitionButtons from './TransitionButtons';
@@ -49,6 +50,7 @@ export default async function ApplicationDetailPage({
 }) {
   const { type, id } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -69,7 +71,7 @@ export default async function ApplicationDetailPage({
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -80,7 +82,7 @@ export default async function ApplicationDetailPage({
   }
 
   // Query from the unified view
-  const { data: application, error } = await supabase
+  const { data: application, error } = await db
     .from('admin_applications_queue')
     .select('*')
     .eq('application_type', type)
@@ -99,7 +101,7 @@ export default async function ApplicationDetailPage({
   const displayName = firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Unknown Applicant';
 
   // Fetch state events if available
-  const { data: stateEvents } = await supabase
+  const { data: stateEvents } = await db
     .from('application_state_events')
     .select('id, from_state, to_state, actor_id, actor_role, reason, created_at')
     .eq('application_id', id)

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Users, Search, Mail, GraduationCap, Clock } from 'lucide-react';
@@ -15,6 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function InstructorStudentsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -30,7 +32,7 @@ export default async function InstructorStudentsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -41,7 +43,7 @@ export default async function InstructorStudentsPage() {
   }
 
   // Get students enrolled in instructor's courses
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select(`
       id,

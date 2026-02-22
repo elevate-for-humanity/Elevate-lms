@@ -9,6 +9,7 @@ import {
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const metadata: Metadata = {
   title: 'Authoritative Documents | Governance | Elevate for Humanity',
   description: 'The seven governing documents that define platform operations for website, LMS, Store, and tax services.',
@@ -24,7 +25,8 @@ export const metadata: Metadata = {
 
 export default async function AuthoritativeDocsPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('governance_documents').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('governance_documents').select('*').limit(50);
 const documents = (dbRows as any[]) || [];
 
   const currentDate = new Date().toLocaleDateString('en-US', {

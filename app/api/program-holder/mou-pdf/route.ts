@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     // Get the user's MOU signature
-    const { data: signature, error: sigError } = await supabase
+    const { data: signature, error: sigError } = await db
       .from('mou_signatures')
       .select('id, signer_name, signer_title, signed_at')
       .eq('user_id', user.id)
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get the active MOU template
-    const { data: template } = await supabase
+    const { data: template } = await db
       .from('mou_templates')
       .select('id, title, content, version')
       .eq('is_active', true)

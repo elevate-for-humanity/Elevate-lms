@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -27,6 +28,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AccreditationPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -40,21 +42,21 @@ export default async function AccreditationPage() {
   }
 
   // Get accreditations
-  const { data: accreditations } = await supabase
+  const { data: accreditations } = await db
     .from('accreditations')
     .select('*')
     .eq('is_active', true)
     .order('order', { ascending: true });
 
   // Get certifications
-  const { data: certifications } = await supabase
+  const { data: certifications } = await db
     .from('certifications')
     .select('*')
     .eq('type', 'organizational')
     .eq('is_active', true);
 
   // Get approved programs
-  const { data: approvedPrograms } = await supabase
+  const { data: approvedPrograms } = await db
     .from('programs')
     .select('id, name, slug, accreditation_status')
     .eq('is_active', true)

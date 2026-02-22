@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 
@@ -15,6 +16,7 @@ import OnboardingFlow from './OnboardingFlow';
 
 export default async function OnboardingStartPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -36,7 +38,7 @@ export default async function OnboardingStartPage() {
   }
 
   // Get user's profile to determine role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('id, full_name, email, role')
     .eq('id', user.id)
@@ -65,7 +67,7 @@ export default async function OnboardingStartPage() {
   }
 
   // Check if onboarding is already complete
-  const { data: progress } = await supabase
+  const { data: progress } = await db
     .from('onboarding_progress')
     .select('is_complete, role')
     .eq('user_id', user.id)
@@ -84,7 +86,7 @@ export default async function OnboardingStartPage() {
   }
 
   // Get active onboarding packet for role
-  const { data: packet } = await supabase
+  const { data: packet } = await db
     .from('onboarding_packets')
     .select('id, title, description')
     .eq('role', profile.role)
@@ -113,14 +115,14 @@ export default async function OnboardingStartPage() {
   }
 
   // Get onboarding documents
-  const { data: documents } = await supabase
+  const { data: documents } = await db
     .from('onboarding_documents')
     .select('*')
     .eq('packet_id', packet.id)
     .order('sort_order', { ascending: true });
 
   // Get existing signatures
-  const { data: signatures } = await supabase
+  const { data: signatures } = await db
     .from('onboarding_signatures')
     .select('document_id')
     .eq('user_id', user.id);
@@ -130,7 +132,7 @@ export default async function OnboardingStartPage() {
   );
 
   // Get payroll profile status
-  const { data: payrollProfile } = await supabase
+  const { data: payrollProfile } = await db
     .from('payroll_profiles')
     .select('status')
     .eq('user_id', user.id)

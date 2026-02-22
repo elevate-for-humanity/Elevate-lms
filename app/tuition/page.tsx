@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 
 export default async function TuitionPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -33,7 +35,7 @@ export default async function TuitionPage() {
   }
   
   // Fetch tuition info
-  const { data: tuitionInfo } = await supabase
+  const { data: tuitionInfo } = await db
     .from('tuition_options')
     .select('*')
     .order('order_index');

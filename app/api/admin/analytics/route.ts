@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,6 +13,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -22,7 +24,7 @@ export async function GET(request: Request) {
     }
 
     // Verify user is admin
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -39,7 +41,7 @@ export async function GET(request: Request) {
     ).toISOString();
 
     // Get page views
-    const { data: pageViews, error: pageViewsError } = await supabase
+    const { data: pageViews, error: pageViewsError } = await db
       .from('page_views')
       .select('path, created_at')
       .gte('created_at', startDate)
@@ -53,7 +55,7 @@ export async function GET(request: Request) {
     }
 
     // Get conversions
-    const { data: conversions, error: conversionsError } = await supabase
+    const { data: conversions, error: conversionsError } = await db
       .from('conversions')
       .select('*')
       .gte('created_at', startDate)
@@ -115,7 +117,7 @@ export async function GET(request: Request) {
     });
 
     // Get top referrers
-    const { data: referrers } = await supabase
+    const { data: referrers } = await db
       .from('page_views')
       .select('referrer')
       .gte('created_at', startDate)

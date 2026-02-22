@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 
 export default async function PendingStudentsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -37,7 +39,7 @@ export default async function PendingStudentsPage() {
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -46,7 +48,7 @@ export default async function PendingStudentsPage() {
   if (!profile || profile.role !== 'program_holder') redirect('/');
 
   // Get program holder record
-  const { data: programHolder } = await supabase
+  const { data: programHolder } = await db
     .from('program_holders')
     .select('id')
     .eq('user_id', user.id)
@@ -59,7 +61,7 @@ export default async function PendingStudentsPage() {
   // Fetch pending applications
   // Note: This assumes there's an applications table or pending status in enrollments
   // For now, we'll check for enrollments with 'pending' status
-  const { data: pendingApplications, count } = await supabase
+  const { data: pendingApplications, count } = await db
     .from('program_holder_students')
     .select(
       `

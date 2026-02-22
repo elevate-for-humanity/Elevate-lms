@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -11,24 +12,25 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get client counts
-    const { count: totalClients } = await supabase
+    const { count: totalClients } = await db
       .from('tax_clients')
       .select('*', { count: 'exact', head: true });
 
-    const { count: pendingReturns } = await supabase
+    const { count: pendingReturns } = await db
       .from('tax_clients')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'pending');
 
-    const { count: completedReturns } = await supabase
+    const { count: completedReturns } = await db
       .from('tax_clients')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'completed');
 
     // Get total refunds
-    const { data: refundData } = await supabase
+    const { data: refundData } = await db
       .from('tax_clients')
       .select('refund_amount')
       .eq('status', 'completed');
@@ -40,7 +42,7 @@ export async function GET(request: Request) {
 
     // Get today's appointments
     const today = new Date().toISOString().split('T')[0];
-    const { count: todayAppointments } = await supabase
+    const { count: todayAppointments } = await db
       .from('appointments')
       .select('*', { count: 'exact', head: true })
       .eq('appointment_date', today)
@@ -49,7 +51,7 @@ export async function GET(request: Request) {
     // Get weekly revenue (last 7 days)
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    const { data: revenueData } = await supabase
+    const { data: revenueData } = await db
       .from('tax_clients')
       .select('preparation_fee')
       .eq('status', 'completed')

@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
@@ -69,6 +70,7 @@ const searchParams = request.nextUrl.searchParams;
 
     // Store in database
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -78,7 +80,7 @@ const searchParams = request.nextUrl.searchParams;
     }
 
     // Save to settings table
-    const { error: saveError } = await supabase
+    const { error: saveError } = await db
       .from('social_media_settings')
       .upsert({
         platform: 'youtube',

@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -25,6 +26,7 @@ export const metadata: Metadata = {
 
 export default async function CAREERSAFEPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -38,7 +40,7 @@ export default async function CAREERSAFEPage() {
   }
   
   // Fetch CareerSafe partner info
-  const { data: partner } = await supabase
+  const { data: partner } = await db
     .from('partners')
     .select('*')
     .eq('slug', 'careersafe')

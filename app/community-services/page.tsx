@@ -16,6 +16,7 @@ CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const metadata: Metadata = {
   title: 'Free Community Services | VITA, Mental Wellness, Job Training | Elevate for Humanity',
   description:
@@ -35,7 +36,8 @@ const colorClasses: Record<string, { bg: string; text: string; border: string; l
 
 export default async function CommunityServicesPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('community_groups').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('community_groups').select('*').limit(50);
 const services = (dbRows as any[]) || [];
 
   return (

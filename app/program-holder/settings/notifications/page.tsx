@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
@@ -14,6 +15,7 @@ export const metadata = {
 
 export default async function ProgramHolderNotificationSettingsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -38,7 +40,7 @@ export default async function ProgramHolderNotificationSettingsPage() {
   }
 
   // Get program holder record
-  const { data: programHolder } = await supabase
+  const { data: programHolder } = await db
     .from('program_holders')
     .select('id, organization_name')
     .eq('user_id', user.id)
@@ -49,7 +51,7 @@ export default async function ProgramHolderNotificationSettingsPage() {
   }
 
   // Get or create notification preferences
-  let { data: preferences } = await supabase
+  let { data: preferences } = await db
     .from('notification_preferences')
     .select('*')
     .eq('program_holder_id', programHolder.id)
@@ -57,7 +59,7 @@ export default async function ProgramHolderNotificationSettingsPage() {
 
   // Create default preferences if they don't exist
   if (!preferences) {
-    const { data: newPreferences } = await supabase
+    const { data: newPreferences } = await db
       .from('notification_preferences')
       .insert({
         program_holder_id: programHolder.id,

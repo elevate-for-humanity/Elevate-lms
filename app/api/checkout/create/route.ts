@@ -7,6 +7,7 @@ export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -42,9 +43,10 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get course details
-    const { data: course, error: courseError } = await supabase
+    const { data: course, error: courseError } = await db
       .from('courses')
       .select('*')
       .eq('id', courseId)
@@ -67,7 +69,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already enrolled
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('enrollments')
       .select('id, payment_status')
       .eq('user_id', user.id)
@@ -115,7 +117,7 @@ export async function POST(request: NextRequest) {
 
     // Create or update enrollment with pending payment
     if (existing) {
-      await supabase
+      await db
         .from('enrollments')
         .update({
           payment_status: 'pending',
@@ -123,7 +125,7 @@ export async function POST(request: NextRequest) {
         })
         .eq('id', existing.id);
     } else {
-      await supabase.from('enrollments').insert({
+      await db.from('enrollments').insert({
         user_id: user.id,
         course_id: courseId,
         status: 'pending',

@@ -1,4 +1,5 @@
 /**
+import { createAdminClient } from '@/lib/supabase/admin';
  * @deprecated Use canonical enrollment routes:
  *   - /api/enroll (student enrollment)
  *   - /api/enrollment/submit (comprehensive wizard)
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 1. Load enrollment with lock
-    const { data: enrollment, error: enrollmentError } = await supabase
+    const { data: enrollment, error: enrollmentError } = await db
       .from('enrollments')
       .select(
         'id, partner_course_id, payment_status, payment_mode, billing_lock'
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Load partner course pricing
-    const { data: partnerCourse, error: courseError } = await supabase
+    const { data: partnerCourse, error: courseError } = await db
       .from('partner_courses')
       .select('id, course_name, retail_price_cents, stripe_price_id')
       .eq('id', enrollment.partner_course_id)
@@ -182,7 +183,7 @@ export async function POST(request: NextRequest) {
     const session = await stripe.checkout.sessions.create(sessionParams);
 
     // 6. Update enrollment with session ID
-    await supabase
+    await db
       .from('enrollments')
       .update({
         stripe_checkout_session_id: session.id,

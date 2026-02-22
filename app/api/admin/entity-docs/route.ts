@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -23,6 +24,7 @@ const { searchParams } = new URL(request.url);
   }
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Verify admin
   const {
@@ -33,7 +35,7 @@ const { searchParams } = new URL(request.url);
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -46,7 +48,7 @@ const { searchParams } = new URL(request.url);
   // Get all documents for this user
   const docTypes = getDocTypesForCategory(category || 'all');
   
-  let query = supabase
+  let query = db
     .from('documents')
     .select('*')
     .eq('user_id', userId);
@@ -97,7 +99,7 @@ async function getEntityStatus(
 } | null> {
   try {
     // Check profile for basic status
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('enrollment_status, agreement_signed_at')
       .eq('id', userId)
@@ -108,7 +110,7 @@ async function getEntityStatus(
     let docsVerified = false;
 
     if (docTypes.length > 0) {
-      const { data: docs } = await supabase
+      const { data: docs } = await db
         .from('documents')
         .select('document_type, status, verified')
         .eq('user_id', userId)
@@ -144,7 +146,7 @@ async function getEntityStatus(
     }
 
     // Check for enrollment/application record
-    const { data: enrollment } = await supabase
+    const { data: enrollment } = await db
       .from('enrollments')
       .select('status, agreement_signed')
       .eq('user_id', userId)

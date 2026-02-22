@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 // App pricing (monthly in cents)
 const APP_PRICES: Record<string, Record<string, number>> = {
@@ -28,6 +29,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
     }
@@ -53,7 +55,7 @@ export async function POST(request: NextRequest) {
     // Get or create Stripe customer
     let customerId: string;
     
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('stripe_customer_id')
       .eq('id', user.id)
@@ -70,7 +72,7 @@ export async function POST(request: NextRequest) {
       });
       customerId = customer.id;
 
-      await supabase
+      await db
         .from('profiles')
         .update({ stripe_customer_id: customerId })
         .eq('id', user.id);

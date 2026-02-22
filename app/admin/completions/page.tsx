@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 export default async function CompletionsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -33,7 +35,7 @@ export default async function CompletionsPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -44,25 +46,25 @@ export default async function CompletionsPage() {
   }
 
   // Fetch completion stats
-  const { count: totalCompletions } = await supabase
+  const { count: totalCompletions } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
 
-  const { count: thisMonthCompletions } = await supabase
+  const { count: thisMonthCompletions } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed')
     .gte('completed_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString());
 
-  const { count: thisWeekCompletions } = await supabase
+  const { count: thisWeekCompletions } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed')
     .gte('completed_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
 
   // Fetch recent completions
-  const { data: recentCompletions } = await supabase
+  const { data: recentCompletions } = await db
     .from('enrollments')
     .select(`
       id,

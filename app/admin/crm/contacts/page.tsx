@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -18,6 +19,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ContactsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/admin/crm/contacts');
@@ -30,7 +32,7 @@ export default async function ContactsPage() {
   }
 
   // Fetch real contacts from CRM
-  const { data: contactData } = await supabase
+  const { data: contactData } = await db
     .from('crm_contacts')
     .select('*')
     .order('updated_at', { ascending: false })

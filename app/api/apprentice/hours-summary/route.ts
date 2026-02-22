@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -11,6 +12,7 @@ export async function GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const {
     data: { user },
@@ -26,7 +28,7 @@ const supabase = await createClient();
 
   try {
     // Get student's apprentice enrollment with transfer hours and required hours
-    let enrollmentQuery = supabase
+    let enrollmentQuery = db
       .from('student_enrollments')
       .select(`
         id,
@@ -64,7 +66,7 @@ const supabase = await createClient();
     }
 
     // Get hour totals from apprentice_hours_log
-    const { data: hourLogs, error: hoursError } = await supabase
+    const { data: hourLogs, error: hoursError } = await db
       .from('apprentice_hours_log')
       .select('minutes, hour_type, funding_phase, status')
       .eq('enrollment_id', enrollment?.id || enrollmentId);
@@ -101,14 +103,14 @@ const supabase = await createClient();
       .reduce((sum, l) => sum + (l.minutes || 0), 0);
 
     // Get RAPIDS status
-    const { data: rapidsData } = await supabase
+    const { data: rapidsData } = await db
       .from('rapids_registrations')
       .select('rapids_id, status, registration_date')
       .eq('student_id', user.id)
       .maybeSingle();
 
     // Get state board readiness
-    const { data: stateBoardData } = await supabase
+    const { data: stateBoardData } = await db
       .from('state_board_readiness')
       .select('ready_for_exam, milady_completed, practical_skills_verified')
       .eq('student_id', user.id)

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import QuestionManagerClient from './QuestionManagerClient';
@@ -13,16 +14,17 @@ export const metadata: Metadata = {
 export default async function QuizQuestionsPage({ params }: { params: Promise<{ courseId: string; quizId: string }> }) {
   const { courseId, quizId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
-  const { data: quiz } = await supabase.from('quizzes').select('*').eq('id', quizId).single();
-  const { data: questions } = await supabase.from('quiz_questions').select('*').eq('quiz_id', quizId).order('order_index');
+  const { data: quiz } = await db.from('quizzes').select('*').eq('id', quizId).single();
+  const { data: questions } = await db.from('quiz_questions').select('*').eq('quiz_id', quizId).order('order_index');
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -31,14 +31,12 @@ interface Profile { id: string; full_name: string | null; }
 
 export default async function LMSPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) { redirect("/login"); }
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) { redirect('/login?redirect=/lms'); }
 
-  // Use admin client for data queries to bypass partner_users RLS recursion
-  // Auth is already verified above via supabase.auth.getUser()
-  const admin = createAdminClient();
-  const db = admin || supabase; // fallback to user client if admin unavailable
+  // Admin client already created above as db
 
   const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
   const typedProfile = profile as Profile | null;
@@ -53,7 +51,7 @@ export default async function LMSPage() {
   let programEnrollments: any[] = [];
   let studentEnrollments: any[] = [];
   try {
-    const { data: pe } = await supabase
+    const { data: pe } = await db
       .from('program_enrollments')
       .select(`id, status, created_at, program:programs(id, name, description, slug, duration_weeks)`)
       .eq('student_id', user.id)
@@ -61,7 +59,7 @@ export default async function LMSPage() {
     programEnrollments = pe || [];
   } catch { /* RLS may block this view */ }
   try {
-    const { data: se } = await supabase
+    const { data: se } = await db
       .from('student_enrollments')
       .select(`id, status, started_at, program_slug`)
       .eq('student_id', user.id)
@@ -73,7 +71,7 @@ export default async function LMSPage() {
   const typedProgramEnrollments = programEnrollments || [];
   const typedStudentEnrollments = studentEnrollments || [];
 
-  const { data: recentActivity } = await supabase
+  const { data: recentActivity } = await db
     .from('lesson_progress')
     .select(`id, completed_at, lesson:training_lessons(title, course_id)`)
     .eq('user_id', user.id)

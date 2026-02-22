@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -19,6 +20,7 @@ export default async function AdminGradebookPage({
 }) {
   const { courseId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -33,7 +35,7 @@ export default async function AdminGradebookPage({
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -44,7 +46,7 @@ export default async function AdminGradebookPage({
   }
 
   // Fetch course
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('courses')
     .select('id, title')
     .eq('id', courseId)
@@ -53,21 +55,21 @@ export default async function AdminGradebookPage({
   if (!course) redirect('/admin/courses');
 
   // Fetch enrollments with student profiles
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select('id, user_id, progress, status, profiles!inner(full_name, email)')
     .eq('course_id', courseId)
     .order('created_at');
 
   // Fetch assignment submissions for this course
-  const { data: submissions } = await supabase
+  const { data: submissions } = await db
     .from('assignment_submissions')
     .select('*')
     .eq('course_id', courseId)
     .order('submitted_at', { ascending: false });
 
   // Fetch quiz attempts for this course
-  const { data: quizAttempts } = await supabase
+  const { data: quizAttempts } = await db
     .from('quiz_attempts')
     .select('*')
     .eq('course_id', courseId)

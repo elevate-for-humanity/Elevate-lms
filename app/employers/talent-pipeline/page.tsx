@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Users, Target, Clock, DollarSign, Award, ArrowRight, Building2, CheckCircle, } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -96,6 +97,7 @@ const benefits = [
 
 export default async function TalentPipelinePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -109,7 +111,7 @@ export default async function TalentPipelinePage() {
   }
   
   // Fetch pipeline stats
-  const { count: candidateCount } = await supabase
+  const { count: candidateCount } = await db
     .from('students')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'job_ready');

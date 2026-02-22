@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
@@ -16,6 +17,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
     }
@@ -29,7 +31,7 @@ export async function GET(request: Request) {
     const studentId = user.id;
 
     // Fetch enrollments with program info
-    const { data: enrollments, error: enrollError } = await supabase
+    const { data: enrollments, error: enrollError } = await db
       .from('enrollments')
       .select(`
         id,
@@ -53,7 +55,7 @@ export async function GET(request: Request) {
     }
 
     // Fetch all hours for this student
-    const { data: hours, error: hoursError } = await supabase
+    const { data: hours, error: hoursError } = await db
       .from('student_hours')
       .select('*')
       .eq('student_id', studentId)

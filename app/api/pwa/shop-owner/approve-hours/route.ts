@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
@@ -12,6 +13,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
@@ -34,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user's partner association
-    const { data: partnerUser } = await supabase
+    const { data: partnerUser } = await db
       .from('partner_users')
       .select('partner_id, role')
       .eq('user_id', user.id)
@@ -48,7 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify entry belongs to this partner
-    const { data: entry } = await supabase
+    const { data: entry } = await db
       .from('progress_entries')
       .select('id, partner_id, apprentice_id, hours_worked')
       .eq('id', entryId)
@@ -65,7 +67,7 @@ export async function POST(request: NextRequest) {
     // Update entry status
     const newStatus = action === 'approve' ? 'approved' : 'rejected';
     
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('progress_entries')
       .update({
         status: newStatus,
@@ -83,7 +85,7 @@ export async function POST(request: NextRequest) {
     // If approved, update apprentice's total hours
     if (action === 'approve') {
       // Get current total
-      const { data: currentProgress } = await supabase
+      const { data: currentProgress } = await db
         .from('apprentice_progress')
         .select('total_hours')
         .eq('user_id', entry.apprentice_id)
@@ -92,7 +94,7 @@ export async function POST(request: NextRequest) {
       const currentHours = currentProgress?.total_hours || 0;
       const newTotal = currentHours + parseFloat(entry.hours_worked || 0);
 
-      await supabase
+      await db
         .from('apprentice_progress')
         .upsert({
           user_id: entry.apprentice_id,

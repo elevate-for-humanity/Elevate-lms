@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -22,10 +23,11 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { certificateId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) return { title: 'Certificate | Elevate for Humanity' };
   
-  const { data: certificate } = await supabase
+  const { data: certificate } = await db
     .from('certificates')
     .select('title')
     .eq('id', certificateId)
@@ -40,6 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CertificateViewPage({ params }: Props) {
   const { certificateId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -53,7 +56,7 @@ export default async function CertificateViewPage({ params }: Props) {
 
   // Fetch certificate with user and course info
   // profiles join works via user_id FK; courses join does not exist on this table
-  const { data: certificate, error } = await supabase
+  const { data: certificate, error } = await db
     .from('certificates')
     .select(`
       *,

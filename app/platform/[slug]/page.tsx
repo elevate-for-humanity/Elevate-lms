@@ -2,6 +2,7 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductDetailPage({ params }: Props) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -38,7 +40,7 @@ export default async function ProductDetailPage({ params }: Props) {
   }
   
   // Try database first
-  const { data: dbProduct } = await supabase
+  const { data: dbProduct } = await db
     .from('platform_products')
     .select('*')
     .eq('slug', params.slug)

@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
@@ -9,6 +10,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -17,7 +19,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get apprentice record
-    const { data: apprentice, error: apprenticeError } = await supabase
+    const { data: apprentice, error: apprenticeError } = await db
       .from('apprentices')
       .select('id')
       .eq('user_id', user.id)
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find active session
-    const { data: session, error: sessionError } = await supabase
+    const { data: session, error: sessionError } = await db
       .from('checkin_sessions')
       .select('id, checkin_time, shop_id')
       .eq('apprentice_id', apprentice.id)
@@ -46,7 +48,7 @@ export async function POST(request: NextRequest) {
     const hoursLogged = (durationMinutes / 60).toFixed(2);
 
     // Update session with checkout time
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('checkin_sessions')
       .update({
         checkout_time: checkoutTime.toISOString(),
@@ -63,7 +65,7 @@ export async function POST(request: NextRequest) {
     const hours = Math.floor(durationMinutes / 60);
     const minutes = durationMinutes % 60;
 
-    const { error: entryError } = await supabase
+    const { error: entryError } = await db
       .from('hour_entries')
       .insert({
         apprentice_id: apprentice.id,

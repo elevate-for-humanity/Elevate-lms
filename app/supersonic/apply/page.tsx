@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { ChevronRight, Zap } from 'lucide-react';
 import SupersonicForm from './SupersonicForm';
@@ -15,13 +16,14 @@ export const dynamic = 'force-dynamic';
 
 export default async function SupersonicApplyPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   let existingProfile = null;
   let existingApplication = null;
 
   if (user) {
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('*')
       .eq('id', user.id)
@@ -29,7 +31,7 @@ export default async function SupersonicApplyPage() {
     existingProfile = profile;
 
     // Check for existing application
-    const { data: application } = await supabase
+    const { data: application } = await db
       .from('refund_advance_applications')
       .select('*')
       .eq('user_id', user.id)

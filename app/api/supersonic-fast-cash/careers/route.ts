@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Save application to database
-    const { data: application, error: appError } = await supabase
+    const { data: application, error: appError } = await db
       .from('career_applications')
       .insert({
         first_name: body.firstName,
@@ -204,7 +205,7 @@ export async function GET(request: NextRequest) {
       const { data: { user } } = await supabase.auth.getUser(token);
       if (user) {
         userEmail = user.email || null;
-        const { data: profile } = await supabase
+        const { data: profile } = await db
           .from('profiles')
           .select('role')
           .eq('id', user.id)
@@ -230,7 +231,7 @@ export async function GET(request: NextRequest) {
       }
       // For unauthenticated users, only return limited status info
       if (!userEmail) {
-        const { data, error } = await supabase
+        const { data, error } = await db
           .from('career_applications')
           .select('id, status, created_at')
           .eq('email', email.toLowerCase())
@@ -250,7 +251,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    let query = supabase
+    let query = db
       .from('career_applications')
       .select('*')
       .order('created_at', { ascending: false });

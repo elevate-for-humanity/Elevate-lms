@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -128,7 +129,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if subdomain is taken
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('organizations')
       .select('id')
       .eq('slug', tenantSubdomain)
@@ -142,7 +143,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create organization
-    const { data: org, error: orgError } = await supabase
+    const { data: org, error: orgError } = await db
       .from('organizations')
       .insert({
         name: organizationName,
@@ -169,7 +170,7 @@ export async function POST(request: NextRequest) {
     const trialEndsAt = new Date();
     trialEndsAt.setDate(trialEndsAt.getDate() + 14);
 
-    const { data: license, error: licenseError } = await supabase
+    const { data: license, error: licenseError } = await db
       .from('licenses')
       .insert({
         organization_id: org.id,
@@ -186,7 +187,7 @@ export async function POST(request: NextRequest) {
     if (licenseError) {
       logger.error('License creation error:', licenseError);
       // Rollback org creation
-      await supabase.from('organizations').delete().eq('id', org.id);
+      await db.from('organizations').delete().eq('id', org.id);
       return NextResponse.json(
         { error: 'Failed to create license' },
         { status: 500 }
@@ -194,7 +195,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log provisioning event
-    await supabase.from('license_events').insert({
+    await db.from('license_events').insert({
       license_id: license.id,
       organization_id: org.id,
       event_type: 'tenant_provisioned',
@@ -274,7 +275,7 @@ const subdomain = request.nextUrl.searchParams.get('subdomain');
     return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
   }
 
-  const { data } = await supabase
+  const { data } = await db
     .from('organizations')
     .select('id')
     .eq('slug', normalized)

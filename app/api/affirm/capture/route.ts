@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
   // DIAGNOSTIC: Mark context with error if params missing (proves capture was hit)
   if (orderId && !checkoutToken) {
-    await supabase
+    await db
       .from('checkout_contexts')
       .update({
         status: 'failed',
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Load checkout context from DB (server-side, tamper-proof)
-  const { data: context, error: contextError } = await supabase
+  const { data: context, error: contextError } = await db
     .from('checkout_contexts')
     .select('*')
     .eq('provider', 'affirm')
@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
   // Check expiration
   if (new Date(context.expires_at) < new Date()) {
     logger.error('Checkout context expired', { orderId, expiresAt: context.expires_at });
-    await supabase
+    await db
       .from('checkout_contexts')
       .update({ status: 'expired' })
       .eq('id', context.id);
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Mark context as completed and store provider response
-    await supabase
+    await db
       .from('checkout_contexts')
       .update({
         status: 'completed',
@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
         const hoursRemaining = Math.max(0, totalHoursRequired - (context.transfer_hours || 0));
         const weeksRemaining = Math.ceil(hoursRemaining / (context.hours_per_week || 40));
         
-        const { data: subscription, error: subError } = await supabase
+        const { data: subscription, error: subError } = await db
           .from('barber_subscriptions')
           .insert({
             customer_email: context.customer_email,
@@ -185,7 +185,7 @@ export async function GET(request: NextRequest) {
     logger.error('Affirm authorization failed:', error);
     
     // Mark context as failed
-    await supabase
+    await db
       .from('checkout_contexts')
       .update({ status: 'failed' })
       .eq('id', context.id);

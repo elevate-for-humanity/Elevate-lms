@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Get user's program holder ID
-  const { data: prof } = await supabase
+  const { data: prof } = await db
     .from('user_profiles')
     .select('program_holder_id')
     .eq('user_id', user.id)

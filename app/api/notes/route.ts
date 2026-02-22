@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -15,6 +16,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -25,7 +27,7 @@ export async function GET(request: NextRequest) {
     const courseId = searchParams.get('courseId');
     const lessonId = searchParams.get('lessonId');
 
-    let query = supabase
+    let query = db
       .from('notes')
       .select('*')
       .eq('user_id', user.id)
@@ -61,6 +63,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -77,7 +80,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: note, error } = await supabase
+    const { data: note, error } = await db
       .from('notes')
       .insert({
         user_id: user.id,

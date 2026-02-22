@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('soc_controls')
       .upsert({
         control_id,
@@ -73,7 +73,7 @@ export async function GET(request: Request) {
 
     const supabase = createAdminClient();
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('soc_controls')
       .select('*')
       .order('control_id');

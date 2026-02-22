@@ -5,6 +5,7 @@ export const maxDuration = 60;
 // app/api/mobile/summary/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -14,6 +15,7 @@ export async function GET(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -24,40 +26,40 @@ export async function GET(req: NextRequest) {
     }
 
     // Get enrollments count
-    const { count: enrollmentsCount } = await supabase
+    const { count: enrollmentsCount } = await db
       .from("enrollments")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id)
       .eq("status", "active");
 
     // Get completed courses count
-    const { count: completedCount } = await supabase
+    const { count: completedCount } = await db
       .from("enrollments")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id)
       .eq("status", "completed");
 
     // Get certificates count
-    const { count: certificatesCount } = await supabase
+    const { count: certificatesCount } = await db
       .from("certificates")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id)
       .eq("is_revoked", false);
 
     // Get unread forum posts count
-    const { count: unreadForumsCount } = await supabase
+    const { count: unreadForumsCount } = await db
       .from("discussion_threads")
       .select("*", { count: "exact", head: true })
       .eq("is_read", false);
 
     // Get study groups count
-    const { count: studyGroupsCount } = await supabase
+    const { count: studyGroupsCount } = await db
       .from("study_group_members")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id);
 
     // Get current streak
-    const { data: streakData } = await supabase
+    const { data: streakData } = await db
       .from("user_streaks")
       .select("current_streak, longest_streak")
       .eq("user_id", user.id)
@@ -67,7 +69,7 @@ export async function GET(req: NextRequest) {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const { count: recentActivityCount } = await supabase
+    const { count: recentActivityCount } = await db
       .from("lesson_progress")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id)

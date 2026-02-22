@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,6 +13,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -27,7 +29,7 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      const { data: profile } = await supabase
+      const { data: profile } = await db
         .from('profiles')
         .select('role')
         .eq('id', user.id)
@@ -38,7 +40,7 @@ export async function GET(request: Request) {
       }
 
       // Admin can see all donations
-      let query = supabase
+      let query = db
         .from('donations')
         .select('*, campaign:campaign_id(name)')
         .order('created_at', { ascending: false });
@@ -78,7 +80,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: donations, error } = await supabase
+    const { data: donations, error } = await db
       .from('donations')
       .select('*, campaign:campaign_id(name)')
       .eq('user_id', user.id)

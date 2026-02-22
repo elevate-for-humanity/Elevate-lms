@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 const supabase = getSupabaseServerClient();
 
-  const { data, error }: any = await supabase
+  const { data, error }: any = await db
     .from("learning_paths")
     .select("*")
     .order("is_featured", { ascending: false })
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
   const body = await parseBody<Record<string, any>>(request);
   const { path_id } = body;
 
-  const { data, error }: any = await supabase
+  const { data, error }: any = await db
     .from("user_learning_paths")
     .insert({
       user_id: user.id,

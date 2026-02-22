@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { stripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -21,6 +22,7 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -35,7 +37,7 @@ export async function POST(req: Request) {
     const customerEmail = formData.get('customerEmail') as string || user.email;
 
     // Get cart items with product details
-    const { data: cartItems, error: cartError } = await supabase
+    const { data: cartItems, error: cartError } = await db
       .from('cart_items')
       .select(`
         id,

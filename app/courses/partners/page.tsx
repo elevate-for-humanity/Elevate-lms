@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 
 export default async function PartnerCoursesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,14 +31,14 @@ export default async function PartnerCoursesPage() {
   }
 
   // Fetch all partner providers
-  const { data: providers } = await supabase
+  const { data: providers } = await db
     .from('partner_lms_providers')
     .select('*')
     .eq('is_active', true)
     .order('provider_name');
 
   // Fetch all partner courses
-  const { data: courses, count } = await supabase
+  const { data: courses, count } = await db
     .from('partner_courses')
     .select('*, partner_lms_providers(provider_name, provider_type)', {
       count: 'exact',

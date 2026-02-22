@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { preparerService } from '@/lib/franchise/preparer-service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function GET(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -27,7 +29,7 @@ export async function GET(
     }
 
     // Check access
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -39,7 +41,7 @@ export async function GET(
     // Check if user owns the office
     let isOwner = false;
     if (preparer.office_id) {
-      const { data: office } = await supabase
+      const { data: office } = await db
         .from('franchise_offices')
         .select('owner_id')
         .eq('id', preparer.office_id)

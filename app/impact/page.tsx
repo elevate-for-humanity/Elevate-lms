@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { TrendingUp, Users, Award, Target, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 
 export default async function ImpactPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -30,7 +32,7 @@ export default async function ImpactPage() {
   }
   
   // Fetch impact metrics
-  const { data: metrics } = await supabase
+  const { data: metrics } = await db
     .from('impact_metrics')
     .select('*')
     .order('category');

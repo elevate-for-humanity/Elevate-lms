@@ -42,7 +42,7 @@ export default async function ApprenticeCourseDetailPage({
   }
 
   // Get enrollment with program
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from('training_enrollments')
     .select('*, programs(id, name, slug)')
     .eq('user_id', user.id)
@@ -66,21 +66,21 @@ export default async function ApprenticeCourseDetailPage({
   }
 
   // Get course from database
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('training_courses')
     .select('*')
     .eq('id', id)
     .single();
 
   // Get course modules
-  const { data: modules } = await supabase
+  const { data: modules } = await db
     .from('course_modules')
     .select('*')
     .eq('course_id', id)
     .order('order_index', { ascending: true });
 
   // Get user's progress on modules
-  const { data: progress } = await supabase
+  const { data: progress } = await db
     .from('module_progress')
     .select('module_id, completed_at')
     .eq('user_id', user.id)

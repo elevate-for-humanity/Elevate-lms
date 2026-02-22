@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,7 @@ const userId = req.headers.get('x-user-id');
   try {
     const supabase = supabaseServer();
     
-    let query = supabase
+    let query = db
       .from('studio_workflow_tracking')
       .select('*')
       .eq('user_id', userId)
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest) {
     const supabase = supabaseServer();
 
     // Upsert tracking record
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('studio_workflow_tracking')
       .upsert(
         {
@@ -125,7 +126,7 @@ const userId = req.headers.get('x-user-id');
     if (last_status !== undefined) updates.last_status = last_status;
     if (notifications_enabled !== undefined) updates.notifications_enabled = notifications_enabled;
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('studio_workflow_tracking')
       .update(updates)
       .eq('id', id)
@@ -164,7 +165,7 @@ const userId = req.headers.get('x-user-id');
   try {
     const supabase = supabaseServer();
 
-    const { error } = await supabase
+    const { error } = await db
       .from('studio_workflow_tracking')
       .delete()
       .eq('id', id)

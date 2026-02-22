@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -28,6 +29,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function LearnerDashboardPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -48,14 +50,14 @@ export default async function LearnerDashboardPage() {
   }
 
   // Fetch profile
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
   // Fetch enrollments from both tables (legacy enrollments + training_enrollments)
-  const { data: legacyEnrollments } = await supabase
+  const { data: legacyEnrollments } = await db
     .from('enrollments')
     .select(`
       id,
@@ -73,7 +75,7 @@ export default async function LearnerDashboardPage() {
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false });
 
-  const { data: trainingEnrollments } = await supabase
+  const { data: trainingEnrollments } = await db
     .from('training_enrollments')
     .select(`
       id,
@@ -109,7 +111,7 @@ export default async function LearnerDashboardPage() {
   });
 
   // Fetch achievements
-  const { data: achievements } = await supabase
+  const { data: achievements } = await db
     .from('user_achievements')
     .select(`
       id,
@@ -126,7 +128,7 @@ export default async function LearnerDashboardPage() {
     .limit(5);
 
   // Fetch notifications
-  const { data: notifications } = await supabase
+  const { data: notifications } = await db
     .from('notifications')
     .select('*')
     .eq('user_id', user.id)
@@ -135,7 +137,7 @@ export default async function LearnerDashboardPage() {
     .limit(5);
 
   // Fetch certificates
-  const { data: certificates } = await supabase
+  const { data: certificates } = await db
     .from('certificates')
     .select('id, certificate_number, course_title, issued_at, verification_code')
     .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
@@ -143,7 +145,7 @@ export default async function LearnerDashboardPage() {
     .limit(5);
 
   // Fetch attendance hours
-  const { data: attendanceData } = await supabase
+  const { data: attendanceData } = await db
     .from('attendance_hours')
     .select('hours_logged, date, type')
     .eq('enrollment_id', enrollments?.[0]?.id || '00000000-0000-0000-0000-000000000000')
@@ -151,7 +153,7 @@ export default async function LearnerDashboardPage() {
     .limit(30);
 
   // Fetch training hours (fallback)
-  const { data: hoursData } = await supabase
+  const { data: hoursData } = await db
     .from('training_hours')
     .select('hours')
     .eq('user_id', user.id);
@@ -163,7 +165,7 @@ export default async function LearnerDashboardPage() {
   // Fetch lesson progress for all enrolled courses
   const courseIds = enrollments?.map(e => e.course_id).filter(Boolean) || [];
   const { data: lessonProgress } = courseIds.length > 0
-    ? await supabase
+    ? await db
         .from('lesson_progress')
         .select('course_id, lesson_id, completed')
         .eq('user_id', user.id)
@@ -171,7 +173,7 @@ export default async function LearnerDashboardPage() {
     : { data: null };
 
   // Check for pending onboarding (program_enrollments in pre-active state)
-  const { data: pendingOnboarding } = await supabase
+  const { data: pendingOnboarding } = await db
     .from('program_enrollments')
     .select('id, enrollment_state, next_required_action, full_name, program_id')
     .eq('user_id', user.id)

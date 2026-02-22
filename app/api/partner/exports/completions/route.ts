@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getMyPartnerContext } from '@/lib/partner/access';
 import { getPartnerStudentsWithTraining } from '@/lib/partner/students';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
@@ -120,7 +121,8 @@ async function logExportAudit(
 ) {
   try {
     const supabase = await createClient();
-    await supabase.from('partner_export_logs').insert({
+  const _admin = createAdminClient(); const db = _admin || supabase;
+    await db.from('partner_export_logs').insert({
       user_id: userId,
       user_email: userEmail || null,
       shop_ids: shopIds,

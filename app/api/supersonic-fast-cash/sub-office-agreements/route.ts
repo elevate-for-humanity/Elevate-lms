@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
@@ -12,6 +13,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const data = await request.json();
 
     // Get IP address
@@ -21,7 +23,7 @@ export async function POST(request: NextRequest) {
       'unknown';
 
     // Insert into database
-    const { data: agreement, error } = await supabase
+    const { data: agreement, error } = await db
       .from('sub_office_agreements')
       .insert({
         sub_office_name: data.subOfficeName,
@@ -64,8 +66,9 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    const { data: agreements, error } = await supabase
+    const { data: agreements, error } = await db
       .from('sub_office_agreements')
       .select('*')
       .order('created_at', { ascending: false });

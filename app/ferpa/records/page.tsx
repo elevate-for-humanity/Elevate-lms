@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -37,6 +38,7 @@ interface StudentRecord {
 
 export default async function FerpaRecordsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -55,7 +57,7 @@ export default async function FerpaRecordsPage() {
     redirect('/login?next=/ferpa/records');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role, full_name')
     .eq('id', user.id)
@@ -67,7 +69,7 @@ export default async function FerpaRecordsPage() {
   }
 
   // Fetch student records with enrollments
-  const { data: students, error } = await supabase
+  const { data: students, error } = await db
     .from('profiles')
     .select(`
       id,
@@ -91,12 +93,12 @@ export default async function FerpaRecordsPage() {
   }
 
   // Get counts
-  const { count: totalStudents } = await supabase
+  const { count: totalStudents } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'student');
 
-  const { count: activeEnrollments } = await supabase
+  const { count: activeEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');

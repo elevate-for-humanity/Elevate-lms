@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default async function AdminPayoutsPage() {
   await requireAdmin();
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function AdminPayoutsPage() {
   }
 
   // Fetch creators with pending earnings
-  const { data: creators } = await supabase
+  const { data: creators } = await db
     .from('marketplace_creators')
     .select(
       `

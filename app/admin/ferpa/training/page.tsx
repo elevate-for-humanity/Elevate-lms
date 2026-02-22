@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import FERPATrainingDashboard from '@/components/compliance/FERPATrainingDashboard';
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 
 export default async function FERPATrainingPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -28,7 +30,7 @@ export default async function FERPATrainingPage() {
     redirect('/login?next=/admin/ferpa/training');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role, full_name')
     .eq('id', user.id)
@@ -40,7 +42,7 @@ export default async function FERPATrainingPage() {
   }
 
   // Fetch training records
-  const { data: trainingRecords } = await supabase
+  const { data: trainingRecords } = await db
     .from('ferpa_training_records')
     .select(`
       *,
@@ -53,7 +55,7 @@ export default async function FERPATrainingPage() {
     .order('completed_at', { ascending: false });
 
   // Fetch pending users (no training record)
-  const { data: allUsers } = await supabase
+  const { data: allUsers } = await db
     .from('profiles')
     .select('id, full_name, email, role, created_at')
     .in('role', ['admin', 'super_admin', 'instructor', 'staff', 'ferpa_officer', 'registrar']);

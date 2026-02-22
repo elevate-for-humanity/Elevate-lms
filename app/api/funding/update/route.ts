@@ -34,14 +34,14 @@ export async function POST(req: Request) {
     }
 
     // Get existing record for audit trail
-    const { data: before } = await supabase
+    const { data: before } = await db
       .from('funding_cases')
       .select('*')
       .eq('apprentice_id', apprentice_id)
       .eq('funding_source', funding_source)
       .single();
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('funding_cases')
       .upsert(
         {
@@ -91,7 +91,7 @@ export async function GET(request: Request) {
 
     const supabase = createAdminClient();
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('funding_cases')
       .select('*')
       .order('created_at', { ascending: false });

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 
 export default async function NewReportPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -37,7 +39,7 @@ export default async function NewReportPage() {
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -46,7 +48,7 @@ export default async function NewReportPage() {
   if (!profile || profile.role !== 'program_holder') redirect('/');
 
   // Get program holder record
-  const { data: programHolder } = await supabase
+  const { data: programHolder } = await db
     .from('program_holders')
     .select('id, organization_name')
     .eq('user_id', user.id)
@@ -57,7 +59,7 @@ export default async function NewReportPage() {
   }
 
   // Get active students for the report
-  const { data: students } = await supabase
+  const { data: students } = await db
     .from('program_holder_students')
     .select('*, student:profiles!student_id(first_name, last_name)')
     .eq('program_holder_id', programHolder.id)

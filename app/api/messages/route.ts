@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
 
     const supabase = await createServerSupabaseClient();
 
-    let query = supabase
+    let query = db
       .from('messages')
       .select(
         `
@@ -100,7 +101,7 @@ export async function POST(request: Request) {
 
     const supabase = await createServerSupabaseClient();
 
-    const { data: message, error } = await supabase
+    const { data: message, error } = await db
       .from('messages')
       .insert({
         sender_id: user.id,

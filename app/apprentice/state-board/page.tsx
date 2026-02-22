@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { 
   Award, 
@@ -27,6 +28,7 @@ export const metadata: Metadata = {
 
 export default async function StateBoardExamPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) { redirect("/login"); }
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -35,14 +37,14 @@ export default async function StateBoardExamPage() {
   }
 
   // Get student enrollment
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from('student_enrollments')
     .select('*')
     .eq('student_id', user.id)
     .single();
 
   // Get time entries to calculate hours
-  const { data: timeEntries } = await supabase
+  const { data: timeEntries } = await db
     .from('time_entries')
     .select('minutes, status')
     .eq('student_id', user.id)

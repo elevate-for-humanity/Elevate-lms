@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(
@@ -15,8 +16,9 @@ export async function GET(
     if (rateLimited) return rateLimited;
 const { id } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  const { data: doc, error } = await supabase
+  const { data: doc, error } = await db
     .from("signature_documents")
     .select(`
       *,

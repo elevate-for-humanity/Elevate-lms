@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 export default async function LearningAnalyticsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -33,7 +35,7 @@ export default async function LearningAnalyticsPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -44,24 +46,24 @@ export default async function LearningAnalyticsPage() {
   }
 
   // Fetch learning analytics data
-  const { count: totalCourses } = await supabase
+  const { count: totalCourses } = await db
     .from('courses')
     .select('*', { count: 'exact', head: true });
 
-  const { count: totalEnrollments } = await supabase
+  const { count: totalEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true });
 
-  const { count: completedEnrollments } = await supabase
+  const { count: completedEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
 
-  const { count: totalCertificates } = await supabase
+  const { count: totalCertificates } = await db
     .from('certificates')
     .select('*', { count: 'exact', head: true });
 
-  const { data: topCourses } = await supabase
+  const { data: topCourses } = await db
     .from('courses')
     .select('id, title, enrollment_count')
     .order('enrollment_count', { ascending: false })

@@ -71,6 +71,7 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get or create user profile
     const {
@@ -120,7 +121,7 @@ export async function POST(req: Request) {
       });
     } else {
       // Authenticated user - check enrollment approval status
-      const { data: profile } = await supabase
+      const { data: profile } = await db
         .from('profiles')
         .select('enrollment_status, program_holder_id')
         .eq('id', studentId)

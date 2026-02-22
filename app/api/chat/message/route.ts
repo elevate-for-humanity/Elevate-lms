@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from "@supabase/supabase-js";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
@@ -65,7 +66,7 @@ export async function POST(req: Request) {
     );
 
     // Verify session exists and is open
-    const { data: session } = await supabase
+    const { data: session } = await db
       .from("live_chat_sessions")
       .select("id, status")
       .eq("id", session_id)
@@ -79,7 +80,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Session is closed" }, { status: 410 });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("live_chat_messages")
       .insert({
         session_id,
@@ -94,7 +95,7 @@ export async function POST(req: Request) {
     }
 
     // Audit log (fire-and-forget)
-    supabase
+    db
       .from("analytics_events")
       .insert([
         {

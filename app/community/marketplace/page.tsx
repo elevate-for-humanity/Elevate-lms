@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -81,6 +82,7 @@ const FEATURED_CATEGORIES = [
 
 export default async function CommunityMarketplacePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -100,7 +102,7 @@ export default async function CommunityMarketplacePage() {
   
   try {
     // Get creator courses
-    const { data: courseData, count: courseCount } = await supabase
+    const { data: courseData, count: courseCount } = await db
       .from('creator_courses')
       .select(`
         *,
@@ -115,7 +117,7 @@ export default async function CommunityMarketplacePage() {
     }
 
     // Get shop products
-    const { data: productData, count: productCount } = await supabase
+    const { data: productData, count: productCount } = await db
       .from('shop_products')
       .select(`
         *,
@@ -132,7 +134,7 @@ export default async function CommunityMarketplacePage() {
     totalListings = (courseCount || 0) + (productCount || 0);
 
     // Count unique sellers
-    const { count: sellerCount } = await supabase
+    const { count: sellerCount } = await db
       .from('shop_profiles')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active');

@@ -55,7 +55,7 @@ export default async function CertificationPage() {
   }
 
   // Get user's certificates
-  const { data: certificates } = await supabase
+  const { data: certificates } = await db
     .from('certificates')
     .select(`
       id,
@@ -71,7 +71,7 @@ export default async function CertificationPage() {
     .order('issued_at', { ascending: false });
 
   // Get certifications in progress
-  const { data: inProgress } = await supabase
+  const { data: inProgress } = await db
     .from('enrollments')
     .select(`
       id,
@@ -83,7 +83,7 @@ export default async function CertificationPage() {
     .not('course.certification_name', 'is', null);
 
   // Get available certifications
-  const { data: availableCerts } = await supabase
+  const { data: availableCerts } = await db
     .from('training_courses')
     .select('id, title, certification_name, certification_body')
     .not('certification_name', 'is', null)

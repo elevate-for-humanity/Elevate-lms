@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
@@ -9,6 +10,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -20,7 +22,7 @@ export async function POST(request: NextRequest) {
     const { format, dateRange, customStartDate, customEndDate, groupByCategory, includeSignatures, includePhotos } = body;
 
     // Get apprentice record
-    const { data: apprentice, error: apprenticeError } = await supabase
+    const { data: apprentice, error: apprenticeError } = await db
       .from('apprentices')
       .select('id, user_id, shop_id, shops(name)')
       .eq('user_id', user.id)
@@ -58,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch approved hour entries
-    const { data: entries, error: entriesError } = await supabase
+    const { data: entries, error: entriesError } = await db
       .from('hour_entries')
       .select('*')
       .eq('apprentice_id', apprentice.id)
@@ -73,7 +75,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user profile
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('full_name, email')
       .eq('id', user.id)

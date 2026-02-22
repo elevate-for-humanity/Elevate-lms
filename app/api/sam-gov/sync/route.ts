@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { searchEntities } from '@/lib/integrations/sam-gov';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -29,6 +30,7 @@ export async function POST(request: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // For now, return empty result since searchEntities requires a name parameter
     // This endpoint would need to be redesigned to work with the actual SAM.gov API
@@ -67,7 +69,7 @@ export async function POST(request: Request) {
     }));
 
     // Use service role for insert
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('sam_opportunities')
       .upsert(records, {
         onConflict: 'sam_id',

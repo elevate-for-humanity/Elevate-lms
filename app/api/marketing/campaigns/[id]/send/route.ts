@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // Using Node.js runtime for email compatibility
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 // import { resend } from '@/lib/resend'; // your Resend client - add later
@@ -18,9 +19,10 @@ export async function POST(
   const { id } = await params;
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // 1) Load campaign
-    const { data: campaign, error: cErr } = await supabase
+    const { data: campaign, error: cErr } = await db
       .from('marketing_campaigns')
       .select('*')
       .eq('id', id)
@@ -29,7 +31,7 @@ export async function POST(
 
     // 2) Build audience (simple version: all active contacts not unsubscribed)
     // Later: apply target_segment filters
-    const { data: contacts, error: contactsErr } = await supabase
+    const { data: contacts, error: contactsErr } = await db
       .from('marketing_contacts')
       .select('*')
       .eq('unsubscribed', false);
@@ -50,14 +52,14 @@ export async function POST(
       status: 'queued',
     }));
 
-    const { error: sendsErr } = await supabase
+    const { error: sendsErr } = await db
       .from('marketing_campaign_sends')
       .insert(sendRows);
     if (sendsErr) throw sendsErr;
 
     // 4) Mark campaign as sending
     // Later: call Resend in a background job / cron
-    await supabase
+    await db
       .from('marketing_campaigns')
       .update({
         status: 'sending',
@@ -66,7 +68,7 @@ export async function POST(
       .eq('id', campaign.id);
 
     // 5) Update stats
-    await supabase
+    await db
       .from('marketing_campaigns')
       .update({
         stats: {

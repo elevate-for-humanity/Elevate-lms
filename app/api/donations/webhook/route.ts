@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
 
@@ -35,10 +36,11 @@ export async function POST(request: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Idempotency check
     if (supabase) {
-      const { data: existing } = await supabase
+      const { data: existing } = await db
         .from('stripe_webhook_events')
         .select('id')
         .eq('stripe_event_id', event.id)
@@ -48,7 +50,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ received: true, duplicate: true });
       }
 
-      await supabase
+      await db
         .from('stripe_webhook_events')
         .insert({ stripe_event_id: event.id, event_type: event.type, status: 'processing' })
         .catch(() => {});
@@ -62,7 +64,7 @@ export async function POST(request: Request) {
 
         if (donationId) {
           // Update donation status
-          await supabase
+          await db
             .from('donations')
             .update({
               payment_status: 'succeeded',
@@ -73,7 +75,7 @@ export async function POST(request: Request) {
             .eq('id', donationId);
 
           // Get donation details for receipt
-          const { data: donation } = await supabase
+          const { data: donation } = await db
             .from('donations')
             .select('*')
             .eq('id', donationId)
@@ -81,7 +83,7 @@ export async function POST(request: Request) {
 
           if (donation && !donation.receipt_sent) {
             // Send receipt email
-            await supabase.from('email_queue').insert({
+            await db.from('email_queue').insert({
               to_email: donation.donor_email,
               from_email: 'noreply@elevateforhumanity.org',
               subject: 'Thank you for your donation - Receipt',
@@ -97,7 +99,7 @@ export async function POST(request: Request) {
             });
 
             // Mark receipt as sent
-            await supabase
+            await db
               .from('donations')
               .update({
                 receipt_sent: true,
@@ -108,7 +110,7 @@ export async function POST(request: Request) {
 
           // Track conversion
           if (donation?.user_id) {
-            await supabase.from('conversions').insert({
+            await db.from('conversions').insert({
               user_id: donation.user_id,
               conversion_type: 'donation_made',
               value: donation.amount,
@@ -122,14 +124,14 @@ export async function POST(request: Request) {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
         // Find donation by payment intent
-        const { data: donation } = await supabase
+        const { data: donation } = await db
           .from('donations')
           .select('id')
           .eq('stripe_payment_intent_id', paymentIntent.id)
           .single();
 
         if (donation) {
-          await supabase
+          await db
             .from('donations')
             .update({
               payment_status: 'failed',
@@ -144,14 +146,14 @@ export async function POST(request: Request) {
         const charge = event.data.object as Stripe.Charge;
 
         // Find donation by payment intent
-        const { data: donation } = await supabase
+        const { data: donation } = await db
           .from('donations')
           .select('id')
           .eq('stripe_payment_intent_id', charge.payment_intent as string)
           .single();
 
         if (donation) {
-          await supabase
+          await db
             .from('donations')
             .update({
               payment_status: 'refunded',
@@ -166,14 +168,14 @@ export async function POST(request: Request) {
         const subscription = event.data.object as Stripe.Subscription;
 
         // Find donation by subscription ID
-        const { data: donation } = await supabase
+        const { data: donation } = await db
           .from('donations')
           .select('id')
           .eq('stripe_subscription_id', subscription.id)
           .single();
 
         if (donation) {
-          await supabase
+          await db
             .from('donations')
             .update({
               payment_status: 'cancelled',

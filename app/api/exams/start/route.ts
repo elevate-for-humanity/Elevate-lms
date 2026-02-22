@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'examId is required' }, { status: 400 });
   }
 
-  const { data: exam, error: examError } = await supabase
+  const { data: exam, error: examError } = await db
     .from('exams')
     .select('*')
     .eq('id', examId)
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
   const studentId = (session as any).userId || (session as any).user?.id;
 
   // Check attempts
-  const { count } = await supabase
+  const { count } = await db
     .from('exam_attempts')
     .select('*', { count: 'exact', head: true })
     .eq('exam_id', examId)
@@ -57,7 +58,7 @@ export async function POST(request: Request) {
   const questions = await selectQuestionsForExamAttempt(examId, exam.adaptive);
 
   // Create attempt
-  const { data: attempt, error: attemptError } = await supabase
+  const { data: attempt, error: attemptError } = await db
     .from('exam_attempts')
     .insert({
       exam_id: examId,
@@ -85,7 +86,7 @@ export async function POST(request: Request) {
     shown_difficulty: q.difficulty,
   }));
 
-  await supabase.from('exam_attempt_questions').insert(questionRows);
+  await db.from('exam_attempt_questions').insert(questionRows);
 
   // Return questions without correct answers to the client
   const payload = questions.map((q, index) => ({

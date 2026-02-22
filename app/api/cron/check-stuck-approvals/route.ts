@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     // Find partners stuck in approved_pending_user for > threshold
     const thresholdTime = new Date(Date.now() - STUCK_THRESHOLD_HOURS * 60 * 60 * 1000);
 
-    const { data: stuckPartners, error } = await supabase
+    const { data: stuckPartners, error } = await db
       .from('partner_applications')
       .select(`
         id,
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       `- ${p.shop_name} (${p.contact_email}) - approved ${new Date(p.reviewed_at).toLocaleDateString()}`
     ).join('\n');
 
-    await supabase.from('notification_outbox').insert({
+    await db.from('notification_outbox').insert({
       to_email: ADMIN_EMAIL,
       template_key: 'admin_alert',
       template_data: {
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Also create in-app notification for admins
-    const { data: admins } = await supabase
+    const { data: admins } = await db
       .from('profiles')
       .select('id')
       .in('role', ['admin', 'super_admin']);
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
         created_at: new Date().toISOString(),
       }));
 
-      await supabase.from('notifications').insert(notifications);
+      await db.from('notifications').insert(notifications);
     }
 
     return NextResponse.json({
@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
   }
 
-  const { data: stuckCount } = await supabase
+  const { data: stuckCount } = await db
     .from('partner_applications')
     .select('id', { count: 'exact', head: true })
     .eq('approval_status', 'approved_pending_user');

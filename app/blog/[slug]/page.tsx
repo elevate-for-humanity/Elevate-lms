@@ -16,7 +16,7 @@ async function getBlogPost(slug: string) {
   const supabase = createAdminClient();
   if (!supabase) return null;
   
-  const { data: post, error } = await supabase
+  const { data: post, error } = await db
     .from('blog_posts')
     .select('*')
     .eq('slug', slug)
@@ -28,7 +28,7 @@ async function getBlogPost(slug: string) {
   }
   
   // Increment view count
-  await supabase
+  await db
     .from('blog_posts')
     .update({ views: (post.views || 0) + 1 })
     .eq('id', post.id);
@@ -40,7 +40,7 @@ async function getRelatedPosts(category: string, currentSlug: string) {
   const supabase = createAdminClient();
   if (!supabase) return [];
   
-  const { data: posts } = await supabase
+  const { data: posts } = await db
     .from('blog_posts')
     .select('title, slug, excerpt, image, published_at')
     .eq('published', true)

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, Clock, MapPin, User, Video, Building } from 'lucide-react';
@@ -17,6 +18,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function BookingPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -30,21 +32,21 @@ export default async function BookingPage() {
   }
 
   // Get available appointment types
-  const { data: appointmentTypes } = await supabase
+  const { data: appointmentTypes } = await db
     .from('appointment_types')
     .select('*')
     .eq('is_active', true)
     .order('name', { ascending: true });
 
   // Get staff available for appointments
-  const { data: staff } = await supabase
+  const { data: staff } = await db
     .from('staff')
     .select('id, name, title, department, avatar_url')
     .eq('accepts_appointments', true)
     .order('name', { ascending: true });
 
   // Get locations
-  const { data: locations } = await supabase
+  const { data: locations } = await db
     .from('locations')
     .select('id, name, address, city, state')
     .eq('is_active', true);

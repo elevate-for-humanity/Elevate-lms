@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -18,6 +19,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const searchParams = request.nextUrl.searchParams;
 
     // Pagination
@@ -30,7 +32,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status') || 'active';
     const search = searchParams.get('search');
 
-    let query = supabase
+    let query = db
       .from('employees')
       .select(
         `
@@ -87,6 +89,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await parseBody<Record<string, any>>(request);
 
     const {
@@ -117,7 +120,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if employee number already exists
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('employees')
       .select('id')
       .eq('employee_number', employee_number)
@@ -131,7 +134,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create employee
-    const { data: employee, error } = await supabase
+    const { data: employee, error } = await db
       .from('employees')
       .insert({
         profile_id,
@@ -161,7 +164,7 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
 
     // Create initial leave balances
-    const { data: policies } = await supabase
+    const { data: policies } = await db
       .from('leave_policies')
       .select('id')
       .eq('is_active', true);
@@ -178,7 +181,7 @@ export async function POST(request: NextRequest) {
         available_hours: 0,
       }));
 
-      await supabase.from('leave_balances').insert(leaveBalances);
+      await db.from('leave_balances').insert(leaveBalances);
     }
 
     return NextResponse.json({ employee }, { status: 201 });

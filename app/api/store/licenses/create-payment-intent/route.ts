@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { parseBody } from '@/lib/api-helpers';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -112,7 +113,8 @@ export async function POST(request: NextRequest) {
 
     // Store pending license in database
     const supabase = await createClient();
-    await supabase.from('license_purchases').insert({
+  const _admin = createAdminClient(); const db = _admin || supabase;
+    await db.from('license_purchases').insert({
       stripe_payment_intent_id: paymentIntent.id,
       stripe_customer_id: customer.id,
       product_id: product.id,

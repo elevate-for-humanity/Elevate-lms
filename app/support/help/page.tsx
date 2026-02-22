@@ -27,7 +27,7 @@ async function getArticles(category?: string, search?: string) {
   const supabase = createAdminClient();
   if (!supabase) return [];
   
-  let query = supabase
+  let query = db
     .from('support_articles')
     .select('id, title, slug, excerpt, category, views')
     .eq('published', true)

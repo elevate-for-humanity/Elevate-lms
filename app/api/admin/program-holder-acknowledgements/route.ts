@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 
@@ -12,6 +13,7 @@ export const GET = withAuth(
     const user = context.user;
     try {
       const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
       // Note: Add authentication check here
       // const { data: { user } } = await supabase.auth.getUser();
@@ -19,7 +21,7 @@ export const GET = withAuth(
       //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       // }
 
-      const { data, error }: any = await supabase
+      const { data, error }: any = await db
         .from('program_holder_acknowledgements')
         .select('*')
         .order('created_at', { ascending: false });

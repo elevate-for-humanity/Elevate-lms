@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { AcknowledgeRightsForm } from './AcknowledgeRightsForm';
 import { Shield } from 'lucide-react';
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 
 export default async function ProgramHolderRightsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -39,7 +41,7 @@ export default async function ProgramHolderRightsPage() {
   }
 
   // Check if already acknowledged
-  const { data: acknowledgement } = await supabase
+  const { data: acknowledgement } = await db
     .from('program_holder_acknowledgements')
     .select('*')
     .eq('user_id', user.id)

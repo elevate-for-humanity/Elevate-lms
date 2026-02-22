@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import {
@@ -25,6 +26,7 @@ export const metadata = {
 
 export default async function ProgramHolderLicensePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -38,7 +40,7 @@ export default async function ProgramHolderLicensePage() {
   }
   
   // Fetch program holder pricing
-  const { data: pricing } = await supabase
+  const { data: pricing } = await db
     .from('pricing_plans')
     .select('*')
     .eq('type', 'program_holder');

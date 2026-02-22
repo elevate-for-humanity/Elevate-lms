@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -16,9 +17,10 @@ export async function POST(request: NextRequest) {
 
     const data = await parseBody<Record<string, any>>(request);
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Store slow resource data for analysis
-    const { error } = await supabase.from('slow_resources').insert({
+    const { error } = await db.from('slow_resources').insert({
       name: data.name,
       duration: data.duration,
       size: data.size,

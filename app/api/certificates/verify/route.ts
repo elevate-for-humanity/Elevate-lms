@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -22,6 +23,7 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database unavailable' },
@@ -29,7 +31,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { data: cert, error } = await supabase
+    const { data: cert, error } = await db
       .from('certificates')
       .select('*')
       .eq('serial', certificateNumber)

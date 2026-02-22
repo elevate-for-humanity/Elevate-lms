@@ -7,6 +7,7 @@ export const metadata: Metadata = {
 };
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -15,7 +16,7 @@ async function requireAdmin(supabase: any) {
   const { data }: any = await supabase.auth.getUser();
   if (!data?.user) return false;
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('user_profiles')
     .select('role')
     .eq('user_id', data.user.id)
@@ -26,6 +27,7 @@ async function requireAdmin(supabase: any) {
 
 export default async function AdminInboxPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -52,12 +54,12 @@ export default async function AdminInboxPage() {
   }
 
   const [{ data: partners }, { data: licenses }] = await Promise.all([
-    supabase
+    db
       .from('partner_inquiries')
       .select('*')
       .order('submitted_at', { ascending: false })
       .limit(50),
-    supabase
+    db
       .from('license_requests')
       .select('*')
       .order('created_at', { ascending: false })

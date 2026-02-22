@@ -3,6 +3,7 @@ export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
@@ -11,6 +12,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await request.json();
 
     const {
@@ -36,7 +38,7 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     // Create appointment
-    const { data: appointment, error } = await supabase
+    const { data: appointment, error } = await db
       .from('curvature_appointments')
       .insert({
         user_id: user?.id || null,
@@ -100,11 +102,12 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { searchParams } = new URL(request.url);
     const date = searchParams.get('date');
 
     // Get services
-    const { data: services, error: servicesError } = await supabase
+    const { data: services, error: servicesError } = await db
       .from('curvature_services')
       .select('*')
       .eq('is_active', true)
@@ -117,7 +120,7 @@ export async function GET(request: NextRequest) {
     // If date provided, get booked times for that date
     let bookedTimes: string[] = [];
     if (date) {
-      const { data: appointments } = await supabase
+      const { data: appointments } = await db
         .from('curvature_appointments')
         .select('appointment_time')
         .eq('appointment_date', date)

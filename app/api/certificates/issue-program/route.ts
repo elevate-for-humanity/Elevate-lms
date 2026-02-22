@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'enrollment_id required' }, { status: 400 });
     }
 
-    const { data: enrollment, error: enrollError } = await supabase
+    const { data: enrollment, error: enrollError } = await db
       .from('enrollments')
       .select('id, user_id, course_id, status')
       .eq('id', enrollment_id)
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing certificate
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('certificates')
       .select('id')
       .eq('enrollment_id', enrollment_id)
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
 
     const certNumber = `EFH-${Date.now().toString(36).toUpperCase()}`;
 
-    const { data: cert, error: certError } = await supabase
+    const { data: cert, error: certError } = await db
       .from('certificates')
       .insert({
         user_id: enrollment.user_id,

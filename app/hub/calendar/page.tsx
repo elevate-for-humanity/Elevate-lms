@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Calendar, Clock, MapPin, Users, Video, Plus } from 'lucide-react';
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function CalendarPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) redirect('/login');
 
@@ -20,7 +22,7 @@ export default async function CalendarPage() {
   if (!user) redirect('/login?redirect=/hub/calendar');
 
   // Fetch upcoming events
-  const { data: events } = await supabase
+  const { data: events } = await db
     .from('events')
     .select('*')
     .gte('start_date', new Date().toISOString())

@@ -36,7 +36,7 @@ export default async function PlacementPage() {
   let jobListings = null;
 
   if (user) {
-    const { data: placementData } = await supabase
+    const { data: placementData } = await db
       .from('placements')
       .select('*')
       .eq('user_id', user.id)
@@ -44,7 +44,7 @@ export default async function PlacementPage() {
     placements = placementData;
   }
 
-  const { data: jobData } = await supabase
+  const { data: jobData } = await db
     .from('job_listings')
     .select('*')
     .eq('is_active', true)
@@ -52,7 +52,7 @@ export default async function PlacementPage() {
     .limit(6);
   jobListings = jobData;
 
-  const { count: partnerCount } = await supabase
+  const { count: partnerCount } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'partner');

@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -19,6 +20,7 @@ export async function GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
     error: authErr,
@@ -36,7 +38,7 @@ const supabase = await createClient();
   const userEmail = user.email;
 
   // Find program holders where this user is the mentor
-  const { data: programHolders } = await supabase
+  const { data: programHolders } = await db
     .from('program_holders')
     .select('id')
     .eq('email', userEmail);
@@ -47,7 +49,7 @@ const supabase = await createClient();
 
   const holderIds = programHolders.map((ph) => ph.id);
 
-  let q = supabase
+  let q = db
     .from('apprentice_hours_log')
     .select(
       `

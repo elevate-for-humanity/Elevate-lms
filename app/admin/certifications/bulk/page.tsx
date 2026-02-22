@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 export default async function BulkCertificationsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -33,7 +35,7 @@ export default async function BulkCertificationsPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -44,13 +46,13 @@ export default async function BulkCertificationsPage() {
   }
 
   // Fetch certification types
-  const { data: certificationTypes } = await supabase
+  const { data: certificationTypes } = await db
     .from('certification_types')
     .select('id, name, provider, validity_months')
     .order('name');
 
   // Fetch pending certifications
-  const { data: pendingCertifications, count: pendingCount } = await supabase
+  const { data: pendingCertifications, count: pendingCount } = await db
     .from('user_certifications')
     .select(`
       id,

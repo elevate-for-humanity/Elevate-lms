@@ -10,12 +10,14 @@ export const metadata: Metadata = generateInternalMetadata({
 });
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { ShopReportForm } from '@/components/shop/ShopReportForm';
 
 
 export default async function NewWeeklyReport() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -36,7 +38,7 @@ export default async function NewWeeklyReport() {
   }
 
   // Get shop for this user
-  const { data: staff } = await supabase
+  const { data: staff } = await db
     .from('shop_staff')
     .select('shop_id')
     .eq('user_id', user.id);
@@ -48,7 +50,7 @@ export default async function NewWeeklyReport() {
   }
 
   // Get active placements for this shop
-  const { data: placements } = await supabase
+  const { data: placements } = await db
     .from('apprentice_placements')
     .select('id, profiles(id, full_name)')
     .eq('shop_id', shopId)

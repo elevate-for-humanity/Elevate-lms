@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole, handleRBACError } from '@/lib/rbac';
 import { withAuth } from '@/lib/with-auth';
 
@@ -14,8 +15,9 @@ export const GET = withAuth(
     try {
       await requireRole(['admin']);
       const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-      const { data, error }: any = await supabase
+      const { data, error }: any = await db
         .from('sso_connections')
         .select('*')
         .order('provider');
@@ -37,6 +39,7 @@ export const POST = withAuth(
     try {
       await requireRole(['admin']);
       const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
       const body = await req.json();
 
       const {
@@ -66,7 +69,7 @@ export const POST = withAuth(
         );
       }
 
-      const { data, error }: any = await supabase
+      const { data, error }: any = await db
         .from('sso_connections')
         .insert({
           provider,

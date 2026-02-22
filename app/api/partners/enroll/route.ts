@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -59,9 +60,10 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Insert into partner_enrollments table
-    const { error } = await supabase.from('partner_enrollments').insert({
+    const { error } = await db.from('partner_enrollments').insert({
       organization_name: organizationName,
       organization_type: organizationType,
       industry,

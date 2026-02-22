@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -26,13 +27,14 @@ export async function POST(req: Request) {
       // Check if it's an admin request
       const { createClient } = await import('@/lib/supabase/server');
       const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 });
       }
       
-      const { data: profile } = await supabase
+      const { data: profile } = await db
         .from('profiles')
         .select('role')
         .eq('id', user.id)

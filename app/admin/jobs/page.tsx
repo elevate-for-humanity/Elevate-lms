@@ -17,13 +17,13 @@ async function getJobsData() {
     return { jobs: [], stats: { totalJobs: 0, activeJobs: 0, employers: 0 } };
   }
   
-  const { data: jobPostings, count: jobCount } = await supabase
+  const { data: jobPostings, count: jobCount } = await db
     .from('job_postings')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .limit(10);
 
-  const { count: employerCount } = await supabase
+  const { count: employerCount } = await db
     .from('employers')
     .select('*', { count: 'exact', head: true });
 

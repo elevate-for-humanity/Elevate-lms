@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -52,7 +53,7 @@ const cookieStore = await cookies();
       return NextResponse.json({ redirectTo: '/auth/login' });
     }
 
-    const { data: profile, error } = await supabase
+    const { data: profile, error } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)

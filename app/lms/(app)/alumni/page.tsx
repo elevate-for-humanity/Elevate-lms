@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -22,6 +23,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AlumniPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -39,7 +41,7 @@ export default async function AlumniPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   // Get alumni members
-  const { data: alumni } = await supabase
+  const { data: alumni } = await db
     .from('profiles')
     .select('id, full_name, avatar_url, graduation_year, program, company, job_title, location')
     .eq('role', 'alumni')
@@ -47,13 +49,13 @@ export default async function AlumniPage() {
     .limit(20);
 
   // Get alumni count
-  const { count: alumniCount } = await supabase
+  const { count: alumniCount } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'alumni');
 
   // Get upcoming alumni events
-  const { data: events } = await supabase
+  const { data: events } = await db
     .from('events')
     .select('*')
     .eq('event_type', 'alumni')
@@ -62,7 +64,7 @@ export default async function AlumniPage() {
     .limit(3);
 
   // Get success stories
-  const { data: stories } = await supabase
+  const { data: stories } = await db
     .from('success_stories')
     .select('*')
     .eq('is_published', true)
@@ -72,7 +74,7 @@ export default async function AlumniPage() {
   // Check if current user is alumni
   let isAlumni = false;
   if (user) {
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)

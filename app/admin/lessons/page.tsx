@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function LessonsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -28,7 +30,7 @@ export default async function LessonsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -38,7 +40,7 @@ export default async function LessonsPage() {
     redirect('/unauthorized');
   }
 
-  const { data: lessons, count: totalLessons } = await supabase
+  const { data: lessons, count: totalLessons } = await db
     .from('lessons')
     .select('id, title, course_id, order_index, duration, video_url, created_at, updated_at', { count: 'exact' })
     .order('updated_at', { ascending: false })
@@ -47,12 +49,12 @@ export default async function LessonsPage() {
   // Get courses for display names
   const courseIds = [...new Set((lessons || []).map(l => l.course_id).filter(Boolean))];
   const { data: courses } = courseIds.length > 0
-    ? await supabase.from('courses').select('id, title').in('id', courseIds)
+    ? await db.from('courses').select('id, title').in('id', courseIds)
     : { data: [] };
 
   const courseMap = new Map((courses || []).map(c => [c.id, c.title]));
 
-  const { count: withVideo } = await supabase
+  const { count: withVideo } = await db
     .from('lessons')
     .select('*', { count: 'exact', head: true })
     .not('video_url', 'is', null);

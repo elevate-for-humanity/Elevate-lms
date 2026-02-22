@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,11 +15,12 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const today = new Date();
     const thirtyDaysFromNow = new Date(today);
     thirtyDaysFromNow.setDate(today.getDate() + 30);
 
-    const { data: expiringDocs } = await supabase
+    const { data: expiringDocs } = await db
       .from('documents')
       .select(
         `
@@ -62,7 +64,7 @@ export async function GET(request: NextRequest) {
       }
 
       if (daysUntilExpiration <= 0) {
-        await supabase
+        await db
           .from('documents')
           .update({ status: 'expired' })
           .eq('id', doc.id);

@@ -5,6 +5,7 @@ export const maxDuration = 60;
 // app/api/study-groups/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -14,6 +15,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -26,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all study groups
-    const { data: groups, error: groupsError } = await supabase
+    const { data: groups, error: groupsError } = await db
       .from("study_groups")
       .select(`
         id,
@@ -54,13 +56,13 @@ export async function GET(request: NextRequest) {
     const groupsWithMembership = await Promise.all(
       (groups || []).map(async (group) => {
         // Get member count
-        const { count: memberCount } = await supabase
+        const { count: memberCount } = await db
           .from("study_group_members")
           .select("*", { count: "exact", head: true })
           .eq("group_id", group.id);
 
         // Check if current user is a member
-        const { data: membership } = await supabase
+        const { data: membership } = await db
           .from("study_group_members")
           .select("id")
           .eq("group_id", group.id)

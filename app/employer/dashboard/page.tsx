@@ -6,6 +6,7 @@ export const metadata: Metadata = {
 };
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -39,6 +40,7 @@ import EmployerWorkforceAnalytics from '@/components/EmployerWorkforceAnalytics'
 
 export default async function EmployerDashboardOrchestrated() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -58,7 +60,7 @@ export default async function EmployerDashboardOrchestrated() {
   if (!user) redirect('/login');
 
   // Get employer profile
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -69,21 +71,21 @@ export default async function EmployerDashboardOrchestrated() {
   }
 
   // Get job postings
-  const { data: postings } = await supabase
+  const { data: postings } = await db
     .from('job_postings')
     .select('*')
     .eq('employer_id', user.id)
     .eq('status', 'active');
 
   // Get pending applications
-  const { data: applications } = await supabase
+  const { data: applications } = await db
     .from('job_applications')
     .select('*')
     .eq('employer_id', user.id)
     .eq('status', 'pending');
 
   // Check apprenticeship program
-  const { data: apprenticeshipProgram } = await supabase
+  const { data: apprenticeshipProgram } = await db
     .from('apprenticeships')
     .select('*')
     .eq('employer_id', user.id)

@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
@@ -17,6 +18,7 @@ export async function POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
       error: authError,
@@ -34,14 +36,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Get course details
-    const { data: course } = await supabase
+    const { data: course } = await db
       .from('courses')
       .select('slug')
       .eq('id', courseId)
       .single();
 
     // Upsert progress record
-    const { error } = await supabase.from('lms_progress').upsert(
+    const { error } = await db.from('lms_progress').upsert(
       {
         user_id: user.id,
         course_id: courseId,

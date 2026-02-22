@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -36,10 +37,11 @@ export async function POST(request: NextRequest) {
     } = body;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // 1. Create tenant
     const slug = generateSlug(organizationName);
-    const { data: tenant, error: tenantError } = await supabase
+    const { data: tenant, error: tenantError } = await db
       .from('tenants')
       .insert({
         name: organizationName,
@@ -58,7 +60,7 @@ export async function POST(request: NextRequest) {
     const validUntil = new Date();
     validUntil.setFullYear(validUntil.getFullYear() + 1);
 
-    await supabase.from('licenses').insert({
+    await db.from('licenses').insert({
       tenant_id: tenant.id,
       tier: licenseConfig.tier,
       status: 'active',
@@ -90,7 +92,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Create profile
-    await supabase.from('profiles').insert({
+    await db.from('profiles').insert({
       id: authUser.user.id,
       email: contactEmail,
       full_name: contactName,
@@ -99,7 +101,7 @@ export async function POST(request: NextRequest) {
     });
 
     // 5. Create tenant branding (default)
-    await supabase.from('tenant_branding').insert({
+    await db.from('tenant_branding').insert({
       tenant_id: tenant.id,
       logo_url: '/default-logo.png',
       primary_color: '#16a34a',

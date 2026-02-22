@@ -7,6 +7,7 @@ import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -38,6 +39,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get authenticated user
     const {
@@ -77,7 +79,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get program details from database
-    const { data: program, error: programError } = await supabase
+    const { data: program, error: programError } = await db
       .from('programs')
       .select('*')
       .eq('id', programId)
@@ -109,7 +111,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get or create Stripe customer
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('stripe_customer_id, email, full_name')
       .eq('id', user.id)
@@ -131,7 +133,7 @@ export async function POST(request: NextRequest) {
         customerId = customer.id;
 
         // Save customer ID to database
-        await supabase
+        await db
           .from('profiles')
           .update({ stripe_customer_id: customer.id })
           .eq('id', user.id);
@@ -283,7 +285,7 @@ export async function POST(request: NextRequest) {
 
     // Log payment attempt in database
     try {
-      await supabase.from('payment_logs').insert({
+      await db.from('payment_logs').insert({
         user_id: user.id,
         program_id: programId,
         session_id: session.id,

@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { jotFormIntegration } from '@/lib/integrations/jotform';
 import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
     // Securely hash SSN before storage
     const ssnData = clientData.ssn ? prepareSSNForStorage(clientData.ssn) : {};
 
-    const { data: client, error: clientError } = await supabase
+    const { data: client, error: clientError } = await db
       .from('clients')
       .upsert({
         first_name: clientData.firstName,
@@ -142,7 +143,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Step 5: Save tax return to database
-    const { data: taxReturn, error: returnError } = await supabase
+    const { data: taxReturn, error: returnError } = await db
       .from('tax_returns')
       .insert({
         user_id: client.id,
@@ -169,7 +170,7 @@ export async function POST(request: NextRequest) {
 
     // Step 6: Save bank account info if provided
     if (clientData.bankAccount) {
-      await supabase.from('bank_accounts').insert({
+      await db.from('bank_accounts').insert({
         client_id: client.id,
         routing_number: clientData.bankAccount.routingNumber,
         account_number: clientData.bankAccount.accountNumber,
@@ -191,7 +192,7 @@ export async function POST(request: NextRequest) {
         created_at: new Date().toISOString(),
       }));
 
-      await supabase.from('dependents').insert(dependentsData);
+      await db.from('dependents').insert(dependentsData);
     }
 
     // Step 8: Send confirmation email to client

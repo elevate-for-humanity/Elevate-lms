@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,7 @@ import Link from 'next/link';
 
 export default async function DIYStartPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -26,7 +28,7 @@ export default async function DIYStartPage() {
   }
   
   // Fetch DIY tax info
-  const { data: diyInfo } = await supabase
+  const { data: diyInfo } = await db
     .from('tax_services')
     .select('*')
     .eq('type', 'diy')

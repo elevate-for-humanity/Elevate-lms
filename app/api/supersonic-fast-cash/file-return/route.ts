@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@supabase/supabase-js';
 import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
 import { Resend } from 'resend';
@@ -90,7 +91,7 @@ export async function POST(request: NextRequest) {
     const ssnData = prepareSSNForStorage(taxReturn.ssn);
 
     // Create client record
-    const { data: client, error: clientError } = await supabase
+    const { data: client, error: clientError } = await db
       .from('clients')
       .insert({
         first_name: taxReturn.firstName,
@@ -164,7 +165,7 @@ export async function POST(request: NextRequest) {
     const calculation = await supersonicTaxEngine.calculateTax(supersonicReturn.returnId);
 
     // Save tax return record
-    const { data: taxReturnRecord, error: returnError } = await supabase
+    const { data: taxReturnRecord, error: returnError } = await db
       .from('tax_returns')
       .insert({
         user_id: client.id,

@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
@@ -150,7 +151,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if org with this email already exists
-    const { data: existingOrg } = await supabase
+    const { data: existingOrg } = await db
       .from('organizations')
       .select('id, slug')
       .eq('contact_email', email)
@@ -169,7 +170,7 @@ export async function POST(request: NextRequest) {
 
     // Generate subdomain
     let subdomain = slugify(orgName.trim());
-    const { data: slugTaken } = await supabase
+    const { data: slugTaken } = await db
       .from('organizations')
       .select('id')
       .eq('slug', subdomain)
@@ -186,7 +187,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create organization
-    const { data: org, error: orgError } = await supabase
+    const { data: org, error: orgError } = await db
       .from('organizations')
       .insert({
         name: orgName.trim(),
@@ -209,7 +210,7 @@ export async function POST(request: NextRequest) {
     const trialEndsAt = new Date();
     trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DURATION_DAYS);
 
-    const { data: license, error: licenseError } = await supabase
+    const { data: license, error: licenseError } = await db
       .from('managed_licenses')
       .insert({
         organization_id: org.id,
@@ -226,12 +227,12 @@ export async function POST(request: NextRequest) {
     if (licenseError) {
       logger.error(`[trial] ${correlationId} — License creation error:`, licenseError);
       // Rollback org
-      await supabase.from('organizations').delete().eq('id', org.id);
+      await db.from('organizations').delete().eq('id', org.id);
       return NextResponse.json({ error: 'Failed to create trial license', correlationId }, { status: 500 });
     }
 
     // Log provisioning event
-    await supabase.from('license_events').insert({
+    await db.from('license_events').insert({
       license_id: license.id,
       organization_id: org.id,
       event_type: 'trial_self_service_start',

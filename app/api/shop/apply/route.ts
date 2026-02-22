@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -23,6 +24,7 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       shop_name,
@@ -61,7 +63,7 @@ export async function POST(req: Request) {
     }
 
     // Create user profile
-    const { error: profileError } = await supabase.from('profiles').upsert({
+    const { error: profileError } = await db.from('profiles').upsert({
       id: userId,
       full_name: owner_name,
       email,
@@ -74,7 +76,7 @@ export async function POST(req: Request) {
     }
 
     // Create shop record
-    const { data: shop, error: shopError } = await supabase
+    const { data: shop, error: shopError } = await db
       .from('shops')
       .insert({
         name: shop_name,
@@ -99,14 +101,14 @@ export async function POST(req: Request) {
     }
 
     // Create shop staff record
-    await supabase.from('shop_staff').insert({
+    await db.from('shop_staff').insert({
       shop_id: shop.id,
       user_id: userId,
       role: 'owner',
     });
 
     // Create onboarding record
-    await supabase.from('shop_onboarding').insert({
+    await db.from('shop_onboarding').insert({
       shop_id: shop.id,
       application_submitted: true,
       application_notes: message || null,

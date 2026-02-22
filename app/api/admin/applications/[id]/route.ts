@@ -11,10 +11,11 @@ export const dynamic = 'force-dynamic';
 
 async function requireAdmin() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return { error: 'Database unavailable', status: 500 };
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Unauthorized', status: 401 };
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 };
   }
@@ -42,7 +43,7 @@ async function resolveCourseId(supabase: any, programInterest: string): Promise<
 
   const normalized = programInterest.toLowerCase().replace(/-/g, ' ').trim();
 
-  const { data: courses } = await supabase
+  const { data: courses } = await db
     .from('courses')
     .select('id, title');
 
@@ -218,7 +219,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         // Step 3: Create enrollment if we have both
         if (userId && courseId) {
           // Check for existing enrollment
-          const { data: existingEnrollment } = await auth.supabase
+          const { data: existingEnrollment } = await auth.db
             .from('enrollments')
             .select('id')
             .eq('user_id', userId)
@@ -240,7 +241,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
           // Update application with resolved IDs and enrolled status
           // Use direct Supabase update since program_id/user_id aren't in the Zod schema
-          await auth.supabase
+          await auth.db
             .from('applications')
             .update({
               status: 'enrolled',
@@ -250,7 +251,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             .eq('id', id);
 
           // Audit log
-          await auth.supabase.from('audit_logs').insert({
+          await auth.db.from('audit_logs').insert({
             actor_id: auth.user.id,
             actor_role: auth.profile.role,
             action: 'create',
@@ -278,7 +279,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
                    updateData.status === 'rejected' ? 'reject' :
                    'status_change';
 
-    await auth.supabase.from('audit_logs').insert({
+    await auth.db.from('audit_logs').insert({
       actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action,
@@ -310,7 +311,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
     const data = await deleteApplication(id);
 
-    await auth.supabase.from('audit_logs').insert({
+    await auth.db.from('audit_logs').insert({
       actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action: 'delete',

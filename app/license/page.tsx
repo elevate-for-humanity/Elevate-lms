@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createPublicClient } from '@/lib/supabase/public';
 import Link from 'next/link';
 import { 
@@ -46,9 +47,9 @@ export default async function LicensePage() {
     const supabase = createPublicClient();
     if (supabase) {
       const [tiersResult, testimonialsResult, partnersResult] = await Promise.allSettled([
-        supabase.from('license_tiers').select('*').eq('is_active', true).order('price', { ascending: true }),
-        supabase.from('testimonials').select('*').eq('is_featured', true).limit(3),
-        supabase.from('partners').select('id, name').eq('is_active', true).limit(6),
+        db.from('license_tiers').select('*').eq('is_active', true).order('price', { ascending: true }),
+        db.from('testimonials').select('*').eq('is_featured', true).limit(3),
+        db.from('partners').select('id, name').eq('is_active', true).limit(6),
       ]);
       if (tiersResult.status === 'fulfilled') licenseTiers = tiersResult.value.data;
       if (testimonialsResult.status === 'fulfilled') testimonials = testimonialsResult.value.data;

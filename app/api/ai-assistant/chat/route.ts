@@ -8,6 +8,7 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -39,6 +40,7 @@ export async function POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { message, conversationId } = await req.json();
 
     if (!message || typeof message !== 'string') {
@@ -51,7 +53,7 @@ export async function POST(req: NextRequest) {
     // Get or create conversation
     let convId = conversationId;
     if (!convId) {
-      const { data: newConv } = await supabase
+      const { data: newConv } = await db
         .from('ai_assistant_conversations')
         .insert({
           user_id: user?.id || null,
@@ -63,7 +65,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Get conversation history
-    const { data: history } = await supabase
+    const { data: history } = await db
       .from('ai_assistant_messages')
       .select('role, content')
       .eq('conversation_id', convId)
@@ -96,7 +98,7 @@ export async function POST(req: NextRequest) {
 
     // Save messages to database
     if (convId) {
-      await supabase.from('ai_assistant_messages').insert([
+      await db.from('ai_assistant_messages').insert([
         { conversation_id: convId, role: 'user', content: message },
         { conversation_id: convId, role: 'assistant', content: assistantMessage },
       ]);

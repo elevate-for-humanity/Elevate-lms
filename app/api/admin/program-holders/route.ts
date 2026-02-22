@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -12,7 +13,7 @@ export const GET = withAuth(
     const { user } = context;
     const supabase = await createRouteHandlerClient({ cookies });
 
-    const { data: holders, error } = await supabase
+    const { data: holders, error } = await db
       .from('program_holders')
       .select(
         `

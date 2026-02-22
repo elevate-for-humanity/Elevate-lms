@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     }
 
     // Insert into applications table
-    const { data: application, error } = await supabase
+    const { data: application, error } = await db
       .from('applications')
       .insert({
         first_name: validated.firstName,
@@ -103,7 +103,7 @@ export async function POST(req: Request) {
     };
 
     // Store RAPIDS pre-registration
-    await supabase.from('rapids_registrations').insert(rapidsPreRegistration).single();
+    await db.from('rapids_registrations').insert(rapidsPreRegistration).single();
 
     // Audit log: Application created
     await auditLog({

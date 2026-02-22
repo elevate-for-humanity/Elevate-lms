@@ -1,10 +1,12 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 export async function submitQuiz(formData: FormData) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -26,7 +28,7 @@ export async function submitQuiz(formData: FormData) {
   }
 
   // Save quiz attempt to database
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('quiz_attempts')
     .insert({
       user_id: user.id,

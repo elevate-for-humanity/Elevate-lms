@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -36,6 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CMLearnerDetailPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -49,7 +51,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
   if (!user) redirect('/login');
 
   // Verify case manager access
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -60,7 +62,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
   }
 
   // Fetch learner
-  const { data: learner, error } = await supabase
+  const { data: learner, error } = await db
     .from('profiles')
     .select('*')
     .eq('id', id)
@@ -69,7 +71,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
   if (error || !learner) notFound();
 
   // Fetch enrollments
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select(`
       *,
@@ -80,7 +82,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
     .order('enrolled_at', { ascending: false });
 
   // Fetch case notes
-  const { data: caseNotes } = await supabase
+  const { data: caseNotes } = await db
     .from('case_notes')
     .select(`
       *,
@@ -91,14 +93,14 @@ export default async function CMLearnerDetailPage({ params }: Props) {
     .limit(5);
 
   // Fetch goals
-  const { data: goals } = await supabase
+  const { data: goals } = await db
     .from('learner_goals')
     .select('*')
     .eq('learner_id', id)
     .order('created_at', { ascending: false });
 
   // Fetch documents
-  const { data: documents } = await supabase
+  const { data: documents } = await db
     .from('learner_documents')
     .select('*')
     .eq('learner_id', id)

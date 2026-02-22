@@ -1,4 +1,5 @@
 "use client";
+import { createAdminClient } from '@/lib/supabase/admin';
 
 import { useState, useEffect } from 'react';
 import Link from "next/link";
@@ -12,7 +13,7 @@ export default function EnterpriseCapitalReadinessPage() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    supabase.from('products').select('*').limit(50)
+    db.from('products').select('*').limit(50)
       .then(({ data }) => { if (data) setDbRows(data); });
   }, []);
 

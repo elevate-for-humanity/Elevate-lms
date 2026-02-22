@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
@@ -21,6 +22,7 @@ export async function POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
       error: authError,
@@ -50,14 +52,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Get course details
-    const { data: course } = await supabase
+    const { data: course } = await db
       .from('courses')
       .select('slug')
       .eq('id', courseId)
       .single();
 
     // Update progress to completed
-    const { error } = await supabase.from('lms_progress').upsert(
+    const { error } = await db.from('lms_progress').upsert(
       {
         user_id: user.id,
         course_id: courseId,
@@ -78,14 +80,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Get user profile for certificate
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('full_name, email')
       .eq('id', user.id)
       .single();
 
     // Get course details
-    const { data: courseDetails } = await supabase
+    const { data: courseDetails } = await db
       .from('courses')
       .select('title, metadata')
       .eq('id', courseId)
@@ -93,7 +95,7 @@ export async function POST(req: NextRequest) {
 
     // Award points for course completion (100 points per course)
     try {
-      const { error: pointsError } = await supabase
+      const { error: pointsError } = await db
         .from('profiles')
         .update({ 
           points: supabase.rpc('coalesce_add', { current_val: 'points', add_val: 100 })
@@ -102,13 +104,13 @@ export async function POST(req: NextRequest) {
       
       // Fallback: direct increment if RPC doesn't exist
       if (pointsError) {
-        const { data: currentProfile } = await supabase
+        const { data: currentProfile } = await db
           .from('profiles')
           .select('points')
           .eq('id', user.id)
           .single();
         
-        await supabase
+        await db
           .from('profiles')
           .update({ points: (currentProfile?.points || 0) + 100 })
           .eq('id', user.id);

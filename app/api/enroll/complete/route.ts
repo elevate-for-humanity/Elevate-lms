@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -38,6 +39,7 @@ export async function POST(req: Request) {
     } = body;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const emailLower = email.toLowerCase();
 
     logger.info('Starting enrollment completion', {
@@ -47,7 +49,7 @@ export async function POST(req: Request) {
     });
 
     // Step 1: Get program details
-    const { data: program, error: programError } = await supabase
+    const { data: program, error: programError } = await db
       .from('programs')
       .select('id, name, slug')
       .eq('slug', programSlug)
@@ -59,7 +61,7 @@ export async function POST(req: Request) {
 
     // Step 2: Check if user already exists
     let userId: string;
-    const { data: existingUser } = await supabase
+    const { data: existingUser } = await db
       .from('profiles')
       .select('id')
       .eq('email', emailLower)
@@ -91,7 +93,7 @@ export async function POST(req: Request) {
       userId = authData.user.id;
 
       // Step 4: Create profile
-      const { error: profileError } = await supabase.from('profiles').insert({
+      const { error: profileError } = await db.from('profiles').insert({
         id: userId,
         email: emailLower,
         full_name: `${firstName} ${lastName}`,
@@ -131,7 +133,7 @@ export async function POST(req: Request) {
     }
 
     // Step 6: Check if already enrolled
-    const { data: existingEnrollment } = await supabase
+    const { data: existingEnrollment } = await db
       .from('enrollments')
       .select('id')
       .eq('user_id', userId)
@@ -145,7 +147,7 @@ export async function POST(req: Request) {
       logger.info('Student already enrolled', { enrollmentId });
 
       // Update status to pending (keep pending until approval)
-      await supabase
+      await db
         .from('enrollments')
         .update({
           status: 'pending',
@@ -155,7 +157,7 @@ export async function POST(req: Request) {
         .eq('id', enrollmentId);
     } else {
       // Step 7: Create enrollment (pending until approval)
-      const { data: enrollment, error: enrollError } = await supabase
+      const { data: enrollment, error: enrollError } = await db
         .from('enrollments')
         .insert({
           user_id: userId,
@@ -180,7 +182,7 @@ export async function POST(req: Request) {
       });
 
       // Notify admins of pending enrollment
-      const { data: admins } = await supabase
+      const { data: admins } = await db
         .from('profiles')
         .select('id')
         .in('role', ['admin', 'super_admin']);
@@ -193,13 +195,13 @@ export async function POST(req: Request) {
           message: `${firstName} ${lastName} (${email}) has completed payment for ${program.name}. Enrollment ID: ${enrollmentId}`,
         }));
 
-        await supabase.from('notifications').insert(notifications);
+        await db.from('notifications').insert(notifications);
         logger.info('Admin notifications created', { count: admins.length });
       }
     }
 
     // Step 8: Update application status
-    await supabase
+    await db
       .from('applications')
       .update({
         status: 'approved',
@@ -209,7 +211,7 @@ export async function POST(req: Request) {
     // Step 9: Mark Milady access granted (link-based, no API)
     // Student will receive Milady signup link in welcome email
     if (programSlug === 'barber-apprenticeship') {
-      await supabase
+      await db
         .from('enrollments')
         .update({ milady_enrolled: true })
         .eq('id', enrollmentId);

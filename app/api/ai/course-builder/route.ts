@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/openai-client';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -29,6 +30,7 @@ export async function POST(req: Request) {
   }
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -88,7 +90,7 @@ Format as JSON with this structure:
 
     const content = completion.choices[0].message.content;
 
-    const { data: course } = await supabase
+    const { data: course } = await db
       .from('ai_generated_courses')
       .insert({
         tenant_id: tenantId,

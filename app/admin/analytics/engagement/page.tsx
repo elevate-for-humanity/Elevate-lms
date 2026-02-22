@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 export default async function EngagementPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -33,7 +35,7 @@ export default async function EngagementPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -44,20 +46,20 @@ export default async function EngagementPage() {
   }
 
   // Fetch engagement data
-  const { count: totalUsers } = await supabase
+  const { count: totalUsers } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true });
 
-  const { count: activeUsers } = await supabase
+  const { count: activeUsers } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .gte('last_sign_in_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
 
-  const { count: totalEnrollments } = await supabase
+  const { count: totalEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true });
 
-  const { data: recentActivity } = await supabase
+  const { data: recentActivity } = await db
     .from('profiles')
     .select('id, full_name, email, last_sign_in_at')
     .order('last_sign_in_at', { ascending: false })

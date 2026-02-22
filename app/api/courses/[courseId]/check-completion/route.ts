@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   }
 
   // 2) Get enrollment row (using program_id since that's what the table uses)
-  const { data: enrollment, error: enrollError } = await supabase
+  const { data: enrollment, error: enrollError } = await db
     .from('enrollments')
     .select('*')
     .eq('program_id', courseId)
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   }
 
   // 5) If both internal + external are complete, mark course completed
-  const { error: updateError } = await supabase
+  const { error: updateError } = await db
     .from('enrollments')
     .update({
       status: 'completed',

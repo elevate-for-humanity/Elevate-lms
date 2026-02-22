@@ -1,4 +1,5 @@
 "use client";
+import { createAdminClient } from '@/lib/supabase/admin';
 
 import React from 'react';
 
@@ -104,7 +105,7 @@ export default function IdentityVerificationFlow({
       if (ssnUploadError) throw ssnUploadError;
 
       // Create document records
-      await supabase.from('program_holder_documents').insert([
+      await db.from('program_holder_documents').insert([
         {
           program_holder_id: userId,
           document_type: 'id',
@@ -122,7 +123,7 @@ export default function IdentityVerificationFlow({
       ]);
 
       // Create verification record
-      await supabase.from('program_holder_verification').insert({
+      await db.from('program_holder_verification').insert({
         program_holder_id: userId,
         verification_type: 'manual',
         status: 'pending',
@@ -130,7 +131,7 @@ export default function IdentityVerificationFlow({
       });
 
       // Update program holder status
-      await supabase
+      await db
         .from('program_holders')
         .update({
           verification_status: 'pending',

@@ -1,4 +1,5 @@
 import { stripe } from '@/lib/stripe/client';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get Stripe customer ID
-    const { data: billing, error: billingError } = await supabase
+    const { data: billing, error: billingError } = await db
       .from('customer_billing')
       .select('stripe_customer_id')
       .eq('user_id', userId)

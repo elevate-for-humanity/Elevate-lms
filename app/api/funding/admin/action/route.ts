@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Check role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
   const { id, action } = await req.json();
 
   // Fetch the application
-  const { data: app, error: fetchError } = await supabase
+  const { data: app, error: fetchError } = await db
     .from('funding_applications')
     .select('id, user_id, course_id, program_id, status')
     .eq('id', id)
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
   // Process action
   if (action === 'approve') {
     // Update application status
-    await supabase
+    await db
       .from('funding_applications')
       .update({
         status: 'approved',
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
       .eq('id', id);
 
     // Auto-enroll the user
-    await supabase.from('enrollments').upsert({
+    await db.from('enrollments').upsert({
       user_id: app.user_id,
       course_id: app.course_id,
       status: 'active',
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Log the action
-    await supabase.from('audit_logs').insert({
+    await db.from('audit_logs').insert({
       who: user.id,
       action: 'APPROVE_APP',
       subject: id,
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
     });
   } else if (action === 'deny') {
     // Update application status
-    await supabase
+    await db
       .from('funding_applications')
       .update({
         status: 'denied',
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest) {
       .eq('id', id);
 
     // Log the action
-    await supabase.from('audit_logs').insert({
+    await db.from('audit_logs').insert({
       who: user.id,
       action: 'DENY_APP',
       subject: id,

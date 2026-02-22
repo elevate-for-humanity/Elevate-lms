@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Redis } from '@upstash/redis';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -14,10 +15,11 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 // Require admin auth — this endpoint exposes infrastructure details
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (supabase) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
     if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -74,9 +76,10 @@ async function checkDatabase() {
   
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     // Simple query to check connection
-    const { error } = await supabase
+    const { error } = await db
       .from('profiles')
       .select('count')
       .limit(1)

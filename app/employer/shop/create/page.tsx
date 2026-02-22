@@ -6,12 +6,14 @@ export const metadata: Metadata = {
 };
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import { createShop } from './_actions/create-shop';
 
 export default async function CreateShopPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -27,7 +29,7 @@ export default async function CreateShopPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?next=/employer/shop/create');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -38,7 +40,7 @@ export default async function CreateShopPage() {
   }
 
   // Check if user already has shop access
-  const { data: existingAccess } = await supabase
+  const { data: existingAccess } = await db
     .from('shop_staff')
     .select('shop_id, shops(name)')
     .eq('user_id', user.id)

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { CourseCreateSchema } from '@/lib/validators/course';
 import { createCourse, listCourses } from '@/lib/db/courses';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -37,6 +38,7 @@ export async function POST(request: Request) {
 
     // Auth check
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });
     }
@@ -46,7 +48,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)

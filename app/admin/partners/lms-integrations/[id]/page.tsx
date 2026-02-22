@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -35,6 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LMSIntegrationDetailPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -48,7 +50,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: adminProfile } = await supabase
+  const { data: adminProfile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -59,7 +61,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
   }
 
   // Fetch LMS provider
-  const { data: provider, error } = await supabase
+  const { data: provider, error } = await db
     .from('partner_lms_providers')
     .select('*')
     .eq('id', id)
@@ -70,20 +72,20 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
   }
 
   // Fetch courses from this provider
-  const { data: courses, count: courseCount } = await supabase
+  const { data: courses, count: courseCount } = await db
     .from('partner_lms_courses')
     .select('*', { count: 'exact' })
     .eq('provider_id', id)
     .order('course_name');
 
   // Fetch enrollments count
-  const { count: enrollmentCount } = await supabase
+  const { count: enrollmentCount } = await db
     .from('partner_lms_enrollments')
     .select('*', { count: 'exact', head: true })
     .in('course_id', courses?.map(c => c.id) || []);
 
   // Fetch recent sync logs
-  const { data: syncLogs } = await supabase
+  const { data: syncLogs } = await db
     .from('partner_lms_sync_logs')
     .select('*')
     .eq('provider_id', id)

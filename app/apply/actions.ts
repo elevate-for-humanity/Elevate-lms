@@ -36,7 +36,7 @@ async function resolveCourseId(supabase: any, programInterest: string): Promise<
     'hvac': 'hvac technician',
     'hvac tech': 'hvac technician',
   };
-  const { data: courses } = await supabase.from('courses').select('id, title');
+  const { data: courses } = await db.from('courses').select('id, title');
   if (!courses?.length) return null;
   const exact = courses.find((c: any) => c.title.toLowerCase() === normalized);
   if (exact) return exact.id;
@@ -76,7 +76,7 @@ async function createStudentAccount(
     let userId: string | null = null;
 
     // Check profiles first
-    const { data: existingProfile } = await supabase
+    const { data: existingProfile } = await db
       .from('profiles')
       .select('id')
       .eq('email', normalizedEmail)
@@ -100,7 +100,7 @@ async function createStudentAccount(
 
       if (newUser?.user) {
         userId = newUser.user.id;
-        await supabase.from('profiles').upsert({
+        await db.from('profiles').upsert({
           id: userId,
           email: normalizedEmail,
           first_name: firstName,
@@ -117,7 +117,7 @@ async function createStudentAccount(
           const found = batch.users.find((u: any) => u.email?.toLowerCase() === normalizedEmail);
           if (found) {
             userId = found.id;
-            await supabase.from('profiles').upsert({
+            await db.from('profiles').upsert({
               id: userId,
               email: normalizedEmail,
               first_name: firstName,
@@ -141,7 +141,7 @@ async function createStudentAccount(
 
     // Resolve program ID from programs table (used by enrollment system)
     const slug = programInterest.toLowerCase().replace(/\s+/g, '-').trim();
-    const { data: programRow } = await supabase
+    const { data: programRow } = await db
       .from('programs')
       .select('id')
       .eq('slug', slug)
@@ -149,7 +149,7 @@ async function createStudentAccount(
     const programId = programRow?.id || courseId || null;
 
     // Link user to application — keep status 'pending' until onboarding is complete
-    await supabase
+    await db
       .from('applications')
       .update({
         status: 'pending',
@@ -162,7 +162,7 @@ async function createStudentAccount(
     // Student must complete: profile → agreements → documents → orientation
     // Only after all steps → admin reviews → status becomes 'approved' → 'enrolled'
     try {
-      await supabase
+      await db
         .from('program_enrollments')
         .insert({
           user_id: userId,
@@ -326,7 +326,7 @@ async function insertApplication(payload: {
   // ── Path A: Supabase available — full DB + auto-approve flow ──
   if (supabase) {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('applications')
         .insert({
           first_name: payload.firstName,
@@ -486,7 +486,7 @@ export async function getApplicationStatus(identifier: string) {
   const supabase = createAdminClient();
   if (!supabase) return null;
 
-  const { data: byRef } = await supabase
+  const { data: byRef } = await db
     .from('applications')
     .select('*')
     .ilike('support_notes', `%${identifier}%`)
@@ -496,7 +496,7 @@ export async function getApplicationStatus(identifier: string) {
 
   if (byRef) return byRef;
 
-  const { data: byEmail } = await supabase
+  const { data: byEmail } = await db
     .from('applications')
     .select('*')
     .eq('email', identifier)

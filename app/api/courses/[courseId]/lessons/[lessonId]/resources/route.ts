@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,9 +17,10 @@ export async function GET(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { lessonId } = await params;
 
-    const { data: resources, error } = await supabase
+    const { data: resources, error } = await db
       .from('course_materials')
       .select('*')
       .eq('lesson_id', lessonId)

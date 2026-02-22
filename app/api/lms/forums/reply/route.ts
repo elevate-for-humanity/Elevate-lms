@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -8,6 +9,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Verify thread exists and is not locked
-  const { data: thread, error: threadError } = await supabase
+  const { data: thread, error: threadError } = await db
     .from('forum_threads')
     .select('id, is_locked')
     .eq('id', threadId)
@@ -48,7 +50,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Create reply
-  const { data: reply, error } = await supabase
+  const { data: reply, error } = await db
     .from('forum_replies')
     .insert({
       thread_id: threadId,

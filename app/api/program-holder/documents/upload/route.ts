@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -22,7 +24,7 @@ export async function POST(req: Request) {
     }
 
     // Verify user is a program holder
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role, organization_id')
       .eq('id', user.id)
@@ -97,7 +99,7 @@ export async function POST(req: Request) {
       .getPublicUrl(uploadData.path);
 
     // Save document record to database
-    const { data: document, error: dbError } = await supabase
+    const { data: document, error: dbError } = await db
       .from('program_holder_documents')
       .insert({
         user_id: user.id,

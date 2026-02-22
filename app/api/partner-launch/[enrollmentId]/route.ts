@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -36,7 +37,7 @@ export async function GET(_req: Request, { params }: Params) {
 const supabase = getSupabaseServerClient();
   const { enrollmentId } = await params;
 
-  const { data: enrollment, error } = await supabase
+  const { data: enrollment, error } = await db
     .from('partner_lms_enrollments')
     .select(
       `

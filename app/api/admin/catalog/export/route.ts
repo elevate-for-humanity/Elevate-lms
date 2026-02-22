@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -10,6 +11,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });
     }
@@ -17,7 +19,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const format = searchParams.get('format') || 'json';
 
-    const { data: programs } = await supabase
+    const { data: programs } = await db
       .from('programs')
       .select('id, title, slug, description, category, status, tuition, duration_weeks, total_hours')
       .eq('status', 'active')

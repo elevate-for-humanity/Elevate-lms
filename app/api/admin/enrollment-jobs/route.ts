@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
@@ -18,6 +19,7 @@ export async function GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Verify staff role
   const {
@@ -27,7 +29,7 @@ const supabase = await createClient();
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -38,7 +40,7 @@ const supabase = await createClient();
   }
 
   // Get failed and retrying jobs
-  const { data: jobs, error } = await supabase
+  const { data: jobs, error } = await db
     .from('enrollment_jobs')
     .select(
       `
@@ -72,6 +74,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Verify staff role
   const {
@@ -81,7 +84,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -96,7 +99,7 @@ export async function POST(req: Request) {
 
   if (action === 'retry' && job_id) {
     // Reset failed job to retry
-    const { error } = await supabase
+    const { error } = await db
       .from('enrollment_jobs')
       .update({
         status: 'pending',

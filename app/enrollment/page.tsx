@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,9 +17,11 @@ export const metadata: Metadata = {
 
 export default async function EnrollmentPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
   let programs: any[] = [];
   if (supabase) {
-    const { data } = await supabase.from('programs').select('id, name, status, description').eq('status', 'active').order('name').limit(20);
+    const { data } = await db.from('programs').select('id, name, status, description').eq('status', 'active').order('name').limit(20);
     programs = data ?? [];
   }
 

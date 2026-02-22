@@ -7,6 +7,7 @@ export const metadata: Metadata = {
 };
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -20,6 +21,7 @@ CheckCircle, } from 'lucide-react';
 
 export default async function AdminShopsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -43,7 +45,7 @@ export default async function AdminShopsPage() {
   }
 
   // Check if user is admin
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -54,7 +56,7 @@ export default async function AdminShopsPage() {
   }
 
   // Get all shops with their onboarding status
-  const { data: shops } = await supabase
+  const { data: shops } = await db
     .from('shops')
     .select(
       `
@@ -67,7 +69,7 @@ export default async function AdminShopsPage() {
     .order('created_at', { ascending: false });
 
   // Get shop applications
-  const { data: applications } = await supabase
+  const { data: applications } = await db
     .from('shop_applications')
     .select('*')
     .eq('status', 'submitted')
@@ -76,7 +78,7 @@ export default async function AdminShopsPage() {
   // Get document status for each shop
   const shopsWithDocs = await Promise.all(
     (shops || []).map(async (shop) => {
-      const { data: docs } = await supabase
+      const { data: docs } = await db
         .from('shop_required_docs_status')
         .select('required, approved')
         .eq('shop_id', shop.id);

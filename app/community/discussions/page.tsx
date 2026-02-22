@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { MessageSquare, Clock, ChevronRight, Plus } from 'lucide-react';
@@ -14,9 +15,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function DiscussionsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch discussions from database
-  const { data: discussions, error } = await supabase
+  const { data: discussions, error } = await db
     .from('discussion_threads')
     .select(`
       id,
@@ -38,7 +40,7 @@ export default async function DiscussionsPage() {
   const discussionList = discussions || [];
 
   // Fetch categories
-  const { data: categoriesData } = await supabase
+  const { data: categoriesData } = await db
     .from('forums')
     .select('id, name, description')
     .eq('is_active', true)

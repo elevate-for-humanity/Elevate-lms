@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -25,6 +26,7 @@ export const metadata: Metadata = {
 
 export default async function ReportsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -45,7 +47,7 @@ export default async function ReportsPage() {
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -54,7 +56,7 @@ export default async function ReportsPage() {
   if (!profile || profile.role !== 'program_holder') redirect('/');
 
   // Get program holder record
-  const { data: programHolder } = await supabase
+  const { data: programHolder } = await db
     .from('program_holders')
     .select('id')
     .eq('user_id', user.id)
@@ -65,7 +67,7 @@ export default async function ReportsPage() {
   }
 
   // Fetch compliance reports (using apprentice_weekly_reports as template)
-  const { data: reports, count: totalReports } = await supabase
+  const { data: reports, count: totalReports } = await db
     .from('apprentice_weekly_reports')
     .select('*', { count: 'exact' })
     .eq('program_holder_id', programHolder.id)

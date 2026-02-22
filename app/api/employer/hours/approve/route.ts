@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -23,6 +24,7 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -32,7 +34,7 @@ export async function POST(req: Request) {
     }
 
     // Check if user is employer/admin/sponsor
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('user_profiles')
       .select('role, employer_id')
       .eq('user_id', user.id)
@@ -47,7 +49,7 @@ export async function POST(req: Request) {
 
     // If employer, verify they supervise this student
     if (profile.role === 'employer' && profile.employer_id) {
-      const { data: hourRecord } = await supabase
+      const { data: hourRecord } = await db
         .from('apprenticeship_hours')
         .select(
           `
@@ -68,7 +70,7 @@ export async function POST(req: Request) {
     }
 
     // Approve the hours
-    const { error } = await supabase
+    const { error } = await db
       .from('apprenticeship_hours')
       .update({
         approved: true,

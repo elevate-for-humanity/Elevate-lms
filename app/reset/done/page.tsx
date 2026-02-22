@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 
 export default async function ResetDonePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -24,7 +26,7 @@ export default async function ResetDonePage() {
   }
   
   // Log reset completion
-  await supabase.from('page_views').insert({ page: 'reset_done' }).select();
+  await db.from('page_views').insert({ page: 'reset_done' }).select();
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 py-4">

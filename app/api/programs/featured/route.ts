@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -24,7 +25,7 @@ const supabase = createSupabaseClient();
   }
 
   // Fetch from database
-  const { data, error }: any = await supabase
+  const { data, error }: any = await db
     .from('programs')
     .select('*')
     .eq('is_featured', true)

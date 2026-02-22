@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -28,6 +29,7 @@ export const metadata: Metadata = {
 
 export default async function ParentPortalPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -41,7 +43,7 @@ export default async function ParentPortalPage() {
   }
   
   // Fetch parent portal info
-  const { data: portalInfo } = await supabase
+  const { data: portalInfo } = await db
     .from('site_settings')
     .select('*')
     .eq('key', 'parent_portal')

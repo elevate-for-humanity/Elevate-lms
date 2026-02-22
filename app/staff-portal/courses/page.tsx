@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BookOpen, Search, Plus } from 'lucide-react';
@@ -14,18 +15,19 @@ export const dynamic = 'force-dynamic';
 
 export default async function StaffCoursesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/staff-portal/courses');
 
   // Fetch courses from training_programs table
-  const { data: courses } = await supabase
+  const { data: courses } = await db
     .from('training_programs')
     .select('id, name, slug, category, tuition_cost, duration_weeks, is_active')
     .order('name');
 
   // Get enrollment counts per program
-  const { data: enrollmentCounts } = await supabase
+  const { data: enrollmentCounts } = await db
     .from('program_enrollments')
     .select('program_id')
     .eq('status', 'ACTIVE');

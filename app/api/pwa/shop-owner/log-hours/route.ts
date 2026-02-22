@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
@@ -12,6 +13,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
@@ -24,7 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user's partner association
-    const { data: partnerUser } = await supabase
+    const { data: partnerUser } = await db
       .from('partner_users')
       .select('partner_id, role')
       .eq('user_id', user.id)
@@ -46,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify apprentice is assigned to this partner
-    const { data: apprenticeAssignment } = await supabase
+    const { data: apprenticeAssignment } = await db
       .from('partner_users')
       .select('id')
       .eq('user_id', apprenticeId)
@@ -58,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing entry
-    const { data: existingEntry } = await supabase
+    const { data: existingEntry } = await db
       .from('progress_entries')
       .select('id, hours_worked')
       .eq('apprentice_id', apprenticeId)
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest) {
 
     if (existingEntry) {
       // Update existing entry
-      const { error: updateError } = await supabase
+      const { error: updateError } = await db
         .from('progress_entries')
         .update({
           hours_worked: parseFloat(hours),
@@ -85,7 +87,7 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // Create new entry
-      const { error: insertError } = await supabase
+      const { error: insertError } = await db
         .from('progress_entries')
         .insert({
           apprentice_id: apprenticeId,
@@ -105,7 +107,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log to audit
-    await supabase.from('partner_audit_log').insert({
+    await db.from('partner_audit_log').insert({
       partner_id: partnerUser.partner_id,
       user_id: user.id,
       action: existingEntry ? 'update_hours' : 'log_hours',

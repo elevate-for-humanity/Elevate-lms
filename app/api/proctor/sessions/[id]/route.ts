@@ -1,17 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 const ALLOWED_ROLES = ['admin', 'super_admin', 'staff', 'instructor'];
 
 async function getProctor() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return null;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('id, full_name, role, tenant_id')
     .eq('id', user.id)
@@ -33,7 +35,7 @@ export async function GET(
     const { id } = await params;
     const { supabase } = ctx;
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('exam_sessions')
       .select('*')
       .eq('id', id)
@@ -74,7 +76,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('exam_sessions')
       .update(updates)
       .eq('id', id)

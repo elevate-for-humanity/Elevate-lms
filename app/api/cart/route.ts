@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCart, addToCart, updateCartItem, removeFromCart } from '@/lib/store/db';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -24,11 +25,12 @@ const cookieStore = await cookies();
     if (!cart) {
       // Create new cart
       const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
       if (!supabase) {
         return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });
       }
 
-      const { data: newCart, error } = await supabase
+      const { data: newCart, error } = await db
         .from('carts')
         .insert({ session_id: sessionId })
         .select()

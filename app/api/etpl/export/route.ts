@@ -17,6 +17,7 @@ export async function GET(req: Request) {
 
     // Authentication check
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
@@ -27,7 +28,7 @@ export async function GET(req: Request) {
     }
 
     // Check admin or sponsor role
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)

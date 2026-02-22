@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Play, Clock, Users, Star, Lock, ArrowRight } from 'lucide-react';
@@ -14,9 +15,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function ClassroomPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch courses from database
-  const { data: courses, error } = await supabase
+  const { data: courses, error } = await db
     .from('courses')
     .select('id, course_name, description, duration_hours, image_url, is_active, price')
     .eq('is_active', true)
@@ -32,7 +34,7 @@ export default async function ClassroomPage() {
   const enrollmentCounts: Record<string, number> = {};
 
   if (courseIds.length > 0) {
-    const { data: enrollments } = await supabase
+    const { data: enrollments } = await db
       .from('enrollments')
       .select('course_id')
       .in('course_id', courseIds);

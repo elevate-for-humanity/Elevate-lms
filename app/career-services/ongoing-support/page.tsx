@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Heart, Users, TrendingUp, MessageSquare, Calendar, Phone } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -13,13 +14,14 @@ export const dynamic = 'force-dynamic';
 
 export default async function OngoingSupportPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1><p className="text-gray-600">Please try again later.</p></div></div>;
   }
   const { data: { user } } = await supabase.auth.getUser();
 
   // Get alumni count
-  const { count: alumniCount } = await supabase
+  const { count: alumniCount } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'alumni');
@@ -27,7 +29,7 @@ export default async function OngoingSupportPage() {
   // Get user's support history if logged in
   let supportHistory = null;
   if (user) {
-    const { data } = await supabase
+    const { data } = await db
       .from('support_sessions')
       .select('*')
       .eq('user_id', user.id)
@@ -37,7 +39,7 @@ export default async function OngoingSupportPage() {
   }
 
   // Get upcoming alumni events
-  const { data: events } = await supabase
+  const { data: events } = await db
     .from('events')
     .select('*')
     .eq('event_type', 'alumni')

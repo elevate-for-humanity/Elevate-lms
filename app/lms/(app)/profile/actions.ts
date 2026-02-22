@@ -1,10 +1,12 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 export async function updateProfile(formData: FormData) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -16,7 +18,7 @@ export async function updateProfile(formData: FormData) {
   const phone = formData.get('phone') as string;
   const bio = formData.get('bio') as string;
 
-  const { error } = await supabase
+  const { error } = await db
     .from('profiles')
     .update({
       first_name: firstName,
@@ -37,6 +39,7 @@ export async function updateProfile(formData: FormData) {
 
 export async function updateProfilePhoto(formData: FormData) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -63,7 +66,7 @@ export async function updateProfilePhoto(formData: FormData) {
     .from('avatars')
     .getPublicUrl(fileName);
 
-  const { error: updateError } = await supabase
+  const { error: updateError } = await db
     .from('profiles')
     .update({ avatar_url: publicUrl })
     .eq('id', user.id);

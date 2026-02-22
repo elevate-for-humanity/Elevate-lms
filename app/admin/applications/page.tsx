@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -58,6 +59,7 @@ export default async function ApplicationsPage({
 }) {
   const params = await searchParams;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -78,7 +80,7 @@ export default async function ApplicationsPage({
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -89,7 +91,7 @@ export default async function ApplicationsPage({
   }
 
   // Query the applications table (where the public form inserts)
-  let query = supabase
+  let query = db
     .from('applications')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false });
@@ -112,7 +114,7 @@ export default async function ApplicationsPage({
   const { data: applications, count: totalCount, error } = await query;
 
   // Status counts
-  const { data: allApps } = await supabase
+  const { data: allApps } = await db
     .from('applications')
     .select('status');
 

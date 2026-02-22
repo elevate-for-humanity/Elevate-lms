@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BookOpen, Play, Clock, ChevronRight, Award } from 'lucide-react';
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ClassroomPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) redirect('/login');
 
@@ -20,7 +22,7 @@ export default async function ClassroomPage() {
   if (!user) redirect('/login?redirect=/hub/classroom');
 
   // Fetch user enrollments with course details
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select(`
       *,
@@ -31,7 +33,7 @@ export default async function ClassroomPage() {
     .order('enrolled_at', { ascending: false });
 
   // Fetch available courses
-  const { data: availableCourses } = await supabase
+  const { data: availableCourses } = await db
     .from('courses')
     .select('*')
     .eq('is_active', true)

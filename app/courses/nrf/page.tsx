@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
 
 export default async function NrfPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -36,7 +38,7 @@ export default async function NrfPage() {
   }
   
   // Fetch NRF courses
-  const { data: nrfCourses } = await supabase
+  const { data: nrfCourses } = await db
     .from('training_courses')
     .select('*')
     .eq('provider', 'nrf');

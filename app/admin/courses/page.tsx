@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function AdminCoursesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -32,7 +34,7 @@ export default async function AdminCoursesPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -42,7 +44,7 @@ export default async function AdminCoursesPage() {
     redirect('/unauthorized');
   }
 
-  const { data: rawCourses, count: totalCourses } = await supabase
+  const { data: rawCourses, count: totalCourses } = await db
     .from('training_courses')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false });
@@ -56,7 +58,7 @@ export default async function AdminCoursesPage() {
     difficulty_level: null,
   }));
 
-  const { count: activeCourses } = await supabase
+  const { count: activeCourses } = await db
     .from('training_courses')
     .select('*', { count: 'exact', head: true })
     .eq('is_active', true);
@@ -66,7 +68,7 @@ export default async function AdminCoursesPage() {
   const draftCount = courses?.filter((c: any) => !c.is_published).length || 0;
 
   // Get enrollment counts
-  const { data: enrollmentCounts } = await supabase
+  const { data: enrollmentCounts } = await db
     .from('training_enrollments')
     .select('course_id');
 

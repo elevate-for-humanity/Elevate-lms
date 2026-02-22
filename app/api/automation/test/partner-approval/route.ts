@@ -15,6 +15,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Check auth and admin role
   const { data: { user } } = await supabase.auth.getUser();
@@ -22,7 +23,7 @@ export async function POST() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)

@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getOrgContext } from '@/lib/org/getOrgContext';
 import { sendOrgInviteEmail } from '@/lib/email/sendOrgInviteEmail';
 import * as crypto from 'node:crypto';
@@ -15,6 +16,7 @@ export async function POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
       error: authError,
@@ -59,7 +61,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if there's already a pending invite for this email
-    const { data: pendingInvite } = await supabase
+    const { data: pendingInvite } = await db
       .from('org_invites')
       .select('id')
       .eq('email', normalizedEmail)
@@ -75,7 +77,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if invited email already has an account and is a member
-    const { data: invitedProfile } = await supabase
+    const { data: invitedProfile } = await db
       .from('profiles')
       .select('id')
       .eq('email', normalizedEmail)
@@ -83,7 +85,7 @@ export async function POST(req: NextRequest) {
 
     if (invitedProfile) {
       // User exists - check if already a member
-      const { data: existingMembership } = await supabase
+      const { data: existingMembership } = await db
         .from('organization_users')
         .select('id')
         .eq('organization_id', targetOrgId)
@@ -102,7 +104,7 @@ export async function POST(req: NextRequest) {
     const token = crypto.randomUUID();
 
     // Create invite
-    const { data: invite, error: inviteError } = await supabase
+    const { data: invite, error: inviteError } = await db
       .from('org_invites')
       .insert({
         email: normalizedEmail,
@@ -125,7 +127,7 @@ export async function POST(req: NextRequest) {
 
     // Send email if RESEND_API_KEY is configured
     if (process.env.RESEND_API_KEY) {
-      const { data: inviterProfile } = await supabase
+      const { data: inviterProfile } = await db
         .from('profiles')
         .select('full_name')
         .eq('id', user.id)
@@ -162,6 +164,7 @@ export async function GET(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
       error: authError,
@@ -181,7 +184,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const { data: invites, error } = await supabase
+    const { data: invites, error } = await db
       .from('org_invites')
       .select('*')
       .eq('organization_id', ctx.organization_id)

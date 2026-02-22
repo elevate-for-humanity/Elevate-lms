@@ -5,6 +5,7 @@ export const maxDuration = 60;
 // app/api/study-groups/[id]/join/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -18,6 +19,7 @@ export async function POST(
 
     const { id } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -32,7 +34,7 @@ export async function POST(
     const groupId = id;
 
     // Check if group exists
-    const { data: group, error: groupError } = await supabase
+    const { data: group, error: groupError } = await db
       .from("study_groups")
       .select("id, max_members")
       .eq("id", groupId)
@@ -46,7 +48,7 @@ export async function POST(
     }
 
     // Check if already a member
-    const { data: existingMembership } = await supabase
+    const { data: existingMembership } = await db
       .from("study_group_members")
       .select("id")
       .eq("group_id", groupId)
@@ -62,7 +64,7 @@ export async function POST(
 
     // Check if group is full
     if (group.max_members) {
-      const { count } = await supabase
+      const { count } = await db
         .from("study_group_members")
         .select("*", { count: "exact", head: true })
         .eq("group_id", groupId);
@@ -76,7 +78,7 @@ export async function POST(
     }
 
     // Add user to group
-    const { error: insertError } = await supabase
+    const { error: insertError } = await db
       .from("study_group_members")
       .insert({
         group_id: groupId,

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Bell, Mail, MessageSquare, Smartphone } from 'lucide-react';
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 export default async function NotificationSettingsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -21,7 +23,7 @@ export default async function NotificationSettingsPage() {
   }
 
   // Fetch user's notification preferences
-  const { data: preferences } = await supabase
+  const { data: preferences } = await db
     .from('notification_preferences')
     .select('*')
     .eq('user_id', user.id)

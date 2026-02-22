@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     // Get all active enrollments
-    const { data: enrollments } = await supabase
+    const { data: enrollments } = await db
       .from('enrollments')
       .select(
         `
@@ -51,7 +52,7 @@ export async function GET(request: Request) {
     const studentIds = enrollments.map((e) => e.student_id);
 
     // Get last login for each student
-    const { data: lastLogins } = await supabase
+    const { data: lastLogins } = await db
       .from('attendance_log')
       .select('student_id, login_time')
       .in('student_id', studentIds)

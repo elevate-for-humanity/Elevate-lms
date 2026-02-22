@@ -1,4 +1,5 @@
 "use client";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import React from 'react';
 
@@ -662,7 +663,7 @@ export default function AdminPortalMapPage() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    supabase.from('pages').select('*').limit(50)
+    db.from('pages').select('*').limit(50)
       .then(({ data }) => { if (data) setDbRows(data); });
   }, []);
 

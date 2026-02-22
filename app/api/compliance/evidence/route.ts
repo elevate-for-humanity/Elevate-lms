@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { uploadComplianceEvidenceFile } from "@/lib/storage/complianceEvidence";
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -13,6 +14,7 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -22,7 +24,7 @@ export async function POST(request: Request) {
   }
 
   // Check if user is admin
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from("profiles")
     .select("role")
     .eq("id", user.id)
@@ -44,7 +46,7 @@ export async function POST(request: Request) {
   }
 
   // Validate item exists
-  const { data: item } = await supabase
+  const { data: item } = await db
     .from("compliance_items")
     .select("id")
     .eq("id", itemId)
@@ -58,7 +60,7 @@ export async function POST(request: Request) {
   const { fileUrl, fileName } = await uploadComplianceEvidenceFile(file, itemId);
 
   // Create evidence record
-  const { data: evidence, error } = await supabase
+  const { data: evidence, error } = await db
     .from("compliance_evidence")
     .insert({
       item_id: itemId,
@@ -74,7 +76,7 @@ export async function POST(request: Request) {
   }
 
   // Log the upload
-  await supabase.from("audit_logs").insert({
+  await db.from("audit_logs").insert({
     actor_id: user.id,
     actor_email: user.email,
     action: "compliance_evidence_uploaded",

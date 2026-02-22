@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -20,6 +21,7 @@ const statusColors: Record<string, string> = {
 
 export default async function AdminWaitlistPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) {
     return <div className="p-8 text-center">Service unavailable</div>;
   }
@@ -27,7 +29,7 @@ export default async function AdminWaitlistPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -37,7 +39,7 @@ export default async function AdminWaitlistPage() {
     redirect('/unauthorized');
   }
 
-  const { data: entries, error } = await supabase
+  const { data: entries, error } = await db
     .from('waitlist')
     .select('*')
     .order('created_at', { ascending: false });

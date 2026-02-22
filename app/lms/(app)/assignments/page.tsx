@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Clock, AlertCircle, Calendar, Upload, ChevronRight, Filter, BookOpen, CheckCircle, } from 'lucide-react';
@@ -15,6 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AssignmentsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -40,7 +42,7 @@ export default async function AssignmentsPage() {
   const stats = { pending: 0, submitted: 0, graded: 0, overdue: 0 };
 
   try {
-    const { data: enrollments } = await supabase
+    const { data: enrollments } = await db
       .from('enrollments')
       .select('course_id')
       .eq('user_id', user.id)
@@ -49,7 +51,7 @@ export default async function AssignmentsPage() {
     const courseIds = enrollments?.map(e => e.course_id) || [];
 
     if (courseIds.length > 0) {
-      const { data: assignmentData } = await supabase
+      const { data: assignmentData } = await db
         .from('assignments')
         .select('*, courses (id, title)')
         .in('course_id', courseIds)
@@ -59,7 +61,7 @@ export default async function AssignmentsPage() {
         assignments = assignmentData;
       }
 
-      const { data: submissionData } = await supabase
+      const { data: submissionData } = await db
         .from('assignment_submissions')
         .select('*')
         .eq('student_id', user.id);

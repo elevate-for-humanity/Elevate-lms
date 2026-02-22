@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -35,6 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LearnerDetailPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -48,7 +50,7 @@ export default async function LearnerDetailPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: adminProfile } = await supabase
+  const { data: adminProfile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -59,7 +61,7 @@ export default async function LearnerDetailPage({ params }: Props) {
   }
 
   // Fetch learner profile
-  const { data: learner, error } = await supabase
+  const { data: learner, error } = await db
     .from('profiles')
     .select('*')
     .eq('id', id)
@@ -70,7 +72,7 @@ export default async function LearnerDetailPage({ params }: Props) {
   }
 
   // Fetch enrollments
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select(`
       *,
@@ -80,14 +82,14 @@ export default async function LearnerDetailPage({ params }: Props) {
     .order('enrolled_at', { ascending: false });
 
   // Fetch certificates
-  const { data: certificates } = await supabase
+  const { data: certificates } = await db
     .from('certificates')
     .select('*')
     .eq('user_id', id)
     .order('issued_at', { ascending: false });
 
   // Fetch recent activity
-  const { data: recentActivity } = await supabase
+  const { data: recentActivity } = await db
     .from('lesson_progress')
     .select(`
       *,

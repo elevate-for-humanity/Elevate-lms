@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { z } from 'zod';
 import { createStoreProduct } from '@/lib/store/stripe-products';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/authGuards';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -51,7 +52,8 @@ export async function POST(req: NextRequest) {
 
     // Store in Supabase
     const supabase = await createClient();
-    const { data, error }: any = await supabase
+  const _admin = createAdminClient(); const db = _admin || supabase;
+    const { data, error }: any = await db
       .from('products')
       .insert({
         title,

@@ -4,10 +4,12 @@ import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { Award, Download, Lock } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export default async function DemoCertificatesPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('certificates').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('certificates').select('*').limit(50);
 const certs = (dbRows as any[]) || [];
 
   return (

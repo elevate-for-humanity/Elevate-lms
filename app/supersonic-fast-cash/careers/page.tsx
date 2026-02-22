@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import {
   AlertTriangle,
@@ -42,6 +43,7 @@ export const metadata: Metadata = {
 
 export default async function TaxCareersPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -55,7 +57,7 @@ export default async function TaxCareersPage() {
   }
   
   // Fetch tax career positions
-  const { data: dbPositions } = await supabase
+  const { data: dbPositions } = await db
     .from('job_postings')
     .select('*')
     .eq('department', 'tax_services')

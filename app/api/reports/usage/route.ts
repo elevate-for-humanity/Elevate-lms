@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -18,7 +19,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   } = await supabase.auth.getUser();
   if (!user) return new Response('Unauthorized', { status: 401 });
 
-  const { data: prof } = await supabase
+  const { data: prof } = await db
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -33,7 +34,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   const format = (url.searchParams.get('format') || 'json').toLowerCase();
 
   // Build query for enrollments
-  let query = supabase.from('enrollments').select(`
+  let query = db.from('enrollments').select(`
       user_id,
       course_id,
       status,
@@ -46,7 +47,7 @@ const supabase = await createRouteHandlerClient({ cookies });
 
   if (code) {
     // Filter by funding program code
-    const { data: prog } = await supabase
+    const { data: prog } = await db
       .from('funding_programs')
       .select('id')
       .eq('code', code)
@@ -70,7 +71,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   // Get last login per user
   const lastLogins: Record<string, string | null> = {};
   if (userIds.length) {
-    const { data: logs } = await supabase
+    const { data: logs } = await db
       .from('login_events')
       .select('user_id, at')
       .in('user_id', userIds)
@@ -84,7 +85,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   // Get lesson progress for minutes calculation
   const progressMap: Record<string, { minutes: number; percent: number }> = {};
   if (userIds.length) {
-    const { data: progress } = await supabase
+    const { data: progress } = await db
       .from('lesson_progress')
       .select('user_id, lesson_id, last_position_seconds, percent')
       .in('user_id', userIds);
@@ -117,7 +118,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   > = {};
 
   if (userIds.length) {
-    const { data: notes } = await supabase
+    const { data: notes } = await db
       .from('program_holder_notes')
       .select('user_id, course_id, status, note, created_at, program_holder_id')
       .in('user_id', userIds)
@@ -146,7 +147,7 @@ const supabase = await createRouteHandlerClient({ cookies });
     )
   ) as string[];
   if (phIds.length) {
-    const { data: phs } = await supabase
+    const { data: phs } = await db
       .from('program_holders')
       .select('id, name')
       .in('id', phIds);

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
@@ -48,11 +49,12 @@ const COHORT_1 = {
 
 export default async function CohortTrackerPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Try to get enrolled HVAC students
   let students: any[] = [];
   if (supabase) {
-    const { data } = await supabase
+    const { data } = await db
       .from('profiles')
       .select('id, full_name, email, phone, enrollment_status, created_at')
       .eq('role', 'student')

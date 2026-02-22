@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Newspaper, Calendar, ArrowRight, Tag,
   Phone
@@ -19,6 +20,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function NewsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -31,14 +33,14 @@ export default async function NewsPage() {
     );
   }
 
-  const { data: articles } = await supabase
+  const { data: articles } = await db
     .from('news_articles')
     .select('*')
     .eq('is_published', true)
     .order('published_at', { ascending: false })
     .limit(12);
 
-  const { data: categories } = await supabase
+  const { data: categories } = await db
     .from('news_categories')
     .select('*')
     .order('name', { ascending: true });

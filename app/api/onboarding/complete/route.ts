@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Mark onboarding as complete
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('profiles')
       .update({
         onboarding_completed: true,
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
     if (updateError) throw updateError;
 
     // Get user profile for email
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('full_name, email')
       .eq('id', session.user.id)

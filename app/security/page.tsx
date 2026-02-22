@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import {
   Shield,
@@ -27,6 +28,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function SecurityPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -40,14 +42,14 @@ export default async function SecurityPage() {
   }
 
   // Get security certifications/attestations
-  const { data: certifications } = await supabase
+  const { data: certifications } = await db
     .from('certifications')
     .select('*')
     .or('category.eq.security,type.eq.security_attestation')
     .eq('is_active', true);
 
   // Get last security audit date
-  const { data: auditInfo } = await supabase
+  const { data: auditInfo } = await db
     .from('site_settings')
     .select('value')
     .eq('key', 'last_security_audit')

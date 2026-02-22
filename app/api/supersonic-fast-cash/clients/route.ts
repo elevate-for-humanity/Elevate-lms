@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@supabase/supabase-js';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get all clients with their tax returns
-    const { data: clients, error } = await supabase
+    const { data: clients, error } = await db
       .from('clients')
       .select(`
         *,
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
     // Securely hash SSN - never store plain text
     const ssnData = body.ssn ? prepareSSNForStorage(body.ssn) : {};
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('clients')
       .insert({
         first_name: body.firstName,

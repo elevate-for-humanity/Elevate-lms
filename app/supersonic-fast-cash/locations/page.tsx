@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { MapPin, Phone, Mail, Clock, Car, Video } from 'lucide-react';
@@ -16,6 +17,7 @@ export const metadata = {
 
 export default async function LocationsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function LocationsPage() {
   }
   
   // Fetch locations
-  const { data: locations } = await supabase
+  const { data: locations } = await db
     .from('locations')
     .select('*')
     .eq('brand', 'supersonic');

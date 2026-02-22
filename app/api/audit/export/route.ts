@@ -25,7 +25,7 @@ export async function GET(req: Request) {
     }
 
     // Query audit snapshot view
-    const { data, error }: any = await supabase.from('audit_snapshot').select('*');
+    const { data, error }: any = await db.from('audit_snapshot').select('*');
 
     if (error) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 400 });

@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -19,6 +20,7 @@ export async function GET(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current hour in configured timezone
     const now = new Date();
@@ -33,7 +35,7 @@ export async function GET(req: Request) {
     else if (estHour >= 17) slot = 2;
 
     // Get active campaigns
-    const { data: campaigns, error } = await supabase
+    const { data: campaigns, error } = await db
       .from('social_media_campaigns')
       .select('*')
       .eq('status', 'active');
@@ -61,7 +63,7 @@ export async function GET(req: Request) {
         // Check if campaign is still within duration
         if (daysElapsed >= campaign.duration_days) {
           // Campaign completed, mark as finished
-          await supabase
+          await db
             .from('social_media_campaigns')
             .update({ status: 'completed' })
             .eq('id', campaign.id);
@@ -89,7 +91,7 @@ export async function GET(req: Request) {
             await postToSocialMedia(platform, postContent, campaign);
 
             // Log the post
-            await supabase.from('social_media_posts').insert({
+            await db.from('social_media_posts').insert({
               campaign_id: campaign.id,
               platform,
               content: postContent,
@@ -112,7 +114,7 @@ export async function GET(req: Request) {
             );
 
             // Log failure
-            await supabase.from('social_media_posts').insert({
+            await db.from('social_media_posts').insert({
               campaign_id: campaign.id,
               platform,
               content: postContent,
@@ -133,7 +135,7 @@ export async function GET(req: Request) {
         }
 
         // Update campaign last_post_at
-        await supabase
+        await db
           .from('social_media_campaigns')
           .update({ last_post_at: now.toISOString() })
           .eq('id', campaign.id);

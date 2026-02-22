@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -14,6 +15,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -23,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check admin access
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -57,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     switch (target_audience) {
       case 'all_students':
-        const { data: allStudents } = await supabase
+        const { data: allStudents } = await db
           .from('profiles')
           .select('email, full_name')
           .eq('role', 'student');
@@ -67,7 +69,7 @@ export async function POST(request: NextRequest) {
       case 'active_students':
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        const { data: activeStudents } = await supabase
+        const { data: activeStudents } = await db
           .from('profiles')
           .select('email, full_name')
           .eq('role', 'student')
@@ -78,7 +80,7 @@ export async function POST(request: NextRequest) {
       case 'inactive_students':
         const sevenDaysAgoInactive = new Date();
         sevenDaysAgoInactive.setDate(sevenDaysAgoInactive.getDate() - 7);
-        const { data: inactiveStudents } = await supabase
+        const { data: inactiveStudents } = await db
           .from('profiles')
           .select('email, full_name')
           .eq('role', 'student')
@@ -87,7 +89,7 @@ export async function POST(request: NextRequest) {
         break;
 
       case 'program_holders':
-        const { data: programHolders } = await supabase
+        const { data: programHolders } = await db
           .from('profiles')
           .select('email, full_name')
           .eq('role', 'program_holder');
@@ -95,7 +97,7 @@ export async function POST(request: NextRequest) {
         break;
 
       case 'instructors':
-        const { data: instructors } = await supabase
+        const { data: instructors } = await db
           .from('profiles')
           .select('email, full_name')
           .eq('role', 'instructor');
@@ -103,7 +105,7 @@ export async function POST(request: NextRequest) {
         break;
 
       case 'employers':
-        const { data: employers } = await supabase
+        const { data: employers } = await db
           .from('profiles')
           .select('email, full_name')
           .eq('role', 'employer');
@@ -111,7 +113,7 @@ export async function POST(request: NextRequest) {
         break;
 
       case 'staff':
-        const { data: staff } = await supabase
+        const { data: staff } = await db
           .from('profiles')
           .select('email, full_name')
           .eq('role', 'staff');
@@ -133,7 +135,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create campaign record
-    const { data: campaign, error: campaignError } = await supabase
+    const { data: campaign, error: campaignError } = await db
       .from('email_campaigns')
       .insert({
         name,
@@ -187,7 +189,7 @@ export async function POST(request: NextRequest) {
           sentCount++;
 
           // Log email send
-          await supabase.from('email_logs').insert({
+          await db.from('email_logs').insert({
             campaign_id: campaign.id,
             recipient_email: recipient.email,
             status: 'sent',
@@ -195,7 +197,7 @@ export async function POST(request: NextRequest) {
           });
         } catch (error) {
           // Log failure
-          await supabase.from('email_logs').insert({
+          await db.from('email_logs').insert({
             campaign_id: campaign.id,
             recipient_email: recipient.email,
             status: 'failed',
@@ -209,7 +211,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update campaign with final counts
-    await supabase
+    await db
       .from('email_campaigns')
       .update({
         status: 'sent',

@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
     const body = await parseBody<Record<string, any>>(request);
 
     // Create Milady RISE enrollment record
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('milady_rise_enrollments')
       .insert({
         student_id: user.id,

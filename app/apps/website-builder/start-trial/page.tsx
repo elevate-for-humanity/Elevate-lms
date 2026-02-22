@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Layout, Check, Clock } from 'lucide-react';
@@ -15,12 +16,13 @@ async function startTrial() {
   'use server';
   
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) redirect('/error?message=service-unavailable');
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/apps/website-builder/start-trial');
 
-  const { data: existing } = await supabase
+  const { data: existing } = await db
     .from('user_app_subscriptions')
     .select('id')
     .eq('user_id', user.id)
@@ -32,7 +34,7 @@ async function startTrial() {
   const trialEndsAt = new Date();
   trialEndsAt.setDate(trialEndsAt.getDate() + 14);
 
-  const { error } = await supabase
+  const { error } = await db
     .from('user_app_subscriptions')
     .insert({
       user_id: user.id,
@@ -50,12 +52,13 @@ async function startTrial() {
 
 export default async function StartTrialPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) redirect('/error?message=service-unavailable');
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/apps/website-builder/start-trial');
 
-  const { data: existing } = await supabase
+  const { data: existing } = await db
     .from('user_app_subscriptions')
     .select('*')
     .eq('user_id', user.id)

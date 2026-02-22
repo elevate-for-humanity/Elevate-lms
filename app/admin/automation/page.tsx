@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -26,6 +27,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AutomationLogPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) redirect('/login');
 
@@ -33,7 +35,7 @@ export default async function AutomationLogPage() {
   if (!user) redirect('/login?redirect=/admin/automation');
 
   // Check admin role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -44,21 +46,21 @@ export default async function AutomationLogPage() {
   }
 
   // Fetch delivery logs (emails/SMS sent)
-  const { data: deliveryLogs } = await supabase
+  const { data: deliveryLogs } = await db
     .from('delivery_logs')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(50);
 
   // Fetch recent notifications
-  const { data: notifications } = await supabase
+  const { data: notifications } = await db
     .from('notifications')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(50);
 
   // Fetch recent enrollments (automation trigger)
-  const { data: recentEnrollments } = await supabase
+  const { data: recentEnrollments } = await db
     .from('enrollments')
     .select(`
       id,

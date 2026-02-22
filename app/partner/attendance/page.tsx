@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Calendar, Users, Plus } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
@@ -15,19 +16,20 @@ type SessionItem = { id: string; title: string; date: string; time: string; pres
 
 export default async function PartnerAttendancePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   let sessions: SessionItem[] = [];
 
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      const { data: partner } = await supabase
+      const { data: partner } = await db
         .from('partners')
         .select('id')
         .eq('user_id', user.id)
         .single();
 
       if (partner) {
-        const { data: sessionData } = await supabase
+        const { data: sessionData } = await db
           .from('partner_sessions')
           .select('id, title, scheduled_date, start_time, end_time, present_count, absent_count, enrolled_count')
           .eq('partner_id', partner.id)

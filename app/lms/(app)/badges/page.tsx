@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -127,6 +128,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
 
 export default async function BadgesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -150,31 +152,31 @@ export default async function BadgesPage() {
   }
 
   // Fetch badges from database
-  const { data: dbBadges } = await supabase
+  const { data: dbBadges } = await db
     .from('badges')
     .select('*')
     .order('created_at');
 
   // Fetch user's earned badges
-  const { data: userBadges } = await supabase
+  const { data: userBadges } = await db
     .from('user_badges')
     .select('*, badges (*)')
     .eq('user_id', user.id);
 
   // Fetch user stats for progress calculation
-  const { count: completedCourses } = await supabase
+  const { count: completedCourses } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .eq('status', 'completed');
 
-  const { data: quizAttempts } = await supabase
+  const { data: quizAttempts } = await db
     .from('quiz_attempts')
     .select('score')
     .eq('user_id', user.id)
     .eq('status', 'completed');
 
-  const { count: forumPosts } = await supabase
+  const { count: forumPosts } = await db
     .from('forum_posts')
     .select('*', { count: 'exact', head: true })
     .eq('author_id', user.id);

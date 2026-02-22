@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import {
@@ -33,6 +34,7 @@ interface Product {
 
 export default async function ProductsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -46,7 +48,7 @@ export default async function ProductsPage() {
   }
 
   // Fetch products from database
-  const { data: productsData, error } = await supabase
+  const { data: productsData, error } = await db
     .from('products')
     .select('*')
     .eq('is_active', true)

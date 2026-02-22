@@ -6,6 +6,7 @@ import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -24,6 +25,7 @@ export async function POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check auth
     const {
@@ -42,7 +44,7 @@ export async function POST(req: NextRequest) {
     const stripeProduct = await createStripeProduct(product);
 
     // Save to database
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('store_products')
       .upsert({
         title: product.title,

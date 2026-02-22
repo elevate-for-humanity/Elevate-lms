@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
@@ -13,6 +14,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current user
     const {
@@ -35,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Save upload record
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('uploads')
       .insert({
         user_id: user.id,
@@ -70,6 +72,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current user
     const {
@@ -83,7 +86,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const dashboardType = searchParams.get('dashboard_type');
 
-    let query = supabase
+    let query = db
       .from('uploads')
       .select('*')
       .eq('user_id', user.id)
@@ -117,6 +120,7 @@ export async function DELETE(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current user
     const {
@@ -138,7 +142,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete upload record (only if owned by user)
-    const { error } = await supabase
+    const { error } = await db
       .from('uploads')
       .delete()
       .eq('id', uploadId)

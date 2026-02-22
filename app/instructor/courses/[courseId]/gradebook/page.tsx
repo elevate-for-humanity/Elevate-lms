@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -11,12 +12,13 @@ export const metadata: Metadata = {
 
 export default async function GradebookPage({ params }: { params: { courseId: string } }) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: course } = await supabase.from('courses').select('*').eq('id', params.courseId).single();
-  const { data: enrollments } = await supabase.from('enrollments').select('*, profiles!inner(full_name, email)').eq('course_id', params.courseId).order('created_at');
+  const { data: course } = await db.from('courses').select('*').eq('id', params.courseId).single();
+  const { data: enrollments } = await db.from('enrollments').select('*, profiles!inner(full_name, email)').eq('course_id', params.courseId).order('created_at');
 
   return (
     <div className="min-h-screen bg-gray-50">

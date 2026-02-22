@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -17,6 +18,7 @@ export default async function InstructorCoursesPage() {
   
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -38,7 +40,7 @@ export default async function InstructorCoursesPage() {
         user = authData.user;
         
         if (user) {
-          const { data, error: queryError } = await supabase
+          const { data, error: queryError } = await db
             .from('training_courses')
             .select('*, training_enrollments(count)')
             .eq('instructor_id', user.id)

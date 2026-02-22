@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
 
 export default async function AcademicIntegrityPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -37,7 +39,7 @@ export default async function AcademicIntegrityPage() {
   }
   
   // Fetch academic integrity policy
-  const { data: policy } = await supabase
+  const { data: policy } = await db
     .from('legal_documents')
     .select('*')
     .eq('type', 'academic_integrity')

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, XCircle, Clock, Eye } from 'lucide-react';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function AdminDocumentReviewPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -30,7 +32,7 @@ export default async function AdminDocumentReviewPage() {
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -44,7 +46,7 @@ export default async function AdminDocumentReviewPage() {
   }
 
   // Get all documents with user info
-  const { data: documents } = await supabase
+  const { data: documents } = await db
     .from('documents')
     .select(
       `

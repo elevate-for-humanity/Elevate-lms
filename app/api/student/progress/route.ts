@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -12,6 +13,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -42,7 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify enrollment belongs to user
-    const { data: enrollment, error: enrollmentError } = await supabase
+    const { data: enrollment, error: enrollmentError } = await db
       .from('enrollments')
       .select('id, user_id, course_id, progress, status')
       .eq('id', enrollmentId)
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const { data: updated, error: updateError } = await supabase
+    const { data: updated, error: updateError } = await db
       .from('enrollments')
       .update(updates)
       .eq('id', enrollmentId)
@@ -87,7 +89,7 @@ export async function POST(request: NextRequest) {
 
     // If moduleId provided, mark module as completed
     if (moduleId) {
-      const { error: completionError } = await supabase
+      const { error: completionError } = await db
         .from('lesson_completions')
         .upsert({
           user_id: user.id,
@@ -131,6 +133,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -152,7 +155,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get enrollment with course details
-    const { data: enrollment, error } = await supabase
+    const { data: enrollment, error } = await db
       .from('enrollments')
       .select(`
         id,
@@ -179,7 +182,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get completed modules
-    const { data: completions } = await supabase
+    const { data: completions } = await db
       .from('lesson_completions')
       .select('module_id, completed_at')
       .eq('user_id', user.id)

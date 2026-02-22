@@ -10,12 +10,14 @@ export const metadata: Metadata = generateInternalMetadata({
 });
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { ShopDocumentUpload } from '@/components/shop/ShopDocumentUpload';
 
 
 export default async function ShopDocumentsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -36,7 +38,7 @@ export default async function ShopDocumentsPage() {
   }
 
   // Get shop for this user
-  const { data: staff } = await supabase
+  const { data: staff } = await db
     .from('shop_staff')
     .select('shop_id, shops(*)')
     .eq('user_id', user.id);
@@ -48,7 +50,7 @@ export default async function ShopDocumentsPage() {
   }
 
   // Get required documents
-  const { data: requirements } = await supabase
+  const { data: requirements } = await db
     .from('shop_document_requirements')
     .select('*')
     .eq('state', 'IN')

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { HSICoursePlayer } from './HSICoursePlayer';
 
@@ -29,6 +30,7 @@ export default async function HSILearnPage({
   params: { courseType: string } 
 }) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -49,7 +51,7 @@ export default async function HSILearnPage({
   }
 
   // Get the HSI course product
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('hsi_course_products')
     .select('*')
     .eq('course_type', params.courseType)
@@ -70,7 +72,7 @@ export default async function HSILearnPage({
   }
 
   // Check if user has an active enrollment
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from('hsi_enrollment_queue')
     .select('*')
     .eq('student_id', user.id)
@@ -80,7 +82,7 @@ export default async function HSILearnPage({
 
   if (!enrollment) {
     // Check for pending enrollment
-    const { data: pendingEnrollment } = await supabase
+    const { data: pendingEnrollment } = await db
       .from('hsi_enrollment_queue')
       .select('*')
       .eq('student_id', user.id)

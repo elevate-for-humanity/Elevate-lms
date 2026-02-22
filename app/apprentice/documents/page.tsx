@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Download, Upload } from 'lucide-react';
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ApprenticeDocumentsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) { redirect("/login"); }
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -22,21 +24,21 @@ export default async function ApprenticeDocumentsPage() {
   }
 
   // Get apprentice profile
-  const { data: apprentice } = await supabase
+  const { data: apprentice } = await db
     .from('apprentices')
     .select('*')
     .eq('user_id', user.id)
     .single();
 
   // Get documents
-  const { data: documents } = await supabase
+  const { data: documents } = await db
     .from('apprentice_documents')
     .select('*')
     .eq('apprentice_id', apprentice?.id)
     .order('created_at', { ascending: false });
 
   // Get required forms
-  const { data: requiredForms } = await supabase
+  const { data: requiredForms } = await db
     .from('apprentice_forms')
     .select('*')
     .eq('program_id', apprentice?.program_id)

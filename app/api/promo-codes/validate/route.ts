@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -17,12 +18,13 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
     // Find the promo code
-    const { data: promo, error } = await supabase
+    const { data: promo, error } = await db
       .from('promo_codes')
       .select('*')
       .eq('code', code.toUpperCase().trim())

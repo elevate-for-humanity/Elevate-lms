@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -29,6 +30,7 @@ export const metadata: Metadata = {
 
 export default async function FERPAPortal() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -48,7 +50,7 @@ export default async function FERPAPortal() {
     redirect('/login?next=/ferpa');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role, full_name')
     .eq('id', user.id)
@@ -67,17 +69,17 @@ export default async function FERPAPortal() {
   }
 
   // Fetch FERPA metrics
-  const { count: totalStudents } = await supabase
+  const { count: totalStudents } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'student');
 
-  const { count: activeEnrollments } = await supabase
+  const { count: activeEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
-  const { count: pendingRequests } = await supabase
+  const { count: pendingRequests } = await db
     .from('applications')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');

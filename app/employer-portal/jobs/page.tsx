@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -18,6 +19,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function JobPostingsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/employer-portal/jobs');
@@ -30,7 +32,7 @@ export default async function JobPostingsPage() {
   }
 
   // Fetch real job postings for this employer
-  const { data: jobPostings } = await supabase
+  const { data: jobPostings } = await db
     .from('job_postings')
     .select('id, job_title, job_description, location, employment_type, salary_min, salary_max, status, positions_available, positions_filled, created_at')
     .eq('employer_id', user.id)

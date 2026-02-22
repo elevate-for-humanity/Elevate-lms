@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -20,7 +21,7 @@ const supabase = createSupabaseClient();
   const { attemptId } = await params;
   const session = await requireApiAuth();
 
-  const { data: attempt } = await supabase
+  const { data: attempt } = await db
     .from('scorm_attempts')
     .select('*')
     .eq('id', attemptId)
@@ -31,7 +32,7 @@ const supabase = createSupabaseClient();
     return NextResponse.json({ error: 'Attempt not found' }, { status: 404 });
   }
 
-  const { data: cmiData } = await supabase
+  const { data: cmiData } = await db
     .from('scorm_cmi_data')
     .select('*')
     .eq('attempt_id', attemptId);
@@ -56,7 +57,7 @@ export async function POST(
   const session = await requireApiAuth();
   const { data } = await request.json();
 
-  const { data: attempt } = await supabase
+  const { data: attempt } = await db
     .from('scorm_attempts')
     .select('*')
     .eq('id', attemptId)
@@ -71,7 +72,7 @@ export async function POST(
   const updates = [];
   for (const [key, value] of Object.entries(data)) {
     updates.push(
-      supabase.from('scorm_cmi_data').upsert({
+      db.from('scorm_cmi_data').upsert({
         attempt_id: attemptId,
         cmi_key: key,
         cmi_value: value as string,
@@ -87,7 +88,7 @@ export async function POST(
   const score = data['cmi.core.score.raw'] || data['cmi.score.raw'];
 
   if (status || score) {
-    await supabase
+    await db
       .from('scorm_attempts')
       .update({
         status,

@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
@@ -12,6 +13,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -24,7 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user is a program holder
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -38,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get program holder record
-    const { data: programHolder, error: phError } = await supabase
+    const { data: programHolder, error: phError } = await db
       .from('program_holders')
       .select('id')
       .eq('user_id', user.id)
@@ -68,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert report
-    const { data: report, error: insertError } = await supabase
+    const { data: report, error: insertError } = await db
       .from('apprentice_weekly_reports')
       .insert({
         program_holder_id: programHolder.id,
@@ -91,7 +93,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log the action
-    await supabase.from('audit_logs').insert({
+    await db.from('audit_logs').insert({
       user_id: user.id,
       action: 'report_submitted',
       resource_type: 'apprentice_weekly_report',

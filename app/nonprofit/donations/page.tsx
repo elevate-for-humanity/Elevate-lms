@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Heart, Users, TrendingUp, Gift } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function DonationsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -26,21 +28,21 @@ export default async function DonationsPage() {
   }
 
   // Get donation tiers
-  const { data: donationTiers } = await supabase
+  const { data: donationTiers } = await db
     .from('donation_tiers')
     .select('*')
     .eq('is_active', true)
     .order('amount', { ascending: true });
 
   // Get impact statistics
-  const { data: impactStats } = await supabase
+  const { data: impactStats } = await db
     .from('impact_statistics')
     .select('*')
     .eq('category', 'donations')
     .order('order', { ascending: true });
 
   // Get recent donors (anonymized)
-  const { data: recentDonors } = await supabase
+  const { data: recentDonors } = await db
     .from('donations')
     .select('amount, created_at, is_anonymous, donor_name')
     .eq('status', 'completed')

@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import {
   getInstructorByProgramId,
   getInstructorById,
@@ -106,8 +107,9 @@ Keep responses concise (2-4 paragraphs max), practical, and encouraging. Focus o
       // Log interaction to database
       try {
         const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
         const { data: { user } } = await supabase.auth.getUser();
-        await supabase.from('ai_instructor_interactions').insert({
+        await db.from('ai_instructor_interactions').insert({
           user_id: user?.id || null,
           program_id: programId,
           instructor_id: instructorId,

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import {
@@ -21,6 +22,7 @@ export const metadata = {
 
 export default async function TaxToolsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -34,7 +36,7 @@ export default async function TaxToolsPage() {
   }
   
   // Fetch tax tools
-  const { data: tools } = await supabase
+  const { data: tools } = await db
     .from('tax_tools')
     .select('*')
     .order('category');

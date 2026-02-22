@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Get user's program holder ID
-  const { data: prof } = await supabase
+  const { data: prof } = await db
     .from('user_profiles')
     .select('program_holder_id')
     .eq('user_id', user.id)
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
   const sigUrl = path; // store path; you can build public URL when needed
 
   const now = new Date().toISOString();
-  const { data: updated, error } = await supabase
+  const { data: updated, error } = await db
     .from('program_holders')
     .update({
       mou_status: 'signed_by_holder',

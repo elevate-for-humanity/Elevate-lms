@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -13,18 +14,19 @@ export async function GET(
     if (rateLimited) return rateLimited;
 const { userId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch user progress across courses and programs
   const [enrollmentsResult, progressResult, certificatesResult] = await Promise.all([
-    supabase
+    db
       .from('enrollments')
       .select('id, status, program_id, created_at')
       .eq('user_id', userId),
-    supabase
+    db
       .from('user_progress')
       .select('*')
       .eq('user_id', userId),
-    supabase
+    db
       .from('certificates')
       .select('id, program_id, issued_at')
       .eq('user_id', userId),

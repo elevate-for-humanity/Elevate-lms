@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
@@ -12,6 +13,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -20,7 +22,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get programs owned by this user
-    const { data: ownedPrograms } = await supabase
+    const { data: ownedPrograms } = await db
       .from('programs')
       .select('id, name')
       .eq('owner_id', user.id);
@@ -43,7 +45,7 @@ export async function GET(request: NextRequest) {
     const programIds = ownedPrograms.map((p) => p.id);
 
     // Get enrollments for owned programs
-    const { data: enrollments } = await supabase
+    const { data: enrollments } = await db
       .from('enrollments')
       .select('student_id, program_id')
       .in('program_id', programIds);
@@ -55,7 +57,7 @@ export async function GET(request: NextRequest) {
     const studentIds = [...new Set(enrollments.map((e) => e.student_id))];
 
     // Get student details
-    const { data: students, error } = await supabase
+    const { data: students, error } = await db
       .from('profiles')
       .select('id, email, full_name, created_at')
       .in('id', studentIds)

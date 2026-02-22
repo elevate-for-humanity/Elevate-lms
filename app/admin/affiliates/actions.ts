@@ -1,11 +1,13 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function createAffiliate(formData: FormData) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) throw new Error('Database unavailable');
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -18,7 +20,7 @@ export async function createAffiliate(formData: FormData) {
   const commission = formData.get('commission') as string;
   const notes = formData.get('notes') as string;
 
-  const { error } = await supabase.from('affiliates').insert({
+  const { error } = await db.from('affiliates').insert({
     name,
     email,
     phone: phone || null,
@@ -31,7 +33,7 @@ export async function createAffiliate(formData: FormData) {
 
   if (error) {
     // If table doesn't exist, insert into a general contacts/partners table
-    const { error: fallbackError } = await supabase.from('profiles').insert({
+    const { error: fallbackError } = await db.from('profiles').insert({
       full_name: name,
       email,
       phone: phone || null,

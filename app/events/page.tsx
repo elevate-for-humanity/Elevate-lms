@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Calendar, MapPin, Clock, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -26,6 +27,7 @@ interface Event {
 
 export default async function EventsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -38,14 +40,14 @@ export default async function EventsPage() {
     );
   }
 
-  const { data: upcomingEvents, error } = await supabase
+  const { data: upcomingEvents, error } = await db
     .from('events')
     .select('id, title, description, event_type, start_time, end_time, location')
     .gte('start_time', new Date().toISOString())
     .order('start_time', { ascending: true })
     .limit(12);
 
-  const { data: pastEvents } = await supabase
+  const { data: pastEvents } = await db
     .from('events')
     .select('id, title, description, event_type, start_time, end_time, location')
     .lt('start_time', new Date().toISOString())

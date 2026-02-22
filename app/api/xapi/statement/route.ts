@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    const { error } = await supabase
+    const { error } = await db
       .from('xapi_statements')
       .insert(records);
 
@@ -81,7 +82,7 @@ const supabase = createSupabaseClient();
     const verb = searchParams.get('verb');
     const limit = parseInt(searchParams.get('limit') || '100');
 
-    let query = supabase
+    let query = db
       .from('xapi_statements')
       .select('*')
       .order('stored_at', { ascending: false })

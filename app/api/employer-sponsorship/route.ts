@@ -9,6 +9,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { 
   validateEmployerSponsorshipTerms,
   handleEmployerSeparation 
@@ -22,6 +23,7 @@ export async function GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -29,7 +31,7 @@ const supabase = await createClient();
   }
 
   // Check admin role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -44,7 +46,7 @@ const supabase = await createClient();
   const status = searchParams.get('status');
   const employerName = searchParams.get('employer');
 
-  let query = supabase
+  let query = db
     .from('employer_sponsorships')
     .select(`
       *,
@@ -81,6 +83,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -88,7 +91,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Check admin role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -129,7 +132,7 @@ export async function POST(request: NextRequest) {
     }, { status: 400 });
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('employer_sponsorships')
     .insert({
       enrollment_id: enrollmentId,
@@ -163,6 +166,7 @@ export async function PATCH(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -170,7 +174,7 @@ const supabase = await createClient();
   }
 
   // Check admin role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -223,14 +227,14 @@ const supabase = await createClient();
       };
 
       // Activate the enrollment
-      const { data: sponsorship } = await supabase
+      const { data: sponsorship } = await db
         .from('employer_sponsorships')
         .select('enrollment_id')
         .eq('id', sponsorshipId)
         .single();
 
       if (sponsorship) {
-        await supabase
+        await db
           .from('enrollments')
           .update({ status: 'active', payment_status: 'paid' })
           .eq('id', sponsorship.enrollment_id);
@@ -243,7 +247,7 @@ const supabase = await createClient();
       }
 
       // Get current sponsorship data
-      const { data: current } = await supabase
+      const { data: current } = await db
         .from('employer_sponsorships')
         .select('reimbursements_received, total_reimbursed, term_months, total_tuition')
         .eq('id', sponsorshipId)
@@ -294,7 +298,7 @@ const supabase = await createClient();
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   }
 
-  const { error } = await supabase
+  const { error } = await db
     .from('employer_sponsorships')
     .update(updateData)
     .eq('id', sponsorshipId);

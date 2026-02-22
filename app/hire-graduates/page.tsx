@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
 
 export default async function HireGraduatesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -32,7 +34,7 @@ export default async function HireGraduatesPage() {
   }
   
   // Fetch job-ready graduates
-  const { data: graduates } = await supabase
+  const { data: graduates } = await db
     .from('students')
     .select('*')
     .eq('status', 'job_ready')

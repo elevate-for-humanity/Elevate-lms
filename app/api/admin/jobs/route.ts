@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContext } from '@/lib/tenant';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -21,9 +22,10 @@ export async function GET(request: NextRequest) {
 
     const tenantContext = await getTenantContext();
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify super_admin role
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', tenantContext.userId)
@@ -37,7 +39,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const limit = parseInt(searchParams.get('limit') || '50', 10);
 
-    let query = supabase
+    let query = db
       .from('provisioning_jobs')
       .select('*')
       .order('updated_at', { ascending: false })
@@ -55,7 +57,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get counts by status
-    const { data: counts } = await supabase
+    const { data: counts } = await db
       .from('provisioning_jobs')
       .select('status')
       .then(({ data }) => {

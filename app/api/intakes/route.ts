@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { IntakeCreateSchema } from '@/lib/validators/course';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -16,6 +17,7 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });
     }
@@ -33,7 +35,7 @@ export async function POST(request: Request) {
     // Get source page from referer header
     const referer = request.headers.get('referer') || '';
     
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('intakes')
       .insert({
         source: parsed.data.source || 'website',
@@ -68,6 +70,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });
     }
@@ -78,7 +81,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -91,7 +94,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
 
-    let query = supabase
+    let query = db
       .from('intakes')
       .select('*')
       .order('created_at', { ascending: false });

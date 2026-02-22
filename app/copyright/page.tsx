@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Copyright as CopyrightIcon, Shield, FileText } from 'lucide-react';
 
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 
 export default async function CopyrightPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -30,7 +32,7 @@ export default async function CopyrightPage() {
   }
   
   // Fetch copyright policy
-  const { data: policy } = await supabase
+  const { data: policy } = await db
     .from('legal_documents')
     .select('*')
     .eq('type', 'copyright')

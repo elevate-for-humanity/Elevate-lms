@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
 
 export async function generateMetadata({
@@ -25,6 +26,7 @@ export async function generateMetadata({
 async function getCategoryPosts(category: string) {
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -38,7 +40,7 @@ async function getCategoryPosts(category: string) {
   }
     const categoryName = category.replace(/-/g, ' ');
 
-    const { data: posts } = await supabase
+    const { data: posts } = await db
       .from('blog_posts')
       .select('*')
       .eq('published', true)
@@ -54,7 +56,8 @@ async function getCategoryPosts(category: string) {
 async function getAllCategories() {
   try {
     const supabase = await createClient();
-    const { data: posts } = await supabase
+  const _admin = createAdminClient(); const db = _admin || supabase;
+    const { data: posts } = await db
       .from('blog_posts')
       .select('category')
       .eq('published', true)

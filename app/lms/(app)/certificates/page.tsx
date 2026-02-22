@@ -45,14 +45,14 @@ export default async function CertificatesPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
   // Fetch certificates (no FK to courses table, use stored course_title/program_name)
-  const { data: certificates } = await supabase
+  const { data: certificates } = await db
     .from('certificates')
     .select('*')
     .eq('user_id', user.id)

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
@@ -14,6 +15,7 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -27,7 +29,7 @@ export async function POST(request: Request) {
     } = body;
 
     // Get partner course details
-    const { data: partnerCourse, error: courseError } = await supabase
+    const { data: partnerCourse, error: courseError } = await db
       .from('partner_courses')
       .select(`
         *,
@@ -41,7 +43,7 @@ export async function POST(request: Request) {
     }
 
     // Check if already enrolled
-    const { data: existingEnrollment } = await supabase
+    const { data: existingEnrollment } = await db
       .from('partner_lms_enrollments')
       .select('*')
       .eq('student_id', user.id)
@@ -65,7 +67,7 @@ export async function POST(request: Request) {
     if (provider?.api_endpoint && provider?.api_key) {
       try {
         // Get user profile for enrollment
-        const { data: profile } = await supabase
+        const { data: profile } = await db
           .from('profiles')
           .select('*')
           .eq('id', user.id)
@@ -103,7 +105,7 @@ export async function POST(request: Request) {
     }
 
     // Create partner enrollment record
-    const { data: enrollment, error: enrollmentError } = await supabase
+    const { data: enrollment, error: enrollmentError } = await db
       .from('partner_lms_enrollments')
       .insert({
         provider_id: partnerCourse.provider_id,
@@ -124,7 +126,7 @@ export async function POST(request: Request) {
     }
 
     // Check if there's a SCORM package mapped to this course
-    const { data: mapping } = await supabase
+    const { data: mapping } = await db
       .from('partner_course_mappings')
       .select(`
         *,
@@ -136,7 +138,7 @@ export async function POST(request: Request) {
 
     // If SCORM package exists, create SCORM enrollment
     if (mapping?.scorm_package) {
-      await supabase
+      await db
         .from('scorm_enrollments')
         .insert({
           scorm_package_id: mapping.scorm_package_id,
@@ -147,7 +149,7 @@ export async function POST(request: Request) {
     }
 
     // Log the sync
-    await supabase
+    await db
       .from('lms_sync_log')
       .insert({
         provider_id: partnerCourse.provider_id,
@@ -180,6 +182,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -190,7 +193,7 @@ export async function GET(request: Request) {
     const userId = searchParams.get('userId') || user.id;
 
     // Get all partner enrollments for user
-    const { data: enrollments, error } = await supabase
+    const { data: enrollments, error } = await db
       .from('partner_lms_enrollments')
       .select(`
         *,

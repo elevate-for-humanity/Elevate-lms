@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 import { notFound } from 'next/navigation';
 import { createPublicClient } from '@/lib/supabase/server';
@@ -160,7 +161,7 @@ export default async function ProgramDetailPage({
       program = await loadProgram(slug);
     } else {
       // Try database first
-      const { data: dbProgram } = await supabase
+      const { data: dbProgram } = await db
         .from('programs')
         .select('*')
         .eq('slug', slug)
@@ -170,13 +171,13 @@ export default async function ProgramDetailPage({
 
       // Fetch outcomes from DB if program found
       if (program?.id) {
-        const { data: outcomes } = await supabase
+        const { data: outcomes } = await db
           .from('program_outcomes')
           .select('outcome')
           .eq('program_id', program.id)
           .order('outcome_order', { ascending: true });
         
-        const { data: requirements } = await supabase
+        const { data: requirements } = await db
           .from('program_requirements')
           .select('requirement')
           .eq('program_id', program.id)

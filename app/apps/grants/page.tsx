@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { GrantsApp } from './GrantsApp';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function GrantsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) {
     redirect('/error?message=service-unavailable');
@@ -24,7 +26,7 @@ export default async function GrantsPage() {
   }
 
   // Check subscription
-  const { data: subscription } = await supabase
+  const { data: subscription } = await db
     .from('user_app_subscriptions')
     .select('*')
     .eq('user_id', user.id)
@@ -54,7 +56,7 @@ export default async function GrantsPage() {
   }
 
   // Fetch grant opportunities from database
-  const { data: opportunities } = await supabase
+  const { data: opportunities } = await db
     .from('grant_opportunities')
     .select('*')
     .eq('opportunity_status', 'open')
@@ -62,13 +64,13 @@ export default async function GrantsPage() {
     .limit(50);
 
   // Fetch user's saved grants
-  const { data: savedGrants } = await supabase
+  const { data: savedGrants } = await db
     .from('user_saved_grants')
     .select('*, grant:grant_opportunities(*)')
     .eq('user_id', user.id);
 
   // Fetch user's applications
-  const { data: applications } = await supabase
+  const { data: applications } = await db
     .from('grant_applications')
     .select('*')
     .eq('user_id', user.id)

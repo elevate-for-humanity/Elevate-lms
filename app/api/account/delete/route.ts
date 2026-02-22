@@ -1,4 +1,5 @@
 // app/api/account/delete/route.ts
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
 import { createSupabaseClient } from '@/lib/supabase-api';
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
   }
 
   const supabase = createSupabaseClient();
-  const { data: user, error: userError } = await supabase
+  const { data: user, error: userError } = await db
     .from('users')
     .select('id, email')
     .eq('email', email)
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
-  const { error: insertError } = await supabase.from('account_deletion_requests').insert({
+  const { error: insertError } = await db.from('account_deletion_requests').insert({
     user_id: user.id,
     email: user.email,
   });

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Circle, Target, TrendingUp } from 'lucide-react';
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ApprenticeSkillsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) { redirect("/login"); }
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -22,14 +24,14 @@ export default async function ApprenticeSkillsPage() {
   }
 
   // Get apprentice profile
-  const { data: apprentice } = await supabase
+  const { data: apprentice } = await db
     .from('apprentices')
     .select('*, program:program_id(name)')
     .eq('user_id', user.id)
     .single();
 
   // Get skill categories and skills
-  const { data: skillCategories } = await supabase
+  const { data: skillCategories } = await db
     .from('skill_categories')
     .select(`
       *,
@@ -42,7 +44,7 @@ export default async function ApprenticeSkillsPage() {
     .order('order', { ascending: true });
 
   // Get overall progress
-  const { data: progressSummary } = await supabase
+  const { data: progressSummary } = await db
     .from('apprentice_skill_progress')
     .select('*')
     .eq('apprentice_id', apprentice?.id);

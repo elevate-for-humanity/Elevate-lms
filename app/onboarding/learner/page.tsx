@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BookOpen, FileText, CreditCard, Calendar, User, ArrowRight } from 'lucide-react';
@@ -66,6 +67,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
 
 export default async function LearnerOnboardingPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) { redirect("/login"); }
   const { data: { user } } = await supabase.auth.getUser();
@@ -73,14 +75,14 @@ export default async function LearnerOnboardingPage() {
     redirect('/login?redirect=/onboarding/learner');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*, onboarding_completed, funding_confirmed, funding_source, orientation_completed, schedule_selected, enrollment_status')
     .eq('id', user.id)
     .single();
 
   // Get enrollment status
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from('enrollments')
     .select('*, programs(name)')
     .eq('user_id', user.id)
@@ -96,7 +98,7 @@ export default async function LearnerOnboardingPage() {
   }
   
   // Check for uploaded documents
-  const { count: docCount } = await supabase
+  const { count: docCount } = await db
     .from('documents')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id);
@@ -122,7 +124,7 @@ export default async function LearnerOnboardingPage() {
 
   // If all steps complete, mark onboarding as done in profile
   if (allComplete && profile && !profile.onboarding_completed) {
-    await supabase
+    await db
       .from('profiles')
       .update({ 
         onboarding_completed: true,

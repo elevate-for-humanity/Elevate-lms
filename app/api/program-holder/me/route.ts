@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -21,7 +22,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Get user's program holder ID
-  const { data: prof } = await supabase
+  const { data: prof } = await db
     .from('user_profiles')
     .select('program_holder_id')
     .eq('user_id', user.id)
@@ -32,7 +33,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Get program holder details
-  const { data: ph, error } = await supabase
+  const { data: ph, error } = await db
     .from('program_holders')
     .select(
       'id, name, payout_share, mou_status, mou_holder_name, mou_holder_signed_at'

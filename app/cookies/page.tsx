@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 
 export default async function CookiesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function CookiesPage() {
   }
   
   // Fetch cookie policy content
-  const { data: policy } = await supabase
+  const { data: policy } = await db
     .from('legal_documents')
     .select('*')
     .eq('type', 'cookie_policy')

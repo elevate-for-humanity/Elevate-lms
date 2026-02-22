@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Code, BookOpen, Github, FileCode, Terminal, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -16,6 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function DevelopersPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function DevelopersPage() {
   }
 
   // Get API documentation
-  const { data: docs } = await supabase
+  const { data: docs } = await db
     .from('documentation')
     .select('*')
     .eq('category', 'api')
@@ -37,7 +39,7 @@ export default async function DevelopersPage() {
     .order('order', { ascending: true });
 
   // Get code examples
-  const { data: examples } = await supabase
+  const { data: examples } = await db
     .from('code_examples')
     .select('*')
     .eq('is_active', true)

@@ -8,10 +8,11 @@ export const dynamic = 'force-dynamic';
 
 async function guardAdmin() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -35,7 +36,7 @@ const denied = await guardAdmin();
       );
     }
 
-    const { data: courses, error } = await supabase
+    const { data: courses, error } = await db
       .from('career_courses')
       .select(`
         *,
@@ -76,7 +77,7 @@ export async function POST(req: Request) {
     }
 
       // Get all courses without Stripe IDs
-      const { data: courses, error } = await supabase
+      const { data: courses, error } = await db
         .from('career_courses')
         .select('*')
         .is('stripe_product_id', null);
@@ -115,7 +116,7 @@ export async function POST(req: Request) {
           });
 
           // Update course with Stripe IDs
-          await supabase
+          await db
             .from('career_courses')
             .update({
               stripe_product_id: product.id,

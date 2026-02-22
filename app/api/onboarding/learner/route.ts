@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.json();
 
     // Save learner onboarding data to database
-    const { error: insertError } = await supabase
+    const { error: insertError } = await db
       .from('learner_onboarding')
       .insert({
         user_id: session.user.id,
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
     if (insertError) throw insertError;
 
     // Update profile to mark onboarding as started
-    await supabase
+    await db
       .from('profiles')
       .update({
         onboarding_started: true,

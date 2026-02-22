@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Metadata } from 'next';
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from "next/link";
 import Image from "next/image";
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 export default async function PathwayDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -30,7 +32,7 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
   }
   
   // Try to fetch from database first
-  const { data: dbPathway } = await supabase
+  const { data: dbPathway } = await db
     .from('pathways')
     .select('*')
     .eq('slug', slug)

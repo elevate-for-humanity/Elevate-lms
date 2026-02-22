@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Clock, Award, ArrowRight } from 'lucide-react';
 
@@ -26,6 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function EnrollProgramPage({ params }: Props) {
   const { programSlug } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Check if user is logged in
   const { data: { user } } = await supabase.auth.getUser();
@@ -35,7 +37,7 @@ export default async function EnrollProgramPage({ params }: Props) {
   }
 
   // Try to find the course/program
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('training_courses')
     .select('*')
     .eq('slug', programSlug)

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -15,6 +16,7 @@ async function confirmSchedule(formData: FormData) {
   'use server';
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) throw new Error('Database unavailable');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
@@ -22,14 +24,14 @@ async function confirmSchedule(formData: FormData) {
   const cohortId = formData.get('cohort_id') as string;
 
   // Update profile
-  await supabase.from('profiles').update({
+  await db.from('profiles').update({
     enrollment_status: 'active',
     schedule_selected: true,
     selected_cohort: cohortId || 'HVAC-2026-C1',
   }).eq('id', user.id);
 
   // Ensure training_enrollments row exists (may already exist from approve step)
-  const { data: existing } = await supabase
+  const { data: existing } = await db
     .from('training_enrollments')
     .select('id')
     .eq('user_id', user.id)
@@ -39,7 +41,7 @@ async function confirmSchedule(formData: FormData) {
 
   if (!existing) {
     // Look up the HVAC course to create enrollment
-    const { data: hvacCourse } = await supabase
+    const { data: hvacCourse } = await db
       .from('training_courses')
       .select('id')
       .ilike('course_name', '%hvac%')
@@ -48,7 +50,7 @@ async function confirmSchedule(formData: FormData) {
       .maybeSingle();
 
     if (hvacCourse) {
-      await supabase.from('training_enrollments').insert({
+      await db.from('training_enrollments').insert({
         user_id: user.id,
         course_id: hvacCourse.id,
         status: 'active',
@@ -62,6 +64,7 @@ async function confirmSchedule(formData: FormData) {
 
 export default async function SelectSchedulePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');

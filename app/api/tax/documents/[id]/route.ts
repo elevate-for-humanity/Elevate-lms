@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,6 +17,7 @@ export async function DELETE(
 const { id } = await params;
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -26,7 +28,7 @@ const { id } = await params;
     }
 
     // Get document to verify ownership and get file path
-    const { data: document, error: fetchError } = await supabase
+    const { data: document, error: fetchError } = await db
       .from('tax_documents')
       .select('*')
       .eq('id', id)
@@ -50,7 +52,7 @@ const { id } = await params;
     }
 
     // Delete from database
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await db
       .from('tax_documents')
       .delete()
       .eq('id', id)

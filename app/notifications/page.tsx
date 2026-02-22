@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import NotificationsClient from './NotificationsClient';
 
@@ -15,6 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function NotificationsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -22,7 +24,7 @@ export default async function NotificationsPage() {
   }
 
   // Fetch notifications
-  const { data: notifications } = await supabase
+  const { data: notifications } = await db
     .from('notifications')
     .select('*')
     .eq('user_id', user.id)

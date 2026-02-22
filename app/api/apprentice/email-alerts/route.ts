@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,9 +12,10 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { type, apprenticeshipId, data } = await request.json();
 
-  const { data: apprenticeship } = await supabase
+  const { data: apprenticeship } = await db
     .from('apprenticeship_enrollments')
     .select(`
       *,
@@ -79,7 +81,7 @@ export async function POST(request: Request) {
 
   // Insert notifications
   for (const notif of notifications) {
-    await supabase.from('notification_log').insert(notif);
+    await db.from('notification_log').insert(notif);
   }
 
   return NextResponse.json({ success: true, sent: notifications.length });
@@ -91,6 +93,7 @@ export async function GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const today = new Date().toISOString().split('T')[0];
   const currentHour = new Date().getHours();
 
@@ -100,7 +103,7 @@ const supabase = await createClient();
   }
 
   // Find apprentices who haven't checked in today
-  const { data: apprenticeships } = await supabase
+  const { data: apprenticeships } = await db
     .from('apprenticeship_enrollments')
     .select(`
       *,
@@ -111,7 +114,7 @@ const supabase = await createClient();
   let alertsSent = 0;
 
   for (const apprenticeship of apprenticeships || []) {
-    const { data: todayLog } = await supabase
+    const { data: todayLog } = await db
       .from('ojt_hours_log')
       .select('id')
       .eq('apprenticeship_id', apprenticeship.id)

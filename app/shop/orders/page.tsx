@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -41,6 +42,7 @@ interface Order {
 
 export default async function OrderHistoryPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -57,7 +59,7 @@ export default async function OrderHistoryPage() {
   if (!user) redirect('/login?next=/shop/orders');
 
   // Fetch orders from database
-  const { data: ordersData, error } = await supabase
+  const { data: ordersData, error } = await db
     .from('orders')
     .select(`
       id,

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { CheckSquare, Square, Calendar, User } from 'lucide-react';
@@ -22,6 +23,7 @@ export default async function QAChecklistPage() {
     'advisor',
   ]);
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -34,7 +36,7 @@ export default async function QAChecklistPage() {
     );
   }
 
-  const { data: checklists, error } = await supabase
+  const { data: checklists, error } = await db
     .from('qa_checklists')
     .select('*')
     .eq('is_active', true)
@@ -42,7 +44,7 @@ export default async function QAChecklistPage() {
     .order('frequency');
 
   const today = new Date().toISOString().split('T')[0];
-  const { data: completions } = await supabase
+  const { data: completions } = await db
     .from('qa_checklist_completions')
     .select('*')
     .eq('user_id', user.id)

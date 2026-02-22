@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -14,6 +15,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get query parameters
     const { searchParams } = new URL(request.url);
@@ -21,7 +23,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category');
 
     // Build query
-    let query = supabase
+    let query = db
       .from('courses')
       .select(
         `

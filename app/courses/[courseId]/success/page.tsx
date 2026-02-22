@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { generateMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { Play, BookOpen } from 'lucide-react';
@@ -18,6 +19,7 @@ export default async function EnrollmentSuccessPage({
   params: { courseId: string };
 }) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -31,7 +33,7 @@ export default async function EnrollmentSuccessPage({
   }
   
   // Fetch course info
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('training_courses')
     .select('id, title, slug')
     .eq('id', params.courseId)

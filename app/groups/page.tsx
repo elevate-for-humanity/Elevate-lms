@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { Users, Plus, Search, MessageSquare, AlertCircle } from 'lucide-react';
 
@@ -25,11 +26,12 @@ interface StudyGroup {
 
 export default async function GroupsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/groups');
 
   // Fetch study groups from database
-  const { data: groups, error } = await supabase
+  const { data: groups, error } = await db
     .from('study_groups')
     .select('id, name, category, member_count, is_active')
     .order('member_count', { ascending: false })

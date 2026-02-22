@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
     // Build query
-    let query = supabase
+    let query = db
       .from('cash_advance_applications')
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })

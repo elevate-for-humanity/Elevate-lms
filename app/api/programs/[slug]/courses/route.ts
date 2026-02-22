@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createServerSupabaseClient } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -41,7 +42,7 @@ export async function GET(
     const category = categoryMap[slug] || slug;
 
     // Fetch courses matching the category
-    const { data: courses, error } = await supabase
+    const { data: courses, error } = await db
       .from('courses')
       .select('*')
       .eq('published', true)

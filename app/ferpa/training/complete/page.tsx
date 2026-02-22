@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 
 export default async function CompleteFERPATrainingPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -32,7 +34,7 @@ export default async function CompleteFERPATrainingPage() {
     redirect('/login?next=/ferpa/training/complete');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -43,7 +45,7 @@ export default async function CompleteFERPATrainingPage() {
   }
 
   // Check if user already has current training
-  const { data: existingTraining } = await supabase
+  const { data: existingTraining } = await db
     .from('ferpa_training_records')
     .select('*')
     .eq('user_id', user.id)

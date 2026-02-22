@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
 import { getAppVersion } from '@/lib/version/getAppVersion';
@@ -40,7 +41,7 @@ const checks: Record<string, any> = {
     ) {
       const supabase = createSupabaseClient();
 
-      const { error } = await supabase
+      const { error } = await db
         .from('programs')
         .select('count')
         .limit(1);

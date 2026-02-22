@@ -54,7 +54,7 @@ export async function POST(req: Request) {
       // Get user by email
       let userId: string | null = null;
       if (customerEmail) {
-        const { data: profile } = await supabase
+        const { data: profile } = await db
           .from('profiles')
           .select('id')
           .eq('email', customerEmail)
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
 
       // Record purchases for each course
       for (const courseId of courseIds) {
-        const { error } = await supabase
+        const { error } = await db
           .from('career_course_purchases')
           .upsert({
             user_id: userId,

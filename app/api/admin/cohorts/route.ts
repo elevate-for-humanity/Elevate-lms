@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -7,10 +8,11 @@ export const dynamic = 'force-dynamic';
 
 async function requireAdmin() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return { error: 'Database unavailable', status: 500 };
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Unauthorized', status: 401 };
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
   if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 };
   }
@@ -29,7 +31,7 @@ const auth = await requireAdmin();
     const status = searchParams.get('status');
     const programId = searchParams.get('program_id');
 
-    let query = auth.supabase
+    let query = auth.db
       .from('cohorts')
       .select(`
         *,
@@ -68,7 +70,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     
-    const { data: cohort, error } = await auth.supabase
+    const { data: cohort, error } = await auth.db
       .from('cohorts')
       .insert({
         program_id: body.program_id,
@@ -90,7 +92,7 @@ export async function POST(request: Request) {
     }
 
     // Log audit
-    await auth.supabase.from('audit_logs').insert({
+    await auth.db.from('audit_logs').insert({
       actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action: 'create',
@@ -121,13 +123,13 @@ const auth = await requireAdmin();
     }
 
     // Get current state for audit
-    const { data: oldCohort } = await auth.supabase
+    const { data: oldCohort } = await auth.db
       .from('cohorts')
       .select('*')
       .eq('id', id)
       .single();
 
-    const { data: cohort, error } = await auth.supabase
+    const { data: cohort, error } = await auth.db
       .from('cohorts')
       .update({
         ...updates,
@@ -142,7 +144,7 @@ const auth = await requireAdmin();
     }
 
     // Log audit
-    await auth.supabase.from('audit_logs').insert({
+    await auth.db.from('audit_logs').insert({
       actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action: 'update',
@@ -174,14 +176,14 @@ const auth = await requireAdmin();
     }
 
     // Get current state for audit
-    const { data: oldCohort } = await auth.supabase
+    const { data: oldCohort } = await auth.db
       .from('cohorts')
       .select('*')
       .eq('id', id)
       .single();
 
     // Soft delete by setting status to cancelled
-    const { error } = await auth.supabase
+    const { error } = await auth.db
       .from('cohorts')
       .update({ status: 'cancelled', updated_at: new Date().toISOString() })
       .eq('id', id);
@@ -191,7 +193,7 @@ const auth = await requireAdmin();
     }
 
     // Log audit
-    await auth.supabase.from('audit_logs').insert({
+    await auth.db.from('audit_logs').insert({
       actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action: 'delete',

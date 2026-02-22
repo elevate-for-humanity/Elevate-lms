@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Download, Calendar, Users, Clock } from 'lucide-react';
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ShopReportsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/shop/reports');
@@ -26,7 +28,7 @@ export default async function ShopReportsPage() {
   }
 
   // Get shops this user is staff at
-  const { data: staffRecords } = await supabase
+  const { data: staffRecords } = await db
     .from('shop_staff')
     .select('shop_id')
     .eq('user_id', user.id);
@@ -45,7 +47,7 @@ export default async function ShopReportsPage() {
   }> = [];
 
   if (shopIds.length > 0) {
-    const { data: placements } = await supabase
+    const { data: placements } = await db
       .from('apprentice_placements')
       .select('id')
       .in('shop_id', shopIds);
@@ -53,7 +55,7 @@ export default async function ShopReportsPage() {
     const placementIds = (placements || []).map(p => p.id);
 
     if (placementIds.length > 0) {
-      const { data: weeklyReports } = await supabase
+      const { data: weeklyReports } = await db
         .from('apprentice_weekly_reports')
         .select('id, placement_id, week_start, week_end, hours_total, status, created_at')
         .in('placement_id', placementIds)

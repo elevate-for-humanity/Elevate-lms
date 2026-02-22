@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     }
 
     // Fetch courses with Stripe price IDs
-    const { data: courses, error } = await supabase
+    const { data: courses, error } = await db
       .from('career_courses')
       .select('id, title, price, stripe_price_id, slug')
       .in('id', courseIds);
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
         });
 
         // Update database
-        await supabase
+        await db
           .from('career_courses')
           .update({
             stripe_product_id: product.id,
@@ -80,7 +80,7 @@ export async function POST(req: Request) {
     let discounts: Stripe.Checkout.SessionCreateParams.Discount[] | undefined;
     
     if (promoCode) {
-      const { data: promo } = await supabase
+      const { data: promo } = await db
         .from('promo_codes')
         .select('*')
         .eq('code', promoCode.toUpperCase())
@@ -106,7 +106,7 @@ export async function POST(req: Request) {
           discounts = [{ coupon: coupon.id }];
 
           // Increment usage count
-          await supabase
+          await db
             .from('promo_codes')
             .update({ current_uses: (promo.current_uses || 0) + 1 })
             .eq('id', promo.id);

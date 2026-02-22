@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
@@ -19,6 +20,7 @@ export async function PATCH(
 const { id } = await params;
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await parseBody<Record<string, any>>(request);
     const { status, rejection_reason } = body;
 
@@ -32,7 +34,7 @@ const { id } = await params;
     } = await supabase.auth.getUser();
 
     // Get existing leave request
-    const { data: existing, error: existingError } = await supabase
+    const { data: existing, error: existingError } = await db
       .from('leave_requests')
       .select('*')
       .eq('id', id)
@@ -47,7 +49,7 @@ const { id } = await params;
     }
 
     // Update leave request
-    const { data: updated, error: updateError } = await supabase
+    const { data: updated, error: updateError } = await db
       .from('leave_requests')
       .update({
         status,

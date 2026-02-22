@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { GraduationCap, Users, FileText, Video, Download } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -16,6 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function TeachersPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function TeachersPage() {
   }
 
   // Get teacher resources
-  const { data: resources } = await supabase
+  const { data: resources } = await db
     .from('resources')
     .select('*')
     .eq('category', 'teachers')
@@ -37,7 +39,7 @@ export default async function TeachersPage() {
     .order('order', { ascending: true });
 
   // Get training videos
-  const { data: videos } = await supabase
+  const { data: videos } = await db
     .from('training_videos')
     .select('*')
     .eq('audience', 'teachers')
@@ -45,7 +47,7 @@ export default async function TeachersPage() {
     .limit(4);
 
   // Get teacher community discussions
-  const { data: discussions } = await supabase
+  const { data: discussions } = await db
     .from('discussions')
     .select('id, title, created_at, reply_count')
     .eq('category', 'teachers')

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { AlertCircle, TrendingDown, FileWarning } from 'lucide-react';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function AtRiskStudentsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -36,7 +38,7 @@ export default async function AtRiskStudentsPage() {
     redirect('/login?next=/admin/at-risk');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -47,7 +49,7 @@ export default async function AtRiskStudentsPage() {
   }
 
   // Fetch at-risk students
-  const { data: atRiskStudents } = await supabase
+  const { data: atRiskStudents } = await db
     .from('student_risk_status')
     .select(
       `
@@ -79,7 +81,7 @@ export default async function AtRiskStudentsPage() {
     .order('overdue_count', { ascending: false });
 
   // Fetch needs action students
-  const { data: needsActionStudents } = await supabase
+  const { data: needsActionStudents } = await db
     .from('student_risk_status')
     .select(
       `
@@ -104,7 +106,7 @@ export default async function AtRiskStudentsPage() {
     .order('overdue_count', { ascending: false });
 
   // Fetch programs with low completion
-  const { data: programStats } = await supabase.from('enrollments').select(`
+  const { data: programStats } = await db.from('enrollments').select(`
       program_id,
       status,
       programs (

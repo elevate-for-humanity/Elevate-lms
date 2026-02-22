@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
@@ -20,6 +21,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
     }
@@ -33,7 +35,7 @@ export async function GET(request: Request) {
     const studentId = user.id;
 
     // Fetch active enrollments with program info
-    const { data: enrollments, error: enrollError } = await supabase
+    const { data: enrollments, error: enrollError } = await db
       .from('enrollments')
       .select(`
         id,
@@ -57,7 +59,7 @@ export async function GET(request: Request) {
     }
 
     // Fetch verified hours grouped by enrollment
-    const { data: verifiedHours, error: verifiedError } = await supabase
+    const { data: verifiedHours, error: verifiedError } = await db
       .from('student_hours')
       .select('enrollment_id, hours')
       .eq('student_id', studentId)
@@ -68,7 +70,7 @@ export async function GET(request: Request) {
     }
 
     // Fetch pending hours grouped by enrollment
-    const { data: pendingHours, error: pendingError } = await supabase
+    const { data: pendingHours, error: pendingError } = await db
       .from('student_hours')
       .select('enrollment_id, hours')
       .eq('student_id', studentId)
@@ -83,7 +85,7 @@ export async function GET(request: Request) {
     let tasks: any[] = [];
     
     if (enrollmentIds.length > 0) {
-      const { data: taskData, error: taskError } = await supabase
+      const { data: taskData, error: taskError } = await db
         .from('student_tasks')
         .select(`
           id,

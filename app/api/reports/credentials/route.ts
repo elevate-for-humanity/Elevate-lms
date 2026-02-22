@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getOrgContext } from '@/lib/org/getOrgContext';
 import { requireReportAccess, toCsv, getCsvHeaders } from '@/lib/reports';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -14,6 +15,7 @@ export async function GET(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
       error: authError,
@@ -30,7 +32,7 @@ export async function GET(req: NextRequest) {
     const format = searchParams.get('format');
     const programId = searchParams.get('program_id');
 
-    let query = supabase
+    let query = db
       .from('reporting_credentials')
       .select('*')
       .eq('organization_id', ctx.organization_id);

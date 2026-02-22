@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { FileText, ChevronRight, Shield, Scale, BookOpen, ShoppingCart, Calculator, UserPlus, Building } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const metadata: Metadata = {
   title: 'Governance Documents | Elevate For Humanity',
   description: 'Authoritative governance documents for Elevate For Humanity platform operations, compliance, and standards.',
@@ -14,7 +15,8 @@ export const metadata: Metadata = {
 
 export default async function GovernanceIndexPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('legal_documents').select('*').limit(50);
 const documents = (dbRows as any[]) || [];
 
   return (

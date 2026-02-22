@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -22,6 +23,7 @@ export async function POST(req: Request) {
     await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/supersonic-cash/apply' } });
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const applicationData = await req.json();
 
     // Validate required fields
@@ -73,7 +75,7 @@ export async function POST(req: Request) {
     const totalRepayment = applicationData.requestedAmount + fee;
 
     // Create application in database
-    const { data: application, error: dbError } = await supabase
+    const { data: application, error: dbError } = await db
       .from('cash_advance_applications')
       .insert({
         first_name: applicationData.firstName,
@@ -120,7 +122,7 @@ export async function POST(req: Request) {
     );
 
     if (autoApprove) {
-      await supabase
+      await db
         .from('cash_advance_applications')
         .update({
           status: 'approved',

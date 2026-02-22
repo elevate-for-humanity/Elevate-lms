@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Find user
-  const { data: user, error } = await supabase
+  const { data: user, error } = await db
     .from('profiles')
     .select('*')
     .eq('email', email)
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
   // Soft-delete pattern: anonymize personal identifiers, keep compliance data
   const anonymizedEmail = `deleted+${user.id}@example.local`;
 
-  await supabase
+  await db
     .from('profiles')
     .update({
       email: anonymizedEmail,

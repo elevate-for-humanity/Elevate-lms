@@ -6,6 +6,7 @@ export const maxDuration = 30;
 import { NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/resend';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const ADMIN_EMAIL = 'info@elevateforhumanity.org';
@@ -37,7 +38,8 @@ export async function POST(req: Request) {
     // Save inquiry to database
     try {
       const supabase = await createClient();
-      await supabase.from('inquiries').insert({
+  const _admin = createAdminClient(); const db = _admin || supabase;
+      await db.from('inquiries').insert({
         name,
         email,
         phone,

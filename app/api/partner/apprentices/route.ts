@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
@@ -12,6 +13,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -22,7 +24,7 @@ export async function GET(request: NextRequest) {
     const programId = searchParams.get('program');
 
     // Get partner user
-    const { data: partnerUser } = await supabase
+    const { data: partnerUser } = await db
       .from('partner_users')
       .select('partner_id')
       .eq('user_id', user.id)
@@ -35,7 +37,7 @@ export async function GET(request: NextRequest) {
 
     // Check program access
     if (programId) {
-      const { data: access } = await supabase
+      const { data: access } = await db
         .from('partner_program_access')
         .select('id')
         .eq('partner_id', partnerUser.partner_id)
@@ -49,7 +51,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get apprentices assigned to this partner
-    let query = supabase
+    let query = db
       .from('apprenticeships')
       .select(`
         id,
@@ -76,7 +78,7 @@ export async function GET(request: NextRequest) {
     // Get total hours for each apprentice
     const apprentices = await Promise.all(
       (apprenticeships || []).map(async (a) => {
-        const { data: progressSum } = await supabase
+        const { data: progressSum } = await db
           .from('progress_entries')
           .select('hours_worked')
           .eq('apprentice_id', a.apprentice_id)

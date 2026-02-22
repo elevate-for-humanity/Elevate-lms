@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -26,6 +27,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const {
     data: { user },
@@ -46,7 +48,7 @@ export async function POST(req: Request) {
   }
 
   // Verify user owns this enrollment
-  const { data: enrollment, error: enrollErr } = await supabase
+  const { data: enrollment, error: enrollErr } = await db
     .from('student_enrollments')
     .select('id, student_id, program_id')
     .eq('id', enrollment_id)
@@ -110,7 +112,7 @@ export async function POST(req: Request) {
   }
 
   // Fetch apprentice funding profile (WIOA start + post-cert date)
-  const { data: profile, error: profErr } = await supabase
+  const { data: profile, error: profErr } = await db
     .from('apprentice_funding_profile')
     .select('wioa_start_date, post_cert_date')
     .eq('enrollment_id', enrollment_id)
@@ -164,7 +166,7 @@ export async function POST(req: Request) {
   week_end.setUTCDate(week_end.getUTCDate() + 7);
   const week_end_iso = week_end.toISOString().slice(0, 10);
 
-  const { data: totals, error: totErr } = await supabase
+  const { data: totals, error: totErr } = await db
     .from('apprentice_hours_log')
     .select('minutes, hour_type, funding_phase')
     .eq('enrollment_id', enrollment_id)
@@ -205,7 +207,7 @@ export async function POST(req: Request) {
     }
   }
 
-  const { data: created, error: insErr } = await supabase
+  const { data: created, error: insErr } = await db
     .from('apprentice_hours_log')
     .insert({
       enrollment_id,
@@ -236,6 +238,7 @@ export async function GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const {
     data: { user },
@@ -249,7 +252,7 @@ const supabase = await createClient();
   const status = searchParams.get('status');
   const funding_phase = searchParams.get('funding_phase');
 
-  let query = supabase
+  let query = db
     .from('apprentice_hours_log')
     .select(
       `

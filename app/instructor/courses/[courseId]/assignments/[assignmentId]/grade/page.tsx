@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import SpeedGraderWrapper from './SpeedGraderWrapper';
 
@@ -15,6 +16,7 @@ type Params = Promise<{ courseId: string; assignmentId: string }>;
 export default async function SpeedGraderPage({ params }: { params: Params }) {
   const { courseId, assignmentId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -28,7 +30,7 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
   if (!user) redirect('/login');
 
   // Verify instructor role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -39,7 +41,7 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
   }
 
   // Fetch assignment
-  const { data: assignment, error: assignmentError } = await supabase
+  const { data: assignment, error: assignmentError } = await db
     .from('assignments')
     .select('id, title, description, max_points, course_id, due_date')
     .eq('id', assignmentId)
@@ -51,14 +53,14 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
   }
 
   // Fetch rubric if linked
-  const { data: rubricLink } = await supabase
+  const { data: rubricLink } = await db
     .from('assignment_rubrics')
     .select('rubric_id, rubrics(*)')
     .eq('assignment_id', assignmentId)
     .single();
 
   // Fetch submissions with student info
-  const { data: submissions } = await supabase
+  const { data: submissions } = await db
     .from('assignment_submissions')
     .select(`
       id,
@@ -75,7 +77,7 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
   // Fetch existing grades for these submissions
   const submissionIds = (submissions || []).map((s: any) => s.id);
   const { data: existingGrades } = submissionIds.length > 0
-    ? await supabase
+    ? await db
         .from('grades')
         .select('*')
         .in('submission_id', submissionIds)

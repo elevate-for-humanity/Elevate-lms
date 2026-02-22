@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -13,6 +14,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check if user is admin
     const { data: { user } } = await supabase.auth.getUser();
@@ -21,7 +23,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -49,7 +51,7 @@ export async function GET(request: Request) {
 
     // Test if we can query the table
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('audit_logs')
         .select('*')
         .limit(1);
@@ -87,7 +89,7 @@ export async function GET(request: Request) {
 
     // Test if we can insert
     try {
-      const { error } = await supabase
+      const { error } = await db
         .from('audit_logs')
         .insert({
           action_type: 'test',
@@ -99,7 +101,7 @@ export async function GET(request: Request) {
         checks.canInsert = true;
 
         // Clean up test record
-        await supabase
+        await db
           .from('audit_logs')
           .delete()
           .eq('action_type', 'test')

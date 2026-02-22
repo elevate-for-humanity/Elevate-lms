@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -122,6 +123,7 @@ export default async function CheckoutSuccessPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -135,7 +137,7 @@ export default async function CheckoutSuccessPage({
   }
   
   // Log checkout success
-  await supabase.from('page_views').insert({ page: 'checkout_success' }).select();
+  await db.from('page_views').insert({ page: 'checkout_success' }).select();
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

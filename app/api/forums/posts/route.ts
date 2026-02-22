@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Missing thread_id' }, { status: 400 });
     }
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('forum_posts')
       .select(
         `
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('forum_posts')
       .insert({
         thread_id,
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
 
     // Update thread updated_at
-    await supabase
+    await db
       .from('forum_threads')
       .update({ updated_at: new Date().toISOString() })
       .eq('id', thread_id);

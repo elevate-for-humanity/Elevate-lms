@@ -4,10 +4,12 @@ import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { DollarSign, Clock } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export default async function DemoIncentivesPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('employer_incentives').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('employer_incentives').select('*').limit(50);
 const incentives = (dbRows as any[]) || [];
 
   return (

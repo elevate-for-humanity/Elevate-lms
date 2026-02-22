@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Heart, Users, Calendar, Phone, Mail, ArrowRight, HandHeart, Briefcase } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function GetInvolvedPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -25,12 +27,12 @@ export default async function GetInvolvedPage() {
     );
   }
 
-  const { count: volunteerCount } = await supabase
+  const { count: volunteerCount } = await db
     .from('volunteers')
     .select('*', { count: 'exact', head: true })
     .eq('organization', 'rise-foundation');
 
-  const { data: opportunities } = await supabase
+  const { data: opportunities } = await db
     .from('volunteer_opportunities')
     .select('*')
     .eq('organization', 'rise-foundation')

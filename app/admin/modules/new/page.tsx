@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { ModuleForm } from '../module-form';
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 
 export default async function NewModulePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -28,7 +30,7 @@ export default async function NewModulePage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -39,7 +41,7 @@ export default async function NewModulePage() {
   }
 
   // Fetch programs for selection
-  const { data: programs } = await supabase
+  const { data: programs } = await db
     .from('programs')
     .select('id, name, slug')
     .eq('is_active', true)

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Download, Users, DollarSign, TrendingUp, Calendar } from 'lucide-react';
@@ -15,13 +16,14 @@ export const dynamic = 'force-dynamic';
 
 export default async function PartnerReportsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/partner/reports');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role, full_name')
     .eq('id', user.id)
@@ -32,7 +34,7 @@ export default async function PartnerReportsPage() {
   }
 
   // Get partner's program holder record
-  const { data: programHolder } = await supabase
+  const { data: programHolder } = await db
     .from('program_holders')
     .select('id, name, payout_share')
     .eq('owner_id', user.id)
@@ -49,25 +51,25 @@ export default async function PartnerReportsPage() {
   const thisYearStart = new Date(now.getFullYear(), 0, 1);
 
   // Fetch enrollment stats
-  const { count: totalEnrollments } = await supabase
+  const { count: totalEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq(partnerField, partnerId);
 
-  const { count: thisQuarterEnrollments } = await supabase
+  const { count: thisQuarterEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq(partnerField, partnerId)
     .gte('enrolled_at', thisQuarterStart.toISOString());
 
-  const { count: completedEnrollments } = await supabase
+  const { count: completedEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq(partnerField, partnerId)
     .eq('status', 'completed');
 
   // Fetch recent completions
-  const { data: recentCompletions } = await supabase
+  const { data: recentCompletions } = await db
     .from('enrollments')
     .select(`
       id,

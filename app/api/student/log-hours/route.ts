@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -15,6 +16,7 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -27,7 +29,7 @@ export async function POST(request: Request) {
     const { enrollment_id, date, hours, services_performed, notes } = body;
 
     // Insert into student_hours table
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('student_hours')
       .insert({
         student_id: user.id,
@@ -51,7 +53,7 @@ export async function POST(request: Request) {
 
     // Also log to apprentice_hours_log if it exists
     try {
-      await supabase.from('apprentice_hours_log').insert({
+      await db.from('apprentice_hours_log').insert({
         apprenticeship_id: enrollment_id,
         log_date: date,
         ojl_hours: hours,

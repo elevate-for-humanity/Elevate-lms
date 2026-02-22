@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -24,7 +25,7 @@ export async function POST(
     const { approved_amount, notes } = body;
 
     // Update application status
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('cash_advance_applications')
       .update({
         status: 'approved',

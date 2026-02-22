@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { getUserById } from '@/lib/supabase-admin';
@@ -19,7 +20,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   if (!serial) return new Response('Missing serial', { status: 400 });
 
   // Fetch certificate data
-  const { data: cert } = await supabase
+  const { data: cert } = await db
     .from('certificates')
     .select('*')
     .eq('serial', serial)
@@ -35,7 +36,7 @@ const supabase = await createRouteHandlerClient({ cookies });
       logger.error("Unhandled error", error instanceof Error ? error : undefined);
     }
 
-  const { data: c } = await supabase
+  const { data: c } = await db
     .from('courses')
     .select('title')
     .eq('id', cert.course_id)

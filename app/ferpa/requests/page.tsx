@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -64,6 +65,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
 
 export default async function FerpaRequestsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -82,7 +84,7 @@ export default async function FerpaRequestsPage() {
     redirect('/login?next=/ferpa/requests');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role, full_name')
     .eq('id', user.id)
@@ -94,7 +96,7 @@ export default async function FerpaRequestsPage() {
   }
 
   // Fetch requests
-  const { data: requests, error } = await supabase
+  const { data: requests, error } = await db
     .from('ferpa_access_requests')
     .select('*')
     .order('created_at', { ascending: false })

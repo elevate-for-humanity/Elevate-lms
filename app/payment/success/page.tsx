@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 export default async function PaymentSuccessPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -27,7 +29,7 @@ export default async function PaymentSuccessPage() {
   }
   
   // Log payment success
-  await supabase.from('page_views').insert({ page: 'payment_success' }).select();
+  await db.from('page_views').insert({ page: 'payment_success' }).select();
   return (
     <div className="min-h-screen bg-zinc-900  to-white py-20">
       <div className="container mx-auto px-4 max-w-2xl text-center">

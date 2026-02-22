@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = "nodejs";
@@ -25,6 +26,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     if (!supabase) {
       return NextResponse.json(
@@ -42,7 +44,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from("profiles")
       .select("role")
       .eq("id", user.id)
@@ -71,7 +73,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get current state
-    const { data: currentApp, error: fetchError } = await supabase
+    const { data: currentApp, error: fetchError } = await db
       .from(tableName)
       .select("id, state")
       .eq("id", application_id)
@@ -87,7 +89,7 @@ export async function POST(request: NextRequest) {
     const oldState = currentApp.state;
 
     // Update the application state
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from(tableName)
       .update({
         state: new_state,
@@ -103,7 +105,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log the state transition event
-    const { error: eventError } = await supabase
+    const { error: eventError } = await db
       .from("application_state_events")
       .insert({
         application_type,

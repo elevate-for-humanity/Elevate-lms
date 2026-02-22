@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { stripe } from '@/lib/stripe/client';
 import { CERTIPORT_EXAMS } from '@/lib/partners/certiport';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -33,6 +34,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -52,7 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing request
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('certiport_exam_requests')
       .select('id, status, voucher_code')
       .eq('user_id', user.id)
@@ -73,14 +75,14 @@ export async function POST(request: NextRequest) {
 
     // Verify course completion if courseId provided
     if (courseId) {
-      const { data: progress } = await supabase
+      const { data: progress } = await db
         .from('lesson_progress')
         .select('completed')
         .eq('user_id', user.id)
         .eq('course_id', courseId)
         .eq('completed', true);
 
-      const { data: totalLessons } = await supabase
+      const { data: totalLessons } = await db
         .from('lessons')
         .select('id')
         .eq('course_id', courseId);
@@ -97,7 +99,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get student profile
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('full_name, email, phone')
       .eq('id', user.id)
@@ -106,7 +108,7 @@ export async function POST(request: NextRequest) {
     // Determine funding status from enrollment
     let fundingSource = 'SELF_PAY';
     if (programSlug) {
-      const { data: enrollment } = await supabase
+      const { data: enrollment } = await db
         .from('enrollments')
         .select('funding_source')
         .eq('user_id', user.id)
@@ -126,7 +128,7 @@ export async function POST(request: NextRequest) {
 
     if (isFunded) {
       // FUNDED PATH: Create request directly, no payment needed
-      const { data: examRequest, error } = await supabase
+      const { data: examRequest, error } = await db
         .from('certiport_exam_requests')
         .insert({
           user_id: user.id,

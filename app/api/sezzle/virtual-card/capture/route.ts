@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sezzle } from '@/lib/sezzle/client';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -69,8 +70,9 @@ export async function POST(request: NextRequest) {
 
     // Update payment record if we have supabase
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (supabase && referenceId) {
-      await supabase
+      await db
         .from('payments')
         .update({
           status: 'captured',

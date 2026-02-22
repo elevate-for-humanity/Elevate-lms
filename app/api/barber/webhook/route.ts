@@ -105,6 +105,7 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const adminClient = createAdminClient();
   if (!supabase) {
     return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
@@ -179,7 +180,7 @@ export async function POST(request: NextRequest) {
           }
 
           // Create enrollment record
-          await supabase.from('barber_subscriptions').insert({
+          await db.from('barber_subscriptions').insert({
             stripe_customer_id: customerId,
             customer_email: customerEmail,
             customer_name: customerName,
@@ -280,7 +281,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
         // Store subscription in database with email tracking fields
-        const { data: subscriptionRecord } = await supabase.from('barber_subscriptions').upsert({
+        const { data: subscriptionRecord } = await db.from('barber_subscriptions').upsert({
           user_id: userId,
           enrollment_id: enrollmentId || null,
           stripe_subscription_id: subscriptionId,
@@ -304,7 +305,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
 
         // Update enrollment status if enrollment_id provided
         if (enrollmentId) {
-          await supabase
+          await db
             .from('enrollments')
             .update({ 
               payment_status: 'active',
@@ -314,7 +315,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
         }
 
         // === NEW: Create/upsert apprentice record ===
-        const { data: existingApprentice } = await supabase
+        const { data: existingApprentice } = await db
           .from('apprentices')
           .select('id, start_date')
           .eq('user_id', userId)
@@ -324,7 +325,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
         if (existingApprentice) {
           // Update existing - only set start_date if null
           apprenticeId = existingApprentice.id;
-          await supabase
+          await db
             .from('apprentices')
             .update({
               status: 'active',
@@ -334,7 +335,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
             .eq('id', apprenticeId);
         } else {
           // Create new apprentice record
-          const { data: newApprentice } = await supabase
+          const { data: newApprentice } = await db
             .from('apprentices')
             .insert({
               user_id: userId,
@@ -349,14 +350,14 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
 
         // Link apprentice to subscription
         if (apprenticeId && subscriptionRecord?.id) {
-          await supabase
+          await db
             .from('barber_subscriptions')
             .update({ apprentice_id: apprenticeId })
             .eq('id', subscriptionRecord.id);
         }
 
         // === NEW: Send emails (idempotent - check if already sent) ===
-        const { data: subRecord } = await supabase
+        const { data: subRecord } = await db
           .from('barber_subscriptions')
           .select('welcome_email_sent_at, milady_email_sent_at')
           .eq('stripe_subscription_id', subscriptionId)
@@ -442,7 +443,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
             }
             
             // Mark welcome email as sent
-            await supabase
+            await db
               .from('barber_subscriptions')
               .update({ 
                 welcome_email_sent_at: new Date().toISOString(),
@@ -490,7 +491,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
             });
             
             // Mark Milady email as sent
-            await supabase
+            await db
               .from('barber_subscriptions')
               .update({ milady_email_sent_at: new Date().toISOString() })
               .eq('stripe_subscription_id', subscriptionId);
@@ -514,7 +515,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
           break;
         }
 
-        await supabase
+        await db
           .from('barber_subscriptions')
           .update({
             status: subscription.status,
@@ -537,7 +538,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
           break;
         }
 
-        await supabase
+        await db
           .from('barber_subscriptions')
           .update({
             status: 'canceled',
@@ -562,7 +563,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
         }
 
         // Record payment
-        await supabase.from('barber_payments').insert({
+        await db.from('barber_payments').insert({
           user_id: subscription.metadata?.user_id,
           stripe_subscription_id: subscriptionId,
           stripe_invoice_id: invoice.id,
@@ -578,7 +579,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
         if (currentWeeks > 0) {
           const newWeeksRemaining = currentWeeks - 1;
           
-          await supabase
+          await db
             .from('barber_subscriptions')
             .update({
               weeks_remaining: newWeeksRemaining,
@@ -644,6 +645,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
 export async function PUT(request: NextRequest) {
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
     }
@@ -654,7 +656,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -707,7 +709,7 @@ export async function PUT(request: NextRequest) {
     });
 
     // Update database
-    await supabase
+    await db
       .from('barber_subscriptions')
       .update({
         transferred_hours_verified,

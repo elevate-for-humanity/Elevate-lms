@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -17,6 +18,7 @@ export async function POST(
 
     const { id } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await req.json();
     const { full_name, email, phone, answers } = body;
 
@@ -28,7 +30,7 @@ export async function POST(
     }
 
     // Load event
-    const { data: event, error: eErr } = await supabase
+    const { data: event, error: eErr } = await db
       .from('events')
       .select('*')
       .eq('id', id)
@@ -44,7 +46,7 @@ export async function POST(
     }
 
     // Count registrations
-    const { count } = await supabase
+    const { count } = await db
       .from('event_registrations')
       .select('*', { count: 'exact', head: true })
       .eq('event_id', id)
@@ -66,7 +68,7 @@ export async function POST(
       data: { user },
     } = await supabase.auth.getUser();
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('event_registrations')
       .insert({
         event_id: id,

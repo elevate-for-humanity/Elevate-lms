@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -34,7 +36,7 @@ export async function POST(req: Request) {
     }
 
     // Verify user is staff at this shop
-    const { data: staff } = await supabase
+    const { data: staff } = await db
       .from('shop_staff')
       .select('id')
       .eq('shop_id', shopId)
@@ -61,7 +63,7 @@ export async function POST(req: Request) {
     }
 
     // Save document record
-    const { error: dbError } = await supabase.from('shop_documents').insert({
+    const { error: dbError } = await db.from('shop_documents').insert({
       shop_id: shopId,
       document_type: documentType,
       file_url: uploadData.path,

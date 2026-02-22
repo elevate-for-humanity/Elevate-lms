@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { validateApiKey } from '@/lib/licensing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const results = {
       success: 0,
       failed: 0,
@@ -139,7 +141,7 @@ async function importStudents(
         student.email.split('@')[0];
 
       // Check if user exists
-      const { data: existing } = await supabase
+      const { data: existing } = await db
         .from('profiles')
         .select('id')
         .eq('email', student.email)
@@ -154,7 +156,7 @@ async function importStudents(
 
       if (existing) {
         // Update existing
-        await supabase
+        await db
           .from('profiles')
           .update({
             full_name: fullName,
@@ -175,7 +177,7 @@ async function importStudents(
         if (authError) throw authError;
 
         // Create profile
-        await supabase.from('profiles').insert({
+        await db.from('profiles').insert({
           id: authUser.user.id,
           email: student.email,
           full_name: fullName,
@@ -214,7 +216,7 @@ async function importCourses(
       const courseCode = course.code || course.name.toUpperCase().replace(/\s+/g, '_').substring(0, 20);
 
       // Check if course exists
-      const { data: existing } = await supabase
+      const { data: existing } = await db
         .from('courses')
         .select('id')
         .eq('course_code', courseCode)
@@ -239,9 +241,9 @@ async function importCourses(
       };
 
       if (existing) {
-        await supabase.from('courses').update(courseData).eq('id', existing.id);
+        await db.from('courses').update(courseData).eq('id', existing.id);
       } else {
-        await supabase.from('courses').insert({
+        await db.from('courses').insert({
           ...courseData,
           id: crypto.randomUUID(),
           created_at: new Date().toISOString(),
@@ -273,7 +275,7 @@ async function importEnrollments(
       }
 
       // Find student
-      const { data: student } = await supabase
+      const { data: student } = await db
         .from('profiles')
         .select('id')
         .eq('email', enrollment.student_email)
@@ -287,7 +289,7 @@ async function importEnrollments(
       }
 
       // Find course
-      const { data: course } = await supabase
+      const { data: course } = await db
         .from('courses')
         .select('id')
         .eq('course_code', enrollment.course_code)
@@ -301,7 +303,7 @@ async function importEnrollments(
       }
 
       // Check existing enrollment
-      const { data: existing } = await supabase
+      const { data: existing } = await db
         .from('enrollments')
         .select('id')
         .eq('user_id', student.id)
@@ -324,9 +326,9 @@ async function importEnrollments(
       };
 
       if (existing) {
-        await supabase.from('enrollments').update(enrollmentData).eq('id', existing.id);
+        await db.from('enrollments').update(enrollmentData).eq('id', existing.id);
       } else {
-        await supabase.from('enrollments').insert({
+        await db.from('enrollments').insert({
           ...enrollmentData,
           id: crypto.randomUUID(),
         });

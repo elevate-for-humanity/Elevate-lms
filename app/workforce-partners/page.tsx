@@ -7,6 +7,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Users, MapPin, Phone, ArrowRight, Handshake, Award, FileText } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const metadata: Metadata = {
   title: 'Workforce Partners | WorkOne & Community Organizations | Elevate For Humanity',
   description: 'Partner with Elevate for Humanity to connect job seekers with free career training. WorkOne centers, community organizations, and workforce boards - learn how we work together.',
@@ -17,7 +18,8 @@ export const metadata: Metadata = {
 
 export default async function WorkforcePartnersPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('programs').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('programs').select('*').limit(50);
 const partners = (dbRows as any[]) || [];
 const services = (dbRows as any[]) || [];
 

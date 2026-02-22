@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -29,7 +30,7 @@ export async function POST(
     const supabase = await createServerSupabaseClient();
 
     // Check if submission already exists
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('assignment_submissions')
       .select('id')
       .eq('assignment_id', id)
@@ -41,7 +42,7 @@ export async function POST(
 
     if (existing) {
       // Update existing submission
-      const result = await supabase
+      const result = await db
         .from('assignment_submissions')
         .update({
           submission_text: submissionText,
@@ -59,7 +60,7 @@ export async function POST(
       error = result.error;
     } else {
       // Create new submission
-      const result = await supabase
+      const result = await db
         .from('assignment_submissions')
         .insert({
           assignment_id: id,

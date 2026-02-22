@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
@@ -9,6 +10,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     if (!supabase) {
       return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
@@ -52,7 +54,7 @@ export async function POST(req: Request) {
       .getPublicUrl(fileName);
 
     // Create document record in database
-    const { data: document, error: dbError } = await supabase
+    const { data: document, error: dbError } = await db
       .from('documents')
       .insert({
         user_id: user.id,

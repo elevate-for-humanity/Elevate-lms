@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { data: attempt, error: attemptError } = await supabase
+  const { data: attempt, error: attemptError } = await db
     .from('exam_attempts')
     .select(
       '*, exam:exams(*), exam_attempt_questions(*, question:questions(*))'
@@ -77,7 +78,7 @@ export async function POST(request: Request) {
     if (isCorrect) correctCount++;
 
     updates.push(
-      supabase
+      db
         .from('exam_attempt_questions')
         .update({
           student_answer: studentAnswer,
@@ -95,7 +96,7 @@ export async function POST(request: Request) {
   const totalQuestions = attempt.exam_attempt_questions.length || 1;
   const score = (correctCount / totalQuestions) * 100;
 
-  await supabase
+  await db
     .from('exam_attempts')
     .update({
       status: 'completed',

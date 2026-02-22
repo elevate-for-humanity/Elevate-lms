@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { 
   Clock, DollarSign, Award, ArrowRight, 
   GraduationCap, Users, FileText, Calendar, Heart, Star
@@ -59,7 +60,8 @@ const steps = [
 
 export default async function ScholarshipsPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('scholarships').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('scholarships').select('*').limit(50);
 const fundingOptions = (dbRows as any[]) || [];
 const scholarshipTypes = (dbRows as any[]) || [];
 

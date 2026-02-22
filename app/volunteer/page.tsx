@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
@@ -17,9 +18,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function VolunteerPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch volunteer opportunities from database
-  const { data: opportunities, error } = await supabase
+  const { data: opportunities, error } = await db
     .from('volunteer_opportunities')
     .select('*')
     .eq('is_active', true)

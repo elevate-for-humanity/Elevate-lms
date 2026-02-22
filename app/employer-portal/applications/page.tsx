@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,6 +20,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ApplicationsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/employer-portal/applications');
@@ -31,7 +33,7 @@ export default async function ApplicationsPage() {
   }
 
   // Fetch real job applications
-  const { data: jobApplications } = await supabase
+  const { data: jobApplications } = await db
     .from('job_applications')
     .select(`
       id,

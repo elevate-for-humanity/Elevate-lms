@@ -1,4 +1,5 @@
 import React from 'react';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { createServerSupabaseClient } from '@/lib/auth';
 
@@ -22,7 +23,7 @@ export default async function OnboardingLayout({
 
   // Check user role - onboarding is for authenticated users only
   // Different onboarding paths for different roles
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', session.user.id)

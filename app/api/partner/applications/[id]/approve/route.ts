@@ -48,7 +48,7 @@ export async function POST(
     }
 
     // Verify admin role
-    const { data: adminProfile } = await supabase
+    const { data: adminProfile } = await db
       .from('profiles')
       .select('role')
       .eq('id', adminUser.id)
@@ -59,7 +59,7 @@ export async function POST(
     }
 
     // Get application for email
-    const { data: application } = await supabase
+    const { data: application } = await db
       .from('partner_applications')
       .select('contact_email, owner_name, programs_requested')
       .eq('id', applicationId)
@@ -204,7 +204,7 @@ export async function POST(
     }
 
     // Queue approval email (non-blocking)
-    await supabase.from('notification_outbox').insert({
+    await db.from('notification_outbox').insert({
       to_email: partnerEmail,
       template_key: 'partner_approved',
       template_data: {

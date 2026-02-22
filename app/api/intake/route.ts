@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     return s.slice(0, max);
   }
 
-  const { error } = await supabase
+  const { error } = await db
     .from('apprenticeship_intake')
     .insert([{
       full_name: body.full_name.trim(),

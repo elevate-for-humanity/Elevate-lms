@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Users, Plus, Phone, Mail, Calendar, Search } from 'lucide-react';
@@ -36,6 +37,7 @@ const statusLabels: Record<string, string> = {
 
 export default async function AdminLeadsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -51,7 +53,7 @@ export default async function AdminLeadsPage() {
   let qualifiedLeads = 0;
 
   try {
-    const result = await supabase
+    const result = await db
       .from('leads')
       .select('*')
       .order('created_at', { ascending: false })
@@ -60,24 +62,24 @@ export default async function AdminLeadsPage() {
     error = result.error;
 
     if (!error) {
-      const { count: total } = await supabase
+      const { count: total } = await db
         .from('leads')
         .select('*', { count: 'exact', head: true });
       totalLeads = total || 0;
 
-      const { count: newCount } = await supabase
+      const { count: newCount } = await db
         .from('leads')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'new');
       newLeads = newCount || 0;
 
-      const { count: contactedCount } = await supabase
+      const { count: contactedCount } = await db
         .from('leads')
         .select('*', { count: 'exact', head: true })
         .gte('last_contacted_at', new Date().toISOString().split('T')[0]);
       contactedToday = contactedCount || 0;
 
-      const { count: qualifiedCount } = await supabase
+      const { count: qualifiedCount } = await db
         .from('leads')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'qualified');

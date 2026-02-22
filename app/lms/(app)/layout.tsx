@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { canAccessRoute, getUnauthorizedRedirect } from '@/lib/auth/lms-routes';
 import { LmsAppShell } from './LmsAppShell';
 
@@ -8,6 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function LmsAppLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?next=/lms/dashboard');
@@ -19,7 +21,7 @@ export default async function LmsAppLayout({ children }: { children: ReactNode }
     redirect('/login?next=/lms/dashboard');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)

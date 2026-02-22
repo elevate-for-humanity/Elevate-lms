@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Save application to database
-    const { data: application, error: appError } = await supabase
+    const { data: application, error: appError } = await db
       .from('refund_advance_applications')
       .insert({
         first_name: body.firstName,
@@ -179,7 +180,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    let query = supabase
+    let query = db
       .from('refund_advance_applications')
       .select('*')
       .order('created_at', { ascending: false });

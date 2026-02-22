@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { ArrowLeft, Users, TrendingUp, Target, Clock } from 'lucide-react';
 
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 
 export default async function LeadsReportPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
@@ -19,12 +21,12 @@ export default async function LeadsReportPage() {
     { data: leads },
     { count: totalLeads },
   ] = await Promise.all([
-    supabase
+    db
       .from('leads')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(50),
-    supabase.from('leads').select('*', { count: 'exact', head: true }),
+    db.from('leads').select('*', { count: 'exact', head: true }),
   ]);
 
   const recentLeads = leads?.filter(l => 

@@ -57,7 +57,7 @@ export async function POST(req: Request) {
         { status: 503 }
       );
     }
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('billing_accounts')
       .insert([
         {

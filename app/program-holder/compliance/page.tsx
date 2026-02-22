@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
 
 export default async function CompliancePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -42,7 +44,7 @@ export default async function CompliancePage() {
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -51,7 +53,7 @@ export default async function CompliancePage() {
   if (!profile || profile.role !== 'program_holder') redirect('/');
 
   // Get program holder record
-  const { data: programHolder } = await supabase
+  const { data: programHolder } = await db
     .from('program_holders')
     .select('*')
     .eq('user_id', user.id)
@@ -62,17 +64,17 @@ export default async function CompliancePage() {
   }
 
   // Calculate compliance score based on various factors
-  const { data: documents } = await supabase
+  const { data: documents } = await db
     .from('program_holder_documents')
     .select('*')
     .eq('user_id', user.id);
 
-  const { data: reports } = await supabase
+  const { data: reports } = await db
     .from('apprentice_weekly_reports')
     .select('*')
     .eq('program_holder_id', programHolder.id);
 
-  const { data: students } = await supabase
+  const { data: students } = await db
     .from('program_holder_students')
     .select('*')
     .eq('program_holder_id', programHolder.id);

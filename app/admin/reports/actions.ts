@@ -1,9 +1,11 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function generateEnrollmentReport(dateRange: string = '30') {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const daysAgo = parseInt(dateRange);
   const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
@@ -13,15 +15,15 @@ export async function generateEnrollmentReport(dateRange: string = '30') {
     { data: courses },
     { count: totalEnrollments },
   ] = await Promise.all([
-    supabase
+    db
       .from('enrollments')
       .select('*, courses(title)')
       .gte('created_at', startDate)
       .order('created_at', { ascending: false }),
-    supabase
+    db
       .from('courses')
       .select('id, title'),
-    supabase
+    db
       .from('enrollments')
       .select('*', { count: 'exact', head: true }),
   ]);
@@ -49,6 +51,7 @@ export async function generateEnrollmentReport(dateRange: string = '30') {
 
 export async function generateLeadReport(dateRange: string = '30') {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const daysAgo = parseInt(dateRange);
   const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
@@ -57,12 +60,12 @@ export async function generateLeadReport(dateRange: string = '30') {
     { data: leads },
     { count: totalLeads },
   ] = await Promise.all([
-    supabase
+    db
       .from('leads')
       .select('*')
       .gte('created_at', startDate)
       .order('created_at', { ascending: false }),
-    supabase
+    db
       .from('leads')
       .select('*', { count: 'exact', head: true }),
   ]);
@@ -97,6 +100,7 @@ export async function generateLeadReport(dateRange: string = '30') {
 
 export async function generateFinancialReport(dateRange: string = '30') {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const daysAgo = parseInt(dateRange);
   const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
@@ -105,11 +109,11 @@ export async function generateFinancialReport(dateRange: string = '30') {
     { data: wotcApps },
     { data: grantApps },
   ] = await Promise.all([
-    supabase
+    db
       .from('wotc_applications')
       .select('*')
       .eq('status', 'approved'),
-    supabase
+    db
       .from('grant_applications')
       .select('*')
       .eq('status', 'approved'),
@@ -133,6 +137,7 @@ export async function generateFinancialReport(dateRange: string = '30') {
 
 export async function generateUserActivityReport(dateRange: string = '30') {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const daysAgo = parseInt(dateRange);
   const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
@@ -142,14 +147,14 @@ export async function generateUserActivityReport(dateRange: string = '30') {
     { count: totalUsers },
     { data: recentUsers },
   ] = await Promise.all([
-    supabase
+    db
       .from('profiles')
       .select('role')
       .not('role', 'is', null),
-    supabase
+    db
       .from('profiles')
       .select('*', { count: 'exact', head: true }),
-    supabase
+    db
       .from('profiles')
       .select('*')
       .gte('created_at', startDate)

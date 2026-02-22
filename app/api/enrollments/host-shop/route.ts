@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     const clientIp = forwardedFor?.split(',')[0]?.trim() || '';
 
     // Insert host shop application
-    const { data: application, error: appError } = await supabase
+    const { data: application, error: appError } = await db
       .from('host_shop_applications')
       .insert({
         shop_name: intake.shopName,
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert agreement acceptance
-    const { error: agreementError } = await supabase
+    const { error: agreementError } = await db
       .from('agreement_acceptances')
       .insert({
         subject_type: 'host_shop',

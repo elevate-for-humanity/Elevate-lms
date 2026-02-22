@@ -28,7 +28,7 @@ const supabase = createAdminClient();
 
   try {
     // Fetch sale details
-    const { data: sale, error } = await supabase
+    const { data: sale, error } = await db
       .from('marketplace_sales')
       .select(
         `

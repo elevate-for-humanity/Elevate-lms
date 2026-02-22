@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -48,8 +49,9 @@ export async function POST(req: Request) {
       try {
         const { createClient } = await import('@/lib/supabase/server');
         const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-        const { data: blogPosts } = await supabase
+        const { data: blogPosts } = await db
           .from('blog_posts')
           .select('title, excerpt, slug')
           .eq('published', true)

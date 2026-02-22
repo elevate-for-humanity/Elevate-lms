@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -13,6 +14,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -23,7 +25,7 @@ export async function GET(request: Request) {
     }
 
     // Get all training modules
-    const { data: modules, error: modulesError } = await supabase
+    const { data: modules, error: modulesError } = await db
       .from('training_modules')
       .select('*')
       .order('order_index', { ascending: true });
@@ -36,7 +38,7 @@ export async function GET(request: Request) {
     }
 
     // Get user's progress
-    const { data: progress, error: progressError } = await supabase
+    const { data: progress, error: progressError } = await db
       .from('staff_training_progress')
       .select('*')
       .eq('user_id', user.id);
@@ -76,6 +78,7 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -96,7 +99,7 @@ export async function POST(request: Request) {
     }
 
     // Check if module exists
-    const { data: module, error: moduleError } = await supabase
+    const { data: module, error: moduleError } = await db
       .from('training_modules')
       .select('*')
       .eq('id', module_id)
@@ -107,7 +110,7 @@ export async function POST(request: Request) {
     }
 
     // Upsert progress
-    const { data: progress, error: progressError } = await supabase
+    const { data: progress, error: progressError } = await db
       .from('staff_training_progress')
       .upsert(
         {

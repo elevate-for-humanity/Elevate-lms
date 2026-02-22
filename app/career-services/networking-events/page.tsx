@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, MapPin, Clock, ArrowRight, Building2 } from 'lucide-react';
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function NetworkingEventsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -27,7 +29,7 @@ export default async function NetworkingEventsPage() {
   }
 
   // Get upcoming networking events
-  const { data: upcomingEvents } = await supabase
+  const { data: upcomingEvents } = await db
     .from('events')
     .select('*')
     .eq('event_type', 'networking')
@@ -36,7 +38,7 @@ export default async function NetworkingEventsPage() {
     .limit(6);
 
   // Get past events
-  const { data: pastEvents } = await supabase
+  const { data: pastEvents } = await db
     .from('events')
     .select('*')
     .eq('event_type', 'networking')
@@ -45,13 +47,13 @@ export default async function NetworkingEventsPage() {
     .limit(3);
 
   // Get employer partners
-  const { count: employerCount } = await supabase
+  const { count: employerCount } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'employer');
 
   // Get event stats
-  const { count: totalEvents } = await supabase
+  const { count: totalEvents } = await db
     .from('events')
     .select('*', { count: 'exact', head: true })
     .eq('event_type', 'networking');

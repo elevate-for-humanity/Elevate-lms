@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -75,6 +76,7 @@ const featuredGroups = [
 
 export default async function GroupsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -96,7 +98,7 @@ export default async function GroupsPage() {
   // Fetch user's groups
   let myGroups: any[] = [];
   try {
-    const { data } = await supabase
+    const { data } = await db
       .from('study_groups')
       .select('id, name, description, member_count, category')
       .contains('member_ids', [user.id])

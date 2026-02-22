@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
@@ -15,6 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function SchedulePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -44,21 +46,21 @@ export default async function SchedulePage() {
     );
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('full_name, email, phone')
     .eq('id', user.id)
     .single();
 
   // Fetch available advisors
-  const { data: advisors } = await supabase
+  const { data: advisors } = await db
     .from('profiles')
     .select('id, full_name, role, avatar_url')
     .in('role', ['staff', 'instructor', 'admin'])
     .limit(10);
 
   // Fetch existing appointments for the user
-  const { data: existingAppointments } = await supabase
+  const { data: existingAppointments } = await db
     .from('appointments')
     .select('id, appointment_date, appointment_time, status, advisor:profiles!appointments_advisor_id_fkey(full_name)')
     .eq('student_id', user.id)

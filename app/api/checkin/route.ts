@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
@@ -9,6 +10,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -24,7 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get apprentice record
-    const { data: apprentice, error: apprenticeError } = await supabase
+    const { data: apprentice, error: apprenticeError } = await db
       .from('apprentices')
       .select('id, shop_id')
       .eq('user_id', user.id)
@@ -35,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing active session
-    const { data: existingSession } = await supabase
+    const { data: existingSession } = await db
       .from('checkin_sessions')
       .select('id')
       .eq('apprentice_id', apprentice.id)
@@ -47,7 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate check-in code
-    const { data: qrCode, error: qrError } = await supabase
+    const { data: qrCode, error: qrError } = await db
       .from('shop_checkin_codes')
       .select('shop_id, shops(name)')
       .eq('code', code.toUpperCase())
@@ -60,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     // Create check-in session
     const checkInTime = new Date().toISOString();
-    const { data: session, error: sessionError } = await supabase
+    const { data: session, error: sessionError } = await db
       .from('checkin_sessions')
       .insert({
         apprentice_id: apprentice.id,

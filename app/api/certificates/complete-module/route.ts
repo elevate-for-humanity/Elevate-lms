@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify enrollment belongs to user
-    const { data: enrollment } = await supabase
+    const { data: enrollment } = await db
       .from('enrollments')
       .select('id, user_id, course_id')
       .eq('id', enrollment_id)
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Record module completion in lesson_progress or similar
-    const { error: progressError } = await supabase
+    const { error: progressError } = await db
       .from('lesson_progress')
       .upsert({
         user_id: user.id,

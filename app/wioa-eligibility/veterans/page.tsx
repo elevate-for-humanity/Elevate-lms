@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Shield, Award, Briefcase, Phone, CheckCircle, } from 'lucide-react';
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function VeteransPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -27,7 +29,7 @@ export default async function VeteransPage() {
   }
 
   // Get veteran-specific programs
-  const { data: programs } = await supabase
+  const { data: programs } = await db
     .from('programs')
     .select('id, name, slug, description')
     .eq('is_active', true)
@@ -35,14 +37,14 @@ export default async function VeteransPage() {
     .limit(6);
 
   // Get veteran resources
-  const { data: resources } = await supabase
+  const { data: resources } = await db
     .from('resources')
     .select('*')
     .eq('category', 'veterans')
     .eq('is_active', true);
 
   // Get veteran testimonials
-  const { data: testimonials } = await supabase
+  const { data: testimonials } = await db
     .from('testimonials')
     .select('*')
     .eq('category', 'veteran')

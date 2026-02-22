@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -16,6 +17,7 @@ export async function GET(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { enrollmentId } = await params;
     const {
       data: { user },
@@ -25,7 +27,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: enrollment, error } = await supabase
+    const { data: enrollment, error } = await db
       .from('scorm_enrollments')
       .select(
         `
@@ -46,7 +48,7 @@ export async function GET(
 
     // Verify user has access
     if (enrollment.user_id !== user.id) {
-      const { data: profile } = await supabase
+      const { data: profile } = await db
         .from('profiles')
         .select('role')
         .eq('id', user.id)

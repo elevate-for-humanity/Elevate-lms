@@ -24,7 +24,7 @@ export default async function StudentPortalGradesPage() {
   }
 
   // Fetch grades from database
-  const { data: grades } = await supabase
+  const { data: grades } = await db
     .from('grades')
     .select(`
       id,
@@ -40,7 +40,7 @@ export default async function StudentPortalGradesPage() {
     .order('graded_at', { ascending: false });
 
   // Fetch course progress/completion
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('training_enrollments')
     .select(`
       id,
@@ -54,7 +54,7 @@ export default async function StudentPortalGradesPage() {
     .order('enrolled_at', { ascending: false });
 
   // Also check course_enrollments table
-  const { data: courseEnrollments } = await supabase
+  const { data: courseEnrollments } = await db
     .from('course_enrollments')
     .select(`
       id,

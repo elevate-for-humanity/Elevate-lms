@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -21,13 +22,14 @@ export const dynamic = 'force-dynamic';
 
 export default async function CommunityPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   let memberCount = 2500;
   const activeDiscussions = 150;
 
   if (supabase) {
     try {
-      const { count } = await supabase
+      const { count } = await db
         .from('profiles')
         .select('*', { count: 'exact', head: true });
       if (count) memberCount = count;

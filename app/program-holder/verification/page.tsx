@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
 
 export default async function VerificationPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -45,7 +47,7 @@ export default async function VerificationPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -56,14 +58,14 @@ export default async function VerificationPage() {
   }
 
   // Fetch program holder data
-  const { data: programHolder } = await supabase
+  const { data: programHolder } = await db
     .from('program_holders')
     .select('*')
     .eq('user_id', user.id)
     .single();
 
   // Fetch uploaded documents
-  const { data: documents } = await supabase
+  const { data: documents } = await db
     .from('program_holder_documents')
     .select('*')
     .eq('user_id', user.id);

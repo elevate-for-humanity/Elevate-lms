@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -12,6 +13,7 @@ export async function GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -21,7 +23,7 @@ const supabase = await createClient();
   }
 
   // Check if user is board member
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from("profiles")
     .select("role, organization")
     .eq("id", user.id)
@@ -31,7 +33,7 @@ const supabase = await createClient();
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { data: referrals, error } = await supabase
+  const { data: referrals, error } = await db
     .from("referrals")
     .select("*")
     .eq("board_org", profile.organization || "")
@@ -49,6 +51,7 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -58,7 +61,7 @@ export async function POST(request: Request) {
   }
 
   // Check if user is board member
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from("profiles")
     .select("role, organization")
     .eq("id", user.id)
@@ -84,7 +87,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { data: referral, error } = await supabase
+  const { data: referral, error } = await db
     .from("referrals")
     .insert({
       board_org: profile.organization || "Unknown Board",
@@ -105,7 +108,7 @@ export async function POST(request: Request) {
   }
 
   // Log the referral creation
-  await supabase.from("audit_logs").insert({
+  await db.from("audit_logs").insert({
     actor_id: user.id,
     actor_email: user.email,
     action: "board_created_referral",

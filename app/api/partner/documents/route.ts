@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get partner
-    const { data: partnerUser } = await supabase
+    const { data: partnerUser } = await db
       .from('partner_users')
       .select('partner_id, partners(state)')
       .eq('user_id', user.id)
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
     const partnerState = (partnerUser.partners as { state: string })?.state || 'Indiana';
 
     // Get partner's programs
-    const { data: programAccess } = await supabase
+    const { data: programAccess } = await db
       .from('partner_program_access')
       .select('program_id')
       .eq('partner_id', partnerId)
@@ -44,14 +45,14 @@ export async function GET(request: NextRequest) {
     const programs = (programAccess || []).map(p => p.program_id);
 
     // Get document requirements for this partner's state and programs
-    const { data: requirements } = await supabase
+    const { data: requirements } = await db
       .from('partner_document_requirements')
       .select('*')
       .or(`state.eq.${partnerState},state.eq.ALL`)
       .or(`program_id.in.(${programs.join(',')}),program_id.eq.ALL`);
 
     // Get partner's uploaded documents
-    const { data: documents } = await supabase
+    const { data: documents } = await db
       .from('partner_documents')
       .select('*')
       .eq('partner_id', partnerId)
@@ -91,6 +92,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const supabaseAdmin = createAdminClient();
 
     if (!supabaseAdmin) {
@@ -106,7 +108,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get partner
-    const { data: partnerUser } = await supabase
+    const { data: partnerUser } = await db
       .from('partner_users')
       .select('partner_id')
       .eq('user_id', user.id)

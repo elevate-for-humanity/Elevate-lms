@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -30,7 +31,7 @@ export const POST = withAuth(
       }
     }
 
-    const { error } = await supabase
+    const { error } = await db
       .from('program_holders')
       .update(updates)
       .eq('id', id);

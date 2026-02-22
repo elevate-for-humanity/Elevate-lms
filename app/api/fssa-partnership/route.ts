@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -16,9 +17,10 @@ export async function POST(request: NextRequest) {
 
     const data = await parseBody<Record<string, any>>(request);
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Store in snap_outreach_log
-    const { error: logError } = await supabase.from('snap_outreach_log').insert({
+    const { error: logError } = await db.from('snap_outreach_log').insert({
       recipient_email: data.email,
       recipient_org: data.organization,
       recipient_name: data.name,

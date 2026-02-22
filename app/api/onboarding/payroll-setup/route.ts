@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -13,6 +14,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -40,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate rate against config
-    const { data: rateConfig } = await supabase
+    const { data: rateConfig } = await db
       .from('payout_rate_configs')
       .select('min_rate, max_rate')
       .eq('role', role)
@@ -61,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if payroll profile already exists
-    const { data: existingProfile } = await supabase
+    const { data: existingProfile } = await db
       .from('payroll_profiles')
       .select('id, status')
       .eq('user_id', user.id)
@@ -70,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     if (existingProfile) {
       // Update existing profile
-      const { error: updateError } = await supabase
+      const { error: updateError } = await db
         .from('payroll_profiles')
         .update({
           payment_type: paymentType,
@@ -89,7 +91,7 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // Create new profile
-      const { error: insertError } = await supabase
+      const { error: insertError } = await db
         .from('payroll_profiles')
         .insert({
           user_id: user.id,
@@ -116,7 +118,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Log audit trail
-    await supabase.from('audit_logs').insert({
+    await db.from('audit_logs').insert({
       actor_user_id: user.id,
       action: 'payroll_profile_created',
       entity: 'payroll_profiles',

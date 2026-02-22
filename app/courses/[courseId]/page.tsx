@@ -20,7 +20,7 @@ export async function generateMetadata({
     };
   }
   
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('training_courses')
     .select('title, description')
     .eq('id', courseId)
@@ -58,7 +58,7 @@ export default async function CourseDetailPage({
   const db = _admin || supabase;
 
   // Fetch course details
-  const { data: course, error } = await supabase
+  const { data: course, error } = await db
     .from('training_courses')
     .select('*')
     .eq('id', courseId)
@@ -69,7 +69,7 @@ export default async function CourseDetailPage({
   }
 
   // Fetch lessons
-  const { data: lessons } = await supabase
+  const { data: lessons } = await db
     .from('training_lessons')
     .select('*')
     .eq('course_id', courseId)
@@ -82,7 +82,7 @@ export default async function CourseDetailPage({
 
   let enrollment = null;
   if (user) {
-    const { data }: any = await supabase
+    const { data }: any = await db
       .from('training_enrollments')
       .select('*')
       .eq('user_id', user.id)

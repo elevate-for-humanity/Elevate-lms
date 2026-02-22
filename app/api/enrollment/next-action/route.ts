@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { 
   getNextRequiredAction, 
   getActionRoute, 
@@ -16,6 +17,7 @@ export async function GET(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
@@ -26,7 +28,7 @@ export async function GET(req: Request) {
     const programId = url.searchParams.get('program_id');
 
     // Get the user's enrollment
-    let query = supabase
+    let query = db
       .from('program_enrollments')
       .select('id, enrollment_state, program_id, training_programs(slug, name)')
       .eq('user_id', user.id);

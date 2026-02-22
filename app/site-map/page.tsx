@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -204,6 +205,7 @@ const sitemapSections = [
 
 export default async function SitemapPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -217,7 +219,7 @@ export default async function SitemapPage() {
   }
   
   // Fetch dynamic sitemap data
-  const { data: programs } = await supabase
+  const { data: programs } = await db
     .from('programs')
     .select('name, slug')
     .eq('status', 'active');

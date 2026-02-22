@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -16,6 +17,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -36,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user's profile to verify name
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('full_name')
       .eq('id', user.id)
@@ -55,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get document to create hash
-    const { data: document } = await supabase
+    const { data: document } = await db
       .from('onboarding_documents')
       .select('content, packet_id')
       .eq('id', documentId)
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get packet version
-    const { data: packet } = await supabase
+    const { data: packet } = await db
       .from('onboarding_packets')
       .select('version')
       .eq('id', document.packet_id)
@@ -93,7 +95,7 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
     // Insert signature
-    const { error: signError } = await supabase
+    const { error: signError } = await db
       .from('onboarding_signatures')
       .insert({
         user_id: user.id,
@@ -135,7 +137,7 @@ export async function POST(request: NextRequest) {
     if (process.env.AUTOMATION_ENABLE_TRIGGERS !== 'false') {
       if (role === 'partner' || role === 'program_holder' || documentId?.includes('mou')) {
         // Get partner_id from user's profile or partner record
-        const { data: partnerRecord } = await supabase
+        const { data: partnerRecord } = await db
           .from('partners')
           .select('id')
           .eq('user_id', user.id)

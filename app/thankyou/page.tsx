@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { ArrowRight, Phone, Mail, Calendar } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -16,6 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ThankyouPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function ThankyouPage() {
   }
 
   // Get next steps content
-  const { data: nextSteps } = await supabase
+  const { data: nextSteps } = await db
     .from('content_blocks')
     .select('*')
     .eq('page', 'thankyou')
@@ -37,7 +39,7 @@ export default async function ThankyouPage() {
     .order('order', { ascending: true });
 
   // Get featured programs to suggest
-  const { data: programs } = await supabase
+  const { data: programs } = await db
     .from('programs')
     .select('id, name, slug, description')
     .eq('is_active', true)
@@ -45,7 +47,7 @@ export default async function ThankyouPage() {
     .limit(3);
 
   // Get contact info
-  const { data: contactInfo } = await supabase
+  const { data: contactInfo } = await db
     .from('settings')
     .select('value')
     .eq('key', 'contact_info')

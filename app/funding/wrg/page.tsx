@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 import { Metadata } from 'next';
 import { createPublicClient } from '@/lib/supabase/server';
@@ -30,7 +31,7 @@ export default async function WrgPage() {
   }
   
   // Fetch WRG funding info
-  const { data: wrgInfo } = await supabase
+  const { data: wrgInfo } = await db
     .from('funding_options')
     .select('*')
     .eq('type', 'wrg')

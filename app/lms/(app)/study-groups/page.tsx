@@ -4,6 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import {
   Users,
@@ -63,6 +64,7 @@ export const metadata: Metadata = {
 
 export default async function StudyGroupsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -86,7 +88,7 @@ export default async function StudyGroupsPage() {
   }
 
   // Fetch user's study groups
-  const { data: myGroupMemberships } = await supabase
+  const { data: myGroupMemberships } = await db
     .from('study_group_members')
     .select(`
       *,
@@ -110,7 +112,7 @@ export default async function StudyGroupsPage() {
   // Fetch available study groups (not joined)
   const joinedGroupIds = typedMemberships.map(m => m.study_group_id);
   
-  const { data: availableGroups } = await supabase
+  const { data: availableGroups } = await db
     .from('study_groups')
     .select(`
       *,
@@ -123,7 +125,7 @@ export default async function StudyGroupsPage() {
     .limit(20);
 
   // Fetch user's enrolled courses for creating groups
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select('courses (id, title)')
     .eq('user_id', user.id)
@@ -142,7 +144,7 @@ export default async function StudyGroupsPage() {
 
   // Calculate member counts
   for (const group of myGroups) {
-    const { count } = await supabase
+    const { count } = await db
       .from('study_group_members')
       .select('*', { count: 'exact', head: true })
       .eq('study_group_id', group.id);

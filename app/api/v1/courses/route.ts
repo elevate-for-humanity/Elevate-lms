@@ -12,6 +12,7 @@ import {
   logAPIRequest,
 } from '@/lib/api/rest-api';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -47,6 +48,7 @@ const startTime = Date.now();
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const searchParams = request.nextUrl.searchParams;
 
     // Pagination
@@ -59,7 +61,7 @@ const startTime = Date.now();
     const status = searchParams.get('status') || 'published';
     const search = searchParams.get('search');
 
-    let query = supabase
+    let query = db
       .from('courses')
       .select(
         `
@@ -159,8 +161,9 @@ export async function POST(request: NextRequest) {
 
     const body = await parseBody<Record<string, any>>(request);
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    const { data: course, error: createError } = await supabase
+    const { data: course, error: createError } = await db
       .from('courses')
       .insert({
         title: body.title,

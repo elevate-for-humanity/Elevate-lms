@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database not available' }, { status: 500 });
     }
@@ -39,7 +41,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
       
-      const { data: profile } = await supabase
+      const { data: profile } = await db
         .from('profiles')
         .select('role')
         .eq('id', user.id)
@@ -54,7 +56,7 @@ export async function POST(request: NextRequest) {
     const { partner_id, course_id, force = false } = body;
 
     // Get courses that need syncing
-    let query = supabase
+    let query = db
       .from('courses')
       .select('*')
       .eq('is_active', true)
@@ -97,7 +99,7 @@ export async function POST(request: NextRequest) {
         
         if (urlCheck.accessible) {
           // Update last_synced_at
-          await supabase
+          await db
             .from('courses')
             .update({
               last_synced_at: new Date().toISOString(),
@@ -130,7 +132,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log sync event
-    await supabase.from('audit_logs').insert({
+    await db.from('audit_logs').insert({
       action: 'content_sync',
       details: {
         total_courses: courses?.length || 0,
@@ -208,6 +210,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database not available' }, { status: 500 });
     }
@@ -215,7 +218,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const partnerId = searchParams.get('partner_id');
 
-    let query = supabase
+    let query = db
       .from('courses')
       .select('id, course_name, partner_url, last_synced_at, external_version, delivery_mode')
       .eq('delivery_mode', 'partner_link')

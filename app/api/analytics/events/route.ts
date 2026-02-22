@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
   const userAgent = req.headers.get('user-agent') || null;
   const referrer = req.headers.get('referer') || null;
 
-  await supabase.from('user_activity_events').insert({
+  await db.from('user_activity_events').insert({
     tenant_id: tenantId,
     user_id: userId,
     event_type: eventType,

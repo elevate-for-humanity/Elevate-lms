@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -128,7 +129,7 @@ export async function POST(req: NextRequest) {
     const supabase = await createServerSupabaseClient();
 
     // Verify lead exists
-    const { data: lead, error: leadError } = await supabase
+    const { data: lead, error: leadError } = await db
       .from('leads')
       .select('id, stage')
       .eq('id', data.leadId)
@@ -145,7 +146,7 @@ export async function POST(req: NextRequest) {
     const eligibility = checkEligibility(data);
 
     // Update lead
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('leads')
       .update({
         stage: eligibility.eligible ? 'ELIGIBLE' : 'INELIGIBLE',
@@ -172,7 +173,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Log event
-    await supabase.from('audit_logs').insert({
+    await db.from('audit_logs').insert({
       event_type: 'eligibility_checked',
       resource_type: 'lead',
       resource_id: data.leadId,

@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
       .getPublicUrl(filePath);
 
     // Save certificate record to database
-    const { data: certRecord, error: dbError } = await supabase
+    const { data: certRecord, error: dbError } = await db
       .from("certificates")
       .insert({
         student_id: studentId,

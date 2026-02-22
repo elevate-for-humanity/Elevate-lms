@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { BarChart3, FileText, Download } from 'lucide-react';
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 
 export default async function ReportsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -30,7 +32,7 @@ export default async function ReportsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?next=/reports');
 
-  const { data: reports } = await supabase
+  const { data: reports } = await db
     .from('reports')
     .select('*')
     .order('created_at', { ascending: false })

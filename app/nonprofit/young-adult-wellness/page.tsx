@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Sparkles, Calendar, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -16,6 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function YoungAdultWellnessPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function YoungAdultWellnessPage() {
   }
 
   // Get young adult services
-  const { data: services } = await supabase
+  const { data: services } = await db
     .from('nonprofit_services')
     .select('*')
     .eq('category', 'young-adult')
@@ -37,7 +39,7 @@ export default async function YoungAdultWellnessPage() {
     .order('order', { ascending: true });
 
   // Get upcoming events
-  const { data: events } = await supabase
+  const { data: events } = await db
     .from('events')
     .select('*')
     .eq('category', 'young-adult')
@@ -47,7 +49,7 @@ export default async function YoungAdultWellnessPage() {
     .limit(3);
 
   // Get testimonials
-  const { data: testimonials } = await supabase
+  const { data: testimonials } = await db
     .from('testimonials')
     .select('*')
     .eq('category', 'young-adult')

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { jotFormIntegration } from '@/lib/integrations/jotform';
 import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
 import { createClient } from '@supabase/supabase-js';
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
     for (const submission of submissions) {
       try {
         // Check if already processed
-        const { data: existing } = await supabase
+        const { data: existing } = await db
           .from('clients')
           .select('id')
           .eq('jotform_submission_id', submission.id)
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
         const ssnData = clientData.ssn ? prepareSSNForStorage(clientData.ssn) : {};
 
         // Create client
-        const { data: client, error: clientError } = await supabase
+        const { data: client, error: clientError } = await db
           .from('clients')
           .insert({
             first_name: clientData.firstName,
@@ -126,7 +127,7 @@ export async function POST(request: NextRequest) {
         });
 
         // Create tax return record
-        await supabase.from('tax_returns').insert({
+        await db.from('tax_returns').insert({
           user_id: client.id,
           tax_year: new Date().getFullYear(),
           filing_status: clientData.filingStatus,

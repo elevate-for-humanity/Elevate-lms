@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
@@ -12,6 +13,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
@@ -30,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is already enrolled
-    const { data: existingEnrollment } = await supabase
+    const { data: existingEnrollment } = await db
       .from('partner_users')
       .select('id')
       .eq('user_id', user.id)
@@ -44,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify partner exists and is active
-    const { data: partner } = await supabase
+    const { data: partner } = await db
       .from('partners')
       .select('id, name, status')
       .eq('id', partnerId)
@@ -61,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create enrollment record
-    const { error: enrollError } = await supabase
+    const { error: enrollError } = await db
       .from('partner_users')
       .insert({
         user_id: user.id,
@@ -76,7 +78,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update user profile with apprentice role if needed
-    await supabase
+    await db
       .from('profiles')
       .update({ 
         role: 'apprentice',
@@ -85,7 +87,7 @@ export async function POST(request: NextRequest) {
       .eq('id', user.id);
 
     // Create initial progress record
-    await supabase
+    await db
       .from('apprentice_progress')
       .insert({
         user_id: user.id,

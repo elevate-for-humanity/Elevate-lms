@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Briefcase, Plus, Search } from 'lucide-react';
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 export default async function OpportunitiesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function OpportunitiesPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?next=/employer/opportunities');
 
-  const { data: opportunities } = await supabase
+  const { data: opportunities } = await db
     .from('job_opportunities')
     .select('*')
     .eq('employer_id', user.id)

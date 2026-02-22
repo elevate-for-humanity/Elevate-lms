@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default async function AdminProductsPage() {
   await requireAdmin();
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function AdminProductsPage() {
   }
 
   // Fetch all products with creator info
-  const { data: products } = await supabase
+  const { data: products } = await db
     .from('marketplace_products')
     .select(
       `

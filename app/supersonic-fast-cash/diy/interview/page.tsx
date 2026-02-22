@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,7 @@ import Link from 'next/link';
 
 export default async function DIYInterviewPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -26,7 +28,7 @@ export default async function DIYInterviewPage() {
   }
   
   // Fetch interview questions
-  const { data: questions } = await supabase
+  const { data: questions } = await db
     .from('tax_interview_questions')
     .select('*')
     .order('order_index');

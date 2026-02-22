@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Users, Clock, ChevronRight } from 'lucide-react';
@@ -16,6 +17,7 @@ type Params = Promise<{ courseId: string }>;
 export default async function InstructorAssignmentsPage({ params }: { params: Params }) {
   const { courseId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -28,14 +30,14 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('courses')
     .select('id, title')
     .eq('id', courseId)
     .single();
 
   // Fetch assignments for this course
-  const { data: assignments } = await supabase
+  const { data: assignments } = await db
     .from('assignments')
     .select('id, title, description, max_points, due_date, created_at')
     .eq('course_id', courseId)
@@ -44,7 +46,7 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
   // Get submission counts per assignment
   const assignmentIds = (assignments || []).map((a: any) => a.id);
   const { data: submissionCounts } = assignmentIds.length > 0
-    ? await supabase
+    ? await db
         .from('assignment_submissions')
         .select('assignment_id')
         .in('assignment_id', assignmentIds)
@@ -57,7 +59,7 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
 
   // Get graded counts
   const { data: gradedCounts } = assignmentIds.length > 0
-    ? await supabase
+    ? await db
         .from('grades')
         .select('assignment_id')
         .in('assignment_id', assignmentIds)

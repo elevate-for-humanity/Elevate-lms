@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { Settings, User, Bell, Building } from 'lucide-react';
 
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function EmployerSettingsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) redirect('/login');
 
@@ -21,14 +23,14 @@ export default async function EmployerSettingsPage() {
   if (!user) redirect('/login?redirect=/employer-portal/settings');
 
   // Fetch user profile
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('full_name, email, phone, job_title')
     .eq('id', user.id)
     .single();
 
   // Fetch employer/company info
-  const { data: employer } = await supabase
+  const { data: employer } = await db
     .from('employers')
     .select('company_name, industry, company_size, ein')
     .eq('user_id', user.id)

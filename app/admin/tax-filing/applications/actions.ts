@@ -1,17 +1,19 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function createTaxApplication(formData: FormData) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) throw new Error('Database unavailable');
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  const { error } = await supabase.from('tax_applications').insert({
+  const { error } = await db.from('tax_applications').insert({
     client_name: formData.get('client_name') as string,
     client_email: formData.get('client_email') as string,
     client_phone: formData.get('client_phone') as string || null,

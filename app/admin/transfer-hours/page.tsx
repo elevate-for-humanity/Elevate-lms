@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { TransferHoursTable } from './transfer-hours-table';
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 export default async function TransferHoursPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -36,7 +38,7 @@ export default async function TransferHoursPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -46,7 +48,7 @@ export default async function TransferHoursPage() {
     redirect('/unauthorized');
   }
 
-  const { data: transferHours, count: totalRequests } = await supabase
+  const { data: transferHours, count: totalRequests } = await db
     .from('transfer_hours')
     .select(
       `
@@ -60,17 +62,17 @@ export default async function TransferHoursPage() {
     )
     .order('created_at', { ascending: false });
 
-  const { count: pendingRequests } = await supabase
+  const { count: pendingRequests } = await db
     .from('transfer_hours')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
-  const { count: approvedRequests } = await supabase
+  const { count: approvedRequests } = await db
     .from('transfer_hours')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'approved');
 
-  const { count: deniedRequests } = await supabase
+  const { count: deniedRequests } = await db
     .from('transfer_hours')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'denied');

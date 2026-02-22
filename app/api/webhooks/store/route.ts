@@ -2,6 +2,7 @@ import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
@@ -13,9 +14,10 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_STORE || '';
  */
 async function grantLmsAccess(userId: string, courseSlug: string) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   // Find course by slug
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('courses')
     .select('id')
     .eq('slug', courseSlug)
@@ -27,7 +29,7 @@ async function grantLmsAccess(userId: string, courseSlug: string) {
   }
 
   // Create enrollment
-  const { error } = await supabase.from('enrollments').upsert({
+  const { error } = await db.from('enrollments').upsert({
     user_id: userId,
     course_id: course.id,
     status: 'active',
@@ -50,8 +52,9 @@ async function grantLmsAccess(userId: string, courseSlug: string) {
  */
 async function unlockDownload(userId: string, productId: string, stripePaymentId?: string) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  const { error } = await supabase.from('user_entitlements').upsert({
+  const { error } = await db.from('user_entitlements').upsert({
     user_id: userId,
     entitlement_type: 'digital_download',
     product_id: productId,
@@ -81,8 +84,9 @@ async function recordPurchase(
   metadata: Record<string, string>
 ) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-  const { error } = await supabase.from('purchases').insert({
+  const { error } = await db.from('purchases').insert({
     user_id: userId,
     stripe_session_id: sessionId,
     product_id: productId,
@@ -201,9 +205,10 @@ export async function POST(req: NextRequest) {
 
     if (paymentIntentId) {
       const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
       // Revoke user_entitlements
-      const { error: entitlementError } = await supabase
+      const { error: entitlementError } = await db
         .from('user_entitlements')
         .update({
           status: 'revoked',
@@ -217,7 +222,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Update purchase record
-      const { error: purchaseError } = await supabase
+      const { error: purchaseError } = await db
         .from('purchases')
         .update({
           status: 'refunded',
@@ -230,7 +235,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Revoke LMS enrollment if applicable
-      const { error: enrollmentError } = await supabase
+      const { error: enrollmentError } = await db
         .from('enrollments')
         .update({
           status: 'refunded',

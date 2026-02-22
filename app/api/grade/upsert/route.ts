@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -15,6 +16,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -24,7 +26,7 @@ export async function POST(req: Request) {
   }
 
   // Check if user is instructor
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -50,7 +52,7 @@ export async function POST(req: Request) {
   }
 
   // Verify this grade item belongs to a course taught by instructor
-  const { data: gradeItem } = await supabase
+  const { data: gradeItem } = await db
     .from('grade_items')
     .select(
       `
@@ -68,7 +70,7 @@ export async function POST(req: Request) {
   }
 
   // Upsert the grade
-  const { error } = await supabase.from('grades').upsert(
+  const { error } = await db.from('grades').upsert(
     {
       grade_item_id: gradeItemId,
       enrollment_id: enrollmentId,

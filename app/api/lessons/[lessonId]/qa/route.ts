@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -17,9 +18,10 @@ export async function GET(
     if (rateLimited) return rateLimited;
 const { lessonId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Q + A list (readable without login if you want)
-  const { data: questions, error } = await supabase
+  const { data: questions, error } = await db
     .from("lesson_questions")
     .select(
       `
@@ -55,6 +57,7 @@ export async function POST(
 
   const { lessonId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const user = await getCurrentUser();
 
   if (!user) {
@@ -79,7 +82,7 @@ export async function POST(
       );
     }
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from("lesson_questions")
       .insert({
         lesson_id: lessonId,
@@ -106,7 +109,7 @@ export async function POST(
     );
   }
 
-  const { data, error }: any = await supabase
+  const { data, error }: any = await db
     .from("lesson_answers")
     .insert({
       question_id: questionId,

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -27,10 +28,11 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { programId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) return { title: 'Program | Program Holder' };
   
-  const { data: program } = await supabase
+  const { data: program } = await db
     .from('programs')
     .select('name')
     .eq('id', programId)
@@ -45,6 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProgramHolderProgramPage({ params }: Props) {
   const { programId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -61,7 +64,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
   if (!user) redirect('/login');
 
   // Verify program holder access
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -72,7 +75,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
   }
 
   // Fetch program
-  const { data: program, error } = await supabase
+  const { data: program, error } = await db
     .from('programs')
     .select('*')
     .eq('id', programId)
@@ -81,7 +84,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
   if (error || !program) notFound();
 
   // Fetch enrollments
-  const { data: enrollments, count: enrollmentCount } = await supabase
+  const { data: enrollments, count: enrollmentCount } = await db
     .from('enrollments')
     .select('*, profiles(first_name, last_name, email)', { count: 'exact' })
     .eq('program_id', programId)
@@ -89,7 +92,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
     .limit(10);
 
   // Fetch courses in program
-  const { data: courses, count: courseCount } = await supabase
+  const { data: courses, count: courseCount } = await db
     .from('courses')
     .select('*', { count: 'exact' })
     .eq('program_id', programId);

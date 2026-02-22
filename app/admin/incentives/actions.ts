@@ -1,11 +1,13 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function createIncentive(formData: FormData) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) throw new Error('Database unavailable');
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -19,7 +21,7 @@ export async function createIncentive(formData: FormData) {
   const start_date = formData.get('start_date') as string;
   const end_date = formData.get('end_date') as string;
 
-  const { error } = await supabase.from('incentives').insert({
+  const { error } = await db.from('incentives').insert({
     name,
     type: type || 'tax_credit',
     amount: amount ? parseFloat(amount) : null,

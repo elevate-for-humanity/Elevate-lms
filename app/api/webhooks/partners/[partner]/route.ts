@@ -1,4 +1,5 @@
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -111,7 +112,7 @@ async function handleEnrollmentCreated(
   const supabase = getSupabaseClient();
 
   // Update enrollment status in database
-  const { error } = await supabase
+  const { error } = await db
     .from('partner_lms_enrollments')
     .update({
       status: 'active',
@@ -134,7 +135,7 @@ async function handleProgressUpdated(
   const supabase = getSupabaseClient();
 
   // Update progress in database
-  const { error } = await supabase
+  const { error } = await db
     .from('partner_lms_enrollments')
     .update({
       progress_percentage: data.percentage || data.progress || 0,
@@ -158,7 +159,7 @@ async function handleCourseCompleted(
   const supabase = getSupabaseClient();
 
   // Get the enrollment step
-  const { data: step, error: stepError } = await supabase
+  const { data: step, error: stepError } = await db
     .from('enrollment_steps')
     .select('id, enrollment_id, provider_id')
     .eq('external_enrollment_id', data.enrollmentId)
@@ -185,7 +186,7 @@ async function handleCourseCompleted(
   }
 
   // Update partner enrollment record
-  const { error } = await supabase
+  const { error } = await db
     .from('partner_lms_enrollments')
     .update({
       status: 'completed',
@@ -203,7 +204,7 @@ async function handleCourseCompleted(
 
   // If there's a next step, auto-enroll
   if (nextStepId) {
-    const { data: nextStep } = await supabase
+    const { data: nextStep } = await db
       .from('enrollment_steps')
       .select(
         '*, provider:partner_lms_providers(*), enrollment:enrollments(user_id)'
@@ -239,7 +240,7 @@ async function handleCourseCompleted(
 
     if (isComplete) {
       // Generate completion certificate
-      await supabase
+      await db
         .from('enrollments')
         .update({
           status: 'completed',
@@ -265,7 +266,7 @@ async function handleCertificateIssued(
   const supabase = getSupabaseClient();
 
   // Update enrollment with certificate data
-  const { error } = await supabase
+  const { error } = await db
     .from('partner_lms_enrollments')
     .update({
       metadata: {

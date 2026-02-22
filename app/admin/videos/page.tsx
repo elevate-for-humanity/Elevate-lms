@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
 
 export default async function VideosPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -41,7 +43,7 @@ export default async function VideosPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -52,7 +54,7 @@ export default async function VideosPage() {
   }
 
   // Fetch videos data
-  const { data: videos, count: totalVideos } = await supabase
+  const { data: videos, count: totalVideos } = await db
     .from('media')
     .select(
       `
@@ -64,7 +66,7 @@ export default async function VideosPage() {
     .order('created_at', { ascending: false })
     .limit(50);
 
-  const { count: publishedVideos } = await supabase
+  const { count: publishedVideos } = await db
     .from('media')
     .select('*', { count: 'exact', head: true })
     .eq('published', true);

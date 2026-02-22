@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { ShoppingCart, Truck, Shield, RotateCcw } from 'lucide-react';
 import AddToCartButton from './AddToCartButton';
 
@@ -16,7 +17,8 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const supabase = await createClient();
-  const { data: product } = await supabase
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: product } = await db
     .from('products')
     .select('name, description')
     .eq('slug', slug)
@@ -35,8 +37,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
-  const { data: product, error } = await supabase
+  const { data: product, error } = await db
     .from('products')
     .select('*')
     .eq('slug', slug)
@@ -47,7 +50,7 @@ export default async function ProductDetailPage({ params }: Props) {
   }
 
   // Get related products from same category
-  const { data: relatedProducts } = await supabase
+  const { data: relatedProducts } = await db
     .from('products')
     .select('id, name, slug, price, image_url, category')
     .eq('category', product.category)

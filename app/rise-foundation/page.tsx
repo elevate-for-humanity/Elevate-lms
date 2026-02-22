@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import {
   Heart,
@@ -31,9 +32,10 @@ export default async function RiseFoundationPage() {
 
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (supabase) {
       // Get programs
-      const { data: programsData } = await supabase
+      const { data: programsData } = await db
         .from('rise_programs')
         .select('*')
         .eq('is_active', true)
@@ -41,13 +43,13 @@ export default async function RiseFoundationPage() {
       programs = programsData;
 
       // Get stats
-      const { count } = await supabase
+      const { count } = await db
         .from('rise_participants')
         .select('*', { count: 'exact', head: true });
       peopleHelped = count;
 
       // Get upcoming events
-      const { data: eventsData } = await supabase
+      const { data: eventsData } = await db
         .from('events')
         .select('*')
         .eq('organization', 'rise-foundation')
@@ -57,7 +59,7 @@ export default async function RiseFoundationPage() {
       events = eventsData;
 
       // Get testimonials
-      const { data: testimonialsData } = await supabase
+      const { data: testimonialsData } = await db
         .from('testimonials')
         .select('*')
         .eq('is_featured', true)

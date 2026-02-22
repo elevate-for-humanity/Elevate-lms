@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 
 export default async function OrientationLayout({
@@ -9,6 +10,7 @@ export default async function OrientationLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/programs/barber-apprenticeship/orientation');
@@ -21,7 +23,7 @@ export default async function OrientationLayout({
   }
 
   // Verify user has an enrollment for this program
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from('enrollments')
     .select('id, status, orientation_completed_at, programs(slug)')
     .eq('user_id', user.id)

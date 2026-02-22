@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -27,6 +28,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database not available' }, { status: 500 });
     }
@@ -41,7 +43,7 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit;
 
     // Build query for courses
-    let query = supabase
+    let query = db
       .from('courses')
       .select(`
         id,
@@ -90,7 +92,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Also fetch available programs for context
-    const { data: programs } = await supabase
+    const { data: programs } = await db
       .from('programs')
       .select('id, slug, name, category, is_active')
       .eq('is_active', true)
@@ -140,6 +142,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database not available' }, { status: 500 });
     }
@@ -178,7 +181,7 @@ export async function POST(request: NextRequest) {
       .substring(0, 20) + '_' + Date.now().toString(36).toUpperCase();
 
     // Insert course
-    const { data: course, error: insertError } = await supabase
+    const { data: course, error: insertError } = await db
       .from('courses')
       .insert({
         course_name,
@@ -201,7 +204,7 @@ export async function POST(request: NextRequest) {
 
     // If program_id provided, link course to program
     if (program_id && course) {
-      await supabase
+      await db
         .from('program_courses')
         .insert({
           program_id,

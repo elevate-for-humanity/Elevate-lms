@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -19,10 +20,11 @@ export async function GET(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get scheduled campaigns that are due
     const now = new Date().toISOString();
-    const { data: campaigns, error } = await supabase
+    const { data: campaigns, error } = await db
       .from('email_campaigns')
       .select('*')
       .eq('status', 'scheduled')
@@ -43,7 +45,7 @@ export async function GET(req: Request) {
     for (const campaign of campaigns) {
       try {
         // Mark as sending
-        await supabase
+        await db
           .from('email_campaigns')
           .update({ status: 'sending' })
           .eq('id', campaign.id);
@@ -79,7 +81,7 @@ export async function GET(req: Request) {
           });
         } else {
           // Mark as failed
-          await supabase
+          await db
             .from('email_campaigns')
             .update({
               status: 'failed',
@@ -101,7 +103,7 @@ export async function GET(req: Request) {
         );
 
         // Mark as failed
-        await supabase
+        await db
           .from('email_campaigns')
           .update({
             status: 'failed',

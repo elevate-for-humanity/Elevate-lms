@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Get user's push subscriptions
-    const { data: subscriptions, error: subError } = await supabase
+    const { data: subscriptions, error: subError } = await db
       .from('push_subscriptions')
       .select('id, endpoint, p256dh, auth')
       .eq('user_id', payload.userId);
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
 
         // Remove invalid subscriptions
         if (error.statusCode === 410 || error.statusCode === 404) {
-          await supabase
+          await db
             .from('push_subscriptions')
             .delete()
             .eq('id', subscription.id);

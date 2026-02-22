@@ -21,6 +21,7 @@ import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -45,6 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     // Require authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -72,7 +74,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get program details
-    const { data: program, error: programError } = await supabase
+    const { data: program, error: programError } = await db
       .from('programs')
       .select('id, title, slug, total_cost, status')
       .eq('id', program_id)
@@ -90,7 +92,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing active enrollment
-    const { data: existingEnrollment } = await supabase
+    const { data: existingEnrollment } = await db
       .from('student_enrollments')
       .select('id, status')
       .eq('student_id', user.id)
@@ -117,7 +119,7 @@ export async function POST(request: NextRequest) {
     const amountCents = Math.round(amountToCharge * 100);
 
     // Get user profile for customer details
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('email, full_name')
       .eq('id', user.id)

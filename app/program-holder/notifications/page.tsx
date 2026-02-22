@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
@@ -15,6 +16,7 @@ export const metadata = {
 
 export default async function ProgramHolderNotificationsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -39,7 +41,7 @@ export default async function ProgramHolderNotificationsPage() {
   }
 
   // Get notifications for this user
-  const { data: notifications } = await supabase
+  const { data: notifications } = await db
     .from('notifications')
     .select('*')
     .eq('user_id', user.id)

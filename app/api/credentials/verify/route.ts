@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getSession();
 
     // Lookup credential
-    const { data: credential, error } = await supabase
+    const { data: credential, error } = await db
       .from('credentials')
       .select(
         `
@@ -85,7 +86,7 @@ export async function POST(req: NextRequest) {
     const isValid = !isExpired && !isRevoked;
 
     // Log verification attempt
-    await supabase.from('audit_logs').insert({
+    await db.from('audit_logs').insert({
       event_type: 'credential_viewed',
       resource_type: 'credential',
       resource_id: credential.id,

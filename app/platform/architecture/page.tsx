@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { generateMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -15,6 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ArchitecturePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -28,7 +30,7 @@ export default async function ArchitecturePage() {
   }
   
   // Fetch architecture docs
-  const { data: docs } = await supabase
+  const { data: docs } = await db
     .from('documentation')
     .select('*')
     .eq('category', 'architecture');

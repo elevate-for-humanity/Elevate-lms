@@ -118,6 +118,7 @@ export async function POST(req: Request) {
     if (!isAdmin && !isWebhook) {
       // Check for authenticated admin user
       const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       
       if (authError || !user) {
@@ -129,7 +130,7 @@ export async function POST(req: Request) {
       }
 
       // Verify admin role
-      const { data: profile } = await supabase
+      const { data: profile } = await db
         .from('profiles')
         .select('role')
         .eq('id', user.id)
@@ -178,7 +179,7 @@ export async function POST(req: Request) {
     expiresAt.setDate(expiresAt.getDate() + config.duration);
 
     // Store license with hashed key (never store raw key)
-    const { data: license, error: licenseError } = await supabase
+    const { data: license, error: licenseError } = await db
       .from('licenses')
       .insert({
         license_key: licenseKeyHash,

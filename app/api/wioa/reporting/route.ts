@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -92,7 +93,7 @@ async function generateEnrollmentReport(
   startDate: string | null,
   endDate: string | null
 ) {
-  let query = supabase.from('enrollments').select('*, profiles(*)');
+  let query = db.from('enrollments').select('*, profiles(*)');
 
   if (startDate) query = query.gte('enrollment_date', startDate);
   if (endDate) query = query.lte('enrollment_date', endDate);
@@ -112,7 +113,7 @@ async function generateOutcomesReport(
   startDate: string | null,
   endDate: string | null
 ) {
-  let query = supabase.from('employment_outcomes').select('*');
+  let query = db.from('employment_outcomes').select('*');
 
   if (startDate) query = query.gte('start_date', startDate);
   if (endDate) query = query.lte('start_date', endDate);
@@ -161,7 +162,7 @@ async function generateDemographicsReport(
   startDate: string | null,
   endDate: string | null
 ) {
-  const { data, error }: any = await supabase
+  const { data, error }: any = await db
     .from('participant_eligibility')
     .select('*');
 
@@ -185,7 +186,7 @@ async function generateServicesReport(
   startDate: string | null,
   endDate: string | null
 ) {
-  let query = supabase.from('supportive_services').select('*');
+  let query = db.from('supportive_services').select('*');
 
   if (startDate) query = query.gte('request_date', startDate);
   if (endDate) query = query.lte('request_date', endDate);

@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -16,6 +17,7 @@ export async function POST(
 
   const { id } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { signerName, signerEmail, role } = await request.json();
 
   if (!signerName || !signerEmail) {
@@ -26,7 +28,7 @@ export async function POST(
   }
 
   // Verify document exists
-  const { data: doc } = await supabase
+  const { data: doc } = await db
     .from("signature_documents")
     .select("id, title, type")
     .eq("id", id)
@@ -43,7 +45,7 @@ export async function POST(
     null;
 
   // Create signature
-  const { data: signature, error } = await supabase
+  const { data: signature, error } = await db
     .from("signatures")
     .insert({
       document_id: doc.id,
@@ -60,7 +62,7 @@ export async function POST(
   }
 
   // Log the signature
-  await supabase.from("audit_logs").insert({
+  await db.from("audit_logs").insert({
     actor_id: null,
     actor_email: signerEmail,
     action: "document_signed",

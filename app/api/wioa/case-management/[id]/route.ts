@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,7 +21,7 @@ const supabase = createSupabaseClient();
   try {
     const { id } = await params;
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('case_management')
       .select('*')
       .eq('id', id)
@@ -53,7 +54,7 @@ const supabase = createSupabaseClient();
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('case_management')
       .update(body)
       .eq('id', id)

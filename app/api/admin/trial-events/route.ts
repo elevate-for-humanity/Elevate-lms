@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/with-auth';
 import { createClient } from '@supabase/supabase-js';
@@ -53,7 +54,7 @@ export const GET = withAuth(
 
       const eventTypes = eventTypeFilters[type] || eventTypeFilters.all;
 
-      const query = supabase
+      const query = db
         .from('license_events')
         .select('id, license_id, organization_id, event_type, event_data, created_at')
         .in('event_type', eventTypes)

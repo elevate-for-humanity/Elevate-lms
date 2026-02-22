@@ -54,7 +54,7 @@ export async function POST(req: Request) {
 
     // Validate license using hashed key lookup
     const licenseHash = hashLicenseKey(licenseKey);
-    const { data: license, error: licenseError } = await supabase
+    const { data: license, error: licenseError } = await db
       .from('licenses')
       .select('id, tier, status, features, max_deployments, expires_at, metadata')
       .eq('license_key', licenseHash)

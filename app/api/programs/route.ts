@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
     const search = searchParams.get('search');
     const isActive = searchParams.get('active') !== 'false';
 
-    let query = supabase
+    let query = db
       .from('programs')
       .select('*')
       .eq('is_active', isActive)

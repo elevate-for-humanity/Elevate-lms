@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { BookOpen, Clock, Award, ChevronRight } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ interface TrainingCourse {
 
 export default async function TrainingCoursesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -37,7 +39,7 @@ export default async function TrainingCoursesPage() {
     );
   }
   
-  const { data: courses, error } = await supabase
+  const { data: courses, error } = await db
     .from('training_courses')
     .select('*')
     .eq('is_active', true)

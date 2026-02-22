@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 
@@ -16,6 +17,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhuma
 export async function POST() {
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -23,7 +25,7 @@ export async function POST() {
     }
 
     // Verify the application is actually approved (DB trigger must have run)
-    const { data: application } = await supabase
+    const { data: application } = await db
       .from('applications')
       .select('id, first_name, last_name, email, program_interest, status, reference_number')
       .eq('user_id', user.id)
@@ -37,7 +39,7 @@ export async function POST() {
     }
 
     // Check if approval email was already sent (idempotent)
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('onboarding_progress')
       .select('status')
       .eq('user_id', user.id)
@@ -101,7 +103,7 @@ export async function POST() {
     }).catch((err) => logger.error('Failed to send admin approval email', err as Error));
 
     // Mark as emailed so we don't send duplicates
-    await supabase
+    await db
       .from('onboarding_progress')
       .update({ status: 'approval_emailed' })
       .eq('user_id', user.id);

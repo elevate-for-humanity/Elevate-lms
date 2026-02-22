@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function StaffApplicationSuccess() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -26,7 +28,7 @@ export default async function StaffApplicationSuccess() {
   }
   
   // Log success page visit
-  await supabase.from('page_views').insert({ page: 'staff_application_success' }).select();
+  await db.from('page_views').insert({ page: 'staff_application_success' }).select();
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
       <div className="max-w-2xl w-full bg-white border border-slate-200 rounded-lg p-8 text-center">

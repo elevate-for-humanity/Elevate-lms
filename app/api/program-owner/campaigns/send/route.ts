@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -15,6 +16,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -23,7 +25,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role, full_name')
       .eq('id', user.id)
@@ -44,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify program owner has access to these students through their programs
-    const { data: ownedPrograms } = await supabase
+    const { data: ownedPrograms } = await db
       .from('programs')
       .select('id')
       .eq('owner_id', user.id);
@@ -56,7 +58,7 @@ export async function POST(request: NextRequest) {
     const programIds = ownedPrograms.map((p) => p.id);
 
     // Get enrollments for owned programs
-    const { data: enrollments } = await supabase
+    const { data: enrollments } = await db
       .from('enrollments')
       .select('student_id')
       .in('program_id', programIds)
@@ -72,7 +74,7 @@ export async function POST(request: NextRequest) {
     const validStudentIds = enrollments.map((e) => e.student_id);
 
     // Get student details
-    const { data: students } = await supabase
+    const { data: students } = await db
       .from('profiles')
       .select('id, email, full_name')
       .in('id', validStudentIds);

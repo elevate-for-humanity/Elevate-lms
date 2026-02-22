@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
@@ -12,6 +13,7 @@ export const POST = withAuth(
   async (req: NextRequest, user) => {
     try {
       const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
       // Step 1: Create the table
       // logger.info("Creating marketing_contacts table...");
@@ -221,7 +223,7 @@ export const POST = withAuth(
       let skipped = 0;
 
       for (const contact of contacts) {
-        const { error } = await supabase
+        const { error } = await db
           .from('marketing_contacts')
           .insert(contact);
 
@@ -240,7 +242,7 @@ export const POST = withAuth(
       }
 
       // Get final count
-      const { count } = await supabase
+      const { count } = await db
         .from('marketing_contacts')
         .select('*', { count: 'exact', head: true });
 

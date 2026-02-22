@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import webpush from 'web-push';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -24,6 +25,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { title, body, targetAudience, url, icon } = await req.json();
 
     // Get target users
@@ -46,7 +48,7 @@ export async function POST(req: Request) {
     for (const user of users) {
       try {
         // Get user's push subscriptions
-        const { data: subscriptions } = await supabase
+        const { data: subscriptions } = await db
           .from('push_subscriptions')
           .select('*')
           .eq('user_id', user.id)
@@ -76,7 +78,7 @@ export async function POST(req: Request) {
             sent++;
 
             // Log notification
-            await supabase.from('notification_logs').insert({
+            await db.from('notification_logs').insert({
               user_id: user.id,
               title,
               body,
@@ -93,14 +95,14 @@ export async function POST(req: Request) {
 
             // If subscription is invalid (410 Gone), mark as inactive
             if (error.statusCode === 410) {
-              await supabase
+              await db
                 .from('push_subscriptions')
                 .update({ active: true })
                 .eq('id', subscription.id);
             }
 
             // Log failure
-            await supabase.from('notification_logs').insert({
+            await db.from('notification_logs').insert({
               user_id: user.id,
               title,
               body,
@@ -144,14 +146,14 @@ async function getTargetUsers(supabase: any, targetAudience: string) {
 
   switch (targetAudience) {
     case 'all-students':
-      query = supabase
+      query = db
         .from('students')
         .select('id, email, first_name, last_name')
         .not('email', 'is', null);
       break;
 
     case 'active-students':
-      query = supabase
+      query = db
         .from('students')
         .select('id, email, first_name, last_name')
         .eq('status', 'active')
@@ -159,7 +161,7 @@ async function getTargetUsers(supabase: any, targetAudience: string) {
       break;
 
     case 'barber-students':
-      query = supabase
+      query = db
         .from('students')
         .select('id, email, first_name, last_name')
         .eq('program_name', 'Barber Program')
@@ -168,7 +170,7 @@ async function getTargetUsers(supabase: any, targetAudience: string) {
       break;
 
     case 'cna-students':
-      query = supabase
+      query = db
         .from('students')
         .select('id, email, first_name, last_name')
         .eq('program_name', 'CNA Program')
@@ -177,7 +179,7 @@ async function getTargetUsers(supabase: any, targetAudience: string) {
       break;
 
     case 'cdl-students':
-      query = supabase
+      query = db
         .from('students')
         .select('id, email, first_name, last_name')
         .eq('program_name', 'CDL Program')
@@ -186,7 +188,7 @@ async function getTargetUsers(supabase: any, targetAudience: string) {
       break;
 
     case 'all-staff':
-      query = supabase
+      query = db
         .from('staff')
         .select('id, email, first_name, last_name')
         .not('email', 'is', null);

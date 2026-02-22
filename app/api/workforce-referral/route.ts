@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { WorkforceAgencyType, WorkforceReferralStatus } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -19,6 +20,7 @@ export async function GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -26,7 +28,7 @@ const supabase = await createClient();
   }
 
   // Check staff role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -41,7 +43,7 @@ const supabase = await createClient();
   const agencyName = searchParams.get('agency');
   const status = searchParams.get('status');
 
-  let query = supabase
+  let query = db
     .from('workforce_referrals')
     .select(`
       *,
@@ -78,6 +80,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -120,7 +123,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid agency type' }, { status: 400 });
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('workforce_referrals')
     .insert({
       user_id: userId,
@@ -155,6 +158,7 @@ export async function PATCH(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -162,7 +166,7 @@ const supabase = await createClient();
   }
 
   // Check staff role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -223,7 +227,7 @@ const supabase = await createClient();
 
     case 'send_status_update':
       // Get referral with case manager info
-      const { data: referral } = await supabase
+      const { data: referral } = await db
         .from('workforce_referrals')
         .select('*, enrollments(status, programs(name))')
         .eq('id', referralId)
@@ -264,7 +268,7 @@ const supabase = await createClient();
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   }
 
-  const { error } = await supabase
+  const { error } = await db
     .from('workforce_referrals')
     .update(updateData)
     .eq('id', referralId);
@@ -282,6 +286,7 @@ export async function PUT(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   // This endpoint is for automated status updates
   // Should be called by a cron job
@@ -295,7 +300,7 @@ const supabase = await createClient();
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-  const { data: referrals } = await supabase
+  const { data: referrals } = await db
     .from('workforce_referrals')
     .select(`
       *,
@@ -331,7 +336,7 @@ const supabase = await createClient();
       logger.error('Failed to send email to:', referral.case_manager_email, emailError);
     }
     
-    await supabase
+    await db
       .from('workforce_referrals')
       .update({ last_status_update_sent_at: new Date().toISOString() })
       .eq('id', referral.id);

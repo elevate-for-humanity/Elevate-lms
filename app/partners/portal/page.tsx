@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { Building2, Users, FileText, BarChart3, Settings, HelpCircle } from 'lucide-react';
@@ -24,6 +25,7 @@ const PORTAL_LINKS = [
 
 export default async function PartnerPortalPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -39,7 +41,7 @@ export default async function PartnerPortalPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?next=/partners/portal');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('first_name, last_name, role, organization')
     .eq('id', user.id)

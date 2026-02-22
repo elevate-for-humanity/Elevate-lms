@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -22,6 +23,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function FerpaCompliancePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -37,7 +39,7 @@ export default async function FerpaCompliancePage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?next=/ferpa/compliance');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -47,17 +49,17 @@ export default async function FerpaCompliancePage() {
   if (!profile || !allowedRoles.includes(profile.role)) redirect('/unauthorized');
 
   // Get compliance metrics
-  const { count: totalStaff } = await supabase
+  const { count: totalStaff } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .in('role', ['admin', 'staff', 'instructor']);
 
-  const { count: trainedStaff } = await supabase
+  const { count: trainedStaff } = await db
     .from('ferpa_training_records')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
 
-  const { count: pendingRequests } = await supabase
+  const { count: pendingRequests } = await db
     .from('ferpa_access_requests')
     .select('*', { count: 'exact', head: true })
     .in('status', ['pending', 'under_review']);

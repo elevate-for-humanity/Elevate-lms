@@ -21,7 +21,7 @@ const supabase = createAdminClient();
     }
   try {
     // Check database connectivity
-    const { error: dbError } = await supabase
+    const { error: dbError } = await db
       .from('marketplace_creators')
       .select('id')
       .limit(1);

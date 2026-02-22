@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 
@@ -15,6 +16,7 @@ import PayrollSetupForm from './PayrollSetupForm';
 
 export default async function PayrollSetupPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -36,7 +38,7 @@ export default async function PayrollSetupPage() {
   }
 
   // Get user's profile to determine role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('id, full_name, email, role')
     .eq('id', user.id)
@@ -47,14 +49,14 @@ export default async function PayrollSetupPage() {
   }
 
   // Get payout rate config for role
-  const { data: rateConfigs } = await supabase
+  const { data: rateConfigs } = await db
     .from('payout_rate_configs')
     .select('*')
     .eq('role', profile.role)
     .eq('is_active', true);
 
   // Check if payroll profile already exists
-  const { data: existingProfile } = await supabase
+  const { data: existingProfile } = await db
     .from('payroll_profiles')
     .select('*')
     .eq('user_id', user.id)

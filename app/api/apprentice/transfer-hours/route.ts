@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -12,6 +13,7 @@ export async function GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const {
     data: { user },
@@ -22,7 +24,7 @@ const supabase = await createClient();
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data: requests, error } = await supabase
+  const { data: requests, error } = await db
     .from('transfer_hour_requests')
     .select(`
       *,
@@ -47,6 +49,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   const {
     data: { user },
@@ -89,7 +92,7 @@ export async function POST(req: Request) {
   }
 
   // Verify enrollment belongs to user
-  const { data: enrollment, error: enrollmentError } = await supabase
+  const { data: enrollment, error: enrollmentError } = await db
     .from('student_enrollments')
     .select('id, student_id, transfer_hours')
     .eq('id', enrollment_id)
@@ -101,7 +104,7 @@ export async function POST(req: Request) {
   }
 
   // Check for existing pending request
-  const { data: existingRequest } = await supabase
+  const { data: existingRequest } = await db
     .from('transfer_hour_requests')
     .select('id')
     .eq('enrollment_id', enrollment_id)
@@ -116,7 +119,7 @@ export async function POST(req: Request) {
   }
 
   // Create transfer request
-  const { data: request, error: insertError } = await supabase
+  const { data: request, error: insertError } = await db
     .from('transfer_hour_requests')
     .insert({
       student_id: user.id,

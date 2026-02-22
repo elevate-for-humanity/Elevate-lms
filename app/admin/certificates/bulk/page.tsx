@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 
 export default async function BulkCertificatesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -33,7 +35,7 @@ export default async function BulkCertificatesPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -44,14 +46,14 @@ export default async function BulkCertificatesPage() {
   }
 
   // Fetch certificate templates
-  const { data: templates } = await supabase
+  const { data: templates } = await db
     .from('certificate_templates')
     .select('id, name, description')
     .eq('status', 'active')
     .order('name');
 
   // Fetch eligible participants (completed courses without certificates)
-  const { data: eligibleParticipants, count: eligibleCount } = await supabase
+  const { data: eligibleParticipants, count: eligibleCount } = await db
     .from('enrollments')
     .select(`
       id,

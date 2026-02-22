@@ -1,18 +1,20 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 
 export async function createProgram(formData: FormData) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -33,7 +35,7 @@ export async function createProgram(formData: FormData) {
   const is_active = formData.get('is_active') === 'on';
   const featured = formData.get('featured') === 'on';
 
-  const { error } = await supabase
+  const { error } = await db
     .from('programs')
     .insert({
       name,
@@ -58,13 +60,14 @@ export async function createProgram(formData: FormData) {
 
 export async function updateProgram(id: string, formData: FormData) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -85,7 +88,7 @@ export async function updateProgram(id: string, formData: FormData) {
   const is_active = formData.get('is_active') === 'on';
   const featured = formData.get('featured') === 'on';
 
-  const { error } = await supabase
+  const { error } = await db
     .from('programs')
     .update({
       name,
@@ -112,13 +115,14 @@ export async function updateProgram(id: string, formData: FormData) {
 
 export async function deleteProgram(id: string) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     throw new Error('Unauthorized');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -128,7 +132,7 @@ export async function deleteProgram(id: string) {
     throw new Error('Unauthorized');
   }
 
-  const { error } = await supabase
+  const { error } = await db
     .from('programs')
     .delete()
     .eq('id', id);

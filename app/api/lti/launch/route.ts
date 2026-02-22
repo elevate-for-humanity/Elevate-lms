@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
 
   // Use issuer + client_id to find platform config
   const clientId = decoded.aud;
-  const { data: platform } = await supabase
+  const { data: platform } = await db
     .from('lti_platforms')
     .select('*')
     .eq('issuer', issuer)
@@ -60,7 +61,7 @@ export async function POST(request: Request) {
   }
 
   // Find / create student user based on email or sub
-  const { data: user } = await supabase
+  const { data: user } = await db
     .from('users')
     .upsert(
       {
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
   const courseTitle = context?.title || 'LTI Course';
   const contextId = context?.id || '';
 
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('courses')
     .upsert(
       {

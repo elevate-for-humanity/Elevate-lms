@@ -2,6 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { BookOpen, Users, BarChart, Settings, Home, MessageSquare } from 'lucide-react';
 import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
@@ -29,6 +30,7 @@ export default async function InstructorLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -47,7 +49,7 @@ export default async function InstructorLayout({
   }
 
   // Verify user has instructor role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)

@@ -31,7 +31,7 @@ export async function POST(
     const supabase = admin || userClient; // admin bypasses RLS recursion
 
     // Get lesson to find course_id
-    const { data: lesson, error: lessonError } = await supabase
+    const { data: lesson, error: lessonError } = await db
       .from('training_lessons')
       .select('id, course_id, title')
       .eq('id', lessonId)
@@ -42,7 +42,7 @@ export async function POST(
     }
 
     // Check if user is enrolled in the course
-    const { data: enrollment } = await supabase
+    const { data: enrollment } = await db
       .from('training_enrollments')
       .select('id, status')
       .eq('user_id', user.id)
@@ -57,7 +57,7 @@ export async function POST(
     }
 
     // Mark lesson as complete
-    const { data: progress, error: progressError } = await supabase
+    const { data: progress, error: progressError } = await db
       .from('lesson_progress')
       .upsert(
         {
@@ -92,12 +92,12 @@ export async function POST(
     });
 
     // Get updated course progress
-    const { data: allLessons } = await supabase
+    const { data: allLessons } = await db
       .from('training_lessons')
       .select('id')
       .eq('course_id', lesson.course_id);
 
-    const { data: completedLessons } = await supabase
+    const { data: completedLessons } = await db
       .from('lesson_progress')
       .select('id')
       .eq('user_id', user.id)
@@ -119,7 +119,7 @@ export async function POST(
     
     if (rpcError) {
       // Fallback: try direct update if RPC doesn't exist
-      await supabase
+      await db
         .from('training_enrollments')
         .update({ progress: progressPercent, updated_at: new Date().toISOString() })
         .eq('user_id', user.id)
@@ -133,7 +133,7 @@ export async function POST(
     let certificate = null;
     if (courseCompleted) {
       // Fetch actual course name
-      const { data: course } = await supabase
+      const { data: course } = await db
         .from('training_courses')
         .select('course_name')
         .eq('id', lesson.course_id)
@@ -203,9 +203,10 @@ export async function DELETE(
 
     const { lessonId } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Mark lesson as incomplete
-    const { error } = await supabase
+    const { error } = await db
       .from('lesson_progress')
       .update({
         completed: false,
@@ -223,7 +224,7 @@ export async function DELETE(
     }
 
     // Recalculate enrollment progress (same logic as POST handler)
-    const { data: lessonRow } = await supabase
+    const { data: lessonRow } = await db
       .from('training_lessons')
       .select('course_id')
       .eq('id', lessonId)
@@ -232,14 +233,14 @@ export async function DELETE(
     if (lessonRow?.course_id) {
       const courseId = lessonRow.course_id;
 
-      const { data: allLessons } = await supabase
+      const { data: allLessons } = await db
         .from('training_lessons')
         .select('id')
         .eq('course_id', courseId);
 
       const totalLessons = allLessons?.length || 0;
 
-      const { data: completedLessons } = await supabase
+      const { data: completedLessons } = await db
         .from('lesson_progress')
         .select('lesson_id')
         .eq('user_id', user.id)
@@ -260,7 +261,7 @@ export async function DELETE(
 
       if (rpcError) {
         // Fallback: direct update
-        await supabase
+        await db
           .from('training_enrollments')
           .update({ progress: progressPercent, updated_at: new Date().toISOString() })
           .eq('user_id', user.id)

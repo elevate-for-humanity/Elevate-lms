@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -14,6 +15,7 @@ export async function GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -24,7 +26,7 @@ const supabase = await createClient();
 
   const folderId = request.nextUrl.searchParams.get('folderId') || null;
 
-  const { data: files, error } = await supabase
+  const { data: files, error } = await db
     .from('files')
     .select('*')
     .eq('user_id', user.id)
@@ -43,6 +45,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -75,7 +78,7 @@ export async function POST(request: NextRequest) {
   } = supabase.storage.from('files').getPublicUrl(fileName);
 
   // Save file metadata
-  const { data, error }: any = await supabase
+  const { data, error }: any = await db
     .from('files')
     .insert({
       user_id: user.id,
@@ -101,6 +104,7 @@ export async function DELETE(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -116,7 +120,7 @@ const supabase = await createClient();
   }
 
   // Get file info
-  const { data: file } = await supabase
+  const { data: file } = await db
     .from('files')
     .select('storage_path')
     .eq('id', id)
@@ -129,7 +133,7 @@ const supabase = await createClient();
   }
 
   // Delete from database
-  const { error } = await supabase
+  const { error } = await db
     .from('files')
     .delete()
     .eq('id', id)

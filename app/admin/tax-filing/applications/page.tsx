@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 
 export default async function TaxFilingApplicationsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function TaxFilingApplicationsPage() {
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -40,18 +42,18 @@ export default async function TaxFilingApplicationsPage() {
   }
 
   // Fetch tax applications
-  const { data: applications } = await supabase
+  const { data: applications } = await db
     .from('tax_applications')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(50);
 
-  const { count: pendingCount } = await supabase
+  const { count: pendingCount } = await db
     .from('tax_applications')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
-  const { count: completedCount } = await supabase
+  const { count: completedCount } = await db
     .from('tax_applications')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');

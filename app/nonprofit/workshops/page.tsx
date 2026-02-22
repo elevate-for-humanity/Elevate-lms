@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Calendar, Clock, MapPin, Users, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -16,6 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function WorkshopsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function WorkshopsPage() {
   }
 
   // Get upcoming workshops
-  const { data: upcomingWorkshops } = await supabase
+  const { data: upcomingWorkshops } = await db
     .from('workshops')
     .select('*')
     .eq('is_active', true)
@@ -37,7 +39,7 @@ export default async function WorkshopsPage() {
     .order('date', { ascending: true });
 
   // Get past workshops for reference
-  const { data: pastWorkshops } = await supabase
+  const { data: pastWorkshops } = await db
     .from('workshops')
     .select('*')
     .eq('is_active', true)
@@ -46,7 +48,7 @@ export default async function WorkshopsPage() {
     .limit(6);
 
   // Get workshop categories
-  const { data: categories } = await supabase
+  const { data: categories } = await db
     .from('workshop_categories')
     .select('*')
     .eq('is_active', true)

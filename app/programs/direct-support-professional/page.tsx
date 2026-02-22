@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 // Force static generation for performance
 
@@ -46,7 +47,7 @@ export default async function Page() {
   }
   
   // Fetch DSP program info
-  const { data: program } = await supabase
+  const { data: program } = await db
     .from('programs')
     .select('*')
     .eq('slug', 'direct-support-professional')

@@ -5,6 +5,7 @@ export const maxDuration = 30;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { sendEmail } from '@/lib/email/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -24,9 +25,10 @@ export async function POST(
 
     const { id } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check if user is admin
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -37,7 +39,7 @@ export async function POST(
     }
 
     // Get application
-    const { data: application, error: appError } = await supabase
+    const { data: application, error: appError } = await db
       .from('applications')
       .select('*')
       .eq('id', id)
@@ -51,7 +53,7 @@ export async function POST(
     const { reason } = body;
 
     // Update application status
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('applications')
       .update({
         status: 'rejected',

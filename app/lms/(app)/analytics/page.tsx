@@ -4,6 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import LearningAnalyticsDashboard from '@/components/LearningAnalyticsDashboard';
 import StudentEngagementAnalytics from '@/components/StudentEngagementAnalytics';
@@ -29,6 +30,7 @@ export const metadata: Metadata = {
 
 export default async function AnalyticsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -52,7 +54,7 @@ export default async function AnalyticsPage() {
   }
 
   // Fetch enrollments
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select(`
       *,
@@ -66,14 +68,14 @@ export default async function AnalyticsPage() {
     .eq('user_id', user.id);
 
   // Fetch lesson progress
-  const { data: lessonProgress } = await supabase
+  const { data: lessonProgress } = await db
     .from('student_progress')
     .select('*')
     .eq('student_id', user.id)
     .order('updated_at', { ascending: false });
 
   // Fetch quiz attempts
-  const { data: quizAttempts } = await supabase
+  const { data: quizAttempts } = await db
     .from('quiz_attempts')
     .select('*')
     .eq('user_id', user.id)
@@ -81,7 +83,7 @@ export default async function AnalyticsPage() {
     .order('completed_at', { ascending: false });
 
   // Fetch assignment submissions
-  const { data: assignments } = await supabase
+  const { data: assignments } = await db
     .from('assignment_submissions')
     .select('*')
     .eq('student_id', user.id)

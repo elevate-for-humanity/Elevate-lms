@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { checkNewMilestone } from '@/lib/pwa/milestones';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
@@ -32,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user's partner assignment
-    const { data: partnerUser } = await supabase
+    const { data: partnerUser } = await db
       .from('partner_users')
       .select('partner_id')
       .eq('user_id', user.id)
@@ -53,7 +55,7 @@ export async function POST(request: NextRequest) {
     const weekEndingStr = weekEnding.toISOString().split('T')[0];
 
     // Check for existing entry for this week
-    const { data: existingEntry } = await supabase
+    const { data: existingEntry } = await db
       .from('progress_entries')
       .select('id, hours_worked')
       .eq('apprentice_id', user.id)
@@ -64,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     if (existingEntry) {
       // Update existing entry
-      const { error: updateError } = await supabase
+      const { error: updateError } = await db
         .from('progress_entries')
         .update({
           hours_worked: existingEntry.hours_worked + parseFloat(hours),
@@ -79,7 +81,7 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // Create new entry
-      const { error: insertError } = await supabase
+      const { error: insertError } = await db
         .from('progress_entries')
         .insert({
           apprentice_id: user.id,
@@ -99,7 +101,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for milestone achievement
-    const { data: totalProgress } = await supabase
+    const { data: totalProgress } = await db
       .from('progress_entries')
       .select('hours_worked')
       .eq('apprentice_id', user.id)

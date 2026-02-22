@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Building, MapPin, Users, Globe, Phone, Mail, Edit, Camera, Award, Briefcase, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 
 export default async function CompanyProfilePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -22,7 +24,7 @@ export default async function CompanyProfilePage() {
   }
 
   // Get employer profile linked to this user
-  const { data: employer } = await supabase
+  const { data: employer } = await db
     .from('rapids_employers')
     .select('*')
     .eq('contact_email', user.email)
@@ -34,7 +36,7 @@ export default async function CompanyProfilePage() {
 
   if (employer) {
     // Count active jobs
-    const { count: jobCount } = await supabase
+    const { count: jobCount } = await db
       .from('job_postings')
       .select('*', { count: 'exact', head: true })
       .eq('employer_id', employer.id)
@@ -43,7 +45,7 @@ export default async function CompanyProfilePage() {
     activeJobs = jobCount || 0;
 
     // Count total hires (placements)
-    const { count: hireCount } = await supabase
+    const { count: hireCount } = await db
       .from('placements')
       .select('*', { count: 'exact', head: true })
       .eq('employer_id', employer.id);

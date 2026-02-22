@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -18,7 +19,7 @@ export async function GET(req: NextRequest) {
     const categoryId = searchParams.get('category_id');
     const courseId = searchParams.get('course_id');
 
-    let query = supabase
+    let query = db
       .from('forum_threads')
       .select(
         `
@@ -76,7 +77,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('forum_threads')
       .insert({
         category_id,

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import {
   Shield,
   GraduationCap,
@@ -28,7 +29,8 @@ export const metadata: Metadata = {
 
 export default async function CredentialPartnersPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('compliance_records').select('*').limit(50);
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: dbRows } = await db.from('compliance_records').select('*').limit(50);
 const CREDENTIAL_PARTNERS = (dbRows as any[]) || [];
 
   return (

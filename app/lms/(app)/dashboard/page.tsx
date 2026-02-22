@@ -72,7 +72,7 @@ export default async function StudentDashboardOrchestrated() {
   const db = _admin || supabase;
 
   // Get partner enrollments (external providers like HSI)
-  const { data: partnerEnrollments } = await supabase
+  const { data: partnerEnrollments } = await db
     .from('partner_lms_enrollments')
     .select('*, partner_lms_courses(*), partner_lms_providers(*)')
     .eq('student_id', user.id)
@@ -80,7 +80,7 @@ export default async function StudentDashboardOrchestrated() {
 
   // Get regular enrollments (internal LMS courses)
   // Query training_enrollments directly and join courses for display
-  const { data: regularEnrollments } = await supabase
+  const { data: regularEnrollments } = await db
     .from('training_enrollments')
     .select('*, course:training_courses(id, course_name, description, duration_hours, is_active)')
     .eq('user_id', user.id)
@@ -100,7 +100,7 @@ export default async function StudentDashboardOrchestrated() {
   let courseProgress = 0;
   if (activeEnrollment) {
     // Try to get from course_progress table first
-    const { data: progress, error: progressError } = await supabase
+    const { data: progress, error: progressError } = await db
       .from('course_progress')
       .select('progress_percentage')
       .eq('enrollment_id', activeEnrollment.id)
@@ -115,7 +115,7 @@ export default async function StudentDashboardOrchestrated() {
   }
 
   // Get certifications from certificates table
-  const { data: certifications } = await supabase
+  const { data: certifications } = await db
     .from('certificates')
     .select('*')
     .eq('user_id', user.id)
@@ -123,7 +123,7 @@ export default async function StudentDashboardOrchestrated() {
     .catch(() => ({ data: null, error: null }));
 
   // Get job placements (gracefully handle if table doesn't exist)
-  const { data: placements } = await supabase
+  const { data: placements } = await db
     .from('job_placements')
     .select('*')
     .eq('user_id', user.id)

@@ -4,6 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import {
   BookOpen,
@@ -30,6 +31,7 @@ export const metadata: Metadata = {
 
 export default async function LibraryPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -53,7 +55,7 @@ export default async function LibraryPage() {
   }
 
   // Fetch user's enrolled courses
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select(`
       *,
@@ -68,7 +70,7 @@ export default async function LibraryPage() {
     .order('created_at', { ascending: false });
 
   // Fetch library resources
-  const { data: resources } = await supabase
+  const { data: resources } = await db
     .from('library_resources')
     .select('*')
     .eq('is_public', true)
@@ -77,14 +79,14 @@ export default async function LibraryPage() {
 
   // Fetch course materials for enrolled courses
   const courseIds = enrollments?.map(e => e.course_id) || [];
-  const { data: courseMaterials } = await supabase
+  const { data: courseMaterials } = await db
     .from('course_materials')
     .select('*, courses (title)')
     .in('course_id', courseIds.length > 0 ? courseIds : ['00000000-0000-0000-0000-000000000000'])
     .order('created_at', { ascending: false });
 
   // Fetch user's bookmarked resources
-  const { data: bookmarks } = await supabase
+  const { data: bookmarks } = await db
     .from('resource_bookmarks')
     .select('resource_id')
     .eq('user_id', user.id);

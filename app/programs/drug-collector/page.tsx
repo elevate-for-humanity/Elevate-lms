@@ -6,6 +6,7 @@ import { Metadata } from 'next';
 import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Stethoscope, CheckCircle } from 'lucide-react';
@@ -31,6 +32,7 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -44,7 +46,7 @@ export default async function Page() {
   }
   
   // Fetch drug collector program
-  const { data: program } = await supabase
+  const { data: program } = await db
     .from('programs')
     .select('*')
     .eq('slug', 'drug-collector')

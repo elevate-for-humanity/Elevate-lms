@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -14,6 +15,7 @@ export async function GET(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check if user is admin
     const {
@@ -24,7 +26,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('user_profiles')
       .select('role')
       .eq('user_id', user.id)
@@ -38,7 +40,7 @@ export async function GET(req: Request) {
     }
 
     // Get all approved hours with student info
-    const { data: rows, error } = await supabase
+    const { data: rows, error } = await db
       .from('apprenticeship_hours')
       .select(
         `

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -13,9 +14,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function MarketplaceSellersPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch sellers from database
-  const { data: sellers, error } = await supabase
+  const { data: sellers, error } = await db
     .from('marketplace_sellers')
     .select(`
       id,

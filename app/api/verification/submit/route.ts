@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
@@ -16,6 +17,7 @@ export async function POST(request: NextRequest) {
     await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/verification/submit' } });
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -27,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if verification already exists
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('id_verifications')
       .select('id, status')
       .eq('user_id', user.id)
@@ -163,7 +165,7 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
     // Create verification record
-    const { data: verification, error: dbError } = await supabase
+    const { data: verification, error: dbError } = await db
       .from('id_verifications')
       .insert({
         user_id: user.id,
@@ -223,6 +225,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -234,7 +237,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's verification
-    const { data: verification, error } = await supabase
+    const { data: verification, error } = await db
       .from('id_verifications')
       .select('*')
       .eq('user_id', user.id)

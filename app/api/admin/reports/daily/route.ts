@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { notifySendgrid } from '@/lib/notify';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
@@ -19,6 +20,7 @@ export const POST = withAuth(
 
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     const [
@@ -26,16 +28,16 @@ export const POST = withAuth(
       { count: completions },
       { count: newUsers },
     ] = await Promise.all([
-      supabase
+      db
         .from('enrollments')
         .select('*', { count: 'exact', head: true })
         .gte('enrolled_at', yesterday.toISOString()),
-      supabase
+      db
         .from('enrollments')
         .select('*', { count: 'exact', head: true })
         .not('completed_at', 'is', null)
         .gte('completed_at', yesterday.toISOString()),
-      supabase
+      db
         .from('users')
         .select('*', { count: 'exact', head: true })
         .gte('created_at', yesterday.toISOString()),

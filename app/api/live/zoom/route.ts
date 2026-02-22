@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Save to database
-    const { data: liveSession, error } = await supabase
+    const { data: liveSession, error } = await db
       .from('live_sessions')
       .insert({
         course_id: courseId,

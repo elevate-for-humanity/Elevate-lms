@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: Request) {
@@ -12,6 +13,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
@@ -25,7 +27,7 @@ export async function GET(request: Request) {
 
     // Get user's barber apprenticeship enrollment
     let enrollmentDate = null;
-    const { data: enrollment } = await supabase
+    const { data: enrollment } = await db
       .from('student_enrollments')
       .select('*')
       .eq('student_id', user.id)
@@ -36,7 +38,7 @@ export async function GET(request: Request) {
       enrollmentDate = enrollment.created_at;
     } else {
       // Check enrollments table as fallback
-      const { data: altEnrollment } = await supabase
+      const { data: altEnrollment } = await db
         .from('enrollments')
         .select('*, programs(slug, title)')
         .eq('user_id', user.id)
@@ -48,7 +50,7 @@ export async function GET(request: Request) {
     }
 
     // Get progress entries for this apprentice
-    const { data: progressEntries } = await supabase
+    const { data: progressEntries } = await db
       .from('progress_entries')
       .select('*')
       .eq('apprentice_id', user.id)
@@ -66,7 +68,7 @@ export async function GET(request: Request) {
     })) || [];
 
     // Get user profile for name
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('full_name, first_name')
       .eq('id', user.id)
@@ -74,14 +76,14 @@ export async function GET(request: Request) {
 
     // Get partner/shop info if assigned
     let shopName = 'Not yet assigned';
-    const { data: partnerUser } = await supabase
+    const { data: partnerUser } = await db
       .from('partner_users')
       .select('partner_id')
       .eq('user_id', user.id)
       .single();
 
     if (partnerUser?.partner_id) {
-      const { data: partner } = await supabase
+      const { data: partner } = await db
         .from('partners')
         .select('name')
         .eq('id', partnerUser.partner_id)

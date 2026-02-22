@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,6 +20,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ActivityLogPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/admin/activity');
@@ -31,7 +33,7 @@ export default async function ActivityLogPage() {
   }
 
   // Fetch real activity from audit log
-  const { data: activityData } = await supabase
+  const { data: activityData } = await db
     .from('audit_logs')
     .select(`
       id,

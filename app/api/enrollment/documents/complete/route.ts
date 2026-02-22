@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
@@ -9,6 +10,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
@@ -22,7 +24,7 @@ export async function POST(req: Request) {
     }
 
     // Verify ownership and current state
-    const { data: enrollment, error: fetchError } = await supabase
+    const { data: enrollment, error: fetchError } = await db
       .from('program_enrollments')
       .select('id, user_id, enrollment_state, program_id, email, full_name')
       .eq('id', enrollment_id)
@@ -60,7 +62,7 @@ export async function POST(req: Request) {
     }
 
     // Advance state to documents_complete, then immediately to active
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('program_enrollments')
       .update({
         enrollment_state: 'active',
@@ -78,14 +80,14 @@ export async function POST(req: Request) {
     // Bridge: create training_enrollments so the student can access course content.
     if (enrollment.program_id) {
       try {
-        const { data: linkedCourses } = await supabase
+        const { data: linkedCourses } = await db
           .from('training_courses')
           .select('id')
           .eq('program_id', enrollment.program_id);
 
         if (linkedCourses && linkedCourses.length > 0) {
           for (const course of linkedCourses) {
-            await supabase
+            await db
               .from('training_enrollments')
               .upsert({
                 user_id: user.id,

@@ -7,6 +7,7 @@ export const metadata: Metadata = {
 };
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,7 @@ export default async function AdminPlacementsPage() {
   
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -26,7 +28,7 @@ export default async function AdminPlacementsPage() {
       </div>
     );
   }
-    const result = await supabase
+    const result = await db
       .from('apprentice_placements')
       .select(`
         *,

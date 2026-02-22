@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -22,6 +23,7 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -31,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     // Check if user is admin/sponsor/employer
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('user_profiles')
       .select('role')
       .eq('user_id', user.id)
@@ -45,7 +47,7 @@ export async function POST(req: Request) {
     }
 
     // Approve the hours
-    const { error } = await supabase
+    const { error } = await db
       .from('apprenticeship_hours')
       .update({
         approved: true,
@@ -88,6 +90,7 @@ export async function PUT(req: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -97,7 +100,7 @@ export async function PUT(req: Request) {
     }
 
     // Check if user is admin/sponsor/employer
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('user_profiles')
       .select('role')
       .eq('user_id', user.id)
@@ -111,7 +114,7 @@ export async function PUT(req: Request) {
     }
 
     // Bulk approve
-    const { error } = await supabase
+    const { error } = await db
       .from('apprenticeship_hours')
       .update({
         approved: true,

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, TrendingUp, Users, DollarSign, GraduationCap, Download, ArrowUp, ArrowDown } from 'lucide-react';
@@ -15,13 +16,14 @@ export const dynamic = 'force-dynamic';
 
 export default async function ProgramHolderAnalyticsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/program-holder/analytics');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -32,7 +34,7 @@ export default async function ProgramHolderAnalyticsPage() {
   }
 
   // Get program holder record
-  const { data: programHolder } = await supabase
+  const { data: programHolder } = await db
     .from('program_holders')
     .select('id, name, payout_share')
     .eq('owner_id', user.id)
@@ -48,13 +50,13 @@ export default async function ProgramHolderAnalyticsPage() {
   const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
   // Current period stats
-  const { count: currentEnrollments } = await supabase
+  const { count: currentEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
     .gte('enrolled_at', thirtyDaysAgo.toISOString());
 
-  const { count: previousEnrollments } = await supabase
+  const { count: previousEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
@@ -62,37 +64,37 @@ export default async function ProgramHolderAnalyticsPage() {
     .lt('enrolled_at', thirtyDaysAgo.toISOString());
 
   // Total stats
-  const { count: totalEnrollments } = await supabase
+  const { count: totalEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id);
 
-  const { count: activeEnrollments } = await supabase
+  const { count: activeEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
     .eq('status', 'active');
 
-  const { count: completedEnrollments } = await supabase
+  const { count: completedEnrollments } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
     .eq('status', 'completed');
 
   // Program performance
-  const { data: programs } = await supabase
+  const { data: programs } = await db
     .from('programs')
     .select('id, name, slug')
     .eq('program_holder_id', programHolder.id);
 
   const programStats = await Promise.all(
     (programs || []).map(async (program: any) => {
-      const { count: enrollments } = await supabase
+      const { count: enrollments } = await db
         .from('enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('program_id', program.id);
 
-      const { count: completed } = await supabase
+      const { count: completed } = await db
         .from('enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('program_id', program.id)

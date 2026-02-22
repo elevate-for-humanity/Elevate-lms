@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -103,7 +104,7 @@ async function createAlertsFromVerdicts(
 ) {
   try {
     // Get all BEHIND and NO_ACTIVITY verdicts
-    const { data: verdicts, error } = await supabase
+    const { data: verdicts, error } = await db
       .from('reporting_verdicts')
       .select(
         `
@@ -165,7 +166,7 @@ async function createAlertsFromVerdicts(
       };
     });
 
-    await supabase.from('alert_notifications').insert(alerts);
+    await db.from('alert_notifications').insert(alerts);
   } catch (error) {
     logger.error("Unhandled error", error instanceof Error ? error : undefined);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

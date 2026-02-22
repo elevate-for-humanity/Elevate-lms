@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -14,6 +15,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -23,7 +25,7 @@ export async function GET(request: Request) {
     }
 
     // Get user profile and check role
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('user_profiles')
       .select('role, employer_id')
       .eq('user_id', user.id)
@@ -39,7 +41,7 @@ export async function GET(request: Request) {
     // Get unapproved hours
     // If employer, only show their students
     // If admin/sponsor, show all
-    const query = supabase
+    const query = db
       .from('apprenticeship_hours')
       .select(
         `

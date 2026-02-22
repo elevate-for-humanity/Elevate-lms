@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 
 export default async function PartnersPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -38,7 +40,7 @@ export default async function PartnersPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -48,13 +50,13 @@ export default async function PartnersPage() {
     redirect('/unauthorized');
   }
 
-  const { count: activePartners } = await supabase
+  const { count: activePartners } = await db
     .from('partners')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
   // Fetch relevant data
-  const { data: items, count: totalItems } = await supabase
+  const { data: items, count: totalItems } = await db
     .from('partners')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false });

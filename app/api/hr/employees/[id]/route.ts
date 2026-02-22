@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,9 +20,10 @@ export async function GET(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { id } = await params;
 
-    const { data: employee, error } = await supabase
+    const { data: employee, error } = await db
       .from('employees')
       .select(
         `
@@ -85,6 +87,7 @@ export async function PATCH(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
 
@@ -97,7 +100,7 @@ export async function PATCH(
       ...updateFields
     } = body;
 
-    const { data: employee, error } = await supabase
+    const { data: employee, error } = await db
       .from('employees')
       .update(updateFields)
       .eq('id', id)
@@ -136,13 +139,14 @@ export async function DELETE(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { id } = await params;
     const searchParams = request.nextUrl.searchParams;
     const terminationDate =
       searchParams.get('termination_date') ||
       new Date().toISOString().split('T')[0];
 
-    const { data: employee, error } = await supabase
+    const { data: employee, error } = await db
       .from('employees')
       .update({
         employment_status: 'terminated',
@@ -156,7 +160,7 @@ export async function DELETE(
     if (error) throw error;
 
     // Terminate active benefits
-    await supabase
+    await db
       .from('benefits_enrollments')
       .update({
         status: 'terminated',

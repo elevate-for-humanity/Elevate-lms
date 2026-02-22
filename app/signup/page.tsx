@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import SignupForm from './SignupForm';
 
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 
 export default async function SignupPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -31,7 +33,7 @@ export default async function SignupPage() {
   // Check if signups are enabled (gracefully handle missing table)
   let signupsEnabled = true;
   try {
-    const { data: settings } = await supabase
+    const { data: settings } = await db
       .from('site_settings')
       .select('*')
       .eq('key', 'signup_enabled')

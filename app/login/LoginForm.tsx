@@ -1,4 +1,5 @@
 "use client";
+import { createAdminClient } from '@/lib/supabase/admin';
 
 import React from 'react';
 
@@ -34,7 +35,7 @@ export default function LoginForm() {
       if (signInError) throw signInError;
 
       // Get user profile to determine redirect
-      const { data: profile } = await supabase
+      const { data: profile } = await db
         .from('profiles')
         .select('role')
         .eq('id', data.user.id)

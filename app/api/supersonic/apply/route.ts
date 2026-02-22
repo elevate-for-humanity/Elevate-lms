@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     if (!supabase) {
       // If no database, just log and return success
@@ -58,7 +60,7 @@ export async function POST(req: Request) {
     }
 
     // Try to save to database
-    const { error } = await supabase.from('tax_applications').insert({
+    const { error } = await db.from('tax_applications').insert({
       first_name: firstName,
       last_name: lastName,
       email,

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { Ticket, AlertCircle, Clock } from 'lucide-react';
@@ -23,6 +24,7 @@ export default async function CustomerServicePage() {
     'advisor',
   ]);
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -35,12 +37,12 @@ export default async function CustomerServicePage() {
     );
   }
 
-  const { data: protocols } = await supabase
+  const { data: protocols } = await db
     .from('customer_service_protocols')
     .select('*')
     .order('category');
 
-  const { data: tickets } = await supabase
+  const { data: tickets } = await db
     .from('customer_service_tickets')
     .select(`*, student:student_id(id, first_name, last_name, email)`)
     .in('status', ['open', 'in_progress'])

@@ -4,6 +4,7 @@ export const revalidate = 86400;
 
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ExternalLink } from 'lucide-react';
@@ -27,6 +28,7 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -40,7 +42,7 @@ export default async function Page() {
   }
   
   // Fetch tax preparation program
-  const { data: program } = await supabase
+  const { data: program } = await db
     .from('programs')
     .select('*')
     .eq('slug', 'tax-preparation')

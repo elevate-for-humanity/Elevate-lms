@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Zap, Database, Mail, Award, Calendar, ArrowRight, AlertCircle, ArrowRightLeft } from 'lucide-react';
 import { INTEGRATIONS, DISCLAIMERS, ROUTES } from '@/lib/pricing';
@@ -30,6 +31,7 @@ const statusColors: Record<string, { bg: string; text: string }> = {
 
 export default async function IntegrationsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -43,7 +45,7 @@ export default async function IntegrationsPage() {
   }
   
   // Fetch integrations
-  const { data: dbIntegrations } = await supabase
+  const { data: dbIntegrations } = await db
     .from('integrations')
     .select('*')
     .eq('status', 'active');

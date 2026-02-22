@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
@@ -16,10 +17,11 @@ export const maxDuration = 60;
 
 async function guardAdmin() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -32,7 +34,7 @@ async function guardAdmin() {
 
 async function safeQuery(supabase: any, table: string, select = '*', options?: { limit?: number; order?: string }) {
   try {
-    let query = supabase.from(table).select(select, { count: 'exact' });
+    let query = db.from(table).select(select, { count: 'exact' });
     if (options?.order) query = query.order(options.order, { ascending: false });
     if (options?.limit) query = query.limit(options.limit);
     const { data, error, count } = await query;
@@ -51,6 +53,7 @@ export async function GET(req: Request) {
     if (denied) return denied;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
     }

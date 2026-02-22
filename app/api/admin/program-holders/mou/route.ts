@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -19,7 +20,7 @@ export const GET = withAuth(
     }
 
     // Get program holder details
-    const { data: holder, error } = await supabase
+    const { data: holder, error } = await db
       .from('program_holders')
       .select(
         `
@@ -55,7 +56,7 @@ export const GET = withAuth(
 
     // Update MOU status to 'sent' if not already
     if (holder.mou_status === 'not_sent') {
-      await supabase
+      await db
         .from('program_holders')
         .update({ mou_status: 'sent' })
         .eq('id', id);

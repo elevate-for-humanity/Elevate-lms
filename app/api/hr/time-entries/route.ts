@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
@@ -16,6 +17,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const params = request.nextUrl.searchParams;
 
     const employeeId = params.get('employee_id');
@@ -23,7 +25,7 @@ export async function GET(request: NextRequest) {
     const end = params.get('end');
     const status = params.get('status');
 
-    let query = supabase
+    let query = db
       .from('time_entries')
       .select(
         `
@@ -66,6 +68,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await parseBody<Record<string, any>>(request);
 
     const {
@@ -98,7 +101,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('time_entries')
       .insert({
         employee_id,

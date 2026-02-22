@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -24,12 +25,13 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { quizId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) {
     return { title: 'Quiz | Elevate LMS' };
   }
 
-  const { data: quiz } = await supabase
+  const { data: quiz } = await db
     .from('quizzes')
     .select('title, description')
     .eq('id', quizId)
@@ -44,6 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function QuizPage({ params }: Props) {
   const { quizId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -63,7 +66,7 @@ export default async function QuizPage({ params }: Props) {
   }
 
   // Fetch quiz with questions
-  const { data: quiz, error: quizError } = await supabase
+  const { data: quiz, error: quizError } = await db
     .from('quizzes')
     .select(`
       id,
@@ -89,7 +92,7 @@ export default async function QuizPage({ params }: Props) {
   }
 
   // Fetch questions for this quiz
-  const { data: questions } = await supabase
+  const { data: questions } = await db
     .from('quiz_questions')
     .select(`
       id,
@@ -108,7 +111,7 @@ export default async function QuizPage({ params }: Props) {
     .order('order_index', { ascending: true });
 
   // Fetch user's previous attempts
-  const { data: attempts } = await supabase
+  const { data: attempts } = await db
     .from('quiz_attempts')
     .select('*')
     .eq('quiz_id', quizId)

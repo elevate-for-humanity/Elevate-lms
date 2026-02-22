@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -11,6 +12,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -18,7 +20,7 @@ export async function GET(request: Request) {
     }
     
     // Get courses and enrollment counts
-    const { data: enrollments } = await supabase
+    const { data: enrollments } = await db
       .from('student_enrollments')
       .select(`
         program_id,

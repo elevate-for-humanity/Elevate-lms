@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { 
   Trophy, 
@@ -43,6 +44,7 @@ const achievementIcons: Record<string, any> = {
 
 export default async function AchievementsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -89,7 +91,7 @@ export default async function AchievementsPage() {
   }
 
   // Fetch user's earned achievements
-  const { data: earnedAchievements } = await supabase
+  const { data: earnedAchievements } = await db
     .from('user_achievements')
     .select(`
       id,
@@ -107,14 +109,14 @@ export default async function AchievementsPage() {
     .order('earned_at', { ascending: false });
 
   // Fetch all available achievements
-  const { data: allAchievements } = await supabase
+  const { data: allAchievements } = await db
     .from('achievements')
     .select('*')
     .eq('active', true)
     .order('points', { ascending: true });
 
   // Get user profile for stats
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('full_name')
     .eq('id', user.id)

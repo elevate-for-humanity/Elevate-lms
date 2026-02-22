@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -10,26 +11,27 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });
     }
 
-    const { count: programCount } = await supabase
+    const { count: programCount } = await db
       .from('programs')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active');
 
-    const { count: courseCount } = await supabase
+    const { count: courseCount } = await db
       .from('courses')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'published');
 
-    const { count: enrollmentCount } = await supabase
+    const { count: enrollmentCount } = await db
       .from('enrollments')
       .select('*', { count: 'exact', head: true })
       .in('status', ['active', 'completed']);
 
-    const { data: categories } = await supabase
+    const { data: categories } = await db
       .from('programs')
       .select('category')
       .eq('status', 'active');

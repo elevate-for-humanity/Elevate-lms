@@ -5,6 +5,7 @@ export const maxDuration = 60;
 // app/api/forums/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -14,6 +15,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -26,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all forums with thread and post counts
-    const { data: forums, error: forumsError } = await supabase
+    const { data: forums, error: forumsError } = await db
       .from("forums")
       .select(`
         id,
@@ -51,13 +53,13 @@ export async function GET(request: NextRequest) {
     const forumsWithStats = await Promise.all(
       (forums || []).map(async (forum) => {
         // Get thread count
-        const { count: threadCount } = await supabase
+        const { count: threadCount } = await db
           .from("discussion_threads")
           .select("*", { count: "exact", head: true })
           .eq("forum_id", forum.id);
 
         // Get post count
-        const { data: threads } = await supabase
+        const { data: threads } = await db
           .from("discussion_threads")
           .select("id")
           .eq("forum_id", forum.id);
@@ -66,7 +68,7 @@ export async function GET(request: NextRequest) {
 
         let postCount = 0;
         if (threadIds.length > 0) {
-          const { count } = await supabase
+          const { count } = await db
             .from("discussion_posts")
             .select("*", { count: "exact", head: true })
             .in("thread_id", threadIds);
@@ -74,7 +76,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Get last activity
-        const { data: lastPost } = await supabase
+        const { data: lastPost } = await db
           .from("discussion_posts")
           .select("created_at")
           .in("thread_id", threadIds)

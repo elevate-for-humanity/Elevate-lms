@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from "@supabase/supabase-js";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("live_chat_sessions")
     .insert({
       status: "open",

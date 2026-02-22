@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { createAdminClient } from '@/lib/supabase/admin';
 /**
  * Payment Monitoring Cron Job
  * 
@@ -47,7 +48,7 @@ export async function GET(request: Request) {
     };
 
     // 1. Get all active subscriptions from database
-    const { data: subscriptions, error: subError } = await supabase
+    const { data: subscriptions, error: subError } = await db
       .from('student_subscriptions')
       .select(`
         *,
@@ -72,7 +73,7 @@ export async function GET(request: Request) {
           
           // Update local status if changed
           if (stripeSub.status !== sub.status) {
-            await supabase
+            await db
               .from('student_subscriptions')
               .update({
                 status: stripeSub.status,
@@ -109,7 +110,7 @@ export async function GET(request: Request) {
     }
 
     // 2. Check for completed subscriptions
-    const { data: completedSubs } = await supabase
+    const { data: completedSubs } = await db
       .from('student_subscriptions')
       .select('*')
       .eq('status', 'active')
@@ -119,7 +120,7 @@ export async function GET(request: Request) {
       for (const sub of completedSubs) {
         if (sub.weeks_paid >= sub.total_weeks) {
           // Mark as completed
-          await supabase
+          await db
             .from('student_subscriptions')
             .update({
               status: 'completed',

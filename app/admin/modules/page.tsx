@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ModulesTable } from './modules-table';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function ModulesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -35,7 +37,7 @@ export default async function ModulesPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -45,7 +47,7 @@ export default async function ModulesPage() {
     redirect('/unauthorized');
   }
 
-  const { data: modules, count: totalModules } = await supabase
+  const { data: modules, count: totalModules } = await db
     .from('modules')
     .select(
       `
@@ -57,23 +59,23 @@ export default async function ModulesPage() {
     )
     .order('created_at', { ascending: false });
 
-  const { count: scormModules } = await supabase
+  const { count: scormModules } = await db
     .from('modules')
     .select('*', { count: 'exact', head: true })
     .eq('module_type', 'scorm');
 
-  const { count: lessonModules } = await supabase
+  const { count: lessonModules } = await db
     .from('modules')
     .select('*', { count: 'exact', head: true })
     .eq('module_type', 'lesson');
 
-  const { count: assessmentModules } = await supabase
+  const { count: assessmentModules } = await db
     .from('modules')
     .select('*', { count: 'exact', head: true })
     .eq('module_type', 'assessment');
 
   // Get programs for filtering
-  const { data: programs } = await supabase
+  const { data: programs } = await db
     .from('programs')
     .select('id, name, slug')
     .eq('is_active', true)

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -28,6 +29,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AgenciesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -41,7 +43,7 @@ export default async function AgenciesPage() {
   }
 
   // Get agency partners
-  const { data: partners } = await supabase
+  const { data: partners } = await db
     .from('partners')
     .select('id, name, logo_url, type')
     .eq('type', 'agency')
@@ -49,14 +51,14 @@ export default async function AgenciesPage() {
     .limit(8);
 
   // Get compliance certifications
-  const { data: certifications } = await supabase
+  const { data: certifications } = await db
     .from('certifications')
     .select('*')
     .eq('type', 'organizational')
     .eq('is_active', true);
 
   // Get case studies
-  const { data: caseStudies } = await supabase
+  const { data: caseStudies } = await db
     .from('case_studies')
     .select('*')
     .eq('category', 'agency')

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import DonationForm from '@/components/DonationForm';
 import {
@@ -26,6 +27,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function DonatePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -39,20 +41,20 @@ export default async function DonatePage() {
   }
 
   // Get impact stats from database
-  const { count: studentsHelped } = await supabase
+  const { count: studentsHelped } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true });
 
-  const { count: graduatesPlaced } = await supabase
+  const { count: graduatesPlaced } = await db
     .from('placements')
     .select('*', { count: 'exact', head: true });
 
-  const { count: totalDonors } = await supabase
+  const { count: totalDonors } = await db
     .from('donations')
     .select('user_id', { count: 'exact', head: true });
 
   // Get total donations amount
-  const { data: donationTotal } = await supabase
+  const { data: donationTotal } = await db
     .from('donations')
     .select('amount')
     .eq('status', 'completed');
@@ -60,7 +62,7 @@ export default async function DonatePage() {
   const totalRaised = donationTotal?.reduce((sum: number, d: any) => sum + (d.amount || 0), 0) || 0;
 
   // Get recent donors (anonymized)
-  const { data: recentDonations } = await supabase
+  const { data: recentDonations } = await db
     .from('donations')
     .select('amount, created_at, is_anonymous')
     .eq('status', 'completed')

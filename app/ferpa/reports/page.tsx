@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -23,6 +24,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function FerpaReportsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -38,7 +40,7 @@ export default async function FerpaReportsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?next=/ferpa/reports');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -48,16 +50,16 @@ export default async function FerpaReportsPage() {
   if (!profile || !allowedRoles.includes(profile.role)) redirect('/unauthorized');
 
   // Get report data
-  const { count: totalRequests } = await supabase
+  const { count: totalRequests } = await db
     .from('ferpa_access_requests')
     .select('*', { count: 'exact', head: true });
 
-  const { count: completedRequests } = await supabase
+  const { count: completedRequests } = await db
     .from('ferpa_access_requests')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
 
-  const { count: auditLogEntries } = await supabase
+  const { count: auditLogEntries } = await db
     .from('ferpa_audit_log')
     .select('*', { count: 'exact', head: true });
 

@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 // Using Node.js runtime for email compatibility
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -16,16 +17,17 @@ export async function POST(req: Request) {
     await requireAdmin();
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { productId } = await req.json();
 
     // Get product details before updating
-    const { data: product } = await supabase
+    const { data: product } = await db
       .from('marketplace_products')
       .select('title, creator_id')
       .eq('id', productId)
       .single();
 
-    const { error } = await supabase
+    const { error } = await db
       .from('marketplace_products')
       .update({ status: 'approved' })
       .eq('id', productId);
@@ -35,14 +37,14 @@ export async function POST(req: Request) {
     // Send approval notification to creator
     if (product?.creator_id) {
       try {
-        const { data: creator } = await supabase
+        const { data: creator } = await db
           .from('marketplace_creators')
           .select('user_id')
           .eq('id', product.creator_id)
           .single();
 
         if (creator?.user_id) {
-          const { data: profile } = await supabase
+          const { data: profile } = await db
             .from('profiles')
             .select('email, full_name')
             .eq('id', creator.user_id)

@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -11,12 +12,13 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
     
     const body = await request.json();
     const { surveyId, responses, metadata } = body;
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('survey_responses')
       .insert({
         survey_id: surveyId,
@@ -46,11 +48,12 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { searchParams } = new URL(request.url);
     const surveyId = searchParams.get('id');
 
     if (surveyId) {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('surveys')
         .select('*')
         .eq('id', surveyId)
@@ -64,7 +67,7 @@ export async function GET(request: NextRequest) {
     }
 
     // List active surveys
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('surveys')
       .select('*')
       .eq('is_active', true)

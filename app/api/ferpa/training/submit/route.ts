@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
@@ -14,6 +15,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify authentication
     const { data: { user } } = await supabase.auth.getUser();
@@ -60,7 +62,7 @@ export async function POST(request: NextRequest) {
     const certificate_id = `FERPA-${Date.now()}-${user_id.substring(0, 8)}`;
 
     // Insert training record
-    const { data: trainingRecord, error: trainingError } = await supabase
+    const { data: trainingRecord, error: trainingError } = await db
       .from('ferpa_training_records')
       .insert({
         id: certificate_id,
@@ -89,7 +91,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log the completion
-    await supabase.from('audit_logs').insert({
+    await db.from('audit_logs').insert({
       user_id,
       action: 'ferpa_training_completed',
       resource_type: 'ferpa_training',

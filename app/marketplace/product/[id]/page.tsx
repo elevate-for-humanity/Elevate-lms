@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { generateMetadata } from '@/lib/seo/metadata';
@@ -21,6 +22,7 @@ export default async function ProductPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -33,7 +35,7 @@ export default async function ProductPage({
     );
   }
 
-  const { data: product } = await supabase
+  const { data: product } = await db
     .from('marketplace_products')
     .select(
       `

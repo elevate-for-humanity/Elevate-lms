@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -23,7 +24,7 @@ export const GET = withAuth(
   const todayStart = new Date(now.setHours(0, 0, 0, 0));
 
   // Active users (last 15 minutes)
-  const { data: activeUsers } = await supabase
+  const { data: activeUsers } = await db
     .from('user_activity_events')
     .select('user_id')
     .eq('tenant_id', tenantId)
@@ -32,21 +33,21 @@ export const GET = withAuth(
   const uniqueActiveUsers = new Set(activeUsers?.map(u => u.user_id) || []).size;
 
   // Courses in progress
-  const { count: coursesInProgress } = await supabase
+  const { count: coursesInProgress } = await db
     .from('course_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('tenant_id', tenantId)
     .eq('status', 'in_progress');
 
   // Completions today
-  const { count: completionsToday } = await supabase
+  const { count: completionsToday } = await db
     .from('course_completions')
     .select('*', { count: 'exact', head: true })
     .eq('tenant_id', tenantId)
     .gte('completed_at', todayStart.toISOString());
 
   // New enrollments today
-  const { count: enrollmentsToday } = await supabase
+  const { count: enrollmentsToday } = await db
     .from('course_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('tenant_id', tenantId)

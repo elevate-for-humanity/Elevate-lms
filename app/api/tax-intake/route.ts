@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 import { supabaseServer } from "@/lib/supabaseServer";
 
 export const runtime = 'nodejs';
@@ -15,7 +16,7 @@ export async function POST(req: Request) {
     const supabase = supabaseServer();
     const body = await req.json();
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from("tax_intake")
       .insert({
         service_type: body.service_type,
@@ -49,7 +50,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data, error }: any = await supabase
+  const { data, error }: any = await db
     .from("tax_intake")
     .select("*")
     .order("created_at", { ascending: false });

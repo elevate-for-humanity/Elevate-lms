@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { ShoppingBag, DollarSign, Package, Users, BarChart3 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
@@ -21,13 +22,14 @@ const emptyStats = [
 
 export default async function ShopDashboardPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   let stats = emptyStats;
   let orders: any[] = [];
 
   if (supabase) {
     try {
       // Get order stats
-      const { data: orderData, count: orderCount } = await supabase
+      const { data: orderData, count: orderCount } = await db
         .from('shop_orders')
         .select('id, total_amount, status, created_at, profiles:user_id(full_name)', { count: 'exact' })
         .order('created_at', { ascending: false })
@@ -45,13 +47,13 @@ export default async function ShopDashboardPage() {
       }
 
       // Get product count
-      const { count: productCount } = await supabase
+      const { count: productCount } = await db
         .from('shop_products')
         .select('*', { count: 'exact', head: true })
         .eq('is_active', true);
 
       // Get total sales
-      const { data: salesData } = await supabase
+      const { data: salesData } = await db
         .from('shop_orders')
         .select('total_amount')
         .eq('status', 'completed');

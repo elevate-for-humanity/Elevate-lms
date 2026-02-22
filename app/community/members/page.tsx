@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Users, Search, Filter, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -13,18 +14,19 @@ export const dynamic = 'force-dynamic';
 
 export default async function MembersPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1><p className="text-gray-600">Please try again later.</p></div></div>;
 
   // Fetch real member count and data
-  const { data: members, count } = await supabase
+  const { data: members, count } = await db
     .from('profiles')
     .select('id, full_name, avatar_url, role, bio, points, created_at', { count: 'exact' })
     .order('points', { ascending: false })
     .limit(50);
 
   // Get role counts for categories
-  const { data: roleCounts } = await supabase
+  const { data: roleCounts } = await db
     .from('profiles')
     .select('role')
     .not('role', 'is', null);

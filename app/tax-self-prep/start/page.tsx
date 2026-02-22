@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
@@ -15,20 +16,21 @@ export const dynamic = 'force-dynamic';
 
 export default async function TaxSelfPrepStartPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/tax-self-prep/start');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
   // Check for existing draft
-  const { data: existingDraft } = await supabase
+  const { data: existingDraft } = await db
     .from('tax_return_drafts')
     .select('*')
     .eq('user_id', user.id)

@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
     }
 
     const supabase = createSupabaseClient();
-    const { data: user, error: userError } = await supabase
+    const { data: user, error: userError } = await db
       .from('users')
       .select('*')
       .eq('email', email)
@@ -39,7 +40,7 @@ export async function GET(request: Request) {
     }
 
     // Fetch enrollments
-    const { data: enrollments, error: enrollmentsError } = await supabase
+    const { data: enrollments, error: enrollmentsError } = await db
       .from('enrollments')
       .select('*, course:courses(title)')
       .eq('user_id', user.id);
@@ -51,7 +52,7 @@ export async function GET(request: Request) {
     }
 
     // Fetch exam attempts
-    const { data: examAttempts, error: examAttemptsError } = await supabase
+    const { data: examAttempts, error: examAttemptsError } = await db
       .from('exam_attempts')
       .select('*, exam:exams(title)')
       .eq('student_id', user.id);
@@ -88,7 +89,7 @@ export async function GET(request: Request) {
     await logStudentSelfAccess(user.id, 'student_record');
 
     // Log export event for audit trail
-    const { error: auditError } = await supabase.from('account_export_events').insert({
+    const { error: auditError } = await db.from('account_export_events').insert({
       user_id: user.id,
       email: user.email,
       format: 'json',

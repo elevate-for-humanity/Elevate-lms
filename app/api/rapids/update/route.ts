@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       updateData.completion_date = completion_date;
     }
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('rapids_tracking')
       .upsert(updateData, { onConflict: 'apprentice_id' })
       .select()
@@ -73,7 +73,7 @@ export async function GET(request: Request) {
 
     const supabase = createAdminClient();
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('rapids_tracking')
       .select('*')
       .order('created_at', { ascending: false });

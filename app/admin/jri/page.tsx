@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
@@ -12,14 +13,15 @@ export const metadata: Metadata = {
 
 export default async function JRIPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1></div></div>;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
-  const { count: totalParticipants } = await supabase.from('jri_participants').select('*', { count: 'exact', head: true });
-  const { count: activeParticipants } = await supabase.from('jri_participants').select('*', { count: 'exact', head: true }).eq('status', 'active');
+  const { count: totalParticipants } = await db.from('jri_participants').select('*', { count: 'exact', head: true });
+  const { count: activeParticipants } = await db.from('jri_participants').select('*', { count: 'exact', head: true }).eq('status', 'active');
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -43,7 +44,7 @@ export async function GET(request: Request) {
     }
 
     // Get leaderboard data from achievements
-    const { data: leaderboard, error } = await supabase
+    const { data: leaderboard, error } = await db
       .from('achievements')
       .select(
         `

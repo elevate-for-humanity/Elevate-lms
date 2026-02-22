@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { generateMetadata } from '@/lib/seo/metadata';
 
 export const dynamic = 'force-dynamic';
@@ -16,6 +17,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default async function ApplicationSuccessPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function ApplicationSuccessPage() {
   }
   
   // Log success page visit
-  await supabase.from('page_views').insert({ page: 'application_success' }).select();
+  await db.from('page_views').insert({ page: 'application_success' }).select();
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumbs */}

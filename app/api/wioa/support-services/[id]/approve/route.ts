@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -32,7 +33,7 @@ export async function POST(
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('supportive_services')
       .update(updateData)
       .eq('id', id)

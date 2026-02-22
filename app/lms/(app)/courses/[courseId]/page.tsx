@@ -41,7 +41,7 @@ export async function generateMetadata({
     return { title: 'Course | Elevate LMS' };
   }
 
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('training_courses')
     .select('course_name, description')
     .eq('id', courseId)
@@ -92,7 +92,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   }
 
   // Fetch the course
-  const { data: course, error } = await supabase
+  const { data: course, error } = await db
     .from('training_courses')
     .select('*')
     .eq('id', courseId)
@@ -103,7 +103,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   }
 
   // Check enrollment
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from('enrollments')
     .select('*')
     .eq('user_id', user.id)
@@ -111,7 +111,7 @@ export default async function CoursePage({ params }: { params: Params }) {
     .single();
 
   // Fetch lessons
-  const { data: lessons } = await supabase
+  const { data: lessons } = await db
     .from('training_lessons')
     .select('*')
     .eq('course_id', courseId)
@@ -120,7 +120,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   const typedLessons = (lessons || []) as Lesson[];
 
   // Fetch lesson progress
-  const { data: lessonProgress } = await supabase
+  const { data: lessonProgress } = await db
     .from('lesson_progress')
     .select('lesson_id, completed, completed_at')
     .eq('user_id', user.id)
@@ -145,7 +145,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   const remainingMinutes = totalMinutes % 60;
 
   // Fetch quizzes for this course
-  const { data: quizzes } = await supabase
+  const { data: quizzes } = await db
     .from('quizzes')
     .select('id, title')
     .eq('course_id', courseId);

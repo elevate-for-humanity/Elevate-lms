@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { BookOpen, Award, Briefcase } from 'lucide-react';
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
 
 export default async function IntegrationsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -44,14 +46,14 @@ export default async function IntegrationsPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
 
   // Fetch student's courses
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select(
       `
@@ -67,19 +69,19 @@ export default async function IntegrationsPage() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
-  const { count: activeCourses } = await supabase
+  const { count: activeCourses } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .eq('status', 'active');
 
-  const { count: completedCourses } = await supabase
+  const { count: completedCourses } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .eq('status', 'completed');
 
-  const { data: recentProgress } = await supabase
+  const { data: recentProgress } = await db
     .from('student_progress')
     .select(
       `

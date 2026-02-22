@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -11,31 +12,32 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get enrollment counts
-    const { count: totalEnrollments } = await supabase
+    const { count: totalEnrollments } = await db
       .from('enrollments')
       .select('*', { count: 'exact', head: true });
 
     // Get completion counts
-    const { count: completedEnrollments } = await supabase
+    const { count: completedEnrollments } = await db
       .from('enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'completed');
 
     // Get active students
-    const { count: activeStudents } = await supabase
+    const { count: activeStudents } = await db
       .from('enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active');
 
     // Get certificates issued
-    const { count: certificatesIssued } = await supabase
+    const { count: certificatesIssued } = await db
       .from('certificates')
       .select('*', { count: 'exact', head: true });
 
     // Get program count
-    const { count: programsOffered } = await supabase
+    const { count: programsOffered } = await db
       .from('programs')
       .select('*', { count: 'exact', head: true })
       .eq('is_active', true);

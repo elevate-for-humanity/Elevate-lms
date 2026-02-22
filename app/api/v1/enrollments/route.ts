@@ -18,6 +18,7 @@ import {
   logAPIRequest,
 } from '@/lib/api/rest-api';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -49,6 +50,7 @@ const startTime = Date.now();
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const searchParams = request.nextUrl.searchParams;
 
     const page = parseInt(searchParams.get('page') || '1', 10);
@@ -57,7 +59,7 @@ const startTime = Date.now();
     const courseId = searchParams.get('course_id');
     const userId = searchParams.get('user_id');
 
-    let query = supabase
+    let query = db
       .from('enrollments')
       .select(
         `
@@ -149,8 +151,9 @@ export async function POST(request: NextRequest) {
 
     const body = await parseBody<Record<string, any>>(request);
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
-    const { data: enrollment, error: createError } = await supabase
+    const { data: enrollment, error: createError } = await db
       .from('enrollments')
       .insert({
         user_id: body.user_id,

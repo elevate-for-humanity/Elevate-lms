@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -18,9 +19,10 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('crm_appointments')
       .insert({
         title: body.title,
@@ -53,7 +55,8 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data, error } = await db
     .from('crm_appointments')
     .select('*, contact:crm_contacts(id, first_name, last_name)')
     .gte('scheduled_at', new Date().toISOString())

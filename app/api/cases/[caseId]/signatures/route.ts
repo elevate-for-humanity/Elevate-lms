@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { addSignature, checkSignatureCompleteness } from '@/lib/workflow/case-management';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ caseId:
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -27,7 +29,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ caseId:
       return NextResponse.json({ error: 'signerRole and agreementType are required' }, { status: 400 });
     }
 
-    const { data: enrollmentCase } = await supabase
+    const { data: enrollmentCase } = await db
       .from('enrollment_cases')
       .select('student_id, program_holder_id, employer_id')
       .eq('id', caseId)
@@ -43,7 +45,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ caseId:
       user.id === enrollmentCase.employer_id;
 
     if (!isAuthorized) {
-      const { data: profile } = await supabase
+      const { data: profile } = await db
         .from('profiles')
         .select('role')
         .eq('id', user.id)
@@ -88,6 +90,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     
     if (authErr || !user) {
@@ -96,7 +99,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
 
     const { caseId } = await params;
 
-    const { data: signatures, error } = await supabase
+    const { data: signatures, error } = await db
       .from('apprentice_agreements')
       .select('id, signer_role, signer_name, signer_email, agreement_type, agreement_version, signed_at, created_at')
       .eq('case_id', caseId)

@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,16 +14,17 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get recent enrollments
-    const { data: enrollments } = await supabase
+    const { data: enrollments } = await db
       .from('enrollments')
       .select('*, profiles(full_name), programs(name)')
       .order('enrolled_at', { ascending: false })
       .limit(5);
 
     // Get recent completions
-    const { data: completions } = await supabase
+    const { data: completions } = await db
       .from('enrollments')
       .select('*, profiles(full_name), programs(name)')
       .eq('status', 'completed')
@@ -30,7 +32,7 @@ export async function GET(request: Request) {
       .limit(5);
 
     // Get recent placements
-    const { data: placements } = await supabase
+    const { data: placements } = await db
       .from('employment_outcomes')
       .select('*, wioa_participants(first_name, last_name)')
       .eq('employed_at_exit', true)

@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { BookOpen, Clock, Award, PlayCircle, ArrowLeft } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -31,6 +32,7 @@ interface TrainingCourse {
 export async function generateMetadata({ params }: { params: Promise<{ courseId: string }> }): Promise<Metadata> {
   const { courseId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -43,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ courseId:
     );
   }
   
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('training_courses')
     .select('title, description')
     .eq('course_id', courseId)
@@ -62,16 +64,17 @@ export async function generateMetadata({ params }: { params: Promise<{ courseId:
 export default async function CourseDetailPage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Fetch course
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('training_courses')
     .select('*')
     .eq('course_id', courseId)
     .single();
 
   // Fetch lessons
-  const { data: lessons } = await supabase
+  const { data: lessons } = await db
     .from('training_lessons')
     .select('*')
     .eq('course_id', courseId)

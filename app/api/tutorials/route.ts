@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { apiAuthGuard } from '@/lib/authGuards';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -26,7 +27,8 @@ export async function GET(request: NextRequest) {
 
     if (action === 'progress' && tutorialId) {
       const supabase = await createClient();
-      const { data, error }: any = await supabase
+  const _admin = createAdminClient(); const db = _admin || supabase;
+      const { data, error }: any = await db
         .from('user_tutorials')
         .select('*')
         .eq('user_id', user.id)
@@ -71,9 +73,10 @@ export async function POST(request: NextRequest) {
     const { action, tutorialId, stepId, stepIndex } = body;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     if (action === 'update-progress') {
-      const { data: current } = await supabase
+      const { data: current } = await db
         .from('user_tutorials')
         .select('completed_steps')
         .eq('user_id', user.id)
@@ -85,7 +88,7 @@ export async function POST(request: NextRequest) {
         completedSteps.push(stepId);
       }
 
-      await supabase.from('user_tutorials').upsert({
+      await db.from('user_tutorials').upsert({
         user_id: user.id,
         tutorial_id: tutorialId,
         current_step: stepIndex + 1,
@@ -97,7 +100,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'complete') {
-      await supabase
+      await db
         .from('user_tutorials')
         .update({
           completed: true,

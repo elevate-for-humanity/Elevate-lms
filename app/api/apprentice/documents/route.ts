@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -17,6 +18,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
     const programSlug = searchParams.get('program') || 'barber-apprenticeship';
 
     // Get document types for this program
-    const { data: documentTypes, error: typesError } = await supabase
+    const { data: documentTypes, error: typesError } = await db
       .from('apprentice_document_types')
       .select('*')
       .eq('program_slug', programSlug)
@@ -38,7 +40,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get student's uploaded documents
-    const { data: uploadedDocuments, error: docsError } = await supabase
+    const { data: uploadedDocuments, error: docsError } = await db
       .from('apprentice_documents')
       .select('*')
       .eq('student_id', user.id)
@@ -69,6 +71,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -85,7 +88,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get document type to validate
-    const { data: docType } = await supabase
+    const { data: docType } = await db
       .from('apprentice_document_types')
       .select('*')
       .eq('id', documentTypeId)
@@ -134,14 +137,14 @@ export async function POST(request: NextRequest) {
       .getPublicUrl(storagePath);
 
     // Delete any existing document of this type (replace)
-    await supabase
+    await db
       .from('apprentice_documents')
       .delete()
       .eq('student_id', user.id)
       .eq('document_type_id', documentTypeId);
 
     // Create document record
-    const { data: docRecord, error: recordError } = await supabase
+    const { data: docRecord, error: recordError } = await db
       .from('apprentice_documents')
       .insert({
         student_id: user.id,
@@ -165,14 +168,14 @@ export async function POST(request: NextRequest) {
     // PHASE 2: Notify staff of document upload
     try {
       // Get student profile for name
-      const { data: studentProfile } = await supabase
+      const { data: studentProfile } = await db
         .from('profiles')
         .select('full_name, email')
         .eq('id', user.id)
         .single();
 
       // Get admin emails
-      const { data: admins } = await supabase
+      const { data: admins } = await db
         .from('profiles')
         .select('email')
         .in('role', ['admin', 'super_admin']);
@@ -221,6 +224,7 @@ export async function DELETE(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -235,7 +239,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Get document to verify ownership and get file path
-    const { data: doc } = await supabase
+    const { data: doc } = await db
       .from('apprentice_documents')
       .select('*')
       .eq('id', docId)
@@ -258,7 +262,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete record
-    const { error } = await supabase
+    const { error } = await db
       .from('apprentice_documents')
       .delete()
       .eq('id', docId);

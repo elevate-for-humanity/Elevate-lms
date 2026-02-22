@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -17,6 +18,7 @@ export async function POST(
 
   const { quizId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
@@ -42,7 +44,7 @@ export async function POST(
   }
 
   // Verify attempt belongs to user and is not completed
-  const { data: attempt, error: attemptError } = await supabase
+  const { data: attempt, error: attemptError } = await db
     .from('quiz_attempts')
     .select('*')
     .eq('id', attemptId)
@@ -56,14 +58,14 @@ export async function POST(
   }
 
   // Get quiz details
-  const { data: quiz } = await supabase
+  const { data: quiz } = await db
     .from('quizzes')
     .select('passing_score')
     .eq('id', quizId)
     .single();
 
   // Get questions with correct answers
-  const { data: questions } = await supabase
+  const { data: questions } = await db
     .from('quiz_questions')
     .select(`
       id,
@@ -114,7 +116,7 @@ export async function POST(
 
   // Save individual answers
   for (const result of answerResults) {
-    await supabase
+    await db
       .from('quiz_attempt_answers')
       .insert({
         attempt_id: attemptId,
@@ -126,7 +128,7 @@ export async function POST(
   }
 
   // Update attempt with results
-  const { error: updateError } = await supabase
+  const { error: updateError } = await db
     .from('quiz_attempts')
     .update({
       completed_at: new Date().toISOString(),

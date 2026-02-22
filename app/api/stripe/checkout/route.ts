@@ -8,6 +8,7 @@ import { getCatalogProduct } from '@/lib/store/db';
 import { STRIPE_PRICE_IDS, isPriceConfigured } from '@/lib/stripe/price-map';
 import { toErrorMessage } from '@/lib/safe';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { paymentRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -42,13 +43,14 @@ export async function POST(req: Request) {
 
     // Get authenticated user and tenant
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     let tenantId: string | null = null;
     if (user) {
-      const { data: membership } = await supabase
+      const { data: membership } = await db
         .from('tenant_memberships')
         .select('tenant_id')
         .eq('user_id', user.id)

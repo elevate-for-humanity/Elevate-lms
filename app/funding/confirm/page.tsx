@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -15,13 +16,14 @@ async function confirmFunding(formData: FormData) {
   'use server';
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) throw new Error('Database unavailable');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
   const fundingSource = formData.get('funding_source') as string;
 
-  await supabase.from('profiles').update({
+  await db.from('profiles').update({
     funding_source: fundingSource || 'pending',
     funding_confirmed: true,
   }).eq('id', user.id);
@@ -31,6 +33,7 @@ async function confirmFunding(formData: FormData) {
 
 export default async function ConfirmFundingPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) redirect('/login');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');

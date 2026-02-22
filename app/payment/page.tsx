@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 
 export default async function PaymentPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -29,7 +31,7 @@ export default async function PaymentPage() {
   }
   
   // Fetch payment options
-  const { data: options } = await supabase
+  const { data: options } = await db
     .from('payment_options')
     .select('*')
     .order('order_index');

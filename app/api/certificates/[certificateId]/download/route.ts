@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,6 +17,7 @@ export async function GET(
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { certificateId } = await params;
     const {
       data: { user },
@@ -26,7 +28,7 @@ export async function GET(
     }
 
     // profiles join works via user_id FK; courses join does not exist on this table
-    const { data: certificate } = await supabase
+    const { data: certificate } = await db
       .from('certificates')
       .select('*, profiles(full_name)')
       .eq('id', certificateId)

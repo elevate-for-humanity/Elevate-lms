@@ -8,7 +8,7 @@ export async function GET() {
   
   try {
     const supabase = createAdminClient();
-    const { data: posts } = await supabase
+    const { data: posts } = await db
       .from('blog_posts')
       .select('title, slug, excerpt, published_at, category, author_name')
       .eq('published', true)

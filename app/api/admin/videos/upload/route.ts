@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -40,7 +41,7 @@ export const POST = withAuth(
     } = supabase.storage.from('videos').getPublicUrl(fileName);
 
     // Save video metadata to database
-    const { data: videoData, error: dbError } = await supabase
+    const { data: videoData, error: dbError } = await db
       .from('videos')
       .insert({
         title,

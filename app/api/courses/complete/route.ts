@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,9 +18,10 @@ export async function POST(req: NextRequest) {
     const { courseId, userId, enrollmentId, completionData } = await req.json();
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Update enrollment status
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from('partner_enrollments')
       .update({
         status: 'completed',
@@ -33,7 +35,7 @@ export async function POST(req: NextRequest) {
     // Create certificate record
     const certificateNumber = `EFH-${generateShortId()}-${courseId.substring(0, 8)}`;
 
-    const { error: certError } = await supabase
+    const { error: certError } = await db
       .from('module_certificates')
       .insert({
         user_id: userId,

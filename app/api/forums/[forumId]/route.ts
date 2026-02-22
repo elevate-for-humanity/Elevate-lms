@@ -5,6 +5,7 @@ export const maxDuration = 60;
 // app/api/forums/[forumId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getUserIdFromRequest } from "@/lib/getUserIdFromRequest";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -19,9 +20,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
     const { forumId } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get threads with creator info
-    const { data: threads, error: threadsError } = await supabase
+    const { data: threads, error: threadsError } = await db
       .from("discussion_threads")
       .select(`
         id,
@@ -47,7 +49,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
     // Get user profiles for thread creators
     const userIds = [...new Set(threads?.map((t) => t.user_id) || [])];
-    const { data: profiles } = await supabase
+    const { data: profiles } = await db
       .from("profiles")
       .select("id, full_name, avatar_url")
       .in("id", userIds);
@@ -56,7 +58,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
     // Get reply counts for each thread
     const threadIds = threads?.map((t) => t.id) || [];
-    const { data: posts } = await supabase
+    const { data: posts } = await db
       .from("discussion_posts")
       .select("thread_id")
       .in("thread_id", threadIds);
@@ -104,6 +106,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 
     const { forumId } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = (await req.json()) as { title?: string; content?: string };
 
     if (!body.title || !body.content) {
@@ -116,7 +119,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     const now = new Date().toISOString();
 
     // 1) Create thread
-    const { data: thread, error: threadError } = await supabase
+    const { data: thread, error: threadError } = await db
       .from("discussion_threads")
       .insert({
         forum_id: forumId,
@@ -137,7 +140,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
 
     // 2) Create first post
-    const { error: postError } = await supabase
+    const { error: postError } = await db
       .from("discussion_posts")
       .insert({
         thread_id: thread.id,

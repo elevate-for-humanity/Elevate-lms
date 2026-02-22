@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Users, MessageSquare, Calendar, BookOpen, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -16,11 +17,12 @@ export const dynamic = 'force-dynamic';
 
 export default async function CommunityHubPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) { return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1><p className="text-gray-600">Please try again later.</p></div></div>; }
   const { data: { user } } = await supabase.auth.getUser();
 
   // Get community groups
-  const { data: groups } = await supabase
+  const { data: groups } = await db
     .from('community_groups')
     .select('*')
     .eq('is_active', true)
@@ -28,7 +30,7 @@ export default async function CommunityHubPage() {
     .limit(6);
 
   // Get upcoming community events
-  const { data: events } = await supabase
+  const { data: events } = await db
     .from('community_events')
     .select('*')
     .eq('is_active', true)
@@ -37,7 +39,7 @@ export default async function CommunityHubPage() {
     .limit(4);
 
   // Get recent discussions
-  const { data: discussions } = await supabase
+  const { data: discussions } = await db
     .from('discussions')
     .select(`
       id,

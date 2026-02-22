@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -13,6 +14,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get certificate data
-    const { data: certificate, error } = await supabase
+    const { data: certificate, error } = await db
       .from('certificates')
       .select(`
         *,
@@ -42,7 +44,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify ownership or admin
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -87,6 +89,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -101,7 +104,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update certificate with PDF URL (after client-side generation and upload)
-    const { error } = await supabase
+    const { error } = await db
       .from('certificates')
       .update({ pdf_url: pdfUrl, updated_at: new Date().toISOString() })
       .eq('id', certificateId)

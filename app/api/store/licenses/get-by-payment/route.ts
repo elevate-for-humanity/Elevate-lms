@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -21,9 +22,10 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get the license purchase by payment intent
-    const { data: purchase, error: purchaseError } = await supabase
+    const { data: purchase, error: purchaseError } = await db
       .from('license_purchases')
       .select(`
         id,
@@ -50,7 +52,7 @@ export async function GET(request: NextRequest) {
     // Get the associated license if provisioned
     let license = null;
     if (purchase.tenant_id) {
-      const { data: licenseData } = await supabase
+      const { data: licenseData } = await db
         .from('licenses')
         .select('id, tier, status, features, max_users, max_programs, valid_until')
         .eq('tenant_id', purchase.tenant_id)

@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
 
 export async function generateMetadata({
@@ -22,6 +23,7 @@ export async function generateMetadata({
 async function getAuthorPosts(author: string) {
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -35,7 +37,7 @@ async function getAuthorPosts(author: string) {
   }
     const authorName = author.replace(/-/g, ' ');
 
-    const { data: posts } = await supabase
+    const { data: posts } = await db
       .from('blog_posts')
       .select('*')
       .eq('published', true)

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowRight, Clock, FileText, AlertCircle } from 'lucide-react';
@@ -14,6 +15,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function TransferHoursPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) { redirect("/login"); }
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -22,14 +24,14 @@ export default async function TransferHoursPage() {
   }
 
   // Get apprentice profile
-  const { data: apprentice } = await supabase
+  const { data: apprentice } = await db
     .from('apprentices')
     .select('*, program:program_id(name, allows_transfer)')
     .eq('user_id', user.id)
     .single();
 
   // Get transfer requests
-  const { data: transferRequests } = await supabase
+  const { data: transferRequests } = await db
     .from('hour_transfer_requests')
     .select('*')
     .eq('apprentice_id', apprentice?.id)

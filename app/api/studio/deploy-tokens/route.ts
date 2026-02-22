@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +46,7 @@ const userId = req.headers.get('x-user-id');
   try {
     const supabase = supabaseServer();
     
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('studio_deploy_tokens')
       .select('id, provider, project_id, created_at, updated_at')
       .eq('user_id', userId);
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
     const supabase = supabaseServer();
     const encryptedToken = encrypt(token);
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('studio_deploy_tokens')
       .upsert(
         {
@@ -144,7 +145,7 @@ const userId = req.headers.get('x-user-id');
 
     const supabase = supabaseServer();
     
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('studio_deploy_tokens')
       .select('encrypted_token, project_id')
       .eq('user_id', userId)
@@ -189,7 +190,7 @@ const userId = req.headers.get('x-user-id');
   try {
     const supabase = supabaseServer();
 
-    const { error } = await supabase
+    const { error } = await db
       .from('studio_deploy_tokens')
       .delete()
       .eq('user_id', userId)

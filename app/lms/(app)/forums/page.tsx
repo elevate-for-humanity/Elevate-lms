@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
 
 export default async function ForumsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -39,7 +41,7 @@ export default async function ForumsPage() {
   // Fetch real forum categories
   let forums: any[] = [];
   try {
-    const { data } = await supabase
+    const { data } = await db
       .from('forums')
       .select('id, name, description, thread_count, post_count')
       .order('name');
@@ -51,7 +53,7 @@ export default async function ForumsPage() {
   // Fetch recent threads
   let recentThreads: any[] = [];
   try {
-    const { data } = await supabase
+    const { data } = await db
       .from('forum_threads')
       .select('id, title, forum_id, is_pinned, reply_count, view_count, created_at, profiles!forum_threads_author_id_fkey(full_name)')
       .order('created_at', { ascending: false })

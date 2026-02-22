@@ -85,7 +85,7 @@ export async function POST(req: Request) {
       .join('\n');
 
     // Insert into applications table
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('applications')
       .insert({
         first_name: body.firstName,

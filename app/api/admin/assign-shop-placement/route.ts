@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { canMatchApprentice, hasVerifiedDocuments } from '@/lib/documents';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -30,6 +31,7 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Verify admin access
     const {
@@ -40,7 +42,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -56,7 +58,7 @@ export async function POST(req: Request) {
     // =========================================================================
     
     // Get apprentice ID from student
-    const { data: apprentice } = await supabase
+    const { data: apprentice } = await db
       .from('apprentices')
       .select('id')
       .eq('user_id', studentId)
@@ -94,7 +96,7 @@ export async function POST(req: Request) {
     }
 
     // Create or update shop placement record
-    const { error: placementError } = await supabase
+    const { error: placementError } = await db
       .from('shop_placements')
       .upsert(
         {
@@ -118,7 +120,7 @@ export async function POST(req: Request) {
     }
 
     // Mark onboarding step complete
-    const { error: onboardingError } = await supabase
+    const { error: onboardingError } = await db
       .from('student_onboarding')
       .update({ shop_placed: true })
       .eq('student_id', studentId);

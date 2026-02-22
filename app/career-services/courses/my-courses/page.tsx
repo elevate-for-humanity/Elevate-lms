@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -15,6 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function MyCoursesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     redirect('/login?redirect=/career-services/courses/my-courses');
@@ -27,7 +29,7 @@ export default async function MyCoursesPage() {
   }
 
   // Get user's purchased courses
-  const { data: purchases } = await supabase
+  const { data: purchases } = await db
     .from('career_course_purchases')
     .select(`
       *,
@@ -45,7 +47,7 @@ export default async function MyCoursesPage() {
     .eq('status', 'completed');
 
   // Get all available courses for comparison
-  const { data: allCourses } = await supabase
+  const { data: allCourses } = await db
     .from('career_courses')
     .select('id, slug, title, subtitle, image_url, price, duration_hours, lesson_count')
     .eq('is_active', true)

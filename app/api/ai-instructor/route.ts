@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -96,6 +97,7 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -115,13 +117,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Get student context
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('full_name')
       .eq('id', user.id)
       .single();
 
-    const { data: enrollment } = await supabase
+    const { data: enrollment } = await db
       .from('enrollments')
       .select(
         `
@@ -176,7 +178,7 @@ export async function POST(request: NextRequest) {
       'I apologize, but I was unable to generate a response. Please try again or contact student support.';
 
     // Log conversation
-    await supabase.from('ai_instructor_logs').insert({
+    await db.from('ai_instructor_logs').insert({
       student_id: user.id,
       message,
       response,
@@ -212,6 +214,7 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -220,7 +223,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: conversations } = await supabase
+    const { data: conversations } = await db
       .from('ai_instructor_logs')
       .select('*')
       .eq('student_id', user.id)

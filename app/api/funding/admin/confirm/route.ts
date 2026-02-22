@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -21,7 +22,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Validate token
-  const { data: tokenData } = await supabase
+  const { data: tokenData } = await db
     .from('approval_tokens')
     .select('token, application_id, used_at')
     .eq('token', token)
@@ -65,7 +66,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Get application
-  const { data: app } = await supabase
+  const { data: app } = await db
     .from('funding_applications')
     .select('id, user_id, course_id, program_id, status')
     .eq('id', tokenData.application_id)
@@ -76,13 +77,13 @@ const supabase = await createRouteHandlerClient({ cookies });
   }
 
   // Mark token as used
-  await supabase
+  await db
     .from('approval_tokens')
     .update({ used_at: new Date().toISOString() })
     .eq('token', token);
 
   // Approve application
-  await supabase
+  await db
     .from('funding_applications')
     .update({
       status: 'approved',
@@ -91,7 +92,7 @@ const supabase = await createRouteHandlerClient({ cookies });
     .eq('id', app.id);
 
   // Create enrollment
-  await supabase.from('enrollments').upsert({
+  await db.from('enrollments').upsert({
     user_id: app.user_id,
     course_id: app.course_id,
     status: 'active',
@@ -100,7 +101,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   });
 
   // Log the action
-  await supabase.from('audit_logs').insert({
+  await db.from('audit_logs').insert({
     who: null, // Case manager approval (no user session)
     action: 'APPROVE_APP_TOKEN',
     subject: app.id,

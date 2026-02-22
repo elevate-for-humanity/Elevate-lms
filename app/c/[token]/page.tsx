@@ -1,4 +1,5 @@
 // =====================================================
+import { createAdminClient } from '@/lib/supabase/admin';
 // CREDENTIAL SHARE LINK HANDOFF
 // /c/<token> → validates → redirects to verifier or partner portal
 // =====================================================
@@ -28,7 +29,7 @@ export default async function CredentialSharePage({ params }: PageProps) {
   const supabase = await createServerSupabaseClient();
 
   // Lookup share token
-  const { data: shareLink, error } = await supabase
+  const { data: shareLink, error } = await db
     .from('credential_share_links')
     .select('*')
     .eq('token', token)
@@ -56,14 +57,14 @@ export default async function CredentialSharePage({ params }: PageProps) {
 
   // Mark as used if one-time
   if (shareLink.one_time_use) {
-    await supabase
+    await db
       .from('credential_share_links')
       .update({ used_at: new Date().toISOString() })
       .eq('id', shareLink.id);
   }
 
   // Log access
-  await supabase.from('audit_logs').insert({
+  await db.from('audit_logs').insert({
     event_type: 'credential_shared',
     resource_type: 'credential',
     resource_id: shareLink.credential_id,

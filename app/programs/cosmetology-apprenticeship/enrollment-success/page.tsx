@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Shield } from 'lucide-react';
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function EnrollmentSuccessPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) {
     redirect('/error?message=service-unavailable');
@@ -24,7 +26,7 @@ export default async function EnrollmentSuccessPage() {
     redirect('/login?redirect=/programs/cosmetology-apprenticeship/enrollment-success');
   }
 
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from('enrollments')
     .select('id, enrolled_at, status, program_id, programs(name, slug)')
     .eq('user_id', user.id)
@@ -37,7 +39,7 @@ export default async function EnrollmentSuccessPage() {
   }
 
   if (enrollment.status === 'paid' || enrollment.status === 'approved') {
-    await supabase
+    await db
       .from('enrollments')
       .update({ status: 'confirmed', confirmed_at: new Date().toISOString() })
       .eq('id', enrollment.id);

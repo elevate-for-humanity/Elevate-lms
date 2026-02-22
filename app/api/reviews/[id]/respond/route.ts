@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,6 +18,7 @@ export async function POST(
   const { id } = await params;
   try {
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const {
       data: { user },
@@ -27,7 +29,7 @@ export async function POST(
     }
 
     // Verify user is admin
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -48,7 +50,7 @@ export async function POST(
     }
 
     // Update review with response
-    const { data: review, error: updateError } = await supabase
+    const { data: review, error: updateError } = await db
       .from('reviews')
       .update({
         response,
@@ -70,7 +72,7 @@ export async function POST(
 
     // Send notification to reviewer if email provided
     if (review.reviewer_email) {
-      await supabase.from('email_queue').insert({
+      await db.from('email_queue').insert({
         to_email: review.reviewer_email,
         from_email: 'noreply@elevateforhumanity.org',
         subject: 'Response to Your Review',

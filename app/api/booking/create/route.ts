@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -11,6 +12,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
     bookingDate.setDate(bookingDate.getDate() + parseInt(dayOffset));
 
     // Create booking record
-    const { data: booking, error } = await supabase
+    const { data: booking, error } = await db
       .from('bookings')
       .insert({
         user_id: user.id,

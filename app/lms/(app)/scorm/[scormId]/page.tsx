@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -14,12 +15,13 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { scormId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return { title: 'SCORM Content | Elevate LMS' };
   }
 
-  const { data: scorm } = await supabase
+  const { data: scorm } = await db
     .from('scorm_packages')
     .select('title')
     .eq('id', scormId)
@@ -33,6 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ScormPage({ params }: Props) {
   const { scormId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -54,7 +57,7 @@ export default async function ScormPage({ params }: Props) {
   }
 
   // Fetch SCORM package
-  const { data: scorm, error } = await supabase
+  const { data: scorm, error } = await db
     .from('scorm_packages')
     .select('*, courses (id, title)')
     .eq('id', scormId)
@@ -65,7 +68,7 @@ export default async function ScormPage({ params }: Props) {
   }
 
   // Fetch user's progress from scorm_enrollments
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from('scorm_enrollments')
     .select('*')
     .eq('scorm_package_id', scormId)

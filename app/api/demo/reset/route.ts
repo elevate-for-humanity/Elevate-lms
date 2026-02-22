@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     // Only delete records belonging to demo tenant
 
     // 1. Delete audit logs for demo tenant users
-    const { count: auditCount } = await supabase
+    const { count: auditCount } = await db
       .from('audit_logs')
       .delete({ count: 'exact' })
       .in('user_id', [
@@ -60,28 +60,28 @@ export async function POST(request: Request) {
     deletedCounts.audit_logs = auditCount || 0;
 
     // 2. Delete enrollments for demo tenant
-    const { count: enrollmentCount } = await supabase
+    const { count: enrollmentCount } = await db
       .from('enrollments')
       .delete({ count: 'exact' })
       .eq('tenant_id', DEMO_TENANT_ID);
     deletedCounts.enrollments = enrollmentCount || 0;
 
     // 3. Delete courses for demo tenant
-    const { count: courseCount } = await supabase
+    const { count: courseCount } = await db
       .from('courses')
       .delete({ count: 'exact' })
       .eq('tenant_id', DEMO_TENANT_ID);
     deletedCounts.courses = courseCount || 0;
 
     // 4. Delete programs for demo tenant
-    const { count: programCount } = await supabase
+    const { count: programCount } = await db
       .from('programs')
       .delete({ count: 'exact' })
       .eq('tenant_id', DEMO_TENANT_ID);
     deletedCounts.programs = programCount || 0;
 
     // 5. Delete profiles for demo tenant (keep tenant itself)
-    const { count: profileCount } = await supabase
+    const { count: profileCount } = await db
       .from('profiles')
       .delete({ count: 'exact' })
       .eq('tenant_id', DEMO_TENANT_ID);

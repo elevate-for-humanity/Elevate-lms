@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -26,6 +27,7 @@ interface Props {
 export default async function EnrollPage({ searchParams }: Props) {
   const params = await searchParams;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -56,7 +58,7 @@ export default async function EnrollPage({ searchParams }: Props) {
   }
 
   // Get user's existing enrollments
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await db
     .from('enrollments')
     .select('course_id')
     .eq('user_id', user.id);
@@ -64,7 +66,7 @@ export default async function EnrollPage({ searchParams }: Props) {
   const enrolledCourseIds = new Set(enrollments?.map(e => e.course_id) || []);
 
   // Fetch available courses (not enrolled)
-  const { data: courses } = await supabase
+  const { data: courses } = await db
     .from('training_courses')
     .select('*')
     .eq('is_published', true)
@@ -73,7 +75,7 @@ export default async function EnrollPage({ searchParams }: Props) {
   const availableCourses = courses?.filter(c => !enrolledCourseIds.has(c.id)) || [];
 
   // Fetch partner courses
-  const { data: partnerCourses } = await supabase
+  const { data: partnerCourses } = await db
     .from('partner_lms_courses')
     .select(`
       *,
@@ -86,7 +88,7 @@ export default async function EnrollPage({ searchParams }: Props) {
     .order('course_name');
 
   // Get partner enrollments
-  const { data: partnerEnrollments } = await supabase
+  const { data: partnerEnrollments } = await db
     .from('partner_lms_enrollments')
     .select('course_id')
     .eq('student_id', user.id);

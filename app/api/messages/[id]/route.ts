@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -25,7 +26,7 @@ const { id } = await params;
     const supabase = await createServerSupabaseClient();
 
     // Update message (RLS ensures user can only update their own received messages)
-    const { data: message, error } = await supabase
+    const { data: message, error } = await db
       .from('messages')
       .update({ read: true, updated_at: new Date().toISOString() })
       .eq('id', id)
@@ -73,7 +74,7 @@ const { id } = await params;
     const supabase = await createServerSupabaseClient();
 
     // Delete message (user can delete messages they sent or received)
-    const { error } = await supabase
+    const { error } = await db
       .from('messages')
       .delete()
       .eq('id', id)

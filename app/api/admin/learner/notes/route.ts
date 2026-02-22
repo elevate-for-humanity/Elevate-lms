@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -24,7 +25,7 @@ async function getHandler(
     return new Response('Missing user_id', { status: 400 });
   }
 
-  const { data: notes, error } = await supabase
+  const { data: notes, error } = await db
     .from('program_holder_notes')
     .select(
       `

@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -18,6 +19,7 @@ export async function GET(
 
     const { courseId } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check if courseId is a UUID or slug
     const isUUID =
@@ -26,7 +28,7 @@ export async function GET(
       );
 
     // Get course with lessons
-    const query = supabase.from('courses').select(`
+    const query = db.from('courses').select(`
         *,
         lessons (
           id,
@@ -80,6 +82,7 @@ export async function PATCH(
 
     const { courseId } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -90,7 +93,7 @@ export async function PATCH(
     }
 
     // Check if user is admin or instructor
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', session.user.id)
@@ -102,7 +105,7 @@ export async function PATCH(
 
     const updates = await request.json();
 
-    const { data: course, error } = await supabase
+    const { data: course, error } = await db
       .from('courses')
       .update(updates)
       .eq('id', courseId)
@@ -139,6 +142,7 @@ export async function DELETE(
 
     const { courseId } = await params;
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Check authentication
     const {
@@ -149,7 +153,7 @@ export async function DELETE(
     }
 
     // Check if user is admin
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', session.user.id)
@@ -162,7 +166,7 @@ export async function DELETE(
       );
     }
 
-    const { error } = await supabase
+    const { error } = await db
       .from('courses')
       .delete()
       .eq('id', courseId);

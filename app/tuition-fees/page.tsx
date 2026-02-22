@@ -3,6 +3,7 @@ import { Phone } from 'lucide-react';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const metadata: Metadata = {
   title: 'Tuition & Fees | Elevate for Humanity',
@@ -16,9 +17,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function TuitionFeesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   // Fetch programs from database
-  const { data: dbPrograms } = await supabase
+  const { data: dbPrograms } = await db
     .from('training_programs')
     .select('*')
     .eq('is_active', true)

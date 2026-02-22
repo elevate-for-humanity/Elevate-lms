@@ -1,4 +1,5 @@
 "use client";
+import { createAdminClient } from '@/lib/supabase/admin';
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from "next/navigation";
@@ -78,7 +79,7 @@ export default function StoreCheckoutCancelPage() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    supabase.from('products').select('*').limit(50)
+    db.from('products').select('*').limit(50)
       .then(({ data }) => { if (data) setDbRows(data); });
   }, []);
 

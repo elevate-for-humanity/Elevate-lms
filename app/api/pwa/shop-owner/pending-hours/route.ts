@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: Request) {
@@ -12,6 +13,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     
     if (!supabase) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
@@ -24,7 +26,7 @@ export async function GET(request: Request) {
     }
 
     // Get user's partner association
-    const { data: partnerUser } = await supabase
+    const { data: partnerUser } = await db
       .from('partner_users')
       .select('partner_id, role')
       .eq('user_id', user.id)
@@ -38,7 +40,7 @@ export async function GET(request: Request) {
     }
 
     // Get pending progress entries
-    const { data: pendingEntries } = await supabase
+    const { data: pendingEntries } = await db
       .from('progress_entries')
       .select(`
         id,

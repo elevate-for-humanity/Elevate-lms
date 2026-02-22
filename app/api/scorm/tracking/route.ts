@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
@@ -14,6 +15,7 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -33,7 +35,7 @@ export async function POST(request: Request) {
     } = body;
 
     // Update SCORM enrollment
-    const { data: enrollment, error: enrollmentError } = await supabase
+    const { data: enrollment, error: enrollmentError } = await db
       .from('scorm_enrollments')
       .upsert({
         scorm_package_id: scormPackageId,
@@ -60,7 +62,7 @@ export async function POST(request: Request) {
     // Track individual SCORM elements
     if (cmiData) {
       const trackingPromises = Object.entries(cmiData).map(([element, value]: any) =>
-        supabase.from('scorm_tracking').insert({
+        db.from('scorm_tracking').insert({
           scorm_enrollment_id: enrollment.id,
           element,
           value: String(value),
@@ -73,7 +75,7 @@ export async function POST(request: Request) {
     // If completed, update main enrollment if linked
     if (status === 'completed' || status === 'passed') {
       if (enrollmentId) {
-        await supabase
+        await db
           .from('enrollments')
           .update({
             progress: 100,
@@ -97,6 +99,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -111,7 +114,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Missing scormPackageId' }, { status: 400 });
     }
 
-    const { data: enrollment, error } = await supabase
+    const { data: enrollment, error } = await db
       .from('scorm_enrollments')
       .select('*')
       .eq('scorm_package_id', scormPackageId)

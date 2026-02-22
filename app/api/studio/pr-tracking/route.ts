@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,7 @@ const userId = req.headers.get('x-user-id');
   try {
     const supabase = supabaseServer();
     
-    let query = supabase
+    let query = db
       .from('studio_pr_tracking')
       .select('*')
       .eq('user_id', userId)
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest) {
     const supabase = supabaseServer();
 
     // Upsert tracking record
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('studio_pr_tracking')
       .upsert(
         {
@@ -124,7 +125,7 @@ const userId = req.headers.get('x-user-id');
     if (notes !== undefined) updates.notes = notes;
     if (last_viewed_at) updates.last_viewed_at = last_viewed_at;
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('studio_pr_tracking')
       .update(updates)
       .eq('id', id)
@@ -163,7 +164,7 @@ const userId = req.headers.get('x-user-id');
   try {
     const supabase = supabaseServer();
 
-    const { error } = await supabase
+    const { error } = await db
       .from('studio_pr_tracking')
       .delete()
       .eq('id', id)

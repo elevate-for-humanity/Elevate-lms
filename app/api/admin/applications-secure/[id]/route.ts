@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +23,7 @@ export const GET = withAuth(
     }
 
     try {
-      const { data: application, error } = await supabase
+      const { data: application, error } = await db
         .from('applications')
         .select('*')
         .eq('id', id)

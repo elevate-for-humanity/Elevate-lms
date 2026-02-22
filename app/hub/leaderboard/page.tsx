@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Trophy, Medal, Crown, Star } from 'lucide-react';
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function LeaderboardPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) redirect('/login');
 
@@ -20,14 +22,14 @@ export default async function LeaderboardPage() {
   if (!user) redirect('/login?redirect=/hub/leaderboard');
 
   // Fetch top learners
-  const { data: topLearners } = await supabase
+  const { data: topLearners } = await db
     .from('profiles')
     .select('id, full_name, avatar_url, points, role')
     .order('points', { ascending: false })
     .limit(50);
 
   // Get current user's rank
-  const { data: userProfile } = await supabase
+  const { data: userProfile } = await db
     .from('profiles')
     .select('points')
     .eq('id', user.id)

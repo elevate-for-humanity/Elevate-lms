@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 
 export default async function EmployerBenefitsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -30,7 +32,7 @@ export default async function EmployerBenefitsPage() {
   }
   
   // Fetch benefit content
-  const { data: benefits } = await supabase
+  const { data: benefits } = await db
     .from('content_blocks')
     .select('*')
     .eq('page', 'employer_benefits');

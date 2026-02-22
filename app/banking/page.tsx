@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
 
 export default async function BankingPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -37,7 +39,7 @@ export default async function BankingPage() {
   }
   
   // Fetch banking services
-  const { data: services } = await supabase
+  const { data: services } = await db
     .from('banking_services')
     .select('*')
     .order('order_index');

@@ -1,4 +1,5 @@
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 /**
  * Milady Email Forwarding Webhook
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
     // Find student by email in our system
     let student = null;
     if (studentEmail) {
-      const { data } = await supabase
+      const { data } = await db
         .from('profiles')
         .select('id, email, full_name')
         .eq('email', studentEmail.toLowerCase())
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
     }
 
     // Log the inbound email
-    await supabase.from('milady_email_logs').insert({
+    await db.from('milady_email_logs').insert({
       from_email: from,
       to_email: to,
       subject,
@@ -134,7 +135,7 @@ export async function POST(request: Request) {
       });
 
       // Update student record to mark Milady email received
-      await supabase
+      await db
         .from('student_onboarding')
         .upsert({
           student_id: student.id,

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
 
 export default async function SuccessStoriesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -31,7 +33,7 @@ export default async function SuccessStoriesPage() {
   }
   
   // Fetch success stories
-  const { data: stories } = await supabase
+  const { data: stories } = await db
     .from('success_stories')
     .select('*')
     .eq('published', true)

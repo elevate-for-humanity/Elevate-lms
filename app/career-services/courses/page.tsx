@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { 
@@ -21,6 +22,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function CareerCoursesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -31,7 +33,7 @@ export default async function CareerCoursesPage() {
   }
 
   // Fetch courses from database
-  const { data: courses } = await supabase
+  const { data: courses } = await db
     .from('career_courses')
     .select(`
       *,

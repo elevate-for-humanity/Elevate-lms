@@ -2,6 +2,7 @@ import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { APP_STORE_PRODUCTS } from '@/lib/stripe/app-store-products';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -49,6 +50,7 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -112,7 +114,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Get program details
-        const { data: program } = await supabase
+        const { data: program } = await db
           .from('programs')
           .select('id, name, slug, total_cost')
           .eq('id', programId)
@@ -169,7 +171,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        const { data: course } = await supabase
+        const { data: course } = await db
           .from('courses')
           .select('id, title, slug, price')
           .eq('id', courseId)

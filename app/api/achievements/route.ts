@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -54,7 +55,7 @@ export async function POST(request: Request) {
     const supabase = await createServerSupabaseClient();
 
     // Create achievement record
-    const { data: achievement, error } = await supabase
+    const { data: achievement, error } = await db
       .from('achievements')
       .insert({
         user_id: user.id,

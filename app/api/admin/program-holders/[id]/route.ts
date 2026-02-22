@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,7 +25,7 @@ const { id } = await params;
   }
 
   // Check if user is admin
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -35,7 +36,7 @@ const { id } = await params;
   }
 
   // Get program holder details
-  const { data: ph, error } = await supabase
+  const { data: ph, error } = await db
     .from('program_holders')
     .select(
       `

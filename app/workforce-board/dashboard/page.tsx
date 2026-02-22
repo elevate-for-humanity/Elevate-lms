@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -41,6 +42,7 @@ export const dynamic = 'force-dynamic';
  */
 export default async function WorkforceBoardDashboard() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -60,7 +62,7 @@ export default async function WorkforceBoardDashboard() {
   }
 
   // Get profile and verify role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('id, role, full_name, email')
     .eq('id', user.id)
@@ -80,11 +82,11 @@ export default async function WorkforceBoardDashboard() {
     programsResult,
     providersResult,
   ] = await Promise.all([
-    supabase.from('enrollments').select('*', { count: 'exact', head: true }),
-    supabase.from('enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
-    supabase.from('enrollments').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-    supabase.from('programs').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-    supabase.from('partner_lms_providers').select('*', { count: 'exact', head: true }),
+    db.from('enrollments').select('*', { count: 'exact', head: true }),
+    db.from('enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
+    db.from('enrollments').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+    db.from('programs').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+    db.from('partner_lms_providers').select('*', { count: 'exact', head: true }),
   ]);
 
   const totalEnrollments = enrollmentsResult.count || 0;
@@ -95,14 +97,14 @@ export default async function WorkforceBoardDashboard() {
   const completionRate = totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0;
 
   // Get recent enrollments
-  const { data: recentEnrollments } = await supabase
+  const { data: recentEnrollments } = await db
     .from('enrollments')
     .select('id, status, created_at, profiles (full_name), programs (name, title)')
     .order('created_at', { ascending: false })
     .limit(5);
 
   // Get at-risk participants
-  const { data: atRiskParticipants, count: atRiskCount } = await supabase
+  const { data: atRiskParticipants, count: atRiskCount } = await db
     .from('enrollments')
     .select('*, profiles (full_name, email)', { count: 'exact' })
     .eq('at_risk', true)

@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -182,9 +183,10 @@ You are the Elevate for Humanity AI Assistant - a warm, helpful guide for prospe
     // Log interaction to database
     try {
       const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
       const { data: { user } } = await supabase.auth.getUser();
       const userMessage = body?.messages?.slice(-1)?.[0]?.content || '';
-      await supabase.from('ai_chat_interactions').insert({
+      await db.from('ai_chat_interactions').insert({
         user_id: user?.id || null,
         user_message: userMessage,
         assistant_response: reply,

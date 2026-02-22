@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs'; // Changed from 'edge' to support email sending
 export const dynamic = 'force-dynamic';
@@ -19,7 +20,7 @@ export async function GET(request: Request) {
     }
 
     const supabase = await createServerSupabaseClient();
-    const { data: enrollments, error } = await supabase
+    const { data: enrollments, error } = await db
       .from('training_enrollments')
       .select(
         `
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
     const supabase = await createServerSupabaseClient();
 
     // Check if already enrolled
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('training_enrollments')
       .select('id')
       .eq('user_id', user.id)
@@ -86,7 +87,7 @@ export async function POST(request: Request) {
     }
 
     // Create enrollment
-    const { data: enrollment, error } = await supabase
+    const { data: enrollment, error } = await db
       .from('training_enrollments')
       .insert({
         user_id: user.id,

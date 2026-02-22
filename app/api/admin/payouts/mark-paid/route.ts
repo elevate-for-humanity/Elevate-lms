@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -40,7 +41,7 @@ export async function POST(req: Request) {
     }
 
     // Get total amount being paid out
-    const { data: salesData } = await supabase
+    const { data: salesData } = await db
       .from('marketplace_sales')
       .select('creator_earnings_cents')
       .eq('creator_id', creatorId)
@@ -51,7 +52,7 @@ export async function POST(req: Request) {
       0;
 
     // Mark all unpaid sales for this creator as paid
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('marketplace_sales')
       .update({
         paid_out: true,

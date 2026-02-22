@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -21,7 +22,7 @@ export default async function WioaPage() {
   try {
     const supabase = createPublicClient();
     if (supabase) {
-      const { data } = await supabase
+      const { data } = await db
         .from('funding_options')
         .select('*')
         .eq('type', 'wioa')

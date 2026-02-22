@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 
 export default async function AdminPerformanceDashboardPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -27,38 +29,38 @@ export default async function AdminPerformanceDashboardPage() {
   }
 
   // Fetch real data from database
-  const { count: totalLeads } = await supabase
+  const { count: totalLeads } = await db
     .from('leads')
     .select('*', { count: 'exact', head: true });
 
-  const { count: enrolledLeads } = await supabase
+  const { count: enrolledLeads } = await db
     .from('leads')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'enrolled');
 
-  const { count: totalCourses } = await supabase
+  const { count: totalCourses } = await db
     .from('courses')
     .select('*', { count: 'exact', head: true });
 
-  const { count: publishedCourses } = await supabase
+  const { count: publishedCourses } = await db
     .from('courses')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'published');
 
-  const { count: totalContacts } = await supabase
+  const { count: totalContacts } = await db
     .from('crm_contacts')
     .select('*', { count: 'exact', head: true });
 
-  const { count: employerContacts } = await supabase
+  const { count: employerContacts } = await db
     .from('crm_contacts')
     .select('*', { count: 'exact', head: true })
     .eq('contact_type', 'employer');
 
-  const { count: wotcApplications } = await supabase
+  const { count: wotcApplications } = await db
     .from('wotc_applications')
     .select('*', { count: 'exact', head: true });
 
-  const { count: approvedWotc } = await supabase
+  const { count: approvedWotc } = await db
     .from('wotc_applications')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'approved');
@@ -73,7 +75,7 @@ export default async function AdminPerformanceDashboardPage() {
     : '0';
 
   // Get courses by category
-  const { data: courses } = await supabase
+  const { data: courses } = await db
     .from('courses')
     .select('category, status');
 

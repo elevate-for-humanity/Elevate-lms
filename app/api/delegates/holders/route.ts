@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,7 +18,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   } = await supabase.auth.getUser();
   if (!user) return new Response('Unauthorized', { status: 401 });
 
-  const { data: prof } = await supabase
+  const { data: prof } = await db
     .from('user_profiles')
     .select('role')
     .eq('user_id', user.id)
@@ -25,7 +26,7 @@ const supabase = await createRouteHandlerClient({ cookies });
 
   if (prof?.role !== 'admin') return new Response('Forbidden', { status: 403 });
 
-  const { data, error }: any = await supabase
+  const { data, error }: any = await db
     .from('program_holders')
     .select('id,name')
     .order('name');

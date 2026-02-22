@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { DocumentUploadForm } from '@/components/documents/DocumentUploadForm';
 
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 
 export default async function UploadDocumentPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -32,7 +34,7 @@ export default async function UploadDocumentPage() {
 
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -40,7 +42,7 @@ export default async function UploadDocumentPage() {
 
   if (!profile || profile.role !== 'employer') redirect('/');
 
-  const { data: requirements } = await supabase
+  const { data: requirements } = await db
     .from('document_requirements')
     .select('*')
     .eq('role', 'employer');

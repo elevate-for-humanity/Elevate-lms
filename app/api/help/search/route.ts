@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -22,7 +23,7 @@ const supabase = createSupabaseClient();
 
   const sanitizedQ = sanitizeSearchInput(q);
 
-  const { data: results, error } = await supabase
+  const { data: results, error } = await db
     .from('help_articles')
     .select('*')
     .or(`title.ilike.%${sanitizedQ}%,body.ilike.%${sanitizedQ}%`)

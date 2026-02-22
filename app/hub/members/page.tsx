@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Search, Filter, MessageSquare, UserPlus } from 'lucide-react';
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function MembersPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   if (!supabase) redirect('/login');
 
@@ -20,7 +22,7 @@ export default async function MembersPage() {
   if (!user) redirect('/login?redirect=/hub/members');
 
   // Fetch members
-  const { data: members, count } = await supabase
+  const { data: members, count } = await db
     .from('profiles')
     .select('id, full_name, avatar_url, role, bio, created_at, points', { count: 'exact' })
     .order('points', { ascending: false })

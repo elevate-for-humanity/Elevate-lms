@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
@@ -23,6 +24,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -133,7 +135,7 @@ export async function POST(request: NextRequest) {
       : null;
 
     // Save verification record to database
-    const { data: verification, error: verificationError } = await supabase
+    const { data: verification, error: verificationError } = await db
       .from('identity_verifications')
       .insert({
         user_id: userId,
@@ -155,7 +157,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update program holder verification status
-    await supabase.from('program_holder_verification').upsert({
+    await db.from('program_holder_verification').upsert({
       program_holder_id: userId,
       identity_documents_uploaded: true,
       identity_documents_uploaded_at: new Date().toISOString(),

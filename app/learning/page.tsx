@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { BookOpen, FileText, NotebookPen, Compass, BookMarked, GraduationCap, ArrowRight,
   Phone
@@ -17,6 +18,7 @@ export const metadata = {
 
 export default async function LearningHubPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -30,7 +32,7 @@ export default async function LearningHubPage() {
   }
   
   // Fetch learning resources
-  const { data: resources } = await supabase
+  const { data: resources } = await db
     .from('learning_resources')
     .select('*')
     .eq('published', true)

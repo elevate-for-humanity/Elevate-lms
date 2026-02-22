@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -41,7 +43,7 @@ export async function POST(req: Request) {
     }
 
     // Verify user has access to this placement
-    const { data: placement } = await supabase
+    const { data: placement } = await db
       .from('apprentice_placements')
       .select('shop_id, shops!inner(id)')
       .eq('id', placementId)
@@ -55,7 +57,7 @@ export async function POST(req: Request) {
     }
 
     // Verify user is staff at this shop
-    const { data: staff } = await supabase
+    const { data: staff } = await db
       .from('shop_staff')
       .select('id')
       .eq('shop_id', placement.shop_id)
@@ -70,7 +72,7 @@ export async function POST(req: Request) {
     }
 
     // Insert report
-    const { error } = await supabase.from('apprentice_weekly_reports').insert({
+    const { error } = await db.from('apprentice_weekly_reports').insert({
       placement_id: placementId,
       week_start: weekStart,
       week_end: weekEnd,

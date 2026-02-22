@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -21,13 +22,14 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     const updateData: any = {};
     if (metadata) updateData.metadata = metadata;
     if (slug) updateData.slug = slug;
     if (title) updateData.title = title;
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('courses')
       .update(updateData)
       .eq('id', id)

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { ArrowLeft, GraduationCap, TrendingUp, Circle, Clock } from 'lucide-react';
 
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 
 export default async function EnrollmentReportPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
@@ -20,13 +22,13 @@ export default async function EnrollmentReportPage() {
     { count: totalEnrollments },
     { data: courses },
   ] = await Promise.all([
-    supabase
+    db
       .from('enrollments')
       .select('*, courses(title), profiles(first_name, last_name, email)')
       .order('created_at', { ascending: false })
       .limit(50),
-    supabase.from('enrollments').select('*', { count: 'exact', head: true }),
-    supabase.from('courses').select('id, title'),
+    db.from('enrollments').select('*', { count: 'exact', head: true }),
+    db.from('courses').select('id, title'),
   ]);
 
   const recentEnrollments = enrollments?.filter(e => 

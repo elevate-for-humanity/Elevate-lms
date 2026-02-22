@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -26,6 +27,7 @@ export const metadata = {
 
 export default async function SponsorLicensingPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -39,7 +41,7 @@ export default async function SponsorLicensingPage() {
   }
   
   // Fetch sponsor licensing info
-  const { data: licensing } = await supabase
+  const { data: licensing } = await db
     .from('pricing_plans')
     .select('*')
     .eq('type', 'sponsor');

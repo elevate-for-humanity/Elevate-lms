@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,10 +17,11 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const params = request.nextUrl.searchParams;
     const employeeId = params.get('employee_id');
 
-    let query = supabase
+    let query = db
       .from('benefits_enrollments')
       .select(
         `
@@ -60,6 +62,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const body = await parseBody<Record<string, any>>(request);
 
     const { employee_id, plan_id, coverage_level, effective_date } = body;
@@ -74,7 +77,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('benefits_enrollments')
       .insert({
         employee_id,

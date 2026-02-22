@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -23,9 +24,10 @@ export async function POST(request: NextRequest) {
 
     const data = await parseBody<Record<string, any>>(request);
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Store in database
-    const { error: dbError } = await supabase.from('partner_inquiries').insert({
+    const { error: dbError } = await db.from('partner_inquiries').insert({
       full_name: data.fullName,
       organization: data.organization,
       email: data.email,

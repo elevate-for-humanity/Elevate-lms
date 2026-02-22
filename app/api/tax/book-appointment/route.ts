@@ -1,4 +1,5 @@
 
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
@@ -42,7 +43,7 @@ export async function POST(req: Request) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Insert appointment into database
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('appointments')
       .insert([
         {

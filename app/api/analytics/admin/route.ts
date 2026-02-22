@@ -5,6 +5,7 @@ export const maxDuration = 60;
 // app/api/analytics/admin/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -14,6 +15,7 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
     // Get current user and verify admin role
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -26,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify user is admin
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from("profiles")
       .select("role")
       .eq("id", user.id)
@@ -40,13 +42,13 @@ export async function GET(request: NextRequest) {
     }
 
     // 1) Total learners (exclude staff/admin)
-    const { count: totalLearners } = await supabase
+    const { count: totalLearners } = await db
       .from("profiles")
       .select("*", { count: "exact", head: true })
       .in("role", ["student", "instructor"]);
 
     // 2) Get all enrollments for completion rate
-    const { data: enrollments } = await supabase
+    const { data: enrollments } = await db
       .from("enrollments")
       .select("user_id, course_id");
 
@@ -56,21 +58,21 @@ export async function GET(request: NextRequest) {
     // Calculate completion for each enrollment
     if (enrollments) {
       for (const enrollment of enrollments) {
-        const { data: modules } = await supabase
+        const { data: modules } = await db
           .from("modules")
           .select("id")
           .eq("course_id", enrollment.course_id);
 
         const moduleIds = modules?.map((m) => m.id) || [];
 
-        const { data: lessons } = await supabase
+        const { data: lessons } = await db
           .from("lessons")
           .select("id")
           .in("module_id", moduleIds);
 
         const totalLessons = lessons?.length || 0;
 
-        const { data: progress } = await supabase
+        const { data: progress } = await db
           .from("lesson_progress")
           .select("lesson_id")
           .eq("user_id", enrollment.user_id)
@@ -91,21 +93,21 @@ export async function GET(request: NextRequest) {
     let atRiskCount = 0;
     if (enrollments) {
       for (const enrollment of enrollments) {
-        const { data: modules } = await supabase
+        const { data: modules } = await db
           .from("modules")
           .select("id")
           .eq("course_id", enrollment.course_id);
 
         const moduleIds = modules?.map((m) => m.id) || [];
 
-        const { data: lessons } = await supabase
+        const { data: lessons } = await db
           .from("lessons")
           .select("id")
           .in("module_id", moduleIds);
 
         const totalLessons = lessons?.length || 0;
 
-        const { data: progress } = await supabase
+        const { data: progress } = await db
           .from("lesson_progress")
           .select("lesson_id")
           .eq("user_id", enrollment.user_id)
@@ -124,7 +126,7 @@ export async function GET(request: NextRequest) {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const { data: recentActivity } = await supabase
+    const { data: recentActivity } = await db
       .from("learning_activity")
       .select("user_id, minutes_spent")
       .gte("activity_date", sevenDaysAgo.toISOString().split("T")[0]);
@@ -137,7 +139,7 @@ export async function GET(request: NextRequest) {
       : 0;
 
     // 5) Program-level stats
-    const { data: courses } = await supabase
+    const { data: courses } = await db
       .from("courses")
       .select("id, title");
 
@@ -145,12 +147,12 @@ export async function GET(request: NextRequest) {
 
     if (courses) {
       for (const course of courses) {
-        const { count: learnerCount } = await supabase
+        const { count: learnerCount } = await db
           .from("enrollments")
           .select("*", { count: "exact", head: true })
           .eq("course_id", course.id);
 
-        const { data: courseEnrollments } = await supabase
+        const { data: courseEnrollments } = await db
           .from("enrollments")
           .select("user_id")
           .eq("course_id", course.id);
@@ -159,21 +161,21 @@ export async function GET(request: NextRequest) {
 
         if (courseEnrollments) {
           for (const enrollment of courseEnrollments) {
-            const { data: modules } = await supabase
+            const { data: modules } = await db
               .from("modules")
               .select("id")
               .eq("course_id", course.id);
 
             const moduleIds = modules?.map((m) => m.id) || [];
 
-            const { data: lessons } = await supabase
+            const { data: lessons } = await db
               .from("lessons")
               .select("id")
               .in("module_id", moduleIds);
 
             const totalLessons = lessons?.length || 0;
 
-            const { data: progress } = await supabase
+            const { data: progress } = await db
               .from("lesson_progress")
               .select("lesson_id")
               .eq("user_id", enrollment.user_id)

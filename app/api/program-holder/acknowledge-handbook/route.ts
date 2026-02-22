@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -13,6 +14,7 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -32,14 +34,14 @@ export async function POST(req: Request) {
     }
 
     // Get user profile
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('email, full_name')
       .eq('id', user.id)
       .single();
 
     // Insert acknowledgement
-    const { data, error }: any = await supabase
+    const { data, error }: any = await db
       .from('program_holder_acknowledgements')
       .insert({
         user_id: user.id,

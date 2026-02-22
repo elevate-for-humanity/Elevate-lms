@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -22,12 +23,13 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { courseId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return { title: 'Enroll | Elevate LMS' };
   }
 
-  const { data: course } = await supabase
+  const { data: course } = await db
     .from('training_courses')
     .select('title')
     .eq('id', courseId)
@@ -42,6 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CourseEnrollPage({ params }: Props) {
   const { courseId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -61,7 +64,7 @@ export default async function CourseEnrollPage({ params }: Props) {
   }
 
   // Fetch course details
-  const { data: course, error } = await supabase
+  const { data: course, error } = await db
     .from('training_courses')
     .select('*')
     .eq('id', courseId)
@@ -72,7 +75,7 @@ export default async function CourseEnrollPage({ params }: Props) {
   }
 
   // Check if already enrolled
-  const { data: existingEnrollment } = await supabase
+  const { data: existingEnrollment } = await db
     .from('enrollments')
     .select('id, status')
     .eq('user_id', user.id)
@@ -84,20 +87,20 @@ export default async function CourseEnrollPage({ params }: Props) {
   }
 
   // Get user profile
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('first_name, last_name, email')
     .eq('id', user.id)
     .single();
 
   // Get lesson count
-  const { count: lessonCount } = await supabase
+  const { count: lessonCount } = await db
     .from('training_lessons')
     .select('*', { count: 'exact', head: true })
     .eq('course_id', courseId);
 
   // Get enrolled student count
-  const { count: studentCount } = await supabase
+  const { count: studentCount } = await db
     .from('enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('course_id', courseId);

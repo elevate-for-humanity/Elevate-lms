@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -24,6 +25,7 @@ export default async function StoreSuccessPage({
 }) {
   const { order_id } = await searchParams;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -48,7 +50,7 @@ export default async function StoreSuccessPage({
   let orderItems = null;
 
   if (orderId) {
-    const { data: orderData } = await supabase
+    const { data: orderData } = await db
       .from('orders')
       .select('*')
       .eq('id', orderId)
@@ -57,7 +59,7 @@ export default async function StoreSuccessPage({
     order = orderData;
 
     if (order) {
-      const { data: items } = await supabase
+      const { data: items } = await db
         .from('order_items')
         .select(`
           id,
@@ -71,7 +73,7 @@ export default async function StoreSuccessPage({
   }
 
   // Get user's recent purchases for downloads
-  const { data: purchases } = await supabase
+  const { data: purchases } = await db
     .from('purchases')
     .select(`
       id,

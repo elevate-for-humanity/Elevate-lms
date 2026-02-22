@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -34,6 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function EmployeeDetailPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -47,7 +49,7 @@ export default async function EmployeeDetailPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: adminProfile } = await supabase
+  const { data: adminProfile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -58,7 +60,7 @@ export default async function EmployeeDetailPage({ params }: Props) {
   }
 
   // Fetch employee
-  const { data: employee, error } = await supabase
+  const { data: employee, error } = await db
     .from('employees')
     .select(`
       *,
@@ -76,7 +78,7 @@ export default async function EmployeeDetailPage({ params }: Props) {
   }
 
   // Fetch time off requests
-  const { data: timeOffRequests } = await supabase
+  const { data: timeOffRequests } = await db
     .from('time_off_requests')
     .select('*')
     .eq('employee_id', id)
@@ -84,7 +86,7 @@ export default async function EmployeeDetailPage({ params }: Props) {
     .limit(5);
 
   // Fetch performance reviews
-  const { data: reviews } = await supabase
+  const { data: reviews } = await db
     .from('performance_reviews')
     .select('*')
     .eq('employee_id', id)

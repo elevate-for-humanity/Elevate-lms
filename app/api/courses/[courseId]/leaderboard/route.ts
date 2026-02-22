@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -17,12 +18,13 @@ export async function GET(
     if (rateLimited) return rateLimited;
 const { courseId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
   const user = await getCurrentUser();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data, error }: any = await supabase
+  const { data, error }: any = await db
     .from("course_leaderboard")
     .select("user_id, progress_percent")
     .eq("course_id", courseId)
@@ -36,7 +38,7 @@ const { courseId } = await params;
 
   // Optionally join profile names
   const userIds = data?.map((r) => r.user_id) || [];
-  const { data: profiles } = await supabase
+  const { data: profiles } = await db
     .from("profiles")
     .select("id, full_name")
     .in("id", userIds);

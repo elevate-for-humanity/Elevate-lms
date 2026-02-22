@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
 
 export default async function ConnectionsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient(); const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -38,7 +40,7 @@ export default async function ConnectionsPage() {
   }
 
   // Fetch suggested connections (other users in same programs)
-  const { data: suggestedUsers } = await supabase
+  const { data: suggestedUsers } = await db
     .from('profiles')
     .select('id, full_name, avatar_url, headline, role')
     .neq('id', user.id)
@@ -47,7 +49,7 @@ export default async function ConnectionsPage() {
   const suggestions = suggestedUsers || [];
 
   // Fetch user's existing connections
-  const { data: myConnections } = await supabase
+  const { data: myConnections } = await db
     .from('user_connections')
     .select('connected_user_id, status, profiles!user_connections_connected_user_id_fkey(full_name, avatar_url, headline)')
     .eq('user_id', user.id)
@@ -56,7 +58,7 @@ export default async function ConnectionsPage() {
   const connections = myConnections || [];
 
   // Fetch pending requests
-  const { data: pendingRequests } = await supabase
+  const { data: pendingRequests } = await db
     .from('user_connections')
     .select('id, user_id, profiles!user_connections_user_id_fkey(full_name, avatar_url, headline)')
     .eq('connected_user_id', user.id)

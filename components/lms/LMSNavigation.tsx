@@ -71,13 +71,13 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
   }, [user?.id, supabase]);
 
   const navItems = [
-    { href: '/lms/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/lms/courses', label: 'My Courses', icon: BookOpen, badge: courseCount > 0 ? courseCount : undefined },
-    { href: '/lms/progress', label: 'Progress', icon: TrendingUp },
-    { href: '/lms/quizzes', label: 'Quizzes', icon: ClipboardCheck },
-    { href: '/lms/schedule', label: 'Schedule', icon: Calendar },
-    { href: '/lms/messages', label: 'Messages', icon: MessageSquare, badge: unreadMessages > 0 ? unreadMessages : undefined },
-    { href: '/lms/certificates', label: 'Certificates', icon: Award },
+    { href: '/lms/dashboard', label: 'Dashboard', desc: 'Your home base', icon: LayoutDashboard },
+    { href: '/lms/courses', label: 'My Courses', desc: 'Lessons & modules', icon: BookOpen, badge: courseCount > 0 ? courseCount : undefined },
+    { href: '/lms/progress', label: 'Progress', desc: 'Track completion', icon: TrendingUp },
+    { href: '/lms/quizzes', label: 'Quizzes', desc: 'Tests & exams', icon: ClipboardCheck },
+    { href: '/lms/schedule', label: 'Schedule', desc: 'Dates & deadlines', icon: Calendar },
+    { href: '/lms/messages', label: 'Messages', desc: 'Inbox & chat', icon: MessageSquare, badge: unreadMessages > 0 ? unreadMessages : undefined },
+    { href: '/lms/certificates', label: 'Certificates', desc: 'Your credentials', icon: Award },
   ];
 
   const isActive = (href: string) =>
@@ -126,14 +126,20 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  title={item.desc}
+                  className={`relative flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                     isActive(item.href)
-                      ? 'bg-white text-brand-blue-900'
+                      ? 'bg-white text-brand-blue-900 shadow-sm'
                       : 'text-white/90 hover:bg-white/10'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
                   <span className="hidden xl:inline">{item.label}</span>
+                  {item.badge && (
+                    <span className="absolute -top-1 -right-1 min-w-[20px] h-5 flex items-center justify-center bg-brand-red-500 text-white text-xs font-bold rounded-full px-1.5">
+                      {item.badge}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -230,8 +236,20 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                         : 'text-white hover:bg-white/10'
                     }`}
                   >
-                    <Icon className="w-5 h-5" />
-                    {item.label}
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        {item.label}
+                        {item.badge && (
+                          <span className="min-w-[20px] h-5 flex items-center justify-center bg-brand-red-500 text-white text-xs font-bold rounded-full px-1.5">
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
+                      <div className={`text-xs ${isActive(item.href) ? 'text-brand-blue-600' : 'text-white/50'}`}>
+                        {item.desc}
+                      </div>
+                    </div>
                   </Link>
                 );
               })}

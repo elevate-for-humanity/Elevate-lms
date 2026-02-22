@@ -389,9 +389,8 @@ const nextConfig = {
       // CDL
       { source: '/programs/cdl', destination: '/programs/cdl-training', permanent: true },
       { source: '/programs/cdl-transportation', destination: '/programs/cdl-training', permanent: true },
-      // CNA
-      { source: '/programs/cna', destination: '/programs/cna-cert', permanent: true },
-      { source: '/programs/cna-certification', destination: '/programs/cna-cert', permanent: true },
+      // CNA — /programs/cna is the canonical page
+      { source: '/programs/cna-cert', destination: '/programs/cna', permanent: true },
       // HVAC
       { source: '/programs/hvac', destination: '/programs/hvac-technician', permanent: true },
       // Barber & Beauty

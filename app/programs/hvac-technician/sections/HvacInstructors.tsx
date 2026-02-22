@@ -122,7 +122,7 @@ function InstructorsAndTutorsSection({ block }: { block: HvacProgramInstructorsB
 
         <ProgramTutorCTA
           programSlug="hvac-technician"
-          programName="HVAC Technician"
+          programName="Building Technician with HVAC Fundamentals"
           applyHref="/programs/hvac-technician/apply"
           suggestions={['What is EPA 608?', 'How long is the program?', 'Is tuition covered?', 'What jobs can I get?']}
         />
@@ -144,7 +144,7 @@ export function HvacInstructors() {
             Frequently Asked Questions
           </h2>
           <p className="text-slate-600 mb-8">
-            Common questions about the HVAC Technician program.
+            Common questions about the Building Technician with HVAC Fundamentals program.
           </p>
           <div className="space-y-3">
             {HVAC_FAQS.map((faq, i) => (

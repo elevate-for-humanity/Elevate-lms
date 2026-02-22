@@ -239,7 +239,7 @@ export default async function VerifyCertificatePage({
                   Provider
                 </p>
                 <p>
-                  <strong>Accreditation:</strong> DOL/WIOA Approved Training
+                  <strong>Status:</strong> WIOA Eligible Training Provider
                   Provider
                 </p>
                 <p>

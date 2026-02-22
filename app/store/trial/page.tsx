@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Clock, Shield, Loader2, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DemoTrialFunnelEvents } from '@/lib/analytics/events';
@@ -155,7 +156,7 @@ export default function TrialPage() {
             {/* Left: visual */}
             <div className="hidden lg:block">
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl border border-slate-200 mb-4">
-                <img src="/images/demos/admin-dashboard-thumb.jpg" alt="Your admin dashboard after trial setup" className="w-full h-full object-cover" />
+                <Image src="/images/demos/admin-dashboard-thumb.jpg" alt="Your admin dashboard after trial setup" fill className="object-cover" />
               </div>
               <p className="text-sm text-slate-500 text-center mb-6">Your admin dashboard — ready in under 60 seconds</p>
               <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">

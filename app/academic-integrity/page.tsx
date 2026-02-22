@@ -421,7 +421,7 @@ export default async function AcademicIntegrityPage() {
         </div>
 
         {/* Student Pledge */}
-        <div className="bg-white rounded-xl p-4 sm:p-4 sm:p-6 md:p-8 text-white mb-8">
+        <div className="bg-slate-900 rounded-xl p-4 sm:p-4 sm:p-6 md:p-8 text-white mb-8">
           <h2 className="text-xl sm:text-2xl font-bold mb-4">Academic Integrity Pledge</h2>
           <div className="bg-white/10 rounded-lg p-4 sm:p-6">
             <p className="text-brand-blue-100 italic mb-4">

@@ -92,7 +92,7 @@ export default function FranchisePage() {
               <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mb-4">
                 <Award className="w-8 h-8 text-brand-green-600" />
               </div>
-              <h3 className="text-xl font-bold mb-3">DOL-Approved Programs</h3>
+              <h3 className="text-xl font-bold mb-3">Industry-Aligned Programs</h3>
               <p className="text-black">
                 Use our DOL Registered Apprenticeship Sponsor status (RAPIDS ID:
                 2025-IN-132301) and DWD approvals

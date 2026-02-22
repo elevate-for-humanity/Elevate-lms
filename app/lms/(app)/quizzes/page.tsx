@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { LmsHeroBanner } from '@/components/lms/LmsHeroBanner';
 import { FileQuestion, Clock, Circle, AlertCircle, Play, Trophy, ChevronRight, BookOpen } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -113,12 +114,13 @@ export default async function QuizzesPage() {
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Quizzes" }]} />
         </div>
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">My Quizzes</h1>
-            <p className="text-slate-600 mt-1">Test your knowledge and track your progress</p>
-          </div>
-        </div>
+        <LmsHeroBanner
+          title="Quizzes & Assessments"
+          subtitle={`${stats.available} quizzes available. ${stats.completed} completed with ${stats.avgScore}% average score.`}
+          image="/images/programs-hq/cybersecurity.jpg"
+          eyebrow="Test Your Knowledge"
+          cta={stats.available > stats.completed ? { label: 'Start Next Quiz', href: '#available-quizzes' } : undefined}
+        />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl border border-slate-200 p-4">

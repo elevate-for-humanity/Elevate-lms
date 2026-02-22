@@ -16,7 +16,7 @@ const credentials = [
   { name: 'Certified Nursing Assistant (CNA)', field: 'Healthcare', issuer: 'Indiana State Dept. of Health', desc: 'State-certified credential for patient care in hospitals, nursing homes, and home health.' },
   { name: 'Commercial Driver License (CDL)', field: 'Transportation', issuer: 'Indiana BMV', desc: 'Class A or Class B CDL for commercial truck driving. Includes pre-trip, skills, and road test.' },
   { name: 'EPA Section 608 Universal Certification', field: 'HVAC', issuer: 'EPA (via approved testing partner)', desc: 'Required by federal law to purchase and handle refrigerants. 15-week prep curriculum with study kits, practice test bank, and proctored certification exam access. Unlimited online retesting. Certification does not expire.' },
-  { name: 'Barber License', field: 'Cosmetology', issuer: 'Indiana PLA', desc: 'State barber license earned through DOL Registered Apprenticeship. 1,500 hours of training.' },
+  { name: 'Barber License', field: 'Cosmetology', issuer: 'Indiana PLA', desc: 'State barber license earned through DOL Registered Apprenticeship program. 1,500 hours of training.' },
   { name: 'Phlebotomy Technician', field: 'Healthcare', issuer: 'NHA / ASCP', desc: 'National certification for blood draw and specimen collection.' },
   { name: 'Medical Assistant', field: 'Healthcare', issuer: 'NHA', desc: 'Clinical and administrative skills for physician offices and outpatient clinics.' },
 ];

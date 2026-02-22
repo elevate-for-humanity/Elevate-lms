@@ -56,7 +56,7 @@ export function HvacHero() {
             <div>
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-6">Program Overview</h2>
               <p className="text-slate-700 leading-relaxed text-lg mb-4">
-                The HVAC Technician program prepares you for employment in heating, ventilation, and air conditioning through structured classroom instruction and hands-on training with real HVAC systems.
+                The Building Technician with HVAC Fundamentals program prepares you for employment in heating, ventilation, and air conditioning through structured classroom instruction and hands-on training with real HVAC systems.
               </p>
               <p className="text-slate-700 leading-relaxed text-lg mb-6">
                 Graduates earn 6 industry-recognized credentials including EPA 608 Universal, Residential HVAC Certification 1 &amp; 2, OSHA 30, CPR, and Rise Up. This program is accredited and eligible for the Indiana Workforce Ready Grant.

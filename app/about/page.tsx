@@ -122,7 +122,7 @@ export default function AboutPage() {
 
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/heroes-hq/funding-hero.jpg" alt="Funding and financial aid" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
+                <Image src="/images/heroes-hq/funding-hero.jpg" alt="Workforce funding options" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Funding Navigation</h3>
@@ -197,7 +197,7 @@ export default function AboutPage() {
             </p>
           </div>
           <Link href="/accreditation" className="mt-3 text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
-            View accreditation and credential details <ArrowRight className="ml-1 w-4 h-4" />
+            View approvals and credential details <ArrowRight className="ml-1 w-4 h-4" />
           </Link>
         </div>
       </section>
@@ -269,8 +269,8 @@ export default function AboutPage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { logo: '/images/partners/usdol.webp', name: 'U.S. Department of Labor', role: 'Registered Apprenticeship Sponsor', desc: 'Our barber and building technician apprenticeships are registered with USDOL and tracked in the RAPIDS system.' },
-              { logo: '/images/partners/dwd.webp', name: 'Indiana DWD', role: 'Approved Training Provider', desc: 'Listed on the Eligible Training Provider List (ETPL). Our programs qualify for WIOA and Workforce Ready Grant funding.' },
+              { logo: '/images/partners/usdol.webp', name: 'U.S. Department of Labor', role: 'Registered Apprenticeship Sponsor', desc: 'Our barber apprenticeship program is registered with USDOL and tracked in the RAPIDS system.' },
+              { logo: '/images/partners/dwd.webp', name: 'Indiana DWD', role: 'Listed Training Provider', desc: 'Listed on the Eligible Training Provider List (ETPL). Eligible students may use WIOA and Workforce Ready Grant funding.' },
               { logo: '/images/partners/workone.webp', name: 'WorkOne', role: 'Workforce Partner', desc: 'We work with WorkOne career centers across Central Indiana for participant referrals and eligibility screening.' },
               { logo: '/images/partners/nextleveljobs.webp', name: 'Next Level Jobs', role: 'Workforce Ready Grant Provider', desc: 'Our high-demand certification programs qualify for the Workforce Ready Grant through Next Level Jobs.' },
             ].map((cred) => (
@@ -415,7 +415,7 @@ export default function AboutPage() {
             {[
               { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/programs-hq/cna-training.jpg', href: '/programs/cna-certification' },
               { name: 'CDL Training', duration: '4–6 weeks', image: '/images/programs-hq/cdl-trucking.jpg', href: '/programs/cdl' },
-              { name: 'HVAC Technician', duration: '12–16 weeks', image: '/images/programs-hq/hvac-technician.jpg', href: '/programs/hvac-technician' },
+              { name: 'Building Technician with HVAC Fundamentals', duration: '12–16 weeks', image: '/images/programs-hq/hvac-technician.jpg', href: '/programs/hvac-technician' },
               { name: 'Electrical', duration: '12–16 weeks', image: '/images/programs-hq/electrical.jpg', href: '/programs/electrical' },
               { name: 'Barber Apprenticeship', duration: '~18 months', image: '/images/programs-hq/barber-training.jpg', href: '/programs/barber-apprenticeship' },
               { name: 'IT & Cybersecurity', duration: '8–16 weeks', image: '/images/programs-hq/cybersecurity.jpg', href: '/programs/technology' },

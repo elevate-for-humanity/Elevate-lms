@@ -12,14 +12,14 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Help Center | Elevate for Humanity',
-  description: 'Find answers to your questions about enrollment, courses, financial aid, certifications, and more. Browse our help articles or contact support.',
-  keywords: ['help center', 'FAQ', 'support', 'enrollment help', 'financial aid', 'course help'],
+  description: 'Find answers to your questions about enrollment, courses, funding, certifications, and more. Browse our help articles or contact support.',
+  keywords: ['help center', 'FAQ', 'support', 'enrollment help', 'funding', 'course help'],
   alternates: {
     canonical: `${SITE_URL}/help/articles`,
   },
   openGraph: {
     title: 'Help Center | Elevate for Humanity',
-    description: 'Find answers to your questions about enrollment, courses, financial aid, and more.',
+    description: 'Find answers to your questions about enrollment, courses, funding, and more.',
     url: `${SITE_URL}/help/articles`,
     siteName: 'Elevate for Humanity',
     type: 'website',
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary',
     title: 'Help Center | Elevate for Humanity',
-    description: 'Find answers to your questions about enrollment, courses, and financial aid.',
+    description: 'Find answers to your questions about enrollment, courses, and funding.',
   },
 };
 

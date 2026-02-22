@@ -79,7 +79,7 @@ export default function FundingVerificationPage() {
           <div className="my-8 space-y-4">
             {[
               { step: '1', title: 'Submit Funding Documentation', desc: 'Upload your funding authorization letter, voucher, or payment information through the enrollment portal or email.' },
-              { step: '2', title: 'Financial Aid Review', desc: 'Our financial aid team reviews your documentation and contacts the funding source for confirmation (2-3 business days).' },
+              { step: '2', title: 'Funding Review', desc: 'Our enrollment team reviews your documentation and contacts the funding source for confirmation (2-3 business days).' },
               { step: '3', title: 'Approval Notification', desc: 'You will receive an email confirming your funding has been verified and your enrollment is approved.' },
               { step: '4', title: 'Enrollment Confirmation', desc: 'Once funding is verified, you will receive your enrollment agreement and program start date.' },
             ].map((item, i) => (
@@ -99,7 +99,7 @@ export default function FundingVerificationPage() {
             <h2>Required Documentation</h2>
             <ul>
               <li><strong>WIOA:</strong> ITA voucher or authorization letter from WorkOne</li>
-              <li><strong>WRG:</strong> FAFSA confirmation and WRG award letter</li>
+              <li><strong>WRG:</strong> WRG eligibility documentation and award letter</li>
               <li><strong>JRI:</strong> Referral letter from probation/parole officer</li>
               <li><strong>SNAP E&T:</strong> SNAP E&T referral from FSSA or case manager</li>
               <li><strong>Employer:</strong> Signed employer sponsorship agreement</li>
@@ -126,7 +126,7 @@ export default function FundingVerificationPage() {
           {/* Contact */}
           <div className="mt-12 bg-slate-50 rounded-xl p-8 border">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Need Help With Funding?</h2>
-            <p className="text-gray-600 mb-6">Our financial aid team can help you identify funding options and complete the verification process.</p>
+            <p className="text-gray-600 mb-6">Our enrollment team can help you identify workforce funding options and complete the verification process.</p>
             <div className="flex flex-wrap gap-4">
               <a href="/contact" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition">
                 <Mail className="w-4 h-4" /> Email Us

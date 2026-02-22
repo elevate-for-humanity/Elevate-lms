@@ -6,7 +6,7 @@ import { Search, ArrowRight, HelpCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Help Center | Elevate For Humanity',
-  description: 'Browse our knowledge base for answers to common questions about enrollment, programs, financial aid, and more.',
+  description: 'Browse our knowledge base for answers to common questions about enrollment, programs, funding, and more.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/support/help',
   },

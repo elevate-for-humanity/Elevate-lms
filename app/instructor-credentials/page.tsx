@@ -50,7 +50,7 @@ const PROGRAM_CREDENTIALS = [
       'State-approved nurse aide training instructor certification',
       'Current CPR/BLS certification',
     ],
-    programHolderRole: 'Healthcare Training Manager — coordinates clinical rotation scheduling, student progress tracking, and exam preparation under accredited nursing program oversight.',
+    programHolderRole: 'Healthcare Training Manager — coordinates clinical rotation scheduling, student progress tracking, and exam preparation under nursing program oversight.',
     smeScope: 'Experienced CNAs and healthcare professionals provide supplemental skills practice and patient care mentoring.',
     credentialIssued: 'CNA Certification — issued by Indiana State Department of Health (ISDH)',
     regulatoryBody: 'Indiana State Department of Health (ISDH)',
@@ -71,9 +71,9 @@ const PROGRAM_CREDENTIALS = [
     regulatoryBody: 'FMCSA (Federal Motor Carrier Safety Administration) / Indiana BMV',
   },
   {
-    program: 'HVAC Technician',
+    program: 'Building Technician with HVAC Fundamentals',
     occupation: 'HVAC Installer / Maintenance Technician',
-    credentialPartner: 'DOE-Approved Trade School',
+    credentialPartner: 'Authorized Testing Partner',
     instructorRequirements: [
       'EPA 608 Universal Certification',
       'OSHA 30-Hour Construction Safety certification',
@@ -118,7 +118,7 @@ const PROGRAM_CREDENTIALS = [
   {
     program: 'Welding',
     occupation: 'Welder',
-    credentialPartner: 'AWS-Accredited Testing Facility / DOE-Approved Trade School',
+    credentialPartner: 'AWS-Accredited Testing Facility / Authorized Testing Partner',
     instructorRequirements: [
       'AWS Certified Welder (minimum D1.1 structural)',
       'OSHA 30-Hour Construction Safety certification',
@@ -133,7 +133,7 @@ const PROGRAM_CREDENTIALS = [
   {
     program: 'Electrical',
     occupation: 'Electrician',
-    credentialPartner: 'DOE-Approved Trade School',
+    credentialPartner: 'Authorized Testing Partner',
     instructorRequirements: [
       'Active Indiana Journeyman or Master Electrician license',
       'OSHA 30-Hour Construction Safety certification',

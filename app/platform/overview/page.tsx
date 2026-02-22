@@ -167,7 +167,7 @@ export default async function PlatformLicensingPage() {
                 <div className="flex items-start gap-2">
                   <span className="text-slate-400 flex-shrink-0">•</span>
                   <div>
-                    <div className="font-semibold">Indiana DWD Approved</div>
+                    <div className="font-semibold">Indiana DWD Listed</div>
                     <div className="text-black">INTraining: 10004621</div>
                   </div>
                 </div>

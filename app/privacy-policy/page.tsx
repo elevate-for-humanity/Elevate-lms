@@ -163,7 +163,7 @@ export default function PrivacyPolicyPage() {
                 <li>Process enrollment applications and determine funding eligibility</li>
                 <li>Deliver training programs, track progress, and issue certifications</li>
                 <li>Provide career services including resume assistance and job placement</li>
-                <li>Process tuition payments and financial aid</li>
+                <li>Process tuition payments and workforce funding</li>
                 <li>Prepare and file tax returns (tax preparation clients, governed by separate addendum)</li>
                 <li>Communicate about programs, schedules, and deadlines</li>
                 <li>Comply with WIOA, WRG, JRI, and DOL reporting requirements</li>
@@ -228,7 +228,7 @@ export default function PrivacyPolicyPage() {
                 <li>To school officials with legitimate educational interest</li>
                 <li>To comply with a judicial order or lawfully issued subpoena</li>
                 <li>To authorized representatives for audit or evaluation purposes</li>
-                <li>In connection with financial aid</li>
+                <li>In connection with workforce funding</li>
                 <li>To accrediting organizations</li>
               </ul>
               <p>

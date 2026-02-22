@@ -4,6 +4,7 @@ export const metadata = siteMetadata({
   title: 'Welding Training Program',
   description: 'Welding pathway focused on employability — core welding concepts, safety, and structured training designed for workforce entry and advancement.',
   path: '/programs/welding',
+  keywords: ['welding training', 'welder certification', 'workforce training', 'skilled trades', 'Indiana'],
 });
 
 export default function WeldingLayout({ children }: { children: React.ReactNode }) {

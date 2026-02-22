@@ -114,7 +114,7 @@ export default function StoreCoursesPage() {
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
               <Shield className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Accredited Providers</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Authorized Providers</h3>
               <p className="text-gray-600">
                 All certifications from recognized providers like Certiport, HSI, and CareerSafe.
               </p>

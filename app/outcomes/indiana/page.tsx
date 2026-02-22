@@ -59,7 +59,7 @@ const programOutcomes = [
     region: 'Statewide',
   },
   {
-    program: 'HVAC Technician',
+    program: 'Building Technician with HVAC Fundamentals',
     enrolled: 56,
     completed: 48,
     employed: 44,

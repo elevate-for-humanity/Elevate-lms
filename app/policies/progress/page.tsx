@@ -28,7 +28,7 @@ export default function ProgressPage() {
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Purpose</h2>
             <p className="text-black mb-6">
               This policy establishes standards for Satisfactory Academic Progress (SAP) that students must maintain 
-              to continue enrollment and remain eligible for financial aid. Federal regulations require institutions 
+              to continue enrollment and remain eligible for workforce funding. Training providers are expected 
               to monitor student progress toward program completion.
             </p>
 
@@ -76,7 +76,7 @@ export default function ProgressPage() {
               SAP is evaluated:
             </p>
             <ul className="list-disc pl-6 mb-6 text-black space-y-2">
-              <li>At the end of each payment period (for financial aid)</li>
+              <li>At the end of each payment period (for funded students)</li>
               <li>At mid-program checkpoints</li>
               <li>Upon program completion</li>
               <li>Before re-enrollment in new programs</li>
@@ -116,7 +116,7 @@ export default function ProgressPage() {
                 <li>Within maximum timeframe</li>
               </ul>
               <p className="text-black mt-3">
-                <strong>Status:</strong> Eligible for continued enrollment and financial aid
+                <strong>Status:</strong> Eligible for continued enrollment and workforce funding
               </p>
             </div>
 
@@ -132,7 +132,7 @@ export default function ProgressPage() {
                 <li>One evaluation period to improve</li>
               </ul>
               <p className="text-black mt-3">
-                <strong>Status:</strong> Remains eligible for financial aid during warning period
+                <strong>Status:</strong> Remains eligible for workforce funding during warning period
               </p>
             </div>
 
@@ -149,7 +149,7 @@ export default function ProgressPage() {
                 <li>May have enrollment restrictions</li>
               </ul>
               <p className="text-black mt-3">
-                <strong>Status:</strong> Financial aid eligibility suspended unless appeal approved
+                <strong>Status:</strong> Funding eligibility suspended unless appeal approved
               </p>
             </div>
 
@@ -160,12 +160,12 @@ export default function ProgressPage() {
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li>Dismissed from program</li>
-                <li>Financial aid terminated</li>
+                <li>Workforce funding terminated</li>
                 <li>May reapply after one term</li>
                 <li>Must demonstrate readiness to succeed</li>
               </ul>
               <p className="text-black mt-3">
-                <strong>Status:</strong> Not eligible for enrollment or financial aid
+                <strong>Status:</strong> Not eligible for enrollment or workforce funding
               </p>
             </div>
 
@@ -210,7 +210,7 @@ export default function ProgressPage() {
 
             <h3 className="text-xl font-bold text-black mt-6 mb-3">Appeal Outcomes</h3>
             <ul className="list-disc pl-6 mb-6 text-black space-y-2">
-              <li><strong>Approved:</strong> Placed on probation with academic plan; financial aid reinstated</li>
+              <li><strong>Approved:</strong> Placed on probation with academic plan; funding eligibility reinstated</li>
               <li><strong>Denied:</strong> Dismissal stands; may reapply after one term</li>
               <li><strong>Conditional:</strong> Additional requirements or restrictions imposed</li>
             </ul>
@@ -261,19 +261,21 @@ export default function ProgressPage() {
               program. Consult with registrar before changing programs.
             </p>
 
-            <h2 className="text-2xl font-bold text-black mt-8 mb-4">Financial Aid Impact</h2>
+            <h2 className="text-2xl font-bold text-black mt-8 mb-4">Funding Impact</h2>
             
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-6">
-              <h3 className="text-lg font-bold text-black mb-3">SAP and Financial Aid</h3>
+              <h3 className="text-lg font-bold text-black mb-3">SAP and Workforce Funding</h3>
               <p className="text-black mb-4">
-                Federal regulations require financial aid recipients to maintain SAP:
+                Workforce funding sources (WIOA, WRG, employer sponsorships) may require students to maintain SAP:
               </p>
               <ul className="list-disc pl-6 text-black space-y-2">
-                <li>Failure to meet SAP results in loss of federal aid</li>
-                <li>Includes Pell Grants, student loans, work-study</li>
-                <li>Also affects state and institutional aid</li>
-                <li>Aid can be reinstated after meeting SAP or successful appeal</li>
+                <li>Failure to meet SAP may result in loss of workforce funding eligibility</li>
+                <li>Applies to WIOA, Workforce Ready Grant, and other funding sources</li>
+                <li>Funding eligibility can be reinstated after meeting SAP or successful appeal</li>
               </ul>
+              <p className="text-black mt-4 text-sm">
+                <strong>Note:</strong> Federal financial aid (FAFSA, Pell Grants, federal loans) is not currently offered at this institution.
+              </p>
             </div>
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Reinstatement</h2>

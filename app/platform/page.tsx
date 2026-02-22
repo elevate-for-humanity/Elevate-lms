@@ -36,7 +36,7 @@ const pipelineSteps = [
 ];
 
 const audiences = [
-  { icon: GraduationCap, title: 'Training Providers', desc: 'Deliver accredited programs with built-in compliance and credential issuance.', href: '/platform/training-providers' },
+  { icon: GraduationCap, title: 'Training Providers', desc: 'Deliver industry-aligned programs with built-in compliance and credential issuance.', href: '/platform/training-providers' },
   { icon: Briefcase, title: 'Employers', desc: 'Access trained candidates, manage apprenticeships, track workforce pipelines.', href: '/platform/employer-portal' },
   { icon: Building2, title: 'Workforce Boards', desc: 'WIOA reporting, outcome dashboards, multi-provider oversight.', href: '/platform/workforce-boards' },
   { icon: Users, title: 'Partners & Nonprofits', desc: 'Plug into shared infrastructure for funded training delivery.', href: '/platform/partners' },

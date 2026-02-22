@@ -152,26 +152,36 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Course Header */}
-      <div className="bg-slate-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-12">
+      {/* Course Header — image hero */}
+      <div className="relative text-white">
+        <div className="absolute inset-0">
+          <Image
+            src={course.thumbnail_url || '/images/programs-hq/training-classroom.jpg'}
+            alt={course.course_name}
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/45 to-slate-900/25" />
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 py-12">
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <nav className="flex items-center gap-2 text-brand-blue-200 text-sm mb-4">
-                <Link href="/lms/dashboard" className="hover:text-white">Dashboard</Link>
+              <nav className="flex items-center gap-2 text-white/70 text-sm mb-4">
+                <Link href="/lms/dashboard" className="hover:text-white transition">Dashboard</Link>
                 <ChevronRight className="w-4 h-4" />
-                <Link href="/lms/courses" className="hover:text-white">Courses</Link>
+                <Link href="/lms/courses" className="hover:text-white transition">Courses</Link>
                 <ChevronRight className="w-4 h-4" />
                 <span className="text-white">{course.course_name}</span>
               </nav>
 
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">{course.course_name}</h1>
+              <h1 className="text-3xl md:text-4xl font-black mb-4 drop-shadow-lg">{course.course_name}</h1>
               
               {course.description && (
-                <p className="text-brand-blue-100 text-lg mb-6">{course.description}</p>
+                <p className="text-white/85 text-lg mb-6 drop-shadow max-w-xl">{course.description}</p>
               )}
 
-              <div className="flex flex-wrap items-center gap-6 text-sm">
+              <div className="flex flex-wrap items-center gap-6 text-sm text-white/90">
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-5 h-5" />
                   <span>{typedLessons.length} Lessons</span>
@@ -237,8 +247,8 @@ export default async function CoursePage({ params }: { params: Params }) {
                       {completedLessons > 0 ? 'Continue Learning' : 'Start Course'}
                     </Link>
                   ) : (
-                    <div className="text-center py-3 bg-brand-green-100 text-brand-green-800 rounded-xl font-semibold">
-                      <span className="text-slate-400 flex-shrink-0">•</span>
+                    <div className="flex items-center justify-center gap-2 py-3 bg-brand-green-100 text-brand-green-800 rounded-xl font-semibold">
+                      <span className="w-3 h-3 rounded-full bg-brand-green-500 inline-block" />
                       Course Completed!
                     </div>
                   )}
@@ -261,31 +271,52 @@ export default async function CoursePage({ params }: { params: Params }) {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Lessons List */}
           <div className="lg:col-span-2">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Course Content</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-slate-900">Course Content</h2>
+              {enrollment && typedLessons.length > 0 && (
+                <span className="text-sm text-slate-500">
+                  {completedLessons} of {typedLessons.length} completed
+                </span>
+              )}
+            </div>
+
+            {/* Progress bar for enrolled students */}
+            {enrollment && typedLessons.length > 0 && (
+              <div className="mb-4">
+                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
+                    style={{ width: `${progressPercentage}%` }}
+                  />
+                </div>
+              </div>
+            )}
             
             {typedLessons.length > 0 ? (
               <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
                 {typedLessons.map((lesson, index) => {
                   const progress = progressMap.get(lesson.id);
                   const isCompleted = progress?.completed;
-                  const isLocked = !enrollment && index > 0;
+                  // Lock if not enrolled, OR if enrolled but previous lesson not done (sequential)
+                  const previousDone = index === 0 || progressMap.get(typedLessons[index - 1]?.id)?.completed;
+                  const isLocked = (!enrollment && index > 0) || (enrollment && !isCompleted && !previousDone);
 
                   return (
                     <div
                       key={lesson.id}
                       className={`border-b border-slate-100 last:border-b-0 ${
-                        isLocked ? 'opacity-60' : ''
+                        isLocked ? 'opacity-50' : ''
                       }`}
                     >
                       {isLocked ? (
-                        <div className="flex items-center gap-4 p-4">
+                        <div className="flex items-center gap-4 p-4 cursor-not-allowed" title="Complete the previous lesson first">
                           <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
                             <Lock className="w-5 h-5 text-slate-400" />
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-medium text-slate-900">{lesson.title}</h3>
+                            <h3 className="font-medium text-slate-400">{lesson.title}</h3>
                             {lesson.duration_minutes && (
-                              <p className="text-sm text-slate-500">{lesson.duration_minutes} min</p>
+                              <p className="text-sm text-slate-400">{lesson.duration_minutes} min</p>
                             )}
                           </div>
                         </div>
@@ -296,11 +327,11 @@ export default async function CoursePage({ params }: { params: Params }) {
                         >
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                             isCompleted
-                              ? 'bg-brand-green-100 text-brand-green-600'
+                              ? 'bg-brand-green-100'
                               : 'bg-brand-blue-100 text-brand-blue-600'
                           }`}>
                             {isCompleted ? (
-                              <span className="text-slate-400 flex-shrink-0">•</span>
+                              <span className="w-3.5 h-3.5 rounded-full bg-brand-green-500 inline-block" />
                             ) : lesson.content_type === 'video' ? (
                               <Video className="w-5 h-5" />
                             ) : (
@@ -308,13 +339,19 @@ export default async function CoursePage({ params }: { params: Params }) {
                             )}
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-medium text-slate-900">{lesson.title}</h3>
+                            <h3 className={`font-medium ${isCompleted ? 'text-brand-green-800' : 'text-slate-900'}`}>{lesson.title}</h3>
                             <div className="flex items-center gap-3 text-sm text-slate-500">
-                              {lesson.duration_minutes && (
-                                <span>{lesson.duration_minutes} min</span>
-                              )}
-                              {lesson.content_type && (
-                                <span className="capitalize">{lesson.content_type}</span>
+                              {isCompleted ? (
+                                <span className="text-brand-green-600 font-medium">Completed</span>
+                              ) : (
+                                <>
+                                  {lesson.duration_minutes && (
+                                    <span>{lesson.duration_minutes} min</span>
+                                  )}
+                                  {lesson.content_type && (
+                                    <span className="capitalize">{lesson.content_type}</span>
+                                  )}
+                                </>
                               )}
                             </div>
                           </div>

@@ -43,7 +43,7 @@ const industries = [
     icon: Wrench,
     description:
       'Learn hands-on skills in HVAC, welding, electrical, plumbing, and construction trades.',
-    programs: ['HVAC Technician', 'Welding', 'Electrical', 'Plumbing'],
+    programs: ['Building Technician', 'Welding', 'Electrical', 'Plumbing'],
     href: '/programs/skilled-trades',
   },
   {

@@ -47,7 +47,7 @@ const industries = [
   },
   {
     name: 'Skilled Trades',
-    roles: ['HVAC Technician', 'Electrician', 'Plumber', 'Welder'],
+    roles: ['Building Technician', 'Electrician', 'Plumber', 'Welder'],
     icon: '🔧',
   },
   {

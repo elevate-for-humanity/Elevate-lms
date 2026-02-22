@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
                 Career & Technical Institute
               </p>
               <p style="color: #6b7280; font-size: 12px; margin: 0 0 5px 0;">
-                ETPL Approved Provider • DOL Registered Apprenticeship Sponsor
+                ETPL Listed Provider • WIOA Eligible Training Provider
               </p>
               <p style="color: #6b7280; font-size: 12px; margin: 0 0 15px 0;">
                 <a href="tel:+13173143757" style="color: #2563eb; text-decoration: none;">(317) 314-3757</a> •

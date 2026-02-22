@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ProgressDashboard } from '@/components/ProgressDashboard';
 import { ProgressTrackingDashboard } from '@/components/ProgressTrackingDashboard';
+import { LmsHeroBanner } from '@/components/lms/LmsHeroBanner';
 import { 
   TrendingUp, 
   Clock, 
@@ -175,13 +176,13 @@ export default async function ProgressPage() {
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Progress" }]} />
         </div>
       <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">My Progress</h1>
-          <p className="text-slate-600 mt-1">
-            Track your learning journey and achievements
-          </p>
-        </div>
+        <LmsHeroBanner
+          title="My Progress"
+          subtitle={`${stats.completedLessons} lessons completed across ${stats.totalCourses} courses. ${overallProgress}% overall completion.`}
+          image="/images/heroes-hq/how-it-works-hero.jpg"
+          eyebrow="Learning Analytics"
+          cta={{ label: 'Continue Learning', href: '/lms/courses' }}
+        />
 
         {/* Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">

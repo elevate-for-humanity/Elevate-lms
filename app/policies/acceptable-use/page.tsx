@@ -73,7 +73,7 @@ export default function AcceptableUsePage() {
               <li>Accessing student records and account information</li>
               <li>Submitting required documentation and forms</li>
               <li>Communicating with administrative staff</li>
-              <li>Managing enrollment and financial aid</li>
+              <li>Managing enrollment and workforce funding</li>
               <li>Scheduling appointments and services</li>
             </ul>
 

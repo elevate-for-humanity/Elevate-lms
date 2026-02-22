@@ -162,7 +162,7 @@ export default async function LowIncomePage() {
                 <li>• SNAP/Food stamps</li>
                 <li>• Housing assistance</li>
                 <li>• One-time payments</li>
-                <li>• Student financial aid</li>
+                <li>• Student workforce funding</li>
                 <li>• Tax refunds</li>
                 <li>• Gifts</li>
               </ul>

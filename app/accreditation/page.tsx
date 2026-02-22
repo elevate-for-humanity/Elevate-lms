@@ -1,6 +1,4 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -9,140 +7,116 @@ import {
   FileCheck,
   Building2,
   ExternalLink,
-CheckCircle, } from 'lucide-react';
+  CheckCircle,
+} from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/accreditation',
   },
-  title:
-    'Accreditation & Approvals | DOL, DWD, DOE Approved Training Provider | Elevate For Humanity',
+  title: 'Approvals & Credentials | Elevate for Humanity',
   description:
-    'Officially approved by U.S. Department of Labor (DOL), Indiana Department of Workforce Development (DWD), Indiana Department of Education (DOE), WIOA eligible, WRG approved, JRI partner. Registered Apprenticeship Sponsor RAPIDS ID: 2025-IN-132301. INTraining Location ID: 10004621.',
+    'Elevate for Humanity is a workforce training provider offering industry-aligned certification programs. Learn about our approvals, credentials, and authorized testing site status.',
   keywords:
-    'DOL approved training, DWD approved, DOE approved, WIOA eligible training provider, WRG approved programs, registered apprenticeship sponsor, Indiana workforce development, accredited training Indiana, state approved training, federal approved training',
+    'workforce training provider, EPA 608 testing site, WIOA eligible, Indiana workforce development, industry certification training',
 };
 
-export const dynamic = 'force-dynamic';
-
-export default async function AccreditationPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Get accreditations
-  const { data: accreditations } = await db
-    .from('accreditations')
-    .select('*')
-    .eq('is_active', true)
-    .order('order', { ascending: true });
-
-  // Get certifications
-  const { data: certifications } = await db
-    .from('certifications')
-    .select('*')
-    .eq('type', 'organizational')
-    .eq('is_active', true);
-
-  // Get approved programs
-  const { data: approvedPrograms } = await db
-    .from('programs')
-    .select('id, name, slug, accreditation_status')
-    .eq('is_active', true)
-    .not('accreditation_status', 'is', null)
-    .limit(10);
-
-  const defaultAccreditations = [
+export default function AccreditationPage() {
+  const credentials = [
     {
-      name: 'U.S. Department of Labor (DOL)',
-      description: 'Registered Apprenticeship Sponsor',
-      id_number: 'RAPIDS ID: 2025-IN-132301',
+      name: 'EPA Section 608 Approved Testing Site',
+      description:
+        'Authorized to administer proctored EPA Section 608 refrigerant handling certification examinations.',
       icon: Shield,
     },
     {
-      name: 'Indiana Department of Workforce Development (DWD)',
-      description: 'Approved Training Provider',
+      name: 'WIOA Eligible Training Provider',
+      description:
+        'Listed on the Eligible Training Provider List (ETPL) for Workforce Innovation and Opportunity Act funding.',
+      icon: FileCheck,
+    },
+    {
+      name: 'Indiana DWD Training Provider',
+      description:
+        'Recognized by the Indiana Department of Workforce Development as a training provider.',
       id_number: 'INTraining Location ID: 10004621',
       icon: Building2,
     },
     {
-      name: 'Indiana Department of Education (DOE)',
-      description: 'Approved Postsecondary Proprietary Educational Institution',
-      id_number: null,
+      name: '501(c)(3) Nonprofit Organization',
+      description:
+        'Registered nonprofit focused on workforce development and career training access.',
       icon: Award,
     },
     {
-      name: 'WIOA Eligible',
-      description: 'Workforce Innovation and Opportunity Act approved provider',
-      id_number: null,
-      icon: FileCheck,
-    },
-    {
-      name: 'WRG Approved',
-      description: 'Workforce Ready Grant eligible programs',
-      id_number: null,
+      name: 'OSHA Safety Training',
+      description:
+        'Programs include OSHA safety certification preparation as part of the training curriculum.',
       icon: CheckCircle,
     },
-    {
-      name: 'JRI Partner',
-      description: 'Justice Reinvestment Initiative training partner',
-      id_number: null,
-      icon: Shield,
-    },
   ];
-
-  const displayAccreditations = accreditations && accreditations.length > 0 
-    ? accreditations 
-    : defaultAccreditations;
 
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Accreditation' }]} />
+          <Breadcrumbs items={[{ label: 'Approvals & Credentials' }]} />
         </div>
       </div>
 
-      {/* Hero Section */}
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/hero/hero-certifications.jpg" alt="Accredited Training Facility" fill className="object-cover" priority sizes="100vw" />
-        </div>
-        <div className="bg-slate-900 py-10">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Accreditation & Approvals</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Officially recognized by federal and state agencies for workforce training excellence</p>
+          <Image
+            src="/images/heroes-hq/success-stories-hero.jpg"
+            alt="Workforce training classroom"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/60 via-slate-900/35 to-transparent" />
+          <div className="absolute inset-0 flex items-center">
+            <div className="max-w-5xl mx-auto px-4">
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg">
+                Approvals &amp; Credentials
+              </h1>
+              <p className="text-lg text-white/85 max-w-2xl drop-shadow">
+                Industry-aligned workforce training with authorized certification testing
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Accreditations Grid */}
+      {/* Credentials Grid */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Our Accreditations</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">
+            Our Credentials
+          </h2>
+          <p className="text-center text-gray-600 max-w-2xl mx-auto mb-12">
+            Elevate for Humanity Training Center is a workforce training provider
+            offering industry-recognized certification programs aligned with
+            employer demand and workforce standards.
+          </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayAccreditations.map((accred: any, index: number) => {
-              const Icon = accred.icon || Award;
+            {credentials.map((cred, index) => {
+              const Icon = cred.icon;
               return (
-                <div key={index} className="bg-white rounded-xl shadow-sm border p-6">
+                <div
+                  key={index}
+                  className="bg-white rounded-xl shadow-sm border p-6"
+                >
                   <Icon className="w-10 h-10 text-brand-blue-600 mb-4" />
-                  <h3 className="font-bold text-lg mb-2">{accred.name}</h3>
-                  <p className="text-gray-600 mb-2">{accred.description}</p>
-                  {accred.id_number && (
-                    <p className="text-sm text-brand-blue-600 font-mono">{accred.id_number}</p>
+                  <h3 className="font-bold text-lg mb-2">{cred.name}</h3>
+                  <p className="text-gray-600 mb-2">{cred.description}</p>
+                  {cred.id_number && (
+                    <p className="text-sm text-brand-blue-600 font-mono">
+                      {cred.id_number}
+                    </p>
                   )}
                 </div>
               );
@@ -154,45 +128,43 @@ export default async function AccreditationPage() {
       {/* What This Means */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">What This Means for You</h2>
+          <h2 className="text-3xl font-bold text-center mb-8">
+            What This Means for Students
+          </h2>
           <div className="space-y-6">
             <div className="flex items-start gap-4">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="w-3 h-3 rounded-full bg-brand-green-500 mt-2 flex-shrink-0" />
               <div>
-                <h3 className="font-bold text-lg">Quality Assurance</h3>
+                <h3 className="font-bold text-lg">
+                  Industry-Recognized Certifications
+                </h3>
                 <p className="text-gray-600">
-                  Our programs meet rigorous federal and state standards for curriculum, 
-                  instruction, and student outcomes.
+                  Students receive preparation and authorized proctored testing
+                  access for credentials including EPA Section 608 and OSHA
+                  safety certifications.
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="w-3 h-3 rounded-full bg-brand-green-500 mt-2 flex-shrink-0" />
               <div>
-                <h3 className="font-bold text-lg">Funding Eligibility</h3>
+                <h3 className="font-bold text-lg">Workforce Funding Access</h3>
                 <p className="text-gray-600">
-                  Eligible students may use WIOA, WRG, JRI, and other funding sources to cover 
-                  training costs.
+                  Eligible students may use WIOA, Workforce Ready Grant (WRG),
+                  or other workforce funding sources to cover training costs.
+                  Federal financial aid (FAFSA, Pell Grants, federal loans) is
+                  not currently offered.
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <span className="w-3 h-3 rounded-full bg-brand-green-500 mt-2 flex-shrink-0" />
               <div>
-                <h3 className="font-bold text-lg">Employer Recognition</h3>
+                <h3 className="font-bold text-lg">Employer-Aligned Training</h3>
                 <p className="text-gray-600">
-                  Employers trust credentials from accredited providers, improving your 
-                  job prospects after graduation.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <span className="text-slate-400 flex-shrink-0">•</span>
-              <div>
-                <h3 className="font-bold text-lg">Transferable Credits</h3>
-                <p className="text-gray-600">
-                  Apprenticeship hours and certifications are recognized across Indiana 
-                  and nationally.
+                  Programs are designed around real workforce pathways and
+                  employer demand in facilities maintenance, building operations,
+                  and technical support roles.
                 </p>
               </div>
             </div>
@@ -200,49 +172,43 @@ export default async function AccreditationPage() {
         </div>
       </section>
 
-      {/* Approved Programs */}
-      {approvedPrograms && approvedPrograms.length > 0 && (
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-6xl mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-8">Approved Programs</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {approvedPrograms.map((program: any) => (
-                <Link
-                  key={program.id}
-                  href={`/programs/${program.slug || program.id}`}
-                  className="bg-white rounded-lg p-4 border hover:shadow-md transition flex items-center justify-between"
-                >
-                  <span className="font-medium">{program.name}</span>
-                  <span className="text-slate-400 flex-shrink-0">•</span>
-                </Link>
-              ))}
-            </div>
-            <div className="text-center mt-8">
-              <Link
-                href="/programs"
-                className="text-brand-blue-600 font-medium hover:underline"
-              >
-                View all programs →
-              </Link>
-            </div>
+      {/* Important Disclosure */}
+      <section className="py-12 bg-slate-50 border-y">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-xl font-bold mb-4">Important Information</h2>
+          <div className="space-y-3 text-gray-600 text-sm">
+            <p>
+              Elevate for Humanity Training Center is a workforce training
+              provider offering industry-recognized certification programs.
+              Programs are not institutionally accredited degree programs. They
+              are aligned with industry certification standards and include
+              access to authorized proctored certification examinations such as
+              EPA Section 608.
+            </p>
+            <p>
+              Certification outcomes are issued by the respective certifying
+              organizations upon successful completion of required examinations.
+              Elevate for Humanity Training Center provides training,
+              preparation, and authorized proctored testing access but does not
+              independently issue federal or state licenses.
+            </p>
+            <p>
+              Financial aid through federal student aid (FAFSA, Pell Grants, and
+              federal loans) is not currently offered. Students may utilize
+              workforce funding programs, grants, employer sponsorships, or
+              self-pay enrollment options where eligible.
+            </p>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* Verification Links */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center mb-8">Verify Our Credentials</h2>
+          <h2 className="text-2xl font-bold text-center mb-8">
+            Verify Our Credentials
+          </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <a
-              href="https://www.apprenticeship.gov/partner-finder"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
-            >
-              <span>DOL Apprenticeship Partner Finder</span>
-              <ExternalLink className="w-5 h-5 text-gray-400" />
-            </a>
             <a
               href="https://intraining.dwd.in.gov/"
               target="_blank"
@@ -250,6 +216,15 @@ export default async function AccreditationPage() {
               className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
             >
               <span>Indiana INTraining Provider Search</span>
+              <ExternalLink className="w-5 h-5 text-gray-400" />
+            </a>
+            <a
+              href="https://www.epa.gov/section608"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+            >
+              <span>EPA Section 608 Information</span>
               <ExternalLink className="w-5 h-5 text-gray-400" />
             </a>
           </div>
@@ -263,7 +238,8 @@ export default async function AccreditationPage() {
             Ready to Start Your Training?
           </h2>
           <p className="text-brand-blue-100 mb-8">
-            Enroll in an accredited program and qualify for free training through WIOA funding.
+            Explore workforce training programs and check your eligibility for
+            funded training options.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

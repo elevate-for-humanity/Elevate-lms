@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, Phone, Mail } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Application Submitted | HVAC Technician Program',
+  title: 'Application Submitted | Building Technician with HVAC Fundamentals',
   robots: 'noindex',
 };
 

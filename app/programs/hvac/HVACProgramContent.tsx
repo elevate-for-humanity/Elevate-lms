@@ -23,11 +23,11 @@ export default function HVACProgramContent() {
     },
     {
       question: "How long is the program?",
-      answer: "400 hours total. That includes classroom instruction, self-paced online coursework, hands-on lab time, and supervised visits to real HVAC job sites where you'll observe technicians and meet hiring managers. Flexible scheduling is available — day and evening options."
+      answer: "400 hours total. That includes classroom instruction, self-paced online coursework, and hands-on lab time working with real HVAC equipment. Flexible scheduling is available — day and evening options."
     },
     {
-      question: "Is this program free?",
-      answer: "It can be. If you qualify for WIOA (a federal workforce training program), your tuition, books, and supplies are fully covered — you pay nothing. We help you check eligibility and handle the paperwork. If you don't qualify for funding, self-pay and payment plan options are available."
+      question: "How much does this program cost?",
+      answer: "If you are referred through WorkOne and qualify for WIOA or Workforce Ready Grant funding, your tuition may be fully covered. Start at indianacareerconnect.com to register, then visit your local WorkOne office — they determine eligibility and issue the funding. If you are not using workforce funding, self-pay tuition is $5,000 with weekly payment plans available."
     },
     {
       question: "What certifications do I get?",
@@ -40,10 +40,6 @@ export default function HVACProgramContent() {
     {
       question: "Can I work while in the program?",
       answer: "Yes. Flexible scheduling is available with day and evening options, and the online coursework is self-paced, so most students keep their current job while training. The program is designed for working adults."
-    },
-    {
-      question: "What does 'employer site days' mean?",
-      answer: "Six times during the program, you'll visit real HVAC contractor job sites with your instructor. You'll observe installations, service calls, and equipment repairs. You'll meet the people who hire HVAC technicians. These visits are documented and go into your apprenticeship application portfolio."
     },
     {
       question: "What happens after I graduate?",
@@ -59,7 +55,7 @@ export default function HVACProgramContent() {
           <Breadcrumbs items={[
             { label: 'Programs', href: '/programs' },
             { label: 'Skilled Trades', href: '/programs/skilled-trades' },
-            { label: 'HVAC Technician' }
+            { label: 'Building Technician with HVAC Fundamentals' }
           ]} />
         </div>
       </div>
@@ -75,6 +71,72 @@ export default function HVACProgramContent() {
           quality={90} className="object-cover"
           priority
         />
+
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
+
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-24 w-full">
+          <div className="max-w-2xl">
+            <FundingBadge type="funded" />
+
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mt-6 mb-6 leading-tight">
+              HVAC Technician Training<br />
+              <span className="text-green-300">EPA 608 Certification</span>
+            </h1>
+
+            <p className="text-xl text-gray-200 mb-4 leading-relaxed">
+              400-hour program covering HVAC fundamentals, refrigerant handling, and hands-on
+              employer site experience. Graduate with your EPA 608 Certification,
+              OSHA 30, and the credentials employers require.
+            </p>
+
+            <p className="text-lg text-green-300 font-semibold mb-8">
+              Tuition may be covered through WIOA or Workforce Ready Grant for eligible students referred by WorkOne. Self-pay and payment plans also available.
+            </p>
+
+            <div className="flex flex-wrap gap-4 mb-8 text-sm text-gray-300">
+              <span className="flex items-center gap-2 bg-green-500/20 backdrop-blur px-4 py-2 rounded-full text-green-300 font-semibold border border-green-400/30">
+                <Award className="w-4 h-4" /> EPA 608 Certification
+              </span>
+              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
+                <Clock className="w-4 h-4" /> 400 Hours
+              </span>
+              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
+                <Calendar className="w-4 h-4" /> Flexible Scheduling
+              </span>
+              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
+                <TrendingUp className="w-4 h-4" /> 4-Star Indiana Top Job
+              </span>
+              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
+                <DollarSign className="w-4 h-4" /> $48K Avg Starting Salary
+              </span>
+            </div>
+
+            <Link
+              href="/apply?program=hvac-technician"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-500 text-white font-bold rounded-full transition-all shadow-lg text-lg mb-4"
+            >
+              Apply
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Link>
+
+            <div className="bg-yellow-500/20 border border-yellow-400/40 rounded-lg px-4 py-3 max-w-xl mb-4">
+              <p className="text-sm text-yellow-100 font-semibold">
+                Do not proceed with enrollment until you have completed WorkOne verification.{' '}
+                <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="text-white underline hover:text-yellow-200">
+                  Start at indianacareerconnect.com
+                </a>
+              </p>
+            </div>
+
+            <Link
+              href="/programs/hvac-technician/apply"
+              className="inline-flex items-center justify-center px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
+            >
+              Enroll in Program
+            </Link>
+          </div>
+        </div>
+
       </section>
 
       {/* What You'll Actually Do — image cards */}
@@ -113,17 +175,18 @@ export default function HVACProgramContent() {
               <div className="relative h-56">
                 <Image
                   src="/images/trades/program-hvac-overview.jpg"
-                  alt="HVAC apprentice observing a technician on a job site"
+                  alt="Hands-on HVAC lab training with real equipment"
                   fill
                   quality={90} className="object-cover"
                 />
               </div>
               <div className="p-6">
-                <div className="text-3xl font-bold text-yellow-600 mb-1">36 Hours</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Real Job Sites</h3>
+                <div className="text-3xl font-bold text-yellow-600 mb-1">292 Hours</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Hands-On Lab</h3>
                 <p className="text-gray-600">
-                  Six supervised visits to HVAC contractor sites. Watch real installations
-                  and service calls. Meet hiring managers. All hours documented for your portfolio.
+                  Work with real HVAC equipment — furnaces, condensers, refrigerant systems,
+                  and electrical components. Practice installation, troubleshooting, and repair
+                  under instructor supervision.
                 </p>
               </div>
             </div>
@@ -131,7 +194,7 @@ export default function HVACProgramContent() {
             <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
               <div className="relative h-56">
                 <Image
-                  src="/images/programs/hvac-hero.jpg"
+                  src="/images/programs-hq/technology-hero.jpg"
                   alt="Student completing HVAC coursework online at their own pace"
                   fill
                   quality={90} className="object-cover"
@@ -163,41 +226,48 @@ export default function HVACProgramContent() {
           </div>
 
           <div className="space-y-6">
+            {/* Step 1 */}
+            <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="flex flex-col md:flex-row gap-6 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
+              <div className="relative w-full md:w-72 h-48 md:h-auto flex-shrink-0">
+                <Image src="/images/programs-hq/training-classroom.jpg" alt="Student meeting with a workforce advisor" fill quality={90} className="object-cover" />
+              </div>
+              <div className="p-6 flex-1">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">1</span>
+                  <h3 className="text-xl font-bold text-gray-900">Choose your path</h3>
+                </div>
+                <p className="text-gray-600 leading-relaxed">
+                  Using workforce funding (WIOA/WRG)? Start at{' '}
+                  <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 font-semibold underline hover:text-brand-blue-800">
+                    indianacareerconnect.com
+                  </a>{' '}
+                  to register with WorkOne — they determine your eligibility and refer you to our program. Self-pay? Skip to step 2.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Steps 2-4 */}
             {[
               {
-                step: 1,
-                title: "Fill out the application",
-                description: "Click \"Apply Now\" on this page. You'll fill out a short form with your name, contact info, and which program you want. It takes about 5 minutes. No account needed.",
-                image: "/images/hvac-hero.jpg",
-                alt: "Student filling out an application form"
-              },
-              {
                 step: 2,
-                title: "We create your student account",
-                description: "As soon as you submit, we automatically create your account and send you an email. You'll set your own password using the link in that email.",
-                image: "/images/programs-hq/training-classroom.jpg",
-                alt: "Student receiving account setup confirmation"
+                title: "Apply or enroll",
+                description: "Funded students: click \"Apply Now\" and submit a short application. We'll coordinate with WorkOne to confirm your funding. Self-pay students: click \"Enroll & Pay\" to register and choose a payment option.",
+                image: "/images/trades/program-hvac-technician.jpg",
+                alt: "Student completing enrollment application"
               },
               {
                 step: 3,
-                title: "Complete your onboarding",
-                description: "Log in and you'll see a simple checklist: upload your photo ID, sign the student agreement, and watch a 10-minute orientation video. That's it.",
-                image: "/images/skilled-trades-vibrant.jpg",
-                alt: "Student completing onboarding checklist on laptop"
+                title: "Complete onboarding",
+                description: "Upload your photo ID, sign the student agreement, and complete a short orientation. Your account and login credentials are created during this step.",
+                image: "/images/trades/program-hvac-overview.jpg",
+                alt: "Student completing onboarding on laptop"
               },
               {
                 step: 4,
-                title: "We check your funding eligibility",
-                description: "We'll determine if you qualify for WIOA or other workforce funding that covers your tuition. We handle the paperwork and coordinate with the workforce office on your behalf. You don't need to register anywhere else.",
-                image: "/images/trades/program-hvac-technician.jpg",
-                alt: "Advisor reviewing funding eligibility with a student"
-              },
-              {
-                step: 5,
                 title: "Start class",
-                description: "Once onboarding is complete and funding is confirmed, you're enrolled. You'll get your class schedule, access to the online learning platform, and everything you need to begin.",
-                image: "/images/hvac-technician-success.jpg",
-                alt: "HVAC student in class with tools and equipment"
+                description: "Once onboarding and funding are confirmed, you're in. You'll get your class schedule, access to the learning platform, and everything you need to begin training.",
+                image: "/images/programs-hq/hvac-technician.jpg",
+                alt: "HVAC students in hands-on training lab"
               }
             ].map((item) => (
               <motion.div
@@ -223,15 +293,23 @@ export default function HVACProgramContent() {
             ))}
           </div>
 
-          <div className="text-center mt-10">
+          <div className="mt-10 flex flex-col items-center gap-4">
             <Link
               href="/apply?program=hvac-technician"
               className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
             >
-              Start Your Application
+              Apply
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
-            <p className="text-sm text-gray-500 mt-3">Takes about 5 minutes. No payment required.</p>
+            <p className="text-sm text-amber-700 font-semibold bg-amber-50 border border-amber-200 rounded-lg px-4 py-2">
+              Do not proceed with enrollment until you have completed WorkOne verification.
+            </p>
+            <Link
+              href="/programs/hvac-technician/apply"
+              className="inline-flex items-center justify-center px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
+            >
+              Enroll in Program
+            </Link>
           </div>
         </div>
       </section>
@@ -252,7 +330,7 @@ export default function HVACProgramContent() {
           <div className="rounded-2xl border-2 border-brand-blue-200 bg-brand-blue-50/30 overflow-hidden mb-8">
             <div className="grid lg:grid-cols-2 gap-0">
               <div className="relative h-64 lg:h-auto">
-                <Image src="/images/efh/programs/trades.jpg" alt="EPA Section 608 certification preparation and proctored exam" fill quality={90} className="object-cover" />
+                <Image src="/images/trades/program-hvac-technician.jpg" alt="EPA Section 608 certification preparation and proctored exam" fill quality={90} className="object-cover" />
               </div>
               <div className="p-8">
                 <div className="flex items-center gap-2 mb-3">
@@ -289,7 +367,7 @@ export default function HVACProgramContent() {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
               <div className="relative h-48">
-                <Image src="/images/courses/hvac-technician-10002289-cover.jpg" alt="OSHA 30 safety certification training" fill quality={90} className="object-cover" />
+                <Image src="/images/trades/program-construction-training.jpg" alt="OSHA 30 safety certification training" fill quality={90} className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -305,7 +383,7 @@ export default function HVACProgramContent() {
 
             <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
               <div className="relative h-48">
-                <Image src="/images/programs/building-technician-hero.jpg" alt="Program completion certificate and apprenticeship portfolio" fill quality={90} className="object-cover" />
+                <Image src="/images/trades/program-building-technology.jpg" alt="Program completion certificate and training portfolio" fill quality={90} className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -326,15 +404,15 @@ export default function HVACProgramContent() {
       <section className="py-8 bg-brand-red-600">
         <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-white text-center sm:text-left">
-            <p className="font-bold text-lg">Ready to apply? It takes 5 minutes.</p>
-            <p className="text-white/80 text-sm">No payment required. We check your funding eligibility for you.</p>
+            <p className="font-bold text-lg">Ready to get started?</p>
+            <p className="text-yellow-200 text-sm font-semibold">Do not enroll until you have completed WorkOne verification.</p>
           </div>
           <div className="flex gap-3">
             <Link href="/apply?program=hvac-technician" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-full hover:bg-brand-red-50 transition-colors whitespace-nowrap">
-              Apply Now
+              Apply
             </Link>
-            <Link href="/contact?program=hvac-technician&subject=programs" className="bg-white/20 text-white font-bold px-6 py-3 rounded-full hover:bg-white/30 transition-colors whitespace-nowrap border border-white/40">
-              Ask a Question
+            <Link href="/programs/hvac-technician/apply" className="bg-green-500 text-white font-bold px-6 py-3 rounded-full hover:bg-green-400 transition-colors whitespace-nowrap">
+              Enroll in Program
             </Link>
           </div>
         </div>
@@ -390,7 +468,7 @@ export default function HVACProgramContent() {
           <div className="mt-8 bg-slate-50 rounded-xl border border-slate-200 p-6">
             <div className="grid sm:grid-cols-3 gap-6 text-center">
               <div>
-                <div className="text-2xl font-bold text-gray-900">Free</div>
+                <div className="text-2xl font-bold text-gray-900">Included</div>
                 <p className="text-sm text-gray-600 mt-1">Study kits provided to every student</p>
               </div>
               <div>
@@ -443,21 +521,21 @@ export default function HVACProgramContent() {
                 role: "HVAC Service Technician",
                 salary: "$40,000 – $55,000/year",
                 description: "Diagnose and repair heating and cooling systems in homes and businesses. Year-round demand — busy in summer and winter.",
-                image: "/images/heroes/programs-trades.jpg",
+                image: "/images/trades/hero-program-hvac.jpg",
                 alt: "HVAC service technician repairing a residential unit"
               },
               {
                 role: "Installation Specialist",
                 salary: "$42,000 – $58,000/year",
                 description: "Install new HVAC systems in homes and commercial buildings. Strong growth driven by new construction and system upgrades.",
-                image: "/images/pathways/trades-hero.jpg",
+                image: "/images/trades/program-hvac-overview.jpg",
                 alt: "HVAC installer working on a new commercial system"
               },
               {
                 role: "Refrigeration Technician",
                 salary: "$50,000 – $70,000/year",
                 description: "Specialized work on commercial refrigeration and industrial cooling. Higher pay because fewer technicians have this skill set.",
-                image: "/images/prog-trades.jpg",
+                image: "/images/trades/program-electrical-training.jpg",
                 alt: "Refrigeration technician working on commercial equipment"
               }
             ].map((career, index) => (
@@ -499,7 +577,7 @@ export default function HVACProgramContent() {
               "You like working with your hands and solving problems",
               "You want to earn certifications that employers actually require",
               "You're interested in eventually starting your own HVAC business",
-              "You qualify for workforce funding and want free training",
+              "You've been referred by WorkOne or qualify for workforce funding",
               "You're a veteran transitioning to civilian work"
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
@@ -516,33 +594,36 @@ export default function HVACProgramContent() {
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <div className="flex flex-col md:flex-row gap-8 items-center">
             <div className="relative w-full md:w-80 h-64 flex-shrink-0 rounded-2xl overflow-hidden">
-              <Image src="/images/skilled-trades-hero-new.jpg" alt="Student meeting with a funding advisor" fill quality={90} className="object-cover" />
+              <Image src="/images/programs-hq/students-learning.jpg" alt="Student meeting with a funding advisor" fill quality={90} className="object-cover" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">How Funding Works</h2>
               <p className="text-gray-700 mb-4">
-                Many students attend this program at no cost through WIOA (Workforce Innovation and Opportunity Act) — a federal program that pays for career training for adults who qualify.
+                Many students have their tuition covered through WIOA (Workforce Innovation and Opportunity Act) or the Workforce Ready Grant — federal and state programs that fund career training for eligible adults.
               </p>
               <p className="text-gray-700 mb-4">
-                <strong>You don&apos;t need to figure this out yourself.</strong> When you apply, we check your eligibility and handle all the paperwork. If you qualify, your tuition, books, and supplies are covered.
+                <strong>To use workforce funding, you must first register at{' '}
+                <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 underline hover:text-brand-blue-800">indianacareerconnect.com</a>
+                {' '}and visit your local WorkOne office.</strong> WorkOne determines your eligibility and refers you to our program. We then coordinate with them to confirm your enrollment and funding.
               </p>
               <p className="text-gray-700 mb-6">
-                If you don&apos;t qualify for funded training, we offer self-pay options with flexible payment plans.
+                If you are not using workforce funding, you can enroll directly with self-pay at $5,000 tuition. Weekly payment plans are available starting at $1,750 down.
               </p>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/apply?program=hvac-technician"
-                  className="inline-flex items-center px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-full hover:bg-brand-blue-500 transition"
-                >
-                  Apply and We&apos;ll Check Your Eligibility
-                </Link>
-                <Link
-                  href="/funding"
-                  className="inline-flex items-center px-6 py-3 border-2 border-brand-blue-600 text-brand-blue-600 font-semibold rounded-full hover:bg-brand-blue-50 transition"
-                >
-                  Learn About Funding Options
-                </Link>
-              </div>
+              <Link
+                href="/apply?program=hvac-technician"
+                className="inline-flex items-center px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-full hover:bg-brand-blue-500 transition mb-3"
+              >
+                Apply
+              </Link>
+              <p className="text-sm text-amber-700 font-semibold bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 mb-3">
+                Do not proceed with enrollment until you have completed WorkOne verification.
+              </p>
+              <Link
+                href="/programs/hvac-technician/apply"
+                className="inline-flex items-center px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-500 transition"
+              >
+                Enroll in Program
+              </Link>
             </div>
           </div>
         </div>
@@ -583,27 +664,29 @@ export default function HVACProgramContent() {
         <div className="absolute inset-0 bg-brand-blue-900/85" />
         <div className="relative max-w-4xl mx-auto px-6 lg:px-8 text-center text-white">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Start?</h2>
-          <p className="text-xl text-brand-blue-100 mb-8 max-w-2xl mx-auto">
-            Apply now. We&apos;ll check your funding eligibility, set up your account, and guide you through every step.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply?program=hvac-technician"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-full hover:bg-brand-blue-50 transition-all shadow-lg text-lg"
-            >
-              Apply Now — It&apos;s Free
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Link>
-            <Link
-              href="/contact?program=hvac-technician&subject=programs"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white/15 hover:bg-white/25 text-white font-semibold rounded-full transition-all"
-            >
-              Talk to Someone First
-            </Link>
+          <Link
+            href="/apply?program=hvac-technician"
+            className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-full hover:bg-brand-blue-50 transition-all shadow-lg text-lg mb-6"
+          >
+            Apply
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Link>
+
+          <div className="bg-yellow-500/20 border border-yellow-400/40 rounded-lg px-4 py-3 max-w-lg mx-auto mb-6">
+            <p className="text-sm text-yellow-100 font-semibold text-center">
+              Do not proceed with enrollment until you have completed WorkOne verification.{' '}
+              <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="text-white underline hover:text-yellow-200">
+                indianacareerconnect.com
+              </a>
+            </p>
           </div>
-          <p className="mt-6 text-brand-blue-200 text-sm">
-            Next cohort starting soon. Limited seats. No payment required to apply.
-          </p>
+
+          <Link
+            href="/programs/hvac-technician/apply"
+            className="inline-flex items-center justify-center px-8 py-4 bg-green-500 hover:bg-green-400 text-white font-bold rounded-full transition-all shadow-lg text-lg"
+          >
+            Enroll in Program
+          </Link>
         </div>
       </section>
     </>

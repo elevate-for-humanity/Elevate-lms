@@ -59,7 +59,7 @@ const PROGRAMS = [
     credential: 'Indiana Barber License',
     issuedBy: 'Indiana Professional Licensing Agency (PLA) through a U.S. Department of Labor Registered Apprenticeship',
     whatItMeans: 'An Indiana barber license means you are legally authorized to cut hair, shave, and provide grooming services for compensation in the state of Indiana. This is a state-regulated professional license — the same license held by every working barber in the state. It is earned through a DOL Registered Apprenticeship, which means it also carries federal recognition.',
-    training: 'You train at a real barbershop under a licensed barber instructor. You learn haircutting techniques (fades, tapers, lineups), clipper and shear mastery, shaving and beard grooming, sanitation and safety (Indiana State Board standards), client consultation, customer service, and business management. Elevate handles all federal apprenticeship registration, compliance paperwork, classroom instruction coordination, and completion certificates.',
+    training: 'You train at a real barbershop under a licensed barber instructor. You learn haircutting techniques (fades, tapers, lineups), clipper and shear mastery, shaving and beard grooming, sanitation and safety (Indiana State Board standards), client consultation, customer service, and business management. Elevate coordinates apprenticeship registration, compliance paperwork, classroom instruction, and completion documentation.',
     duration: 'Approximately 18 months (1,500 on-the-job training hours plus required classroom instruction)',
     examDay: 'After completing all required hours and coursework, you sit for the Indiana State Board barber exam. Elevate provides exam prep materials and practice tests. Once you pass, you receive your Indiana barber license.',
     whoHires: [
@@ -71,7 +71,7 @@ const PROGRAMS = [
     nextStep: 'After licensure, many barbers open their own shops. Others pursue cosmetology cross-licensing, instructor certification, or build a client base at an established shop.',
   },
   {
-    name: 'HVAC Technician',
+    name: 'Building Technician with HVAC Fundamentals',
     image: '/images/programs-hq/hvac-technician.jpg',
     href: '/programs/hvac-technician',
     credential: 'EPA Section 608 Certification + OSHA 30-Hour Safety Certification',

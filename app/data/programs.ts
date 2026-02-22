@@ -80,7 +80,7 @@ interface Testimonial {
 export const programs: Program[] = [
   {
     slug: 'hvac-technician',
-    name: 'HVAC Technician',
+    name: 'Building Technician with HVAC Fundamentals',
     heroTitle: 'HVAC Technician Career Training',
     heroSubtitle:
       'Master heating, cooling, and refrigeration in 4-9 months. HVAC technicians are in high demand everywhere—companies need skilled workers now. Get hands-on training with real equipment and graduate ready for a career with excellent pay and job security.',

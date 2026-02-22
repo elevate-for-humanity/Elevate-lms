@@ -99,7 +99,7 @@ const RTI_PROGRAMS = [
   { program: 'Barber Apprenticeship', totalHours: 2000, rtiHours: 144, ojtHours: 1500, method: 'In-Person + LMS', credential: 'Indiana Barber License', credentialIssuer: 'Indiana PLA / USDOL' },
   { program: 'CNA Certification', totalHours: 150, rtiHours: 105, ojtHours: 45, method: 'Hybrid', credential: 'CNA Certification', credentialIssuer: 'Indiana ISDH' },
   { program: 'CDL Commercial Driving', totalHours: 160, rtiHours: 40, ojtHours: 120, method: 'In-Person', credential: 'CDL Class A/B', credentialIssuer: 'Indiana BMV' },
-  { program: 'HVAC Technician', totalHours: 400, rtiHours: 200, ojtHours: 200, method: 'Hybrid', credential: 'EPA 608 + OSHA 10', credentialIssuer: 'EPA / OSHA' },
+  { program: 'Building Technician with HVAC Fundamentals', totalHours: 400, rtiHours: 200, ojtHours: 200, method: 'Hybrid', credential: 'EPA 608 + OSHA 10', credentialIssuer: 'EPA / OSHA' },
   { program: 'IT Support', totalHours: 320, rtiHours: 280, ojtHours: 40, method: 'Online + Labs', credential: 'CompTIA A+', credentialIssuer: 'CompTIA' },
   { program: 'Cybersecurity', totalHours: 400, rtiHours: 360, ojtHours: 40, method: 'Online + Labs', credential: 'CompTIA Security+', credentialIssuer: 'CompTIA' },
   { program: 'Welding', totalHours: 400, rtiHours: 160, ojtHours: 240, method: 'In-Person', credential: 'AWS D1.1 + OSHA 10', credentialIssuer: 'AWS / OSHA' },
@@ -111,11 +111,11 @@ const RTI_REGISTRY = [
   { program: 'Barber Apprenticeship', credentialPartner: 'Licensed Barber School (State-Approved)', partnerType: 'State-Approved School', programHolder: 'Barber Apprenticeship Coordinator', rtiHours: 144, mouStatus: 'Required', credentialIssued: 'Indiana Barber License (PLA)' },
   { program: 'CNA Certification', credentialPartner: 'Accredited Nursing Program', partnerType: 'State-Approved School', programHolder: 'Healthcare Training Manager', rtiHours: 105, mouStatus: 'Required', credentialIssued: 'CNA Certification (ISDH)' },
   { program: 'CDL Commercial Driving', credentialPartner: 'ELDT-Compliant CDL School', partnerType: 'State-Approved School', programHolder: 'CDL Program Coordinator', rtiHours: 40, mouStatus: 'Required', credentialIssued: 'CDL Class A/B (BMV)' },
-  { program: 'HVAC Technician', credentialPartner: 'DOE-Approved Trade School', partnerType: 'State-Approved School', programHolder: 'Trades Program Lead', rtiHours: 200, mouStatus: 'Required', credentialIssued: 'EPA 608 + OSHA 10' },
+  { program: 'Building Technician with HVAC Fundamentals', credentialPartner: 'Authorized Testing Partner', partnerType: 'Industry Partner', programHolder: 'Trades Program Lead', rtiHours: 200, mouStatus: 'Required', credentialIssued: 'EPA 608 + OSHA 10' },
   { program: 'IT Support', credentialPartner: 'Authorized CompTIA Academy', partnerType: 'Authorized Training Center', programHolder: 'Technology Program Lead', rtiHours: 280, mouStatus: 'Required', credentialIssued: 'CompTIA A+' },
   { program: 'Cybersecurity', credentialPartner: 'Authorized CompTIA Academy', partnerType: 'Authorized Training Center', programHolder: 'Technology Program Lead', rtiHours: 360, mouStatus: 'Required', credentialIssued: 'CompTIA Security+' },
   { program: 'Welding', credentialPartner: 'AWS-Accredited Testing Facility', partnerType: 'State-Approved School', programHolder: 'Trades Program Lead', rtiHours: 160, mouStatus: 'Required', credentialIssued: 'AWS D1.1 + OSHA 10' },
-  { program: 'Electrical', credentialPartner: 'DOE-Approved Trade School', partnerType: 'State-Approved School', programHolder: 'Trades Program Lead', rtiHours: 200, mouStatus: 'Required', credentialIssued: 'OSHA 10 + NCCER Core' },
+  { program: 'Electrical', credentialPartner: 'Authorized Testing Partner', partnerType: 'Industry Partner', programHolder: 'Trades Program Lead', rtiHours: 200, mouStatus: 'Required', credentialIssued: 'OSHA 10 + NCCER Core' },
 ];
 
 export default function InstructionalFrameworkPage() {

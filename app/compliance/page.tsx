@@ -88,7 +88,7 @@ export default async function CompliancePage() {
               <span className="text-gray-500">Program #2025-IN-132301</span>
             </div>
             <div className="flex justify-between border-b pb-3">
-              <span className="font-medium">Indiana DWD Approved Training Provider</span>
+              <span className="font-medium">Indiana DWD Listed Training Provider</span>
               <span className="text-gray-500">INTraining ID: 10004621</span>
             </div>
             <div className="flex justify-between">

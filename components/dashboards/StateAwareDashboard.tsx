@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { AlertCircle, Lock, ArrowRight } from 'lucide-react';
 
 /**
@@ -181,12 +182,13 @@ export function StateAwareDashboard({
 }
 
 /**
- * SECTION CARD - For Available Sections
+ * SECTION CARD - Image-based cards for available sections
  */
 interface SectionCardProps {
   title: string;
   description: string;
   href: string;
+  image?: string;
   icon?: React.ReactNode;
   badge?: string;
 }
@@ -195,31 +197,54 @@ export function SectionCard({
   title,
   description,
   href,
+  image,
   icon,
   badge,
 }: SectionCardProps) {
   return (
     <Link
       href={href}
-      className="group bg-white border-2 border-slate-200 rounded-lg p-6 hover:border-brand-blue-600 hover:shadow-lg transition"
+      className="group bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-xl hover:border-brand-blue-400 transition-all duration-300"
     >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-3">
-          {icon && <div className="text-brand-blue-600">{icon}</div>}
-          <h4 className="font-bold text-black group-hover:text-brand-blue-600 transition">
-            {title}
-          </h4>
+      {image ? (
+        <div className="relative h-36 overflow-hidden">
+          <Image
+            src={image}
+            alt={title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          {badge && (
+            <span className="absolute top-3 right-3 px-3 py-1 bg-brand-red-600 text-white text-xs font-bold rounded-full shadow-lg">
+              {badge}
+            </span>
+          )}
+          <div className="absolute bottom-3 left-4 right-4">
+            <h4 className="font-bold text-white text-lg drop-shadow-lg">{title}</h4>
+          </div>
         </div>
-        {badge && (
-          <span className="px-3 py-2 bg-brand-blue-100 text-brand-blue-700 text-xs font-bold rounded-full">
-            {badge}
-          </span>
-        )}
-      </div>
-      <p className="text-black text-sm mb-4">{description}</p>
-      <div className="flex items-center gap-2 text-brand-blue-600 font-semibold text-sm group-hover:gap-3 transition-all">
-        <span>View</span>
-        <ArrowRight className="h-4 w-4" />
+      ) : (
+        <div className="flex items-start justify-between p-4 pb-0">
+          <div className="flex items-center gap-3">
+            {icon && <div className="text-brand-blue-600">{icon}</div>}
+            <h4 className="font-bold text-slate-900 group-hover:text-brand-blue-600 transition">
+              {title}
+            </h4>
+          </div>
+          {badge && (
+            <span className="px-3 py-1 bg-brand-red-100 text-brand-red-700 text-xs font-bold rounded-full">
+              {badge}
+            </span>
+          )}
+        </div>
+      )}
+      <div className="p-4">
+        <p className="text-slate-600 text-sm mb-3 line-clamp-2">{description}</p>
+        <div className="flex items-center gap-2 text-brand-blue-600 font-semibold text-sm group-hover:gap-3 transition-all">
+          <span>Open</span>
+          <ArrowRight className="h-4 w-4" />
+        </div>
       </div>
     </Link>
   );
@@ -252,7 +277,7 @@ export function ProgressIndicator({ steps }: ProgressIndicatorProps) {
               }`}
             >
               {step.status === 'completed' ? (
-                <span className="text-slate-400 flex-shrink-0">•</span>
+                <span className="w-3 h-3 rounded-full bg-white inline-block" />
               ) : step.status === 'locked' ? (
                 <Lock className="h-5 w-5" />
               ) : (

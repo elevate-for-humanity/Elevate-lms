@@ -32,7 +32,7 @@ export default function TransparencyPage() {
     'WIOA Eligible Training Provider',
     'Indiana Career Connect Partner',
     '501(c)(3) Nonprofit Organization',
-    'BBB Accredited Charity',
+    'EPA Section 608 Approved Testing Site',
   ];
 
   return (

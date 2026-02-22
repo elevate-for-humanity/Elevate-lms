@@ -84,7 +84,7 @@ export default async function HubWelcomePage() {
     },
     {
       name: 'Trades Apprentice',
-      program: 'HVAC Technician',
+      program: 'Building Technician with HVAC Fundamentals',
       quote: 'I could see my progress every day. The system kept me accountable and on schedule.',
       image: '/images/hub/instructor.jpg',
     },

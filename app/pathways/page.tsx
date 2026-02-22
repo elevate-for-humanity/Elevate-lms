@@ -109,10 +109,10 @@ const PROGRAMS = [
     salary: '$30K–$60K+ (shop owners earn more)',
     jobs: 'Licensed barber, shop employee, shop owner, instructor',
     funding: 'Earn while you learn — apprentices are paid during training',
-    desc: 'DOL Registered Apprenticeship. You train at a real barbershop under a licensed instructor. You learn fades, tapers, lineups, shaving, beard grooming, sanitation, client consultation, and business management. Elevate handles all federal apprenticeship registration and compliance paperwork.',
+    desc: 'DOL Registered Apprenticeship. You train at a real barbershop under a licensed instructor. You learn fades, tapers, lineups, shaving, beard grooming, sanitation, client consultation, and business management. Elevate coordinates apprenticeship registration and compliance paperwork.',
   },
   {
-    name: 'HVAC Technician',
+    name: 'Building Technician with HVAC Fundamentals',
     image: '/images/programs-hq/hvac-technician.jpg',
     href: '/programs/hvac-technician',
     duration: '12–16 weeks',

@@ -16,7 +16,7 @@ const RESOURCES = [
   { title: 'Practice Exams', desc: 'Timed practice tests that simulate the format and difficulty of your certification exam.', icon: Monitor },
   { title: 'Course Materials', desc: 'Textbook chapters, lecture notes, and supplemental readings organized by program.', icon: BookOpen },
   { title: 'Audio Resources', desc: 'Podcast-style lessons and audio study aids for learning on the go.', icon: Headphones },
-  { title: 'Downloadable Forms', desc: 'Enrollment forms, financial aid applications, and program-specific documents.', icon: Download },
+  { title: 'Downloadable Forms', desc: 'Enrollment forms, funding applications, and program-specific documents.', icon: Download },
 ];
 
 export default function LearningCenterPage() {

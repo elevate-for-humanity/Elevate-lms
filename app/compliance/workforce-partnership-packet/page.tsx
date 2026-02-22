@@ -123,7 +123,7 @@ export default function WorkforcePartnershipPacketPage() {
                 </div>
                 <div>
                   <dt className="font-semibold text-gray-500 text-xs uppercase tracking-wider">Approvals</dt>
-                  <dd className="text-gray-900">DOL, DWD, DOE, WIOA Eligible, WRG Approved</dd>
+                  <dd className="text-gray-900">WIOA Eligible Training Provider, WRG Provider, Indiana DWD Listed</dd>
                 </div>
                 <div>
                   <dt className="font-semibold text-gray-500 text-xs uppercase tracking-wider">Cohort Setup Time</dt>

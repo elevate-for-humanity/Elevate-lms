@@ -23,7 +23,7 @@ export const maxDuration = 60;
 const PROGRAM_DETAILS: Record<string, { name: string; totalPrice: number }> = {
   cna: { name: 'Certified Nursing Assistant (CNA)', totalPrice: 1200 },
   barber: { name: 'Barber Apprenticeship', totalPrice: 4980 },
-  hvac: { name: 'HVAC Technician', totalPrice: 5500 },
+  hvac: { name: 'Building Technician with HVAC Fundamentals', totalPrice: 5500 },
   'medical-assistant': { name: 'Medical Assistant', totalPrice: 4200 },
   cdl: { name: 'CDL Training', totalPrice: 5000 },
 };

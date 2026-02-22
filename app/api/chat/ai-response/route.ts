@@ -62,7 +62,7 @@ What would you like to know more about?`,
 
 **About Elevate for Humanity:**
 - Nonprofit workforce development organization in Indianapolis, Indiana
-- DOL Registered Apprenticeship Sponsor
+- DOL Registered Apprenticeship Sponsor (Barber program)
 - WIOA-approved training provider
 - JRI-approved for justice-involved individuals
 - Training is 100% FREE for eligible participants

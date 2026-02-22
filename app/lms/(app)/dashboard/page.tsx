@@ -18,6 +18,7 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
 import { getStudentState } from '@/lib/orchestration/state-machine';
+import { LMS_HEROES, LMS_SECTION_CARDS, LMS_TOOLS } from '@/lib/lms/image-map';
 import {
   StateAwareDashboard,
   SectionCard,
@@ -33,6 +34,7 @@ import {
   GraduationCap,
   TrendingUp,
   Target,
+  ArrowRight,
 } from 'lucide-react';
 import { PointsDisplay } from '@/components/gamification/PointsDisplay';
 import { BadgeShowcase } from '@/components/gamification/BadgeShowcase';
@@ -205,45 +207,45 @@ export default async function StudentDashboardOrchestrated() {
       </div>
 
       {/* Hero Welcome Banner */}
-      <div className="relative text-white mb-8 rounded-2xl overflow-hidden">
-        <div className="relative h-[200px] md:h-[250px] overflow-hidden rounded-t-2xl">
+      <div className="relative text-white mb-8 rounded-2xl overflow-hidden shadow-lg">
+        <div className="relative h-[300px] md:h-[340px]">
           <Image
-            src="/images/heroes-hq/success-hero.jpg"
-            alt="Learning"
+            src={LMS_HEROES.dashboard}
+            alt="Students celebrating training completion"
             fill
             className="object-cover"
             quality={100}
+            priority
           />
-        </div>
-        <div className="p-8 md:p-12 bg-brand-green-900 rounded-b-2xl">
-          <div className="flex items-center gap-3 mb-4">
-            <GraduationCap className="w-10 h-10 text-white" />
-            <div>
-              <h1 className="text-3xl md:text-4xl font-black text-white">
-                Welcome to Your Student Portal
-              </h1>
-              <p className="text-lg text-brand-green-100">
-                {profile?.full_name || user.email?.split('@')[0]}, you&apos;re in. Start your first lesson, track progress, upload required items, see deadlines and announcements, and complete quizzes and assessments.
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-green-900/70 via-brand-green-900/40 to-transparent" />
+          <div className="absolute inset-0 flex items-center">
+            <div className="p-8 md:p-12 max-w-2xl">
+              <div className="flex items-center gap-3 mb-3">
+                <GraduationCap className="w-10 h-10 text-white drop-shadow-lg" />
+                <h1 className="text-3xl md:text-4xl font-black text-white drop-shadow-lg">
+                  Welcome Back, {profile?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
+                </h1>
+              </div>
+              <p className="text-base md:text-lg text-white/90 drop-shadow mb-4">
+                Start your next lesson, track progress, and complete quizzes and assessments.
               </p>
+
+              {activeEnrollment && (
+                <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4 border border-white/20 max-w-md">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold text-sm">Course Progress</span>
+                    <span className="font-black">{Math.round(courseProgress)}%</span>
+                  </div>
+                  <div className="w-full bg-white/20 rounded-full h-3">
+                    <div
+                      className="bg-white rounded-full h-3 transition-all duration-500"
+                      style={{ width: `${courseProgress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-
-          {activeEnrollment && (
-            <div className="mt-6 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-semibold">Current Program Progress</span>
-                <span className="font-black">
-                  {Math.round(courseProgress)}%
-                </span>
-              </div>
-              <div className="w-full bg-white/20 rounded-full h-3">
-                <div
-                  className="bg-white rounded-full h-3 transition-all duration-500"
-                  style={{ width: `${courseProgress}%` }}
-                ></div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -349,7 +351,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="Orientation"
                     description="Get started with your training journey"
                     href="/lms/orientation"
-                    image="/hero-images/how-it-works-hero.jpg"
+                    image={LMS_SECTION_CARDS.orientation}
                     badge={
                       !profile.orientation_completed ? 'Required' : undefined
                     }
@@ -361,7 +363,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="Eligibility Check"
                     description="Verify you qualify for free training"
                     href="/apply"
-                    image="/hero-images/apply-hero.jpg"
+                    image={LMS_SECTION_CARDS.eligibility}
                     badge={
                       !profile.eligibility_verified ? 'Required' : undefined
                     }
@@ -373,7 +375,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="Browse Programs"
                     description="Explore 20+ training programs"
                     href="/programs"
-                    image="/hero-images/programs-hero.jpg"
+                    image={LMS_SECTION_CARDS.programs}
                   />
                 )}
 
@@ -382,7 +384,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="View Programs"
                     description="See what's available (enroll after eligibility)"
                     href="/programs"
-                    image="/hero-images/programs-hero.jpg"
+                    image={LMS_SECTION_CARDS.programsView}
                   />
                 )}
 
@@ -391,7 +393,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="Funding Options"
                     description="Learn about WIOA, WRG, and other funding"
                     href="/how-it-works#funding"
-                    image="/hero-images/wioa-hero.jpg"
+                    image={LMS_SECTION_CARDS.funding}
                   />
                 )}
 
@@ -400,7 +402,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="My Courses"
                     description={`Continue learning (${courseProgress}% complete)`}
                     href="/lms/courses"
-                    image="/hero-images/healthcare-category.jpg"
+                    image={LMS_SECTION_CARDS.courses}
                     badge={courseProgress < 100 ? 'In Progress' : 'Complete'}
                   />
                 )}
@@ -410,7 +412,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="Track Progress"
                     description="View your learning analytics"
                     href="/lms/progress"
-                    image="/hero-images/skilled-trades-category.jpg"
+                    image={LMS_SECTION_CARDS.progress}
                   />
                 )}
 
@@ -419,7 +421,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="My Certificates"
                     description="View and download your credentials"
                     href="/lms/certificates"
-                    image="/hero-images/technology-category.jpg"
+                    image={LMS_SECTION_CARDS.certificates}
                   />
                 )}
 
@@ -428,7 +430,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="Certification Exam"
                     description="Schedule your final exam"
                     href="/lms/certification"
-                    image="/images/heroes-hq/success-stories-hero.jpg"
+                    image={LMS_SECTION_CARDS.certification}
                     badge="Ready"
                   />
                 )}
@@ -438,7 +440,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="Job Placement"
                     description="Connect with employers"
                     href="/lms/placement"
-                    image="/images/heroes/lms-profile.jpg"
+                    image={LMS_SECTION_CARDS.placement}
                   />
                 )}
 
@@ -447,7 +449,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="Get Support"
                     description="Contact your advisor"
                     href="/lms/support"
-                    image="/hero-images/barber-beauty-category.jpg"
+                    image={LMS_SECTION_CARDS.support}
                   />
                 )}
 
@@ -456,7 +458,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="Alumni Network"
                     description="Connect with graduates"
                     href="/lms/alumni"
-                    image="/hero-images/about-hero.jpg"
+                    image={LMS_SECTION_CARDS.alumni}
                   />
                 )}
               </div>
@@ -546,96 +548,47 @@ export default async function StudentDashboardOrchestrated() {
               </a>
             </div>
 
-            {/* All Student Features */}
+            {/* All Student Features — descriptive cards with images */}
             <div className="mt-8">
-              <h3 className="text-lg font-semibold text-black mb-4">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">
                 My Learning Tools
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <Link
-                  href="/lms/courses"
-                  aria-label="Link"
-                  className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-                >
-                  My Courses
-                </Link>
-                <Link
-                  href="/lms/assignments"
-                  aria-label="Link"
-                  className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-                >
-                  Assignments
-                </Link>
-                <Link
-                  href="/lms/grades"
-                  aria-label="Link"
-                  className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-                >
-                  Grades
-                </Link>
-                <Link
-                  href="/lms/calendar"
-                  aria-label="Link"
-                  className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-                >
-                  Calendar
-                </Link>
-                <Link
-                  href="/lms/messages"
-                  aria-label="Link"
-                  className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-                >
-                  Messages
-                </Link>
-                <Link
-                  href="/lms/forums"
-                  aria-label="Link"
-                  className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-                >
-                  Forums
-                </Link>
-                <Link
-                  href="/lms/study-groups"
-                  aria-label="Link"
-                  className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-                >
-                  Study Groups
-                </Link>
-                <Link
-                  href="/lms/resources"
-                  aria-label="Link"
-                  className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-                >
-                  Resources
-                </Link>
-                <Link
-                  href="/lms/certificates"
-                  aria-label="Link"
-                  className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-                >
-                  Certificates
-                </Link>
-                <Link
-                  href="/lms/achievements"
-                  aria-label="Link"
-                  className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-                >
-                  Achievements
-                </Link>
-                <Link
-                  href="/lms/profile"
-                  aria-label="Link"
-                  className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-                >
-                  My Profile
-                </Link>
-                <Link
-                  href="/lms/support"
-                  aria-label="Link"
-                  className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-                >
-                  Support
-                </Link>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { href: '/lms/courses', label: 'My Courses', desc: 'Continue lessons, watch videos, and complete modules', image: LMS_TOOLS.courses },
+                  { href: '/lms/assignments', label: 'Assignments', desc: 'View due dates, submit work, and check feedback', image: LMS_TOOLS.assignments },
+                  { href: '/lms/grades', label: 'Grades', desc: 'See scores, GPA, and instructor comments', image: LMS_TOOLS.grades },
+                  { href: '/lms/quizzes', label: 'Quizzes & Exams', desc: 'Take practice quizzes and certification exams', image: LMS_TOOLS.quizzes },
+                  { href: '/lms/schedule', label: 'Schedule', desc: 'Class times, deadlines, and upcoming events', image: LMS_TOOLS.schedule },
+                  { href: '/lms/messages', label: 'Messages', desc: 'Chat with instructors and classmates', image: LMS_TOOLS.messages },
+                  { href: '/lms/resources', label: 'Resources', desc: 'Handouts, study guides, and reference materials', image: LMS_TOOLS.resources },
+                  { href: '/lms/certificates', label: 'Certificates', desc: 'Download earned credentials and certificates', image: LMS_TOOLS.certificates },
+                  { href: '/lms/achievements', label: 'Achievements', desc: 'Badges, streaks, and milestones you have earned', image: LMS_TOOLS.achievements },
+                  { href: '/lms/profile', label: 'My Profile', desc: 'Update your info, photo, and contact details', image: LMS_TOOLS.profile },
+                  { href: '/lms/support', label: 'Get Help', desc: 'Contact your advisor or submit a support request', image: LMS_TOOLS.support },
+                  { href: '/lms/forums', label: 'Discussion Forums', desc: 'Ask questions and share knowledge with peers', image: LMS_TOOLS.forums },
+                ].map((tool) => (
+                  <Link
+                    key={tool.href}
+                    href={tool.href}
+                    aria-label={tool.label}
+                    className="group flex items-center gap-4 p-3 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-400 hover:shadow-md transition-all"
+                  >
+                    <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                      <Image
+                        src={tool.image}
+                        alt={tool.label}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-slate-900 group-hover:text-brand-blue-600 transition text-sm">{tool.label}</div>
+                      <div className="text-xs text-slate-500 line-clamp-1">{tool.desc}</div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-brand-blue-600 flex-shrink-0 transition" />
+                  </Link>
+                ))}
               </div>
             </div>
 

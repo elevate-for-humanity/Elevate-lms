@@ -61,7 +61,7 @@ export default function HvacApplyPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          program: 'HVAC Technician',
+          program: 'Building Technician with HVAC Fundamentals',
           programSlug: 'hvac-technician',
           fundingType: formData.fundingInterest === 'self-pay' ? 'self-pay' : formData.fundingInterest,
           source: 'program-page',
@@ -97,7 +97,7 @@ export default function HvacApplyPage() {
             phone: formData.phone,
             programId: 'hvac-technician',
             programSlug: 'hvac-technician',
-            programName: 'HVAC Technician Program',
+            programName: 'Building Technician with HVAC Fundamentals',
             amount: affirmAmount,
             paymentOption: affirmAmount >= PRICING.fullPrice ? 'full' : 'deposit',
             applicationId,
@@ -158,10 +158,10 @@ export default function HvacApplyPage() {
             phone: formData.phone,
             programId: 'hvac-technician',
             programSlug: 'hvac-technician',
-            programName: 'HVAC Technician Program',
+            programName: 'Building Technician with HVAC Fundamentals',
             amount: sezzleAmount,
             paymentOption: sezzleAmount >= PRICING.fullPrice ? 'full' : 'deposit',
-            description: `HVAC Technician Program - $${sezzleAmount} payment via Sezzle`,
+            description: `Building Technician with HVAC Fundamentals - $${sezzleAmount} payment via Sezzle`,
             applicationId,
           }),
         });
@@ -224,7 +224,7 @@ export default function HvacApplyPage() {
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Apply Now</h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">HVAC Technician Program — 20 Weeks, 6 Credentials</p>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Building Technician with HVAC Fundamentals — 20 Weeks, 6 Credentials</p>
           </div>
         </div>
       </section>

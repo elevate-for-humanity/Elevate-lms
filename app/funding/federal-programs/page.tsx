@@ -8,7 +8,7 @@ import { Building2 } from 'lucide-react';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/federal-programs' },
   title: 'Federal Funding Programs | Elevate For Humanity',
-  description: 'Federal workforce development funding including WIOA Title I, Pell Grants, DOL apprenticeship, and veteran education benefits.',
+  description: 'Federal workforce development funding including WIOA Title I, workforce grants, and veteran education benefits.',
 };
 
 const PROGRAMS = [

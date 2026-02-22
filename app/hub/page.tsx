@@ -50,8 +50,9 @@ export default async function HubPage() {
     .eq('id', user.id)
     .single();
 
-  // Redirect to onboarding if not completed
-  if (!profile?.onboarding_completed) {
+  // Redirect to onboarding only if explicitly false (new students).
+  // Null/undefined means existing user — grandfathered in.
+  if (profile?.onboarding_completed === false) {
     redirect('/onboarding');
   }
 

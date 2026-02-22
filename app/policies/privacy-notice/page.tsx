@@ -164,7 +164,7 @@ export default function PrivacyNoticePage() {
         <h3>Administrative Operations</h3>
         <ul>
           <li>Manage student records and accounts</li>
-          <li>Process payments and financial aid</li>
+          <li>Process payments and workforce funding</li>
           <li>Maintain attendance records</li>
           <li>Enforce policies and code of conduct</li>
           <li>Respond to inquiries and support requests</li>

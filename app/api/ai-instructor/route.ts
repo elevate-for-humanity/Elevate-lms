@@ -9,44 +9,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
-
-async function callGemini(
-  systemPrompt: string,
-  messages: Array<{ role: string; content: string }>,
-): Promise<string | null> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return null;
-
-  const contents = messages.map((m) => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }],
-  }));
-
-  for (const model of GEMINI_MODELS) {
-    try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            system_instruction: { parts: [{ text: systemPrompt }] },
-            contents,
-            generationConfig: { maxOutputTokens: 800, temperature: 0.7 },
-          }),
-        },
-      );
-      if (!res.ok) continue;
-      const data = await res.json();
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (text) return text;
-    } catch (err) {
-      logger.error(`Gemini ${model} error:`, err as Error);
-    }
-  }
-  return null;
-}
+import { aiChat, isAIAvailable } from '@/lib/ai';
 
 const SYSTEM_PROMPT = `You are an AI instructor assistant for Elevate for Humanity, a workforce training institution. Your role is to guide students through their programs and courses with consistent, helpful support.
 
@@ -83,7 +46,7 @@ export async function POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    if (!process.env.GEMINI_API_KEY) {
+    if (!isAIAvailable()) {
       return NextResponse.json(
         { error: 'AI Instructor is not configured. Please contact support.' },
         { status: 503 },
@@ -130,20 +93,24 @@ export async function POST(request: NextRequest) {
       contextMessage += `\nNo active enrollment`;
     }
 
-    const chatMessages = [
+    const chatMessages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+      { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: `Current student context:\n${contextMessage}` },
       ...conversationHistory.map((msg: { role: string; content: string }) => ({
-        role: msg.role,
+        role: msg.role as 'user' | 'assistant',
         content: msg.content,
       })),
       { role: 'user', content: message },
     ];
 
-    const response = await callGemini(SYSTEM_PROMPT, chatMessages);
-
-    const finalResponse =
-      response ||
-      'I apologize, but I was unable to generate a response. Please try again or contact student support.';
+    let finalResponse: string;
+    try {
+      const result = await aiChat({ messages: chatMessages, temperature: 0.7, maxTokens: 800 });
+      finalResponse = result.content;
+    } catch (err) {
+      logger.error('AI chat failed:', err instanceof Error ? err : new Error(String(err)));
+      finalResponse = 'I apologize, but I was unable to generate a response. Please try again or contact student support.';
+    }
 
     // Log conversation
     await db.from('ai_instructor_logs').insert({

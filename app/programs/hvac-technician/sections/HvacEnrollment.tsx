@@ -154,7 +154,7 @@ export function HvacEnrollment() {
           <div className="mt-6 flex justify-center">
             <ProgramTutorCTA
               programSlug="hvac-technician"
-              programName="HVAC Technician"
+              programName="Building Technician with HVAC Fundamentals"
               applyHref="/programs/hvac-technician/apply"
               suggestions={['What is EPA 608?', 'How long is the program?', 'Is tuition covered?', 'What jobs can I get?']}
             />

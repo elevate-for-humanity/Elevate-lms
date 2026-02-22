@@ -81,7 +81,7 @@ async function getCategories() {
     // Return default categories when database is not configured
     return [
       { title: 'Healthcare', description: 'CNA, Medical Assistant, Phlebotomy training programs.', href: '/programs/healthcare', programs: ['CNA Training', 'Medical Assistant', 'Phlebotomy'] },
-      { title: 'Skilled Trades', description: 'HVAC, Electrical, Welding, Plumbing training programs.', href: '/programs/skilled-trades', programs: ['HVAC Technician', 'Electrical', 'Welding'] },
+      { title: 'Skilled Trades', description: 'HVAC, Electrical, Welding, Plumbing training programs.', href: '/programs/skilled-trades', programs: ['Building Technician', 'Electrical', 'Welding'] },
       { title: 'Technology', description: 'IT Support, Cybersecurity, Web Development programs.', href: '/programs/technology', programs: ['IT Support', 'Cybersecurity', 'Web Dev'] },
       { title: 'CDL & Transportation', description: 'Commercial driving license training programs.', href: '/programs/cdl', programs: ['CDL Class A', 'CDL Class B'] },
       { title: 'Beauty & Barbering', description: 'Barber apprenticeship and cosmetology programs.', href: '/programs/barber-apprenticeship', programs: ['Barber Apprenticeship', 'Cosmetology'] },
@@ -105,7 +105,7 @@ async function getCategories() {
     // Return default categories if no programs in database
     return [
       { title: 'Healthcare', description: 'CNA, Medical Assistant, Phlebotomy training programs.', href: '/programs/healthcare', programs: ['CNA Training', 'Medical Assistant', 'Phlebotomy'] },
-      { title: 'Skilled Trades', description: 'HVAC, Electrical, Welding, Plumbing training programs.', href: '/programs/skilled-trades', programs: ['HVAC Technician', 'Electrical', 'Welding'] },
+      { title: 'Skilled Trades', description: 'HVAC, Electrical, Welding, Plumbing training programs.', href: '/programs/skilled-trades', programs: ['Building Technician', 'Electrical', 'Welding'] },
       { title: 'Technology', description: 'IT Support, Cybersecurity, Web Development programs.', href: '/programs/technology', programs: ['IT Support', 'Cybersecurity', 'Web Dev'] },
       { title: 'CDL & Transportation', description: 'Commercial driving license training programs.', href: '/programs/cdl', programs: ['CDL Class A', 'CDL Class B'] },
       { title: 'Beauty & Barbering', description: 'Barber apprenticeship and cosmetology programs.', href: '/programs/barber-apprenticeship', programs: ['Barber Apprenticeship', 'Cosmetology'] },
@@ -246,7 +246,7 @@ export default async function ProgramsPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {[
               {
-                name: 'HVAC Technician',
+                name: 'Building Technician with HVAC Fundamentals',
                 image: '/images/programs-hq/hvac-technician.jpg',
                 slug: 'hvac-technician',
                 href: '/programs/hvac-technician',

@@ -49,7 +49,7 @@ const benefits = [
 ];
 
 const requirements = [
-  'State-licensed or accredited training program',
+  'State-licensed or industry-recognized training program',
   'Industry-recognized credential or certification upon completion',
   'Documented job placement outcomes',
   'Ability to accept WIOA or other workforce funding',

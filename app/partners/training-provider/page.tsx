@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 const REQUIREMENTS = [
-  'Licensed or accredited training provider in good standing',
+  'Licensed or industry-recognized training provider in good standing',
   'Programs that lead to industry-recognized certifications or credentials',
   'Demonstrated employment outcomes for program graduates',
   'Willingness to meet WIOA and ETPL reporting requirements',

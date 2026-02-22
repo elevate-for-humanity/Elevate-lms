@@ -326,7 +326,7 @@ export default function ContactPage() {
                   <select id="meetingTopic" name="meetingTopic" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500">
                     <option value="General inquiry">General inquiry</option>
                     <option value="Enrollment help">Enrollment help</option>
-                    <option value="Funding and financial aid">Funding and financial aid</option>
+                    <option value="Funding and workforce grants">Funding and workforce grants</option>
                     <option value="Program information">Program information</option>
                     <option value="Employer partnership">Employer partnership</option>
                     <option value="Orientation">Orientation</option>

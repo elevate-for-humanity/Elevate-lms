@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Clock, Users, Star } from 'lucide-react';
+import { LMS_HEROES, LMS_CATEGORIES } from '@/lib/lms/image-map';
 
 export const metadata: Metadata = {
   title: 'Interactive Courses | LMS',
@@ -107,12 +108,24 @@ export default async function InteractiveCoursesPage() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Courses" }]} />
         </div>
-      {/* Video Hero */}
-      {/* Hero */}
-      <section className="bg-slate-900 py-16">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Interactive Courses</h1>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto">Engaging lessons with quizzes, assignments, and hands-on activities</p>
+      {/* Hero Banner with Image */}
+      <section className="relative overflow-hidden">
+        <div className="relative h-[240px] md:h-[300px]">
+          <Image
+            src={LMS_HEROES.courses}
+            alt="Students in a training classroom"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/60 via-slate-900/30 to-transparent" />
+          <div className="absolute inset-0 flex items-center">
+            <div className="max-w-5xl mx-auto px-8">
+              <span className="inline-block text-xs font-bold uppercase tracking-wider text-brand-blue-300 mb-2">Student Portal</span>
+              <h1 className="text-4xl md:text-5xl font-black text-white mb-3 drop-shadow-lg">My Courses</h1>
+              <p className="text-lg text-white/85 max-w-2xl drop-shadow">Engaging lessons with quizzes, assignments, and hands-on activities</p>
+            </div>
+          </div>
         </div>
       </section>
 

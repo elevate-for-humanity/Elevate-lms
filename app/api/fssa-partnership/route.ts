@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
           <h3>Our SNAP E&T Capabilities:</h3>
           <ul>
             <li>✅ ETPL-approved training provider</li>
-            <li>✅ DOL Registered Apprenticeship Sponsor</li>
+            <li>✅ DOL Registered Apprenticeship Sponsor (Barber program)</li>
             <li>✅ 80-hour compliance tracking system</li>
             <li>✅ Automated FSSA reporting</li>
             <li>✅ Multiple credentialed pathways</li>

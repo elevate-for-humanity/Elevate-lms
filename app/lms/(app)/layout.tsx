@@ -32,11 +32,11 @@ export default async function LmsAppLayout({ children }: { children: ReactNode }
     redirect(getUnauthorizedRedirect(profile.role));
   }
 
-  // Onboarding gate: students must complete onboarding before accessing LMS
-  // Admins and staff bypass this check
+  // Onboarding gate: only new students (onboarding_completed explicitly false) must onboard.
+  // Existing students with null/undefined are grandfathered in. Admins/staff bypass.
   if (
     profile?.role === 'student' &&
-    profile?.onboarding_completed !== true
+    profile?.onboarding_completed === false
   ) {
     redirect('/onboarding/learner');
   }

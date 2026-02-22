@@ -81,6 +81,13 @@ export async function POST(
       );
     }
 
+    logger.info('Lesson completed', {
+      userId: user.id,
+      lessonId,
+      courseId: lesson.course_id,
+      lessonTitle: lesson.title,
+    });
+
     // Get updated course progress
     const { data: allLessons } = await supabase
       .from('training_lessons')
@@ -140,7 +147,19 @@ export async function POST(
       });
       if (certResult.success && certResult.certificate) {
         certificate = certResult.certificate;
+        logger.info('Certificate issued', {
+          userId: user.id,
+          courseId: lesson.course_id,
+          certificateNumber: certResult.certificate.certificate_number,
+          alreadyIssued: certResult.alreadyIssued,
+        });
       }
+
+      logger.info('Course completed', {
+        userId: user.id,
+        courseId: lesson.course_id,
+        progressPercent,
+      });
     }
 
     return NextResponse.json({

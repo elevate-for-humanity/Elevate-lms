@@ -39,21 +39,29 @@ export default async function LMSPage() {
 
   const { data: courseEnrollments } = await supabase
     .from('training_enrollments')
-    .select(`id, progress, status, enrolled_at, last_accessed, course:training_courses(id, title, description, thumbnail_url, duration_hours, lesson_count)`)
+    .select(`id, progress, status, enrolled_at, last_accessed, course:training_courses(id, course_name, description, thumbnail_url, duration_hours, lesson_count)`)
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false });
 
-  const { data: programEnrollments } = await supabase
-    .from('program_enrollments')
-    .select(`id, status, created_at, program:programs(id, name, description, slug, duration_weeks)`)
-    .eq('student_id', user.id)
-    .in('status', ['IN_PROGRESS', 'active']);
-
-  const { data: studentEnrollments } = await supabase
-    .from('student_enrollments')
-    .select(`id, status, started_at, program_slug`)
-    .eq('student_id', user.id)
-    .eq('status', 'active');
+  // These views may fail due to RLS — non-fatal, training_enrollments is primary
+  let programEnrollments: any[] = [];
+  let studentEnrollments: any[] = [];
+  try {
+    const { data: pe } = await supabase
+      .from('program_enrollments')
+      .select(`id, status, created_at, program:programs(id, name, description, slug, duration_weeks)`)
+      .eq('student_id', user.id)
+      .in('status', ['IN_PROGRESS', 'active']);
+    programEnrollments = pe || [];
+  } catch { /* RLS may block this view */ }
+  try {
+    const { data: se } = await supabase
+      .from('student_enrollments')
+      .select(`id, status, started_at, program_slug`)
+      .eq('student_id', user.id)
+      .eq('status', 'active');
+    studentEnrollments = se || [];
+  } catch { /* RLS may block this view */ }
 
   const typedEnrollments = (courseEnrollments || []) as Enrollment[];
   const typedProgramEnrollments = programEnrollments || [];
@@ -155,7 +163,7 @@ export default async function LMSPage() {
                 )}
               </div>
               <div className="flex-1">
-                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">{continueCourse.course?.title}</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">{continueCourse.course?.course_name || course?.title}</h2>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex-1 max-w-xs h-2 bg-slate-200 rounded-full overflow-hidden">
                     <div className="h-full bg-brand-blue-600 rounded-full" style={{ width: `${continueCourse.progress}%` }} />
@@ -191,7 +199,7 @@ export default async function LMSPage() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-slate-900 truncate group-hover:text-brand-blue-600 transition">{enrollment.course?.title}</h3>
+                        <h3 className="font-semibold text-slate-900 truncate group-hover:text-brand-blue-600 transition">{enrollment.course?.course_name || course?.title}</h3>
                         <div className="flex items-center gap-3 mt-1">
                           <div className="flex-1 max-w-[120px] h-1.5 bg-slate-200 rounded-full overflow-hidden">
                             <div className="h-full bg-brand-blue-600 rounded-full" style={{ width: `${enrollment.progress || 0}%` }} />

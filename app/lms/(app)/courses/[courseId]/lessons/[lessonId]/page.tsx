@@ -67,17 +67,14 @@ export default function LessonPage() {
       .eq('id', courseId)
       .single();
 
-    // Fetch user progress for ALL lessons in this course
+    // Fetch user progress via server API (bypasses RLS recursion)
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (user && lessonsData) {
-      const lessonIds = lessonsData.map((l: any) => l.id);
-      const { data: allProgress } = await supabase
-        .from('lesson_progress')
-        .select('lesson_id, completed')
-        .eq('user_id', user.id)
-        .in('lesson_id', lessonIds);
+      const progressRes = await fetch(`/api/lms/progress?courseId=${courseId}`);
+      const progressData = progressRes.ok ? await progressRes.json() : { progress: [] };
+      const allProgress = progressData.progress;
 
       if (allProgress) {
         const completedIds = new Set(

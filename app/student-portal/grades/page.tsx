@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { GraduationCap, BookOpen, Award } from 'lucide-react';
@@ -14,6 +15,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function StudentPortalGradesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {

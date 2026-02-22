@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { GraduationCap, Clock, FileText, Award, BookOpen, ArrowRight } from 'lucide-react';
@@ -18,6 +19,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function ApprenticePortalPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
   
   if (!supabase) {
     redirect('/login?redirect=/apprentice');

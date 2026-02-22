@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { BookOpen, Award, Briefcase } from 'lucide-react';
@@ -70,6 +71,8 @@ const getCachedUserData = unstable_cache(
 
 export default async function LearningPathsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   if (!supabase) {
     return (

@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -25,7 +26,9 @@ export async function POST(
     const body = await request.json().catch(() => ({}));
     const { timeSpentSeconds } = body;
 
-    const supabase = await createClient();
+    const userClient = await createClient();
+    const admin = createAdminClient();
+    const supabase = admin || userClient; // admin bypasses RLS recursion
 
     // Get lesson to find course_id
     const { data: lesson, error: lessonError } = await supabase

@@ -3,6 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import CertificateDownload from '@/components/CertificateDownload';
 import CertificateGenerator from '@/components/CertificateGenerator';
@@ -20,6 +21,8 @@ export const metadata: Metadata = {
 
 export default async function CertificatesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   if (!supabase) {
     return (

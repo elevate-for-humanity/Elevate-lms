@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -72,6 +73,8 @@ const SETTINGS_SECTIONS = [
 
 export default async function SettingsPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   if (!supabase) {
     return (

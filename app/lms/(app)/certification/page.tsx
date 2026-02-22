@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import {
   Award,
@@ -20,6 +21,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function CertificationPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   if (!supabase) {
     return (

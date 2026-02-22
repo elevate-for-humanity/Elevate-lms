@@ -10,6 +10,7 @@ export const metadata: Metadata = generateInternalMetadata({
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 
 interface Params {
@@ -19,6 +20,8 @@ interface Params {
 export default async function LaunchCourse({ params }: { params: Params }) {
   const { courseId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   if (!supabase) {
     return (
@@ -47,7 +50,7 @@ export default async function LaunchCourse({ params }: { params: Params }) {
   if (error || !course) redirect('/lms/courses');
 
   // Track "started"
-  await supabase.from('lms_progress').upsert(
+  await db.from('lms_progress').upsert(
     {
       user_id: user.id,
       course_id: course.id,

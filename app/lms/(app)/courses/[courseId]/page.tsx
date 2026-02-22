@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Image from 'next/image';
 import {
@@ -33,6 +34,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { courseId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   if (!supabase) {
     return { title: 'Course | Elevate LMS' };
@@ -68,6 +71,8 @@ interface LessonProgress {
 export default async function CoursePage({ params }: { params: Params }) {
   const { courseId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   if (!supabase) {
     return (

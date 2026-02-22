@@ -10,6 +10,7 @@ export const metadata: Metadata = generateInternalMetadata({
 });
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { safeFormatDate } from '@/lib/format-utils';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
@@ -67,6 +68,8 @@ export default async function StudentDashboardOrchestrated() {
   ]);
 
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   // Get partner enrollments (external providers like HSI)
   const { data: partnerEnrollments } = await supabase

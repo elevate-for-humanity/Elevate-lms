@@ -4,6 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import {
   BookOpen,
@@ -191,6 +192,8 @@ const downloadableResources = [
 
 export default async function ResourcesPage() {
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   if (!supabase) {
     return (

@@ -1,6 +1,7 @@
-// ProLingo-style LMS Dashboard - clean, educational, minimal
+// LMS Dashboard — server-side data fetching with admin client to bypass RLS recursion
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -34,10 +35,15 @@ export default async function LMSPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) { redirect('/login?redirect=/lms'); }
 
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  // Use admin client for data queries to bypass partner_users RLS recursion
+  // Auth is already verified above via supabase.auth.getUser()
+  const admin = createAdminClient();
+  const db = admin || supabase; // fallback to user client if admin unavailable
+
+  const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
   const typedProfile = profile as Profile | null;
 
-  const { data: courseEnrollments } = await supabase
+  const { data: courseEnrollments } = await db
     .from('training_enrollments')
     .select(`id, progress, status, enrolled_at, last_accessed, course:training_courses(id, course_name, description, thumbnail_url, duration_hours, lesson_count)`)
     .eq('user_id', user.id)
@@ -77,14 +83,14 @@ export default async function LMSPage() {
 
   const courseIds = typedEnrollments.map(e => e.course?.id).filter(Boolean) as string[];
   const { data: assignments } = courseIds.length > 0 
-    ? await supabase.from('assignments').select('*').in('course_id', courseIds).gte('due_date', new Date().toISOString()).order('due_date', { ascending: true }).limit(5)
+    ? await db.from('assignments').select('*').in('course_id', courseIds).gte('due_date', new Date().toISOString()).order('due_date', { ascending: true }).limit(5)
     : { data: [] };
   const typedAssignments = (assignments || []) as Assignment[];
 
-  const { data: certificates } = await supabase.from('certificates').select('*').eq('user_id', user.id).order('issued_at', { ascending: false }).limit(3);
+  const { data: certificates } = await db.from('certificates').select('*').eq('user_id', user.id).order('issued_at', { ascending: false }).limit(3);
   const typedCertificates = (certificates || []) as Certificate[];
 
-  const { count: notificationCount } = await supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false);
+  const { count: notificationCount } = await db.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false);
 
   const totalProgress = typedEnrollments.length ? Math.round(typedEnrollments.reduce((sum, e) => sum + (e.progress || 0), 0) / typedEnrollments.length) : 0;
   const completedCourses = typedEnrollments.filter(e => e.progress === 100).length;

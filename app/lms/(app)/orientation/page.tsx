@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { requireRole } from '@/lib/auth/require-role';
@@ -72,6 +73,8 @@ export default async function OrientationPage() {
               onComplete={async () => {
                 'use server';
                 const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   if (!supabase) {
     return (

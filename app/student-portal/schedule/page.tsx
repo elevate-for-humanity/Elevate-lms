@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Calendar, Clock, MapPin, User, BookOpen } from 'lucide-react';
 
@@ -14,6 +15,8 @@ export const metadata: Metadata = {
 
 export default async function StudentPortalSchedulePage() {
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {

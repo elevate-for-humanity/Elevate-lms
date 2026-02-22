@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function generateMetadata({
   params,
@@ -9,6 +10,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { courseId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   if (!supabase) {
     return {
@@ -51,6 +54,8 @@ export default async function CourseDetailPage({
 }) {
   const { courseId } = await params;
   const supabase = await createClient();
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
   // Fetch course details
   const { data: course, error } = await supabase

@@ -55,7 +55,7 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           from: 'Elevate For Humanity <noreply@elevateforhumanity.org>',
-          to: 'elevate4humanityedu@gmail.com',
+          to: 'info@elevateforhumanity.org',
           subject: `New Advising Request from ${name}`,
           html: `
             <h2>New Advising Request</h2>

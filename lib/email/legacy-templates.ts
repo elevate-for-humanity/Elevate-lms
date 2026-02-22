@@ -430,7 +430,7 @@ export async function sendWelcomeEmail(params: WelcomeEmailParams) {
       <p><strong>Tenant ID:</strong> ${tenantId}</p>
       <p><strong>Valid Until:</strong> ${new Date(validUntil).toLocaleDateString()}</p>
       <p>You can now access your platform at: <a href="https://www.elevateforhumanity.org/platform">https://www.elevateforhumanity.org/platform</a></p>
-      <p>If you have any questions, please contact us at elevate4humanityedu@gmail.com</p>
+      <p>If you have any questions, please contact us at info@elevateforhumanity.org</p>
       <p>Thank you for choosing Elevate for Humanity!</p>
     `,
   });
@@ -460,7 +460,7 @@ export async function sendEnrollmentEmail(params: EnrollmentEmailParams) {
         <li>Attend orientation (if required)</li>
       </ol>
       <p><a href="https://www.elevateforhumanity.org/lms/dashboard">Access Your Dashboard</a></p>
-      <p>If you have any questions, please contact us at elevate4humanityedu@gmail.com</p>
+      <p>If you have any questions, please contact us at info@elevateforhumanity.org</p>
     `,
   });
 }

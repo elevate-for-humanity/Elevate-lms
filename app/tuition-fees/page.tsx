@@ -24,17 +24,43 @@ export default async function TuitionFeesPage() {
     .eq('is_active', true)
     .order('name');
 
-  const programs = (dbPrograms || []).map((p: any) => ({
-    name: p.name,
-    duration: p.duration_weeks ? `${p.duration_weeks} weeks` : p.duration || 'Varies',
-    tuition: p.tuition_cost || 0,
-    examFees: p.exam_fee || 0,
-    examFeesNote: p.exam_fee_note || 'Third-party certification exam',
-    materials: p.materials_cost || 0,
-    materialsNote: p.materials_note || 'Included in tuition',
-    total: (p.tuition_cost || 0) + (p.exam_fee || 0) + (p.materials_cost || 0),
-    fundingType: p.funding_type || 'Self-Pay',
-  }));
+  // Static program data — authoritative tuition schedule
+  // DB programs supplement this if tuition_cost is populated
+  const STATIC_PROGRAMS = [
+    { name: 'Barber Apprenticeship', duration: '52 weeks', tuition: 0, examFees: 75, examFeesNote: 'Indiana PSI barber exam', materials: 0, fundingType: 'DOL Registered Apprenticeship' },
+    { name: 'Cosmetology Apprenticeship', duration: '52 weeks', tuition: 0, examFees: 75, examFeesNote: 'Indiana PSI cosmetology exam', materials: 0, fundingType: 'DOL Registered Apprenticeship' },
+    { name: 'Esthetician Apprenticeship', duration: '36 weeks', tuition: 0, examFees: 75, examFeesNote: 'Indiana PSI esthetician exam', materials: 0, fundingType: 'DOL Registered Apprenticeship' },
+    { name: 'Nail Technician Apprenticeship', duration: '24 weeks', tuition: 0, examFees: 75, examFeesNote: 'Indiana PSI nail tech exam', materials: 0, fundingType: 'DOL Registered Apprenticeship' },
+    { name: 'CNA Certification', duration: '6 weeks', tuition: 0, examFees: 115, examFeesNote: 'Pearson VUE CNA exam', materials: 0, fundingType: 'WIOA / WRG Eligible' },
+    { name: 'CDL Training (Class A)', duration: '4 weeks', tuition: 0, examFees: 50, examFeesNote: 'Indiana BMV CDL skills test', materials: 0, fundingType: 'WIOA / WRG Eligible' },
+    { name: 'HVAC Technician', duration: '12 weeks', tuition: 0, examFees: 150, examFeesNote: 'EPA 608 certification', materials: 0, fundingType: 'WIOA / WRG Eligible' },
+    { name: 'Electrical Technician', duration: '12 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
+    { name: 'Plumbing Technician', duration: '12 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
+    { name: 'Welding', duration: '10 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
+    { name: 'Phlebotomy Technician', duration: '8 weeks', tuition: 0, examFees: 135, examFeesNote: 'NHA CPT exam', materials: 0, fundingType: 'WIOA / WRG Eligible' },
+    { name: 'Medical Assistant', duration: '16 weeks', tuition: 0, examFees: 155, examFeesNote: 'NHA CCMA exam', materials: 0, fundingType: 'WIOA / WRG Eligible' },
+    { name: 'Tax Preparation', duration: '8 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'Grant-Funded' },
+    { name: 'Web Development', duration: '16 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
+    { name: 'Cybersecurity Fundamentals', duration: '12 weeks', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'WIOA / WRG Eligible' },
+    { name: 'CPR / First Aid (HSI)', duration: '1 day', tuition: 0, examFees: 0, examFeesNote: '', materials: 0, fundingType: 'Included with programs' },
+  ];
+
+  // Use DB data if tuition fields are populated, otherwise use static
+  const dbMapped = (dbPrograms || [])
+    .filter((p: any) => p.tuition_cost != null && p.tuition_cost > 0)
+    .map((p: any) => ({
+      name: p.name,
+      duration: p.duration_weeks ? `${p.duration_weeks} weeks` : p.duration || 'Varies',
+      tuition: p.tuition_cost || 0,
+      examFees: p.exam_fee || 0,
+      examFeesNote: p.exam_fee_note || 'Third-party certification exam',
+      materials: p.materials_cost || 0,
+      fundingType: p.funding_type || 'Self-Pay',
+    }));
+
+  const programs = dbMapped.length > 0
+    ? dbMapped
+    : STATIC_PROGRAMS.map(p => ({ ...p, total: p.tuition + p.examFees + p.materials }));
 
   return (
     <div className="min-h-screen bg-white">
@@ -50,7 +76,8 @@ export default async function TuitionFeesPage() {
         <div className="max-w-6xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-4">Tuition & Fees Schedule</h1>
           <p className="text-xl text-gray-300">
-            Transparent pricing for all programs. Effective January 2026.
+            Most programs are grant-funded or employer-sponsored at no cost to eligible students.
+            Third-party exam fees may apply.
           </p>
         </div>
       </div>
@@ -85,7 +112,7 @@ export default async function TuitionFeesPage() {
               {programs.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-8 text-center text-gray-500">
-                    No programs available at this time.
+                    Program schedule is being updated. <Link href="/programs" className="text-brand-orange-600 hover:underline">View active programs</Link> or <Link href="/contact" className="text-brand-orange-600 hover:underline">contact us</Link> for current pricing.
                   </td>
                 </tr>
               ) : (

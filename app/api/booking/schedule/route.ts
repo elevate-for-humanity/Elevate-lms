@@ -96,7 +96,7 @@ export async function POST(req: Request) {
 
         await resend.emails.send({
           from: 'Elevate for Humanity <noreply@elevateforhumanity.org>',
-          to: 'elevate4humanityedu@gmail.com',
+          to: 'info@elevateforhumanity.org',
           subject: `Meeting Request from ${data.name}`,
           html: `
             <h2>New Meeting Request</h2>
@@ -124,7 +124,7 @@ export async function POST(req: Request) {
             <p><strong>Requested Date:</strong> ${dateStr}<br>
             <strong>Requested Time:</strong> ${data.time}</p>
             <p>Our team will confirm your meeting within 1 business day. If the requested time is unavailable, we will suggest alternatives.</p>
-            <p>If you need to reach us sooner, email <a href="mailto:elevate4humanityedu@gmail.com">elevate4humanityedu@gmail.com</a>.</p>
+            <p>If you need to reach us sooner, email <a href="mailto:info@elevateforhumanity.org">info@elevateforhumanity.org</a>.</p>
             <p>— Elevate for Humanity</p>
           `,
         });

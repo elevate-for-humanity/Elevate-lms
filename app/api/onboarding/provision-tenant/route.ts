@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
     const adminUrl = `https://${slug}.www.elevateforhumanity.org/admin`;
 
     await resend.emails.send({
-      from: 'Elevate for Humanity <onboarding@www.elevateforhumanity.org>',
+      from: 'Elevate for Humanity <onboarding@elevateforhumanity.org>',
       to: contactEmail,
       subject: '🎉 Your Platform is Ready!',
       html: generateWelcomeEmail({
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
     setTimeout(
       async () => {
         await resend.emails.send({
-          from: 'Elevate for Humanity <onboarding@www.elevateforhumanity.org>',
+          from: 'Elevate for Humanity <onboarding@elevateforhumanity.org>',
           to: contactEmail,
           subject: '📚 Quick Start Guide - Set Up Your Platform',
           html: generateSetupGuideEmail({
@@ -304,7 +304,7 @@ function generateWelcomeEmail(data: any): string {
       <h3>📞 Need Help?</h3>
       <p>
         • <strong>Documentation:</strong> <a href="https://www.elevateforhumanity.org/docs">docs.www.elevateforhumanity.org</a><br>
-        • <strong>Support:</strong> support@www.elevateforhumanity.org<br>
+        • <strong>Support:</strong> support@elevateforhumanity.org<br>
         • <strong>Live Chat:</strong> Available in your admin dashboard
       </p>
 
@@ -408,7 +408,7 @@ function generateSetupGuideEmail(data: any): string {
       <p>We're here for you:</p>
       <ul>
         <li><strong>Live Chat:</strong> Click the chat icon in your dashboard</li>
-        <li><strong>Email:</strong> support@www.elevateforhumanity.org</li>
+        <li><strong>Email:</strong> support@elevateforhumanity.org</li>
         <li><strong>Phone:</strong> (555) 123-4567</li>
         <li><strong>Schedule Call:</strong> <a href="https://www.elevateforhumanity.org/book">Book a setup call</a></li>
       </ul>

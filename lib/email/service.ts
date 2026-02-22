@@ -8,7 +8,7 @@
 import { sendEmail as coreSendEmail } from './resend';
 import type { EmailOptions as CoreEmailOptions } from './resend';
 
-const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
+const ADMIN_EMAIL = 'info@elevateforhumanity.org';
 
 export type EmailOptions = CoreEmailOptions;
 

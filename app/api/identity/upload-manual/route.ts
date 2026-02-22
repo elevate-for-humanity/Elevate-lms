@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        to: 'elevate4humanityedu@gmail.com',
+        to: 'info@elevateforhumanity.org',
         subject: 'New Identity Verification Pending Review',
         html: `
           <h2>New Identity Verification Submission</h2>

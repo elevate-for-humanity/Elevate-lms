@@ -32,7 +32,7 @@ export const studentEmailTemplates = {
 
         <p style="color: #666; font-size: 14px;">
           <strong>Elevate for Humanity</strong><br />
-          Support: <a href="mailto:elevate4humanityedu@gmail.com">elevate4humanityedu@gmail.com</a><br />
+          Support: <a href="mailto:info@elevateforhumanity.org">info@elevateforhumanity.org</a><br />
           Phone: <a href="tel:+13173143757">(317) 314-3757</a>
         </p>
       </div>
@@ -54,7 +54,7 @@ We're glad you took this step.
 
 —
 Elevate for Humanity
-Support: elevate4humanityedu@gmail.com
+Support: info@elevateforhumanity.org
 Phone: (317) 314-3757
     `
   },

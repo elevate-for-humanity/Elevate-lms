@@ -5,7 +5,7 @@ const FROM_EMAIL =
   process.env.MAIL_FROM ||
   'Elevate for Humanity <noreply@elevateforhumanity.org>';
 const REPLY_TO_EMAIL =
-  process.env.REPLY_TO_EMAIL || 'elevate4humanityedu@gmail.com';
+  process.env.REPLY_TO_EMAIL || 'info@elevateforhumanity.org';
 
 export interface EmailOptions {
   to: string | string[];

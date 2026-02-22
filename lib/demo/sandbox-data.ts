@@ -12,7 +12,7 @@ export const DEMO_ORGANIZATION = {
   type: 'training_provider',
   domain: 'demo.elevateforhumanity.org',
   contact_name: 'Demo Admin',
-  contact_email: 'elevate4humanityedu@gmail.com',
+  contact_email: 'info@elevateforhumanity.org',
   branding: {
     logo_url: '/images/demo/acme-logo.png',
     primary_color: '#4F46E5',

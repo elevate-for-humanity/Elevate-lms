@@ -142,7 +142,7 @@ export const emailTemplates = {
           <tr>
             <td style="background-color: #f8fafc; padding: 30px; text-align: center;">
               <p style="color: #64748b; font-size: 14px; margin: 0;">
-                Elevate for Humanity | (317) 314-3757 | elevateforhumanity.edu@gmail.com
+                Elevate for Humanity | (317) 314-3757 | info@elevateforhumanity.org
               </p>
             </td>
           </tr>
@@ -520,7 +520,7 @@ export const emailTemplates = {
           <tr>
             <td style="background-color: #f8fafc; padding: 30px; text-align: center;">
               <p style="color: #64748b; font-size: 14px; margin: 0;">
-                Elevate for Humanity | (317) 314-3757 | elevateforhumanity.edu@gmail.com
+                Elevate for Humanity | (317) 314-3757 | info@elevateforhumanity.org
               </p>
             </td>
           </tr>
@@ -724,7 +724,7 @@ export const emailTemplates = {
           <tr>
             <td style="background-color: #f8fafc; padding: 30px; text-align: center;">
               <p style="color: #64748b; font-size: 14px; margin: 0;">
-                Elevate for Humanity | (317) 314-3757 | elevateforhumanity.edu@gmail.com
+                Elevate for Humanity | (317) 314-3757 | info@elevateforhumanity.org
               </p>
             </td>
           </tr>

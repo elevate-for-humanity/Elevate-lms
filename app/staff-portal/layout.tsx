@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
-import { SkipToContent } from '@/components/ui/SkipToContent';
+
 
 export const dynamic = 'force-dynamic';
 
@@ -54,7 +54,6 @@ export default async function StaffPortalLayout({
 
   return (
     <>
-      <SkipToContent />
       <IdleTimeoutGuard />
       <nav className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

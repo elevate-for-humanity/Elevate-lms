@@ -60,7 +60,7 @@ export default function FerpaConsentPage() {
           <p>For questions about your FERPA rights or to submit a records request, contact:</p>
           <p>
             Elevate for Humanity — Program Director<br />
-            Email: elevate4humanityedu@gmail.com
+            Email: info@elevateforhumanity.org
           </p>
         </div>
       </div>

@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Elevate for Humanity <onboarding@www.elevateforhumanity.org>',
+          from: 'Elevate for Humanity <onboarding@elevateforhumanity.org>',
           to: [to],
           subject: '🎉 Welcome! Your LMS Access is Ready',
           html: emailHTML,

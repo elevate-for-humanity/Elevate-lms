@@ -10,7 +10,7 @@ import AdminHeader from '@/components/admin/AdminHeader';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import { DemoTourProvider } from '@/components/demo/DemoTourProvider';
 import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
-import { SkipToContent } from '@/components/ui/SkipToContent';
+
 
 export const dynamic = 'force-dynamic';
 
@@ -111,7 +111,6 @@ export default async function AdminLayout({
 
   const content = (
     <>
-      <SkipToContent />
       <IdleTimeoutGuard />
       <AdminSidebar />
       <div className="lg:pl-60">

@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 
-const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
+const ADMIN_EMAIL = 'info@elevateforhumanity.org';
 
 async function sendEmailDirect(to: string, subject: string, html: string) {
   try {
@@ -373,7 +373,7 @@ async function insertApplication(payload: {
     return { success: true, applicationId: `email-${referenceNumber}`, referenceNumber };
   } catch (emailError) {
     logger.error(`[Application] Email send failed for ${payload.email}`, emailError as Error);
-    return { success: false, error: 'We could not process your application. Please email us directly at elevate4humanityedu@gmail.com with your name, phone number, and program interest.' };
+    return { success: false, error: 'We could not process your application. Please email us directly at info@elevateforhumanity.org with your name, phone number, and program interest.' };
   }
 }
 

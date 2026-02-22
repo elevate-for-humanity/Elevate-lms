@@ -173,7 +173,7 @@ export function generateLicenseWelcomeEmail(data: LicenseWelcomeEmailData): {
                 Elevate for Humanity
               </p>
               <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-                Questions? Reply to this email or contact <a href="mailto:elevate4humanityedu@gmail.com" style="color: #059669;">elevate4humanityedu@gmail.com</a>
+                Questions? Reply to this email or contact <a href="mailto:info@elevateforhumanity.org" style="color: #059669;">info@elevateforhumanity.org</a>
               </p>
             </td>
           </tr>
@@ -220,7 +220,7 @@ NEED HELP?
 ==========
 Schedule a free onboarding call: https://www.elevateforhumanity.org/schedule?type=onboarding
 
-Questions? Reply to this email or contact elevate4humanityedu@gmail.com
+Questions? Reply to this email or contact info@elevateforhumanity.org
 
 ---
 Elevate for Humanity

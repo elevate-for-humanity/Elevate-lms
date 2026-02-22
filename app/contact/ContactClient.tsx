@@ -182,7 +182,7 @@ export default function ContactClient() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
-                  href="mailto:elevate4humanityedu@gmail.com"
+                  href="mailto:info@elevateforhumanity.org"
                   className="inline-flex items-center justify-center bg-zinc-900 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-xl hover:scale-105 transition-all"
                 >
                   Email Us

@@ -207,7 +207,7 @@ export async function POST(req: Request) {
     `;
 
     await sendEmail({
-      to: process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com',
+      to: process.env.PARTNER_NOTIFICATION_EMAIL || 'info@elevateforhumanity.org',
       subject: `New Barbershop Partner Application: ${body.shopLegalName}`,
       html: internalEmailHtml,
     }).catch(err => logger.error('Failed to send internal notification', err));
@@ -232,7 +232,7 @@ export async function POST(req: Request) {
       <p>If you have questions, contact us at:</p>
       <ul>
         <li>Phone: (317) 314-3757</li>
-        <li>Email: elevate4humanityedu@gmail.com</li>
+        <li>Email: info@elevateforhumanity.org</li>
       </ul>
       
       <p>Thank you for your interest in developing the next generation of licensed barbers!</p>

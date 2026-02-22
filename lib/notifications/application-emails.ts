@@ -5,7 +5,7 @@
 
 import { sendEmail } from '@/lib/email';
 
-const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
+const ADMIN_EMAIL = 'info@elevateforhumanity.org';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
 interface ApplicationData {
@@ -101,7 +101,7 @@ export async function sendApplicationConfirmation(application: ApplicationData) 
                     </p>
                     <p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
                       📞 Call us: <a href="tel:317-314-3757" style="color: #dc2626; text-decoration: none; font-weight: 600;">317-314-3757</a><br>
-                      📧 Email: <a href="mailto:elevate4humanityedu@gmail.com" style="color: #dc2626; text-decoration: none; font-weight: 600;">elevate4humanityedu@gmail.com</a>
+                      📧 Email: <a href="mailto:info@elevateforhumanity.org" style="color: #dc2626; text-decoration: none; font-weight: 600;">info@elevateforhumanity.org</a>
                     </p>
                   </div>
                 </td>
@@ -344,7 +344,7 @@ export async function sendEnrollmentLink(application: ApplicationData, enrollmen
                     </p>
                     <p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
                       📞 <a href="tel:317-314-3757" style="color: #10b981; text-decoration: none; font-weight: 600;">317-314-3757</a><br>
-                      📧 <a href="mailto:elevate4humanityedu@gmail.com" style="color: #10b981; text-decoration: none; font-weight: 600;">elevate4humanityedu@gmail.com</a>
+                      📧 <a href="mailto:info@elevateforhumanity.org" style="color: #10b981; text-decoration: none; font-weight: 600;">info@elevateforhumanity.org</a>
                     </p>
                   </div>
                 </td>

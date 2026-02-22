@@ -145,7 +145,7 @@ async function sendAlertEmail(data: {
 
     Legal contacts:
     - IP Attorney: [YOUR ATTORNEY]
-    - DMCA Agent: legal@www.elevateforhumanity.org
+    - DMCA Agent: legal@elevateforhumanity.org
   `;
 
   logger.info('[ALERT EMAIL]', emailContent);
@@ -156,8 +156,8 @@ async function sendAlertEmail(data: {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
   await sgMail.send({
-    to: 'elizabeth@www.elevateforhumanity.org',
-    from: 'alerts@www.elevateforhumanity.org',
+    to: 'elizabeth@elevateforhumanity.org',
+    from: 'alerts@elevateforhumanity.org',
     subject: '🚨 URGENT: Unauthorized Site Copy Detected',
     text: emailContent,
     html: emailContent.replace(/\n/g, '<br>')

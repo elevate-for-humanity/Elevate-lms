@@ -111,7 +111,7 @@ export function getBarberWelcomeEmail(data: BarberWelcomeEmailData): {
       <strong>Call:</strong> <a href="tel:317-314-3757" style="color: #3b82f6; text-decoration: none;">317-314-3757</a>
     </p>
     <p style="margin: 0 0 20px 0;">
-      <strong>Email:</strong> <a href="mailto:elevate4humanityedu@gmail.com" style="color: #3b82f6; text-decoration: none;">elevate4humanityedu@gmail.com</a>
+      <strong>Email:</strong> <a href="mailto:info@elevateforhumanity.org" style="color: #3b82f6; text-decoration: none;">info@elevateforhumanity.org</a>
     </p>
     <p style="margin: 0; color: #64748b; font-size: 14px;">
       Welcome to your new career in barbering!<br>
@@ -197,7 +197,7 @@ How to login:
 💬 NEED HELP?
 
 Call: 317-314-3757
-Email: elevate4humanityedu@gmail.com
+Email: info@elevateforhumanity.org
 
 Welcome to your new career in barbering!
 

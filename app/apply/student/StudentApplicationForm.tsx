@@ -44,13 +44,13 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
       } else {
         setError(
           result.error ||
-          'Something went wrong submitting your application. Please try again or contact us at elevate4humanityedu@gmail.com.'
+          'Something went wrong submitting your application. Please try again or contact us at info@elevateforhumanity.org.'
         );
         setLoading(false);
       }
     } catch {
       setError(
-        'The application system is temporarily unavailable. Please email us at elevate4humanityedu@gmail.com with your name, phone, and program interest.'
+        'The application system is temporarily unavailable. Please email us at info@elevateforhumanity.org with your name, phone, and program interest.'
       );
       setLoading(false);
     }

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TEAM } from '@/data/team';
 
@@ -301,6 +301,29 @@ export default function AboutPage() {
                 <p className="text-xs text-gray-600">{cred.desc}</p>
               </div>
             ))}
+          </div>
+
+          {/* Verification Links */}
+          <div className="mt-8 bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="font-bold text-slate-900 text-sm mb-3 uppercase tracking-wider">Verify Our Credentials</h3>
+            <div className="grid sm:grid-cols-2 gap-3 text-sm">
+              <a href="https://intraining.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-800 hover:underline">
+                <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+                INTraining — ETPL Provider Lookup (search &quot;2Exclusive&quot;)
+              </a>
+              <a href="https://www.apprenticeship.gov/partner-finder" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-800 hover:underline">
+                <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+                Apprenticeship.gov — Registered Sponsor Finder
+              </a>
+              <a href="https://www.in.gov/dwd/job-seekers/training-opportunities/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-800 hover:underline">
+                <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+                Indiana DWD — Training Opportunities
+              </a>
+              <Link href="/cert/verify" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-800 hover:underline">
+                <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+                Verify a Student Certificate
+              </Link>
+            </div>
           </div>
         </div>
       </section>

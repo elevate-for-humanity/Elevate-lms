@@ -429,7 +429,7 @@ async function sendMiladyCredentialsEmail(
     </ol>
     
     <p style="font-size: 14px; color: #6b7280;">
-      Questions? Contact us at <a href="mailto:elevate4humanityedu@gmail.com">elevate4humanityedu@gmail.com</a>
+      Questions? Contact us at <a href="mailto:info@elevateforhumanity.org">info@elevateforhumanity.org</a>
     </p>
   </div>
 </body>

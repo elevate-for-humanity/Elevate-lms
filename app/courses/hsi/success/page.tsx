@@ -186,9 +186,9 @@ export default async function HSISuccessPage({
                   <Phone className="w-4 h-4" />
                   Get Help Online
                 </a>
-                <a href="mailto:elevateforhumanity@gmail.com" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700">
+                <a href="mailto:info@elevateforhumanity.org" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700">
                   <Mail className="w-4 h-4" />
-                  elevateforhumanity@gmail.com
+                  info@elevateforhumanity.org
                 </a>
               </div>
             </div>

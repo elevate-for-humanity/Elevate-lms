@@ -276,7 +276,7 @@ export default function ContactPage() {
                   const endH = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
                   const endDT = `${date.replace(/-/g, '')}T${endH}${time.split(':')[1]}00`;
                   const details = `Meeting with ${name} (${email})%0A%0ATopic: ${encodeURIComponent(topic || 'General inquiry')}%0A%0AZoom Link: ${ZOOM_MEETING_URL}`;
-                  const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Elevate for Humanity — Meeting')}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)},${encodeURIComponent('elevate4humanityedu@gmail.com')}&location=Zoom`;
+                  const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Elevate for Humanity — Meeting')}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)},${encodeURIComponent('info@elevateforhumanity.org')}&location=Zoom`;
 
                   window.open(calUrl, '_blank');
                 }}

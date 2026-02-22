@@ -56,7 +56,7 @@ export async function POST(req: Request) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to: 'elevate4humanityedu@gmail.com',
+          to: 'info@elevateforhumanity.org',
           subject: `New Employer Onboarding: ${business_name}`,
           html: `
             <h2>New Employer Onboarding Submission</h2>

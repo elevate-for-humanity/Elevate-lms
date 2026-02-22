@@ -148,6 +148,16 @@ export default async function ProgramsPage() {
   
   return (
     <div className="min-h-screen bg-white">
+      {/* Now Enrolling Banner */}
+      <div className="bg-brand-green-600 text-white py-2.5 text-center text-sm font-semibold tracking-wide">
+        <div className="max-w-6xl mx-auto px-4 flex items-center justify-center gap-3 flex-wrap">
+          <span>Now Enrolling — Grant-Funded Programs Available</span>
+          <Link href="/apply" className="inline-flex items-center gap-1 bg-white text-brand-green-700 px-3 py-1 rounded-full text-xs font-bold hover:bg-green-50 transition-colors">
+            Apply Today →
+          </Link>
+        </div>
+      </div>
+
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -457,7 +467,13 @@ export default async function ProgramsPage() {
                     </div>
                     <div>
                       <span className="text-slate-500 text-xs block">Funding</span>
-                      <span className="font-medium text-brand-green-700">{program.funding}</span>
+                      <div className="flex flex-wrap gap-1 mt-0.5">
+                        {program.funding.split(',').map((f: string) => (
+                          <span key={f.trim()} className="inline-block bg-brand-green-100 text-brand-green-800 text-[10px] font-bold px-1.5 py-0.5 rounded">
+                            {f.trim()}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
 

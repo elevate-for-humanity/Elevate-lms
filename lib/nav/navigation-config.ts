@@ -237,8 +237,8 @@ export const contactInfo = {
     tel: '+13173143757',
   },
   email: {
-    general: 'elevate4humanityedu@gmail.com',
-    support: 'elevate4humanityedu@gmail.com',
+    general: 'info@elevateforhumanity.org',
+    support: 'info@elevateforhumanity.org',
     security: 'security@www.elevateforhumanity.org',
   },
   address: {

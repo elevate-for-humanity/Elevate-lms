@@ -391,7 +391,7 @@ export async function getAppointmentsNeedingReminders(
  */
 export const APPOINTMENT_CONTACT = {
   phone: '(317) 314-3757',
-  email: 'elevate4humanityedu@gmail.com',
+  email: 'info@elevateforhumanity.org',
   address: '8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240',
   hours: 'Monday-Friday, 9:00 AM - 5:00 PM EST'
 };

@@ -103,7 +103,7 @@ async function sendEmail(payload: EmailPayload): Promise<void> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: process.env.EMAIL_FROM || 'elevate4humanityedu@gmail.com',
+        from: process.env.EMAIL_FROM || 'info@elevateforhumanity.org',
         to: [to],
         subject: template.subject,
         html: template.html,

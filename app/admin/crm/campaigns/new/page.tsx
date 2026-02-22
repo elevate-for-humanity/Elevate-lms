@@ -19,7 +19,7 @@ export default function NewCampaignPage() {
     name: '',
     subject: '',
     from_name: 'Elevate for Humanity',
-    from_email: 'elevate4humanityedu@gmail.com',
+    from_email: 'info@elevateforhumanity.org',
     html_content: '',
     target_audience: 'all_students', // all_students, active_students, inactive_students, program_holders, instructors
   });

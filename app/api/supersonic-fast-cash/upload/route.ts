@@ -60,7 +60,7 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           from: 'Supersonic Fast Cash <noreply@supersonicfastcash.com>',
-          to: 'elevate4humanityedu@gmail.com',
+          to: 'info@elevateforhumanity.org',
           subject: `New Tax Document Upload from ${firstName} ${lastName}`,
           html: `
             <h2>New Tax Document Upload</h2>

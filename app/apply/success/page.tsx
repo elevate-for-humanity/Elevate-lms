@@ -95,10 +95,11 @@ const ROLE_CONFIG: Record<string, {
 
 const ENROLLED_CONFIG = {
   title: "You're Enrolled!",
-  message: "Your account is set up and your courses are ready. Check your email for a one-click login link to access your dashboard.",
+  message: "Your account is set up. Check your email for a one-click login link to start onboarding.",
   steps: [
-    { icon: <Mail className="w-5 h-5 text-brand-blue-600" />, title: 'Check your email', description: 'We sent you a login link. Click "Open My Dashboard" in the email to sign in instantly — no password needed.' },
-    { icon: <BookOpen className="w-5 h-5 text-brand-blue-600" />, title: 'Start learning', description: 'Your courses are loaded and ready. Begin your first lesson right away.' },
+    { icon: <Mail className="w-5 h-5 text-brand-blue-600" />, title: 'Check your email', description: 'We sent you a login link. Click "Start My Onboarding" in the email to sign in instantly — no password needed.' },
+    { icon: <UserCheck className="w-5 h-5 text-brand-blue-600" />, title: 'Complete onboarding', description: 'Fill in your profile, upload your ID, confirm funding, and complete a short orientation.' },
+    { icon: <BookOpen className="w-5 h-5 text-brand-blue-600" />, title: 'Start learning', description: 'Once onboarding is done, your courses are ready in the dashboard.' },
   ],
   primaryLink: '/login',
   primaryLabel: 'Or Sign In Here',

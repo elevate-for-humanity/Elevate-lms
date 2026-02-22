@@ -2,16 +2,40 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-import OpenAI from 'openai';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 
-const openai = process.env.OPENAI_API_KEY
-  ? new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    })
-  : null;
+const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
+
+async function callGemini(systemPrompt: string, userPrompt: string): Promise<string | null> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+
+  for (const model of GEMINI_MODELS) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: systemPrompt }] },
+            contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+            generationConfig: { maxOutputTokens: 150, temperature: 0.7 },
+          }),
+        },
+      );
+      if (!res.ok) continue;
+      const data = await res.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) return text;
+    } catch (err) {
+      logger.error(`Gemini ${model} error:`, err as Error);
+    }
+  }
+  return null;
+}
 
 const contextPrompts = {
   welcome:
@@ -24,79 +48,51 @@ const contextPrompts = {
     'You are an AI instructor congratulating a student on completing a module. Celebrate their achievement and encourage them to continue. Keep it brief (2-3 sentences).',
 };
 
+const fallbackMessages = {
+  welcome:
+    "Welcome to your training program! I'm your AI instructor, here to guide you every step of the way. Together, we'll build the skills you need for a successful career. Let's get started!",
+  lesson:
+    "Let's dive into this lesson together. Remember, learning is a journey - take your time, ask questions, and don't be afraid to make mistakes. Every expert was once a beginner!",
+  encouragement:
+    "You're making excellent progress! Your dedication and hard work are truly paying off. Keep pushing forward - you're closer to your goals than you think!",
+  completion:
+    "Congratulations on completing this module! This is a significant achievement. Take a moment to celebrate your success, then get ready for the next exciting challenge ahead!",
+};
+
 export async function POST(req: NextRequest) {
-    const rateLimited = await applyRateLimit(req, 'api');
-    if (rateLimited) return rateLimited;
+  const rateLimited = await applyRateLimit(req, 'api');
+  if (rateLimited) return rateLimited;
 
-    const auth = await requireAuth(req);
-    if (auth.error) return auth.error;
-
-  // Fallback messages for when API is not configured
-  const fallbackMessages = {
-    welcome:
-      "Welcome to your training program! I'm your AI instructor, here to guide you every step of the way. Together, we'll build the skills you need for a successful career. Let's get started!",
-    lesson:
-      "Let's dive into this lesson together. Remember, learning is a journey - take your time, ask questions, and don't be afraid to make mistakes. Every expert was once a beginner!",
-    encouragement:
-      "You're making excellent progress! Your dedication and hard work are truly paying off. Keep pushing forward - you're closer to your goals than you think!",
-    completion:
-      "Congratulations on completing this module! This is a significant achievement. Take a moment to celebrate your success, then get ready for the next exciting challenge ahead!",
-  };
+  const auth = await requireAuth(req);
+  if (auth.error) return auth.error;
 
   try {
     const { programId, lessonId, context = 'welcome' } = await req.json();
 
-    // If no OpenAI configured, return helpful fallback
-    if (!openai) {
+    if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json({
         message: fallbackMessages[context as keyof typeof fallbackMessages] || fallbackMessages.welcome,
-        fallback: true
+        fallback: true,
       });
     }
 
     const systemPrompt =
-      contextPrompts[context as keyof typeof contextPrompts] ||
-      contextPrompts.welcome;
+      contextPrompts[context as keyof typeof contextPrompts] || contextPrompts.welcome;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'system',
-          content: systemPrompt,
-        },
-        {
-          role: 'user',
-          content: `Generate an encouraging message for a student in program ${programId || 'general training'}, lesson ${lessonId || 'introduction'}.`,
-        },
-      ],
-      max_tokens: 150,
-      temperature: 0.7,
-    });
+    const userPrompt = `Generate an encouraging message for a student in program ${programId || 'general training'}, lesson ${lessonId || 'introduction'}.`;
 
-    const message =
-      completion.choices[0]?.message?.content ||
-      "Welcome! I'm here to support your learning journey.";
-
-    // Optional: Generate audio with ElevenLabs
-    // const audioUrl = await generateAudio(message);
+    const message = await callGemini(systemPrompt, userPrompt);
 
     return NextResponse.json({
-      message,
-      // audioUrl,
+      message: message || fallbackMessages[context as keyof typeof fallbackMessages] || fallbackMessages.welcome,
+      fallback: !message,
     });
-  } catch (error) { 
-    logger.error(
-      'AI Instructor error:',
-      error instanceof Error ? error : new Error(String(error))
-    );
-
-    const context = 'welcome';
+  } catch (error) {
+    logger.error('AI Instructor error:', error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json({
-      message:
-        fallbackMessages[context as keyof typeof fallbackMessages] ||
-        fallbackMessages.welcome,
+      message: fallbackMessages.welcome,
+      fallback: true,
     });
   }
 }

@@ -211,7 +211,7 @@ async function createStudentAccount(
       const { data: linkData } = await supabase.auth.admin.generateLink({
         type: 'magiclink',
         email: normalizedEmail,
-        options: { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/lms/dashboard?welcome=true` },
+        options: { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/onboarding/learner` },
       });
       if (linkData?.properties?.action_link) {
         magicLink = linkData.properties.action_link;
@@ -318,7 +318,7 @@ async function insertApplication(payload: {
   async function sendApplicationEmails(magicLink?: string | null) {
     // Build the login step based on whether we have a magic link
     const loginStep = magicLink
-      ? `<li><strong>Log in now:</strong> <a href="${magicLink}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;margin:8px 0">Open My Dashboard</a></li>`
+      ? `<li><strong>Log in now:</strong> <a href="${magicLink}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;margin:8px 0">Start My Onboarding</a></li>`
       : [
           `<li><strong>Set your password:</strong> Go to <a href="${siteUrl}/forgot-password">${siteUrl}/forgot-password</a> and enter your email: <strong>${payload.email}</strong></li>`,
           `<li><strong>Log in:</strong> Go to <a href="${siteUrl}/login">${siteUrl}/login</a></li>`,

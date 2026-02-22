@@ -23,7 +23,7 @@ export default function HVACProgramContent() {
     },
     {
       question: "How long is the program?",
-      answer: "12 weeks, 144 total hours. That breaks down to 72 hours of evening classroom instruction, 36 hours of self-paced online coursework you complete on your own time, and 36 hours of supervised visits to real HVAC job sites where you'll watch technicians work and meet hiring managers."
+      answer: "400 hours total. That includes classroom instruction, self-paced online coursework, hands-on lab time, and supervised visits to real HVAC job sites where you'll observe technicians and meet hiring managers. Flexible scheduling is available — day and evening options."
     },
     {
       question: "Is this program free?",
@@ -39,7 +39,7 @@ export default function HVACProgramContent() {
     },
     {
       question: "Can I work while in the program?",
-      answer: "Yes. Classes are in the evening and the online coursework is self-paced, so most students keep their current job while training. The program is designed for working adults."
+      answer: "Yes. Flexible scheduling is available with day and evening options, and the online coursework is self-paced, so most students keep their current job while training. The program is designed for working adults."
     },
     {
       question: "What does 'employer site days' mean?",
@@ -94,10 +94,10 @@ export default function HVACProgramContent() {
 
             <div className="flex flex-wrap gap-4 mb-8 text-sm text-gray-300">
               <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
-                <Clock className="w-4 h-4" /> 12 Weeks
+                <Clock className="w-4 h-4" /> 400 Hours
               </span>
               <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
-                <Calendar className="w-4 h-4" /> Evening Classes
+                <Calendar className="w-4 h-4" /> Flexible Scheduling
               </span>
               <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
                 <TrendingUp className="w-4 h-4" /> 4-Star Indiana Top Job
@@ -153,10 +153,10 @@ export default function HVACProgramContent() {
               </div>
               <div className="p-6">
                 <div className="text-3xl font-bold text-brand-blue-600 mb-1">72 Hours</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Evening Classroom</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Classroom Instruction</h3>
                 <p className="text-gray-600">
                   Instructor-led classes covering HVAC theory, electrical fundamentals,
-                  refrigeration, and EPA 608 exam prep. Evenings so you can keep your day job.
+                  refrigeration, and EPA 608 exam prep. Flexible day and evening options available.
                 </p>
               </div>
             </div>
@@ -365,7 +365,7 @@ export default function HVACProgramContent() {
                   <h3 className="text-lg font-bold text-gray-900">Program Certificate</h3>
                 </div>
                 <p className="text-gray-600 text-sm">
-                  Documents your 144 hours of instruction, employer site visits, and exam preparation.
+                  Documents your 400 hours of instruction, employer site visits, and exam preparation.
                   Includes your apprenticeship application portfolio with documented OJT hours.
                 </p>
               </div>
@@ -461,7 +461,7 @@ export default function HVACProgramContent() {
             <div className="bg-white rounded-xl border border-slate-200 p-5">
               <h3 className="font-bold text-gray-900 mb-1">Standard Track — 15 Weeks</h3>
               <p className="text-sm text-gray-600">
-                One session per week. Designed for working adults who need evening or weekend scheduling. Covers all material at a steady pace with time for review between sessions.
+                Flexible scheduling with day and evening options. Designed for working adults. Covers all material at a steady pace with time for review between sessions.
               </p>
             </div>
             <div className="bg-white rounded-xl border-2 border-brand-red-200 p-5">

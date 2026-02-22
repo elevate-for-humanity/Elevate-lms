@@ -6,17 +6,48 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import OpenAI from 'openai';
+import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-// Initialize OpenAI client only if API key is available
-const openai = process.env.OPENAI_API_KEY
-  ? new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    })
-  : null;
+const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
 
-// AI Instructor System Prompt
+async function callGemini(
+  systemPrompt: string,
+  messages: Array<{ role: string; content: string }>,
+): Promise<string | null> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+
+  const contents = messages.map((m) => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }],
+  }));
+
+  for (const model of GEMINI_MODELS) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: systemPrompt }] },
+            contents,
+            generationConfig: { maxOutputTokens: 800, temperature: 0.7 },
+          }),
+        },
+      );
+      if (!res.ok) continue;
+      const data = await res.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) return text;
+    } catch (err) {
+      logger.error(`Gemini ${model} error:`, err as Error);
+    }
+  }
+  return null;
+}
+
 const SYSTEM_PROMPT = `You are an AI instructor assistant for Elevate for Humanity, a workforce training institution. Your role is to guide students through their programs and courses with consistent, helpful support.
 
 ## Your Responsibilities:
@@ -28,40 +59,14 @@ const SYSTEM_PROMPT = `You are an AI instructor assistant for Elevate for Humani
 
 ## Available Programs:
 1. **Barbering** (2,000 hours, 15-24 months) / **Cosmetology** (1,500 hours, 12-18 months)
-   - State licensure preparation
-   - Theory + practical skills
-   - Milady CIMA integration for theory
-   - Hands-on training in salon techniques
-
 2. **Certified Nursing Assistant (CNA)** (120 hours, 4-8 weeks)
-   - State certification preparation
-   - Clinical skills training
-   - Patient care fundamentals
-   - Healthcare career pathway
-
-3. **HVAC Technician** (360 hours, 8-12 weeks)
-   - EPA 608 certification
-   - NATE certification preparation
-   - Residential and commercial systems
-   - Hands-on equipment training
-
-4. **Tax Preparation** (240 hours, 8 weeks)
-   - IRS PTIN certification
-   - AFSP (Annual Filing Season Program)
-   - Individual and business tax returns
-   - Tax software training
-
-5. **Commercial Driver's License (CDL)** (160 hours, 4-6 weeks)
-   - Class A CDL preparation
-   - DOT regulations and safety
-   - Pre-trip inspection
-   - Road test preparation
+3. **HVAC Technician** (400 hours) — EPA 608, NATE certification prep
+4. **Tax Preparation** (240 hours, 8 weeks) — IRS PTIN, AFSP
+5. **Commercial Driver's License (CDL)** (160 hours, 4-6 weeks) — Class A CDL
 
 ## Key Resources:
 - Student Handbook: /student-handbook
-- Course Syllabi: /syllabi
 - Hour Tracking: /lms/hours-tracking
-- Milady CIMA: /lms/milady
 - Career Services: /career-services
 - Financial Aid: /funding
 - Support Services: /support
@@ -71,33 +76,22 @@ const SYSTEM_PROMPT = `You are an AI instructor assistant for Elevate for Humani
 - Provide specific, actionable guidance
 - Reference official resources when appropriate
 - Escalate complex issues to human staff
-- Use clear, professional language
-- Be concise but thorough
-
-## Important Notes:
-- Always verify student enrollment before providing program-specific advice
-- Direct financial questions to financial aid office
-- Direct technical issues to IT support
-- Direct personal/crisis situations to student services
-- Remind students of important deadlines and requirements
-
-When a student asks a question, provide helpful guidance while directing them to the appropriate resources or staff when needed.`;
+- Be concise but thorough`;
 
 export async function POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    // Check if OpenAI is configured
-    if (!openai) {
+    if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
         { error: 'AI Instructor is not configured. Please contact support.' },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+    const db = createAdminClient() || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -110,10 +104,7 @@ export async function POST(request: NextRequest) {
     const { message, conversationHistory = [] } = body;
 
     if (!message) {
-      return NextResponse.json(
-        { error: 'Message is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
     // Get student context
@@ -125,17 +116,11 @@ export async function POST(request: NextRequest) {
 
     const { data: enrollment } = await db
       .from('program_enrollments')
-      .select(
-        `
-        *,
-        program:programs(*)
-      `
-      )
+      .select('*, program:programs(*)')
       .eq('student_id', user.id)
       .eq('status', 'active')
       .single();
 
-    // Build context message
     let contextMessage = `Student: ${profile?.full_name || 'Unknown'}`;
     if (enrollment) {
       contextMessage += `\nEnrolled in: ${enrollment.program?.name}`;
@@ -145,76 +130,44 @@ export async function POST(request: NextRequest) {
       contextMessage += `\nNo active enrollment`;
     }
 
-    // Prepare messages for OpenAI
-    const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-      {
-        role: 'system',
-        content: SYSTEM_PROMPT,
-      },
-      {
-        role: 'system',
-        content: `Current student context:\n${contextMessage}`,
-      },
+    const chatMessages = [
+      { role: 'user', content: `Current student context:\n${contextMessage}` },
       ...conversationHistory.map((msg: { role: string; content: string }) => ({
-        role: msg.role as 'user' | 'assistant',
+        role: msg.role,
         content: msg.content,
       })),
-      {
-        role: 'user',
-        content: message,
-      },
+      { role: 'user', content: message },
     ];
 
-    // Call OpenAI API
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages,
-      temperature: 0.7,
-      max_tokens: 800,
-    });
+    const response = await callGemini(SYSTEM_PROMPT, chatMessages);
 
-    const response =
-      completion.choices[0]?.message?.content ||
+    const finalResponse =
+      response ||
       'I apologize, but I was unable to generate a response. Please try again or contact student support.';
 
     // Log conversation
     await db.from('ai_instructor_logs').insert({
       student_id: user.id,
       message,
-      response,
+      response: finalResponse,
       enrollment_id: enrollment?.id,
       created_at: new Date().toISOString(),
     });
 
-    return NextResponse.json({
-      response,
-      conversationId: completion.id,
-    });
-  } catch (error) { 
-    // Error: $1
-    return NextResponse.json(
-      { error: 'Failed to process request' },
-      { status: 500 }
-    );
+    return NextResponse.json({ response: finalResponse });
+  } catch (error) {
+    logger.error('AI Instructor error:', error instanceof Error ? error : new Error(String(error)));
+    return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
   }
 }
 
-// Get conversation history
 export async function GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    // Check if OpenAI is configured
-    if (!openai) {
-      return NextResponse.json(
-        { error: 'AI Instructor is not configured' },
-        { status: 503 }
-      );
-    }
-
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+    const db = createAdminClient() || supabase;
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -231,11 +184,8 @@ export async function GET(request: NextRequest) {
       .limit(20);
 
     return NextResponse.json({ conversations });
-  } catch (error) { 
-    // Error: $1
-    return NextResponse.json(
-      { error: 'Failed to fetch conversations' },
-      { status: 500 }
-    );
+  } catch (error) {
+    logger.error('AI Instructor GET error:', error instanceof Error ? error : new Error(String(error)));
+    return NextResponse.json({ error: 'Failed to fetch conversations' }, { status: 500 });
   }
 }

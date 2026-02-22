@@ -55,25 +55,16 @@ export default async function AcademicIntegrityPage() {
       </div>
       
       {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/heroes/faq-section-2.jpg"
           alt="Academic Integrity"
           fill
-          className="object-cover brightness-50"
+          className="object-cover"
           quality={100}
           priority
           sizes="100vw"
         />
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <Shield className="w-16 h-16 mx-auto mb-4" />
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
-            Academic Integrity Policy
-          </h1>
-          <p className="text-xl md:text-2xl">
-            Upholding Honesty, Ethics, and Professional Standards
-          </p>
-        </div>
       </section>
 
       <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8 sm:px-6 sm:py-12">
@@ -497,7 +488,7 @@ export default async function AcademicIntegrityPage() {
           </div>
         </div>
       {/* CTA Section */}
-      <section className="bg-brand-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>

@@ -36,14 +36,9 @@ export default function SkillDevelopmentPage() {
         </div>
       </div>
 
-      <section className="relative h-[350px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image src="/images/hero/hero-hands-on-training.jpg" alt="Skill Development" fill className="object-cover" priority sizes="100vw" />
         
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <Wrench className="w-16 h-16 mx-auto mb-4 text-white/80" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Skill Development</h1>
-          <p className="text-xl text-brand-green-100">Build the skills you need to succeed</p>
-        </div>
       </section>
 
       <section className="py-16 bg-white">
@@ -93,7 +88,7 @@ export default function SkillDevelopmentPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-brand-green-700 text-white">
+      <section className="py-16 bg-brand-green-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Start Building Your Skills</h2>
           <p className="text-xl text-brand-green-100 mb-8">Get matched with a mentor who can help you grow.</p>

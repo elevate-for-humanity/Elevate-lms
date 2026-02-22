@@ -82,7 +82,7 @@ export default async function GrantWorkflowPage() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/homepage/funders-philanthropy.jpg"
           alt="Grant Workflow"
@@ -93,12 +93,6 @@ export default async function GrantWorkflowPage() {
           sizes="100vw"
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Grants</h1>
-          <p className="text-base md:text-lg mb-8 text-gray-100">
-            Review and manage grant applications
-          </p>
-        </div>
       </section>
 
       <div className="min-h-screen bg-slate-50">

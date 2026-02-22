@@ -58,7 +58,7 @@ export default function ProgramHolderLanding() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[400px] flex items-center overflow-hidden bg-teal-800">
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden bg-teal-800">
         <Image
           src="/images/heroes/training-provider-2.jpg"
           alt="Program Holder Portal"
@@ -66,20 +66,6 @@ export default function ProgramHolderLanding() {
           className="object-cover opacity-30"
           priority
         />
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-16 text-center text-white">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Program Holder Portal</h1>
-          <p className="text-xl text-teal-100 mb-8 max-w-2xl mx-auto">
-            Manage your training programs, track outcomes, and grow your workforce development impact.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/login?redirect=/program-holder/dashboard" className="px-8 py-4 bg-white text-teal-800 font-bold rounded-lg hover:bg-teal-50">
-              Sign In
-            </Link>
-            <Link href="/onboarding/partner" className="px-8 py-4 bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-500 border border-teal-400">
-              Become a Program Holder
-            </Link>
-          </div>
-        </div>
       </section>
 
       {/* Avatar Guide */}
@@ -101,7 +87,7 @@ export default function ProgramHolderLanding() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-teal-800 text-white">
+      <section className="py-16 bg-teal-800">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Expand Your Training Programs?</h2>
           <p className="text-teal-100 mb-8">

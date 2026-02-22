@@ -50,7 +50,7 @@ export default async function BankingPage() {
         <Breadcrumbs items={[{ label: "Banking" }]} />
       </div>
 {/* Hero */}
-      <section className="relative h-[400px] md:h-[500px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/programs/efh-business-startup-marketing-hero.jpg"
           alt="Banking Services"
@@ -61,23 +61,6 @@ export default async function BankingPage() {
         />
         
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 uppercase">
-            Banking Services
-          </h1>
-          <p className="text-xl md:text-2xl mb-4">
-            Powered by EPS Financial - FDIC Insured
-          </p>
-          <p className="text-lg mb-8">
-            Fast refund advances, direct deposit, and prepaid card services
-          </p>
-          <Link
-            href="#products"
-            className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-block"
-          >
-            View Products
-          </Link>
-        </div>
       </section>
 
       {/* Trust Badges */}
@@ -378,7 +361,7 @@ export default async function BankingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Get Started?

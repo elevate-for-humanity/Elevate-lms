@@ -78,7 +78,7 @@ export default function CareerCounselingPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[350px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/community/event-5.jpg"
           alt="Career Counseling Services"
@@ -89,23 +89,6 @@ export default function CareerCounselingPage() {
         />
         
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <span className="inline-block bg-white/20 backdrop-blur-sm text-white text-sm font-semibold px-4 py-2 rounded-full mb-4">
-            Free for Program Participants
-          </span>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Career Counseling
-          </h1>
-          <p className="text-xl md:text-2xl mb-6">
-            Discover your path. Achieve your potential.
-          </p>
-          <Link
-            href="/career-services/contact"
-            className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center"
-          >
-            Schedule a Session <ArrowRight className="ml-2 w-5 h-5" />
-          </Link>
-        </div>
       </section>
 
       {/* What We Offer */}
@@ -331,7 +314,7 @@ export default function CareerCounselingPage() {
       </section>
 
       {/* Testimonial */}
-      <section className="py-16 bg-brand-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-2xl italic mb-6">
             &quot;Career counseling helped me realize I had more options than I thought. My counselor helped me see how my skills could transfer to a completely new field. Now I am in a career I love.&quot;

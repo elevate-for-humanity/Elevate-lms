@@ -66,21 +66,7 @@ export default function TestimonialsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[400px] flex items-center overflow-hidden bg-slate-700">
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 w-full">
-          <div className="max-w-2xl">
-            <span className="inline-block px-4 py-2 bg-brand-green-500 text-white text-sm font-semibold rounded-full mb-6">
-              Real People, Real Results
-            </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6">
-              Success Stories
-            </h1>
-            <p className="text-xl text-gray-200 mb-8">
-              Meet the graduates who transformed their lives through career training. 
-              Their success could be your success.
-            </p>
-          </div>
-        </div>
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden bg-slate-700">
       </section>
 
       {/* Stats - only show if we have testimonials */}
@@ -208,7 +194,7 @@ export default function TestimonialsPage() {
         )}
 
         {/* CTA */}
-        <section className="bg-slate-700 rounded-2xl p-8 text-white text-center">
+        <section className="bg-slate-700 rounded-2xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">Your Success Story Starts Here</h2>
           <p className="text-brand-orange-100 mb-6 max-w-xl mx-auto">
             Join the graduates who have transformed their lives through 

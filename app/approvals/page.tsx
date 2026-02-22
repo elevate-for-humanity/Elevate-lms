@@ -26,7 +26,7 @@ export default function ApprovalsPage() {
         <Breadcrumbs items={[{ label: "Approvals" }]} />
       </div>
 {/* Hero Section with Background Image */}
-      <section className="relative h-[500px] w-full overflow-hidden">
+      <section className="relative h-48 md:h-64 w-full overflow-hidden">
         <Image
           src="/images/programs/cpr-group-training-hd.jpg"
           alt="Official documents and certifications"
@@ -37,20 +37,6 @@ export default function ApprovalsPage() {
           sizes="100vw"
         />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 h-full flex items-center">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-2xl">
-              Approvals, Credentials & Partnerships
-            </h1>
-            <p className="text-base md:text-lg text-slate-200 leading-relaxed drop-shadow-lg">
-              Elevate For Humanity operates under Selfish Inc, a 501(c)(3)
-              nonprofit and registered federal contractor. Together, our
-              entities form a multi-industry-standard workforce ecosystem that
-              is approved by state and federal agencies to deliver training,
-              apprenticeships, and workforce services.
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* State & Workforce Approvals */}

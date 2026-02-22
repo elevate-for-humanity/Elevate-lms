@@ -52,8 +52,6 @@ const features = [
   },
 ];
 
-
-
 const useCases = [
   {
     title: 'Workforce Boards',
@@ -97,7 +95,7 @@ export default function AnalyticsProPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-[50vh] min-h-[400px] flex items-center overflow-hidden">
+      <section className="relative h-[50vh] min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
           src="/images/technology/program-it-support-training.jpg"
           alt="Analytics Pro"
@@ -106,39 +104,7 @@ export default function AnalyticsProPage() {
           priority
         />
         
-        <div className="relative z-10 max-w-6xl mx-auto px-4 w-full">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
-              <BarChart3 className="w-6 h-6 text-slate-900" />
-            </div>
-            <span className="text-indigo-200 font-medium">Platform Add-On</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-4">
-            Analytics Pro
-          </h1>
-          <p className="text-xl text-indigo-100 max-w-2xl mb-6">
-            Advanced reporting and predictive analytics for workforce development. 
-            Turn data into actionable insights that improve student outcomes.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link 
-              href="/contact?product=analytics-pro"
-              className="inline-flex items-center gap-2 bg-white text-indigo-700 px-6 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-colors"
-            >
-              Request Demo
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link 
-              href="#features"
-              className="inline-flex items-center gap-2 border-2 border-white text-slate-900 px-6 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
-            >
-              View Features
-            </Link>
-          </div>
-        </div>
       </section>
-
-
 
       {/* Features Grid */}
       <section id="features" className="py-16 lg:py-24">

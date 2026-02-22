@@ -75,7 +75,7 @@ const templateFileContents: Record<string, string> = {
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Editor' }]} />
       </div>
       {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/heroes/blog-post-2.jpg"
           alt="Hero"
@@ -86,10 +86,6 @@ const templateFileContents: Record<string, string> = {
           sizes="100vw"
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Content Studio</h1>
-          <p className="text-base md:text-lg mb-8 text-gray-100">Create and manage content for your platform</p>
-        </div>
       </section>
       <h1>Welcome to EFH</h1>
       <p>Edit this file to see changes</p>
@@ -129,7 +125,6 @@ npm run dev
 \`\`\`
 `,
 };
-
 
 export default function EditorPage() {
   const [selectedFile, setSelectedFile] = useState<string>('/app/page.tsx');
@@ -248,7 +243,7 @@ export default function EditorPage() {
           </div>
         </Split>
         {/* CTA Section */}
-        <section className="py-16    text-white">
+        <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-2xl md:text-3xl font-bold mb-6">

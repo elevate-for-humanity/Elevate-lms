@@ -49,7 +49,7 @@ export default function EmployersPage() {
       </div>
 
       {/* Hero with Image */}
-      <section className="relative min-h-[550px] flex items-center overflow-hidden">
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
           src="/images/heroes/workforce-partner-2.jpg"
           alt="Partner with Elevate for Humanity"
@@ -57,37 +57,6 @@ export default function EmployersPage() {
           className="object-cover"
           priority
         />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 w-full">
-          <div className="max-w-2xl bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
-            <div className="inline-flex items-center gap-2 bg-brand-orange-100 text-brand-orange-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
-              <Building2 className="w-4 h-4" />
-              For Employers
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
-              Hire Trained, Certified Candidates
-            </h1>
-            <p className="text-xl text-gray-700 mb-8">
-              Access a pipeline of job-ready talent who have completed hands-on training 
-              and earned industry credentials. No recruiting fees. No guesswork.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/contact?type=employer"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-semibold rounded-lg transition-colors"
-              >
-                Partner With Us
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <a
-                href="/support"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-lg transition-colors"
-              >
-                <Phone className="w-5 h-5" />
-                Get Help Online
-              </a>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Avatar Guide */}
@@ -262,7 +231,7 @@ export default function EmployersPage() {
       <EmployerPartners variant="full" showStats={true} showCTA={false} />
 
       {/* CTA */}
-      <section className="py-20 bg-brand-orange-500 text-white">
+      <section className="py-20 bg-brand-orange-500">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
             Ready to Build Your Team?

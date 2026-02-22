@@ -46,7 +46,7 @@ export default async function RiseFoundationPage() {
         <Breadcrumbs items={[{ label: "Rise" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative h-[600px] overflow-hidden bg-slate-900">
+      <section className="relative h-48 md:h-64 overflow-hidden bg-slate-900">
         <Image
           src="/images/barber/gallery-1.jpg"
           alt="RISE Foundation"
@@ -56,41 +56,6 @@ export default async function RiseFoundationPage() {
           quality={100}
           sizes="100vw"
         />
-        <div className="relative z-10 flex h-full items-center">
-          {/* Hero Section */}
-          <section className="relative h-[400px] md:h-[500px] flex items-center justify-center text-white overflow-hidden">
-            <Image
-              src="/images/trades/program-construction-training.jpg"
-              alt="Hero"
-              fill
-              className="object-cover"
-              quality={100}
-              priority
-              sizes="100vw"
-            />
-
-            <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">RISE Foundation</h1>
-              <p className="text-base md:text-lg mb-8 text-gray-100">
-                Empowering communities through workforce development and education
-              </p>
-            </div>
-          </section>
-
-          <div className="mx-auto max-w-7xl px-12 text-center text-white">
-            <h1 className="mb-6 text-6xl font-light md:text-8xl">
-              RISE Foundation
-            </h1>
-            <p className="mb-8 text-base md:text-lg font-light">
-              Recognizing Indusstart Safety & Empowerment
-            </p>
-            <p className="mx-auto max-w-3xl text-base md:text-lg text-slate-200">
-              A non-profit organization dedicated to providing free educational
-              opportunities, workforce development, and community empowerment
-              programs.
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* Mission Section */}
@@ -287,7 +252,7 @@ export default async function RiseFoundationPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-40 px-12 bg-slate-900 text-white">
+      <section className="py-40 px-12 bg-slate-900">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-2xl md:text-3xl font-light mb-6 text-3xl md:text-2xl md:text-3xl lg:text-3xl md:text-4xl">
             Support Our Mission

@@ -17,8 +17,6 @@ import {
   Eye,
 } from 'lucide-react';
 
-
-
 export default function EmailMarketingPage() {
   const router = useRouter();
   useEffect(() => {
@@ -43,7 +41,7 @@ export default function EmailMarketingPage() {
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Email Marketing" }]} />
       </div>
       {/* Hero Section */}
-      <section className="relative h-[300px] md:h-[380px] lg:h-[420px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/heroes/blog-post-9.jpg"
           alt="Email Marketing"
@@ -54,28 +52,6 @@ export default function EmailMarketingPage() {
           sizes="100vw"
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 drop-shadow-2xl">
-            Email Marketing
-          </h1>
-          <p className="text-base md:text-lg mb-8 text-gray-100 drop-shadow-lg">
-            Create and track email campaigns
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
-            >
-              Get Started Free
-            </Link>
-            <Link
-              href="/programs"
-              className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
-            >
-              View Programs
-            </Link>
-          </div>
-        </div>
       </section>
 
       <div className="mx-auto max-w-7xl">

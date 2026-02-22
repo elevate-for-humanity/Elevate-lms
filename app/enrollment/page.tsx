@@ -44,19 +44,6 @@ export default async function EnrollmentPage() {
       {/* Hero */}
       <div className="relative h-64 md:h-80 overflow-hidden">
         <Image src="/images/getting-started-hero.jpg" alt="Elevate for Humanity enrollment" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-900/50" />
-        <div className="relative z-10 h-full flex flex-col justify-center px-6 md:px-10 max-w-5xl mx-auto">
-          <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Enrollment' }]} />
-          <h1 className="text-3xl md:text-4xl font-bold text-white mt-4">Enroll in a Training Program</h1>
-          <p className="text-gray-300 text-sm md:text-base mt-2 max-w-xl">
-            Start your career in the skilled trades. WIOA and Next Level Jobs funding available. No prior experience required.
-          </p>
-          <div className="mt-4">
-            <Link href="/apply/student" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition-colors">
-              Apply Now <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
       </div>
 
       <div className="py-4 border-b border-gray-100">

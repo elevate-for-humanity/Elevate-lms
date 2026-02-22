@@ -55,7 +55,7 @@ export default async function MobileAppPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[450px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/technology/hero-program-cybersecurity.jpg"
           alt="Mobile App"
@@ -65,29 +65,6 @@ export default async function MobileAppPage() {
           priority
           sizes="100vw"
         />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Take Elevate With You
-          </h1>
-          <p className="text-base md:text-lg mb-8 text-gray-100">
-            Install our mobile app directly from your browser. No app store
-            needed.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="#install"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-            >
-              Install Now
-            </a>
-            <Link
-              href="/programs"
-              className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-            >
-              View Programs
-            </Link>
-          </div>
-        </div>
       </section>
 
       {/* Features Section */}
@@ -270,7 +247,7 @@ export default async function MobileAppPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
             Ready to Get Started?

@@ -21,7 +21,7 @@ export default function GrantsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] min-h-[400px] flex items-center overflow-hidden">
+      <section className="relative h-[50vh] min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
           src="/images/heroes/hero-federal-funding.jpg"
           alt="Students celebrating graduation"
@@ -29,23 +29,6 @@ export default function GrantsPage() {
           className="object-cover"
           priority
         />
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <span className="inline-block bg-brand-green-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
-            No Loans — No Repayment
-          </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-            Get Your Training Paid For
-          </h1>
-          <p className="text-xl text-gray-200 max-w-2xl mb-8">
-            You shouldn&apos;t have to go into debt to start a new career. Federal and state grants cover your entire training — tuition, books, supplies, and even certification exams.
-          </p>
-          <Link
-            href="/wioa-eligibility"
-            className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-          >
-            See If You Qualify <ArrowRight className="w-5 h-5" />
-          </Link>
-        </div>
       </section>
 
       {/* What This Means For You */}

@@ -93,25 +93,6 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
       {/* Hero */}
       <div className="relative h-48 md:h-56 overflow-hidden">
         <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Elevate for Humanity workforce training" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-slate-900/60" />
-        <div className="relative z-10 h-full flex items-center px-6 md:px-8 max-w-[1400px] mx-auto">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 bg-brand-blue-600 rounded-lg flex items-center justify-center"><Shield className="w-4 h-4 text-white" /></div>
-              <span className="text-brand-blue-400 text-xs font-semibold tracking-widest uppercase">Admin Console</span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">{greeting}, {displayName}</h1>
-            <p className="text-gray-400 text-sm mt-1 max-w-md">Workforce development operations for Elevate for Humanity</p>
-          </div>
-          <div className="hidden md:flex items-center gap-6">
-            {[{ l:'Students', v:c.students },{ l:'Enrollments', v:c.enrollments },{ l:'Cert Rate', v:certRate+'%' }].map(s => (
-              <div key={s.l} className="text-center">
-                <div className="text-2xl font-bold text-white">{typeof s.v==='number' ? <AnimatedCounter target={s.v} /> : s.v}</div>
-                <div className="text-[10px] text-gray-400 uppercase tracking-wider">{s.l}</div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 -mt-6 relative z-20">

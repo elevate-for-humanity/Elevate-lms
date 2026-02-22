@@ -96,7 +96,7 @@ export default async function ReportsPage() {
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Reports" }]} />
         </div>
       {/* Hero Section */}
-      <section className="relative h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/heroes/resource-3.jpg"
           alt="Reports"
@@ -107,14 +107,6 @@ export default async function ReportsPage() {
           sizes="100vw"
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Compliance Reports
-          </h1>
-          <p className="text-lg text-gray-100">
-            Submit and track your compliance reports
-          </p>
-        </div>
       </section>
 
       {/* Content Section */}

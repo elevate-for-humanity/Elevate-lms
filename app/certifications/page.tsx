@@ -28,14 +28,9 @@ export default function CertificationsPage() {
         </div>
       </div>
 
-      <section className="relative h-[350px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image src="/images/hero/hero-certifications.jpg" alt="Certifications" fill className="object-cover" priority sizes="100vw" />
         
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <Award className="w-16 h-16 mx-auto mb-4 text-white/80" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Industry Certifications</h1>
-          <p className="text-xl text-brand-green-100">Credentials that open doors to career opportunities</p>
-        </div>
       </section>
 
       <section className="py-16 bg-white">
@@ -116,7 +111,7 @@ export default function CertificationsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-brand-green-700 text-white">
+      <section className="py-16 bg-brand-green-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Get Certified Today</h2>
           <p className="text-xl text-brand-green-100 mb-8">Start your journey toward industry-recognized credentials.</p>

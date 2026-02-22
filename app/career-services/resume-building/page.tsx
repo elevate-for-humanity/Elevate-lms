@@ -69,7 +69,7 @@ export default function ResumeBuildingPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[350px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/business/startup.jpg"
           alt="Resume Building Services"
@@ -80,23 +80,6 @@ export default function ResumeBuildingPage() {
         />
         
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <span className="inline-block bg-white/20 backdrop-blur-sm text-white text-sm font-semibold px-4 py-2 rounded-full mb-4">
-            Free for Program Participants
-          </span>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Resume Building
-          </h1>
-          <p className="text-xl md:text-2xl mb-6">
-            Your resume is your first impression. Make it count.
-          </p>
-          <Link
-            href="/career-services/contact"
-            className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center"
-          >
-            Schedule Resume Review <ArrowRight className="ml-2 w-5 h-5" />
-          </Link>
-        </div>
       </section>
 
       {/* Services */}
@@ -281,7 +264,7 @@ export default function ResumeBuildingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-green-700 text-white">
+      <section className="py-16 bg-brand-green-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Ready to Build Your Resume?

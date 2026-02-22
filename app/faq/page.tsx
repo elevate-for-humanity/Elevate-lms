@@ -72,7 +72,7 @@ export default function FAQPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[400px] flex items-center overflow-hidden">
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
           src="/images/heroes/training-provider-3.jpg"
           alt="Get answers to your questions"
@@ -80,18 +80,6 @@ export default function FAQPage() {
           className="object-cover"
           priority
         />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 w-full">
-          <div className="max-w-2xl bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
-            <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-              Frequently Asked Questions
-            </h1>
-            <p className="text-xl text-gray-700 mb-6">
-              Find answers to common questions about our free training programs, 
-              eligibility requirements, funding options, and career services.
-            </p>
-
-          </div>
-        </div>
       </section>
 
       {/* Quick Links */}

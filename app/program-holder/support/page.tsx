@@ -99,7 +99,7 @@ export default async function SupportPage() {
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Support" }]} />
         </div>
       {/* Hero Section */}
-      <section className="relative h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/efh/hero/hero-main-clean.jpg"
           alt="Support"
@@ -110,14 +110,6 @@ export default async function SupportPage() {
           sizes="100vw"
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Support Center
-          </h1>
-          <p className="text-lg text-gray-100">
-            We're here to help you succeed
-          </p>
-        </div>
       </section>
 
       {/* Content Section */}

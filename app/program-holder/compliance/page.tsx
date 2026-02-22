@@ -134,7 +134,7 @@ export default async function CompliancePage() {
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Compliance" }]} />
         </div>
       {/* Hero Section */}
-      <section className="relative h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/certifications/osha.jpg"
           alt="Compliance"
@@ -145,14 +145,6 @@ export default async function CompliancePage() {
           sizes="100vw"
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Compliance Dashboard
-          </h1>
-          <p className="text-lg text-gray-100">
-            Monitor your compliance status and resolve issues
-          </p>
-        </div>
       </section>
 
       {/* Content Section */}

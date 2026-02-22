@@ -43,7 +43,7 @@ export default function TaxServicesPage() {
         <Breadcrumbs items={[{ label: "Tax" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative min-h-[550px] flex items-center overflow-hidden">
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
           src="/images/business/customer-service.jpg"
           alt="Tax Preparation Services"
@@ -52,39 +52,6 @@ export default function TaxServicesPage() {
           priority
         />
         
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 w-full">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-brand-green-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-6">
-              <DollarSign className="w-4 h-4" />
-              Tax Season 2026 - File by April 15th
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6">
-              Tax Preparation Services
-            </h1>
-            <p className="text-xl md:text-2xl text-brand-blue-100 mb-8">
-              Choose the tax service that fits your needs. Free VITA tax preparation for 
-              eligible individuals or professional services through Supersonic Fast Cash.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/tax"
-                className="inline-flex items-center justify-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors"
-              >
-                <Users className="w-5 h-5" />
-                Free VITA Tax Prep
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/supersonic-fast-cash"
-                className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors"
-              >
-                <Zap className="w-5 h-5" />
-                Supersonic Fast Cash
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Quick Links Navigation */}
@@ -461,7 +428,7 @@ export default function TaxServicesPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-brand-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>

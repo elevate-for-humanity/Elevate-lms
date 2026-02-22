@@ -73,7 +73,7 @@ export default function FounderPage() {
       </div>
 {/* Avatar Video Overlay */}
       {/* Hero Section */}
-      <section className="relative min-h-[500px] flex items-end overflow-hidden">
+      <section className="relative min-h-48 md:h-64 flex items-end overflow-hidden">
         <Image
           src="/images/team/elizabeth-greene.jpg"
           alt="Elizabeth Greene - Founder"
@@ -81,15 +81,6 @@ export default function FounderPage() {
           className="object-cover"
           priority
         />
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pb-12">
-          <p className="text-brand-blue-400 font-semibold mb-2">Founder & Chief Executive Officer</p>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-4">
-            Elizabeth Greene
-          </h1>
-          <p className="text-xl text-white/90 max-w-2xl">
-            Transformational leader and workforce development pioneer creating pathways out of poverty and into prosperity.
-          </p>
-        </div>
       </section>
 
       {/* Credentials Bar */}

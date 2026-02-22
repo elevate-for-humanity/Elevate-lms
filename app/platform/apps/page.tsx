@@ -50,7 +50,7 @@ export default async function PlatformAppsPage() {
         ]}
       />
       {/* Hero Section */}
-      <section className="relative h-[300px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/heroes-hq/success-hero.jpg"
           alt="Platform Apps"
@@ -60,14 +60,6 @@ export default async function PlatformAppsPage() {
           priority
           sizes="100vw"
         />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Modular Apps & Features
-          </h1>
-          <p className="text-base md:text-lg md:text-xl text-gray-100">
-            Every license includes apps. Enable only what you need.
-          </p>
-        </div>
       </section>
 
       {/* How It Works */}
@@ -262,7 +254,7 @@ export default async function PlatformAppsPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl md:text-2xl md:text-3xl font-bold mb-6">
             Ready to Choose Your License?

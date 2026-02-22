@@ -32,14 +32,9 @@ export default function IndustryInsightsPage() {
         </div>
       </div>
 
-      <section className="relative h-[350px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image src="/images/hero/portal-hero.jpg" alt="Industry Insights" fill className="object-cover" priority sizes="100vw" />
         
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <Lightbulb className="w-16 h-16 mx-auto mb-4 text-white/80" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Industry Insights</h1>
-          <p className="text-xl text-indigo-100">Learn from professionals who know your industry</p>
-        </div>
       </section>
 
       <section className="py-16 bg-white">
@@ -81,7 +76,7 @@ export default function IndustryInsightsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-indigo-700 text-white">
+      <section className="py-16 bg-indigo-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Get Industry Knowledge</h2>
           <p className="text-xl text-indigo-100 mb-8">Connect with mentors who have been where you want to go.</p>

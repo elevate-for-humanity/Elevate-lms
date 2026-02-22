@@ -97,7 +97,7 @@ export default async function VerifyCertificatePage({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative h-[300px] md:h-[380px] lg:h-[420px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/artlist/hero-training-1.jpg"
           alt="Certificate verification"
@@ -108,17 +108,9 @@ export default async function VerifyCertificatePage({
           sizes="100vw"
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 drop-shadow-2xl">
-            Certificate Verification
-          </h1>
-          <p className="text-base md:text-lg mb-8 text-gray-100 drop-shadow-lg">
-            Verify the authenticity of credentials issued by Elevate for Humanity
-          </p>
-        </div>
       </section>
 
-      <section className="   text-white py-16">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <div className="mb-6">

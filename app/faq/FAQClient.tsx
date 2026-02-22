@@ -400,36 +400,6 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                                 <Share2 className="w-4 h-4" />
                               </button>
                               {showShareMenu === faq.id && (
-                                <div className="absolute right-0 bottom-full mb-2 bg-white rounded-lg shadow-xl border py-2 min-w-[160px] z-10">
-                                  <button
-                                    onClick={() => copyLink(faq.id)}
-                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                  >
-                                    {copiedLink ? <Check className="w-4 h-4 text-brand-green-500" /> : <Copy className="w-4 h-4" />}
-                                    {copiedLink ? 'Copied!' : 'Copy Link'}
-                                  </button>
-                                  <button
-                                    onClick={() => shareToTwitter(faq)}
-                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                  >
-                                    <Twitter className="w-4 h-4" />
-                                    Twitter
-                                  </button>
-                                  <button
-                                    onClick={() => shareToFacebook(faq)}
-                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                  >
-                                    <Facebook className="w-4 h-4" />
-                                    Facebook
-                                  </button>
-                                  <button
-                                    onClick={() => shareToLinkedIn(faq)}
-                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                  >
-                                    <Linkedin className="w-4 h-4" />
-                                    LinkedIn
-                                  </button>
-                                </div>
                               )}
                             </div>
                           </div>

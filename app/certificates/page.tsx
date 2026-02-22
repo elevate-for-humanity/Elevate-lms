@@ -27,7 +27,7 @@ export default function CertificatesPage() {
         <Breadcrumbs items={[{ label: "Certificates" }]} />
       </div>
 {/* Hero */}
-      <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/certificates-hero.jpg"
           alt="Certificates & Credentials"
@@ -38,18 +38,6 @@ export default function CertificatesPage() {
           sizes="100vw"
         />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <Award className="h-20 w-20 text-white mx-auto mb-6" />
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6">
-              Certificates & Credentials
-            </h1>
-            <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto">
-              Earn industry-recognized certificates that employers trust and
-              value.
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* Verify Certificate */}

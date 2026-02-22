@@ -27,7 +27,7 @@ export default function SubofficeOnboardingPage() {
         <Breadcrumbs items={[{ label: "Suboffice Onboarding" }]} />
       </div>
 {/* Hero */}
-      <section className="relative h-[400px] md:h-[500px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/heroes/blog-post-6.jpg"
           alt="Suboffice Onboarding"
@@ -38,24 +38,10 @@ export default function SubofficeOnboardingPage() {
         />
         
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 uppercase">
-            Open Your Suboffice
-          </h1>
-          <p className="text-xl md:text-2xl mb-8">
-            Partner with Elevate for Humanity - Complete Onboarding in Minutes
-          </p>
-          <Link
-            href="#start"
-            className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-block"
-          >
-            Start Onboarding
-          </Link>
-        </div>
       </section>
 
       {/* How You Get Paid - CRITICAL */}
-      <section className="py-16 bg-brand-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
             <DollarSign className="w-16 h-16 mx-auto mb-4" />
@@ -350,7 +336,7 @@ export default function SubofficeOnboardingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Get Started?

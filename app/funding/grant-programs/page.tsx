@@ -19,8 +19,6 @@ const grantFundedPrograms = programs.filter((p) =>
   )
 );
 
-
-
 export default function GrantProgramsPage() {
   const [dbRows, setDbRows] = useState<any[]>([]);
   useEffect(() => {
@@ -42,7 +40,7 @@ export default function GrantProgramsPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-[400px] overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/heroes/lms-analytics.jpg"
           alt="Funded Training Programs"
@@ -52,28 +50,6 @@ export default function GrantProgramsPage() {
           priority
           sizes="100vw"
         />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center text-white h-full flex flex-col justify-center drop-shadow-lg">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 drop-shadow-md">
-            Funded Training Programs
-          </h1>
-          <p className="text-base md:text-lg mb-8 drop-shadow-md">
-            ETPL Approved • WIOA Eligible • WRG Funded • JRI Approved
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg"
-            >
-              Apply for Free Training
-            </Link>
-            <Link
-              href="/funding/how-it-works"
-              className="bg-white hover:bg-slate-100 text-black px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg"
-            >
-              How It Works
-            </Link>
-          </div>
-        </div>
       </section>
 
       {/* What is ETPL/WRG */}
@@ -306,7 +282,7 @@ export default function GrantProgramsPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-brand-blue-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Ready to Start Your Free Training?

@@ -62,7 +62,7 @@ export default function StudentsPage() {
         <Breadcrumbs items={[{ label: "For", href: "/for" }, { label: "Students" }]} />
       </div>
 {/* Hero */}
-      <section className="relative h-[600px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/courses/medical-assistant-10002419-cover.jpg"
           alt="Students in training"
@@ -72,33 +72,6 @@ export default function StudentsPage() {
           priority
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-brand-green-600 px-4 py-2 rounded-full mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
-            <span className="font-semibold">Funded Training</span>
-          </div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            Start Your Career Journey
-          </h1>
-          <p className="text-xl md:text-2xl mb-8">
-            No student debt. Get certified. Get hired.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-orange-600 text-white font-bold rounded-lg hover:bg-brand-orange-700 transition text-lg"
-            >
-              Apply Now
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-            <Link
-              href="/programs"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-black font-bold rounded-lg hover:bg-slate-100 transition text-lg"
-            >
-              View All Programs
-            </Link>
-          </div>
-        </div>
       </section>
 
       {/* Benefits */}
@@ -210,7 +183,7 @@ export default function StudentsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-zinc-900   text-white">
+      <section className="py-16 bg-zinc-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Start?</h2>
           <p className="text-xl mb-8">

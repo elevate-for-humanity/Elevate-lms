@@ -60,7 +60,7 @@ export default async function ProductDetailPage({ params }: Props) {
         <Breadcrumbs items={[{ label: "Platform", href: "/platform" }, { label: "[Slug]" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative h-[300px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/programs/cpr-group-training-hd.jpg"
           alt={product.name}
@@ -70,21 +70,6 @@ export default async function ProductDetailPage({ params }: Props) {
           priority
           sizes="100vw"
         />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <Link
-            href="/platform"
-            className="inline-flex items-center text-white hover:text-gray-200 mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Platform
-          </Link>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            {product.name}
-          </h1>
-          <p className="text-base md:text-lg text-gray-100">
-            {product.description}
-          </p>
-        </div>
       </section>
 
       {/* Main Content */}

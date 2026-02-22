@@ -261,7 +261,7 @@ export default async function TutorialsPage() {
       </div>
 
       {/* Hero Banner */}
-      <section className="relative h-[300px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/heroes/hero-students.jpg"
           alt="Students learning with video tutorials"
@@ -273,30 +273,6 @@ export default async function TutorialsPage() {
         />
         
         
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
-            <Play className="w-5 h-5" />
-            <span className="text-sm font-semibold">12 Video Tutorials</span>
-          </div>
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">
-            Learn How to Succeed
-          </h1>
-          <p className="text-lg text-white/90 max-w-2xl mx-auto mb-6">
-            Step-by-step video guides to help you navigate applications, courses, and everything in between.
-          </p>
-          
-          {/* Search */}
-          <div className="max-w-xl mx-auto">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search tutorials..."
-                className="w-full pl-12 pr-4 py-3 rounded-xl text-gray-900 border-2 border-white/20 focus:border-white focus:outline-none"
-              />
-            </div>
-          </div>
-        </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-8">

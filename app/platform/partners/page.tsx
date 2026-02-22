@@ -100,7 +100,7 @@ export default function PartnersPage() {
       <div className="max-w-7xl mx-auto px-4 pb-2">
         <p className="text-sm text-slate-600 font-medium">Part of the <a href="/platform" className="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p>
       </div>
-<header className="relative min-h-[400px] flex items-center">
+<header className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/team-vibrant.jpg"
           alt="Partner with Elevate for Humanity"
@@ -108,23 +108,6 @@ export default function PartnersPage() {
           className="object-cover"
           priority
         />
-        
-        <div className="relative z-10 mx-auto max-w-6xl px-6 py-16 text-white">
-          <h1 className="text-4xl md:text-5xl font-bold">Partner With Elevate for Humanity</h1>
-          <p className="mt-4 max-w-3xl text-lg text-white/90">
-            Plug into workforce infrastructure that reduces hiring risk, improves training completion, and supports
-            funding and reimbursement pathways.
-          </p>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/contact" className="rounded-md bg-white px-6 py-3 text-black font-semibold hover:bg-gray-200">
-              Partner Intake
-            </Link>
-            <Link href="/pathways" className="rounded-md border border-white px-6 py-3 font-semibold hover:bg-white hover:text-black">
-              View Workforce Pathways
-            </Link>
-          </div>
-        </div>
       </header>
 
       {/* Avatar Guide */}

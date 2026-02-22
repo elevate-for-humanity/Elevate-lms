@@ -50,10 +50,10 @@ export default async function TaxSelfPrepPage() {
         ]}
       />
       {/* Hero - TurboTax Style */}
-      <section className="relative    text-white py-20">
+      <section className="relative py-20">
         <div className="max-w-7xl mx-auto px-4">
           {/* Hero Section */}
-          <section className="relative h-[400px] md:h-[500px] flex items-center justify-center text-white overflow-hidden">
+          <section className="relative h-48 md:h-64 overflow-hidden">
             <Image
               src="/images/courses/barber-apprenticeship-10002417-cover.jpg"
               alt="Hero"
@@ -64,12 +64,6 @@ export default async function TaxSelfPrepPage() {
               sizes="100vw"
             />
 
-            <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">Tax Self-Prep</h1>
-              <p className="text-base md:text-lg mb-8 text-gray-100">
-                Prepare your taxes online with guided, step-by-step filing
-              </p>
-            </div>
           </section>
 
           <div className="max-w-3xl mx-auto text-center">
@@ -541,7 +535,7 @@ export default async function TaxSelfPrepPage() {
       </ScrollReveal>
 
       {/* CTA */}
-      <section className="py-20 bg-brand-blue-600 text-white px-4">
+      <section className="py-20 bg-brand-blue-600 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-2xl md:text-3xl font-bold mb-6 text-2xl md:text-3xl lg:text-2xl md:text-3xl">
             Ready to do your taxes?
@@ -561,7 +555,7 @@ export default async function TaxSelfPrepPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-brand-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>

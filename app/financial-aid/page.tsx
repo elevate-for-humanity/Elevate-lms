@@ -62,7 +62,7 @@ export default function FinancialAidPage() {
       </div>
 
       {/* Hero with Image */}
-      <section className="relative min-h-[500px] flex items-center overflow-hidden">
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
           src="/images/heroes/hero-state-funding.jpg"
           alt="Financial aid and funding options"
@@ -70,37 +70,6 @@ export default function FinancialAidPage() {
           className="object-cover"
           priority
         />
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 w-full">
-          <div className="max-w-2xl bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
-            <div className="inline-flex items-center gap-2 bg-brand-green-100 text-brand-green-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
-              <DollarSign className="w-4 h-4" />
-              Most Students Pay $0
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-6">
-              Financial Aid & Funding Options
-            </h1>
-            <p className="text-xl text-gray-700 mb-8">
-              Don&apos;t let cost stop you from starting a new career. Through WIOA, state grants, 
-              and employer sponsorships, most of our students receive free training.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/apply"
-                className="inline-flex items-center gap-2 bg-brand-green-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-green-800 transition-colors"
-              >
-                Check Your Eligibility
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="/support"
-                className="inline-flex items-center gap-2 bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
-              >
-                <Phone className="w-4 h-4" />
-                Call Get Help Online
-              </Link>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Quick Links to Related Pages */}
@@ -225,7 +194,7 @@ export default function FinancialAidPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-brand-green-700 text-white">
+      <section className="py-16 lg:py-24 bg-brand-green-700">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your New Career?</h2>
           <p className="text-xl text-white/90 mb-8">

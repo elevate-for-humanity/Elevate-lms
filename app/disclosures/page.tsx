@@ -39,7 +39,7 @@ export default function DisclosuresPage() {
       </div>
 
       {/* Hero Banner */}
-      <section className="relative min-h-[400px] flex items-center overflow-hidden">
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
           src="/images/heroes-hq/about-hero.jpg"
           alt="Student Consumer Information"
@@ -47,41 +47,10 @@ export default function DisclosuresPage() {
           className="object-cover"
           priority
         />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 w-full">
-          <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-brand-orange-500 text-white text-sm font-semibold rounded-full mb-6">
-              <Shield className="w-4 h-4" />
-              Transparency & Compliance
-            </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6">
-              Student Consumer Information
-            </h1>
-            <p className="text-xl text-gray-200 mb-8">
-              We believe in complete transparency. Access all required disclosures, 
-              policies, and consumer information in one place.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="#policies"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-semibold rounded-lg transition-colors"
-              >
-                View All Policies
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg backdrop-blur-sm transition-colors"
-              >
-                <Phone className="w-5 h-5" />
-                Contact Us
-              </Link>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Quick Stats */}
-      <section className="py-8 bg-gray-900 text-white">
+      <section className="py-8 bg-gray-900">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
@@ -380,7 +349,7 @@ export default function DisclosuresPage() {
       </section>
 
       {/* Complaint Process CTA */}
-      <section className="py-16 bg-gray-800 text-white">
+      <section className="py-16 bg-gray-800">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>

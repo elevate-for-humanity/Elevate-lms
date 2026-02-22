@@ -87,7 +87,7 @@ export default function TestingPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[350px] flex items-center overflow-hidden">
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
           src="/images/artlist/cropped/hero-training-2-wide.jpg"
           alt="Workforce credential testing"
@@ -96,14 +96,6 @@ export default function TestingPage() {
           priority
         />
         <div className="absolute inset-0 bg-slate-900/60" />
-        <div className="relative z-10 max-w-5xl mx-auto px-4 py-16 w-full">
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
-            Testing &amp; Credential Exams
-          </h1>
-          <p className="text-xl text-slate-200 max-w-2xl">
-            Workforce credential exams administered through authorized testing centers and approved proctoring organizations.
-          </p>
-        </div>
       </section>
 
       {/* Disclosure */}

@@ -85,7 +85,7 @@ export default function GuidesPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-[50vh] min-h-[400px] flex items-center overflow-hidden">
+      <section className="relative h-[50vh] min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
           src="/images/heroes/blog-post-1.jpg"
           alt="Guides & Resources"
@@ -94,40 +94,7 @@ export default function GuidesPage() {
           priority
         />
         
-        <div className="relative z-10 max-w-6xl mx-auto px-4 w-full">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-slate-900" />
-            </div>
-            <span className="text-brand-blue-200 font-medium">Elevate Store</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-4">
-            Guides & Resources
-          </h1>
-          <p className="text-xl text-brand-blue-100 max-w-2xl mb-6">
-            Professional guides to help you build, scale, and maintain compliant workforce programs. 
-            Written by industry experts with real-world experience.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link 
-              href="#guides"
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
-            >
-              Browse Guides
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link 
-              href="/store/guides/licensing"
-              className="inline-flex items-center gap-2 border-2 border-white text-slate-900 px-6 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
-            >
-              <Download className="w-5 h-5" />
-              Free Licensing Guide
-            </Link>
-          </div>
-        </div>
       </section>
-
-
 
       {/* Category Pills */}
       <section className="py-8 border-b">

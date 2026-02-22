@@ -124,7 +124,7 @@ export default function JRIPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-[450px] flex items-center bg-slate-900">
+      <section className="relative min-h-48 md:h-64 flex items-center bg-slate-900">
         <Image
           src="/images/heroes-hq/jri-hero.jpg"
           alt="JRI Program participants"
@@ -133,39 +133,6 @@ export default function JRIPage() {
           priority
         />
         
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-6">
-              <Shield className="w-4 h-4" />
-              Indiana Justice Reinvestment Initiative
-            </div>
-            
-            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-              A Second Chance at a Real Career
-            </h1>
-            
-            <p className="text-xl text-white/90 mb-8">
-              Funded career training for justice-involved individuals. Tuition covered for eligible participants. Just opportunity.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/apply?funding=jri"
-                className="inline-flex items-center justify-center bg-brand-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-green-700 transition text-lg"
-              >
-                Apply for JRI Program
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-              <a
-                href="/support"
-                className="inline-flex items-center justify-center bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition text-lg"
-              >
-                <Phone className="mr-2 w-5 h-5" />
-                Get Help Online
-              </a>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Stats Section */}

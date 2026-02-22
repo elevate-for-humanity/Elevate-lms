@@ -35,7 +35,7 @@ export default function RevenueShareCalculator() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[300px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/programs/efh-business-startup-marketing-hero.jpg"
           alt="Revenue Share Calculator"
@@ -46,15 +46,6 @@ export default function RevenueShareCalculator() {
         />
         
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <Calculator className="w-16 h-16 mx-auto mb-4" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Revenue Share Calculator
-          </h1>
-          <p className="text-xl">
-            Calculate Your Potential Earnings as a Suboffice Partner
-          </p>
-        </div>
       </section>
 
       {/* Calculator */}

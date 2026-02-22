@@ -71,8 +71,6 @@ const complianceAreas = [
   },
 ];
 
-
-
 export default function ComplianceAutomationPage() {
   const [dbRows, setDbRows] = useState<any[]>([]);
   useEffect(() => {
@@ -98,7 +96,7 @@ export default function ComplianceAutomationPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-[50vh] min-h-[400px] flex items-center overflow-hidden">
+      <section className="relative h-[50vh] min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
           src="/images/heroes-hq/funding-hero.jpg"
           alt="Compliance Automation"
@@ -107,39 +105,7 @@ export default function ComplianceAutomationPage() {
           priority
         />
         
-        <div className="relative z-10 max-w-6xl mx-auto px-4 w-full">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-slate-900" />
-            </div>
-            <span className="text-emerald-200 font-medium">Platform Add-On</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-4">
-            Compliance Automation
-          </h1>
-          <p className="text-xl text-emerald-100 max-w-2xl mb-6">
-            Automate WIOA reporting, audit preparation, and compliance tracking. 
-            Reduce administrative burden while maintaining perfect documentation.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link 
-              href="/contact?product=compliance-automation"
-              className="inline-flex items-center gap-2 bg-white text-emerald-700 px-6 py-3 rounded-lg font-semibold hover:bg-emerald-50 transition-colors"
-            >
-              Request Demo
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link 
-              href="#features"
-              className="inline-flex items-center gap-2 border-2 border-white text-slate-900 px-6 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
-            >
-              View Features
-            </Link>
-          </div>
-        </div>
       </section>
-
-
 
       {/* Features Grid */}
       <section id="features" className="py-16 lg:py-24">

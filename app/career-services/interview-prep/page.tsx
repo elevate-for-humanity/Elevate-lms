@@ -70,7 +70,7 @@ export default function InterviewPrepPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[350px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/heroes/event-1.jpg"
           alt="Interview Preparation Services"
@@ -81,23 +81,6 @@ export default function InterviewPrepPage() {
         />
         
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <span className="inline-block bg-white/20 backdrop-blur-sm text-white text-sm font-semibold px-4 py-2 rounded-full mb-4">
-            Free for Program Participants
-          </span>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Interview Preparation
-          </h1>
-          <p className="text-xl md:text-2xl mb-6">
-            Confidence comes from preparation. We will get you ready.
-          </p>
-          <Link
-            href="/career-services/contact"
-            className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center"
-          >
-            Schedule Mock Interview <ArrowRight className="ml-2 w-5 h-5" />
-          </Link>
-        </div>
       </section>
 
       {/* Services */}
@@ -273,7 +256,7 @@ export default function InterviewPrepPage() {
       </section>
 
       {/* Success Stats */}
-      <section className="py-16 bg-brand-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>

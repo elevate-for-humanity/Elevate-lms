@@ -220,7 +220,7 @@ export default function StudentPortalPage() {
         <Breadcrumbs items={[{ label: "Student Portal" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/artlist/hero-training-1.jpg"
           alt="Student Portal"
@@ -231,45 +231,6 @@ export default function StudentPortalPage() {
           sizes="100vw"
         />
 
-
-        <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Student Portal
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
-            Your complete dashboard for courses, grades, schedule, career services, and student resources
-          </p>
-          <div className="flex flex-wrap justify-center gap-4 text-white/90 mb-8">
-            <div className="flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
-              <span>24/7 Course Access</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
-              <span>Real-Time Grades</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
-              <span>Career Support</span>
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/lms"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition"
-            >
-              <GraduationCap className="w-5 h-5" />
-              Sign In to My Dashboard
-            </Link>
-            <Link
-              href="/apply"
-              className="inline-flex items-center justify-center gap-2 bg-brand-blue-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-800 transition border-2 border-white"
-            >
-              Not Enrolled? Apply Now
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </div>
-        </div>
       </section>
 
       {/* Avatar Guide */}
@@ -430,7 +391,7 @@ export default function StudentPortalPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-slate-700 text-white">
+      <section className="py-16 bg-slate-700">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-black mb-6">
             Questions? Contact Us

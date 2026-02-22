@@ -49,21 +49,13 @@ export default async function TuitionPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-slate-900 text-white py-12 sm:py-16">
+      <section className="relative bg-slate-900 py-12 sm:py-16">
         <Image
           src="/images/funding/funding-dol-program-v2.jpg"
           alt="Tuition and Payment Options"
           fill
           className="object-cover opacity-30"
         />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-2xl sm:text-4xl font-bold mb-4">
-            How to Pay for Training
-          </h1>
-          <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto">
-            Elevate for Humanity is a workforce training institute. Most of our students do not pay tuition on their own. Instead, students are placed into one of three structured funding pathways based on eligibility and career goals.
-          </p>
-        </div>
       </section>
 
       {/* Intro */}

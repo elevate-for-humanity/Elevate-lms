@@ -41,7 +41,7 @@ export default function RefundAdvancePage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[350px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/programs/efh-business-startup-marketing-hero.jpg"
           alt="Refund Advance"
@@ -52,20 +52,6 @@ export default function RefundAdvancePage() {
         />
         
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <DollarSign className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Refund Advance
-          </h1>
-          <p className="text-xl md:text-2xl mb-4">
-            Get up to $6,000 today - No credit check required
-          </p>
-          <p className="text-lg text-brand-blue-100">
-            Repaid automatically from your IRS refund
-          </p>
-        </div>
       </section>
 
       {/* Key Benefits */}
@@ -390,7 +376,7 @@ export default function RefundAdvancePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-brand-blue-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Need Cash Now?

@@ -65,7 +65,7 @@ export default async function HowToUsePage() {
         ]}
       />
       {/* Hero Section */}
-      <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/homepage/student-portal-interface.png"
           alt="How To Use"
@@ -76,23 +76,6 @@ export default async function HowToUsePage() {
           sizes="100vw"
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            How To Use
-          </h1>
-          <p className="text-base md:text-lg md:text-xl mb-8 text-gray-100">
-            Manage your program administration
-            development.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/admin/dashboard"
-              className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-            >
-              Back to Dashboard
-            </Link>
-          </div>
-        </div>
       </section>
 
       {/* Content Section */}
@@ -160,7 +143,7 @@ export default async function HowToUsePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-700 text-white">
+      <section className="py-16 bg-brand-blue-700">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">

@@ -34,8 +34,6 @@ const CodeEditor = dynamic(() => import('@/components/dev-studio/CodeEditor'), {
   ),
 });
 
-
-
 export default function DevStudioPage() {
   const router = useRouter();
 
@@ -264,7 +262,7 @@ export default function DevStudioPage() {
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Dev Studio' }]} />
       </div>
       {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/efh/sections/staffing.jpg"
           alt="Hero"
@@ -275,12 +273,6 @@ export default function DevStudioPage() {
           sizes="100vw"
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Content Studio</h1>
-          <p className="text-base md:text-lg mb-8 text-gray-100">
-            Create and manage content for your platform
-          </p>
-        </div>
       </section>
 
       {/* Header */}
@@ -408,7 +400,7 @@ export default function DevStudioPage() {
         </div>
 
         {/* CTA Section */}
-        <section className="py-16    text-white">
+        <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-2xl md:text-3xl font-bold mb-6">

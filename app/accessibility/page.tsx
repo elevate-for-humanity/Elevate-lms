@@ -24,23 +24,16 @@ export default function AccessibilityPage() {
       </div>
       
       {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/heroes/faq-section-3.jpg"
           alt="Accessibility Commitment"
           fill
-          className="object-cover brightness-50"
+          className="object-cover"
           quality={100}
           priority
           sizes="100vw"
         />
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <Accessibility className="w-16 h-16 mx-auto mb-4" />
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
-            Accessibility Commitment
-          </h1>
-          <p className="text-xl md:text-2xl">Ensuring Equal Access for All</p>
-        </div>
       </section>
 
       <div className="max-w-4xl mx-auto px-4 py-16">

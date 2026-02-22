@@ -53,12 +53,6 @@ export default function TransparencyPage() {
           className="object-cover"
           priority
         />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 text-white">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Transparency</h1>
-          <p className="text-xl text-brand-blue-100 max-w-2xl">
-            We believe in complete transparency. Here's how we measure our impact and use our resources.
-          </p>
-        </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-16">
@@ -180,7 +174,7 @@ export default function TransparencyPage() {
       </div>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Questions About Our Data?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

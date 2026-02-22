@@ -118,7 +118,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
         <Breadcrumbs items={[{ label: "Blog", href: "/blog" }, { label: "[Slug]" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] flex items-end overflow-hidden">
+      <section className="relative h-48 md:h-64 flex items-end overflow-hidden">
         <Image
           src={post.image || '/images/blog/default.jpg'}
           alt={post.title}
@@ -129,35 +129,6 @@ export default async function BlogPostPage({ params }: { params: Params }) {
           sizes="100vw"
         />
         
-        <div className="relative z-10 max-w-4xl mx-auto px-6 pb-12 w-full">
-          <Link 
-            href="/blog" 
-            className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-4 transition"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Blog
-          </Link>
-          <span className="inline-block px-3 py-2 bg-brand-orange-500 text-white text-sm font-bold rounded-full mb-4">
-            {post.category}
-          </span>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-            {post.title}
-          </h1>
-          <div className="flex flex-wrap items-center gap-4 text-white/80 text-sm">
-            <div className="flex items-center gap-2">
-              <User className="w-4 h-4" />
-              <span>{post.author_name}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              <span>{publishedDate}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span>{post.reading_time || 5} min read</span>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Content */}
@@ -227,7 +198,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
         </section>
       )}
 
-      <section className="py-16 bg-brand-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your Career Journey?</h2>
           <p className="text-xl text-brand-blue-100 mb-8">

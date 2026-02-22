@@ -37,17 +37,9 @@ export default function DonationsPage() {
         </div>
       </div>
 
-      <section className="relative h-[400px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image src="/images/hero/hero-community.jpg" alt="Donate" fill className="object-cover" priority sizes="100vw" />
         
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <Heart className="w-16 h-16 mx-auto mb-4 text-white/80" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Transform Lives Through Giving</h1>
-          <p className="text-xl text-brand-red-100 mb-8">Your donation helps provide career training and opportunities to those who need it most</p>
-          <a href="#donate" className="bg-white hover:bg-gray-100 text-brand-red-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
-            Donate Now <Heart className="ml-2 w-5 h-5" />
-          </a>
-        </div>
       </section>
 
       <section className="py-12 bg-brand-red-50">
@@ -121,7 +113,7 @@ export default function DonationsPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-brand-red-700 text-white">
+      <section className="py-16 bg-brand-red-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Other Ways to Give</h2>
           <div className="grid md:grid-cols-3 gap-8">

@@ -30,40 +30,7 @@ export default function HSIPage() {
         <Breadcrumbs items={[{ label: "Partners", href: "/partners" }, { label: "Hsi" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative h-[400px] w-full overflow-hidden   ">
-        <div className="relative z-10 h-full flex items-center">
-          <div className="max-w-7xl mx-auto px-6 w-full">
-            <div className="max-w-4xl">
-              <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-semibold mb-4">
-                Partner Course
-              </div>
-              <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 drop-shadow-2xl">
-                Health & Safety Institute (HSI)
-              </h1>
-              <p className="text-base md:text-lg text-white mb-8 drop-shadow-lg">
-                CPR, AED, First Aid, and Emergency Medical Responder Training
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <a
-                  href="https://hsi.com/solutions/cpr-aed-first-aid-training/elevate-for-humanity-career-training-org-nts-class-sign-up"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-full hover:bg-slate-100 transition-all hover:scale-105 shadow-2xl gap-2"
-                >
-                  Enroll Now
-                  <ExternalLink className="w-5 h-5" />
-                </a>
-
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white/20 backdrop-blur-sm text-white font-bold rounded-full hover:bg-white/30 transition-all hover:scale-105 border-2 border-white/50 shadow-2xl"
-                >
-                  Questions? Contact Us
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
+      <section className="relative h-48 md:h-64 w-full overflow-hidden">
       </section>
 
       {/* Avatar Guide */}
@@ -228,7 +195,7 @@ export default function HSIPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20   ">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-2xl md:text-2xl md:text-3xl font-bold text-white mb-6 text-2xl md:text-3xl lg:text-2xl md:text-3xl">
             Ready to Get Started?

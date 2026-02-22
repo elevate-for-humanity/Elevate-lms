@@ -91,7 +91,7 @@ export default function CourseDiscussionsPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section */}
-        <section className="relative h-[300px] md:h-[380px] lg:h-[420px] flex items-center justify-center text-white overflow-hidden">
+        <section className="relative h-48 md:h-64 overflow-hidden">
           <Image
             src="/images/community/community-hero.jpg"
             alt="Discussions"
@@ -102,28 +102,6 @@ export default function CourseDiscussionsPage() {
             sizes="100vw"
           />
 
-          <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 drop-shadow-2xl">
-              Discussions
-            </h1>
-            <p className="text-base md:text-lg mb-8 text-gray-100 drop-shadow-lg">
-              Connect with classmates and instructors in course discussions
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/contact"
-                className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
-              >
-                Get Started Free
-              </Link>
-              <Link
-                href="/programs"
-                className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
-              >
-                View Programs
-              </Link>
-            </div>
-          </div>
         </section>
 
         <div className="text-center">
@@ -190,7 +168,7 @@ export default function CourseDiscussionsPage() {
           </section>
 
           {/* CTA Section */}
-          <section className="py-16    text-white">
+          <section className="py-16">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <h2 className="text-2xl md:text-3xl font-bold mb-6">

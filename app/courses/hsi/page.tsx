@@ -85,7 +85,7 @@ export default async function HsiPage() {
         ]}
       />
       {/* Hero Section */}
-      <section className="relative h-[300px] md:h-[380px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/programs-hq/skilled-trades-hero.jpg"
           alt="HSI Safety Training"
@@ -96,31 +96,6 @@ export default async function HsiPage() {
           sizes="100vw"
         />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-            <span className="text-sm font-semibold">Powered by HSI</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 drop-shadow-2xl">
-            HSI Safety Training Courses
-          </h1>
-          <p className="text-base md:text-lg mb-8 text-gray-100 drop-shadow-lg max-w-2xl mx-auto">
-            Access 1,200+ OSHA-compliant safety training courses. CPR, First Aid, and workplace safety certifications - Funded through WIOA funding.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/programs/cpr-first-aid-hsi"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
-            >
-              Get CPR Certified
-            </Link>
-            <Link
-              href="/courses/catalog"
-              className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
-            >
-              Browse All Courses
-            </Link>
-          </div>
-        </div>
       </section>
 
       {/* Avatar Guide */}
@@ -273,7 +248,7 @@ export default async function HsiPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16    text-white">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">

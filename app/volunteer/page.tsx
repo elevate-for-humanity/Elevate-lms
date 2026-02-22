@@ -60,13 +60,6 @@ export default async function VolunteerPage() {
           className="object-cover"
           priority
         />
-        <div className="relative z-10 max-w-6xl mx-auto px-4 text-center text-white">
-          <Heart className="w-16 h-16 mx-auto mb-4 opacity-90" />
-          <h1 className="text-4xl font-bold mb-4">Volunteer With Us</h1>
-          <p className="text-xl text-brand-orange-100 max-w-2xl mx-auto">
-            Join our community of volunteers making a difference. Your time and skills can help transform lives.
-          </p>
-        </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-12">

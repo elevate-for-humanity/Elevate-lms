@@ -21,7 +21,7 @@ export default function FederalCompliancePage() {
         <Breadcrumbs items={[{ label: "Policies", href: "/policies" }, { label: "Federal Compliance" }]} />
       </div>
 {/* Hero */}
-      <section className="relative min-h-[400px] flex items-center overflow-hidden">
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         <Image
           src="/images/heroes/training-provider-2.jpg"
           alt="Federal Compliance"
@@ -29,19 +29,6 @@ export default function FederalCompliancePage() {
           className="object-cover"
           priority
         />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 w-full">
-          <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-500 text-white text-sm font-semibold rounded-full mb-6">
-              <Shield className="w-4 h-4" />
-              Compliance
-            </span>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Federal Compliance Policy</h1>
-            <p className="text-xl text-brand-blue-100">
-              Elevate for Humanity maintains full compliance with all applicable federal laws governing educational institutions and workforce development programs.
-            </p>
-            <p className="text-sm text-brand-blue-200 mt-4">Effective Date: January 1, 2025 | Last Updated: January 2026</p>
-          </div>
-        </div>
       </section>
 
       <div className="max-w-4xl mx-auto px-4 py-12">
@@ -227,7 +214,7 @@ export default function FederalCompliancePage() {
         </section>
 
         {/* Reporting and Contact */}
-        <section className="bg-gray-900 text-white rounded-2xl p-8">
+        <section className="bg-gray-900 rounded-2xl p-8">
           <h2 className="text-2xl font-bold mb-6">Reporting Compliance Concerns</h2>
           <p className="text-gray-300 mb-6">
             If you believe the Institution has violated any federal compliance requirement, you may report your concern through the following channels:

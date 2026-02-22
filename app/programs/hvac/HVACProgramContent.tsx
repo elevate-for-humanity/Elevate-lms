@@ -31,7 +31,7 @@ export default function HVACProgramContent() {
     },
     {
       question: "What certifications do I get?",
-      answer: "You'll earn your EPA 608 Universal Certification (required by federal law to purchase and handle all refrigerant types — the highest level covering all four categories), OSHA 30 Safety Certification, and a program completion certificate. The EPA 608 Universal is what employers require."
+      answer: "You'll earn your EPA 608 Certification (required by federal law to purchase and handle all refrigerant types — the highest level covering all four categories), OSHA 30 Safety Certification, and a program completion certificate. The EPA 608 is what employers require."
     },
     {
       question: "What jobs can I get after this?",
@@ -81,12 +81,12 @@ export default function HVACProgramContent() {
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mt-6 mb-6 leading-tight">
               HVAC Technician Training<br />
-              <span className="text-green-300">EPA 608 Universal Certification</span>
+              <span className="text-green-300">EPA 608 Certification</span>
             </h1>
 
             <p className="text-xl text-gray-200 mb-4 leading-relaxed">
               400-hour program covering HVAC fundamentals, refrigerant handling, and hands-on
-              employer site experience. Graduate with your EPA 608 Universal Certification,
+              employer site experience. Graduate with your EPA 608 Certification,
               OSHA 30, and the credentials employers require.
             </p>
 
@@ -96,7 +96,7 @@ export default function HVACProgramContent() {
 
             <div className="flex flex-wrap gap-4 mb-8 text-sm text-gray-300">
               <span className="flex items-center gap-2 bg-green-500/20 backdrop-blur px-4 py-2 rounded-full text-green-300 font-semibold border border-green-400/30">
-                <Award className="w-4 h-4" /> EPA 608 Universal Certification
+                <Award className="w-4 h-4" /> EPA 608 Certification
               </span>
               <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
                 <Clock className="w-4 h-4" /> 400 Hours
@@ -314,7 +314,7 @@ export default function HVACProgramContent() {
               <div className="p-8">
                 <div className="flex items-center gap-2 mb-3">
                   <Award className="w-6 h-6 text-brand-blue-600" />
-                  <h3 className="text-xl font-bold text-gray-900">EPA Section 608 Universal Certification</h3>
+                  <h3 className="text-xl font-bold text-gray-900">EPA Section 608 Certification</h3>
                 </div>
                 <p className="text-gray-700 mb-4">
                   Required by federal law to purchase and handle refrigerants. Without this certification, you cannot legally work on most HVAC systems.
@@ -405,7 +405,7 @@ export default function HVACProgramContent() {
               EPA 608 Certification — 15-Week Curriculum
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Structured progression from Core fundamentals through all three specialty types, ending with a proctored Universal certification exam administered through an approved testing partner.
+              Structured progression from Core fundamentals through all three specialty types, ending with a proctored certification exam administered through an approved testing partner.
             </p>
           </div>
 
@@ -425,7 +425,7 @@ export default function HVACProgramContent() {
               { week: 12, title: 'Low-Pressure Systems & Centrifugal Chillers', section: 'Type III', color: 'bg-purple-100 text-purple-700' },
               { week: 13, title: 'Type III Recovery, Leak Detection & Water Tubes', section: 'Type III', color: 'bg-purple-100 text-purple-700' },
               { week: 14, title: 'Type III Review & Practice Exam', section: 'Type III', color: 'bg-purple-100 text-purple-700' },
-              { week: 15, title: 'Universal Review & Proctored Certification Exam', section: 'Exam', color: 'bg-brand-red-100 text-brand-red-700' },
+              { week: 15, title: 'Review & Proctored Certification Exam', section: 'Exam', color: 'bg-brand-red-100 text-brand-red-700' },
             ].map((w) => (
               <div
                 key={w.week}

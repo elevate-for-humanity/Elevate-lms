@@ -44,7 +44,7 @@ export default async function InstructorStudentsPage() {
 
   // Get students enrolled in instructor's courses
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       status,

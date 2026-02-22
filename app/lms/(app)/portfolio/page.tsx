@@ -55,7 +55,7 @@ export default async function PortfolioPage() {
 
   // Fetch completed courses
   const { data: completedCourses } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*, course:courses(*)')
     .eq('user_id', user.id)
     .eq('status', 'completed')

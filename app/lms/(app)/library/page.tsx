@@ -56,7 +56,7 @@ export default async function LibraryPage() {
 
   // Fetch user's enrolled courses
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       courses (

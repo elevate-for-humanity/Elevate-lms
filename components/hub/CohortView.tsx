@@ -36,7 +36,7 @@ export default function CohortView({ showBy = 'program' }: { showBy?: 'program' 
 
           for (const program of programs) {
             const { data: enrollments } = await supabase
-              .from('enrollments')
+              .from('program_enrollments')
               .select('id, status, progress')
               .eq('program_id', program.id);
 
@@ -99,7 +99,7 @@ export default function CohortView({ showBy = 'program' }: { showBy?: 'program' 
       } else {
         // Group by start month
         const { data: enrollments } = await supabase
-          .from('enrollments')
+          .from('program_enrollments')
           .select('id, status, progress, created_at');
 
         if (enrollments) {

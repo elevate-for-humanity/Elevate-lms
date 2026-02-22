@@ -18,14 +18,14 @@ export async function GET(request: Request) {
 
     // Get recent enrollments
     const { data: enrollments } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*, profiles(full_name), programs(name)')
       .order('enrolled_at', { ascending: false })
       .limit(5);
 
     // Get recent completions
     const { data: completions } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*, profiles(full_name), programs(name)')
       .eq('status', 'completed')
       .order('completion_date', { ascending: false })

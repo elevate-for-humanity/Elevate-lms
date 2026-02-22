@@ -18,7 +18,7 @@ async function getAccreditationData(supabase: any) {
     db.from('programs').select('id, name, status, created_at').eq('status', 'active'),
     db.from('training_courses').select('id, course_name, is_active').eq('is_active', true),
     db.from('certificates').select('id, created_at, status'),
-    db.from('enrollments').select('id, status, created_at'),
+    db.from('program_enrollments').select('id, status, created_at'),
     db.from('completions').select('id, created_at'),
   ]);
 

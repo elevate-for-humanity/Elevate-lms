@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     // Get enrollments for owned programs
     const { data: enrollments } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('student_id')
       .in('program_id', programIds)
       .in('student_id', student_ids);

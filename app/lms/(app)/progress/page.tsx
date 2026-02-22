@@ -67,7 +67,7 @@ export default async function ProgressPage() {
   try {
     // Get enrollments with course details
     const { data: enrollmentData } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(`
         *,
         courses (

@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // Get course details
     const { data: course, error: courseError } = await db
-      .from('courses')
+      .from('training_courses')
       .select('*')
       .eq('id', courseId)
       .single();
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     // Check if already enrolled
     const { data: existing } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id, payment_status')
       .eq('user_id', user.id)
       .eq('course_id', courseId)
@@ -118,14 +118,14 @@ export async function POST(request: NextRequest) {
     // Create or update enrollment with pending payment
     if (existing) {
       await db
-        .from('enrollments')
+        .from('program_enrollments')
         .update({
           payment_status: 'pending',
           stripe_checkout_session_id: session.id,
         })
         .eq('id', existing.id);
     } else {
-      await db.from('enrollments').insert({
+      await db.from('program_enrollments').insert({
         user_id: user.id,
         course_id: courseId,
         status: 'pending',

@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     const { data: enrollment } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(
         `
         *,

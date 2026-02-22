@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
     // Update enrollment to mark documents submitted
     const { error } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .update({ 
         documents_submitted_at: new Date().toISOString(),
         status: 'active',

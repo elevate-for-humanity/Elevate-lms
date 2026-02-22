@@ -60,7 +60,7 @@ const startTime = Date.now();
     const userId = searchParams.get('user_id');
 
     let query = db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(
         `
         id,
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
   const _admin = createAdminClient(); const db = _admin || supabase;
 
     const { data: enrollment, error: createError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .insert({
         user_id: body.user_id,
         course_id: body.course_id,

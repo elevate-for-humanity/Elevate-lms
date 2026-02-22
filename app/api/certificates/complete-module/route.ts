@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     // Verify enrollment belongs to user
     const { data: enrollment } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id, user_id, course_id')
       .eq('id', enrollment_id)
       .eq('user_id', user.id)

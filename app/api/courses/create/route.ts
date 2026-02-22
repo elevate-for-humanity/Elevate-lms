@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     // Insert course
     const { data: course, error: courseError } = await db
-      .from('courses')
+      .from('training_courses')
       .insert({
         slug,
         title: courseData.title,
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
       ) {
         const lessonData = moduleData.lessons[lessonIndex];
 
-        const { error: lessonError } = await db.from('lessons').insert({
+        const { error: lessonError } = await db.from('training_lessons').insert({
           course_id: course.id,
           title: lessonData.title,
           description: moduleData.description || '',

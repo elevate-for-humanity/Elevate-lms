@@ -75,7 +75,7 @@ export default function InstructorProgramAnnouncementsPage() {
 
     // Get enrolled count
     const { count } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('program_id', programId);
     

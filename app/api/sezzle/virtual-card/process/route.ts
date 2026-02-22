@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
       // Create enrollment if we have the necessary info
       if (programSlug && holder?.email) {
         const { error: enrollmentError } = await db
-          .from('enrollments')
+          .from('program_enrollments')
           .insert({
             program_slug: programSlug,
             email: holder.email,

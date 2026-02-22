@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { data: enrollment, error } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .insert({
         first_name: data.firstName.trim(),
         last_name: data.lastName.trim(),

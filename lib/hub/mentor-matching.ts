@@ -44,7 +44,7 @@ export async function getMentorMatches(userId: string, limit = 10): Promise<Ment
 
   // Get student's current program
   const { data: studentEnrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('program_id, programs(name, slug)')
     .eq('user_id', userId)
     .eq('status', 'active')
@@ -319,7 +319,7 @@ export async function registerAsMentor(
 
   // Verify user has completed a program
   const { data: completion } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id')
     .eq('user_id', userId)
     .eq('status', 'completed')

@@ -47,7 +47,7 @@ export default async function AdminGradebookPage({
 
   // Fetch course
   const { data: course } = await db
-    .from('courses')
+    .from('training_courses')
     .select('id, title')
     .eq('id', courseId)
     .single();
@@ -56,7 +56,7 @@ export default async function AdminGradebookPage({
 
   // Fetch enrollments with student profiles
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id, user_id, progress, status, profiles!inner(full_name, email)')
     .eq('course_id', courseId)
     .order('created_at');

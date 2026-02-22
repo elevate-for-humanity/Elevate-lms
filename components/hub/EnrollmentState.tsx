@@ -113,7 +113,7 @@ export default function EnrollmentState({ userId }: { userId?: string }) {
 
       // Fetch enrollments with program details
       const { data: enrollmentData } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select(`
           id,
           status,

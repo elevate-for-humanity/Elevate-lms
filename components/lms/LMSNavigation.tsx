@@ -61,7 +61,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
 
       // Load enrolled course count
       const { count: enrollCount } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id)
         .eq('status', 'active');

@@ -818,7 +818,7 @@ async function grantCourseAccess(
   accessLevel: 'full' | 'active'
 ): Promise<void> {
   await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .update({ 
       access_status: accessLevel,
       access_granted_at: new Date().toISOString(),
@@ -836,7 +836,7 @@ async function suspendCourseAccess(
   reason: string
 ): Promise<void> {
   await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .update({ 
       access_status: 'suspended',
       suspension_reason: reason,
@@ -856,7 +856,7 @@ async function updateEnrollmentStatus(
   paymentStatus: string
 ): Promise<void> {
   await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .update({ 
       status,
       payment_status: paymentStatus,

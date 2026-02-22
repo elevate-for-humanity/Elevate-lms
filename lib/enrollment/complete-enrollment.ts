@@ -40,7 +40,7 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
 
     // Step 2: Verify course exists and is available
     const { data: course, error: courseError } = await supabase
-      .from('courses')
+      .from('training_courses')
       .select('*')
       .eq('id', data.courseId)
       .single();
@@ -51,7 +51,7 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
 
     // Step 3: Check if already enrolled
     const { data: existing } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id')
       .eq('user_id', data.userId)
       .eq('course_id', data.courseId)
@@ -64,7 +64,7 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
     // Step 4: Check prerequisites (if any)
     if (course.prerequisites && course.prerequisites.length > 0) {
       const { data: completedCourses } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('course_id')
         .eq('user_id', data.userId)
         .eq('status', 'completed')
@@ -77,7 +77,7 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
 
     // Step 5: Create enrollment record
     const { data: enrollment, error: enrollError } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .insert({
         user_id: data.userId,
         course_id: data.courseId,
@@ -157,7 +157,7 @@ export async function verifyCourseAccess(userId: string, courseId: string): Prom
   const supabase = await createClient();
 
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('status, end_date')
     .eq('user_id', userId)
     .eq('course_id', courseId)

@@ -31,7 +31,7 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
   if (!user) redirect('/login');
 
   const { data: course } = await db
-    .from('courses')
+    .from('training_courses')
     .select('id, title')
     .eq('id', courseId)
     .single();

@@ -32,7 +32,7 @@ export async function GET(request: Request) {
 
     // Fetch enrollments with program info
     const { data: enrollments, error: enrollError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(`
         id,
         program:programs (

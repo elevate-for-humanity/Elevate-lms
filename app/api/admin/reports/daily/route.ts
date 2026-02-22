@@ -29,11 +29,11 @@ export const POST = withAuth(
       { count: newUsers },
     ] = await Promise.all([
       db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .gte('enrolled_at', yesterday.toISOString()),
       db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .not('completed_at', 'is', null)
         .gte('completed_at', yesterday.toISOString()),

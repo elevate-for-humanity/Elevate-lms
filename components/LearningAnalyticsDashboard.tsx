@@ -59,7 +59,7 @@ export default function LearningAnalyticsDashboard() {
 
         // Fetch enrollments
         const { data: enrollments } = await supabase
-          .from('enrollments')
+          .from('program_enrollments')
           .select('status, progress_percent')
           .eq('user_id', user.id);
 

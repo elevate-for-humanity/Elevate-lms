@@ -252,7 +252,7 @@ export async function confirmPayment(
   // If course purchase, create enrollment
   if (payment.course_id) {
     const { data: enrollment } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .insert({
         user_id: payment.user_id,
         course_id: payment.course_id,
@@ -334,7 +334,7 @@ export async function processRefund(
   // If course enrollment, cancel it
   if (payment.course_id) {
     await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .update({
         status: 'cancelled',
         cancelled_at: new Date().toISOString(),
@@ -569,7 +569,7 @@ export async function handleStripeWebhook(event: Stripe.Event): Promise<void> {
 export async function getCoursePrice(courseId: string): Promise<number> {
   const supabase = await createClient();
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('price')
     .eq('id', courseId)
     .single();

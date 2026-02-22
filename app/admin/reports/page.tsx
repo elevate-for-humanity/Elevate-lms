@@ -24,9 +24,9 @@ export default async function ReportsPage() {
     { count: totalEnrollments },
   ] = await Promise.all([
     db.from('profiles').select('*', { count: 'exact', head: true }),
-    db.from('courses').select('*', { count: 'exact', head: true }),
+    db.from('training_courses').select('*', { count: 'exact', head: true }),
     db.from('leads').select('*', { count: 'exact', head: true }),
-    db.from('enrollments').select('*', { count: 'exact', head: true }),
+    db.from('program_enrollments').select('*', { count: 'exact', head: true }),
   ]);
 
   // Get recent activity
@@ -36,7 +36,7 @@ export default async function ReportsPage() {
     .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
 
   const { data: recentEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('created_at')
     .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
 

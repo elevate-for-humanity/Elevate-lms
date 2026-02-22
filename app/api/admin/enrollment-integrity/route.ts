@@ -41,7 +41,7 @@ const guard = await apiRequireAdmin();
     .select('*', { count: 'exact', head: true });
 
   const { count: totalLegacyEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
 
   return NextResponse.json({

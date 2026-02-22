@@ -21,7 +21,7 @@ export async function sendWelcomeSequence(enrollmentId: string) {
   const supabase = createAdminClient();
 
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       student_id,
@@ -195,7 +195,7 @@ export async function autoAssignCourses(enrollmentId: string) {
   const supabase = createAdminClient();
 
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('student_id, program_id')
     .eq('id', enrollmentId)
     .single();

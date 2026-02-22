@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
         ? db.from('profiles').select('full_name').eq('id', certificate.user_id).maybeSingle()
         : Promise.resolve({ data: null }),
       certificate.course_id
-        ? db.from('courses').select('title').eq('id', certificate.course_id).maybeSingle()
+        ? db.from('training_courses').select('title').eq('id', certificate.course_id).maybeSingle()
         : Promise.resolve({ data: null }),
     ]);
 

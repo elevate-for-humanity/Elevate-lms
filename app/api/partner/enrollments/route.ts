@@ -32,7 +32,7 @@ export async function GET(request: Request) {
 
     // Get enrollments for this tenant (RLS also enforces this)
     const { data: enrollments, error } = await db
-      .from("enrollments")
+      .from("program_enrollments")
       .select(`
         id,
         user_id,

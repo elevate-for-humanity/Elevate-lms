@@ -54,7 +54,7 @@ export default async function IssueCertificatePage() {
 
   // Fetch courses for selection
   const { data: courses } = await db
-    .from('courses')
+    .from('training_courses')
     .select('id, title')
     .eq('status', 'published')
     .order('title');

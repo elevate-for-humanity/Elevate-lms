@@ -52,25 +52,25 @@ export default async function PartnerReportsPage() {
 
   // Fetch enrollment stats
   const { count: totalEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq(partnerField, partnerId);
 
   const { count: thisQuarterEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq(partnerField, partnerId)
     .gte('enrolled_at', thisQuarterStart.toISOString());
 
   const { count: completedEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq(partnerField, partnerId)
     .eq('status', 'completed');
 
   // Fetch recent completions
   const { data: recentCompletions } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       completed_at,

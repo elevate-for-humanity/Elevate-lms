@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     if (title) updateData.title = title;
 
     const { data, error }: any = await db
-      .from('courses')
+      .from('training_courses')
       .update(updateData)
       .eq('id', id)
       .select()

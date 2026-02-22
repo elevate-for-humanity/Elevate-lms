@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         .eq('completed', true);
 
       const { data: totalLessons } = await db
-        .from('lessons')
+        .from('training_lessons')
         .select('id')
         .eq('course_id', courseId);
 
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
     let fundingSource = 'SELF_PAY';
     if (programSlug) {
       const { data: enrollment } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('funding_source')
         .eq('user_id', user.id)
         .eq('program_slug', programSlug)

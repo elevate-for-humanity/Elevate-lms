@@ -81,8 +81,8 @@ export function AdminReportingDashboard() {
         { data: activities },
       ] = await Promise.all([
         supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
-        supabase.from('enrollments').select('*', { count: 'exact', head: true }).in('status', ['active', 'pending']),
-        supabase.from('enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
+        supabase.from('program_enrollments').select('*', { count: 'exact', head: true }).in('status', ['active', 'pending']),
+        supabase.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
         supabase.from('payments').select('amount').gte('created_at', startDate.toISOString()),
         supabase.from('training_programs').select(`
           id, name,

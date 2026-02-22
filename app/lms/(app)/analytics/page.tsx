@@ -55,7 +55,7 @@ export default async function AnalyticsPage() {
 
   // Fetch enrollments
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       courses (

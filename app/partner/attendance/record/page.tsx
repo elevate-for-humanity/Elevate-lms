@@ -35,7 +35,7 @@ export default async function RecordAttendancePage() {
   if (partner) {
     // Get students enrolled with this partner
     const { data: enrollmentData } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(`
         id,
         user_id,
@@ -54,7 +54,7 @@ export default async function RecordAttendancePage() {
 
     // Get courses for this partner
     const { data: courseData } = await db
-      .from('courses')
+      .from('training_courses')
       .select('id, title')
       .eq('partner_id', partner.id)
       .eq('is_active', true);

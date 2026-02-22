@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
 
     // Validate course exists and is available
     const { data: course, error: courseError } = await db
-      .from('courses')
+      .from('training_courses')
       .select('id, title, status, is_published')
       .eq('id', courseId)
       .single();
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
 
     // Check existing enrollment
     const { data: existing } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('user_id, course_id, status')
       .eq('user_id', user.id)
       .eq('course_id', courseId)
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
       
       // Reactivate expired/withdrawn enrollment
       const { data: reactivated, error: reactivateError } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .update({ 
           status: 'active', 
           started_at: new Date().toISOString() 
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
 
     // Create new enrollment
     const { data: enrollment, error } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .insert({
         user_id: user.id,
         course_id: courseId,

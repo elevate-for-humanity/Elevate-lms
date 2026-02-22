@@ -241,7 +241,7 @@ async function handleCourseCompleted(
     if (isComplete) {
       // Generate completion certificate
       await db
-        .from('enrollments')
+        .from('program_enrollments')
         .update({
           status: 'completed',
           completed_at: new Date().toISOString(),

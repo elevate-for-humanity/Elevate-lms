@@ -43,7 +43,7 @@ export async function checkEnrollmentAccess(
 
   // Get enrollment for this user (optionally filtered by program)
   let query = supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id, status, program_slug, agreement_signed')
     .eq('user_id', userId);
 
@@ -245,7 +245,7 @@ export async function approveEnrollment(
   const supabase = await createClient();
 
   const { data: enrollment, error: fetchError } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id, status, user_id, program_slug')
     .eq('id', enrollmentId)
     .single();
@@ -262,7 +262,7 @@ export async function approveEnrollment(
   }
 
   const { error: updateError } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .update({
       status: 'active',
       approved_at: new Date().toISOString(),

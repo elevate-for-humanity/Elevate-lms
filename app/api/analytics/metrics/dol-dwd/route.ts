@@ -15,7 +15,7 @@ const supabase = await createServerSupabaseClient();
 
   // Get DOL/DWD reporting data
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(
       `
       *,

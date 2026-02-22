@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
     // Update enrollment to mark orientation complete
     const { error } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .update({ 
         orientation_completed_at: new Date().toISOString(),
         status: 'orientation_complete',

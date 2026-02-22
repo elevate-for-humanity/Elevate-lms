@@ -361,7 +361,7 @@ export async function getStudentsWithLowAttendance(
 
   // Get all students in course
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('student_id, profiles(full_name, email)')
     .eq('course_id', course_id)
     .eq('status', 'active');

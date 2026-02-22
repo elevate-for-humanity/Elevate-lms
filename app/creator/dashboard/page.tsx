@@ -29,7 +29,7 @@ export default async function CreatorDashboardPage() {
 
   // Fetch courses created by this user
   const { data: coursesData } = await db
-    .from('courses')
+    .from('training_courses')
     .select('id, course_name, is_active, enrolled_count, created_at')
     .eq('created_by', user.id)
     .order('created_at', { ascending: false });

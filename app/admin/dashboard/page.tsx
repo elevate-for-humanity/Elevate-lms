@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: 'Admin Dashboard | Elevate For Humanity',
 };
 
-async function getDashboardData(supabase: any) {
+async function getDashboardData(supabase: any, db: any) {
   const [
     studentsRes,
     programsRes,
@@ -29,18 +29,18 @@ async function getDashboardData(supabase: any) {
     db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
     db.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     db.from('training_courses').select('id', { count: 'exact', head: true }).eq('is_active', true),
-    db.from('enrollments').select('id', { count: 'exact', head: true }),
+    db.from('program_enrollments').select('id', { count: 'exact', head: true }),
     db.from('certificates').select('id', { count: 'exact', head: true }),
     db.from('training_lessons').select('id', { count: 'exact', head: true }),
     db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'partner'),
     db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student').eq('enrollment_status', 'at_risk'),
     // Full data for charts
     db.from('profiles').select('enrollment_status').eq('role', 'student'),
-    db.from('enrollments').select('status, enrolled_at, progress, course_id'),
+    db.from('program_enrollments').select('status, enrolled_at, progress, course_id'),
     db.from('programs').select('id, name, status'),
     db.from('training_courses').select('id, course_name, is_active'),
     db.from('profiles').select('id, full_name, email, enrollment_status, created_at').eq('role', 'student').order('created_at', { ascending: false }).limit(10),
-    db.from('enrollments').select('course_id, status').limit(500),
+    db.from('program_enrollments').select('course_id, status').limit(500),
   ]);
 
   // Build enrollment trend by month
@@ -142,7 +142,7 @@ export default async function AdminDashboardPage() {
     );
   }
 
-  const data = await getDashboardData(supabase);
+  const data = await getDashboardData(supabase, db);
 
   return <DashboardClient data={data} />;
 }

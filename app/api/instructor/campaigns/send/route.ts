@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // Verify instructor has access to these students through their courses
     const { data: courses } = await db
-      .from('courses')
+      .from('training_courses')
       .select('id')
       .eq('instructor_id', user.id);
 

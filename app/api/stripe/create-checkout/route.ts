@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     
     // Get course details
     const { data: course, error: courseError } = await db
-      .from('courses')
+      .from('training_courses')
       .select('*')
       .eq('id', courseId)
       .single();

@@ -252,7 +252,7 @@ export async function canAccessCourse(courseId: string): Promise<boolean> {
 
   // Check if user is enrolled
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
@@ -262,7 +262,7 @@ export async function canAccessCourse(courseId: string): Promise<boolean> {
 
   // Check if user is the course instructor
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('instructor_id')
     .eq('id', courseId)
     .single();
@@ -299,7 +299,7 @@ export async function canEditCourse(courseId: string): Promise<boolean> {
 
   // Check if user is the course instructor
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('instructor_id')
     .eq('id', courseId)
     .single();
@@ -340,7 +340,7 @@ export async function canAccessStudentData(studentId: string): Promise<boolean> 
   // Instructors can access data of their enrolled students
   if (role === 'instructor') {
     const { data: enrollment } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('course_id, courses!inner(instructor_id)')
       .eq('user_id', studentId)
       .eq('courses.instructor_id', user.id)

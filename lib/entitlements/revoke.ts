@@ -67,7 +67,7 @@ export async function revokeAllAccessForPayment(userId: string, paymentIntentId:
 
   // Revoke any enrollments tied to this payment
   const { error: enrollmentError } = await supabase
-    .from("enrollments")
+    .from("program_enrollments")
     .update({ 
       status: "refunded",
       refunded_at: new Date().toISOString()

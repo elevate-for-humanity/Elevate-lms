@@ -22,10 +22,10 @@ export async function GET(request: Request) {
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
 
     const [totalRes, monthRes, todayRes, activeRes] = await Promise.all([
-      db.from('enrollments').select('id', { count: 'exact', head: true }),
-      db.from('enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfMonth),
-      db.from('enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfDay),
-      db.from('enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+      db.from('program_enrollments').select('id', { count: 'exact', head: true }),
+      db.from('program_enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfMonth),
+      db.from('program_enrollments').select('id', { count: 'exact', head: true }).gte('enrolled_at', startOfDay),
+      db.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     ]);
 
     return NextResponse.json({

@@ -23,7 +23,7 @@ export async function verifyCourseAccess(courseId: string): Promise<CourseAccess
 
   // Check enrollment
   const { data: enrollment, error: enrollError } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       course:courses(*)
@@ -68,7 +68,7 @@ export async function verifyCourseAccess(courseId: string): Promise<CourseAccess
 
   // Update last accessed
   await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .update({ last_accessed: new Date().toISOString() })
     .eq('id', enrollment.id);
 

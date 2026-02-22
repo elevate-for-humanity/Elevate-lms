@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       .select('id, name, credential, accreditation_status, accreditation_body, accreditation_expires');
 
     const { data: enrollments } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id, status, program_id, enrolled_at, completed_at');
 
     const { data: certificates } = await db

@@ -42,7 +42,7 @@ export default async function DonatePage() {
 
   // Get impact stats from database
   const { count: studentsHelped } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
 
   const { count: graduatesPlaced } = await db

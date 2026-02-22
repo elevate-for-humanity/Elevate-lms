@@ -17,7 +17,7 @@ export default function DemoLearnerPage() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    supabase.from('enrollments').select('*').limit(50)
+    supabase.from('program_enrollments').select('*').limit(50)
       .then(({ data }) => { if (data) setDbRows(data); });
   }, []);
 

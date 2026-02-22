@@ -64,7 +64,7 @@ export default async function AchievementsPage() {
 
   // Fetch enrollments
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       courses (
@@ -79,7 +79,7 @@ export default async function AchievementsPage() {
 
   // Fetch completed courses
   const { count: completedCourses } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .eq('status', 'completed');

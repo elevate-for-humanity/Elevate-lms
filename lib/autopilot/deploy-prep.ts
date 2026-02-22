@@ -89,7 +89,7 @@ export async function runAutopilot(config: {
 
 async function syncEnrollments(supabase: any) {
   const { data: enrollments, error } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*')
     .eq('status', 'active');
 
@@ -104,11 +104,11 @@ async function syncEnrollments(supabase: any) {
 
 async function generateReports(supabase: any) {
   const { count: enrollmentCount } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
 
   const { count: completionCount } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
 
@@ -136,7 +136,7 @@ async function cleanupExpired(supabase: any) {
 
 async function sendReminders(supabase: any) {
   const { data: incomplete } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id')
     .eq('status', 'active')
     .lt('progress', 50);
@@ -156,7 +156,7 @@ export async function buildCourse(courseData: {
   const supabase = await createClient();
 
   const { data: course, error } = await supabase
-    .from('courses')
+    .from('training_courses')
     .insert({
       title: courseData.title,
       description: courseData.description,
@@ -193,7 +193,7 @@ export async function generateSitemap() {
   const supabase = await createClient();
 
   const { data: programs } = await supabase.from('programs').select('slug');
-  const { data: courses } = await supabase.from('courses').select('slug');
+  const { data: courses } = await supabase.from('training_courses').select('slug');
 
   const urls = [
     '/',

@@ -19,7 +19,7 @@ const { userId } = await params;
   // Fetch user progress across courses and programs
   const [enrollmentsResult, progressResult, certificatesResult] = await Promise.all([
     db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id, status, program_id, created_at')
       .eq('user_id', userId),
     db

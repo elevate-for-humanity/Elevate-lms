@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     // Get courses that need syncing
     let query = db
-      .from('courses')
+      .from('training_courses')
       .select('*')
       .eq('is_active', true)
       .eq('delivery_mode', 'partner_link')
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
         if (urlCheck.accessible) {
           // Update last_synced_at
           await db
-            .from('courses')
+            .from('training_courses')
             .update({
               last_synced_at: new Date().toISOString(),
               external_version: urlCheck.version || null,
@@ -219,7 +219,7 @@ export async function GET(request: NextRequest) {
     const partnerId = searchParams.get('partner_id');
 
     let query = db
-      .from('courses')
+      .from('training_courses')
       .select('id, course_name, partner_url, last_synced_at, external_version, delivery_mode')
       .eq('delivery_mode', 'partner_link')
       .not('partner_url', 'is', null)

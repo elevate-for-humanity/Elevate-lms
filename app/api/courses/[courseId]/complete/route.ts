@@ -28,7 +28,7 @@ export async function POST(
 
     // Get course info
     const { data: course, error: courseError } = await db
-      .from('courses')
+      .from('training_courses')
       .select('id, title')
       .eq('id', courseId)
       .single();
@@ -39,7 +39,7 @@ export async function POST(
 
     // Check enrollment
     const { data: enrollment, error: enrollmentError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id, status, progress')
       .eq('user_id', user.id)
       .eq('course_id', courseId)
@@ -54,7 +54,7 @@ export async function POST(
 
     // Check if all lessons are completed
     const { data: lessons } = await db
-      .from('lessons')
+      .from('training_lessons')
       .select('id')
       .eq('course_id', courseId);
 
@@ -82,7 +82,7 @@ export async function POST(
 
     // Mark course as completed
     const { error: updateError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .update({
         status: 'completed',
         progress: 100,
@@ -174,14 +174,14 @@ export async function GET(
 
     // Get completion status
     const { data: enrollment } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('status, progress, completed_at')
       .eq('user_id', user.id)
       .eq('course_id', courseId)
       .single();
 
     const { data: lessons } = await db
-      .from('lessons')
+      .from('training_lessons')
       .select('id')
       .eq('course_id', courseId);
 

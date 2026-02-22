@@ -20,7 +20,7 @@ export default async function ProgramBuilderPage() {
   const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
-  const { data: courses } = await db.from('courses').select('id, title').eq('status', 'published').order('title');
+  const { data: courses } = await db.from('training_courses').select('id, title').eq('status', 'published').order('title');
 
   return (
     <div className="min-h-screen bg-gray-50">

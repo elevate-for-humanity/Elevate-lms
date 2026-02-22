@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
     // 1) Load enrollment + course + program
     const { data: enrollment, error: enrollmentError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(
         `
         id,
@@ -188,7 +188,7 @@ export async function POST(request: Request) {
     // 7) Update enrollment status to completed and record certificate issuance timestamp
     const now = new Date().toISOString();
     await db
-      .from('enrollments')
+      .from('program_enrollments')
       .update({
         status: 'completed',
         completed_at: now,

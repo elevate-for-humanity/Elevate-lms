@@ -28,7 +28,7 @@ export async function GET(request: Request) {
 
     // Get all active enrollments
     const { data: enrollments } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(
         `
         id,

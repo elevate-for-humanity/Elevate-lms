@@ -17,8 +17,8 @@ export default async function GradebookPage({ params }: { params: { courseId: st
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: course } = await db.from('courses').select('*').eq('id', params.courseId).single();
-  const { data: enrollments } = await db.from('enrollments').select('*, profiles!inner(full_name, email)').eq('course_id', params.courseId).order('created_at');
+  const { data: course } = await db.from('training_courses').select('*').eq('id', params.courseId).single();
+  const { data: enrollments } = await db.from('program_enrollments').select('*, profiles!inner(full_name, email)').eq('course_id', params.courseId).order('created_at');
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -39,7 +39,7 @@ export async function GET(request: Request) {
     } else {
       // Check enrollments table as fallback
       const { data: altEnrollment } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*, programs(slug, title)')
         .eq('user_id', user.id)
         .single();

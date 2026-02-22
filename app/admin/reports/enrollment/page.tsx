@@ -23,12 +23,12 @@ export default async function EnrollmentReportPage() {
     { data: courses },
   ] = await Promise.all([
     db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*, courses(title), profiles(first_name, last_name, email)')
       .order('created_at', { ascending: false })
       .limit(50),
-    db.from('enrollments').select('*', { count: 'exact', head: true }),
-    db.from('courses').select('id, title'),
+    db.from('program_enrollments').select('*', { count: 'exact', head: true }),
+    db.from('training_courses').select('id, course_name'),
   ]);
 
   const recentEnrollments = enrollments?.filter(e => 

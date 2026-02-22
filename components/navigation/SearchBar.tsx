@@ -102,7 +102,7 @@ export function SearchBar({ placeholder = "Search programs, courses...", classNa
 
       // Search courses
       const { data: courses } = await supabase
-        .from('courses')
+        .from('training_courses')
         .select('id, title, description, slug')
         .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`)
         .limit(5);

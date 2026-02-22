@@ -64,7 +64,7 @@ export default async function AccreditationPage() {
     .eq('status', 'active');
 
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*, program:programs(name)')
     .gte(
       'created_at',
@@ -72,7 +72,7 @@ export default async function AccreditationPage() {
     );
 
   const { data: completions } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*')
     .eq('status', 'completed')
     .gte(

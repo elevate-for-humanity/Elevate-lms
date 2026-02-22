@@ -27,7 +27,7 @@ export async function getAllCourses(supabase?: SupabaseClient) {
   const client = supabase || await createClient();
 
   const { data, error } = await client
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('active', true)
     .order('order_index');
@@ -50,7 +50,7 @@ export async function getCoursesByProgram(
   const client = supabase || await createClient();
 
   const { data, error } = await client
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('program_id', programId)
     .eq('active', true)
@@ -71,7 +71,7 @@ export async function getCourseById(id: string, supabase?: SupabaseClient) {
   const client = supabase || createClient();
 
   const { data, error } = await client
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('id', id)
     .eq('active', true)
@@ -92,7 +92,7 @@ export async function getCourseCount(supabase?: SupabaseClient) {
   const client = supabase || createClient();
 
   const { count, error } = await client
-    .from('courses')
+    .from('training_courses')
     .select('*', { count: 'exact', head: true })
     .eq('active', true);
 

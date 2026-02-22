@@ -34,7 +34,7 @@ export async function syncStudentMiladyProgress(
 
   // Get active enrollment
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(
       `
       *,
@@ -168,7 +168,7 @@ export async function syncStudentMiladyProgress(
     requiredHours > 0 ? Math.round((totalHours / requiredHours) * 100) : 0;
 
   await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .update({
       progress_percentage: progressPercentage,
       theory_hours_completed: totalTheoryHours,
@@ -217,7 +217,7 @@ export async function syncAllStudents(): Promise<{
 
   // Get all students with active enrollments
   const { data: activeEnrollments } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('student_id')
     .eq('status', 'active');
 
@@ -300,7 +300,7 @@ export async function generateECRReport(studentId: string): Promise<{
 
   // Get enrollment
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(
       `
       *,

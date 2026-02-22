@@ -60,7 +60,7 @@ export async function getJobMatches(userId: string, limit = 10): Promise<JobMatc
 
   // Get completed programs
   const { data: completedEnrollments } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('program_id, programs(name, slug)')
     .eq('user_id', userId)
     .eq('status', 'completed');
@@ -263,7 +263,7 @@ export async function getEmployerTalentPipeline(employerId: string, limit = 20):
 
   // Find matching students
   const { data: candidates } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       user_id,
       progress,

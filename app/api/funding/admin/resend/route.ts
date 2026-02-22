@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     const [learnerUser, courseResult, programResult] = await Promise.all([
       getUserById(app.user_id),
       db
-        .from('courses')
+        .from('training_courses')
         .select('title')
         .eq('id', app.course_id)
         .maybeSingle(),

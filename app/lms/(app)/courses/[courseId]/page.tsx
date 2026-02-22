@@ -104,7 +104,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   // Check enrollment
   const { data: enrollment } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*')
     .eq('user_id', user.id)
     .eq('course_id', courseId)

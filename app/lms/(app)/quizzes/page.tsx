@@ -42,7 +42,7 @@ export default async function QuizzesPage() {
 
   try {
     const { data: enrollments } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('course_id')
       .eq('user_id', user.id)
       .eq('status', 'active');

@@ -47,25 +47,25 @@ export default async function CompletionsPage() {
 
   // Fetch completion stats
   const { count: totalCompletions } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
 
   const { count: thisMonthCompletions } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed')
     .gte('completed_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString());
 
   const { count: thisWeekCompletions } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed')
     .gte('completed_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
 
   // Fetch recent completions
   const { data: recentCompletions } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       completed_at,

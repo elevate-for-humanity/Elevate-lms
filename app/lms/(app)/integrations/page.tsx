@@ -54,7 +54,7 @@ export default async function IntegrationsPage() {
 
   // Fetch student's courses
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(
       `
       *,
@@ -70,13 +70,13 @@ export default async function IntegrationsPage() {
     .order('created_at', { ascending: false });
 
   const { count: activeCourses } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .eq('status', 'active');
 
   const { count: completedCourses } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .eq('status', 'completed');

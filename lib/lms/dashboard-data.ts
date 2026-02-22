@@ -44,7 +44,7 @@ export async function getAdminDashboardStats(
   const supabase = await createClient();
 
   let query = supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
 
   if (orgId) {
@@ -59,12 +59,12 @@ export async function getAdminDashboardStats(
     { data: pendingVerifications },
     { data: overdueData },
   ] = await Promise.all([
-    supabase.from('enrollments').select('*', { count: 'exact', head: true }),
+    supabase.from('program_enrollments').select('*', { count: 'exact', head: true }),
     supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active'),
-    supabase.from('enrollments').select('id').eq('status', 'completed'),
+    supabase.from('program_enrollments').select('id').eq('status', 'completed'),
     supabase.from('student_risk_status').select('id').eq('status', 'at_risk'),
     supabase
       .from('student_requirements')
@@ -101,7 +101,7 @@ export async function getStudentProgressList(
   const supabase = await createClient();
 
   const { data, error }: any = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(
       `
       id,
@@ -313,7 +313,7 @@ export async function getProgramCompletionStats(programId: string) {
   const supabase = await createClient();
 
   const { data, error }: any = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(
       `
       id,

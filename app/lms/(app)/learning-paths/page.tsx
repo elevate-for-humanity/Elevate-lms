@@ -31,7 +31,7 @@ const getCachedUserData = unstable_cache(
         .eq('id', userId)
         .single(),
       db
-        .from('enrollments')
+        .from('program_enrollments')
         .select(`
           id, status, progress, created_at,
           courses (id, title, description, thumbnail_url)
@@ -40,12 +40,12 @@ const getCachedUserData = unstable_cache(
         .order('created_at', { ascending: false })
         .limit(10),
       db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
         .eq('status', 'active'),
       db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
         .eq('status', 'completed'),

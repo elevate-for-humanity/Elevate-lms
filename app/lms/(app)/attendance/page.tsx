@@ -20,7 +20,7 @@ export default async function AttendancePage() {
 
   // Get user's enrollments to find their attendance
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id, course_id, courses(title)')
     .eq('user_id', user.id);
 

@@ -282,7 +282,7 @@ export async function POST(req: Request) {
       // STEP 2: Create/activate enrollment (AUTO-ENROLL)
       // Idempotent upsert — safe against Stripe retries and race conditions
       const { data: upsertResult } = await supabaseClient
-        .from('enrollments')
+        .from('program_enrollments')
         .upsert({
           student_id: studentId,
           program_id: programId,
@@ -298,7 +298,7 @@ export async function POST(req: Request) {
 
       // Check if this was a new enrollment or an update
       const { data: existing } = await supabaseClient
-        .from('enrollments')
+        .from('program_enrollments')
         .select('id, status')
         .eq('student_id', studentId)
         .eq('program_id', programId)
@@ -316,7 +316,7 @@ export async function POST(req: Request) {
       } else if (existing.status !== 'active') {
         // Activate existing enrollment
         await supabaseClient
-          .from('enrollments')
+          .from('program_enrollments')
           .update({
             status: 'active',
             payment_status: 'paid',

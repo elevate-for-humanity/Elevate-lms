@@ -23,7 +23,7 @@ export default async function ClassroomPage() {
 
   // Fetch user enrollments with course details
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       courses (id, title, description, thumbnail_url, duration_hours),
@@ -34,7 +34,7 @@ export default async function ClassroomPage() {
 
   // Fetch available courses
   const { data: availableCourses } = await db
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('is_active', true)
     .limit(6);

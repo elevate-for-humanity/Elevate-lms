@@ -40,12 +40,12 @@ const supabase = await createClient();
 
   // Get total enrollments
   const { count: totalEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
 
   // Get completed enrollments
   const { count: completedEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
 
@@ -63,7 +63,7 @@ const supabase = await createClient();
   // Get enrollments by sector (if you have this field)
   // Note: This is a Content - adjust based on your schema
   const { data: bySectorData } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('sector')
     .not('sector', 'is', null);
 
@@ -81,7 +81,7 @@ const supabase = await createClient();
 
   // Get enrollments by ZIP code (if you have this field)
   const { data: byZipData } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('zip_code')
     .not('zip_code', 'is', null);
 

@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     // Get courses taught by this instructor
     const { data: courses } = await db
-      .from('courses')
+      .from('training_courses')
       .select('id, title')
       .eq('instructor_id', user.id);
 

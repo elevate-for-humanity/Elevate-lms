@@ -65,7 +65,7 @@ export default async function LeaderboardPage() {
 
   // Fetch enrollment data for completed courses
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('user_id, status, completed_lessons')
     .eq('status', 'completed');
 

@@ -41,7 +41,7 @@ export async function GET(request: Request) {
 
     // Fetch enrollments
     const { data: enrollments, error: enrollmentsError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*, course:courses(title)')
       .eq('user_id', user.id);
 

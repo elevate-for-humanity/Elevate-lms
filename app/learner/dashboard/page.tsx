@@ -58,7 +58,7 @@ export default async function LearnerDashboardPage() {
 
   // Fetch enrollments from both tables (legacy enrollments + training_enrollments)
   const { data: legacyEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       course_id,

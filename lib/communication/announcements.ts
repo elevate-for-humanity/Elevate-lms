@@ -212,7 +212,7 @@ async function createRecipients(announcement: Announcement): Promise<void> {
     case 'program':
       // All students enrolled in program
       const { data: programStudents } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('student_id')
         .eq('program_id', announcement.scope_id)
         .eq('status', 'active');
@@ -221,7 +221,7 @@ async function createRecipients(announcement: Announcement): Promise<void> {
     case 'course':
       // All students enrolled in course
       const { data: courseStudents } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('student_id')
         .eq('course_id', announcement.scope_id)
         .eq('status', 'active');

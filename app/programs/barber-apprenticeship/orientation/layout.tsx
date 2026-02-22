@@ -24,7 +24,7 @@ export default async function OrientationLayout({
 
   // Verify user has an enrollment for this program
   const { data: enrollment } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id, status, orientation_completed_at, programs(slug)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })

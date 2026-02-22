@@ -359,7 +359,7 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
 
     if (payment?.enrollment_id) {
       await db
-        .from('enrollments')
+        .from('program_enrollments')
         .update({
           status: 'active',
           payment_status: 'paid',
@@ -415,7 +415,7 @@ async function handleOrderRefunded(event: SezzleWebhookEvent, supabase: any) {
 
   if (payment?.enrollment_id) {
     await db
-      .from('enrollments')
+      .from('program_enrollments')
       .update({
         status: 'refunded',
         deactivated_at: new Date().toISOString(),

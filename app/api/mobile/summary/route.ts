@@ -27,14 +27,14 @@ export async function GET(req: NextRequest) {
 
     // Get enrollments count
     const { count: enrollmentsCount } = await db
-      .from("enrollments")
+      .from("program_enrollments")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id)
       .eq("status", "active");
 
     // Get completed courses count
     const { count: completedCount } = await db
-      .from("enrollments")
+      .from("program_enrollments")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id)
       .eq("status", "completed");

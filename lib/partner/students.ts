@@ -96,7 +96,7 @@ export async function getPartnerStudentsWithTraining(
 
   // 3. Get enrollments for these students
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id, user_id, course_id, progress, status, created_at, completed_at, courses!inner(title)')
     .in('user_id', studentIds);
 
@@ -208,7 +208,7 @@ export async function getPartnerDashboardStats(shopIds: string[]) {
 
   const [enrollResult, certResult] = await Promise.all([
     supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('status, progress')
       .in('user_id', studentIds),
     supabase

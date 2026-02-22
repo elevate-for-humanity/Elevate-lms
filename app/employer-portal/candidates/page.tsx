@@ -34,7 +34,7 @@ export default async function CandidatesPage() {
 
   // Fetch real candidates from completed enrollments
   const { data: completedEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       user_id,

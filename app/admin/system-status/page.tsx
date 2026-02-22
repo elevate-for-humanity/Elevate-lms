@@ -181,7 +181,7 @@ async function checkCreatorPlatformCapabilities(supabase: any): Promise<CreatorC
   
   // 8. Enrollment-based Access Control
   const { count: enrollmentCount } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
   capabilities.push({
     name: 'Enrollment-based Access',

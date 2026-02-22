@@ -59,7 +59,7 @@ export default async function GradesPage() {
 
   // Fetch enrollments with course details
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       courses (

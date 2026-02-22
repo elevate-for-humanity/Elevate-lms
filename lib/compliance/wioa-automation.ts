@@ -4,7 +4,7 @@ export async function generateWIOAReport(startDate: Date, endDate: Date) {
   const supabase = await createClient();
 
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       user:profiles!enrollments_user_id_fkey(full_name, email),

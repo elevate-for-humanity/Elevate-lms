@@ -28,7 +28,7 @@ export default async function EnrollmentSuccessPage() {
 
   // Get enrollment to verify and get start date
   const { data: enrollment } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id, enrolled_at, status, program_id, programs(name, slug)')
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false })
@@ -43,7 +43,7 @@ export default async function EnrollmentSuccessPage() {
   // Mark enrollment as confirmed if not already
   if (enrollment.status === 'paid' || enrollment.status === 'approved') {
     await db
-      .from('enrollments')
+      .from('program_enrollments')
       .update({ status: 'confirmed', confirmed_at: new Date().toISOString() })
       .eq('id', enrollment.id);
   }

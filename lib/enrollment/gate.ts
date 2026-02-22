@@ -80,7 +80,7 @@ export async function gateApprenticeDashboard(): Promise<{
 
   // Get active enrollment
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*, programs(slug, name)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })

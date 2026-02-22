@@ -28,7 +28,7 @@ export async function GET(
       );
 
     // Get course with lessons
-    const query = db.from('courses').select(`
+    const query = db.from('training_courses').select(`
         *,
         lessons (
           id,
@@ -106,7 +106,7 @@ export async function PATCH(
     const updates = await request.json();
 
     const { data: course, error } = await db
-      .from('courses')
+      .from('training_courses')
       .update(updates)
       .eq('id', courseId)
       .select()
@@ -167,7 +167,7 @@ export async function DELETE(
     }
 
     const { error } = await db
-      .from('courses')
+      .from('training_courses')
       .delete()
       .eq('id', courseId);
 

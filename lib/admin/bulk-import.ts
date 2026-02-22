@@ -272,7 +272,7 @@ export async function importUsers(
 
       // Enroll in program if specified
       if (user.programId && user.role === 'student') {
-        await supabase.from('enrollments').insert({
+        await supabase.from('program_enrollments').insert({
           student_id: authUser.user.id,
           program_id: user.programId,
           cohort: user.cohort,

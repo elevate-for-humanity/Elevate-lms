@@ -69,7 +69,7 @@ if (!supabaseAdmin) {
 
     // Get enrollments with program details
     const { data: enrollments } = await supabaseAdmin
-      .from('enrollments')
+      .from('program_enrollments')
       .select(
         `
         id,

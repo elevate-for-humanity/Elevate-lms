@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
 
   // Gather enrollment data
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id, funding_pathway, intake_completed, status, created_at')
     .gte('created_at', startDate.toISOString())
     .lte('created_at', endDate.toISOString());

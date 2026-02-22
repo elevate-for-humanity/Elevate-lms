@@ -69,7 +69,7 @@ export default function ThreadDetailPage() {
     // Check if user is enrolled
     if (authUser) {
       const { count } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('program_id', programData.id)
         .eq('user_id', authUser.id);

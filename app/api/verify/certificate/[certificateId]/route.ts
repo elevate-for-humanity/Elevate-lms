@@ -58,7 +58,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
     // Get course details
     const { data: course } = await db
-      .from("courses")
+      .from("training_courses")
       .select("title, description")
       .eq("id", certificate.course_id)
       .single();

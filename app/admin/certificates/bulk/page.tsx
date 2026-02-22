@@ -54,7 +54,7 @@ export default async function BulkCertificatesPage() {
 
   // Fetch eligible participants (completed courses without certificates)
   const { data: eligibleParticipants, count: eligibleCount } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       user_id,

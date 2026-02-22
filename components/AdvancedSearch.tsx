@@ -79,7 +79,7 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
       // Get enrollment counts
       const programIds = programs?.map(p => p.id) || [];
       const { data: enrollmentCounts } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('program_id')
         .in('program_id', programIds);
 

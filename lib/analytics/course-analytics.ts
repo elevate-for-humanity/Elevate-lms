@@ -54,7 +54,7 @@ export async function getCourseAnalytics(courseId: string): Promise<CourseAnalyt
 
   // Get course info
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('id, title')
     .eq('id', courseId)
     .single();
@@ -63,7 +63,7 @@ export async function getCourseAnalytics(courseId: string): Promise<CourseAnalyt
 
   // Get all enrollments
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       student_id,
@@ -81,7 +81,7 @@ export async function getCourseAnalytics(courseId: string): Promise<CourseAnalyt
 
   // Get lesson data
   const { data: lessons } = await supabase
-    .from('lessons')
+    .from('training_lessons')
     .select('id, title, order_number')
     .eq('course_id', courseId)
     .order('order_number');
@@ -201,7 +201,7 @@ export async function getEnrollmentTrends(
 
   const intervals = period === 'week' ? 7 : period === 'month' ? 30 : 90;
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('enrolled_at, status')
     .eq('course_id', courseId)
     .gte('enrolled_at', new Date(Date.now() - intervals * 24 * 60 * 60 * 1000).toISOString());

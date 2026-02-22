@@ -97,7 +97,7 @@ export async function processUI3Results(
 
     // Get enrollment for this student
     const { data: enrollment } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id, completion_date')
       .eq('student_id', profile.id)
       .order('completion_date', { ascending: false })
@@ -182,7 +182,7 @@ export async function scheduleUI3Matching() {
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
   const { data: students2nd } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('student_id, id, completion_date')
     .lte('completion_date', sixMonthsAgo.toISOString())
     .is('verified_2nd_quarter', null);
@@ -192,7 +192,7 @@ export async function scheduleUI3Matching() {
   twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
 
   const { data: students4th } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('student_id, id, completion_date')
     .lte('completion_date', twelveMonthsAgo.toISOString())
     .is('verified_4th_quarter', null);

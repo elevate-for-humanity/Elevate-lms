@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     // Get user's enrollments
     const { data: enrollments } = await db
-      .from("enrollments")
+      .from("program_enrollments")
       .select("course_id")
       .eq("user_id", user.id);
 
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       const moduleIds = modules?.map((m) => m.id) || [];
 
       const { data: lessons } = await db
-        .from("lessons")
+        .from("training_lessons")
         .select("id")
         .in("module_id", moduleIds);
 
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
       const moduleIds = modules?.map((m) => m.id) || [];
 
       const { data: lessons } = await db
-        .from("lessons")
+        .from("training_lessons")
         .select("id")
         .in("module_id", moduleIds);
 

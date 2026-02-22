@@ -58,7 +58,7 @@ export default async function CalendarPage() {
 
   try {
     const { data: enrollments } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*, courses (id, title, description, start_date, end_date)')
       .eq('user_id', user.id)
       .eq('status', 'active');

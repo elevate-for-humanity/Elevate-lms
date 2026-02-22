@@ -20,9 +20,9 @@ export default async function ProgressPage() {
   const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
-  const { count: totalEnrollments } = await db.from('enrollments').select('*', { count: 'exact', head: true });
-  const { count: inProgress } = await db.from('enrollments').select('*', { count: 'exact', head: true }).eq('status', 'in_progress');
-  const { count: completed } = await db.from('enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed');
+  const { count: totalEnrollments } = await db.from('program_enrollments').select('*', { count: 'exact', head: true });
+  const { count: inProgress } = await db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'in_progress');
+  const { count: completed } = await db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed');
 
   return (
     <div className="min-h-screen bg-gray-50">

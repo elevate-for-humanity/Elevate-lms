@@ -59,7 +59,7 @@ export default async function EnrollPage({ searchParams }: Props) {
 
   // Get user's existing enrollments
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('course_id')
     .eq('user_id', user.id);
 

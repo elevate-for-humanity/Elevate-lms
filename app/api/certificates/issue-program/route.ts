@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: enrollment, error: enrollError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id, user_id, course_id, status')
       .eq('id', enrollment_id)
       .single();

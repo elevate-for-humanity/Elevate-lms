@@ -30,7 +30,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   // 2) Get enrollment row (using program_id since that's what the table uses)
   const { data: enrollment, error: enrollError } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*')
     .eq('program_id', courseId)
     .eq('user_id', user.id)
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   // 5) If both internal + external are complete, mark course completed
   const { error: updateError } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .update({
       status: 'completed',
       completed_at: new Date().toISOString(),

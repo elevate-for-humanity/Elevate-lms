@@ -18,7 +18,7 @@ export async function createDrugTest(order: DrugTestOrder): Promise<string | nul
 
   // Get organization from enrollment
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('organization_id')
     .eq('id', order.enrollment_id)
     .single();
@@ -346,7 +346,7 @@ export async function checkDrugTestRequired(enrollmentId: string): Promise<{
 
   // Get enrollment with program
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       programs(id, name)

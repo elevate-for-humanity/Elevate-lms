@@ -78,13 +78,13 @@ export default async function StudentsPage() {
 
   // Get active enrollments count
   const { count: activeEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
   // Get completed enrollments count
   const { count: completedEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
 

@@ -22,7 +22,7 @@ export default async function SampleReportsPage() {
 
   const [students, enrollments, certificates, completions, programs, courses] = await Promise.all([
     db.from('profiles').select('id, full_name, email, role, enrollment_status, created_at').eq('role', 'student').order('created_at', { ascending: false }).limit(20),
-    db.from('enrollments').select('id, status, created_at, program_id').order('created_at', { ascending: false }).limit(20),
+    db.from('program_enrollments').select('id, status, created_at, program_id').order('created_at', { ascending: false }).limit(20),
     db.from('certificates').select('id, status, created_at').order('created_at', { ascending: false }).limit(20),
     db.from('completions').select('id, created_at').order('created_at', { ascending: false }).limit(20),
     db.from('programs').select('id, name, status', { count: 'exact' }),

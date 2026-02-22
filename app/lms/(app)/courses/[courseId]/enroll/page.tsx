@@ -76,7 +76,7 @@ export default async function CourseEnrollPage({ params }: Props) {
 
   // Check if already enrolled
   const { data: existingEnrollment } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id, status')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
@@ -101,7 +101,7 @@ export default async function CourseEnrollPage({ params }: Props) {
 
   // Get enrolled student count
   const { count: studentCount } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('course_id', courseId);
 

@@ -104,7 +104,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   if (action === 'approve' && document.document_type === 'photo_id') {
     // Check if this user has a pending enrollment that can now be approved
     const { data: pendingEnrollment } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id, status')
       .eq('user_id', document.user_id)
       .eq('status', 'pending')
@@ -113,7 +113,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     if (pendingEnrollment) {
       // Mark enrollment as ready for approval (docs verified)
       await db
-        .from('enrollments')
+        .from('program_enrollments')
         .update({
           docs_verified: true,
           docs_verified_at: new Date().toISOString(),

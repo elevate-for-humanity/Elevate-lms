@@ -235,7 +235,7 @@ const supabase = await createClient();
 
       if (sponsorship) {
         await db
-          .from('enrollments')
+          .from('program_enrollments')
           .update({ status: 'active', payment_status: 'paid' })
           .eq('id', sponsorship.enrollment_id);
       }

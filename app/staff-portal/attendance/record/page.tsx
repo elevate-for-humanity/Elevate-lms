@@ -35,7 +35,7 @@ export default async function RecordAttendancePage() {
 
   // Fetch active students with their enrollments
   const { data: activeEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       student_id,

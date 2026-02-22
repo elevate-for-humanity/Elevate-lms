@@ -277,7 +277,7 @@ export async function canIssueCredential(
   
   // Check enrollment status
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('status, intake_completed, funding_pathway')
     .eq('id', enrollmentId)
     .single();
@@ -309,7 +309,7 @@ export async function checkAcademicAccess(
   
   // Check enrollment status
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('status, funding_pathway')
     .eq('id', enrollmentId)
     .eq('user_id', userId)

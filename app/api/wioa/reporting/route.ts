@@ -93,7 +93,7 @@ async function generateEnrollmentReport(
   startDate: string | null,
   endDate: string | null
 ) {
-  let query = db.from('enrollments').select('*, profiles(*)');
+  let query = db.from('program_enrollments').select('*, profiles(*)');
 
   if (startDate) query = query.gte('enrollment_date', startDate);
   if (endDate) query = query.lte('enrollment_date', endDate);

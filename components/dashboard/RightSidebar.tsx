@@ -143,7 +143,7 @@ export function RightSidebar() {
   async function loadStats(userId: string) {
     // Get completed courses
     const { count: completedCount } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
       .eq('status', 'completed');

@@ -27,7 +27,7 @@ export async function generateProgramAuditExport(
 
   // Fetch all enrollments for the program with related data
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(
       `
       id,

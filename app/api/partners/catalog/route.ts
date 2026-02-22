@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     // Build query for courses
     let query = db
-      .from('courses')
+      .from('training_courses')
       .select(`
         id,
         course_name,
@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
 
     // Insert course
     const { data: course, error: insertError } = await db
-      .from('courses')
+      .from('training_courses')
       .insert({
         course_name,
         course_code,

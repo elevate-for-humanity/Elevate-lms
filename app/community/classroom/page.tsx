@@ -19,7 +19,7 @@ export default async function ClassroomPage() {
 
   // Fetch courses from database
   const { data: courses, error } = await db
-    .from('courses')
+    .from('training_courses')
     .select('id, course_name, description, duration_hours, image_url, is_active, price')
     .eq('is_active', true)
     .order('created_at', { ascending: false })
@@ -35,7 +35,7 @@ export default async function ClassroomPage() {
 
   if (courseIds.length > 0) {
     const { data: enrollments } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('course_id')
       .in('course_id', courseIds);
 

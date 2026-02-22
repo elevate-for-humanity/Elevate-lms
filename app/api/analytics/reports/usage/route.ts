@@ -34,7 +34,7 @@ const supabase = await createRouteHandlerClient({ cookies });
   const format = (url.searchParams.get('format') || 'json').toLowerCase();
 
   // Build query for enrollments
-  let query = db.from('enrollments').select(`
+  let query = db.from('program_enrollments').select(`
       user_id,
       course_id,
       status,

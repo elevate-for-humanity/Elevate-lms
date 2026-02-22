@@ -45,13 +45,13 @@ export async function GET(request: NextRequest) {
 
     // 2) Get course counts
     const { count: totalCourses } = await db
-      .from("enrollments")
+      .from("program_enrollments")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id);
 
     // Get completed courses (progress >= 100%)
     const { data: enrollments } = await db
-      .from("enrollments")
+      .from("program_enrollments")
       .select("course_id")
       .eq("user_id", user.id);
 
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
         const moduleIds = modules?.map((m) => m.id) || [];
 
         const { data: lessons } = await db
-          .from("lessons")
+          .from("training_lessons")
           .select("id")
           .in("module_id", moduleIds);
 

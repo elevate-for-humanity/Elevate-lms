@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
 
     // Create enrollment - ACTIVE immediately (Elevate paid)
     const { data: enrollment, error: enrollmentError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .insert({
         user_id: profileId,
         program_id: programId || null,

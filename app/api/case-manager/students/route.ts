@@ -65,7 +65,7 @@ export async function GET(request: Request) {
       (students || []).map(async (student) => {
         // Get enrollments
         const { data: enrollments } = await db
-          .from('enrollments')
+          .from('program_enrollments')
           .select(
             `
             id,

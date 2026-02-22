@@ -34,7 +34,7 @@ export async function getCourseProgress(userId: string, courseId: string) {
   const supabase = await createClient();
 
   const { data: lessons } = await supabase
-    .from('lessons')
+    .from('training_lessons')
     .select('id')
     .eq('course_id', courseId);
 

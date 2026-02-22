@@ -250,7 +250,7 @@ export async function GET(request: NextRequest) {
         } else {
           // 4. Try enrollments table with users
           const { data: basicEnrollments } = await db
-            .from('enrollments')
+            .from('program_enrollments')
             .select(`
               *,
               users:user_id (

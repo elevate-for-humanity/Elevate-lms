@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     const { data: enrollments } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id, status, program_id, enrolled_at, completed_at');
 
     const { data: applications } = await db

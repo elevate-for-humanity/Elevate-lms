@@ -28,14 +28,14 @@ export async function GET(request: Request) {
     if (courseId) {
       // Get progress for specific course
       const { data: enrollment } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*')
         .eq('user_id', user.id)
         .eq('course_id', courseId)
         .single();
 
       const { data: lessons } = await db
-        .from('lessons')
+        .from('training_lessons')
         .select('id, title, order_index, duration_minutes')
         .eq('course_id', courseId)
         .order('order_index');
@@ -74,7 +74,7 @@ export async function GET(request: Request) {
 
     // Get all enrollments with progress
     const { data: enrollments } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(`
         id,
         course_id,

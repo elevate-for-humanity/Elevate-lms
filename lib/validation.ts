@@ -8,7 +8,7 @@ export async function checkDuplicateEnrollment(
 ): Promise<{ isDuplicate: boolean; existingEnrollmentId?: string }> {
   const supabase = await createClient();
   const { data: existing } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id')
     .eq('student_id', studentId)
     .eq('program_id', programId)
@@ -24,7 +24,7 @@ export async function checkDuplicateEnrollment(
 export async function verifyCertificateEligibility(enrollmentId: string) {
   const supabase = await createClient();
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(
       '*, program:programs(required_lessons), progress:lesson_progress(completed_at)'
     )

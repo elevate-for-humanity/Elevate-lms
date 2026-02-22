@@ -66,7 +66,7 @@ export async function POST(req: Request) {
 
     // Get enrollment details
     const { data: enrollment, error: enrollmentError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(
         `
         *,
@@ -143,7 +143,7 @@ export async function POST(req: Request) {
     } else if (paymentMode === 'scholarship') {
       // No charge - mark as paid immediately
       const { error: updateError } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .update({
           status: 'active',
           payment_status: 'paid',
@@ -170,7 +170,7 @@ export async function POST(req: Request) {
     } else {
       // employer mode - create invoice for employer
       const { data: enrollment } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*, programs(*), users(*)')
         .eq('id', enrollmentId)
         .single();
@@ -209,7 +209,7 @@ export async function POST(req: Request) {
 
       // Update enrollment with invoice ID
       await db
-        .from('enrollments')
+        .from('program_enrollments')
         .update({
           stripe_invoice_id: invoice.id,
           payment_status: 'pending',
@@ -287,7 +287,7 @@ export async function POST(req: Request) {
     if (!session.url) {
       // Unlock enrollment if session creation failed
       await db
-        .from('enrollments')
+        .from('program_enrollments')
         .update({
           billing_lock: false,
           billing_lock_reason: 'Session creation failed',
@@ -302,7 +302,7 @@ export async function POST(req: Request) {
 
     // Update enrollment with stripe session ID
     await db
-      .from('enrollments')
+      .from('program_enrollments')
       .update({
         stripe_checkout_session_id: session.id,
       })

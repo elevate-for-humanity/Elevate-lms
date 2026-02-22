@@ -72,7 +72,7 @@ export default async function CertificationPage() {
 
   // Get certifications in progress
   const { data: inProgress } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       progress,

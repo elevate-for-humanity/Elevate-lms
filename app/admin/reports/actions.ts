@@ -16,15 +16,15 @@ export async function generateEnrollmentReport(dateRange: string = '30') {
     { count: totalEnrollments },
   ] = await Promise.all([
     db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*, courses(title)')
       .gte('created_at', startDate)
       .order('created_at', { ascending: false }),
     db
-      .from('courses')
+      .from('training_courses')
       .select('id, title'),
     db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*', { count: 'exact', head: true }),
   ]);
 

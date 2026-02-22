@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
   // Fetch course details for expiry calculation
   const { data: course } = await db
-    .from('courses')
+    .from('training_courses')
     .select('id, title, cert_valid_days')
     .eq('id', course_id)
     .maybeSingle();
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Mark enrollment as completed
-  await db.from('enrollments').upsert({
+  await db.from('program_enrollments').upsert({
     user_id,
     course_id,
     status: 'completed',
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
 
   // Get enrollment for funding program
   const { data: en } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('funding_program_id')
     .eq('user_id', user_id)
     .eq('course_id', course_id)

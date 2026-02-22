@@ -165,7 +165,7 @@ export default async function BadgesPage() {
 
   // Fetch user stats for progress calculation
   const { count: completedCourses } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .eq('status', 'completed');

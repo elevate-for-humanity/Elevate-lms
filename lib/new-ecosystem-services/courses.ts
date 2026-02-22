@@ -20,7 +20,7 @@ export type Lesson = {
 
 export async function listCourses() {
   const { data, error } = await supa
-    .from('courses')
+    .from('training_courses')
     .select('id, program_id, code, title, summary, cover_url')
     .order('title');
   if (error) throw error;
@@ -29,7 +29,7 @@ export async function listCourses() {
 
 export async function listCoursesByProgram(programId: string) {
   const { data, error } = await supa
-    .from('courses')
+    .from('training_courses')
     .select('id, program_id, code, title, summary, cover_url')
     .eq('program_id', programId)
     .order('title');
@@ -39,7 +39,7 @@ export async function listCoursesByProgram(programId: string) {
 
 export async function getCourse(courseId: string) {
   const { data, error } = await supa
-    .from('courses')
+    .from('training_courses')
     .select('id, program_id, code, title, summary, cover_url')
     .eq('id', courseId)
     .single();
@@ -49,7 +49,7 @@ export async function getCourse(courseId: string) {
 
 export async function listLessons(courseId: string) {
   const { data, error } = await supa
-    .from('lessons')
+    .from('training_lessons')
     .select('id, course_id, idx, title, video_url, html')
     .eq('course_id', courseId)
     .order('idx', { ascending: true });
@@ -59,7 +59,7 @@ export async function listLessons(courseId: string) {
 
 export async function getLesson(lessonId: string) {
   const { data, error } = await supa
-    .from('lessons')
+    .from('training_lessons')
     .select('id, course_id, idx, title, video_url, html')
     .eq('id', lessonId)
     .single();

@@ -73,7 +73,7 @@ export default async function LearnerDetailPage({ params }: Props) {
 
   // Fetch enrollments
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       courses (id, title, thumbnail_url)

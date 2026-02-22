@@ -106,7 +106,7 @@ async function generateQuarterlyReport(
 
   // 1. Enrollment Metrics
   let enrollmentQuery = db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id, status, created_at, completed_at, user_id, course_id')
     .gte('created_at', startISO)
     .lte('created_at', endISO);
@@ -207,7 +207,7 @@ async function generateQuarterlyReport(
     programBreakdown = await Promise.all(
       (programs || []).map(async (program: Record<string, any>) => {
         const { data: programEnrollments } = await db
-          .from('enrollments')
+          .from('program_enrollments')
           .select('id, status')
           .eq('program_id', program.id)
           .gte('created_at', startISO)

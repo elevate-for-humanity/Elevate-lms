@@ -36,14 +36,14 @@ export async function GET(request: NextRequest) {
 
     // Fetch completed courses
     const { data: completedEnrollments } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('course_id')
       .eq('user_id', user.id)
       .eq('status', 'completed');
 
     // Fetch available courses
     const { data: courses } = await db
-      .from('courses')
+      .from('training_courses')
       .select('id, title, description, category, difficulty, duration_hours, rating')
       .eq('published', true)
       .limit(100);

@@ -39,11 +39,11 @@ export default async function AdminPerformanceDashboardPage() {
     .eq('status', 'enrolled');
 
   const { count: totalCourses } = await db
-    .from('courses')
+    .from('training_courses')
     .select('*', { count: 'exact', head: true });
 
   const { count: publishedCourses } = await db
-    .from('courses')
+    .from('training_courses')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'published');
 
@@ -76,7 +76,7 @@ export default async function AdminPerformanceDashboardPage() {
 
   // Get courses by category
   const { data: courses } = await db
-    .from('courses')
+    .from('training_courses')
     .select('category, status');
 
   const categoryStats: Record<string, { total: number; published: number }> = {};

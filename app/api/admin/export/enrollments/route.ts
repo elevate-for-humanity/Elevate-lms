@@ -25,7 +25,7 @@ export const GET = withAuth(
       const status = searchParams.get('status');
 
       // Build query
-      let query = supabaseAdmin.from('enrollments').select(
+      let query = supabaseAdmin.from('program_enrollments').select(
         `
         id,
         user_id,

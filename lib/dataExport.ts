@@ -140,7 +140,7 @@ export async function exportCourses(
 ): Promise<any[]> {
   const supabase = await createClient();
 
-  let query = supabase.from('courses').select(`
+  let query = supabase.from('training_courses').select(`
       id,
       title,
       description,
@@ -191,7 +191,7 @@ export async function exportEnrollments(
 ): Promise<any[]> {
   const supabase = await createClient();
 
-  let query = supabase.from('enrollments').select(`
+  let query = supabase.from('program_enrollments').select(`
       id,
       enrolled_at,
       completed_at,

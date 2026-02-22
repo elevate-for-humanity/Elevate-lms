@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { data: enrollments, error } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(`
         id,
         course_id,

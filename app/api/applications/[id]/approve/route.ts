@@ -107,7 +107,7 @@ export async function POST(
     let enrollment = null;
     if (studentId && courseId) {
       const { data: enrollData } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .insert({
           user_id: studentId,
           course_id: courseId,

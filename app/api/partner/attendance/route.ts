@@ -93,7 +93,7 @@ export async function POST(request: Request) {
 
   // Verify enrollment belongs to this partner's tenant
   const { data: enrollment } = await db
-    .from("enrollments")
+    .from("program_enrollments")
     .select("id, tenant_id")
     .eq("id", enrollmentId)
     .single();

@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
   if (type === "enrollments_by_program") {
     const query = db
-      .from("enrollments")
+      .from("program_enrollments")
       .select("program_id, count")
       .order("count", { ascending: false });
 

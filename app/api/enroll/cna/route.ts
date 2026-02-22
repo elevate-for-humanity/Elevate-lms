@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     // Create enrollment record
     const { data: enrollment, error: enrollmentError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .insert({
         first_name: firstName,
         last_name: lastName,

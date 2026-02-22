@@ -306,7 +306,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
         // Update enrollment status if enrollment_id provided
         if (enrollmentId) {
           await db
-            .from('enrollments')
+            .from('program_enrollments')
             .update({ 
               payment_status: 'active',
               stripe_subscription_id: subscriptionId,

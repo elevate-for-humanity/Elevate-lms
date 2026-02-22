@@ -61,14 +61,14 @@ export async function POST(request: Request) {
 
     // 2. Delete enrollments for demo tenant
     const { count: enrollmentCount } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .delete({ count: 'exact' })
       .eq('tenant_id', DEMO_TENANT_ID);
     deletedCounts.enrollments = enrollmentCount || 0;
 
     // 3. Delete courses for demo tenant
     const { count: courseCount } = await db
-      .from('courses')
+      .from('training_courses')
       .delete({ count: 'exact' })
       .eq('tenant_id', DEMO_TENANT_ID);
     deletedCounts.courses = courseCount || 0;

@@ -14,7 +14,7 @@ export async function checkCourseCompletion(
 ): Promise<boolean> {
   // Get all lessons for the course
   const { data: lessons } = await supa
-    .from('lessons')
+    .from('training_lessons')
     .select('id')
     .eq('course_id', courseId);
 

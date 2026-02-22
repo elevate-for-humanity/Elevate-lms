@@ -20,7 +20,7 @@ export async function bulkEnrollStudents(
     }));
 
     const { data, error }: any = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .insert(enrollments)
       .select();
 
@@ -59,7 +59,7 @@ export async function bulkUnenrollStudents(
 
   try {
     const { error } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .delete()
       .in('student_id', studentIds)
       .eq('course_id', courseId);
@@ -98,7 +98,7 @@ export async function bulkIssueCertificates(
   try {
     // Get course details
     const { data: course } = await supabase
-      .from('courses')
+      .from('training_courses')
       .select('title, program_name')
       .eq('id', courseId)
       .single();
@@ -215,7 +215,7 @@ export async function bulkDeleteUsers(userIds: string[], actorId: string) {
   try {
     // Delete related data first
     await Promise.all([
-      supabase.from('enrollments').delete().in('student_id', userIds),
+      supabase.from('program_enrollments').delete().in('student_id', userIds),
       supabase.from('certificates').delete().in('student_id', userIds),
       supabase.from('assignments').delete().in('student_id', userIds),
       supabase.from('grades').delete().in('student_id', userIds),

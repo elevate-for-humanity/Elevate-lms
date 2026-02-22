@@ -40,7 +40,7 @@ export default async function AdminGradebookIndexPage() {
   }
 
   const { data: courses } = await db
-    .from('courses')
+    .from('training_courses')
     .select('id, title, enrollment_count, status')
     .order('title');
 

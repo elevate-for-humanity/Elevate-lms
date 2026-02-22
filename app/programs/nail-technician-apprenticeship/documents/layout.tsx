@@ -23,7 +23,7 @@ export default async function DocumentsLayout({
   }
 
   const { data: enrollment } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id, status, orientation_completed_at, documents_submitted_at, programs(slug)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })

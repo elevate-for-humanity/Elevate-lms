@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
     // Get enrollment details
     const { data: enrollment, error: enrollError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*, programs(*)')
       .eq('id', enrollment_id)
       .single();

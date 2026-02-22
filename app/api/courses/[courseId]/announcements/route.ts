@@ -63,7 +63,7 @@ export async function POST(
 
   // Optional: verify user is instructor for this course
   const { data: course, error: courseError } = await db
-    .from('courses')
+    .from('training_courses')
     .select('instructor_id')
     .eq('id', courseId)
     .single();
@@ -97,7 +97,7 @@ export async function POST(
 
   // Optional: create notifications for enrolled students
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('user_id')
     .eq('course_id', courseId);
 

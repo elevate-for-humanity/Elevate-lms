@@ -18,7 +18,7 @@ async function grantLmsAccess(userId: string, courseSlug: string) {
   
   // Find course by slug
   const { data: course } = await db
-    .from('courses')
+    .from('training_courses')
     .select('id')
     .eq('slug', courseSlug)
     .single();
@@ -29,7 +29,7 @@ async function grantLmsAccess(userId: string, courseSlug: string) {
   }
 
   // Create enrollment
-  const { error } = await db.from('enrollments').upsert({
+  const { error } = await db.from('program_enrollments').upsert({
     user_id: userId,
     course_id: course.id,
     status: 'active',
@@ -236,7 +236,7 @@ export async function POST(req: NextRequest) {
 
       // Revoke LMS enrollment if applicable
       const { error: enrollmentError } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .update({
           status: 'refunded',
           refunded_at: new Date().toISOString(),

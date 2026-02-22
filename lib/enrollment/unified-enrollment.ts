@@ -95,7 +95,7 @@ async function createCourseEnrollment(
 
   // Check existing
   const { data: existing } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('user_id')
     .eq('user_id', params.userId)
     .eq('course_id', params.courseId)
@@ -111,7 +111,7 @@ async function createCourseEnrollment(
   }
 
   const { data, error } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .insert({
       user_id: params.userId,
       course_id: params.courseId,
@@ -261,7 +261,7 @@ export async function getUserEnrollments(userId: string) {
   const [courseEnrollments, programEnrollments, workforceEnrollments] = await Promise.all([
     // Course enrollments
     supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*, courses(id, title, slug)')
       .eq('user_id', userId),
     
@@ -301,7 +301,7 @@ export async function checkEnrollmentStatus(
 
   if (options.courseId) {
     const { data } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('status')
       .eq('user_id', userId)
       .eq('course_id', options.courseId)

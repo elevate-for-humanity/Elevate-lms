@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
 
     // 2) Get all enrollments for completion rate
     const { data: enrollments } = await db
-      .from("enrollments")
+      .from("program_enrollments")
       .select("user_id, course_id");
 
     const totalEnrollments = enrollments?.length || 0;
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
         const moduleIds = modules?.map((m) => m.id) || [];
 
         const { data: lessons } = await db
-          .from("lessons")
+          .from("training_lessons")
           .select("id")
           .in("module_id", moduleIds);
 
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
         const moduleIds = modules?.map((m) => m.id) || [];
 
         const { data: lessons } = await db
-          .from("lessons")
+          .from("training_lessons")
           .select("id")
           .in("module_id", moduleIds);
 
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
 
     // 5) Program-level stats
     const { data: courses } = await db
-      .from("courses")
+      .from("training_courses")
       .select("id, title");
 
     const byProgram = [];
@@ -148,12 +148,12 @@ export async function GET(request: NextRequest) {
     if (courses) {
       for (const course of courses) {
         const { count: learnerCount } = await db
-          .from("enrollments")
+          .from("program_enrollments")
           .select("*", { count: "exact", head: true })
           .eq("course_id", course.id);
 
         const { data: courseEnrollments } = await db
-          .from("enrollments")
+          .from("program_enrollments")
           .select("user_id")
           .eq("course_id", course.id);
 
@@ -169,7 +169,7 @@ export async function GET(request: NextRequest) {
             const moduleIds = modules?.map((m) => m.id) || [];
 
             const { data: lessons } = await db
-              .from("lessons")
+              .from("training_lessons")
               .select("id")
               .in("module_id", moduleIds);
 

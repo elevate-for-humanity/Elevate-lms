@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
 
     // Get enrollment details (using enrollments table)
     const { data: enrollment, error: enrollmentError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id, user_id, program_id, status, program_holder_id')
       .eq('id', enrollment_id)
       .single();
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
 
     // STEP 1: Activate enrollment (admin-only, no program holder checks needed)
     const { error: updateEnrollmentError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .update({
         status: 'active',
         milady_enrolled: true, // Grant Milady access on approval

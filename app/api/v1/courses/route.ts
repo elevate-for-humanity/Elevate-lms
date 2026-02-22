@@ -62,7 +62,7 @@ const startTime = Date.now();
     const search = searchParams.get('search');
 
     let query = db
-      .from('courses')
+      .from('training_courses')
       .select(
         `
         id,
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
   const _admin = createAdminClient(); const db = _admin || supabase;
 
     const { data: course, error: createError } = await db
-      .from('courses')
+      .from('training_courses')
       .insert({
         title: body.title,
         description: body.description,

@@ -33,7 +33,7 @@ export async function POST(req: Request) {
         switch (action.type) {
           case 'progress_update':
             await db
-              .from('enrollments')
+              .from('program_enrollments')
               .update({ progress: action.progress })
               .eq('id', action.enrollmentId);
             break;

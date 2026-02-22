@@ -57,7 +57,7 @@ export default async function SAPMonitoringPage() {
 
   // Get all active enrollments with student and program data
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(
       `
       *,

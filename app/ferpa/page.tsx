@@ -75,7 +75,7 @@ export default async function FERPAPortal() {
     .eq('role', 'student');
 
   const { count: activeEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 

@@ -83,7 +83,7 @@ export default async function LearnerOnboardingPage() {
 
   // Get enrollment status
   const { data: enrollment } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*, programs(name)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })

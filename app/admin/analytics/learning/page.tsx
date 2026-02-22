@@ -47,15 +47,15 @@ export default async function LearningAnalyticsPage() {
 
   // Fetch learning analytics data
   const { count: totalCourses } = await db
-    .from('courses')
+    .from('training_courses')
     .select('*', { count: 'exact', head: true });
 
   const { count: totalEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
 
   const { count: completedEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed');
 
@@ -64,7 +64,7 @@ export default async function LearningAnalyticsPage() {
     .select('*', { count: 'exact', head: true });
 
   const { data: topCourses } = await db
-    .from('courses')
+    .from('training_courses')
     .select('id, title, enrollment_count')
     .order('enrollment_count', { ascending: false })
     .limit(10);

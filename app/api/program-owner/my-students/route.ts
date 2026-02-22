@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     // Get enrollments for owned programs
     const { data: enrollments } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('student_id, program_id')
       .in('program_id', programIds);
 

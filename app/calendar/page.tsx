@@ -37,7 +37,7 @@ export default async function CalendarPage() {
 
   if (user) {
     const { data: enrollmentData } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(`
         id,
         course:courses(id, title, schedule, start_date, end_date)

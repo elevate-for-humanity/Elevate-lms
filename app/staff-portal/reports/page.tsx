@@ -52,12 +52,12 @@ export default async function StaffReportsPage() {
 
   // Enrollment stats
   const { count: activeEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
   const { count: completedThisMonth } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed')
     .gte('completed_at', monthAgo);
@@ -70,7 +70,7 @@ export default async function StaffReportsPage() {
 
   // Recent enrollments for the table
   const { data: recentEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       status,

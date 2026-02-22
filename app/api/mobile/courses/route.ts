@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     // Get user's enrolled courses
     const { data: enrollments, error: enrollError } = await db
-      .from("enrollments")
+      .from("program_enrollments")
       .select(`
         id,
         course_id,
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
         const moduleIds = modules?.map((m) => m.id) || [];
 
         const { data: lessons } = await db
-          .from("lessons")
+          .from("training_lessons")
           .select("id")
           .in("module_id", moduleIds);
 
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
 
         if (nextLesson) {
           const { data: lessonData } = await db
-            .from("lessons")
+            .from("training_lessons")
             .select("title")
             .eq("id", nextLesson.id)
             .single();

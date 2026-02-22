@@ -28,7 +28,7 @@ export default function BarberDocumentsPage() {
       if (!user) return;
       
       const { data: enrollment } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('id')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })

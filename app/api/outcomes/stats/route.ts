@@ -16,18 +16,18 @@ export async function GET(request: Request) {
 
     // Get enrollment counts
     const { count: totalEnrollments } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*', { count: 'exact', head: true });
 
     // Get completion counts
     const { count: completedEnrollments } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'completed');
 
     // Get active students
     const { count: activeStudents } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active');
 

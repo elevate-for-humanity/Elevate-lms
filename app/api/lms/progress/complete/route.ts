@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     // Get course details
     const { data: course } = await db
-      .from('courses')
+      .from('training_courses')
       .select('slug')
       .eq('id', courseId)
       .single();
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
 
     // Get course details
     const { data: courseDetails } = await db
-      .from('courses')
+      .from('training_courses')
       .select('title, metadata')
       .eq('id', courseId)
       .single();

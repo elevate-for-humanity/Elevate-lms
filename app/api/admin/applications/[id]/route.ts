@@ -44,7 +44,7 @@ async function resolveCourseId(supabase: any, programInterest: string): Promise<
   const normalized = programInterest.toLowerCase().replace(/-/g, ' ').trim();
 
   const { data: courses } = await db
-    .from('courses')
+    .from('training_courses')
     .select('id, title');
 
   if (!courses?.length) return null;
@@ -220,7 +220,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         if (userId && courseId) {
           // Check for existing enrollment
           const { data: existingEnrollment } = await auth.db
-            .from('enrollments')
+            .from('program_enrollments')
             .select('id')
             .eq('user_id', userId)
             .eq('course_id', courseId)

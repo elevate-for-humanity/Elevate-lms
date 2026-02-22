@@ -93,7 +93,7 @@ export default function AutomationFeed({ limit = 20 }: { limit?: number }) {
 
     // Fetch recent enrollments
     const { data: enrollments } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select(`
         id, 
         created_at,

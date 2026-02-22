@@ -132,7 +132,7 @@ export async function exportNewRegistrations(
   // Query enrollments that need RAPIDS registration
   const supabase = getSupabaseAdmin();
   let query = supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       profiles:user_id (
@@ -256,7 +256,7 @@ export async function exportProgressUpdates(
   // Query active apprentices with hours logged
   const supabase = getSupabaseAdmin();
   const { data: enrollments, error } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       profiles:user_id (
@@ -340,7 +340,7 @@ export async function exportCompletions(
   const supabase = getSupabaseAdmin();
 
   let query = supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       profiles:user_id (
@@ -415,7 +415,7 @@ export async function exportCancellations(
   const supabase = getSupabaseAdmin();
 
   let query = supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       profiles:user_id (
@@ -524,7 +524,7 @@ export async function markAsSubmitted(
   }[type];
 
   const { error } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .update({ 
       [updateField]: true,
       [`${updateField}_at`]: new Date().toISOString(),

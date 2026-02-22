@@ -137,7 +137,7 @@ export async function createEnrollmentFromPayment(
 
     // Check for existing enrollment (idempotency)
     const { data: existing } = await supabaseAdmin
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id, status')
       .eq('student_id', finalStudentId)
       .eq('program_id', programId)
@@ -149,7 +149,7 @@ export async function createEnrollmentFromPayment(
     if (!existing) {
       // Create new enrollment
       const { data: newEnrollment, error: enrollError } = await supabaseAdmin
-        .from('enrollments')
+        .from('program_enrollments')
         .insert({
           student_id: finalStudentId,
           program_id: programId,
@@ -181,7 +181,7 @@ export async function createEnrollmentFromPayment(
     } else if (existing.status !== 'active') {
       // Activate existing enrollment
       await supabaseAdmin
-        .from('enrollments')
+        .from('program_enrollments')
         .update({
           status: 'active',
           payment_status: 'paid',

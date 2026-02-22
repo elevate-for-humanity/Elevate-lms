@@ -22,12 +22,12 @@ export async function GET(request: Request) {
       .eq('status', 'active');
 
     const { count: courseCount } = await db
-      .from('courses')
+      .from('training_courses')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'published');
 
     const { count: enrollmentCount } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .in('status', ['active', 'completed']);
 

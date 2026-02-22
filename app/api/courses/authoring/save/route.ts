@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       // Save lessons
       for (const lesson of module.lessons) {
         const { data: lessonData, error: lessonError } = await db
-          .from('lessons')
+          .from('training_lessons')
           .upsert({
             id: lesson.id.startsWith('lesson-') ? undefined : lesson.id,
             module_id: moduleData.id,

@@ -129,7 +129,7 @@ export async function POST(req: Request) {
 
     // STEP 5: Create enrollment (FREE - no payment required)
     const { data: existingEnrollment } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id')
       .eq('user_id', userId)
       .eq('program_id', program.id)
@@ -143,7 +143,7 @@ export async function POST(req: Request) {
     } else {
       // Idempotent upsert — safe against race conditions
       const { data: enrollment, error: enrollError } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .upsert({
           user_id: userId,
           program_id: program.id,

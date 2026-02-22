@@ -37,7 +37,7 @@ const supabase = await createRouteHandlerClient({ cookies });
     }
 
   const { data: c } = await db
-    .from('courses')
+    .from('training_courses')
     .select('title')
     .eq('id', cert.course_id)
     .maybeSingle();

@@ -134,7 +134,7 @@ export async function POST(req: Request) {
 
     // Step 6: Check if already enrolled
     const { data: existingEnrollment } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id')
       .eq('user_id', userId)
       .eq('program_id', program.id)
@@ -148,7 +148,7 @@ export async function POST(req: Request) {
 
       // Update status to pending (keep pending until approval)
       await db
-        .from('enrollments')
+        .from('program_enrollments')
         .update({
           status: 'pending',
           payment_status: 'paid',
@@ -158,7 +158,7 @@ export async function POST(req: Request) {
     } else {
       // Step 7: Create enrollment (pending until approval)
       const { data: enrollment, error: enrollError } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .insert({
           user_id: userId,
           program_id: program.id,
@@ -212,7 +212,7 @@ export async function POST(req: Request) {
     // Student will receive Milady signup link in welcome email
     if (programSlug === 'barber-apprenticeship') {
       await db
-        .from('enrollments')
+        .from('program_enrollments')
         .update({ milady_enrolled: true })
         .eq('id', enrollmentId);
       logger.info('Milady access granted (link-based)', { userId, enrollmentId });

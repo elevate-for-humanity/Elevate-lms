@@ -71,7 +71,7 @@ export async function canAccessStudent(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       course_id,

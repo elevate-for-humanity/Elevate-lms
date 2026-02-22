@@ -51,7 +51,7 @@ export async function GET(request: Request) {
 
       // Active enrollments
       db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'active'),
 
@@ -70,7 +70,7 @@ export async function GET(request: Request) {
 
       // Course completions this month
       db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'completed')
         .gte(

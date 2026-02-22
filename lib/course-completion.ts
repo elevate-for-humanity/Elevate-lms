@@ -80,7 +80,7 @@ async function checkInternalLessons(
   const supabase = getSupabaseAdmin();
   // Count total lessons in course
   const { count: totalLessons } = await supabase
-    .from('lessons')
+    .from('training_lessons')
     .select('*', { count: 'exact', head: true })
     .eq('course_id', courseId);
 
@@ -92,7 +92,7 @@ async function checkInternalLessons(
     .eq('completed', true)
     .in(
       'lesson_id',
-      supabase.from('lessons').select('id').eq('course_id', courseId)
+      supabase.from('training_lessons').select('id').eq('course_id', courseId)
     );
 
   return {
@@ -173,7 +173,7 @@ export async function completeCourse(
   const supabase = getSupabaseAdmin();
   // Update enrollment status
   const { error } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .update({
       status: 'completed',
       completed_at: new Date().toISOString(),
@@ -201,7 +201,7 @@ async function generateCourseCertificate(
   const supabase = getSupabaseAdmin();
   // Get course details
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('title')
     .eq('id', courseId)
     .single();

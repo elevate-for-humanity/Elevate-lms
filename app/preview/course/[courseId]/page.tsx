@@ -22,13 +22,13 @@ export default function CoursePreviewPage() {
     const supabase = createClient();
 
     const { data: courseData } = await supabase
-      .from('courses')
+      .from('training_courses')
       .select('*')
       .eq('id', courseId)
       .single();
 
     const { data: lessonsData } = await supabase
-      .from('lessons')
+      .from('training_lessons')
       .select('*')
       .eq('course_id', courseId)
       .order('order_number');

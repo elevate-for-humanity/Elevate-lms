@@ -85,7 +85,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
 
   // Fetch enrollments
   const { data: enrollments, count: enrollmentCount } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*, profiles(first_name, last_name, email)', { count: 'exact' })
     .eq('program_id', programId)
     .order('enrolled_at', { ascending: false })
@@ -93,7 +93,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
 
   // Fetch courses in program
   const { data: courses, count: courseCount } = await db
-    .from('courses')
+    .from('training_courses')
     .select('*', { count: 'exact' })
     .eq('program_id', programId);
 

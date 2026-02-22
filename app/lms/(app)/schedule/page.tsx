@@ -42,7 +42,7 @@ export default async function SchedulePage() {
 
   // Get user's enrollments for schedule
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(
       `
       *,

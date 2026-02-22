@@ -76,7 +76,7 @@ export async function POST(request: Request) {
     if (status === 'completed' || status === 'passed') {
       if (enrollmentId) {
         await db
-          .from('enrollments')
+          .from('program_enrollments')
           .update({
             progress: 100,
             status: 'completed',

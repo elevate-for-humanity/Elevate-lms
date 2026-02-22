@@ -143,7 +143,7 @@ async function importCourses(
 
       // Check if course exists
       const { data: existing } = await db
-        .from('courses')
+        .from('training_courses')
         .select('id')
         .eq('course_code', code)
         .eq('tenant_id', tenantId)
@@ -160,9 +160,9 @@ async function importCourses(
       };
 
       if (existing) {
-        await db.from('courses').update(courseData).eq('id', existing.id);
+        await db.from('training_courses').update(courseData).eq('id', existing.id);
       } else {
-        await db.from('courses').insert({
+        await db.from('training_courses').insert({
           ...courseData,
           id: crypto.randomUUID(),
           created_at: new Date().toISOString(),
@@ -213,7 +213,7 @@ async function importEnrollments(
 
       // Find course
       const { data: course } = await db
-        .from('courses')
+        .from('training_courses')
         .select('id')
         .eq('course_code', courseCode)
         .eq('tenant_id', tenantId)
@@ -227,7 +227,7 @@ async function importEnrollments(
 
       // Check existing enrollment
       const { data: existing } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('id')
         .eq('user_id', student.id)
         .eq('course_id', course.id)
@@ -243,9 +243,9 @@ async function importEnrollments(
       };
 
       if (existing) {
-        await db.from('enrollments').update(enrollmentData).eq('id', existing.id);
+        await db.from('program_enrollments').update(enrollmentData).eq('id', existing.id);
       } else {
-        await db.from('enrollments').insert({
+        await db.from('program_enrollments').insert({
           ...enrollmentData,
           id: crypto.randomUUID(),
         });

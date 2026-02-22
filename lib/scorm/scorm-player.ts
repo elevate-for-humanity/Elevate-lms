@@ -146,7 +146,7 @@ async function updateCourseProgress(sessionId: string, score?: number): Promise<
 
   // Update enrollment status
   await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .update({
       status: 'completed',
       progress: 100,

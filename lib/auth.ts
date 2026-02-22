@@ -260,7 +260,7 @@ export async function canAccessStudent(studentId: string): Promise<boolean> {
     if (!supabase) return false;
 
     const { data }: any = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id')
       .eq('student_id', studentId)
       .eq('delegate_id', user.id)
@@ -275,7 +275,7 @@ export async function canAccessStudent(studentId: string): Promise<boolean> {
     if (!supabase) return false;
 
     const { data }: any = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id')
       .eq('student_id', studentId)
       .eq('program_holder_id', user.profile.id)
@@ -297,7 +297,7 @@ export async function canAccessEnrollment(
   if (!supabase) return false;
 
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('student_id, delegate_id, program_holder_id')
     .eq('id', enrollmentId)
     .single();

@@ -51,7 +51,7 @@ export default async function CreatePage() {
 
   // Fetch relevant data
   const { data: items, count } = await db
-    .from('courses')
+    .from('training_courses')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .limit(20);

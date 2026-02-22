@@ -53,7 +53,7 @@ export default function DigitalBinder({
           .eq('user_id', studentId).order('created_at', { ascending: false }),
         supabase.from('case_notes').select('id, created_at, author_name, note, category')
           .eq('student_id', studentId).order('created_at', { ascending: false }),
-        supabase.from('enrollments').select('progress, status')
+        supabase.from('program_enrollments').select('progress, status')
           .eq('user_id', studentId).eq('status', 'active').limit(1).maybeSingle(),
       ]);
 

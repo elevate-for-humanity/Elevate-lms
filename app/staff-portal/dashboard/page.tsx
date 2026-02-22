@@ -57,25 +57,25 @@ export default async function StaffDashboard() {
 
   // Get active enrollments
   const { count: activeEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
   // Get at-risk students
   const { count: atRiskCount } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('at_risk', true);
 
   // Get pending enrollments
   const { count: pendingEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
   // Get recent enrollments for activity feed
   const { data: recentEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(
       `
       id,

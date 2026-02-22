@@ -43,7 +43,7 @@ function CertiportExamContent() {
 
       // Check funding status from most recent enrollment
       const { data: enrollment } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('funding_source, program_slug')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })

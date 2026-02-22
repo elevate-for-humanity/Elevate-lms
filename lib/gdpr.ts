@@ -9,7 +9,7 @@ export async function exportUserData(userId: string) {
     // Collect all user data from various tables
     const [profile, enrollments, certificates, assignments, grades, notes, messages] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', userId).single(),
-      supabase.from('enrollments').select('*').eq('student_id', userId),
+      supabase.from('program_enrollments').select('*').eq('student_id', userId),
       supabase.from('certificates').select('*').eq('student_id', userId),
       supabase.from('assignments').select('*').eq('student_id', userId),
       supabase.from('grades').select('*').eq('student_id', userId),
@@ -56,7 +56,7 @@ export async function deleteUserData(userId: string, options: { keepProfile?: bo
   try {
     // Delete user data from all tables
     const deletions = await Promise.all([
-      supabase.from('enrollments').delete().eq('student_id', userId),
+      supabase.from('program_enrollments').delete().eq('student_id', userId),
       supabase.from('certificates').delete().eq('student_id', userId),
       supabase.from('assignments').delete().eq('student_id', userId),
       supabase.from('grades').delete().eq('student_id', userId),

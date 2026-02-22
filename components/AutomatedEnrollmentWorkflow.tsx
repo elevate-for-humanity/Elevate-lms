@@ -127,7 +127,7 @@ export default function AutomatedEnrollmentWorkflow({
 
     try {
       const { data: enrollmentData, error: enrollmentError } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select(`
           id,
           user_id,
@@ -174,34 +174,34 @@ export default function AutomatedEnrollmentWorkflow({
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
       const { count: todayCount } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .gte('created_at', today.toISOString());
 
       const { count: yesterdayCount } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .gte('created_at', yesterday.toISOString())
         .lt('created_at', today.toISOString());
 
       const { count: totalCount } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .gte('created_at', thirtyDaysAgo.toISOString());
 
       const { count: completedCount } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .in('status', ['active', 'completed'])
         .gte('created_at', thirtyDaysAgo.toISOString());
 
       const { count: pendingCount } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .in('status', ['pending', 'submitted', 'documents_pending', 'payment_pending']);
 
       const { count: failedCount } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .in('status', ['rejected', 'cancelled', 'failed']);
 
@@ -248,7 +248,7 @@ export default function AutomatedEnrollmentWorkflow({
 
       if (statusMap[stepNumber]) {
         await supabase
-          .from('enrollments')
+          .from('program_enrollments')
           .update({ status: statusMap[stepNumber], updated_at: new Date().toISOString() })
           .eq('id', enrollmentId);
       }

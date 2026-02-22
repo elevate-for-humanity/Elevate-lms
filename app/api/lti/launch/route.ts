@@ -86,7 +86,7 @@ export async function POST(request: Request) {
   const contextId = context?.id || '';
 
   const { data: course } = await db
-    .from('courses')
+    .from('training_courses')
     .upsert(
       {
         title: courseTitle,

@@ -294,7 +294,7 @@ export async function POST(request: NextRequest) {
           // Create or update enrollment with enrolled_pending_approval status
           // CRITICAL: Status is NOT 'active' - training access is locked
           const { data: enrollment, error: enrollError } = await db
-            .from('enrollments')
+            .from('program_enrollments')
             .upsert({
               user_id: studentId,
               application_id: applicationId,
@@ -1201,7 +1201,7 @@ export async function POST(request: NextRequest) {
           ((session.amount_total || 0) > 0 ? 'self_pay' : 'unknown');
 
         // Idempotent upsert (legacy path) — safe against webhook retries
-        await db.from('enrollments').upsert({
+        await db.from('program_enrollments').upsert({
           user_id: userId,
           course_id: courseId,
           status: 'active',
@@ -1221,7 +1221,7 @@ export async function POST(request: NextRequest) {
         // Create partner payment record if applicable
         if (partnerOwedCents > 0) {
           const { data: course } = await db
-            .from('courses')
+            .from('training_courses')
             .select('partner_id')
             .eq('id', courseId)
             .single();
@@ -1661,7 +1661,7 @@ export async function POST(request: NextRequest) {
 
           // Update enrollment status to paused
           const { error: pauseError } = await db
-            .from('enrollments')
+            .from('program_enrollments')
             .update({
               status: 'paused',
               paused_at: new Date().toISOString(),
@@ -1764,7 +1764,7 @@ export async function POST(request: NextRequest) {
         // If there's an enrollment, mark it as refunded
         if (enrollmentId) {
           const { error: enrollError } = await db
-            .from('enrollments')
+            .from('program_enrollments')
             .update({ 
               status: 'refunded',
               refunded_at: new Date().toISOString()

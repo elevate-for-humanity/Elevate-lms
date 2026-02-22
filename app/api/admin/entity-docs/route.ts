@@ -147,7 +147,7 @@ async function getEntityStatus(
 
     // Check for enrollment/application record
     const { data: enrollment } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('status, agreement_signed')
       .eq('user_id', userId)
       .single();

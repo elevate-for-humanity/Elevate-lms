@@ -149,7 +149,7 @@ export async function issueCertificate(
 
     // Update enrollment with completion and certificate reference
     const { error: updateError } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .update({
         status: 'completed',
         completed_at: completionDate,

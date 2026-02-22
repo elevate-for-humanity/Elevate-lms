@@ -201,7 +201,7 @@ export async function getPeerRecommendations(userId: string, limit = 5) {
 
   // Get user's enrolled courses
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('course_id')
     .eq('user_id', userId)
     .eq('status', 'active');
@@ -212,7 +212,7 @@ export async function getPeerRecommendations(userId: string, limit = 5) {
 
   // Find other users in same courses
   const { data: peers } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       user_id,
       profiles:user_id (full_name, avatar_url)

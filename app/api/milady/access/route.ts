@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     if (error || !access) {
       // Check if student has active enrollment (payment completed, docs verified)
       const { data: enrollment } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('id, status, docs_verified')
         .eq('user_id', studentId)
         .eq('status', 'active')
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
 
       // Check for pending enrollment (paid but not yet approved)
       const { data: pendingEnrollment } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('id, status, docs_verified')
         .eq('user_id', studentId)
         .eq('status', 'pending')

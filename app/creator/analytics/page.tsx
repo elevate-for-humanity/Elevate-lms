@@ -38,7 +38,7 @@ export default async function CreatorAnalyticsPage() {
         user = authData.user;
         
         const { data: courses, error: coursesError } = await db
-          .from('courses')
+          .from('training_courses')
           .select('id')
           .eq('creator_id', user.id);
 
@@ -47,20 +47,20 @@ export default async function CreatorAnalyticsPage() {
 
           if (courseIds.length > 0) {
             const { count: total } = await db
-              .from('enrollments')
+              .from('program_enrollments')
               .select('*', { count: 'exact', head: true })
               .in('course_id', courseIds);
             totalEnrollments = total || 0;
 
             const { count: active } = await db
-              .from('enrollments')
+              .from('program_enrollments')
               .select('*', { count: 'exact', head: true })
               .in('course_id', courseIds)
               .eq('status', 'active');
             activeEnrollments = active || 0;
 
             const { count: completed } = await db
-              .from('enrollments')
+              .from('program_enrollments')
               .select('*', { count: 'exact', head: true })
               .in('course_id', courseIds)
               .eq('status', 'completed');

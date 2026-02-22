@@ -92,7 +92,7 @@ const supabase = await createRouteHandlerClient({ cookies });
     .eq('id', app.id);
 
   // Create enrollment
-  await db.from('enrollments').upsert({
+  await db.from('program_enrollments').upsert({
     user_id: app.user_id,
     course_id: app.course_id,
     status: 'active',

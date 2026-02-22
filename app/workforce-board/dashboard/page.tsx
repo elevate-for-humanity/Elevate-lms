@@ -82,9 +82,9 @@ export default async function WorkforceBoardDashboard() {
     programsResult,
     providersResult,
   ] = await Promise.all([
-    db.from('enrollments').select('*', { count: 'exact', head: true }),
-    db.from('enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
-    db.from('enrollments').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+    db.from('program_enrollments').select('*', { count: 'exact', head: true }),
+    db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
+    db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'active'),
     db.from('programs').select('*', { count: 'exact', head: true }).eq('status', 'active'),
     db.from('partner_lms_providers').select('*', { count: 'exact', head: true }),
   ]);
@@ -98,14 +98,14 @@ export default async function WorkforceBoardDashboard() {
 
   // Get recent enrollments
   const { data: recentEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('id, status, created_at, profiles (full_name), programs (name, title)')
     .order('created_at', { ascending: false })
     .limit(5);
 
   // Get at-risk participants
   const { data: atRiskParticipants, count: atRiskCount } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*, profiles (full_name, email)', { count: 'exact' })
     .eq('at_risk', true)
     .eq('status', 'active')

@@ -26,8 +26,8 @@ export default async function WIOAReportsPage() {
   const _admin = createAdminClient(); const db = _admin || supabase;
 
   // Query real participant counts from enrollments
-  const { count: totalParticipants } = await db.from('enrollments').select('*', { count: 'exact', head: true });
-  const { count: completedEnrollments } = await db.from('enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed');
+  const { count: totalParticipants } = await db.from('program_enrollments').select('*', { count: 'exact', head: true });
+  const { count: completedEnrollments } = await db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed');
   const { count: totalCerts } = await db.from('certificates').select('*', { count: 'exact', head: true });
 
   const credentialRate = (totalParticipants && totalParticipants > 0) ? Math.round(((totalCerts || 0) / totalParticipants) * 100) : 0;

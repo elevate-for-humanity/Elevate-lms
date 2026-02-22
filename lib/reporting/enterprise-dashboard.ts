@@ -87,7 +87,7 @@ export async function calculateOverallMetrics(
   const supabase = await createClient();
 
   // Get enrollments
-  let enrollmentQuery = supabase.from('enrollments').select('*');
+  let enrollmentQuery = supabase.from('program_enrollments').select('*');
 
   if (startDate) {
     enrollmentQuery = enrollmentQuery.gte(
@@ -193,7 +193,7 @@ export async function calculateProgramMetrics(): Promise<ProgramMetrics[]> {
 
   for (const program of programs) {
     const { data: enrollments } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*')
       .eq('program_id', program.id);
 
@@ -255,7 +255,7 @@ export async function calculateSiteMetrics(): Promise<SiteMetrics[]> {
 
   for (const site of sites) {
     const { data: enrollments } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*')
       .eq('site_id', site.id);
 
@@ -382,7 +382,7 @@ export async function calculateFunderMetrics(): Promise<FunderMetrics[]> {
       .map((f) => f.enrollment_id)
       .filter(Boolean);
     const { data: enrollments } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*')
       .in('id', enrollmentIds);
 
@@ -598,7 +598,7 @@ export async function getTimeSeriesData(
   // This would use SQL date_trunc for efficient grouping
   // Simplified version here
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('enrolled_at, status, completion_date')
     .gte('enrolled_at', startDate.toISOString())
     .lte('enrolled_at', endDate.toISOString());

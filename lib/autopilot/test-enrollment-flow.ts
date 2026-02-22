@@ -123,7 +123,7 @@ export async function testEnrollmentFlow(
     // STEP 3: Create enrollment
 
     const { data: existingEnrollment } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*')
       .eq('user_id', userId)
       .eq('program_id', program.id)
@@ -136,7 +136,7 @@ export async function testEnrollmentFlow(
 
       // Update to active
       await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .update({
           status: 'active',
           payment_status: 'paid',
@@ -152,7 +152,7 @@ export async function testEnrollmentFlow(
       });
     } else {
       const { data: newEnrollment, error: enrollError } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .insert({
           user_id: userId,
           program_id: program.id,

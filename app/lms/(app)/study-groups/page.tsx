@@ -126,7 +126,7 @@ export default async function StudyGroupsPage() {
 
   // Fetch user's enrolled courses for creating groups
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('courses (id, title)')
     .eq('user_id', user.id)
     .eq('status', 'active');

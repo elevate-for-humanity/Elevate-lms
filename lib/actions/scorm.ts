@@ -62,7 +62,7 @@ export async function trackScormProgress(data: {
   if (data.status === 'completed' || data.status === 'passed') {
     if (data.enrollmentId) {
       await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .update({
           progress: 100,
           status: 'completed',

@@ -37,7 +37,7 @@ export async function GET(request: Request) {
 
       // Active students (enrolled in last 30 days)
       db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('user_id', { count: 'exact', head: true })
         .gte(
           'created_at',
@@ -46,11 +46,11 @@ export async function GET(request: Request) {
         .eq('status', 'active'),
 
       // Total enrollments
-      db.from('enrollments').select('id', { count: 'exact', head: true }),
+      db.from('program_enrollments').select('id', { count: 'exact', head: true }),
 
       // Completed courses
       db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('id', { count: 'exact', head: true })
         .eq('status', 'completed'),
 
@@ -70,7 +70,7 @@ export async function GET(request: Request) {
 
       // Active courses
       db
-        .from('courses')
+        .from('training_courses')
         .select('id', { count: 'exact', head: true })
         .eq('is_published', true),
 
@@ -90,7 +90,7 @@ export async function GET(request: Request) {
 
     // Get recent activity (last 10 enrollments - public data only)
     const { data: recentActivity } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('created_at, courses(title)')
       .order('created_at', { ascending: false })
       .limit(10);

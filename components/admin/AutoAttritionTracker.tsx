@@ -93,7 +93,7 @@ export function AutoAttritionTracker() {
     try {
       // Fetch enrollment data
       const { data: enrollments } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('id, status, program_id, user_id, created_at, training_programs(name)')
         .order('created_at', { ascending: false });
 
@@ -132,7 +132,7 @@ export function AutoAttritionTracker() {
         // Fetch at-risk students (inactive for 7+ days)
         const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
         const { data: inactiveStudents } = await supabase
-          .from('enrollments')
+          .from('program_enrollments')
           .select('user_id, program_id, profiles(full_name), training_programs(name)')
           .eq('status', 'active')
           .lt('updated_at', sevenDaysAgo)
@@ -175,9 +175,9 @@ export function AutoAttritionTracker() {
     try {
       const supabase = createClient();
       const [totalRes, activeRes, droppedRes] = await Promise.all([
-        supabase.from('enrollments').select('id', { count: 'exact', head: true }),
-        supabase.from('enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-        supabase.from('enrollments').select('id', { count: 'exact', head: true }).eq('status', 'dropped'),
+        supabase.from('program_enrollments').select('id', { count: 'exact', head: true }),
+        supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+        supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'dropped'),
       ]);
       const total = totalRes.count ?? 0;
       const active = activeRes.count ?? 0;

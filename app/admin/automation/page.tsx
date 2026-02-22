@@ -61,7 +61,7 @@ export default async function AutomationLogPage() {
 
   // Fetch recent enrollments (automation trigger)
   const { data: recentEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       created_at,

@@ -19,7 +19,7 @@ async function getWIOAData() {
   
   // Get enrollments with WIOA funding
   const { data: enrollments, count } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       profiles:user_id (full_name, email),

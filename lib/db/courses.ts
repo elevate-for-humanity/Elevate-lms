@@ -23,7 +23,7 @@ async function getSupabase() {
 export async function createCourse(input: CourseCreate) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('courses')
+    .from('training_courses')
     .insert({
       title: input.title,
       description: input.description || null,
@@ -40,7 +40,7 @@ export async function createCourse(input: CourseCreate) {
 export async function listCourses() {
   const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*, programs(id, title)')
     .order('created_at', { ascending: false });
   if (error) throw new Error('Database operation failed');
@@ -50,7 +50,7 @@ export async function listCourses() {
 export async function getCourse(id: string) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*, programs(id, title)')
     .eq('id', id)
     .single();
@@ -62,7 +62,7 @@ export async function getCourse(id: string) {
 export async function updateCourse(id: string, patch: CourseUpdate) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('courses')
+    .from('training_courses')
     .update({ ...patch, updated_at: new Date().toISOString() })
     .eq('id', id)
     .select()
@@ -74,7 +74,7 @@ export async function updateCourse(id: string, patch: CourseUpdate) {
 
 export async function deleteCourse(id: string) {
   const supabase = await getSupabase();
-  const { error } = await supabase.from('courses').delete().eq('id', id);
+  const { error } = await supabase.from('training_courses').delete().eq('id', id);
   if (error) throw new Error('Database operation failed');
   return { ok: true };
 }
@@ -83,7 +83,7 @@ export async function deleteCourse(id: string) {
 export async function createLesson(input: LessonCreate) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('lessons')
+    .from('training_lessons')
     .insert({
       course_id: input.course_id,
       title: input.title,
@@ -101,7 +101,7 @@ export async function createLesson(input: LessonCreate) {
 export async function listLessons(courseId: string) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('lessons')
+    .from('training_lessons')
     .select('*')
     .eq('course_id', courseId)
     .order('order_index', { ascending: true });
@@ -112,7 +112,7 @@ export async function listLessons(courseId: string) {
 export async function getLesson(id: string) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('lessons')
+    .from('training_lessons')
     .select('*')
     .eq('id', id)
     .single();
@@ -124,7 +124,7 @@ export async function getLesson(id: string) {
 export async function updateLesson(id: string, patch: LessonUpdate) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('lessons')
+    .from('training_lessons')
     .update({ ...patch, updated_at: new Date().toISOString() })
     .eq('id', id)
     .select()
@@ -136,7 +136,7 @@ export async function updateLesson(id: string, patch: LessonUpdate) {
 
 export async function deleteLesson(id: string) {
   const supabase = await getSupabase();
-  const { error } = await supabase.from('lessons').delete().eq('id', id);
+  const { error } = await supabase.from('training_lessons').delete().eq('id', id);
   if (error) throw new Error('Database operation failed');
   return { ok: true };
 }
@@ -272,7 +272,7 @@ export async function deleteQuestion(id: string) {
 export async function createEnrollment(input: EnrollmentCreate) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .insert({
       user_id: input.user_id,
       course_id: input.course_id,
@@ -290,7 +290,7 @@ export async function createEnrollment(input: EnrollmentCreate) {
 export async function listEnrollments(filters?: { courseId?: string; userId?: string; status?: string }) {
   const supabase = await getSupabase();
   let query = supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*, student:profiles!enrollments_user_id_fkey(id, full_name, email), course:courses(id, title)')
     .order('enrolled_at', { ascending: false });
   
@@ -306,7 +306,7 @@ export async function listEnrollments(filters?: { courseId?: string; userId?: st
 export async function getEnrollment(id: string) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*, student:profiles!enrollments_user_id_fkey(id, full_name, email), course:courses(id, title)')
     .eq('id', id)
     .single();
@@ -321,7 +321,7 @@ export async function updateEnrollment(id: string, patch: EnrollmentUpdate) {
   if (patch.status === 'completed') updateData.completed_at = new Date().toISOString();
   
   const { data, error } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .update(updateData)
     .eq('id', id)
     .select('*, student:profiles!enrollments_user_id_fkey(id, full_name, email), course:courses(id, title)')
@@ -333,7 +333,7 @@ export async function updateEnrollment(id: string, patch: EnrollmentUpdate) {
 
 export async function deleteEnrollment(id: string) {
   const supabase = await getSupabase();
-  const { error } = await supabase.from('enrollments').delete().eq('id', id);
+  const { error } = await supabase.from('program_enrollments').delete().eq('id', id);
   if (error) throw new Error('Database operation failed');
   return { ok: true };
 }

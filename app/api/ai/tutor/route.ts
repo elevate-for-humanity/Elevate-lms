@@ -43,7 +43,7 @@ export async function POST(req: Request) {
 
   // Fetch course content for context
   const { data: course } = await db
-    .from('courses')
+    .from('training_courses')
     .select(
       `
       *,

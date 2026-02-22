@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
 
   // Log certification event
   const { data: en } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('funding_program_id')
     .eq('user_id', old.user_id)
     .eq('course_id', old.course_id)

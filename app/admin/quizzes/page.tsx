@@ -49,7 +49,7 @@ export default async function QuizzesPage() {
   // Get courses for display names
   const courseIds = [...new Set((quizzes || []).map(q => q.course_id).filter(Boolean))];
   const { data: courses } = courseIds.length > 0
-    ? await db.from('courses').select('id, title').in('id', courseIds)
+    ? await db.from('training_courses').select('id, course_name').in('id', courseIds)
     : { data: [] };
 
   const courseMap = new Map((courses || []).map(c => [c.id, c.title]));

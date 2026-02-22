@@ -45,7 +45,7 @@ export default function InstructorAnnouncementsPage() {
 
     // Load course
     const { data: courseData } = await supabase
-      .from('courses')
+      .from('training_courses')
       .select('id, title, instructor_id')
       .eq('id', courseId)
       .single();
@@ -66,7 +66,7 @@ export default function InstructorAnnouncementsPage() {
 
     // Get enrolled count
     const { count } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('course_id', courseId);
     

@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     // Fetch enrollment details
     const { data: enrollment } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(
         `
         id,

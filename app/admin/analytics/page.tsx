@@ -55,11 +55,11 @@ export default async function AnalyticsPage() {
     .select('*', { count: 'exact', head: true });
 
   const { count: totalCourses } = await db
-    .from('courses')
+    .from('training_courses')
     .select('*', { count: 'exact', head: true });
 
   const { count: totalEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true });
 
   const { count: totalPrograms } = await db

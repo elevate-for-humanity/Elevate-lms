@@ -106,7 +106,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
     setLoading(true);
     try {
       const { error: deleteError } = await supabase
-        .from('courses')
+        .from('training_courses')
         .delete()
         .eq('id', courseId);
 
@@ -122,7 +122,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
   const togglePublish = async (course: Course) => {
     try {
       const { error: updateError } = await supabase
-        .from('courses')
+        .from('training_courses')
         .update({ is_published: !course.is_published })
         .eq('id', course.id);
 

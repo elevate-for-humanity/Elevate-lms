@@ -245,7 +245,7 @@ export function AutoProgramGenerator() {
       const supabase = createClient();
       const [programsRes, enrollmentsRes] = await Promise.all([
         supabase.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-        supabase.from('enrollments').select('id', { count: 'exact', head: true }),
+        supabase.from('program_enrollments').select('id', { count: 'exact', head: true }),
       ]);
       setNationalStats({
         totalPrograms: programsRes.count ?? 0,

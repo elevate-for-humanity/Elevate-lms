@@ -44,7 +44,7 @@ export async function getActivityFeed(options: {
 
   // 1. Recent enrollments
   const enrollmentQuery = supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       created_at,

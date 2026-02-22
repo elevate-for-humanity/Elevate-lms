@@ -23,14 +23,14 @@ export function RealOutcomes() {
       // Direct DB queries for real-time metrics
       const [enrollmentsResult, completedResult, activeResult] = await Promise.all([
         supabase
-          .from('enrollments')
+          .from('program_enrollments')
           .select('*', { count: 'exact', head: true }),
         supabase
-          .from('enrollments')
+          .from('program_enrollments')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'completed'),
         supabase
-          .from('enrollments')
+          .from('program_enrollments')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'active')
           .gte('updated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())

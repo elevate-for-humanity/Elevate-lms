@@ -1,7 +1,6 @@
 -- Part 3 of 6: Create tables
 
-CREATE TABLE IF NOT EXISTS forum_subscriptions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS forum_subscriptions (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -9,8 +8,7 @@ CREATE TABLE IF NOT EXISTS forum_subscriptions (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS forum_thread_views (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS forum_thread_views (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -18,8 +16,7 @@ CREATE TABLE IF NOT EXISTS forum_thread_views (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS foundation_services (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS foundation_services (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   content text,
   description text,
   elevateforhumanity text,
@@ -29,8 +26,7 @@ CREATE TABLE IF NOT EXISTS foundation_services (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS funding_change_audit (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS funding_change_audit (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   action text,
   details jsonb,
@@ -39,8 +35,7 @@ CREATE TABLE IF NOT EXISTS funding_change_audit (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS funding_options (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS funding_options (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   elevateforhumanity text,
   gov text,
   jpg text,
@@ -48,8 +43,7 @@ CREATE TABLE IF NOT EXISTS funding_options (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS funding_programs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS funding_programs (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -57,8 +51,7 @@ CREATE TABLE IF NOT EXISTS funding_programs (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS funding_records (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS funding_records (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -66,8 +59,7 @@ CREATE TABLE IF NOT EXISTS funding_records (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS funding_tracking (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS funding_tracking (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   progress_percentage numeric DEFAULT 0,
   status text DEFAULT 'in_progress',
@@ -75,8 +67,7 @@ CREATE TABLE IF NOT EXISTS funding_tracking (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS gamification_points (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS gamification_points (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -84,8 +75,7 @@ CREATE TABLE IF NOT EXISTS gamification_points (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS gdpr_requests (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS gdpr_requests (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   status text DEFAULT 'pending',
   notes text,
@@ -93,8 +83,7 @@ CREATE TABLE IF NOT EXISTS gdpr_requests (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS generated_assets (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS generated_assets (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -102,8 +91,7 @@ CREATE TABLE IF NOT EXISTS generated_assets (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS grade_items (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS grade_items (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -111,8 +99,7 @@ CREATE TABLE IF NOT EXISTS grade_items (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS grant_eligibility_results (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS grant_eligibility_results (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -120,8 +107,7 @@ CREATE TABLE IF NOT EXISTS grant_eligibility_results (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS grant_entities (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS grant_entities (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   agency text,
   draft text,
   due_date timestamptz,
@@ -134,8 +120,7 @@ CREATE TABLE IF NOT EXISTS grant_entities (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS grant_federal_forms (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS grant_federal_forms (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -143,8 +128,7 @@ CREATE TABLE IF NOT EXISTS grant_federal_forms (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS grant_matches (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS grant_matches (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -152,8 +136,7 @@ CREATE TABLE IF NOT EXISTS grant_matches (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS grant_notification_log (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS grant_notification_log (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   action text,
   details jsonb,
@@ -162,8 +145,7 @@ CREATE TABLE IF NOT EXISTS grant_notification_log (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS grant_notifications (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS grant_notifications (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   title text,
   content text,
@@ -172,8 +154,7 @@ CREATE TABLE IF NOT EXISTS grant_notifications (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS grant_packages (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS grant_packages (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -181,13 +162,12 @@ CREATE TABLE IF NOT EXISTS grant_packages (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS grant_submissions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS grant_submissions (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   awarded text,
   confirmation_number text,
   elevateforhumanity text,
   entity text,
-  grant text,
+  "grant" text,
   jpg text,
   other text,
   portal_url text,
@@ -200,8 +180,7 @@ CREATE TABLE IF NOT EXISTS grant_submissions (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS grants (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS grants (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   agency text,
   draft text,
   due_date timestamptz,
@@ -214,8 +193,7 @@ CREATE TABLE IF NOT EXISTS grants (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS handbook_sections (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS handbook_sections (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   description text,
   pdf text,
   slug text,
@@ -224,8 +202,7 @@ CREATE TABLE IF NOT EXISTS handbook_sections (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS help_search_log (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS help_search_log (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   action text,
   details jsonb,
@@ -234,8 +211,7 @@ CREATE TABLE IF NOT EXISTS help_search_log (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS hour_logs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS hour_logs (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   action text,
   details jsonb,
@@ -244,8 +220,7 @@ CREATE TABLE IF NOT EXISTS hour_logs (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS hours_log (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS hours_log (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   action text,
   details jsonb,
@@ -254,8 +229,7 @@ CREATE TABLE IF NOT EXISTS hours_log (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS hours_logs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS hours_logs (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   activity_type text,
   date timestamptz,
   description text,
@@ -265,16 +239,14 @@ CREATE TABLE IF NOT EXISTS hours_logs (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS hsi_course_products (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS hsi_course_products (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   course_name text,
   hsi_enrollment_link text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS id_verifications (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS id_verifications (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   elevateforhumanity text,
   first_name text,
   id_type text,
@@ -287,8 +259,7 @@ CREATE TABLE IF NOT EXISTS id_verifications (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS identity_verifications (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS identity_verifications (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -296,15 +267,13 @@ CREATE TABLE IF NOT EXISTS identity_verifications (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS impact_metrics (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS impact_metrics (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   elevateforhumanity text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS impact_statistics (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS impact_statistics (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   amount numeric DEFAULT 0,
   description text,
   donor_name text,
@@ -314,8 +283,7 @@ CREATE TABLE IF NOT EXISTS impact_statistics (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS incentives (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS incentives (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -323,8 +291,7 @@ CREATE TABLE IF NOT EXISTS incentives (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS industries (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS industries (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   description text,
   elevateforhumanity text,
   jpg text,
@@ -333,8 +300,7 @@ CREATE TABLE IF NOT EXISTS industries (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS intake_records (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS intake_records (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -342,8 +308,7 @@ CREATE TABLE IF NOT EXISTS intake_records (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS integrations (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS integrations (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   description text,
   elevateforhumanity text,
   integration text,
@@ -357,8 +322,7 @@ CREATE TABLE IF NOT EXISTS integrations (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS interviews (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS interviews (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   candidate text,
   date timestamptz,
   interview_type text,
@@ -373,8 +337,7 @@ CREATE TABLE IF NOT EXISTS interviews (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS issued_certificates (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS issued_certificates (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -382,18 +345,16 @@ CREATE TABLE IF NOT EXISTS issued_certificates (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS job_listings (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS job_listings (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   company text,
-  desc text,
+  "desc" text,
   location text,
   position text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS jobs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS jobs (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -401,15 +362,13 @@ CREATE TABLE IF NOT EXISTS jobs (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS jri_participants (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS jri_participants (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   elevateforhumanity text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS leaderboard (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS leaderboard (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -417,8 +376,7 @@ CREATE TABLE IF NOT EXISTS leaderboard (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS learner_documents (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS learner_documents (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
   avatar_url text,
   city text,
@@ -439,8 +397,7 @@ CREATE TABLE IF NOT EXISTS learner_documents (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS learner_goals (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS learner_goals (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
   avatar_url text,
   city text,
@@ -461,8 +418,7 @@ CREATE TABLE IF NOT EXISTS learner_goals (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS learner_onboarding (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS learner_onboarding (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
   name text,
   description text,
@@ -471,23 +427,20 @@ CREATE TABLE IF NOT EXISTS learner_onboarding (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS learning_resources (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS learning_resources (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   elevateforhumanity text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS legal_documents (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS legal_documents (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   elevateforhumanity text,
   jpg text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS lesson_bookmarks (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS lesson_bookmarks (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -495,8 +448,7 @@ CREATE TABLE IF NOT EXISTS lesson_bookmarks (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS lesson_comments (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS lesson_comments (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -504,8 +456,7 @@ CREATE TABLE IF NOT EXISTS lesson_comments (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS lesson_enhancements (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS lesson_enhancements (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -513,8 +464,7 @@ CREATE TABLE IF NOT EXISTS lesson_enhancements (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS lesson_notes (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS lesson_notes (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -522,8 +472,7 @@ CREATE TABLE IF NOT EXISTS lesson_notes (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS lesson_questions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS lesson_questions (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -531,8 +480,7 @@ CREATE TABLE IF NOT EXISTS lesson_questions (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS license_audit_log (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS license_audit_log (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   action text,
   details jsonb,
@@ -541,8 +489,7 @@ CREATE TABLE IF NOT EXISTS license_audit_log (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS license_keys (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS license_keys (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -550,8 +497,7 @@ CREATE TABLE IF NOT EXISTS license_keys (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS license_tiers (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS license_tiers (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   answer text,
   content text,
   description text,
@@ -569,15 +515,13 @@ CREATE TABLE IF NOT EXISTS license_tiers (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS live_sessions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS live_sessions (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   scheduled_at timestamptz,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS login_events (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS login_events (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   action text,
   details jsonb,
@@ -586,8 +530,7 @@ CREATE TABLE IF NOT EXISTS login_events (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS lti_platforms (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS lti_platforms (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -595,8 +538,7 @@ CREATE TABLE IF NOT EXISTS lti_platforms (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS marketplace_courses (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS marketplace_courses (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   category text,
   creator_name text,
   duration_hours text,
@@ -611,8 +553,7 @@ CREATE TABLE IF NOT EXISTS marketplace_courses (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS marketplace_sellers (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS marketplace_sellers (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   description text,
   is_verified text,
   products_count integer DEFAULT 0,
@@ -624,8 +565,7 @@ CREATE TABLE IF NOT EXISTS marketplace_sellers (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS meetings (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS meetings (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text,
   host_id uuid,
   scheduled_at timestamptz,
@@ -634,8 +574,7 @@ CREATE TABLE IF NOT EXISTS meetings (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS mentor_sessions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS mentor_sessions (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   date timestamptz,
   duration integer DEFAULT 0,
   duration_minutes text,
@@ -655,8 +594,7 @@ CREATE TABLE IF NOT EXISTS mentor_sessions (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS mentorships (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS mentorships (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   date timestamptz,
   enrollments text,
   mentee text,
@@ -673,8 +611,7 @@ CREATE TABLE IF NOT EXISTS mentorships (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS message_notifications (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS message_notifications (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   title text,
   content text,
@@ -683,8 +620,7 @@ CREATE TABLE IF NOT EXISTS message_notifications (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS milady_access (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS milady_access (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -692,8 +628,7 @@ CREATE TABLE IF NOT EXISTS milady_access (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS milady_email_logs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS milady_email_logs (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   action text,
   details jsonb,
@@ -702,8 +637,7 @@ CREATE TABLE IF NOT EXISTS milady_email_logs (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS milady_license_codes (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS milady_license_codes (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -711,8 +645,7 @@ CREATE TABLE IF NOT EXISTS milady_license_codes (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS milady_orientation_status (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS milady_orientation_status (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -720,8 +653,7 @@ CREATE TABLE IF NOT EXISTS milady_orientation_status (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS milady_provisioning_queue (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS milady_provisioning_queue (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -729,8 +661,7 @@ CREATE TABLE IF NOT EXISTS milady_provisioning_queue (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS milady_rise_enrollments (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS milady_rise_enrollments (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -738,8 +669,7 @@ CREATE TABLE IF NOT EXISTS milady_rise_enrollments (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS moderation_queue (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS moderation_queue (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -747,8 +677,7 @@ CREATE TABLE IF NOT EXISTS moderation_queue (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS module_progress (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS module_progress (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   description text,
   documents_submitted_at timestamptz,
   duration_minutes text,
@@ -761,8 +690,7 @@ CREATE TABLE IF NOT EXISTS module_progress (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS mous (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS mous (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   effective_date date,
   elevateforhumanity text,
   expiry_date date,
@@ -771,8 +699,7 @@ CREATE TABLE IF NOT EXISTS mous (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS navigation_categories (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS navigation_categories (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -780,8 +707,7 @@ CREATE TABLE IF NOT EXISTS navigation_categories (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS navigation_items (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS navigation_items (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -789,8 +715,7 @@ CREATE TABLE IF NOT EXISTS navigation_items (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS news_articles (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS news_articles (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   category text,
   elevateforhumanity text,
   excerpt text,
@@ -801,8 +726,7 @@ CREATE TABLE IF NOT EXISTS news_articles (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS news_categories (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS news_categories (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   category text,
   elevateforhumanity text,
   excerpt text,
@@ -813,10 +737,9 @@ CREATE TABLE IF NOT EXISTS news_categories (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS nonprofit_services (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS nonprofit_services (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   age text,
-  all text,
+  "all" text,
   content text,
   date timestamptz,
   description text,
@@ -829,8 +752,7 @@ CREATE TABLE IF NOT EXISTS nonprofit_services (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS notes (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS notes (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -838,8 +760,7 @@ CREATE TABLE IF NOT EXISTS notes (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS ojt_notes (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS ojt_notes (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -847,8 +768,7 @@ CREATE TABLE IF NOT EXISTS ojt_notes (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS ojt_placements (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS ojt_placements (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -856,8 +776,7 @@ CREATE TABLE IF NOT EXISTS ojt_placements (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS onboarding_events (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS onboarding_events (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   action text,
   details jsonb,
@@ -866,8 +785,7 @@ CREATE TABLE IF NOT EXISTS onboarding_events (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS onboarding_submissions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS onboarding_submissions (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   status text DEFAULT 'pending',
   notes text,
@@ -875,17 +793,15 @@ CREATE TABLE IF NOT EXISTS onboarding_submissions (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS organization_members (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS organization_members (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
-  role text DEFAULT 'member',
+  "role" text DEFAULT 'member',
   status text DEFAULT 'active',
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS orientation_completions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS orientation_completions (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -893,8 +809,7 @@ CREATE TABLE IF NOT EXISTS orientation_completions (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS partner_acknowledgment_items (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS partner_acknowledgment_items (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -902,8 +817,7 @@ CREATE TABLE IF NOT EXISTS partner_acknowledgment_items (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS partner_acknowledgments (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS partner_acknowledgments (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text,
   description text,
   status text DEFAULT 'active',
@@ -911,8 +825,7 @@ CREATE TABLE IF NOT EXISTS partner_acknowledgments (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS partner_attendance (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS partner_attendance (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   fri_hours text,
   mon_hours text,
   notes text,
@@ -927,8 +840,7 @@ CREATE TABLE IF NOT EXISTS partner_attendance (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS partner_course_payments (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS partner_course_payments (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   amount numeric DEFAULT 0,
   status text DEFAULT 'pending',
@@ -937,8 +849,7 @@ CREATE TABLE IF NOT EXISTS partner_course_payments (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS partner_lms_sync_logs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS partner_lms_sync_logs (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   active text,
   api_key text,
   api_url text,
@@ -961,8 +872,7 @@ CREATE TABLE IF NOT EXISTS partner_lms_sync_logs (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS partner_profiles (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS partner_profiles (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text,
   description text,
   file_url text,
@@ -971,8 +881,7 @@ CREATE TABLE IF NOT EXISTS partner_profiles (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS partner_sessions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS partner_sessions (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   absent boolean DEFAULT false,
   absent_count integer DEFAULT 0,
   date timestamptz,
@@ -987,8 +896,7 @@ CREATE TABLE IF NOT EXISTS partner_sessions (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS pathways (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS pathways (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   blue text,
   credential text,
   description text,
@@ -1004,15 +912,13 @@ CREATE TABLE IF NOT EXISTS pathways (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS payment_options (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS payment_options (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   elevateforhumanity text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS payment_plan_selections (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS payment_plan_selections (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   amount numeric DEFAULT 0,
   status text DEFAULT 'pending',
@@ -1021,8 +927,7 @@ CREATE TABLE IF NOT EXISTS payment_plan_selections (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS payment_sessions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS payment_sessions (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text,
   host_id uuid,
   scheduled_at timestamptz,
@@ -1031,8 +936,7 @@ CREATE TABLE IF NOT EXISTS payment_sessions (
   updated_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS payment_splits (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS payment_splits (  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   amount numeric DEFAULT 0,
   status text DEFAULT 'pending',

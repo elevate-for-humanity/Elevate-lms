@@ -106,7 +106,7 @@ export default async function AtRiskStudentsPage() {
     .order('overdue_count', { ascending: false });
 
   // Fetch programs with low completion
-  const { data: programStats } = await db.from('enrollments').select(`
+  const { data: programStats } = await db.from('program_enrollments').select(`
       program_id,
       status,
       programs (

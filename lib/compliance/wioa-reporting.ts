@@ -128,7 +128,7 @@ export async function generateQuarterlyReport(
 
   // Get all students who enrolled or completed during quarter
   const { data: enrollments, error } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(
       `
       *,
@@ -275,7 +275,7 @@ export async function calculateWIOAPerformance(
 
   // Get all completers in the period
   const { data: completers } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*')
     .gte('completion_date', startDate)
     .lte('completion_date', endDate)
@@ -351,7 +351,7 @@ export async function scheduleWageFollowUp(enrollmentId: string) {
   );
 
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select('completion_date')
     .eq('id', enrollmentId)
     .single();

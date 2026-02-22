@@ -42,7 +42,7 @@ const supabase = await createRouteHandlerClient({ cookies });
 
   // Get enrollments for courses belonging to this program holder
   const { data: enrolls, error } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(
       `
       user_id,

@@ -72,7 +72,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
 
   // Fetch enrollments
   const { data: enrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       *,
       courses (id, title),

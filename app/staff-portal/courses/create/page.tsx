@@ -69,7 +69,7 @@ export default function CreateCoursePage() {
         return;
       }
 
-      const { error: insertError } = await supabase.from('courses').insert({
+      const { error: insertError } = await supabase.from('training_courses').insert({
         course_name: formData.name,
         slug: formData.slug || null,
         description: formData.description,

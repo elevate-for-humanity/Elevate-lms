@@ -40,7 +40,7 @@ export async function getProgramCohorts(programId: string): Promise<Cohort[]> {
 
   // Get all enrollments for this program
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       user_id,
@@ -109,7 +109,7 @@ export async function getCohortMembers(programId: string, startMonth: string): P
   endDate.setMonth(endDate.getMonth() + 1);
 
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       user_id,
@@ -167,7 +167,7 @@ export async function getUserCohort(userId: string): Promise<Cohort | null> {
   const supabase = await createClient();
 
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .select(`
       id,
       program_id,

@@ -46,7 +46,7 @@ export default function ProgressCompliance({ userId }: { userId?: string }) {
 
       // Fetch enrollment progress
       const { data: enrollments } = await supabase
-        .from('enrollments')
+        .from('program_enrollments')
         .select('id, progress, status, programs(required_hours)')
         .eq('user_id', targetUserId)
         .eq('status', 'active')
@@ -61,7 +61,7 @@ export default function ProgressCompliance({ userId }: { userId?: string }) {
 
       // Fetch total lessons for enrolled courses
       const { count: totalLessons } = await supabase
-        .from('lessons')
+        .from('training_lessons')
         .select('*', { count: 'exact', head: true });
 
       // Fetch hour logs

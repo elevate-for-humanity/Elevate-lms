@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     // 1. Load enrollment with lock
     const { data: enrollment, error: enrollmentError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(
         'id, partner_course_id, payment_status, payment_mode, billing_lock'
       )
@@ -184,7 +184,7 @@ export async function POST(request: NextRequest) {
 
     // 6. Update enrollment with session ID
     await db
-      .from('enrollments')
+      .from('program_enrollments')
       .update({
         stripe_checkout_session_id: session.id,
         updated_at: new Date().toISOString(),

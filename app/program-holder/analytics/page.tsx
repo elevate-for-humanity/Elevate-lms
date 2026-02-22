@@ -51,13 +51,13 @@ export default async function ProgramHolderAnalyticsPage() {
 
   // Current period stats
   const { count: currentEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
     .gte('enrolled_at', thirtyDaysAgo.toISOString());
 
   const { count: previousEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
     .gte('enrolled_at', sixtyDaysAgo.toISOString())
@@ -65,18 +65,18 @@ export default async function ProgramHolderAnalyticsPage() {
 
   // Total stats
   const { count: totalEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id);
 
   const { count: activeEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
     .eq('status', 'active');
 
   const { count: completedEnrollments } = await db
-    .from('enrollments')
+    .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('program_holder_id', programHolder.id)
     .eq('status', 'completed');
@@ -90,12 +90,12 @@ export default async function ProgramHolderAnalyticsPage() {
   const programStats = await Promise.all(
     (programs || []).map(async (program: any) => {
       const { count: enrollments } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('program_id', program.id);
 
       const { count: completed } = await db
-        .from('enrollments')
+        .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('program_id', program.id)
         .eq('status', 'completed');

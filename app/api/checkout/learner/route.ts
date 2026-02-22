@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
         }
 
         const { data: course } = await db
-          .from('courses')
+          .from('training_courses')
           .select('id, title, slug, price')
           .eq('id', courseId)
           .single();

@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     // Verify enrollment belongs to user
     const { data: enrollment, error: enrollmentError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id, user_id, course_id, progress, status')
       .eq('id', enrollmentId)
       .eq('user_id', user.id)
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: updated, error: updateError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .update(updates)
       .eq('id', enrollmentId)
       .eq('user_id', user.id)
@@ -156,7 +156,7 @@ export async function GET(request: NextRequest) {
 
     // Get enrollment with course details
     const { data: enrollment, error } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(`
         id,
         progress,

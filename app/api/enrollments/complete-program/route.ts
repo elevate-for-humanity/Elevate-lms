@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     // Get enrollment with program and student details
     const { data: enrollment, error: enrollmentError } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select(`
         id,
         user_id,

@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     // Check if already enrolled
     const { data: existingEnrollment } = await db
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id, status')
       .eq('application_id', application_id)
       .single();

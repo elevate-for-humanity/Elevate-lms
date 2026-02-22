@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
 
     // Get courses created by this user or all if admin
     let query = db
-      .from("courses")
+      .from("training_courses")
       .select("*")
       .order("created_at", { ascending: false });
 
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
 
     // Create course
     const { data: course, error: courseError } = await db
-      .from("courses")
+      .from("training_courses")
       .insert({
         title,
         description,

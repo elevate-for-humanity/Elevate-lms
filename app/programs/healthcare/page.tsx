@@ -32,24 +32,10 @@ export default function HealthcareProgramsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image src="/images/hero/hero-healthcare.jpg" alt="Healthcare Training Programs" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
-          <div className="max-w-4xl mx-auto">
-            <span className="inline-block bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Funding Available</span>
-            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Healthcare Programs</h1>
-            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
-              CNA, Medical Assistant, Phlebotomy, and more. Get certified and working in healthcare in weeks.
-            </p>
-          </div>
-        </div>
       </section>
 
-      {/* Avatar Guide */}
-      <section className="py-8 bg-white">
-        <div className="max-w-3xl mx-auto px-4">
-        </div>
-      </section>
 
       {/* Quick Stats */}
       <section className="bg-slate-900 py-5">

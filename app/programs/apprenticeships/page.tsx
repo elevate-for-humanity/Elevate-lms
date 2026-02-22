@@ -2,6 +2,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 import RequestMeeting from '@/components/RequestMeeting';
@@ -24,6 +25,7 @@ export default function ApprenticeshipsPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <ProgramHeroBanner videoSrc="/videos/program-hero.mp4" voiceoverSrc="/audio/heroes/programs.mp3" />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Apprenticeships' }]} />
@@ -31,17 +33,8 @@ export default function ApprenticeshipsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image src="/images/hero/hero-hands-on-training.jpg" alt="Apprenticeship Programs" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
-          <div className="max-w-4xl mx-auto">
-            <span className="inline-block bg-brand-red-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Earn While You Learn</span>
-            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Apprenticeship Programs</h1>
-            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
-              Get paid while you train under a licensed professional. US Department of Labor registered. JRI and WIOA funding available.
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* Stats */}

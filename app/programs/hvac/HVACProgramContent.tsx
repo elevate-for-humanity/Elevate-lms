@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import PageAvatar from '@/components/PageAvatar';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import {
@@ -64,8 +64,10 @@ export default function HVACProgramContent() {
         </div>
       </div>
 
-      {/* Hero — real image background */}
-      <section className="relative min-h-[500px] lg:min-h-[600px] flex items-center">
+      <ProgramHeroBanner videoSrc="/videos/hvac-hero-final.mp4" voiceoverSrc="/audio/heroes/skilled-trades.mp3" />
+
+      {/* Hero */}
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/trades/hero-program-hvac.jpg"
           alt="HVAC technician working on a commercial heating and cooling unit"
@@ -73,66 +75,7 @@ export default function HVACProgramContent() {
           quality={90} className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
-
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-24 w-full">
-          <div className="max-w-2xl">
-            <FundingBadge type="funded" />
-
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mt-6 mb-6 leading-tight">
-              HVAC Technician Training<br />
-              <span className="text-green-300">EPA 608 Certification</span>
-            </h1>
-
-            <p className="text-xl text-gray-200 mb-4 leading-relaxed">
-              400-hour program covering HVAC fundamentals, refrigerant handling, and hands-on
-              employer site experience. Graduate with your EPA 608 Certification,
-              OSHA 30, and the credentials employers require.
-            </p>
-
-            <p className="text-lg text-green-300 font-semibold mb-8">
-              Free for those who qualify for workforce funding. Self-pay options available.
-            </p>
-
-            <div className="flex flex-wrap gap-4 mb-8 text-sm text-gray-300">
-              <span className="flex items-center gap-2 bg-green-500/20 backdrop-blur px-4 py-2 rounded-full text-green-300 font-semibold border border-green-400/30">
-                <Award className="w-4 h-4" /> EPA 608 Certification
-              </span>
-              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
-                <Clock className="w-4 h-4" /> 400 Hours
-              </span>
-              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
-                <Calendar className="w-4 h-4" /> Flexible Scheduling
-              </span>
-              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
-                <TrendingUp className="w-4 h-4" /> 4-Star Indiana Top Job
-              </span>
-              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
-                <DollarSign className="w-4 h-4" /> $48K Avg Starting Salary
-              </span>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/apply?program=hvac-technician"
-                className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
-              >
-                Apply Now — It&apos;s Free
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-              <Link
-                href="#how-to-enroll"
-                className="inline-flex items-center justify-center px-8 py-4 bg-white/15 hover:bg-white/25 backdrop-blur text-white font-semibold rounded-full transition-all"
-              >
-                See How It Works
-              </Link>
-            </div>
-          </div>
-        </div>
       </section>
-
-      {/* Video Avatar Guide */}
-      <PageAvatar videoSrc="/videos/avatars/trades-guide.mp4" title="Your HVAC Program Guide" />
 
       {/* What You'll Actually Do — image cards */}
       <section className="py-16 bg-white">

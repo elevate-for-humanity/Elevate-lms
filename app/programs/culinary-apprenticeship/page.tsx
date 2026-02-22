@@ -2,6 +2,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
@@ -23,23 +24,15 @@ export default function CulinaryApprenticeshipPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <ProgramHeroBanner videoSrc="/videos/program-hero.mp4" />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Culinary Apprenticeship' }]} />
         </div>
       </div>
 
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+      <section className="relative h-48 md:h-64 overflow-hidden">
         <Image src="/images/culinary/hero-program-culinary.jpg" alt="Culinary Apprenticeship" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
-          <div className="max-w-4xl mx-auto">
-            <span className="inline-block bg-brand-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Earn While You Learn</span>
-            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Culinary Apprenticeship</h1>
-            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
-              Get paid while training in a professional kitchen. Food handler and ServSafe certification included.
-            </p>
-          </div>
-        </div>
       </section>
 
       <section className="bg-slate-900 py-5">

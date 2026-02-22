@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import { createBrowserClient } from '@supabase/ssr';
@@ -90,14 +91,7 @@ export default function PlumbingProgramPage() {
         </div>
       </div>
 
-      {/* Hero */}
-      {/* Hero */}
-      <section className="bg-slate-900 py-16">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Plumbing Fundamentals <span className="text-cyan-300">Career Pathway</span></h1>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto">Master the essential trade that keeps water flowing and buildings functioning. Learn installation, repair, and service skills for a <strong className="text-white">recession-proof career.</strong></p>
-        </div>
-      </section>
+      <ProgramHeroBanner videoSrc="/videos/electrician-trades.mp4" voiceoverSrc="/audio/heroes/skilled-trades.mp3" />
 
       {/* Stats */}
       <section className="bg-white border-b">

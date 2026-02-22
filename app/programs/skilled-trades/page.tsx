@@ -44,11 +44,6 @@ export default function SkilledTradesPage() {
         </div>
       </section>
 
-      {/* Avatar Guide */}
-      <section className="py-8 bg-white">
-        <div className="max-w-3xl mx-auto px-4">
-        </div>
-      </section>
 
       <section className="bg-slate-900 py-5">
         <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">

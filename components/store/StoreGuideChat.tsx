@@ -88,15 +88,11 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
     const completed = localStorage.getItem(GUIDE_STORAGE_KEYS.COMPLETED);
     if (completed) return;
 
-    // Always greet on store pages — clear dismissed flag so returning visitors see it too
+    // Open guide chat — speech deferred until user interacts
     const timer = setTimeout(() => {
       setIsOpen(true);
       setHasAutoOpened(true);
-      const mainQuestion = storeGuideFlow.questions.find(q => q.id === 'main');
-      if (mainQuestion) {
-        setTimeout(() => speak(storeGuideFlow.welcomeMessage + '. ' + mainQuestion.question), 400);
-      }
-    }, 800);
+    }, 500);
     return () => clearTimeout(timer);
   }, [forceOpen, hasAutoOpened, speak]);
 

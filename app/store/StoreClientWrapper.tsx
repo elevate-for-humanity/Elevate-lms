@@ -1,8 +1,15 @@
 'use client';
 
 import { useState, useEffect, useCallback, ReactNode } from 'react';
-import StoreGuideChat from '@/components/store/StoreGuideChat';
-import GuidedTour from '@/components/store/GuidedTour';
+import dynamic from 'next/dynamic';
+
+// Lazy-load chat and tour — they aren't needed for initial render
+const StoreGuideChat = dynamic(() => import('@/components/store/StoreGuideChat'), {
+  ssr: false,
+});
+const GuidedTour = dynamic(() => import('@/components/store/GuidedTour'), {
+  ssr: false,
+});
 
 interface StoreClientWrapperProps {
   children: ReactNode;
@@ -10,6 +17,13 @@ interface StoreClientWrapperProps {
 
 export default function StoreClientWrapper({ children }: StoreClientWrapperProps) {
   const [activeTourId, setActiveTourId] = useState<string | null>(null);
+  const [showGuide, setShowGuide] = useState(false);
+
+  // Defer guide chat load until after page is interactive
+  useEffect(() => {
+    const timer = setTimeout(() => setShowGuide(true), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Handle tour trigger buttons
   useEffect(() => {
@@ -40,8 +54,8 @@ export default function StoreClientWrapper({ children }: StoreClientWrapperProps
     <>
       {children}
       
-      {/* Store Guide Chat - Center screen modal */}
-      <StoreGuideChat onStartTour={handleStartTour} />
+      {/* Store Guide Chat — deferred to avoid blocking initial paint */}
+      {showGuide && <StoreGuideChat onStartTour={handleStartTour} />}
       
       {/* Guided Tour - Spotlight overlay */}
       {activeTourId && (

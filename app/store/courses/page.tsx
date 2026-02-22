@@ -37,9 +37,7 @@ export default function StoreCoursesPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <video autoPlay muted loop playsInline preload="none" className="absolute inset-0 w-full h-full object-cover">
-            <source src="/videos/hero-home.mp4" type="video/mp4" />
-          </video>
+          <Image src="/images/heroes-hq/programs-hero.jpg" alt="Certification courses" fill sizes="100vw" className="object-cover" priority quality={85} />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

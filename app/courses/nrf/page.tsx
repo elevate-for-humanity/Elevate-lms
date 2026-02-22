@@ -37,7 +37,7 @@ export default async function NrfPage() {
   
   // Fetch NRF courses
   const { data: nrfCourses } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('provider', 'nrf');
 

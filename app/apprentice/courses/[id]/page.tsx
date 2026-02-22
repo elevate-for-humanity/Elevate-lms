@@ -40,7 +40,7 @@ export default async function ApprenticeCourseDetailPage({
 
   // Get enrollment with program
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('training_enrollments')
     .select('*, programs(id, name, slug)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
@@ -64,7 +64,7 @@ export default async function ApprenticeCourseDetailPage({
 
   // Get course from database
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('id', id)
     .single();

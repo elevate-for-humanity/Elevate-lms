@@ -15,7 +15,7 @@ export default async function LivePage({ params }: { params: { courseId: string 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: course } = await supabase.from('courses').select('*').eq('id', params.courseId).single();
+  const { data: course } = await supabase.from('training_courses').select('*').eq('id', params.courseId).single();
   const { data: sessions } = await supabase.from('live_sessions').select('*').eq('course_id', params.courseId).gte('scheduled_at', new Date().toISOString()).order('scheduled_at').limit(5);
 
   return (

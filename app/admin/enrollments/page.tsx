@@ -27,8 +27,8 @@ export default async function AdminEnrollmentsPage() {
     .from('training_enrollments')
     .select(`
       *,
-      student:profiles!enrollments_user_id_fkey(id, full_name, email),
-      course:courses(id, title)
+      student:profiles(id, full_name, email),
+      course:training_courses(id, course_name)
     `)
     .order('enrolled_at', { ascending: false });
 
@@ -39,11 +39,23 @@ export default async function AdminEnrollmentsPage() {
     .order('full_name');
 
   // Fetch courses for dropdown
-  const { data: courses } = await supabase
+  const { data: coursesRaw } = await supabase
     .from('training_courses')
-    .select('id, title')
-    .eq('is_published', true)
-    .order('title');
+    .select('id, course_name')
+    .eq('is_active', true)
+    .order('course_name');
+
+  // Map course_name to title for the client component
+  const courses = (coursesRaw || []).map(c => ({ id: c.id, title: c.course_name }));
+
+  // Fetch cohorts for dropdown
+  const { data: cohortsRaw } = await supabase
+    .from('cohorts')
+    .select('id, name, code, status')
+    .eq('status', 'active')
+    .order('name');
+
+  const cohorts = cohortsRaw || [];
 
   const allEnrollments = enrollments || [];
   const stats = {
@@ -69,6 +81,7 @@ export default async function AdminEnrollmentsPage() {
         initialEnrollments={allEnrollments} 
         users={users || []} 
         courses={courses || []} 
+        cohorts={cohorts}
         stats={stats} 
       />
     </div>

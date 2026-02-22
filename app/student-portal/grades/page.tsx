@@ -38,7 +38,7 @@ export default async function StudentPortalGradesPage() {
 
   // Fetch course progress/completion
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('training_enrollments')
     .select(`
       id,
       progress,

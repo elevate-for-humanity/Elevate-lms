@@ -33,7 +33,7 @@ export default async function CoursedetailPage() {
   
   // Fetch featured courses
   const { data: courses } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('featured', true)
     .limit(10);

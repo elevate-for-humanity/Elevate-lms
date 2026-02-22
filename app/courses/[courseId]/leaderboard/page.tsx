@@ -31,7 +31,7 @@ export default function CourseLeaderboardPage() {
 
     // Load course
     const { data: courseData } = await supabase
-      .from('courses')
+      .from('training_courses')
       .select('*')
       .eq('id', courseId)
       .single();

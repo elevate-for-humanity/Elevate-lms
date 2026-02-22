@@ -32,7 +32,7 @@ export default async function HsiPage() {
   
   // Fetch HSI courses
   const { data: hsiCourses } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('provider', 'hsi');
   const courseCategories = [

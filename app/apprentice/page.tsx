@@ -37,7 +37,7 @@ export default async function ApprenticePortalPage() {
 
   // Get active enrollment with program info
   const { data: enrollment } = await supabase
-    .from('enrollments')
+    .from('training_enrollments')
     .select('*, programs(slug, name)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
@@ -65,7 +65,7 @@ export default async function ApprenticePortalPage() {
   }) : { label: 'Apply to a Program', href: '/programs', description: 'Start your journey' };
 
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('training_enrollments')
     .select('id, status, progress, course_id')
     .eq('user_id', user.id)
     .limit(5);

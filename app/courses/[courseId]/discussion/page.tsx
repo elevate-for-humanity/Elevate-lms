@@ -15,7 +15,7 @@ export default async function DiscussionPage({ params }: { params: { courseId: s
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: course } = await supabase.from('courses').select('*').eq('id', params.courseId).single();
+  const { data: course } = await supabase.from('training_courses').select('*').eq('id', params.courseId).single();
   const { data: discussions } = await supabase.from('discussions').select('*, profiles!inner(full_name)').eq('course_id', params.courseId).order('created_at', { ascending: false }).limit(20);
 
   return (

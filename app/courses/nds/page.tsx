@@ -32,7 +32,7 @@ export default async function NdsPage() {
   
   // Fetch NDS courses
   const { data: ndsCourses } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('provider', 'nds');
   const courseCategories = [

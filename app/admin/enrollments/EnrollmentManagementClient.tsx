@@ -28,10 +28,18 @@ interface Course {
   title: string;
 }
 
+interface Cohort {
+  id: string;
+  name: string;
+  code: string;
+  status: string;
+}
+
 interface Props {
   initialEnrollments: Enrollment[];
   users: User[];
   courses: Course[];
+  cohorts: Cohort[];
   stats: {
     total: number;
     active: number;
@@ -40,7 +48,7 @@ interface Props {
   };
 }
 
-export default function EnrollmentManagementClient({ initialEnrollments, users, courses, stats }: Props) {
+export default function EnrollmentManagementClient({ initialEnrollments, users, courses, cohorts, stats }: Props) {
   const [enrollments, setEnrollments] = useState<Enrollment[]>(initialEnrollments);
   const [showModal, setShowModal] = useState(false);
   const [editingEnrollment, setEditingEnrollment] = useState<Enrollment | null>(null);
@@ -52,6 +60,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
   const [formData, setFormData] = useState({
     user_id: '',
     course_id: '',
+    cohort_id: '',
     status: 'active',
     progress: '0',
     at_risk: false,
@@ -60,7 +69,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
   const supabase = createClient();
 
   const resetForm = () => {
-    setFormData({ user_id: '', course_id: '', status: 'active', progress: '0', at_risk: false });
+    setFormData({ user_id: '', course_id: '', cohort_id: '', status: 'active', progress: '0', at_risk: false });
     setEditingEnrollment(null);
     setError(null);
   };
@@ -126,11 +135,12 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
           .insert({
             user_id: formData.user_id,
             course_id: formData.course_id,
+            cohort_id: formData.cohort_id || null,
             status: formData.status,
             progress: parseInt(formData.progress) || 0,
             enrolled_at: new Date().toISOString(),
           })
-          .select('*, student:profiles(id, full_name, email), course:training_courses(id, title)')
+          .select('*, student:profiles(id, full_name, email), course:training_courses(id, course_name)')
           .single();
 
         if (insertError) throw insertError;
@@ -210,7 +220,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
 
   const filteredEnrollments = enrollments.filter(enrollment => {
     const studentName = enrollment.student?.full_name || enrollment.student?.email || '';
-    const courseName = enrollment.course?.title || '';
+    const courseName = enrollment.course?.course_name || enrollment.course?.title || '';
     const matchesSearch = 
       studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       courseName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -316,7 +326,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {enrollment.course?.title || 'Unknown Course'}
+                    {enrollment.course?.course_name || enrollment.course?.title || 'Unknown Course'}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
@@ -407,6 +417,19 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
                   <option value="">Select a course</option>
                   {courses.map((course) => (
                     <option key={course.id} value={course.id}>{course.title}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Cohort (optional)</label>
+                <select
+                  value={formData.cohort_id}
+                  onChange={(e) => setFormData({ ...formData, cohort_id: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg"
+                >
+                  <option value="">No cohort</option>
+                  {cohorts.map((cohort) => (
+                    <option key={cohort.id} value={cohort.id}>{cohort.name} ({cohort.code})</option>
                   ))}
                 </select>
               </div>

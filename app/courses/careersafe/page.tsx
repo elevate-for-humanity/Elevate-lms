@@ -32,7 +32,7 @@ export default async function CareerSafePage() {
   
   // Fetch CareerSafe courses
   const { data: courses } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('provider', 'careersafe');
   const courseCategories = [

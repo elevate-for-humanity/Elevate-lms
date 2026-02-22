@@ -122,10 +122,10 @@ export async function POST(
     // Auto-create certificate if course completed
     let certificate = null;
     if (courseCompleted) {
-      // Fetch actual course title (lesson.title is the lesson name, not the course)
+      // Fetch actual course name
       const { data: course } = await supabase
         .from('training_courses')
-        .select('title')
+        .select('course_name')
         .eq('id', lesson.course_id)
         .single();
 
@@ -136,7 +136,7 @@ export async function POST(
         courseId: lesson.course_id,
         enrollmentId: enrollment.id,
         studentName: user.user_metadata?.full_name || user.email || 'Student',
-        courseTitle: course?.title || lesson.title,
+        courseTitle: course?.course_name || lesson.title,
       });
       if (certResult.success && certResult.certificate) {
         certificate = certResult.certificate;

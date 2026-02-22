@@ -32,7 +32,7 @@ export default async function EnrollmentSuccessPage({
   
   // Fetch course info
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('id, title, slug')
     .eq('id', params.courseId)
     .single();

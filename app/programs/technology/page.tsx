@@ -65,8 +65,16 @@ export default function TechnologyPage() {
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6 text-center">Choose Your Path</h2>
           <div className="grid grid-cols-2 gap-4">
             {[
-              { name: 'IT Support', href: '/programs/technology/it-support', img: '/images/programs-hq/it-support.jpg', duration: '8-12 weeks', desc: 'Help desk, troubleshooting, CompTIA A+' },
-              { name: 'Cybersecurity', href: '/programs/technology/cybersecurity', img: '/images/technology/cybersecurity-hero.jpg', duration: '12-16 weeks', desc: 'Network security, CompTIA Security+' },
+              { name: 'IT Help Desk Technician', href: '/programs/it-help-desk', img: '/images/programs-hq/it-support.jpg', duration: '8 weeks', desc: 'Certiport IT Specialist — Device Config. SOC 15-1232, 3-star.' },
+              { name: 'Cybersecurity Analyst', href: '/programs/cybersecurity-analyst', img: '/images/programs-hq/cybersecurity.jpg', duration: '12 weeks', desc: 'Certiport IT Specialist — Cybersecurity. SOC 15-1212, 4-star.' },
+              { name: 'Network Support Technician', href: '/programs/network-support-technician', img: '/images/programs-hq/it-support.jpg', duration: '12 weeks', desc: 'Certiport + Cisco CCST. SOC 15-1231, 4-star.' },
+              { name: 'Software Development', href: '/programs/software-development', img: '/images/programs-hq/technology-hero.jpg', duration: '12 weeks', desc: 'Certiport IT Specialist — Software Dev. SOC 15-1252, 5-star.' },
+              { name: 'Network & Systems Admin', href: '/programs/network-administration', img: '/images/programs-hq/technology-hero.jpg', duration: '12 weeks', desc: 'Certiport IT Specialist — Databases. SOC 15-1244, 4-star.' },
+              { name: 'Web Development', href: '/programs/web-development', img: '/images/programs-hq/technology-hero.jpg', duration: '10 weeks', desc: 'Meta + WordPress certified. SOC 15-1254, 4-star.' },
+              { name: 'Graphic Design', href: '/programs/graphic-design', img: '/images/programs-hq/business-office.jpg', duration: '10 weeks', desc: 'Adobe Certified Professional. SOC 27-1024, 4-star.' },
+              { name: 'CAD/Drafting', href: '/programs/cad-drafting', img: '/images/programs-hq/skilled-trades-hero.jpg', duration: '10 weeks', desc: 'Autodesk Certified User. SOC 17-3011, 4-star.' },
+              { name: 'Project Management', href: '/programs/project-management', img: '/images/programs-hq/business-training.jpg', duration: '8 weeks', desc: 'PMI Project Management Ready. SOC 11-9199, 5-star.' },
+              { name: 'Office Administration', href: '/programs/office-administration', img: '/images/programs-hq/business-office.jpg', duration: '6 weeks', desc: 'Microsoft Office Specialist. SOC 43-3031, 3-star.' },
             ].map((p) => (
               <Link key={p.name} href={p.href} className="group">
                 <div className="relative aspect-[3/2] rounded-xl overflow-hidden mb-2">

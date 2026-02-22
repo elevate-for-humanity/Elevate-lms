@@ -198,9 +198,8 @@ function logSecurityEvent(eventType: string, data: any) {
   
   // Check if already logged for this route
   if (loggedRoutes.has(routeKey)) {
-    if (process.env.NODE_ENV === 'development') {
-    }
-    return; // Skip - already logged for this route
+    // Already logged for this route
+    return;
   }
   
   // Check cooldown - only log same event once per minute
@@ -224,10 +223,6 @@ function logSecurityEvent(eventType: string, data: any) {
     userAgent: navigator.userAgent,
     data,
   };
-
-  // Log to console in development
-  if (process.env.NODE_ENV === 'development') {
-  }
 
   // Send to analytics/monitoring service
   try {

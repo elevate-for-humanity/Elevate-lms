@@ -195,18 +195,18 @@ export async function POST(req: NextRequest) {
     // STEP 2.5a: Create training_enrollments so student can access course content
     if (enrollment.program_id) {
       try {
-        const { data: programCourses } = await supabase
-          .from('program_courses')
-          .select('course_id')
+        const { data: linkedCourses } = await supabase
+          .from('training_courses')
+          .select('id')
           .eq('program_id', enrollment.program_id);
 
-        if (programCourses && programCourses.length > 0) {
-          for (const pc of programCourses) {
+        if (linkedCourses && linkedCourses.length > 0) {
+          for (const course of linkedCourses) {
             await supabase
               .from('training_enrollments')
               .upsert({
                 user_id: enrollment.user_id,
-                course_id: pc.course_id,
+                course_id: course.id,
                 status: 'active',
                 progress: 0,
                 enrolled_at: new Date().toISOString(),
@@ -214,7 +214,7 @@ export async function POST(req: NextRequest) {
           }
           logger.info('Created training_enrollments on approval', {
             userId: enrollment.user_id,
-            courseCount: programCourses.length,
+            courseCount: linkedCourses.length,
           });
         }
       } catch (bridgeErr) {

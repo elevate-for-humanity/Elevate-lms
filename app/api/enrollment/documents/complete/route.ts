@@ -76,21 +76,20 @@ export async function POST(req: Request) {
     }
 
     // Bridge: create training_enrollments so the student can access course content.
-    // Look up courses linked to this program via program_courses table.
     if (enrollment.program_id) {
       try {
-        const { data: programCourses } = await supabase
-          .from('program_courses')
-          .select('course_id')
+        const { data: linkedCourses } = await supabase
+          .from('training_courses')
+          .select('id')
           .eq('program_id', enrollment.program_id);
 
-        if (programCourses && programCourses.length > 0) {
-          for (const pc of programCourses) {
+        if (linkedCourses && linkedCourses.length > 0) {
+          for (const course of linkedCourses) {
             await supabase
               .from('training_enrollments')
               .upsert({
                 user_id: user.id,
-                course_id: pc.course_id,
+                course_id: course.id,
                 status: 'active',
                 progress: 0,
                 enrolled_at: new Date().toISOString(),
@@ -99,13 +98,12 @@ export async function POST(req: Request) {
           logger.info('Created training_enrollments for activated student', {
             userId: user.id,
             programId: enrollment.program_id,
-            courseCount: programCourses.length,
+            courseCount: linkedCourses.length,
           });
         } else {
-          logger.warn('No program_courses found for program', { programId: enrollment.program_id });
+          logger.warn('No training_courses found for program', { programId: enrollment.program_id });
         }
       } catch (bridgeErr) {
-        // Non-fatal — admin can create enrollments manually
         logger.error('Failed to create training_enrollments bridge', bridgeErr as Error);
       }
     }

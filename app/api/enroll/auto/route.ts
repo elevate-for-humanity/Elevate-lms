@@ -186,24 +186,24 @@ export async function POST(req: Request) {
 
     // STEP 5b: Create training_enrollments so student can access course content
     try {
-      const { data: programCourses } = await supabase
-        .from('program_courses')
-        .select('course_id')
+      const { data: linkedCourses } = await supabase
+        .from('training_courses')
+        .select('id')
         .eq('program_id', program.id);
 
-      if (programCourses && programCourses.length > 0) {
-        for (const pc of programCourses) {
+      if (linkedCourses && linkedCourses.length > 0) {
+        for (const course of linkedCourses) {
           await supabase
             .from('training_enrollments')
             .upsert({
               user_id: userId,
-              course_id: pc.course_id,
+              course_id: course.id,
               status: 'active',
               progress: 0,
               enrolled_at: new Date().toISOString(),
             }, { onConflict: 'user_id,course_id' });
         }
-        logger.info('Created training_enrollments', { userId, courseCount: programCourses.length });
+        logger.info('Created training_enrollments', { userId, courseCount: linkedCourses.length });
       }
     } catch (bridgeErr) {
       logger.warn('training_enrollments bridge failed (non-fatal)', bridgeErr);

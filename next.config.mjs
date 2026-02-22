@@ -397,6 +397,9 @@ const nextConfig = {
       { source: '/compare-programs/:path*', destination: '/programs/:path*', permanent: true },
 
       // Program alias → DB canonical slug (one URL per program)
+      // Archived year-specific variants
+      { source: '/programs/barber-2024', destination: '/programs/barber-apprenticeship', permanent: true },
+      { source: '/programs/hvac-2024', destination: '/programs/hvac-technician', permanent: true },
       // CDL
       { source: '/programs/cdl', destination: '/programs/cdl-training', permanent: true },
       { source: '/programs/cdl-transportation', destination: '/programs/cdl-training', permanent: true },

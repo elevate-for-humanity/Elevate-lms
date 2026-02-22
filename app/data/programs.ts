@@ -1482,46 +1482,6 @@ export const programs: Program[] = [
     ctaSecondary: { label: 'Learn More', href: '/funding' },
   },
     {
-    slug: 'barber-2024',
-    name: 'Barber Training',
-    heroTitle: 'Barber Training',
-    heroSubtitle: 'State-licensed barber training program covering cutting, styling, shaving, and business management.',
-    shortDescription: 'State-licensed barber training program covering cutting, styling, shaving, and business management.',
-    longDescription: `State-licensed barber training program covering cutting, styling, shaving, and business management.`,
-    heroImage: '/images/heroes-hq/programs-hero.jpg',
-    heroImageAlt: 'Barber Training training at Elevate for Humanity',
-    duration: '52 weeks',
-    clockHours: 0,
-    schedule: 'Contact for schedule',
-    delivery: 'In-Person',
-    credential: 'Certificate of Completion',
-    approvals: ['Elevate for Humanity'],
-    fundingOptions: [
-      'WIOA',
-      'Payment Plans'
-    ],
-    highlights: [
-      '52 weeks program',
-      'Earn: Certificate of Completion',
-      'Funding: WIOA, Payment Plans'
-    ],
-    whatYouLearn: [
-      'Barber Training fundamentals',
-      'Hands-on practical training',
-      'Industry certification preparation',
-      'Job readiness and placement support'
-    ],
-    outcomes: [
-      'Barber Training',
-      'Entry-level positions in the field'
-    ],
-    requirements: [
-      'High school diploma or GED'
-    ],
-    ctaPrimary: { label: 'Apply Now', href: '/apply?program=barber-2024' },
-    ctaSecondary: { label: 'Learn More', href: '/funding' },
-  },
-    {
     slug: 'bookkeeping',
     name: 'Bookkeeping',
     heroTitle: 'Bookkeeping',
@@ -2188,46 +2148,6 @@ export const programs: Program[] = [
       'Age 18+, physical fitness, pass drug test, clean driving record helpful'
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=forklift-operator' },
-    ctaSecondary: { label: 'Learn More', href: '/funding' },
-  },
-    {
-    slug: 'hvac-2024',
-    name: 'HVAC Technician Training',
-    heroTitle: 'HVAC Technician Training',
-    heroSubtitle: 'Comprehensive HVAC training covering installation, maintenance, and repair of heating and cooling systems.',
-    shortDescription: 'Comprehensive HVAC training covering installation, maintenance, and repair of heating and cooling systems.',
-    longDescription: `Comprehensive HVAC training covering installation, maintenance, and repair of heating and cooling systems.`,
-    heroImage: '/images/programs-hq/skilled-trades-hero.jpg',
-    heroImageAlt: 'HVAC Technician Training training at Elevate for Humanity',
-    duration: '24 weeks',
-    clockHours: 0,
-    schedule: 'Contact for schedule',
-    delivery: 'In-Person',
-    credential: 'Certificate of Completion',
-    approvals: ['Elevate for Humanity'],
-    fundingOptions: [
-      'WIOA',
-      'Payment Plans'
-    ],
-    highlights: [
-      '24 weeks program',
-      'Earn: Certificate of Completion',
-      'Funding: WIOA, Payment Plans'
-    ],
-    whatYouLearn: [
-      'HVAC Technician Training fundamentals',
-      'Hands-on practical training',
-      'Industry certification preparation',
-      'Job readiness and placement support'
-    ],
-    outcomes: [
-      'HVAC Technician Training',
-      'Entry-level positions in the field'
-    ],
-    requirements: [
-      'High school diploma or GED'
-    ],
-    ctaPrimary: { label: 'Apply Now', href: '/apply?program=hvac-2024' },
     ctaSecondary: { label: 'Learn More', href: '/funding' },
   },
     {

@@ -1,0 +1,414 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e3]:
+    - status [ref=e4]
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - link "Elevate for Humanity - Home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+        - generic [ref=e9]:
+          - link "Sign In" [ref=e10] [cursor=pointer]:
+            - /url: /login
+          - link "Apply Now" [ref=e11] [cursor=pointer]:
+            - /url: /apply
+          - button "Open navigation menu" [active] [ref=e12] [cursor=pointer]:
+            - img [ref=e13]
+    - main [ref=e14]:
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - img [ref=e18]
+          - heading "Something Went Wrong" [level=1] [ref=e20]
+          - paragraph [ref=e21]: We encountered an unexpected error. Our team has been notified.
+          - paragraph [ref=e23]: isLoading is not defined
+        - generic [ref=e24]:
+          - button "Try Again" [ref=e25] [cursor=pointer]:
+            - img [ref=e26]
+            - text: Try Again
+          - link "Go Home" [ref=e31] [cursor=pointer]:
+            - /url: /
+            - img [ref=e32]
+            - text: Go Home
+        - generic [ref=e35]:
+          - paragraph [ref=e36]: "If this problem persists, please contact support:"
+          - link "elevate4humanityedu@gmail.com" [ref=e37] [cursor=pointer]:
+            - /url: mailto:elevate4humanityedu@gmail.com
+    - generic [ref=e40]:
+      - generic [ref=e42]:
+        - button [ref=e44] [cursor=pointer]:
+          - img [ref=e46]
+        - generic [ref=e50]:
+          - generic [ref=e51]: Elevate Guide
+          - button [ref=e52] [cursor=pointer]:
+            - img [ref=e53]
+      - generic [ref=e58]:
+        - generic [ref=e59]:
+          - generic [ref=e60]:
+            - img [ref=e61]
+            - generic [ref=e63]:
+              - paragraph [ref=e64]: Elevate Guide
+              - paragraph [ref=e65]: Ask me anything!
+          - generic [ref=e66]:
+            - button [ref=e67] [cursor=pointer]:
+              - img [ref=e68]
+            - button [ref=e70] [cursor=pointer]:
+              - img [ref=e71]
+        - button "Tap to chat with Elevate Guide" [ref=e75] [cursor=pointer]:
+          - img [ref=e76]
+          - text: Tap to chat with Elevate Guide
+    - contentinfo [ref=e78]:
+      - generic [ref=e80]:
+        - generic [ref=e81]:
+          - heading "Programs" [level=3] [ref=e82]
+          - list [ref=e83]:
+            - listitem [ref=e84]:
+              - link "All Programs" [ref=e85] [cursor=pointer]:
+                - /url: /programs
+            - listitem [ref=e86]:
+              - link "Healthcare" [ref=e87] [cursor=pointer]:
+                - /url: /programs#healthcare
+            - listitem [ref=e88]:
+              - link "Skilled Trades" [ref=e89] [cursor=pointer]:
+                - /url: /programs#skilled-trades
+            - listitem [ref=e90]:
+              - link "Technology" [ref=e91] [cursor=pointer]:
+                - /url: /programs#technology
+            - listitem [ref=e92]:
+              - link "Business" [ref=e93] [cursor=pointer]:
+                - /url: /programs#business
+            - listitem [ref=e94]:
+              - link "Apprenticeships" [ref=e95] [cursor=pointer]:
+                - /url: /programs#apprenticeships
+        - generic [ref=e96]:
+          - heading "Services" [level=3] [ref=e97]
+          - list [ref=e98]:
+            - listitem [ref=e99]:
+              - link "Career Services" [ref=e100] [cursor=pointer]:
+                - /url: /career-services
+            - listitem [ref=e101]:
+              - link "VITA Tax Prep" [ref=e102] [cursor=pointer]:
+                - /url: /vita
+            - listitem [ref=e103]:
+              - link "Drug Testing" [ref=e104] [cursor=pointer]:
+                - /url: /drug-testing
+            - listitem [ref=e105]:
+              - link "Certifications" [ref=e106] [cursor=pointer]:
+                - /url: /certifications
+            - listitem [ref=e107]:
+              - link "Mentorship" [ref=e108] [cursor=pointer]:
+                - /url: /mentorship
+            - listitem [ref=e109]:
+              - link "Training Providers" [ref=e110] [cursor=pointer]:
+                - /url: /training-providers
+            - listitem [ref=e111]:
+              - link "Volunteer" [ref=e112] [cursor=pointer]:
+                - /url: /volunteer
+        - generic [ref=e113]:
+          - heading "Store" [level=3] [ref=e114]
+          - list [ref=e115]:
+            - listitem [ref=e116]:
+              - link "Store Home" [ref=e117] [cursor=pointer]:
+                - /url: /store
+            - listitem [ref=e118]:
+              - link "Platform Licenses" [ref=e119] [cursor=pointer]:
+                - /url: /store/licenses
+            - listitem [ref=e120]:
+              - link "AI Tools & Apps" [ref=e121] [cursor=pointer]:
+                - /url: /store/apps
+            - listitem [ref=e122]:
+              - link "Digital Resources" [ref=e123] [cursor=pointer]:
+                - /url: /store/digital
+            - listitem [ref=e124]:
+              - link "Courses" [ref=e125] [cursor=pointer]:
+                - /url: /store/courses
+        - generic [ref=e126]:
+          - heading "Get Started" [level=3] [ref=e127]
+          - list [ref=e128]:
+            - listitem [ref=e129]:
+              - link "Apply Now" [ref=e130] [cursor=pointer]:
+                - /url: /apply
+            - listitem [ref=e131]:
+              - link "How It Works" [ref=e132] [cursor=pointer]:
+                - /url: /how-it-works
+            - listitem [ref=e133]:
+              - link "WIOA Eligibility" [ref=e134] [cursor=pointer]:
+                - /url: /wioa-eligibility
+            - listitem [ref=e135]:
+              - link "Funding & Grants" [ref=e136] [cursor=pointer]:
+                - /url: /funding
+            - listitem [ref=e137]:
+              - link "Financial Aid" [ref=e138] [cursor=pointer]:
+                - /url: /financial-aid
+            - listitem [ref=e139]:
+              - link "Tuition & Fees" [ref=e140] [cursor=pointer]:
+                - /url: /tuition-fees
+            - listitem [ref=e141]:
+              - link "Outcomes" [ref=e142] [cursor=pointer]:
+                - /url: /outcomes
+            - listitem [ref=e143]:
+              - link "FAQ" [ref=e144] [cursor=pointer]:
+                - /url: /faq
+        - generic [ref=e145]:
+          - heading "For Employers" [level=3] [ref=e146]
+          - list [ref=e147]:
+            - listitem [ref=e148]:
+              - link "Employer Overview" [ref=e149] [cursor=pointer]:
+                - /url: /employer
+            - listitem [ref=e150]:
+              - link "Hire Graduates" [ref=e151] [cursor=pointer]:
+                - /url: /hire-graduates
+            - listitem [ref=e152]:
+              - link "Partner With Us" [ref=e153] [cursor=pointer]:
+                - /url: /partner-with-us
+            - listitem [ref=e154]:
+              - link "Partners" [ref=e155] [cursor=pointer]:
+                - /url: /partners
+            - listitem [ref=e156]:
+              - link "OJT & Funding" [ref=e157] [cursor=pointer]:
+                - /url: /ojt-and-funding
+            - listitem [ref=e158]:
+              - link "Workforce Board" [ref=e159] [cursor=pointer]:
+                - /url: /workforce-board
+            - listitem [ref=e160]:
+              - link "Workforce Partners" [ref=e161] [cursor=pointer]:
+                - /url: /workforce-partners
+            - listitem [ref=e162]:
+              - link "Government" [ref=e163] [cursor=pointer]:
+                - /url: /government
+        - generic [ref=e164]:
+          - heading "Company" [level=3] [ref=e165]
+          - list [ref=e166]:
+            - listitem [ref=e167]:
+              - link "About Us" [ref=e168] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e169]:
+              - link "Contact" [ref=e170] [cursor=pointer]:
+                - /url: /contact
+            - listitem [ref=e171]:
+              - link "Team" [ref=e172] [cursor=pointer]:
+                - /url: /team
+            - listitem [ref=e173]:
+              - link "Founder" [ref=e174] [cursor=pointer]:
+                - /url: /founder
+            - listitem [ref=e175]:
+              - link "Careers" [ref=e176] [cursor=pointer]:
+                - /url: /careers
+            - listitem [ref=e177]:
+              - link "Locations" [ref=e178] [cursor=pointer]:
+                - /url: /locations
+            - listitem [ref=e179]:
+              - link "Donate" [ref=e180] [cursor=pointer]:
+                - /url: /donate
+            - listitem [ref=e181]:
+              - link "Impact" [ref=e182] [cursor=pointer]:
+                - /url: /impact
+            - listitem [ref=e183]:
+              - link "Success Stories" [ref=e184] [cursor=pointer]:
+                - /url: /success-stories
+            - listitem [ref=e185]:
+              - link "Transparency" [ref=e186] [cursor=pointer]:
+                - /url: /transparency
+            - listitem [ref=e187]:
+              - link "Accreditation" [ref=e188] [cursor=pointer]:
+                - /url: /accreditation
+        - generic [ref=e189]:
+          - heading "Resources" [level=3] [ref=e190]
+          - list [ref=e191]:
+            - listitem [ref=e192]:
+              - link "Blog" [ref=e193] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=e194]:
+              - link "News" [ref=e195] [cursor=pointer]:
+                - /url: /news
+            - listitem [ref=e196]:
+              - link "Events" [ref=e197] [cursor=pointer]:
+                - /url: /events
+            - listitem [ref=e198]:
+              - link "Webinars" [ref=e199] [cursor=pointer]:
+                - /url: /webinars
+            - listitem [ref=e200]:
+              - link "Support" [ref=e201] [cursor=pointer]:
+                - /url: /support
+            - listitem [ref=e202]:
+              - link "Help Center" [ref=e203] [cursor=pointer]:
+                - /url: /help
+            - listitem [ref=e204]:
+              - link "Community" [ref=e205] [cursor=pointer]:
+                - /url: /community
+            - listitem [ref=e206]:
+              - link "Alumni" [ref=e207] [cursor=pointer]:
+                - /url: /alumni
+            - listitem [ref=e208]:
+              - link "Forums" [ref=e209] [cursor=pointer]:
+                - /url: /forums
+        - generic [ref=e210]:
+          - heading "Portals" [level=3] [ref=e211]
+          - list [ref=e212]:
+            - listitem [ref=e213]:
+              - link "Student LMS" [ref=e214] [cursor=pointer]:
+                - /url: /lms
+            - listitem [ref=e215]:
+              - link "Student Portal" [ref=e216] [cursor=pointer]:
+                - /url: /student-portal
+            - listitem [ref=e217]:
+              - link "Employer Portal" [ref=e218] [cursor=pointer]:
+                - /url: /employer-portal
+            - listitem [ref=e219]:
+              - link "Partner Portal" [ref=e220] [cursor=pointer]:
+                - /url: /partner-portal
+            - listitem [ref=e221]:
+              - link "Staff Portal" [ref=e222] [cursor=pointer]:
+                - /url: /staff-portal
+            - listitem [ref=e223]:
+              - link "Instructor Portal" [ref=e224] [cursor=pointer]:
+                - /url: /instructor
+        - generic [ref=e225]:
+          - heading "Governance" [level=3] [ref=e226]
+          - list [ref=e227]:
+            - listitem [ref=e228]:
+              - link "Governance Hub" [ref=e229] [cursor=pointer]:
+                - /url: /governance
+            - listitem [ref=e230]:
+              - link "Security & Data Protection" [ref=e231] [cursor=pointer]:
+                - /url: /governance/security
+            - listitem [ref=e232]:
+              - link "Compliance & Disclosures" [ref=e233] [cursor=pointer]:
+                - /url: /governance/compliance
+            - listitem [ref=e234]:
+              - link "Authoritative Documents" [ref=e235] [cursor=pointer]:
+                - /url: /governance/authoritative-docs
+            - listitem [ref=e236]:
+              - link "Operational Controls" [ref=e237] [cursor=pointer]:
+                - /url: /governance/operational-controls
+            - listitem [ref=e238]:
+              - link "Governance Contact" [ref=e239] [cursor=pointer]:
+                - /url: /governance/contact
+        - generic [ref=e240]:
+          - heading "Legal" [level=3] [ref=e241]
+          - list [ref=e242]:
+            - listitem [ref=e243]:
+              - link "Privacy Policy" [ref=e244] [cursor=pointer]:
+                - /url: /privacy-policy
+            - listitem [ref=e245]:
+              - link "Terms of Service" [ref=e246] [cursor=pointer]:
+                - /url: /terms-of-service
+            - listitem [ref=e247]:
+              - link "Refund Policy" [ref=e248] [cursor=pointer]:
+                - /url: /refund-policy
+            - listitem [ref=e249]:
+              - link "Accessibility" [ref=e250] [cursor=pointer]:
+                - /url: /accessibility
+            - listitem [ref=e251]:
+              - link "Disclosures" [ref=e252] [cursor=pointer]:
+                - /url: /disclosures
+            - listitem [ref=e253]:
+              - link "All Policies" [ref=e254] [cursor=pointer]:
+                - /url: /policies
+            - listitem [ref=e255]:
+              - link "Equal Opportunity" [ref=e256] [cursor=pointer]:
+                - /url: /equal-opportunity
+            - listitem [ref=e257]:
+              - link "Site Map" [ref=e258] [cursor=pointer]:
+                - /url: /site-map
+      - generic [ref=e261]:
+        - generic [ref=e262]:
+          - img "Elevate" [ref=e263]
+          - generic [ref=e264]: © 2026 Elevate for Humanity
+        - generic [ref=e265]:
+          - link "Privacy" [ref=e266] [cursor=pointer]:
+            - /url: /privacy-policy
+          - link "Terms" [ref=e267] [cursor=pointer]:
+            - /url: /terms-of-service
+    - button "Open chat" [ref=e268] [cursor=pointer]:
+      - img [ref=e269]
+  - generic [ref=e274]:
+    - generic [ref=e276]:
+      - img [ref=e278]
+      - generic [ref=e280]:
+        - heading "We Value Your Privacy" [level=3] [ref=e281]
+        - paragraph [ref=e282]:
+          - text: We use cookies to enhance your experience, analyze site traffic, and provide personalized content. By clicking "Accept All", you consent to our use of cookies.
+          - link "Learn more" [ref=e283] [cursor=pointer]:
+            - /url: /privacy-policy
+    - generic [ref=e284]:
+      - button "Reject all cookies" [ref=e285] [cursor=pointer]: Reject
+      - button "Accept all cookies" [ref=e286] [cursor=pointer]: Accept
+      - button "Close cookie consent banner" [ref=e287] [cursor=pointer]:
+        - img [ref=e288]
+  - generic:
+    - generic [ref=e293]:
+      - generic [ref=e294]:
+        - navigation [ref=e296]:
+          - button "previous" [disabled] [ref=e297]:
+            - img "previous" [ref=e298]
+          - generic [ref=e300]:
+            - generic [ref=e301]: 1/
+            - text: "1"
+          - button "next" [disabled] [ref=e302]:
+            - img "next" [ref=e303]
+        - link "Next.js 16.1.1 (stale) Turbopack" [ref=e306] [cursor=pointer]:
+          - /url: https://nextjs.org/docs/messages/version-staleness
+          - img [ref=e307]
+          - generic "There is a newer version (16.1.4) available, upgrade recommended!" [ref=e309]: Next.js 16.1.1 (stale)
+          - generic [ref=e310]: Turbopack
+      - dialog "Build Error" [ref=e312]:
+        - generic [ref=e315]:
+          - generic [ref=e316]:
+            - generic [ref=e317]:
+              - generic [ref=e319]: Build Error
+              - generic [ref=e320]:
+                - button "Copy Error Info" [ref=e321] [cursor=pointer]:
+                  - img [ref=e322]
+                - button "No related documentation found" [disabled] [ref=e324]:
+                  - img [ref=e325]
+                - button "Attach Node.js inspector" [ref=e327] [cursor=pointer]:
+                  - img [ref=e328]
+            - generic [ref=e337]: Parsing ecmascript source code failed
+          - generic [ref=e339]:
+            - generic [ref=e341]:
+              - img [ref=e343]
+              - generic [ref=e346]: ./app/programs/page.tsx (72:3)
+              - button "Open in editor" [ref=e347] [cursor=pointer]:
+                - img [ref=e349]
+            - generic [ref=e352]:
+              - generic [ref=e353]: Parsing ecmascript source code failed
+              - generic [ref=e354]: 70 |
+              - generic [ref=e355]: "]"
+              - text: ","
+              - generic [ref=e356]: 71 |
+              - generic [ref=e357]: "}"
+              - text: ", >"
+              - generic [ref=e358]: 72 |
+              - generic [ref=e359]: "{"
+              - generic [ref=e360]: "|"
+              - text: ^
+              - generic [ref=e361]: 73 |
+              - generic [ref=e362]: title
+              - text: ":"
+              - generic [ref=e363]: "'CDL & Transportation'"
+              - text: ","
+              - generic [ref=e364]: 74 |
+              - generic [ref=e365]: description
+              - text: ":"
+              - generic [ref=e366]: "'Get your Commercial Driver\\'s License and start earning quickly. CDL drivers are in high demand nationwide with starting salaries of $50,000-$80,000+. Our program includes classroom instruction, behind-the-wheel training, and job placement assistance with local and national carriers.'"
+              - text: ","
+              - generic [ref=e367]: 75 |
+              - generic [ref=e368]: href
+              - text: ": '/programs/cdl-transportation',"
+              - generic [ref=e369]: "Unexpected token `{`. Expected identifier, string literal, numeric literal or [ for the computed key"
+        - generic [ref=e370]: "1"
+        - generic [ref=e371]: "2"
+    - generic [ref=e376] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e377]:
+        - img [ref=e378]
+      - button "Open issues overlay" [ref=e382]:
+        - generic [ref=e383]:
+          - generic [ref=e384]: "0"
+          - generic [ref=e385]: "1"
+        - generic [ref=e386]: Issue
+  - alert [ref=e387]
+```

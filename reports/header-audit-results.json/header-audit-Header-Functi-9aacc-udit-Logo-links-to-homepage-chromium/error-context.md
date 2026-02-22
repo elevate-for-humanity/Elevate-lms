@@ -1,0 +1,495 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e3]:
+    - status [ref=e4]
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - link "Elevate for Humanity - Home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+        - generic [ref=e9]:
+          - link "Sign In" [ref=e10] [cursor=pointer]:
+            - /url: /login
+          - link "Apply Now" [ref=e11] [cursor=pointer]:
+            - /url: /apply
+          - button "Open navigation menu" [active] [ref=e12] [cursor=pointer]
+    - main [ref=e13]:
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - img "Elevate for Humanity" [ref=e16]
+          - generic [ref=e18]:
+            - heading "About Elevate for Humanity" [level=1] [ref=e19]
+            - paragraph [ref=e20]: Transforming lives through workforce development, one person at a time.
+        - generic [ref=e22]:
+          - heading "Who We Are" [level=2] [ref=e23]
+          - generic [ref=e24]:
+            - paragraph [ref=e25]:
+              - strong [ref=e26]: Elevate for Humanity
+              - text: is a nonprofit workforce development organization based in Indianapolis, Indiana. We provide career training, industry certifications, and support services to individuals facing barriers to employment—including justice-involved individuals, low-income families, veterans, and anyone seeking a pathway to economic stability.
+            - paragraph [ref=e27]:
+              - text: As a
+              - strong [ref=e28]: DOL Registered Apprenticeship Sponsor
+              - text: and
+              - strong [ref=e29]: WIOA-approved training provider
+              - text: ", we connect students with funding that makes training 100% free for eligible participants. Our programs lead to industry-recognized certifications and direct employment opportunities."
+        - generic [ref=e32]:
+          - img "Training session" [ref=e34]
+          - generic [ref=e35]:
+            - heading "Our Mission" [level=2] [ref=e36]
+            - paragraph [ref=e37]: To create pathways out of poverty and into prosperity by providing accessible, high-quality workforce training and support services to those who need it most.
+            - generic [ref=e38]:
+              - generic [ref=e39]:
+                - img [ref=e40]
+                - generic [ref=e43]: Remove financial barriers to career training
+              - generic [ref=e44]:
+                - img [ref=e45]
+                - generic [ref=e48]: Provide industry-recognized certifications
+              - generic [ref=e49]:
+                - img [ref=e50]
+                - generic [ref=e53]: Connect graduates with employment
+              - generic [ref=e54]:
+                - img [ref=e55]
+                - generic [ref=e58]: Offer wraparound support for lasting success
+        - generic [ref=e60]:
+          - heading "Who We Serve" [level=2] [ref=e61]
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - img [ref=e64]
+              - heading "Justice-Involved" [level=3] [ref=e66]
+              - paragraph [ref=e67]: Second chance training through JRI funding
+            - generic [ref=e68]:
+              - img [ref=e69]
+              - heading "Low-Income Families" [level=3] [ref=e74]
+              - paragraph [ref=e75]: Free training through WIOA funding
+            - generic [ref=e76]:
+              - img [ref=e77]
+              - heading "Veterans" [level=3] [ref=e79]
+              - paragraph [ref=e80]: Career transition support and training
+            - generic [ref=e81]:
+              - img [ref=e82]
+              - heading "Career Changers" [level=3] [ref=e86]
+              - paragraph [ref=e87]: New skills for new opportunities
+        - generic [ref=e89]:
+          - heading "Our Values" [level=2] [ref=e90]
+          - generic [ref=e91]:
+            - generic [ref=e92]:
+              - img [ref=e94]
+              - heading "Mission-Driven" [level=3] [ref=e98]
+              - paragraph [ref=e99]: Every decision serves our mission to create pathways out of poverty.
+            - generic [ref=e100]:
+              - img [ref=e102]
+              - heading "Student-First" [level=3] [ref=e107]
+              - paragraph [ref=e108]: Your success is our success. We provide support at every step.
+            - generic [ref=e109]:
+              - img [ref=e111]
+              - heading "Excellence" [level=3] [ref=e114]
+              - paragraph [ref=e115]: Industry-recognized training that employers actually want.
+            - generic [ref=e116]:
+              - img [ref=e118]
+              - heading "Community" [level=3] [ref=e120]
+              - paragraph [ref=e121]: We believe in second chances and the power of community.
+        - generic [ref=e123]:
+          - heading "Our Credentials" [level=2] [ref=e124]
+          - generic [ref=e125]:
+            - generic [ref=e126]:
+              - img [ref=e127]
+              - generic [ref=e129]: DOL Registered
+              - generic [ref=e130]: Apprenticeship Sponsor
+            - generic [ref=e131]:
+              - img [ref=e132]
+              - generic [ref=e135]: WIOA Approved
+              - generic [ref=e136]: Training Provider
+            - generic [ref=e137]:
+              - img [ref=e138]
+              - generic [ref=e141]: State Certified
+              - generic [ref=e142]: Indiana DWD & DOE
+            - generic [ref=e143]:
+              - img [ref=e144]
+              - generic [ref=e146]: JRI Approved
+              - generic [ref=e147]: Justice Programs
+        - generic [ref=e149]:
+          - heading "Ready to Start Your Journey?" [level=2] [ref=e150]
+          - paragraph [ref=e151]: Training is 100% free for eligible Indiana residents.
+          - generic [ref=e152]:
+            - link "Explore Programs" [ref=e153] [cursor=pointer]:
+              - /url: /programs
+            - link "Apply Now" [ref=e154] [cursor=pointer]:
+              - /url: /apply
+              - text: Apply Now
+              - img [ref=e155]
+    - generic [ref=e159]:
+      - generic [ref=e161]:
+        - button [ref=e163] [cursor=pointer]:
+          - img [ref=e165]
+        - generic [ref=e169]:
+          - generic [ref=e170]: Elevate Guide
+          - button [ref=e171] [cursor=pointer]:
+            - img [ref=e172]
+      - generic [ref=e178]:
+        - generic [ref=e179]:
+          - img [ref=e180]
+          - generic [ref=e182]:
+            - paragraph [ref=e183]: Elevate Guide
+            - paragraph [ref=e184]: Ask me anything!
+        - button [ref=e186] [cursor=pointer]:
+          - img [ref=e187]
+    - contentinfo [ref=e190]:
+      - generic [ref=e192]:
+        - generic [ref=e193]:
+          - heading "Programs" [level=3] [ref=e194]
+          - list [ref=e195]:
+            - listitem [ref=e196]:
+              - link "All Programs" [ref=e197] [cursor=pointer]:
+                - /url: /programs
+            - listitem [ref=e198]:
+              - link "Healthcare" [ref=e199] [cursor=pointer]:
+                - /url: /programs#healthcare
+            - listitem [ref=e200]:
+              - link "Skilled Trades" [ref=e201] [cursor=pointer]:
+                - /url: /programs#skilled-trades
+            - listitem [ref=e202]:
+              - link "Technology" [ref=e203] [cursor=pointer]:
+                - /url: /programs#technology
+            - listitem [ref=e204]:
+              - link "Business" [ref=e205] [cursor=pointer]:
+                - /url: /programs#business
+            - listitem [ref=e206]:
+              - link "Apprenticeships" [ref=e207] [cursor=pointer]:
+                - /url: /programs#apprenticeships
+        - generic [ref=e208]:
+          - heading "Services" [level=3] [ref=e209]
+          - list [ref=e210]:
+            - listitem [ref=e211]:
+              - link "Career Services" [ref=e212] [cursor=pointer]:
+                - /url: /career-services
+            - listitem [ref=e213]:
+              - link "VITA Tax Prep" [ref=e214] [cursor=pointer]:
+                - /url: /vita
+            - listitem [ref=e215]:
+              - link "Drug Testing" [ref=e216] [cursor=pointer]:
+                - /url: /drug-testing
+            - listitem [ref=e217]:
+              - link "Certifications" [ref=e218] [cursor=pointer]:
+                - /url: /certifications
+            - listitem [ref=e219]:
+              - link "Mentorship" [ref=e220] [cursor=pointer]:
+                - /url: /mentorship
+            - listitem [ref=e221]:
+              - link "Training Providers" [ref=e222] [cursor=pointer]:
+                - /url: /training-providers
+            - listitem [ref=e223]:
+              - link "Volunteer" [ref=e224] [cursor=pointer]:
+                - /url: /volunteer
+        - generic [ref=e225]:
+          - heading "Store" [level=3] [ref=e226]
+          - list [ref=e227]:
+            - listitem [ref=e228]:
+              - link "Store Home" [ref=e229] [cursor=pointer]:
+                - /url: /store
+            - listitem [ref=e230]:
+              - link "Platform Licenses" [ref=e231] [cursor=pointer]:
+                - /url: /store/licenses
+            - listitem [ref=e232]:
+              - link "AI Tools & Apps" [ref=e233] [cursor=pointer]:
+                - /url: /store/apps
+            - listitem [ref=e234]:
+              - link "Digital Resources" [ref=e235] [cursor=pointer]:
+                - /url: /store/digital
+            - listitem [ref=e236]:
+              - link "Courses" [ref=e237] [cursor=pointer]:
+                - /url: /store/courses
+        - generic [ref=e238]:
+          - heading "Get Started" [level=3] [ref=e239]
+          - list [ref=e240]:
+            - listitem [ref=e241]:
+              - link "Apply Now" [ref=e242] [cursor=pointer]:
+                - /url: /apply
+            - listitem [ref=e243]:
+              - link "How It Works" [ref=e244] [cursor=pointer]:
+                - /url: /how-it-works
+            - listitem [ref=e245]:
+              - link "WIOA Eligibility" [ref=e246] [cursor=pointer]:
+                - /url: /wioa-eligibility
+            - listitem [ref=e247]:
+              - link "Funding & Grants" [ref=e248] [cursor=pointer]:
+                - /url: /funding
+            - listitem [ref=e249]:
+              - link "Financial Aid" [ref=e250] [cursor=pointer]:
+                - /url: /financial-aid
+            - listitem [ref=e251]:
+              - link "Tuition & Fees" [ref=e252] [cursor=pointer]:
+                - /url: /tuition-fees
+            - listitem [ref=e253]:
+              - link "Outcomes" [ref=e254] [cursor=pointer]:
+                - /url: /outcomes
+            - listitem [ref=e255]:
+              - link "FAQ" [ref=e256] [cursor=pointer]:
+                - /url: /faq
+        - generic [ref=e257]:
+          - heading "For Employers" [level=3] [ref=e258]
+          - list [ref=e259]:
+            - listitem [ref=e260]:
+              - link "Employer Overview" [ref=e261] [cursor=pointer]:
+                - /url: /employer
+            - listitem [ref=e262]:
+              - link "Hire Graduates" [ref=e263] [cursor=pointer]:
+                - /url: /hire-graduates
+            - listitem [ref=e264]:
+              - link "Partner With Us" [ref=e265] [cursor=pointer]:
+                - /url: /partner-with-us
+            - listitem [ref=e266]:
+              - link "Partners" [ref=e267] [cursor=pointer]:
+                - /url: /partners
+            - listitem [ref=e268]:
+              - link "OJT & Funding" [ref=e269] [cursor=pointer]:
+                - /url: /ojt-and-funding
+            - listitem [ref=e270]:
+              - link "Workforce Board" [ref=e271] [cursor=pointer]:
+                - /url: /workforce-board
+            - listitem [ref=e272]:
+              - link "Workforce Partners" [ref=e273] [cursor=pointer]:
+                - /url: /workforce-partners
+            - listitem [ref=e274]:
+              - link "Government" [ref=e275] [cursor=pointer]:
+                - /url: /government
+        - generic [ref=e276]:
+          - heading "Company" [level=3] [ref=e277]
+          - list [ref=e278]:
+            - listitem [ref=e279]:
+              - link "About Us" [ref=e280] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e281]:
+              - link "Contact" [ref=e282] [cursor=pointer]:
+                - /url: /contact
+            - listitem [ref=e283]:
+              - link "Team" [ref=e284] [cursor=pointer]:
+                - /url: /team
+            - listitem [ref=e285]:
+              - link "Founder" [ref=e286] [cursor=pointer]:
+                - /url: /founder
+            - listitem [ref=e287]:
+              - link "Careers" [ref=e288] [cursor=pointer]:
+                - /url: /careers
+            - listitem [ref=e289]:
+              - link "Locations" [ref=e290] [cursor=pointer]:
+                - /url: /locations
+            - listitem [ref=e291]:
+              - link "Donate" [ref=e292] [cursor=pointer]:
+                - /url: /donate
+            - listitem [ref=e293]:
+              - link "Impact" [ref=e294] [cursor=pointer]:
+                - /url: /impact
+            - listitem [ref=e295]:
+              - link "Success Stories" [ref=e296] [cursor=pointer]:
+                - /url: /success-stories
+            - listitem [ref=e297]:
+              - link "Transparency" [ref=e298] [cursor=pointer]:
+                - /url: /transparency
+            - listitem [ref=e299]:
+              - link "Accreditation" [ref=e300] [cursor=pointer]:
+                - /url: /accreditation
+        - generic [ref=e301]:
+          - heading "Resources" [level=3] [ref=e302]
+          - list [ref=e303]:
+            - listitem [ref=e304]:
+              - link "Blog" [ref=e305] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=e306]:
+              - link "News" [ref=e307] [cursor=pointer]:
+                - /url: /news
+            - listitem [ref=e308]:
+              - link "Events" [ref=e309] [cursor=pointer]:
+                - /url: /events
+            - listitem [ref=e310]:
+              - link "Webinars" [ref=e311] [cursor=pointer]:
+                - /url: /webinars
+            - listitem [ref=e312]:
+              - link "Support" [ref=e313] [cursor=pointer]:
+                - /url: /support
+            - listitem [ref=e314]:
+              - link "Help Center" [ref=e315] [cursor=pointer]:
+                - /url: /help
+            - listitem [ref=e316]:
+              - link "Community" [ref=e317] [cursor=pointer]:
+                - /url: /community
+            - listitem [ref=e318]:
+              - link "Alumni" [ref=e319] [cursor=pointer]:
+                - /url: /alumni
+            - listitem [ref=e320]:
+              - link "Forums" [ref=e321] [cursor=pointer]:
+                - /url: /forums
+        - generic [ref=e322]:
+          - heading "Portals" [level=3] [ref=e323]
+          - list [ref=e324]:
+            - listitem [ref=e325]:
+              - link "Student LMS" [ref=e326] [cursor=pointer]:
+                - /url: /lms
+            - listitem [ref=e327]:
+              - link "Student Portal" [ref=e328] [cursor=pointer]:
+                - /url: /student-portal
+            - listitem [ref=e329]:
+              - link "Employer Portal" [ref=e330] [cursor=pointer]:
+                - /url: /employer-portal
+            - listitem [ref=e331]:
+              - link "Partner Portal" [ref=e332] [cursor=pointer]:
+                - /url: /partner-portal
+            - listitem [ref=e333]:
+              - link "Staff Portal" [ref=e334] [cursor=pointer]:
+                - /url: /staff-portal
+            - listitem [ref=e335]:
+              - link "Instructor Portal" [ref=e336] [cursor=pointer]:
+                - /url: /instructor
+        - generic [ref=e337]:
+          - heading "Governance" [level=3] [ref=e338]
+          - list [ref=e339]:
+            - listitem [ref=e340]:
+              - link "Governance Hub" [ref=e341] [cursor=pointer]:
+                - /url: /governance
+            - listitem [ref=e342]:
+              - link "Security & Data Protection" [ref=e343] [cursor=pointer]:
+                - /url: /governance/security
+            - listitem [ref=e344]:
+              - link "Compliance & Disclosures" [ref=e345] [cursor=pointer]:
+                - /url: /governance/compliance
+            - listitem [ref=e346]:
+              - link "Authoritative Documents" [ref=e347] [cursor=pointer]:
+                - /url: /governance/authoritative-docs
+            - listitem [ref=e348]:
+              - link "Operational Controls" [ref=e349] [cursor=pointer]:
+                - /url: /governance/operational-controls
+            - listitem [ref=e350]:
+              - link "Governance Contact" [ref=e351] [cursor=pointer]:
+                - /url: /governance/contact
+        - generic [ref=e352]:
+          - heading "Legal" [level=3] [ref=e353]
+          - list [ref=e354]:
+            - listitem [ref=e355]:
+              - link "Privacy Policy" [ref=e356] [cursor=pointer]:
+                - /url: /privacy-policy
+            - listitem [ref=e357]:
+              - link "Terms of Service" [ref=e358] [cursor=pointer]:
+                - /url: /terms-of-service
+            - listitem [ref=e359]:
+              - link "Refund Policy" [ref=e360] [cursor=pointer]:
+                - /url: /refund-policy
+            - listitem [ref=e361]:
+              - link "Accessibility" [ref=e362] [cursor=pointer]:
+                - /url: /accessibility
+            - listitem [ref=e363]:
+              - link "Disclosures" [ref=e364] [cursor=pointer]:
+                - /url: /disclosures
+            - listitem [ref=e365]:
+              - link "All Policies" [ref=e366] [cursor=pointer]:
+                - /url: /policies
+            - listitem [ref=e367]:
+              - link "Equal Opportunity" [ref=e368] [cursor=pointer]:
+                - /url: /equal-opportunity
+            - listitem [ref=e369]:
+              - link "Site Map" [ref=e370] [cursor=pointer]:
+                - /url: /site-map
+      - generic [ref=e373]:
+        - generic [ref=e374]:
+          - img "Elevate" [ref=e375]
+          - generic [ref=e376]: © 2026 Elevate for Humanity
+        - generic [ref=e377]:
+          - link "Privacy" [ref=e378] [cursor=pointer]:
+            - /url: /privacy-policy
+          - link "Terms" [ref=e379] [cursor=pointer]:
+            - /url: /terms-of-service
+    - button "Open chat" [ref=e380] [cursor=pointer]:
+      - img [ref=e381]
+  - generic [ref=e386]:
+    - generic [ref=e388]:
+      - img [ref=e390]
+      - generic [ref=e392]:
+        - heading "We Value Your Privacy" [level=3] [ref=e393]
+        - paragraph [ref=e394]:
+          - text: We use cookies to enhance your experience, analyze site traffic, and provide personalized content. By clicking "Accept All", you consent to our use of cookies.
+          - link "Learn more" [ref=e395] [cursor=pointer]:
+            - /url: /privacy-policy
+    - generic [ref=e396]:
+      - button "Reject all cookies" [ref=e397] [cursor=pointer]: Reject
+      - button "Accept all cookies" [ref=e398] [cursor=pointer]: Accept
+      - button "Close cookie consent banner" [ref=e399] [cursor=pointer]:
+        - img [ref=e400]
+  - generic:
+    - generic [ref=e405]:
+      - generic [ref=e406]:
+        - generic [ref=e407]:
+          - navigation [ref=e408]:
+            - button "previous" [disabled] [ref=e409]:
+              - img "previous" [ref=e410]
+            - generic [ref=e412]:
+              - generic [ref=e413]: 1/
+              - text: "1"
+            - button "next" [disabled] [ref=e414]:
+              - img "next" [ref=e415]
+          - img
+        - generic [ref=e417]:
+          - link "Next.js 16.1.1 (stale) Turbopack" [ref=e418] [cursor=pointer]:
+            - /url: https://nextjs.org/docs/messages/version-staleness
+            - img [ref=e419]
+            - generic "There is a newer version (16.1.4) available, upgrade recommended!" [ref=e421]: Next.js 16.1.1 (stale)
+            - generic [ref=e422]: Turbopack
+          - img
+      - dialog "Build Error" [ref=e424]:
+        - generic [ref=e427]:
+          - generic [ref=e428]:
+            - generic [ref=e429]:
+              - generic [ref=e431]: Build Error
+              - generic [ref=e432]:
+                - button "Copy Error Info" [ref=e433] [cursor=pointer]:
+                  - img [ref=e434]
+                - button "No related documentation found" [disabled] [ref=e436]:
+                  - img [ref=e437]
+                - button "Attach Node.js inspector" [ref=e439] [cursor=pointer]:
+                  - img [ref=e440]
+            - generic [ref=e449]: Parsing ecmascript source code failed
+          - generic [ref=e451]:
+            - generic [ref=e453]:
+              - img [ref=e455]
+              - generic [ref=e458]: ./app/programs/page.tsx (72:3)
+              - button "Open in editor" [ref=e459] [cursor=pointer]:
+                - img [ref=e461]
+            - generic [ref=e464]:
+              - generic [ref=e465]: Parsing ecmascript source code failed
+              - generic [ref=e466]: 70 |
+              - generic [ref=e467]: "]"
+              - text: ","
+              - generic [ref=e468]: 71 |
+              - generic [ref=e469]: "}"
+              - text: ", >"
+              - generic [ref=e470]: 72 |
+              - generic [ref=e471]: "{"
+              - generic [ref=e472]: "|"
+              - text: ^
+              - generic [ref=e473]: 73 |
+              - generic [ref=e474]: title
+              - text: ":"
+              - generic [ref=e475]: "'CDL & Transportation'"
+              - text: ","
+              - generic [ref=e476]: 74 |
+              - generic [ref=e477]: description
+              - text: ":"
+              - generic [ref=e478]: "'Get your Commercial Driver\\'s License and start earning quickly. CDL drivers are in high demand nationwide with starting salaries of $50,000-$80,000+. Our program includes classroom instruction, behind-the-wheel training, and job placement assistance with local and national carriers.'"
+              - text: ","
+              - generic [ref=e479]: 75 |
+              - generic [ref=e480]: href
+              - text: ": '/programs/cdl-transportation',"
+              - generic [ref=e481]: "Unexpected token `{`. Expected identifier, string literal, numeric literal or [ for the computed key"
+        - generic [ref=e482]: "1"
+        - generic [ref=e483]: "2"
+    - generic [ref=e488] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e489]:
+        - img [ref=e490]
+      - button "Open issues overlay" [ref=e494]:
+        - generic [ref=e495]:
+          - generic [ref=e496]: "0"
+          - generic [ref=e497]: "1"
+        - generic [ref=e498]: Issue
+  - alert [ref=e499]
+```

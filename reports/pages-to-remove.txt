@@ -1,0 +1,17 @@
+# PAGES TO REMOVE (no value, duplicates, experiments)
+app/admin/autopilots/page.tsx
+app/admin/course-generator/page.tsx
+app/admin/course-studio-ai/page.tsx
+app/admin/course-studio-simple/page.tsx
+app/admin/course-studio/page.tsx
+app/admin/dashboard-enhanced/page.tsx
+app/admin/dev-studio/page.tsx
+app/admin/live-chat/page.tsx
+app/admin/master-dashboard/page.tsx
+app/admin/media-studio/page.tsx
+app/admin/portal-map/page.tsx
+app/admin/test-emails/page.tsx
+app/admin/test-webhook/page.tsx
+app/admin/video-generator/page.tsx
+app/admin/video-studio/page.tsx
+app/admin/voice-studio/page.tsx

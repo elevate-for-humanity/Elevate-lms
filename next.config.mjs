@@ -12,7 +12,6 @@ const nextConfig = {
     'pdfkit',
     'pdf-lib',
     'jspdf',
-    'jspdf-autotable',
     '@react-pdf/renderer',
     '@aws-sdk/client-s3',
     '@aws-sdk/s3-request-presigner',
@@ -21,7 +20,6 @@ const nextConfig = {
     'stripe',
     'ioredis',
     'redis',
-    '@upstash/redis',
     'socket.io',
     'socket.io-client',
     '@sendgrid/mail',
@@ -31,16 +29,10 @@ const nextConfig = {
     '@sentry/core',
     '@opentelemetry/api',
     '@opentelemetry/sdk-node',
-    '@opentelemetry/exporter-trace-otlp-http',
-    '@opentelemetry/resources',
-    '@opentelemetry/semantic-conventions',
     'puppeteer',
     'puppeteer-core',
     'playwright',
     'chromium-bidi',
-    'jsdom',
-    'typescript',
-    'core-js',
   ],
 
   // Disable dev indicators (static route indicator, build indicator)
@@ -126,6 +118,7 @@ const nextConfig = {
       'react-hot-toast',
       'date-fns',
       'framer-motion',
+      '@stripe/stripe-js',
       'zod',
       'react-hook-form',
       '@hookform/resolvers',
@@ -213,16 +206,8 @@ const nextConfig = {
   // See: https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
   outputFileTracingExcludes: {
     '/api/accreditation/report': ['**/*'],
-    // Exclude heavy/unnecessary files from ALL routes to reduce Lambda size
+    // Exclude heavy test/browser packages from ALL routes to reduce Lambda size
     '*': [
-      // Generated assets — served by CDN, not the server handler
-      'public/generated/**',
-      'public/generated/videos/**',
-      'public/generated/lessons/**',
-      'public/generated-images/**',
-      // Test reports — dev artifacts
-      'reports/**',
-      // Browser automation — not used at runtime
       '**/node_modules/playwright/**',
       '**/node_modules/puppeteer/**',
       '**/node_modules/@playwright/**',
@@ -231,43 +216,6 @@ const nextConfig = {
       '**/node_modules/**/chromium/**',
       '**/node_modules/@sparticuz/**',
       '**/node_modules/chrome-aws-lambda/**',
-      // TypeScript compiler — dev only
-      '**/node_modules/typescript/**',
-      // Sharp native binaries — externalized via serverExternalPackages
-      '**/node_modules/@img/sharp-libvips-*/**',
-      '**/node_modules/@img/sharp-linux-*/**',
-      '**/node_modules/@img/sharp-darwin-*/**',
-      '**/node_modules/@img/sharp-win32-*/**',
-      // Heavy PDF libraries — externalized
-      '**/node_modules/jspdf/dist/**',
-      '**/node_modules/pdfkit/js/**',
-      '**/node_modules/pdf-parse/lib/**',
-      // jsdom — pulled in by tests, not needed at runtime
-      '**/node_modules/jsdom/**',
-      // core-js — polyfills not needed in Node 20
-      '**/node_modules/core-js/**',
-      // Dev/audit artifacts — not needed at runtime
-      'audit-packet/**',
-      'playwright-report/**',
-      'lighthouse-*.json',
-      'lighthouse-report.json',
-      'lighthouse-final.json',
-      'lighthouse-prod.json',
-      'lighthouse-prod2.json',
-      'package-lock.json',
-      // @apm-js-collab — large WASM/JS bundle
-      '**/node_modules/@apm-js-collab/**',
-      '**/node_modules/.pnpm/@apm-js-collab*/**',
-      // pdf-lib — externalized
-      '**/node_modules/pdf-lib/**',
-      '**/node_modules/.pnpm/pdf-lib*/**',
-      // Source .tsx/.ts files — not needed at runtime in the handler
-      'app/**/*.tsx',
-      'app/**/*.ts',
-      'components/**/*.tsx',
-      'components/**/*.ts',
-      'lib/**/*.ts',
-      'lib/**/*.tsx',
     ],
   },
 

@@ -1,0 +1,236 @@
+{
+  "timestamp": "2026-01-20T10:30:30.624Z",
+  "summary": {
+    "totalMedia": 129,
+    "validMedia": 123,
+    "brokenMedia": 6
+  },
+  "brokenMedia": [
+    {
+      "url": "/videos/program-hero.mp4",
+      "status": "missing"
+    },
+    {
+      "url": "/videos/hero-video-segment-with-narration.mp4",
+      "status": "missing"
+    },
+    {
+      "url": "/videos/elevate-overview-with-narration.mp4",
+      "status": "missing"
+    },
+    {
+      "url": "/videos/voiceover.mp3?v=4",
+      "status": "missing"
+    },
+    {
+      "url": "/videos/homepage-hero-new.mp4",
+      "status": "missing"
+    },
+    {
+      "url": "/videos/voiceover.mp3",
+      "status": "missing"
+    }
+  ],
+  "validMedia": [
+    {
+      "url": "/images/artlist/hero-training-1.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/artlist/hero-training-3.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/business/collaboration-1.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/hero/hero-main-welcome.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/hero/hero-hands-on-training.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/facilities-new/facility-1.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/facilities-new/facility-3.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/hero/admin-hero.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/artlist/hero-training-5.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/artlist/hero-training-7.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/artlist/hero-training-2.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/artlist/hero-training-6.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/artlist/hero-training-8.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/artlist/hero-training-4.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/videos/hero-home.mp4",
+      "status": "valid"
+    },
+    {
+      "url": "/images/heroes/workforce-partner-1.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/icons/book.png",
+      "status": "valid"
+    },
+    {
+      "url": "/images/icons/users.png",
+      "status": "valid"
+    },
+    {
+      "url": "/images/icons/clock.png",
+      "status": "valid"
+    },
+    {
+      "url": "/images/icons/check-circle.png",
+      "status": "valid"
+    },
+    {
+      "url": "/images/heroes/contact-hero.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/programs/cpr-group-training-hd.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/programs/efh-business-startup-marketing-hero.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/hero/hero-career-services.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/videos/career-services-hero.mp4",
+      "status": "valid"
+    },
+    {
+      "url": "/images/efh/sections/staffing.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/efh/sections/coaching.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/certificates-hero.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/hero/hero-certifications.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/testimonials/student-marcus.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/hero/hero-community.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/healthcare/hero-programs-healthcare.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/programs/cpr-certification-group-hd.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/team/elizabeth-greene.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/heroes/lms-analytics.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/heroes/success-story-3.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/heroes/success-story-4.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/success-new/success-1.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/programs-new/program-7.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/programs-new/program-9.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/heroes/cash-bills.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/funding/infographic-wioa-process.png",
+      "status": "valid"
+    },
+    {
+      "url": "/images/programs-new/program-11.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/programs-new/program-13.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/students-new/student-5.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/heroes/community.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/employers/partnership-office-meeting.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/heroes/homepage.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/images/stories/success-banner.jpg",
+      "status": "valid"
+    },
+    {
+      "url": "/videos/getting-started-hero.mp4",
+      "status": "valid"
+    }
+  ]
+}

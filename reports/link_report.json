@@ -1,0 +1,212 @@
+{
+  "timestamp": "2026-01-28T20:58:18.504Z",
+  "summary": {
+    "totalLinks": 831,
+    "validLinks": 831,
+    "brokenLinks": 0,
+    "dynamicSkipped": 0
+  },
+  "brokenLinks": [],
+  "validLinks": [
+    {
+      "link": "/",
+      "status": "valid"
+    },
+    {
+      "link": "/api/auth/signout",
+      "status": "valid"
+    },
+    {
+      "link": "/programs",
+      "status": "valid"
+    },
+    {
+      "link": "/how-it-works",
+      "status": "valid"
+    },
+    {
+      "link": "/career-services",
+      "status": "valid"
+    },
+    {
+      "link": "/apply",
+      "status": "valid"
+    },
+    {
+      "link": "/partner/attendance/record",
+      "status": "valid"
+    },
+    {
+      "link": "/partner/students",
+      "status": "valid"
+    },
+    {
+      "link": "/partner/reports",
+      "status": "valid"
+    },
+    {
+      "link": "/employers",
+      "status": "valid"
+    },
+    {
+      "link": "/drug-testing",
+      "status": "valid"
+    },
+    {
+      "link": "/contact",
+      "status": "valid"
+    },
+    {
+      "link": "/careers",
+      "status": "valid"
+    },
+    {
+      "link": "/student/support",
+      "status": "valid"
+    },
+    {
+      "link": "/student-handbook",
+      "status": "valid"
+    },
+    {
+      "link": "/support/contact",
+      "status": "valid"
+    },
+    {
+      "link": "/auth/login",
+      "status": "valid"
+    },
+    {
+      "link": "/pricing",
+      "status": "valid"
+    },
+    {
+      "link": "/account",
+      "status": "valid"
+    },
+    {
+      "link": "/store/licenses",
+      "status": "valid"
+    },
+    {
+      "link": "/account/settings",
+      "status": "valid"
+    },
+    {
+      "link": "/learner/dashboard",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/accreditation/report",
+      "status": "valid"
+    },
+    {
+      "link": "/compliance",
+      "status": "valid"
+    },
+    {
+      "link": "/syllabi",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/accreditation",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/affiliates",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/affiliates/new",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/dashboard",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/students",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/enrollments",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/programs",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/reports",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/applications",
+      "status": "valid"
+    },
+    {
+      "link": "/admin",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/autopilots",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/workflows",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/copilot",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/campaigns",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/campaigns/new",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/cash-advances/pending",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/cash-advances/reports",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/cash-advances/settings",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/cash-advances",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/certifications/bulk",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/compliance",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/course-builder",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/course-builder/new",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/crm/appointments",
+      "status": "valid"
+    },
+    {
+      "link": "/admin/crm/appointments/new",
+      "status": "valid"
+    }
+  ]
+}

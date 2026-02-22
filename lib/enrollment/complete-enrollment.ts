@@ -51,7 +51,7 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
 
     // Step 3: Check if already enrolled
     const { data: existing } = await supabase
-      .from('program_enrollments')
+      .from('training_enrollments')
       .select('id')
       .eq('user_id', data.userId)
       .eq('course_id', data.courseId)
@@ -64,7 +64,7 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
     // Step 4: Check prerequisites (if any)
     if (course.prerequisites && course.prerequisites.length > 0) {
       const { data: completedCourses } = await supabase
-        .from('program_enrollments')
+        .from('training_enrollments')
         .select('course_id')
         .eq('user_id', data.userId)
         .eq('status', 'completed')
@@ -75,15 +75,15 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
       }
     }
 
-    // Step 5: Create enrollment record
+    // Step 5: Create training enrollment — instant course access
     const { data: enrollment, error: enrollError } = await supabase
-      .from('program_enrollments')
+      .from('training_enrollments')
       .insert({
         user_id: data.userId,
         course_id: data.courseId,
         status: 'active',
         progress: 0,
-        started_at: new Date().toISOString(),
+        enrolled_at: new Date().toISOString(),
       })
       .select('id')
       .single();
@@ -157,15 +157,14 @@ export async function verifyCourseAccess(userId: string, courseId: string): Prom
   const supabase = await createClient();
 
   const { data: enrollment } = await supabase
-    .from('program_enrollments')
-    .select('status, end_date')
+    .from('training_enrollments')
+    .select('status')
     .eq('user_id', userId)
     .eq('course_id', courseId)
     .single();
 
   if (!enrollment) return false;
-  if (enrollment.status !== 'active') return false;
-  if (enrollment.end_date && new Date(enrollment.end_date) < new Date()) return false;
+  if (enrollment.status !== 'active' && enrollment.status !== 'completed') return false;
 
   return true;
 }

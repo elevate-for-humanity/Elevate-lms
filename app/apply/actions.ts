@@ -148,19 +148,17 @@ async function createStudentAccount(
       .maybeSingle();
     const programId = programRow?.id || courseId || null;
 
-    // Link user to application — keep status 'pending' until onboarding is complete
+    // Link user to application — auto-approved for instant LMS access
     await supabase
       .from('applications')
       .update({
-        status: 'pending',
+        status: 'approved',
         user_id: userId,
         program_id: programId,
       })
       .eq('id', applicationId);
 
-    // Create program_enrollments record in 'onboarding' state.
-    // Student must complete: profile → agreements → documents → orientation
-    // Only after all steps → admin reviews → status becomes 'approved' → 'enrolled'
+    // Create program_enrollments record — active immediately
     try {
       await supabase
         .from('program_enrollments')
@@ -171,16 +169,43 @@ async function createStudentAccount(
           full_name: `${firstName} ${lastName}`,
           amount_paid_cents: 0,
           funding_source: 'pending',
-          status: 'pending',
-          enrollment_state: 'onboarding',
-          next_required_action: 'COMPLETE_PROFILE',
+          status: 'active',
+          enrollment_state: 'enrolled',
         });
     } catch (enrollErr) {
-      // Non-fatal — admin can create enrollment manually
       logger.error('Failed to create program_enrollment record', enrollErr as Error);
     }
 
-    logger.info('Student account created — pending onboarding', { applicationId, userId, email: normalizedEmail });
+    // Auto-enroll in all courses for this program — instant LMS access
+    if (programId) {
+      try {
+        const { data: courses } = await supabase
+          .from('training_courses')
+          .select('id')
+          .eq('program_id', programId)
+          .eq('is_active', true);
+
+        if (courses && courses.length > 0) {
+          const courseEnrollments = courses.map((c: { id: string }) => ({
+            user_id: userId,
+            course_id: c.id,
+            status: 'active',
+            progress: 0,
+            enrolled_at: new Date().toISOString(),
+          }));
+
+          await supabase
+            .from('training_enrollments')
+            .upsert(courseEnrollments, { onConflict: 'user_id,course_id', ignoreDuplicates: true });
+
+          logger.info('Auto-enrolled in courses', { userId, courseCount: courses.length });
+        }
+      } catch (courseErr) {
+        logger.error('Failed to auto-enroll in courses', courseErr as Error);
+      }
+    }
+
+    logger.info('Student account created — instant LMS access', { applicationId, userId, email: normalizedEmail });
     return { userId, accountCreated: true };
   } catch (err) {
     logger.error('Account creation failed', err as Error);
@@ -398,7 +423,7 @@ export async function submitStudentApplication(data: StudentApplicationData) {
   });
 
   if (result.success) {
-    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/apply/success?role=student&ref=${result.referenceNumber}` };
+    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/lms/dashboard?welcome=true` };
   }
   return result;
 }

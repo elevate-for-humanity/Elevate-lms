@@ -29,7 +29,9 @@ interface Assignment { id: string; title: string; course_title: string; due_date
 interface Certificate { id: string; title: string; issued_at: string; }
 interface Profile { id: string; full_name: string | null; }
 
-export default async function LMSPage() {
+export default async function LMSPage({ searchParams }: { searchParams: Promise<{ welcome?: string }> }) {
+  const params = await searchParams;
+  const isNewUser = params?.welcome === 'true';
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
   if (!supabase) { redirect("/login"); }
@@ -102,6 +104,16 @@ export default async function LMSPage() {
           <Breadcrumbs items={[{ label: 'LMS' }]} />
         </div>
       </div>
+
+      {/* Welcome Banner for new enrollees */}
+      {isNewUser && (
+        <div className="bg-green-600 text-white px-4 py-3">
+          <div className="max-w-6xl mx-auto flex items-center gap-3">
+            <span className="text-lg">Welcome to Elevate LMS!</span>
+            <span className="text-green-100">Your courses are ready. Start learning below.</span>
+          </div>
+        </div>
+      )}
 
       {/* Avatar Guide */}
       <AvatarVideoOverlay videoSrc="/videos/avatars/ai-tutor.mp4" avatarName="AI Tutor" position="bottom-right" autoPlay={true} showOnLoad={true} />

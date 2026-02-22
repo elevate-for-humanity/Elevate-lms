@@ -29,6 +29,7 @@ export async function POST(
     const userClient = await createClient();
     const admin = createAdminClient();
     const supabase = admin || userClient; // admin bypasses RLS recursion
+    const db = supabase;
 
     // Get lesson to find course_id
     const { data: lesson, error: lessonError } = await db

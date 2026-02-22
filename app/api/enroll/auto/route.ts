@@ -113,7 +113,7 @@ export async function POST(req: Request) {
         last_name: lastName,
         phone: phone ?? null,
         role: 'student',
-        enrollment_status: 'pending', // Requires approval before portal access
+        enrollment_status: 'active', // Instant LMS access on enrollment
       });
 
       if (profileError) {
@@ -147,7 +147,7 @@ export async function POST(req: Request) {
         .upsert({
           user_id: userId,
           program_id: program.id,
-          status: 'pending',
+          status: 'active',
           payment_status: 'waived',
         }, {
           onConflict: 'user_id,program_id',

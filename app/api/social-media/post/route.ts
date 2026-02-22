@@ -288,7 +288,7 @@ async function postToFacebook(data: any) {
       const error = await response.json();
       return {
         success: false,
-        error: `Facebook API error: ${JSON.stringify(error)}`,
+        error: 'Facebook API request failed',
       };
     }
 
@@ -368,7 +368,7 @@ async function postToInstagram(data: any) {
 
     if (!containerResponse.ok) {
       const error = await containerResponse.json();
-      return { success: false, error: `Instagram API error: ${JSON.stringify(error)}` };
+      return { success: false, error: 'Instagram API request failed' };
     }
 
     const container = await containerResponse.json();
@@ -388,7 +388,7 @@ async function postToInstagram(data: any) {
 
     if (!publishResponse.ok) {
       const error = await publishResponse.json();
-      return { success: false, error: `Instagram publish error: ${JSON.stringify(error)}` };
+      return { success: false, error: 'Instagram publish request failed' };
     }
 
     const result = await publishResponse.json();
@@ -488,7 +488,7 @@ async function postToTwitter(data: any) {
 
     if (!tweetResponse.ok) {
       const error = await tweetResponse.json();
-      return { success: false, error: `Twitter API error: ${JSON.stringify(error)}` };
+      return { success: false, error: 'Twitter API request failed' };
     }
 
     const result = await tweetResponse.json();

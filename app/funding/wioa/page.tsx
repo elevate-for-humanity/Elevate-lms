@@ -44,7 +44,7 @@ export default async function WioaPage() {
       {/* Hero Section - Image Only */}
       <section className="relative h-[400px] overflow-hidden">
         <Image
-          src="/images/heroes/success-story-4.jpg"
+          src="/images/heroes-hq/funding-hero.jpg"
           alt="WIOA Success Story"
           fill
           className="object-cover"

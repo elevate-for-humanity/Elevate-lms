@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function TransparencyPage() {
   const outcomes = [
     { label: 'Programs Available', value: '10+', image: '/images/community/community-hero.jpg' },
-    { label: 'Placement Goal', value: '85%', image: '/images/heroes/success-story-5.jpg' },
+    { label: 'Placement Goal', value: '85%', image: '/images/heroes-hq/success-hero.jpg' },
     { label: 'Training Cost', value: '$0', image: '/images/heroes-hq/funding-hero.jpg' },
     { label: 'Support', value: '24/7', image: '/images/heroes/blog-post-10.jpg' },
     { label: 'Funding Sources', value: '5+', image: '/images/heroes-hq/how-it-works-hero.jpg' },

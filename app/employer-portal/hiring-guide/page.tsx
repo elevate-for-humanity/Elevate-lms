@@ -23,7 +23,7 @@ const steps = [
     number: 2,
     title: 'Review Candidates',
     description: 'Browse pre-screened candidates with verified WOTC eligibility. Each profile shows certifications, skills, and potential tax credits.',
-    image: '/images/heroes/success-story-2.jpg',
+    image: '/images/heroes-hq/employer-hero.jpg',
     tips: ['Check WOTC eligibility status', 'Review completed certifications', 'Look at work history'],
   },
   {
@@ -70,7 +70,7 @@ export default function HiringGuidePage() {
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Hiring Guide" }]} />
 <div className="relative h-80 bg-brand-blue-800">
         <Image
-          src="/images/heroes/success-story-2.jpg"
+          src="/images/heroes-hq/employer-hero.jpg"
           alt="Hiring guide"
           fill
           className="object-cover opacity-20"

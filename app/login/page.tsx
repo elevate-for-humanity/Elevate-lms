@@ -89,7 +89,7 @@ function LoginForm() {
       {/* Hero Banner */}
       <section className="relative h-[200px] w-full overflow-hidden">
         <Image
-          src="/images/heroes/success-story-5.jpg"
+          src="/images/heroes-hq/success-hero.jpg"
           alt="Elevate for Humanity login"
           fill
           className="object-cover"

@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
       {/* Hero Banner */}
       <section className="relative h-[180px] w-full overflow-hidden">
         <Image
-          src="/images/heroes/success-story-3.jpg"
+          src="/images/heroes-hq/success-hero.jpg"
           alt="Forgot password"
           fill
           className="object-cover"

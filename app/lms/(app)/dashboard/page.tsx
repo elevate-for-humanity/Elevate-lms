@@ -428,7 +428,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="Certification Exam"
                     description="Schedule your final exam"
                     href="/lms/certification"
-                    image="/images/heroes/success-story-1.jpg"
+                    image="/images/heroes-hq/success-stories-hero.jpg"
                     badge="Ready"
                   />
                 )}

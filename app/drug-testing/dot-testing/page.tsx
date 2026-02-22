@@ -304,7 +304,7 @@ export default function DotTestingPage() {
             </div>
             <div className="relative h-[350px] rounded-2xl overflow-hidden">
               <Image
-                src="/images/heroes/success-story-1.jpg"
+                src="/images/heroes-hq/success-stories-hero.jpg"
                 alt="DOT Random Testing Consortium"
                 fill
                 className="object-cover"

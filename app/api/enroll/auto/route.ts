@@ -184,6 +184,31 @@ export async function POST(req: Request) {
       }
     }
 
+    // STEP 5b: Create training_enrollments so student can access course content
+    try {
+      const { data: programCourses } = await supabase
+        .from('program_courses')
+        .select('course_id')
+        .eq('program_id', program.id);
+
+      if (programCourses && programCourses.length > 0) {
+        for (const pc of programCourses) {
+          await supabase
+            .from('training_enrollments')
+            .upsert({
+              user_id: userId,
+              course_id: pc.course_id,
+              status: 'active',
+              progress: 0,
+              enrolled_at: new Date().toISOString(),
+            }, { onConflict: 'user_id,course_id' });
+        }
+        logger.info('Created training_enrollments', { userId, courseCount: programCourses.length });
+      }
+    } catch (bridgeErr) {
+      logger.warn('training_enrollments bridge failed (non-fatal)', bridgeErr);
+    }
+
     // STEP 6: Create application record
     const { data: application } = await supabase
       .from('applications')

@@ -37,7 +37,7 @@ export default async function LaunchCourse({ params }: { params: Params }) {
   if (!user) redirect('/login');
 
   const { data: course, error } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select(
       'id, slug, title, delivery_mode, partner_url, launch_mode, allow_iframe'
     )

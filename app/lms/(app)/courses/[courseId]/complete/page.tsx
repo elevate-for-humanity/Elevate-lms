@@ -38,7 +38,7 @@ export default async function CompleteCourse({ params }: { params: Params }) {
   if (!user) redirect('/login');
 
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('id, title, delivery_mode')
     .eq('id', courseId)
     .single();

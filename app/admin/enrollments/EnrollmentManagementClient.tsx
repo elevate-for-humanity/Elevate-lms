@@ -91,7 +91,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
       if (editingEnrollment) {
         // UPDATE existing enrollment
         const { data, error: updateError } = await supabase
-          .from('enrollments')
+          .from('training_enrollments')
           .update({
             status: formData.status,
             progress: parseInt(formData.progress) || 0,
@@ -109,7 +109,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
         // CREATE new enrollment
         // Check if already enrolled
         const { data: existing } = await supabase
-          .from('enrollments')
+          .from('training_enrollments')
           .select('id')
           .eq('user_id', formData.user_id)
           .eq('course_id', formData.course_id)
@@ -122,16 +122,15 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
         }
 
         const { data, error: insertError } = await supabase
-          .from('enrollments')
+          .from('training_enrollments')
           .insert({
             user_id: formData.user_id,
             course_id: formData.course_id,
             status: formData.status,
             progress: parseInt(formData.progress) || 0,
-            at_risk: formData.at_risk,
             enrolled_at: new Date().toISOString(),
           })
-          .select('*, student:profiles!enrollments_user_id_fkey(id, full_name, email), course:courses(id, title)')
+          .select('*, student:profiles(id, full_name, email), course:training_courses(id, title)')
           .single();
 
         if (insertError) throw insertError;
@@ -163,7 +162,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
       }
 
       const { error: deleteError } = await supabase
-        .from('enrollments')
+        .from('training_enrollments')
         .delete()
         .eq('id', enrollmentId);
 
@@ -179,7 +178,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
   const toggleAtRisk = async (enrollment: Enrollment) => {
     try {
       const { error: updateError } = await supabase
-        .from('enrollments')
+        .from('training_enrollments')
         .update({ at_risk: !enrollment.at_risk, updated_at: new Date().toISOString() })
         .eq('id', enrollment.id);
 
@@ -193,7 +192,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
   const markComplete = async (enrollment: Enrollment) => {
     try {
       const { error: updateError } = await supabase
-        .from('enrollments')
+        .from('training_enrollments')
         .update({ 
           status: 'completed', 
           progress: 100,

@@ -81,7 +81,7 @@ export default async function CertificationPage() {
 
   // Get available certifications
   const { data: availableCerts } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('id, title, certification_name, certification_body')
     .not('certification_name', 'is', null)
     .eq('is_active', true)

@@ -29,7 +29,7 @@ export async function POST(
 
     // Get lesson to find course_id
     const { data: lesson, error: lessonError } = await supabase
-      .from('lessons')
+      .from('training_lessons')
       .select('id, course_id, title')
       .eq('id', lessonId)
       .single();
@@ -40,7 +40,7 @@ export async function POST(
 
     // Check if user is enrolled in the course
     const { data: enrollment } = await supabase
-      .from('enrollments')
+      .from('training_enrollments')
       .select('id, status')
       .eq('user_id', user.id)
       .eq('course_id', lesson.course_id)
@@ -83,7 +83,7 @@ export async function POST(
 
     // Get updated course progress
     const { data: allLessons } = await supabase
-      .from('lessons')
+      .from('training_lessons')
       .select('id')
       .eq('course_id', lesson.course_id);
 
@@ -110,7 +110,7 @@ export async function POST(
     if (rpcError) {
       // Fallback: try direct update if RPC doesn't exist
       await supabase
-        .from('enrollments')
+        .from('training_enrollments')
         .update({ progress: progressPercent, updated_at: new Date().toISOString() })
         .eq('user_id', user.id)
         .eq('course_id', lesson.course_id);
@@ -124,7 +124,7 @@ export async function POST(
     if (courseCompleted) {
       // Fetch actual course title (lesson.title is the lesson name, not the course)
       const { data: course } = await supabase
-        .from('courses')
+        .from('training_courses')
         .select('title')
         .eq('id', lesson.course_id)
         .single();
@@ -202,7 +202,7 @@ export async function DELETE(
 
     // Recalculate enrollment progress (same logic as POST handler)
     const { data: lessonRow } = await supabase
-      .from('lessons')
+      .from('training_lessons')
       .select('course_id')
       .eq('id', lessonId)
       .single();
@@ -211,7 +211,7 @@ export async function DELETE(
       const courseId = lessonRow.course_id;
 
       const { data: allLessons } = await supabase
-        .from('lessons')
+        .from('training_lessons')
         .select('id')
         .eq('course_id', courseId);
 
@@ -239,7 +239,7 @@ export async function DELETE(
       if (rpcError) {
         // Fallback: direct update
         await supabase
-          .from('enrollments')
+          .from('training_enrollments')
           .update({ progress: progressPercent, updated_at: new Date().toISOString() })
           .eq('user_id', user.id)
           .eq('course_id', courseId);

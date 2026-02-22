@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('title')
     .eq('id', courseId)
     .single();
@@ -62,7 +62,7 @@ export default async function CourseEnrollPage({ params }: Props) {
 
   // Fetch course details
   const { data: course, error } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('id', courseId)
     .single();
@@ -92,7 +92,7 @@ export default async function CourseEnrollPage({ params }: Props) {
 
   // Get lesson count
   const { count: lessonCount } = await supabase
-    .from('lessons')
+    .from('training_lessons')
     .select('*', { count: 'exact', head: true })
     .eq('course_id', courseId);
 

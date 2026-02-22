@@ -39,7 +39,7 @@ export async function generateMetadata({
   }
 
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('course_name, description')
     .eq('id', courseId)
     .single();
@@ -88,7 +88,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   // Fetch the course
   const { data: course, error } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('id', courseId)
     .single();
@@ -107,7 +107,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   // Fetch lessons
   const { data: lessons } = await supabase
-    .from('lessons')
+    .from('training_lessons')
     .select('*')
     .eq('course_id', courseId)
     .order('order_index', { ascending: true });

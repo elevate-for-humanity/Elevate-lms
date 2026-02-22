@@ -48,21 +48,21 @@ export default function LessonPage() {
 
     // Fetch current lesson
     const { data: lessonData } = await supabase
-      .from('lessons')
+      .from('training_lessons')
       .select('*')
       .eq('id', lessonId)
       .single();
 
     // Fetch all lessons for this course
     const { data: lessonsData } = await supabase
-      .from('lessons')
+      .from('training_lessons')
       .select('*')
       .eq('course_id', courseId)
       .order('order_index');
 
     // Fetch course info
     const { data: courseData } = await supabase
-      .from('courses')
+      .from('training_courses')
       .select('*')
       .eq('id', courseId)
       .single();

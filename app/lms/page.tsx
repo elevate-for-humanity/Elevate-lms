@@ -38,10 +38,10 @@ export default async function LMSPage() {
   const typedProfile = profile as Profile | null;
 
   const { data: courseEnrollments } = await supabase
-    .from('enrollments')
-    .select(`id, progress, status, enrolled_at, last_accessed, course:courses(id, title, description, thumbnail_url, duration_hours, lesson_count)`)
+    .from('training_enrollments')
+    .select(`id, progress, status, enrolled_at, last_accessed, course:training_courses(id, title, description, thumbnail_url, duration_hours, lesson_count)`)
     .eq('user_id', user.id)
-    .order('last_accessed', { ascending: false });
+    .order('enrolled_at', { ascending: false });
 
   const { data: programEnrollments } = await supabase
     .from('program_enrollments')
@@ -61,7 +61,7 @@ export default async function LMSPage() {
 
   const { data: recentActivity } = await supabase
     .from('lesson_progress')
-    .select(`id, completed_at, lesson:lessons(title, course_id)`)
+    .select(`id, completed_at, lesson:training_lessons(title, course_id)`)
     .eq('user_id', user.id)
     .order('completed_at', { ascending: false })
     .limit(5);

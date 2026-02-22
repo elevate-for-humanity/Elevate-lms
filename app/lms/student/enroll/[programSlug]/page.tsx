@@ -36,7 +36,7 @@ export default async function EnrollProgramPage({ params }: Props) {
 
   // Try to find the course/program
   const { data: course } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('*')
     .eq('slug', programSlug)
     .single();

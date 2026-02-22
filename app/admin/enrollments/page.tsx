@@ -24,7 +24,7 @@ export default async function AdminEnrollmentsPage() {
 
   // Fetch enrollments with student and course details
   const { data: enrollments } = await supabase
-    .from('enrollments')
+    .from('training_enrollments')
     .select(`
       *,
       student:profiles!enrollments_user_id_fkey(id, full_name, email),
@@ -40,7 +40,7 @@ export default async function AdminEnrollmentsPage() {
 
   // Fetch courses for dropdown
   const { data: courses } = await supabase
-    .from('courses')
+    .from('training_courses')
     .select('id, title')
     .eq('is_published', true)
     .order('title');

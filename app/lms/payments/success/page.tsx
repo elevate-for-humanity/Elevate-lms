@@ -86,7 +86,7 @@ export default function PaymentSuccessPage() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    supabase.from('courses').select('*').limit(50)
+    supabase.from('training_courses').select('*').limit(50)
       .then(({ data }) => { if (data) setDbRows(data); });
   }, []);
 

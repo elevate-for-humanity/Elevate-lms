@@ -192,7 +192,37 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // STEP 2.5: Create apprentice record (for hour logging and tracking)
+    // STEP 2.5a: Create training_enrollments so student can access course content
+    if (enrollment.program_id) {
+      try {
+        const { data: programCourses } = await supabase
+          .from('program_courses')
+          .select('course_id')
+          .eq('program_id', enrollment.program_id);
+
+        if (programCourses && programCourses.length > 0) {
+          for (const pc of programCourses) {
+            await supabase
+              .from('training_enrollments')
+              .upsert({
+                user_id: enrollment.user_id,
+                course_id: pc.course_id,
+                status: 'active',
+                progress: 0,
+                enrolled_at: new Date().toISOString(),
+              }, { onConflict: 'user_id,course_id' });
+          }
+          logger.info('Created training_enrollments on approval', {
+            userId: enrollment.user_id,
+            courseCount: programCourses.length,
+          });
+        }
+      } catch (bridgeErr) {
+        logger.warn('training_enrollments bridge failed (non-fatal)', bridgeErr);
+      }
+    }
+
+    // STEP 2.5b: Create apprentice record (for hour logging and tracking)
     // Check if apprentice record already exists
     const { data: existingApprentice } = await supabase
       .from('apprentices')

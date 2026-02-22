@@ -13,15 +13,21 @@ const footerLinks = {
   about: [
     { name: 'About Elevate', href: '/about' },
     { name: 'Our Mission', href: '/mission' },
+    { name: 'Our Team', href: '/team' },
     { name: 'How It Works', href: '/how-it-works' },
     { name: 'Indiana Outcomes', href: '/outcomes/indiana' },
+    { name: 'Impact', href: '/impact' },
+    { name: 'Press', href: '/press' },
     { name: 'Contact', href: '/contact' },
   ],
   programs: [
     { name: 'Training Programs', href: '/programs' },
+    { name: 'Certifications', href: '/training/certifications' },
     { name: 'Career Pathways', href: '/how-it-works' },
     { name: 'Apprenticeships', href: '/programs/barber-apprenticeship' },
+    { name: 'Career Services', href: '/career-counseling' },
     { name: 'Employer Partnerships', href: '/employer' },
+    { name: 'Partner Directory', href: '/directory' },
   ],
   platform: [
     { name: 'Platform Overview', href: '/store' },
@@ -36,12 +42,16 @@ const footerLinks = {
     { name: 'Data Privacy', href: '/governance/data' },
     { name: 'Accessibility', href: '/accessibility' },
     { name: 'Security', href: '/governance/security' },
+    { name: 'Transparency', href: '/transparency' },
     { name: 'Verify Credentials', href: '/verify' },
   ],
   access: [
     { name: 'Student Portal', href: '/login' },
     { name: 'Partner Portal', href: '/partner/login' },
+    { name: 'Partnerships', href: '/partnerships' },
     { name: 'Support', href: '/support' },
+    { name: 'FAQ', href: '/faq' },
+    { name: 'Site Map', href: '/site-map' },
   ],
   legal: [
     { name: 'Terms of Service', href: '/terms-of-service' },
@@ -145,6 +155,13 @@ export default function ServerFooter() {
               </p>
             </div>
             
+            {/* Contact */}
+            <div className="flex flex-wrap items-center justify-center gap-4 text-slate-400 text-sm mb-4">
+              <a href="tel:+13173143757" className="hover:text-white">(317) 314-3757</a>
+              <span className="text-slate-700">|</span>
+              <a href="mailto:info@elevateforhumanity.org" className="hover:text-white">info@elevateforhumanity.org</a>
+            </div>
+
             {/* Authority Badges */}
             <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
               {[

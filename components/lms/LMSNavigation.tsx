@@ -19,6 +19,8 @@ import {
   Calendar,
   MessageSquare,
   Settings,
+  TrendingUp,
+  ClipboardCheck,
 } from 'lucide-react';
 
 interface LMSNavigationProps {
@@ -71,6 +73,8 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
   const navItems = [
     { href: '/lms/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/lms/courses', label: 'My Courses', icon: BookOpen, badge: courseCount > 0 ? courseCount : undefined },
+    { href: '/lms/progress', label: 'Progress', icon: TrendingUp },
+    { href: '/lms/quizzes', label: 'Quizzes', icon: ClipboardCheck },
     { href: '/lms/schedule', label: 'Schedule', icon: Calendar },
     { href: '/lms/messages', label: 'Messages', icon: MessageSquare, badge: unreadMessages > 0 ? unreadMessages : undefined },
     { href: '/lms/certificates', label: 'Certificates', icon: Award },

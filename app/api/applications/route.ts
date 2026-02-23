@@ -221,6 +221,7 @@ export async function POST(req: Request) {
 
     // Send email notifications — direct call, no self-fetch
     try {
+      logger.info('[Applications] Sending confirmation email', { to: body.email, ref: referenceNumber });
       // Confirmation email to applicant
       const studentEmailResult = await sendEmail({
         to: body.email,
@@ -260,8 +261,10 @@ export async function POST(req: Request) {
         `,
       });
 
-      if (!studentEmailResult.success) {
-        logger.error('Failed to send student confirmation email', { error: studentEmailResult.error, email: body.email });
+      if (studentEmailResult.success) {
+        logger.info('[Applications] Student email sent', { to: body.email, id: studentEmailResult.data?.id });
+      } else {
+        logger.error('[Applications] Student email FAILED', { error: studentEmailResult.error, to: body.email });
       }
 
       // Notification email to staff
@@ -284,11 +287,13 @@ export async function POST(req: Request) {
         `,
       });
 
-      if (!staffEmailResult.success) {
-        logger.error('Failed to send staff notification email', { error: staffEmailResult.error });
+      if (staffEmailResult.success) {
+        logger.info('[Applications] Staff email sent', { id: staffEmailResult.data?.id });
+      } else {
+        logger.error('[Applications] Staff email FAILED', { error: staffEmailResult.error });
       }
     } catch (emailError) {
-      logger.error('Email send failed', emailError instanceof Error ? emailError : undefined);
+      logger.error('[Applications] Email send threw exception', emailError instanceof Error ? emailError : undefined);
     }
 
     return NextResponse.json(

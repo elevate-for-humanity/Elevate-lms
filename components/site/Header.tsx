@@ -42,7 +42,7 @@ export const NAV_ITEMS = [
     href: '/about',
     subItems: [
       { name: 'About Elevate', href: '/about' },
-      { name: 'Our Team', href: '/team' },
+      { name: 'Our Team', href: '/about/team' },
       { name: 'Our Mission', href: '/mission' },
       { name: 'How It Works', href: '/how-it-works' },
       { name: 'Success Stories', href: '/testimonials' },
@@ -56,7 +56,7 @@ export const NAV_ITEMS = [
     href: '/platform',
     subItems: [
       { name: 'Platform Overview', href: '/platform' },
-      { name: 'License the Platform', href: '/platform/licensing' },
+      { name: 'License the Platform', href: '/store/licensing' },
       { name: 'Compliance & Security', href: '/compliance' },
       { name: 'Demos', href: '/store/demos' },
       { name: 'Add-Ons & Tools', href: '/store/add-ons' },
@@ -79,7 +79,7 @@ export const NAV_ITEMS = [
     name: 'Support', 
     href: '/support',
     subItems: [
-      { name: 'Help Center', href: '/help' },
+      { name: 'Help Center', href: '/support/help' },
       { name: 'Contact Us', href: '/contact' },
       { name: 'FAQ', href: '/faq' },
       { name: 'Schedule & Calendar', href: '/academic-calendar' },

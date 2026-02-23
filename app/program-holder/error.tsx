@@ -24,8 +24,13 @@ export default function Error({
           Something went wrong
         </h1>
         <p className="text-black mb-6">
-          {error.message || 'An unexpected error occurred. Please try again.'}
+          An unexpected error occurred. Please try again.
         </p>
+        {error.message && process.env.NODE_ENV === 'development' && (
+          <pre className="text-xs text-left bg-red-50 p-3 rounded mb-4 overflow-auto">
+            <code>{error.message}</code>
+          </pre>
+        )}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={reset}

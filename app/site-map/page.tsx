@@ -21,11 +21,9 @@ const sitemapSections = [
       { name: 'Healthcare', href: '/programs/healthcare' },
       { name: 'CNA Training', href: '/programs/cna' },
       { name: 'Skilled Trades', href: '/programs/skilled-trades' },
-      { name: 'CDL Transportation', href: '/programs/cdl-transportation' },
-      { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
+      { name: 'CDL Training', href: '/programs/cdl-training' },
       { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
       { name: 'Cosmetology', href: '/programs/cosmetology-apprenticeship' },
-      { name: 'Business & Finance', href: '/programs/business-financial' },
       { name: 'Tax Preparation', href: '/programs/tax-preparation' },
       { name: 'Technology', href: '/programs/technology' },
       { name: 'Apprenticeships', href: '/programs/apprenticeships' },
@@ -46,7 +44,6 @@ const sitemapSections = [
     title: 'Rise Foundation',
     links: [
       { name: 'Rise Foundation Home', href: '/rise-foundation' },
-      { name: 'About Rise Foundation', href: '/rise-foundation/about' },
       { name: 'Programs', href: '/rise-foundation/programs' },
       { name: 'Trauma Recovery', href: '/rise-foundation/trauma-recovery' },
       { name: 'Addiction Rehabilitation', href: '/rise-foundation/addiction-rehabilitation' },
@@ -60,15 +57,13 @@ const sitemapSections = [
     title: 'For Students',
     links: [
       { name: 'Apply Now', href: '/apply' },
-      { name: 'Quick Application', href: '/apply/quick' },
       { name: 'Student Application', href: '/apply/student' },
       { name: 'WIOA Eligibility', href: '/wioa-eligibility' },
       { name: 'Funding Options', href: '/funding' },
       { name: 'Financial Aid', href: '/financial-aid' },
-      { name: 'Student Portal', href: '/lms/dashboard' },
+      { name: 'Student Portal', href: '/student-portal' },
       { name: 'Course Catalog', href: '/courses' },
       { name: 'Career Services', href: '/career-services' },
-      { name: 'Success Stories', href: '/success-stories' },
       { name: 'Student Handbook', href: '/student-handbook' },
     ],
   },
@@ -88,23 +83,17 @@ const sitemapSections = [
     title: 'Platform & LMS',
     links: [
       { name: 'Platform Overview', href: '/platform' },
-      { name: 'LMS Dashboard', href: '/lms' },
       { name: 'Course Catalog', href: '/courses' },
-      { name: 'AI Studio', href: '/ai-studio' },
       { name: 'Community Hub', href: '/community' },
-      { name: 'Marketplace', href: '/marketplace' },
-      { name: 'Platform Demo', href: '/store/demo' },
-      { name: 'Admin Demo', href: '/store/demo/admin' },
+      { name: 'Store Demos', href: '/store/demos' },
     ],
   },
   {
     title: 'Store & Licensing',
     links: [
       { name: 'Store', href: '/store' },
-      { name: 'Pricing', href: '/pricing' },
-      { name: 'Licenses', href: '/store/licenses' },
-      { name: 'Platform Demo', href: '/store/demo' },
-      { name: 'White Label', href: '/white-label' },
+      { name: 'Licensing', href: '/store/licensing' },
+      { name: 'License Pricing', href: '/license/pricing' },
       { name: 'Franchise', href: '/franchise' },
     ],
   },
@@ -136,12 +125,10 @@ const sitemapSections = [
   {
     title: 'Partners',
     links: [
-      { name: 'Partners Overview', href: '/partners' },
       { name: 'Training Providers', href: '/partners/training-provider' },
-      { name: 'Workforce Partners', href: '/partners/workforce' },
-      { name: 'Technology Partners', href: '/partners/technology' },
-      { name: 'Reentry Partners', href: '/partners/reentry' },
-      { name: 'Join as Partner', href: '/partners/join' },
+      { name: 'Partner Portal', href: '/partners/portal' },
+      { name: 'Workforce Partners', href: '/workforce-partners' },
+      { name: 'Partner Application', href: '/partner/apply' },
     ],
   },
   {
@@ -149,7 +136,7 @@ const sitemapSections = [
     links: [
       { name: 'FAQ', href: '/faq' },
       /* Blog hidden until posts are published */
-      { name: 'Help Center', href: '/help' },
+      { name: 'Help Center', href: '/support/help' },
       { name: 'Calendar', href: '/calendar' },
       { name: 'Events', href: '/events' },
       { name: 'Webinars', href: '/webinars' },
@@ -170,11 +157,9 @@ const sitemapSections = [
   {
     title: 'Nonprofit',
     links: [
-      { name: 'Nonprofit Overview', href: '/nonprofit' },
       { name: 'Donate', href: '/donate' },
       { name: 'Philanthropy', href: '/philanthropy' },
-      { name: 'Mental Wellness', href: '/nonprofit/mental-wellness' },
-      { name: 'Workshops', href: '/nonprofit/workshops' },
+      { name: 'Rise Foundation', href: '/rise-foundation' },
     ],
   },
   {
@@ -193,12 +178,12 @@ const sitemapSections = [
   {
     title: 'Portals & Dashboards',
     links: [
-      { name: 'Student Portal', href: '/lms/dashboard' },
-      { name: 'Employer Portal', href: '/employer/dashboard' },
+      { name: 'Student Portal', href: '/student-portal' },
+      { name: 'Employer Portal', href: '/employer-portal' },
+      { name: 'Partner Portal', href: '/partner-portal' },
       { name: 'Admin Dashboard', href: '/admin/dashboard' },
-      { name: 'Program Holder Portal', href: '/program-holder/dashboard' },
       { name: 'Login', href: '/login' },
-      { name: 'Register', href: '/register' },
+      { name: 'Sign Up', href: '/signup' },
     ],
   },
 ];

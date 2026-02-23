@@ -51,7 +51,7 @@ export default async function CookiesPage() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Cookie Policy</h1>
           <p className="text-base md:text-lg text-slate-300">
-            Last Updated: January 1, 2026
+            Last Updated: February 22, 2026
           </p>
         </div>
       </section>

@@ -18,6 +18,7 @@ import {
   ClipboardList,
 CheckCircle, } from 'lucide-react';
 import { QuizSystem } from '@/components/lms/QuizSystem';
+import LessonPlayer from '@/components/lms/LessonPlayer';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 import { NoteTaking } from '@/components/NoteTaking';
 import DigitalBinder from '@/components/DigitalBinder';
@@ -398,45 +399,20 @@ export default function LessonPage() {
               passingScore={lesson.passing_score || 70}
             />
           </div>
-        ) : lesson.video_url && !lesson.video_url.endsWith('.mp3') ? (
-          <div className="bg-black aspect-video relative group">
-            <video
-              src={lesson.video_url}
-              controls
-              playsInline
-              controlsList="nodownload"
-              className="w-full h-full"
-              onEnded={() => {
+        ) : lesson.video_url ? (
+          <div className="max-w-4xl mx-auto p-4 md:p-8">
+            <LessonPlayer
+              videoUrl={lesson.video_url}
+              lessonTitle={lesson.title}
+              moduleTitle={course?.title}
+              transcript={lesson.transcript ?? null}
+              onComplete={() => {
                 if (!isCompleted) {
                   setIsCompleted(true);
+                  markComplete();
                 }
               }}
             />
-            <div className="absolute top-4 left-4 bg-slate-900/70 text-white px-3 py-2 rounded text-sm opacity-0 group-hover:opacity-100 transition">
-              Lesson {currentIndex + 1} of {lessons.length}
-            </div>
-          </div>
-        ) : lesson.video_url?.endsWith('.mp3') ? (
-          <div className="bg-gradient-to-br from-slate-900 to-slate-800 py-10 px-4">
-            <div className="max-w-2xl mx-auto text-center">
-              <div className="w-16 h-16 bg-brand-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-8 h-8 text-brand-blue-400" />
-              </div>
-              <h3 className="text-white text-lg font-semibold mb-2">
-                Lesson {currentIndex + 1} of {lessons.length}
-              </h3>
-              <p className="text-slate-400 text-sm mb-6">Listen to the audio lesson below</p>
-              <audio
-                src={lesson.video_url}
-                controls
-                className="w-full max-w-md mx-auto"
-                onEnded={() => {
-                  if (!isCompleted) {
-                    setIsCompleted(true);
-                  }
-                }}
-              />
-            </div>
           </div>
         ) : (
           /* Reading / text lesson — no video, show content directly */

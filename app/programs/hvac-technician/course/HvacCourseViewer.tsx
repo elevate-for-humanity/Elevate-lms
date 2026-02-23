@@ -52,14 +52,19 @@ const MODULE_FIRST_LESSON: Record<string, string> = {
   'hvac-16': '15d76752-0478-53f3-85c5-31c201cc9b09', // HVAC Resume Workshop
 };
 
+/** Public course detail page — no auth required */
+function courseUrl() {
+  return `/courses/${HVAC_COURSE_ID}`;
+}
+
+/** Direct lesson URL inside the LMS player (auth-gated, used after enrollment) */
 function lmsLessonUrl(lessonId: string) {
   return `/lms/courses/${HVAC_COURSE_ID}/lessons/${lessonId}`;
 }
 
-/** Login-aware URL: sends unauthenticated users to login with a return path */
-function loginThenLessonUrl(lessonId: string) {
-  const dest = lmsLessonUrl(lessonId);
-  return `/login?next=${encodeURIComponent(dest)}`;
+/** Public-safe lesson link: goes to the public course page with a lesson anchor */
+function publicLessonUrl(lessonId: string) {
+  return `/courses/${HVAC_COURSE_ID}#lesson-${lessonId}`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -139,7 +144,7 @@ function ModuleAccordion({
         <div className="flex items-center gap-2">
           {firstLessonId && (
             <Link
-              href={loginThenLessonUrl(firstLessonId)}
+              href={publicLessonUrl(firstLessonId)}
               onClick={(e) => e.stopPropagation()}
               className="hidden sm:inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-md bg-brand-blue-600 text-white hover:bg-brand-blue-700 transition-colors"
             >
@@ -165,7 +170,7 @@ function ModuleAccordion({
               <div key={lesson.id} className="relative">
                 {isPreviewable ? (
                   <Link
-                    href={loginThenLessonUrl(firstLessonId)}
+                    href={publicLessonUrl(firstLessonId)}
                     className="flex items-start gap-3 px-5 py-3 hover:bg-brand-blue-50 transition-colors group"
                   >
                     <Icon className="w-4 h-4 mt-0.5 text-brand-blue-500 flex-shrink-0" />
@@ -284,7 +289,7 @@ export default function HvacCourseViewer({
           {/* Primary CTAs */}
           <div className="mt-8 flex flex-wrap gap-4">
             <Link
-              href={loginThenLessonUrl(FIRST_LESSON_ID)}
+              href={courseUrl()}
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               <Play className="w-5 h-5" />
@@ -411,7 +416,7 @@ export default function HvacCourseViewer({
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
             <Link
-              href={loginThenLessonUrl(FIRST_LESSON_ID)}
+              href={courseUrl()}
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               <Play className="w-5 h-5" />

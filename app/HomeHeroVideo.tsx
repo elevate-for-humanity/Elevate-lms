@@ -8,6 +8,7 @@ export default function HomeHeroVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const voiceoverRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [voiceActive, setVoiceActive] = useState(false);
   const hasPlayedRef = useRef(false);
   const userInteractedRef = useRef(false);
@@ -61,6 +62,13 @@ export default function HomeHeroVideo() {
     return () => observer.disconnect();
   }, [playVoiceover]);
 
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !video.muted;
+    setIsMuted(video.muted);
+  };
+
   const toggleVoiceover = () => {
     const audio = voiceoverRef.current;
     if (!audio) return;
@@ -86,27 +94,40 @@ export default function HomeHeroVideo() {
       <audio ref={voiceoverRef} src="/audio/welcome-voiceover.mp3" preload="auto" onEnded={() => setVoiceActive(false)} />
 
       {isPlaying && (
-        <button
-          onClick={toggleVoiceover}
-          className={`absolute z-20 flex items-center gap-2 backdrop-blur-sm text-white rounded-full shadow-lg transition-all ${
-            voiceActive
-              ? 'bottom-4 right-4 px-4 py-2.5 bg-black/60 hover:bg-black/80'
-              : 'bottom-6 right-6 px-5 py-3 bg-brand-red-600 hover:bg-brand-red-700 animate-pulse'
-          }`}
-          aria-label={voiceActive ? 'Stop narration' : 'Play narration'}
-        >
-          {voiceActive ? (
-            <>
-              <span className="text-lg leading-none" aria-hidden="true">&#x1F50A;</span>
-              <span className="text-sm font-semibold hidden sm:inline">Narration On</span>
-            </>
-          ) : (
-            <>
-              <span className="text-lg leading-none" aria-hidden="true">&#x1F507;</span>
-              <span className="text-sm font-bold">Tap for Narration</span>
-            </>
-          )}
-        </button>
+        <>
+          {/* Unmute video button — bottom left */}
+          <button
+            onClick={toggleMute}
+            className="absolute z-20 bottom-4 left-4 flex items-center gap-2 backdrop-blur-sm text-white rounded-full shadow-lg px-4 py-2.5 bg-black/60 hover:bg-black/80 transition-all"
+            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+          >
+            <span className="text-lg leading-none" aria-hidden="true">{isMuted ? '\u{1F507}' : '\u{1F50A}'}</span>
+            <span className="text-sm font-semibold hidden sm:inline">{isMuted ? 'Unmute' : 'Muted'}</span>
+          </button>
+
+          {/* Narration button — bottom right */}
+          <button
+            onClick={toggleVoiceover}
+            className={`absolute z-20 flex items-center gap-2 backdrop-blur-sm text-white rounded-full shadow-lg transition-all ${
+              voiceActive
+                ? 'bottom-4 right-4 px-4 py-2.5 bg-black/60 hover:bg-black/80'
+                : 'bottom-4 right-4 px-4 py-2.5 bg-brand-red-600 hover:bg-brand-red-700'
+            }`}
+            aria-label={voiceActive ? 'Stop narration' : 'Play narration'}
+          >
+            {voiceActive ? (
+              <>
+                <span className="text-lg leading-none" aria-hidden="true">&#x1F3A4;</span>
+                <span className="text-sm font-semibold hidden sm:inline">Narration On</span>
+              </>
+            ) : (
+              <>
+                <span className="text-lg leading-none" aria-hidden="true">&#x1F3A4;</span>
+                <span className="text-sm font-semibold hidden sm:inline">Narration</span>
+              </>
+            )}
+          </button>
+        </>
       )}
     </div>
   );

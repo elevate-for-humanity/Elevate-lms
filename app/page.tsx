@@ -46,9 +46,14 @@ export default function HomePage() {
             <p className="text-lg sm:text-xl text-slate-300 mt-4 leading-relaxed max-w-2xl mx-auto">
               WIOA-funded career training in healthcare, skilled trades, CDL, and technology. Zero tuition for eligible Indiana residents.
             </p>
-            <p className="text-sm text-slate-400 mt-3 tracking-wide">
-              EPA Section 608 Certification Preparation &amp; Proctored Exam Access Available
-            </p>
+            <div className="flex flex-wrap justify-center gap-4 mt-6">
+              <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg text-lg transition-colors">
+                Apply Now — It&apos;s Free
+              </Link>
+              <Link href="/programs" className="border-2 border-white/30 text-white font-bold px-8 py-4 rounded-lg text-lg hover:bg-white/10 transition-colors">
+                Browse Programs
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -63,58 +68,25 @@ export default function HomePage() {
           <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
             Choose your path below. Each option takes you directly to the information you need — everything starts online.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              {
-                href: '/programs',
-                image: '/images/artlist/cropped/hero-training-3-square.webp',
-                alt: 'Students in a hands-on training session',
-                label: 'I want to train',
-                desc: 'Browse programs in healthcare, trades, CDL, and tech. See schedules, requirements, and how to enroll.',
-                cta: 'Browse Programs',
-              },
-              {
-                href: '/funding',
-                image: '/images/heroes-hq/funding-hero.webp',
-                alt: 'Workforce funding and financial aid',
-                label: 'I need funding',
-                desc: 'Many programs are available at no cost to eligible participants. Check eligibility for WIOA, Workforce Ready Grant, JRI, and other funding sources.',
-                cta: 'Check Eligibility',
-              },
-              {
-                href: '/employer',
-                image: '/images/business-vibrant.webp',
-                alt: 'Employer reviewing candidate profiles',
-                label: "I'm an employer",
-                desc: 'Hire credentialed graduates, access WOTC tax credits ($2,400-$9,600/hire depending on category), and get OJT wage reimbursements.',
-                cta: 'Hire Graduates',
-              },
-              {
-                href: '/store',
-                image: '/images/homepage/schools-nonprofits.webp',
-                alt: 'Training school using the Elevate platform',
-                label: 'I run a school',
-                desc: 'License the Elevate platform for your organization. White-label LMS with enrollment, compliance, and reporting.',
-                cta: 'Get Licensed',
-              },
+              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', icon: '🎓' },
+              { href: '/funding', label: 'I need funding', desc: 'Most programs are tuition-free. Check your eligibility.', cta: 'Check Eligibility', icon: '💰' },
+              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', icon: '🏢' },
+              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', icon: '🏫' },
             ].map((item) => (
-              <div
+              <Link
                 key={item.href}
-                className="flex flex-col items-center gap-3 p-5 bg-white rounded-xl shadow-sm border border-slate-200 text-center group"
+                href={item.href}
+                className="flex flex-col p-5 bg-white rounded-xl border-2 border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all group"
               >
-                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden">
-                  <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
-                </div>
-                <span className="font-semibold text-lg text-slate-900">{item.label}</span>
-                <span className="text-sm text-slate-500">{item.desc}</span>
-                <Link
-                  href={item.href}
-                  className="mt-2 inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-6 py-3 rounded-lg transition-colors w-full"
-                >
-                  {item.cta}
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-                </Link>
-              </div>
+                <span className="text-3xl mb-3">{item.icon}</span>
+                <span className="font-bold text-lg text-slate-900 mb-1">{item.label}</span>
+                <span className="text-sm text-slate-600 mb-4 flex-1">{item.desc}</span>
+                <span className="text-brand-red-600 font-semibold text-sm group-hover:underline">
+                  {item.cta} →
+                </span>
+              </Link>
             ))}
           </div>
         </div>
@@ -181,7 +153,7 @@ export default function HomePage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { title: 'Register', desc: 'Sign up at indianacareerconnect.com to determine funding eligibility.', href: '/funding', image: '/images/workforce-1.webp' },
+              { title: 'Apply Online', desc: 'Fill out a short application — takes about 5 minutes. No account needed.', href: '/apply/student', image: '/images/workforce-1.webp' },
               { title: 'Choose a Program', desc: 'Pick the career path that fits your goals and schedule.', href: '/programs', image: '/images/Content_PATHWAY_TRADES.webp' },
               { title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification.', href: '/how-it-works', image: '/images/workforce-2.webp' },
               { title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates.', href: '/career-services', image: '/images/workforce-3.webp' },
@@ -211,14 +183,6 @@ export default function HomePage() {
       <InView animation="fade-up">
       <section aria-label="Funding options" className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
-          <Image
-            src="/images/programs-hq/training-classroom.webp"
-            alt="Students in funded training programs"
-            width={1200}
-            height={800}
-            sizes="(max-width: 768px) 100vw, 960px"
-            className="w-full h-auto rounded-lg mb-10"
-          />
           <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Funding Available</p>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">100% Tuition-Free Programs</h2>
           <p className="text-lg text-slate-700 mb-8">
@@ -265,14 +229,6 @@ export default function HomePage() {
       <InView animation="fade-up">
       <section aria-label="Employer partnerships" className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
-          <Image
-            src="/images/efh-building-tech-hero.webp"
-            alt="Employer partners hiring trained graduates"
-            width={1200}
-            height={800}
-            sizes="(max-width: 768px) 100vw, 960px"
-            className="w-full h-auto rounded-lg mb-10"
-          />
           <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">For Employers</p>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Hire Our Skilled Graduates</h2>
           <p className="text-lg text-slate-700 mb-8">
@@ -355,22 +311,34 @@ export default function HomePage() {
       </section>
       </InView>
 
-      {/* ===== CREDENTIALS ===== */}
-      <section className="py-6 bg-white border-t border-slate-100">
+      {/* ===== TRUST BAR ===== */}
+      <section className="py-8 bg-slate-50 border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 mb-4">
+          <p className="text-center text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Recognized By</p>
+          <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 mb-6">
             {[
               { src: '/images/partners/usdol.webp', alt: 'U.S. Department of Labor' },
               { src: '/images/partners/dwd.webp', alt: 'Indiana DWD' },
               { src: '/images/partners/workone.webp', alt: 'WorkOne Indiana' },
               { src: '/images/partners/nextleveljobs.webp', alt: 'Next Level Jobs' },
             ].map((logo) => (
-              <Image key={logo.alt} src={logo.src} alt={logo.alt} width={80} height={32} className="object-contain h-6 w-auto opacity-60 hover:opacity-100 transition-opacity" />
+              <Image key={logo.alt} src={logo.src} alt={logo.alt} width={100} height={40} className="object-contain h-8 w-auto opacity-70 hover:opacity-100 transition-opacity" />
             ))}
           </div>
-          <p className="text-center text-[10px] leading-relaxed text-slate-400 max-w-4xl mx-auto">
-            501(c)(3) Nonprofit · ETPL Listed · WIOA Eligible Training Provider · Workforce Ready Grant Provider · JRI Approved · Rise Certified · Certiport Authorized Testing Center · EPA 608 Approved Testing Site · OSHA Safety Training · OSHA 10/30 · HSI Training Center · CareerSafe · Government Contractor · State Bidder · ITAP · UEI Registered · CAGE Code · Milady Authorized · Buy Black Certified · IRS Enrolled Agent (EFIN/PTIN) · Indiana PLA Licensed · NHA/ASCP Certified · Choice Medical CNA Partner · Barber License · Nail Technician License · Esthetician License · Nail Instructor License · Esthetician Instructor License · Cosmetology Instructor License · Substitute Teacher Certification · NRF Rise Up · Intuit QuickBooks Certified
-          </p>
+          <div className="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
+            {[
+              '501(c)(3) Nonprofit', 'ETPL Listed', 'WIOA Provider', 'Workforce Ready Grant',
+              'JRI Approved', 'Certiport Testing Center', 'EPA 608 Testing Site',
+              'OSHA 10/30', 'HSI Training Center', 'IRS Enrolled Agent',
+            ].map((badge) => (
+              <span key={badge} className="inline-block bg-white border border-slate-200 text-slate-600 text-[11px] font-medium px-2.5 py-1 rounded-full">
+                {badge}
+              </span>
+            ))}
+            <Link href="/credentials" className="inline-block text-brand-blue-600 text-[11px] font-semibold px-2.5 py-1 hover:underline">
+              View all credentials →
+            </Link>
+          </div>
         </div>
       </section>
     </main>

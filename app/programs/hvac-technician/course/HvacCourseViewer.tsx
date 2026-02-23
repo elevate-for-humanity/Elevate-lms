@@ -147,7 +147,7 @@ const MODULE_FIRST_LESSON: Record<string, string> = {
 };
 
 function lessonUrl(lessonId: string) {
-  return `/lms/courses/${HVAC_COURSE_ID}/lessons/${lessonId}`;
+  return `/courses/${HVAC_COURSE_ID}/lessons/${lessonId}`;
 }
 
 function lessonUrlById(definitionId: string) {

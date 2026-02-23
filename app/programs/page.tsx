@@ -521,7 +521,7 @@ export default async function ProgramsPage() {
                   <Link href={`/contact?subject=${encodeURIComponent(program.name)}`} className="inline-flex items-center gap-1 border border-slate-300 text-slate-600 text-xs font-semibold px-3 py-1.5 rounded-full hover:border-brand-blue-400 hover:text-brand-blue-600 transition-colors">
                     Inquiry
                   </Link>
-                  <Link href="/lms/courses" className="inline-flex items-center gap-1 border border-slate-300 text-slate-600 text-xs font-semibold px-3 py-1.5 rounded-full hover:border-brand-blue-400 hover:text-brand-blue-600 transition-colors">
+                  <Link href="/courses" className="inline-flex items-center gap-1 border border-slate-300 text-slate-600 text-xs font-semibold px-3 py-1.5 rounded-full hover:border-brand-blue-400 hover:text-brand-blue-600 transition-colors">
                     LMS Dashboard
                   </Link>
                 </div>

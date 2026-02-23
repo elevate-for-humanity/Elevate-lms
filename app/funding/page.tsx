@@ -116,7 +116,7 @@ export default function FundingPage() {
                     </div>
                   ))}
                 </div>
-                <Link href="/programs/jri" className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:underline">
+                <Link href="/funding/jri" className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:underline">
                   Learn about JRI <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>

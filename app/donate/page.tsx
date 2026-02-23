@@ -238,7 +238,7 @@ export default async function DonatePage() {
               <p className="text-gray-600 text-sm mb-4">
                 Become a sustaining donor with a recurring monthly gift.
               </p>
-              <Link href="/donate/monthly" className="text-teal-600 font-medium hover:underline">
+              <Link href="/donate#donate-form" className="text-teal-600 font-medium hover:underline">
                 Start Monthly
               </Link>
             </div>

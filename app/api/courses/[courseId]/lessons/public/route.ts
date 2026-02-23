@@ -25,7 +25,7 @@ export async function GET(
   // Fetch course
   const { data: course, error: courseErr } = await supabase
     .from('training_courses')
-    .select('id, title, description, course_name, is_active')
+    .select('id, course_name, description, is_active')
     .eq('id', courseId)
     .single();
 
@@ -36,7 +36,7 @@ export async function GET(
   // Fetch lessons via admin client (bypasses RLS)
   const { data: lessons, error: lessonsErr } = await supabase
     .from('lessons')
-    .select('id, course_id, title, content, video_url, lesson_number, order_index, duration_minutes, is_required, is_published, lesson_type')
+    .select('id, course_id, title, content, video_url, lesson_number, order_index, duration_minutes, is_required, is_published, content_type')
     .eq('course_id', courseId)
     .order('order_index');
 
@@ -44,5 +44,7 @@ export async function GET(
     return NextResponse.json({ error: 'Failed to load lessons' }, { status: 500 });
   }
 
-  return NextResponse.json({ course, lessons: lessons || [] });
+  // Normalize course_name → title for frontend compatibility
+  const normalizedCourse = { ...course, title: course.course_name };
+  return NextResponse.json({ course: normalizedCourse, lessons: lessons || [] });
 }

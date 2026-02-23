@@ -14,7 +14,7 @@ export function BarberDeliveryModel() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-48">
-                <Image src="/images/programs-hq/barber-training.jpg" alt="Barber classroom instruction" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src="/images/barber-highlight-1.jpg" alt="Barber classroom instruction" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-lg text-slate-900 mb-2">Related Technical Instruction (RTI)</h3>
@@ -23,7 +23,7 @@ export function BarberDeliveryModel() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-48">
-                <Image src="/images/barber/gallery-1.jpg" alt="Apprentice cutting hair in licensed barbershop" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src="/images/beauty/hero-program-barber.jpg" alt="Apprentice cutting hair in licensed barbershop" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-lg text-slate-900 mb-2">On-the-Job Training (OJT)</h3>
@@ -32,7 +32,7 @@ export function BarberDeliveryModel() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-48">
-                <Image src="/images/barber/gallery-2.jpg" alt="Barber apprentice progress tracking" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src="/images/beauty/program-barber-overview.jpg" alt="Barber apprentice progress tracking" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-lg text-slate-900 mb-2">Progress Tracking</h3>
@@ -41,7 +41,7 @@ export function BarberDeliveryModel() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-48">
-                <Image src="/images/barber/gallery-3.jpg" alt="Licensed barbershop training environment" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src="/images/barber-professional.jpg" alt="Licensed barbershop training environment" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-lg text-slate-900 mb-2">Program Oversight</h3>

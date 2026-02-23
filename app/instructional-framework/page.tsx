@@ -285,7 +285,7 @@ export default function InstructionalFrameworkPage() {
                     <ul className="space-y-1">
                       {tier.requirements.map((req, i) => (
                         <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
-                          <ClipboardCheck className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                          <ClipboardCheck className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                           {req}
                         </li>
                       ))}
@@ -372,7 +372,7 @@ export default function InstructionalFrameworkPage() {
                     <td className="p-3 text-gray-700 border-b">{r.programHolder}</td>
                     <td className="p-3 text-center text-brand-blue-700 font-medium border-b">{r.rtiHours}</td>
                     <td className="p-3 text-center border-b">
-                      <span className="text-xs font-medium text-green-700 bg-green-50 px-2 py-0.5 rounded">{r.mouStatus}</span>
+                      <span className="text-xs font-medium text-brand-green-700 bg-brand-green-50 px-2 py-0.5 rounded">{r.mouStatus}</span>
                     </td>
                     <td className="p-3 text-gray-700 border-b text-xs">{r.credentialIssued}</td>
                   </tr>
@@ -505,7 +505,7 @@ export default function InstructionalFrameworkPage() {
               {
                 type: 'Certificate of Completion',
                 issuer: 'Elevate for Humanity',
-                color: 'bg-green-50 border-green-200',
+                color: 'bg-brand-green-50 border-brand-green-200',
                 examples: 'Program completion certificates, module completion records, workforce readiness certificates, RTI hour documentation',
                 note: 'Documents that the student completed the Elevate training pathway. Does not replace industry credentials.',
               },

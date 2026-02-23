@@ -186,7 +186,7 @@ export default function ApprenticeshipStructurePage() {
                     <td className="p-2.5 text-gray-600 border-b">{p.issuer}</td>
                     <td className="p-2.5 text-center border-b">
                       {p.registered ? (
-                        <span className="text-green-700 font-semibold">Yes</span>
+                        <span className="text-brand-green-700 font-semibold">Yes</span>
                       ) : (
                         <span className="text-gray-400">—</span>
                       )}
@@ -231,9 +231,9 @@ export default function ApprenticeshipStructurePage() {
               </p>
             </div>
 
-            <div className="bg-green-50 border border-green-200 rounded-lg p-5 print:bg-white print:border-gray-300">
+            <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-5 print:bg-white print:border-gray-300">
               <div className="flex items-center gap-2 mb-2">
-                <FileCheck className="w-5 h-5 text-green-600 print:text-gray-700" />
+                <FileCheck className="w-5 h-5 text-brand-green-600 print:text-gray-700" />
                 <h3 className="font-bold text-gray-900">Completion Certificates</h3>
                 <span className="text-xs text-gray-500 ml-auto">Issued by: Elevate for Humanity</span>
               </div>
@@ -286,19 +286,19 @@ export default function ApprenticeshipStructurePage() {
               <div>
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">RTI Delivery Sources</p>
                 <ul className="space-y-1 text-sm text-gray-700">
-                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />Licensed/State-Approved Training Providers</li>
-                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />Credentialed Subject Matter Experts (supplemental)</li>
-                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />LMS Modules (structured, tracked)</li>
-                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />AI-Assisted Tutoring (academic support, not primary instruction)</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />Licensed/State-Approved Training Providers</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />Credentialed Subject Matter Experts (supplemental)</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />LMS Modules (structured, tracked)</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />AI-Assisted Tutoring (academic support, not primary instruction)</li>
                 </ul>
               </div>
               <div>
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">RTI Compliance Controls</p>
                 <ul className="space-y-1 text-sm text-gray-700">
-                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />Credential match: instructor license matches occupation</li>
-                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />Fixed RTI hour minimums per program</li>
-                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />MOU-governed partner relationships</li>
-                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />LMS as single system of record</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />Credential match: instructor license matches occupation</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />Fixed RTI hour minimums per program</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />MOU-governed partner relationships</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />LMS as single system of record</li>
                 </ul>
               </div>
             </div>
@@ -345,17 +345,17 @@ export default function ApprenticeshipStructurePage() {
             <div className="bg-slate-50 rounded-lg p-4 print:border print:bg-white">
               <p className="font-semibold text-gray-900 text-sm mb-2">Assessment Authority</p>
               <ul className="space-y-1 text-xs text-gray-700">
-                <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />RTI competencies → Credential Partner / Instructor</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />OJT competencies → Employer Supervisor</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />Final completion → Program Holder + Sponsor</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />RTI competencies → Credential Partner / Instructor</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />OJT competencies → Employer Supervisor</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />Final completion → Program Holder + Sponsor</li>
               </ul>
             </div>
             <div className="bg-slate-50 rounded-lg p-4 print:border print:bg-white">
               <p className="font-semibold text-gray-900 text-sm mb-2">Evaluation Checkpoints</p>
               <ul className="space-y-1 text-xs text-gray-700">
-                <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />30-day evaluation (initial progress)</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />Midpoint evaluation (competency milestone)</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />Final review (certification readiness)</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />30-day evaluation (initial progress)</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />Midpoint evaluation (competency milestone)</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />Final review (certification readiness)</li>
               </ul>
             </div>
           </div>

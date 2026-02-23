@@ -135,7 +135,7 @@ const CREDENTIAL_PARTNERS = (dbRows as any[]) || [];
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">MOU Status</p>
-                      <p className="text-sm text-green-700 font-medium flex items-center gap-1">
+                      <p className="text-sm text-brand-green-700 font-medium flex items-center gap-1">
                         <CheckCircle className="w-4 h-4" /> {partner.mouStatus}
                       </p>
                     </div>

@@ -301,7 +301,7 @@ export default function PathwaysPage() {
                   <div className="p-6 flex-1">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="text-xl font-bold text-gray-900">{p.name}</h3>
-                      <span className="text-sm bg-green-50 text-green-700 px-3 py-1 rounded-full font-semibold whitespace-nowrap ml-3">{p.funding}</span>
+                      <span className="text-sm bg-brand-green-50 text-brand-green-700 px-3 py-1 rounded-full font-semibold whitespace-nowrap ml-3">{p.funding}</span>
                     </div>
                     <p className="text-sm text-gray-700 mb-4">{p.desc}</p>
 

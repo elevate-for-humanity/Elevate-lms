@@ -227,19 +227,19 @@ export default function InstructorCredentialsPage() {
             </p>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span><strong>Credential match:</strong> Instructor license or certification must correspond to the occupation being taught</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span><strong>Field experience:</strong> Minimum years of documented professional experience in the occupation</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span><strong>MOU documentation:</strong> All credential partners and program holders operate under signed agreements with defined scope</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span><strong>Periodic review:</strong> Instructor credentials are verified annually and maintained in compliance files</span>
               </li>
             </ul>
@@ -283,7 +283,7 @@ export default function InstructorCredentialsPage() {
                     <ul className="space-y-1">
                       {prog.instructorRequirements.map((req, j) => (
                         <li key={j} className="text-sm text-gray-700 flex items-start gap-2">
-                          <ClipboardCheck className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                          <ClipboardCheck className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                           {req}
                         </li>
                       ))}

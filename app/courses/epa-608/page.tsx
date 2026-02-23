@@ -129,21 +129,21 @@ export default function EPA608CoursePage() {
             <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
               <h3 className="font-bold text-slate-900 mb-3">Exam Structure</h3>
               <ul className="space-y-2 text-sm text-slate-700">
-                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> <strong>Core</strong> — 25 questions (must score 70%+)</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> <strong>Type I</strong> — 25 questions (must score 70%+)</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> <strong>Type II</strong> — 25 questions (must score 70%+)</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> <strong>Type III</strong> — 25 questions (must score 70%+)</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> <strong>Core</strong> — 25 questions (must score 70%+)</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> <strong>Type I</strong> — 25 questions (must score 70%+)</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> <strong>Type II</strong> — 25 questions (must score 70%+)</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> <strong>Type III</strong> — 25 questions (must score 70%+)</li>
               </ul>
               <p className="text-sm text-slate-600 mt-3">Pass all four sections to earn your <strong>Universal</strong> certification.</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
               <h3 className="font-bold text-slate-900 mb-3">What You Should Know</h3>
               <ul className="space-y-2 text-sm text-slate-700">
-                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> Exam is proctored through an approved testing partner</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> Available online — no travel to a testing center required</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> Unlimited retesting at no additional cost</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> Certification does not expire</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" /> Recognized nationwide by all HVAC employers</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Exam is proctored through an approved testing partner</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Available online — no travel to a testing center required</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Unlimited retesting at no additional cost</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Certification does not expire</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Recognized nationwide by all HVAC employers</li>
               </ul>
             </div>
           </div>

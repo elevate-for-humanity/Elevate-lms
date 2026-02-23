@@ -145,27 +145,27 @@ export default function WorkforcePartnershipPacketPage() {
             </p>
             <div className="grid sm:grid-cols-2 gap-3 text-sm">
               <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">RTI via licensed credential partners (mapped hours)</span>
               </div>
               <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">OJT via approved employer partners</span>
               </div>
               <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">Competency-based assessment with mapped standards</span>
               </div>
               <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">LMS tracking for RTI hours, modules, and evaluations</span>
               </div>
               <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">Credentials issued by licensed authorities (not Elevate)</span>
               </div>
               <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">MOU-governed partner relationships</span>
               </div>
             </div>
@@ -199,7 +199,7 @@ export default function WorkforcePartnershipPacketPage() {
                   <tr key={i} className={i % 2 === 0 ? 'bg-slate-50/50' : 'bg-white'}>
                     <td className="p-2.5 font-medium text-gray-900 border-b">
                       {p.name}
-                      {p.registered && <span className="ml-1 text-[10px] text-green-700 font-semibold">(RAPIDS)</span>}
+                      {p.registered && <span className="ml-1 text-[10px] text-brand-green-700 font-semibold">(RAPIDS)</span>}
                     </td>
                     <td className="p-2.5 text-gray-700 border-b">{p.duration}</td>
                     <td className="p-2.5 text-gray-700 border-b">{p.format}</td>
@@ -296,18 +296,18 @@ export default function WorkforcePartnershipPacketPage() {
               <div>
                 <p className="font-semibold text-gray-900 mb-1">Assessment Authority</p>
                 <ul className="space-y-1 text-gray-700 text-xs">
-                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />RTI competencies verified by Credential Partner / Instructor</li>
-                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />OJT competencies verified by Employer Supervisor</li>
-                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />Final completion verified by Program Holder + Sponsor (Elevate)</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />RTI competencies verified by Credential Partner / Instructor</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />OJT competencies verified by Employer Supervisor</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />Final completion verified by Program Holder + Sponsor (Elevate)</li>
                 </ul>
               </div>
               <div>
                 <p className="font-semibold text-gray-900 mb-1">Evaluation Checkpoints</p>
                 <ul className="space-y-1 text-gray-700 text-xs">
-                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />30-day evaluation (initial progress review)</li>
-                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />Midpoint evaluation (competency milestone check)</li>
-                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />Final competency review (certification readiness)</li>
-                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />Completion documentation (credential issuance + placement)</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />30-day evaluation (initial progress review)</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />Midpoint evaluation (competency milestone check)</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />Final competency review (certification readiness)</li>
+                  <li className="flex items-start gap-2"><CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />Completion documentation (credential issuance + placement)</li>
                 </ul>
               </div>
             </div>

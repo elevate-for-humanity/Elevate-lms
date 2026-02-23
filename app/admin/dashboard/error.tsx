@@ -11,9 +11,9 @@ export default function DashboardError({
 }) {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
-      <div className="max-w-md w-full bg-white rounded-xl border border-red-200 p-8 text-center">
-        <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-          <AlertTriangle className="w-6 h-6 text-red-600" />
+      <div className="max-w-md w-full bg-white rounded-xl border border-brand-red-200 p-8 text-center">
+        <div className="w-12 h-12 bg-brand-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <AlertTriangle className="w-6 h-6 text-brand-red-600" />
         </div>
         <h2 className="text-lg font-semibold text-gray-900 mb-2">Dashboard Error</h2>
         <p className="text-sm text-gray-500 mb-1">

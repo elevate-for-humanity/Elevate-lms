@@ -203,7 +203,7 @@ export default function CoursePreviewPage() {
                     Next Lesson →
                   </button>
                 ) : (
-                  <span className="px-4 py-2 bg-green-600/20 text-green-400 rounded-lg text-sm flex items-center gap-2">
+                  <span className="px-4 py-2 bg-brand-green-600/20 text-brand-green-400 rounded-lg text-sm flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" /> Course Complete
                   </span>
                 )}

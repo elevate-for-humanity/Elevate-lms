@@ -107,10 +107,10 @@ export default async function LMSPage({ searchParams }: { searchParams: Promise<
 
       {/* Welcome Banner for new enrollees */}
       {isNewUser && (
-        <div className="bg-green-600 text-white px-4 py-3">
+        <div className="bg-brand-green-600 text-white px-4 py-3">
           <div className="max-w-6xl mx-auto flex items-center gap-3">
             <span className="text-lg">Welcome to Elevate LMS!</span>
-            <span className="text-green-100">Your courses are ready. Start learning below.</span>
+            <span className="text-brand-green-100">Your courses are ready. Start learning below.</span>
           </div>
         </div>
       )}

@@ -49,7 +49,7 @@ function RubricCard({ competency, index }: { competency: Competency; index: numb
           <ul className="space-y-0.5">
             {competency.passCriteria.map((c, i) => (
               <li key={i} className="text-xs text-gray-700 flex items-start gap-1.5">
-                <CheckCircle className="w-3 h-3 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-3 h-3 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 {c}
               </li>
             ))}
@@ -261,7 +261,7 @@ export default function CompetencyVerificationPage() {
                 'LMS Documentation Reference',
               ].map((field, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
+                  <CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0" />
                   {field}
                 </div>
               ))}

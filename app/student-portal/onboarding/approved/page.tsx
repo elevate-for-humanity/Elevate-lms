@@ -128,8 +128,8 @@ export default async function ApprovedPage() {
     <main className="min-h-screen bg-slate-50 py-12">
       <div className="max-w-2xl mx-auto px-6">
         <div className="text-center mb-10">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-10 h-10 text-green-600" />
+          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Shield className="w-10 h-10 text-brand-green-600" />
           </div>
           <h1 className="text-3xl font-extrabold text-slate-900 mb-2">
             Enrollment Approved
@@ -148,15 +148,15 @@ export default async function ApprovedPage() {
             {checklist.map((item, i) => (
               <div key={i} className="flex items-center gap-3 px-6 py-3">
                 {item.verified ? (
-                  <CheckCircle className="w-5 h-5 text-green-600 shrink-0" />
+                  <CheckCircle className="w-5 h-5 text-brand-green-600 shrink-0" />
                 ) : (
-                  <XCircle className="w-5 h-5 text-red-500 shrink-0" />
+                  <XCircle className="w-5 h-5 text-brand-red-500 shrink-0" />
                 )}
                 <span className="flex-1 text-sm text-slate-800">{item.requirement}</span>
                 <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                   item.verified
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
+                    ? 'bg-brand-green-100 text-brand-green-700'
+                    : 'bg-brand-red-100 text-brand-red-700'
                 }`}>
                   {item.status}
                 </span>
@@ -170,19 +170,19 @@ export default async function ApprovedPage() {
           <h3 className="font-bold text-slate-900 mb-3">What Happens Next</h3>
           <ul className="space-y-2 text-sm text-slate-700">
             <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+              <CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" />
               Your program enrollment is now active
             </li>
             <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+              <CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" />
               You can access your course materials in the LMS
             </li>
             <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+              <CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" />
               Your instructor will contact you with your class schedule
             </li>
             <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+              <CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" />
               If you applied for WIOA funding, we will coordinate with WorkOne on your behalf
             </li>
           </ul>

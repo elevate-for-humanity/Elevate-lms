@@ -78,13 +78,13 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
   };
 
   const stats = [
-    { label:'Students', value:c.students, icon:Users, href:'/admin/students', color:'#2563eb', bg:'bg-blue-50', bd:'border-blue-200', sub:`${certRate}% cert rate` },
+    { label:'Students', value:c.students, icon:Users, href:'/admin/students', color:'#2563eb', bg:'bg-brand-blue-50', bd:'border-brand-blue-200', sub:`${certRate}% cert rate` },
     { label:'Programs', value:c.programs, icon:GraduationCap, href:'/admin/programs', color:'#10b981', bg:'bg-emerald-50', bd:'border-emerald-200', sub:`${c.programs} active` },
     { label:'Courses', value:c.courses, icon:BookOpen, href:'/admin/courses', color:'#8b5cf6', bg:'bg-purple-50', bd:'border-purple-200', sub:`${c.lessons} lessons` },
     { label:'Enrollments', value:c.enrollments, icon:TrendingUp, href:'/admin/enrollments', color:'#f59e0b', bg:'bg-amber-50', bd:'border-amber-200', sub:`across ${enrollTrend.length} months` },
     { label:'Certificates', value:c.certificates, icon:Award, href:'/admin/certificates', color:'#06b6d4', bg:'bg-teal-50', bd:'border-teal-200', sub:'issued to date' },
     { label:'Partners', value:c.partners, icon:Building2, href:'/admin/partners', color:'#6366f1', bg:'bg-indigo-50', bd:'border-indigo-200', sub:'organizations' },
-    { label:'At Risk', value:c.atRisk, icon:AlertTriangle, href:'/admin/at-risk', color:'#ef4444', bg:'bg-red-50', bd:'border-red-200', sub:'need intervention' },
+    { label:'At Risk', value:c.atRisk, icon:AlertTriangle, href:'/admin/at-risk', color:'#ef4444', bg:'bg-brand-red-50', bd:'border-brand-red-200', sub:'need intervention' },
     { label:'Lessons', value:c.lessons, icon:FileText, href:'/admin/lessons', color:'#ec4899', bg:'bg-pink-50', bd:'border-pink-200', sub:'total content' },
   ];
 

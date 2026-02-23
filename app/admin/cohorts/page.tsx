@@ -142,7 +142,7 @@ export default async function CohortTrackerPage() {
                       <td className="px-6 py-3">
                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
                           s.enrollment_status === 'active' ? 'bg-emerald-100 text-emerald-700' :
-                          s.enrollment_status === 'enrolled' ? 'bg-blue-100 text-blue-700' :
+                          s.enrollment_status === 'enrolled' ? 'bg-brand-blue-100 text-brand-blue-700' :
                           'bg-amber-100 text-amber-700'
                         }`}>{s.enrollment_status || 'pending'}</span>
                       </td>

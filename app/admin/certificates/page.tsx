@@ -109,7 +109,7 @@ export default async function CertificatesPage({
           </div>
         )}
         {params.error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+          <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-800">
             Error: {params.error.replace(/_/g, ' ')}
           </div>
         )}
@@ -127,7 +127,7 @@ export default async function CertificatesPage({
             <p className="text-sm text-gray-500">Active</p>
           </div>
           <div className="bg-white rounded-xl border p-5">
-            <Shield className="w-5 h-5 text-red-600 mb-2" />
+            <Shield className="w-5 h-5 text-brand-red-600 mb-2" />
             <p className="text-2xl font-bold">{revokedCount}</p>
             <p className="text-sm text-gray-500">Revoked</p>
           </div>
@@ -176,7 +176,7 @@ export default async function CertificatesPage({
                   <td className="px-6 py-4 text-center">
                     <span className={`px-2 py-1 rounded text-xs font-medium ${
                       c.status === 'issued' || c.status === 'active' ? 'bg-brand-green-100 text-brand-green-700' :
-                      c.status === 'revoked' ? 'bg-red-100 text-red-700' :
+                      c.status === 'revoked' ? 'bg-brand-red-100 text-brand-red-700' :
                       c.status === 'expired' ? 'bg-gray-100 text-gray-700' :
                       'bg-brand-blue-100 text-brand-blue-700'
                     }`}>{c.status || 'unknown'}</span>
@@ -187,7 +187,7 @@ export default async function CertificatesPage({
                         <input type="hidden" name="certId" value={c.id} />
                         <input type="hidden" name="reason" value="Admin revocation" />
                         <button type="submit"
-                          className="text-red-600 hover:text-red-800 text-sm font-medium"
+                          className="text-brand-red-600 hover:text-brand-red-800 text-sm font-medium"
                           onClick={(e) => { if (!confirm('Revoke this certificate?')) e.preventDefault(); }}>
                           Revoke
                         </button>

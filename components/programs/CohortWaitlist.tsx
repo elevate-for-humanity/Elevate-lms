@@ -52,7 +52,7 @@ export default function CohortWaitlist({ programSlug, programName }: CohortWaitl
       </div>
 
       {result ? (
-        <div className={`flex items-start gap-3 p-4 rounded-lg ${result.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+        <div className={`flex items-start gap-3 p-4 rounded-lg ${result.success ? 'bg-brand-green-50 text-brand-green-800' : 'bg-brand-red-50 text-brand-red-800'}`}>
           {result.success ? <CheckCircle className="w-5 h-5 mt-0.5 flex-shrink-0" /> : <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />}
           <div>
             <p className="font-medium">{result.message}</p>

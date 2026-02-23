@@ -57,7 +57,7 @@ function CompetencyCard({ item, sectionNum }: { item: RubricItem; sectionNum: nu
           <ul className="space-y-1">
             {item.passCriteria.map((c, i) => (
               <li key={i} className="text-xs text-gray-700 flex items-start gap-1.5">
-                <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 {c}
               </li>
             ))}
@@ -65,9 +65,9 @@ function CompetencyCard({ item, sectionNum }: { item: RubricItem; sectionNum: nu
         </div>
 
         {item.failurePolicy && (
-          <div className="bg-red-50 border border-red-200 rounded px-3 py-2 flex items-start gap-2 print:bg-white print:border-gray-400">
-            <AlertTriangle className="w-3.5 h-3.5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-red-800">{item.failurePolicy}</p>
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded px-3 py-2 flex items-start gap-2 print:bg-white print:border-gray-400">
+            <AlertTriangle className="w-3.5 h-3.5 text-brand-red-600 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-brand-red-800">{item.failurePolicy}</p>
           </div>
         )}
 
@@ -196,10 +196,10 @@ export default function BarberCompetencyRubricPage() {
             <div className="bg-slate-50 rounded-lg p-5 print:border print:bg-white">
               <h3 className="font-semibold text-gray-900 text-sm mb-2">Scoring Scale</h3>
               <div className="space-y-1 text-xs text-gray-700">
-                <p><span className="font-semibold text-red-600">1</span> — Not Competent</p>
-                <p><span className="font-semibold text-orange-600">2</span> — Developing</p>
+                <p><span className="font-semibold text-brand-red-600">1</span> — Not Competent</p>
+                <p><span className="font-semibold text-brand-orange-600">2</span> — Developing</p>
                 <p><span className="font-semibold text-brand-blue-600">3</span> — Competent (Industry Ready)</p>
-                <p><span className="font-semibold text-green-600">4</span> — Advanced</p>
+                <p><span className="font-semibold text-brand-green-600">4</span> — Advanced</p>
                 <p><span className="font-semibold text-purple-600">5</span> — Mastery</p>
               </div>
               <p className="text-xs text-gray-500 mt-3 font-medium">
@@ -368,7 +368,7 @@ export default function BarberCompetencyRubricPage() {
                 'Completion status visible to all authorized parties',
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-1.5">
-                  <ClipboardCheck className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
+                  <ClipboardCheck className="w-3.5 h-3.5 text-brand-green-600 flex-shrink-0" />
                   {item}
                 </div>
               ))}

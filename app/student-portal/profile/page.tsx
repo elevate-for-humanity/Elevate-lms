@@ -174,7 +174,7 @@ export default function StudentProfilePage() {
         <p className="text-slate-600 mb-8">Fill in your personal information and emergency contact. All fields marked * are required.</p>
 
         {message && (
-          <div className={`flex items-center gap-2 p-4 rounded-lg mb-6 ${message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+          <div className={`flex items-center gap-2 p-4 rounded-lg mb-6 ${message.type === 'success' ? 'bg-brand-green-50 text-brand-green-800' : 'bg-brand-red-50 text-brand-red-800'}`}>
             {message.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
             {message.text}
           </div>
@@ -238,7 +238,7 @@ export default function StudentProfilePage() {
           {/* Emergency Contact */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Heart className="w-5 h-5 text-red-500" />
+              <Heart className="w-5 h-5 text-brand-red-500" />
               <h2 className="text-lg font-semibold text-slate-900">Emergency Contact</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

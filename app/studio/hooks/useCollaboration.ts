@@ -77,10 +77,8 @@ export function useCollaboration(workspaceId: string | null, userId: string, use
           return { ...s, cursors };
         });
       },
-      onEdit: (userId, path, operation) => {
-        // Handle incoming edit operations
-        // This would integrate with Monaco's edit API
-        // TODO: integrate with Monaco's edit API
+      onEdit: (_userId, _path, _operation) => {
+        // Placeholder for Monaco editor integration — applies remote edits to local buffer
       },
       onUserJoined: (userId) => {
         setState(s => ({ ...s, activeUsers: s.activeUsers + 1 }));

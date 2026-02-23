@@ -82,7 +82,7 @@ export default function TradesProgramPage({ data }: { data: TradesProgramData })
           <div className="flex flex-wrap items-center gap-3 mb-3">
             <h1 className="text-2xl sm:text-3xl font-bold">{data.name}</h1>
             {data.nextLevelJobsEligible && (
-              <span className="inline-block bg-green-700 text-white text-xs font-bold px-3 py-1 rounded">Next Level Jobs Eligible</span>
+              <span className="inline-block bg-brand-green-700 text-white text-xs font-bold px-3 py-1 rounded">Next Level Jobs Eligible</span>
             )}
           </div>
           <p className="text-slate-300 text-sm mb-4 max-w-2xl">{data.tagline}</p>

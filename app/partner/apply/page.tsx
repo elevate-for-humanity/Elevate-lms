@@ -105,9 +105,9 @@ export default function PartnerApplyPage() {
           <p className="text-gray-500 text-sm mb-6">All fields marked * are required. For the full onboarding with document uploads, <Link href="/partner/onboarding" className="text-brand-blue-600 hover:underline">start here instead</Link>.</p>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-              <p className="text-red-700 text-sm">{error}</p>
+            <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-brand-red-600 shrink-0 mt-0.5" />
+              <p className="text-brand-red-700 text-sm">{error}</p>
             </div>
           )}
 

@@ -115,7 +115,7 @@ export default async function AiTutorLogsPage() {
           <h2 className="font-semibold mb-3">Top IPs (Last 24h)</h2>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
             {topIpList.map(([hash, count]) => (
-              <div key={hash} className={`text-xs font-mono px-2 py-1 rounded ${count > 20 ? 'bg-red-50 text-red-700' : count > 10 ? 'bg-amber-50 text-amber-700' : 'bg-gray-50 text-gray-600'}`}>
+              <div key={hash} className={`text-xs font-mono px-2 py-1 rounded ${count > 20 ? 'bg-brand-red-50 text-brand-red-700' : count > 10 ? 'bg-amber-50 text-amber-700' : 'bg-gray-50 text-gray-600'}`}>
                 {hash.slice(0, 8)}... <span className="font-bold">{count}</span>
               </div>
             ))}
@@ -141,7 +141,7 @@ export default async function AiTutorLogsPage() {
             </thead>
             <tbody className="divide-y">
               {recentLogs?.map((log: any) => (
-                <tr key={log.id} className={log.blocked_reason ? 'bg-red-50' : ''}>
+                <tr key={log.id} className={log.blocked_reason ? 'bg-brand-red-50' : ''}>
                   <td className="px-4 py-2 text-gray-600 whitespace-nowrap">
                     {new Date(log.created_at).toLocaleString('en-US', {
                       month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
@@ -154,7 +154,7 @@ export default async function AiTutorLogsPage() {
                   <td className="px-4 py-2">{log.response_length}</td>
                   <td className="px-4 py-2">
                     {log.blocked_reason ? (
-                      <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">
+                      <span className="text-xs bg-brand-red-100 text-brand-red-700 px-2 py-0.5 rounded-full font-medium">
                         {log.blocked_reason}
                       </span>
                     ) : (

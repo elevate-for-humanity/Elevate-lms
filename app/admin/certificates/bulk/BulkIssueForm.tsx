@@ -115,9 +115,9 @@ export default function BulkIssueForm({
             </div>
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-red-600 mt-0.5" />
-                <p className="text-red-700 text-sm">{error}</p>
+              <div className="p-3 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-brand-red-600 mt-0.5" />
+                <p className="text-brand-red-700 text-sm">{error}</p>
               </div>
             )}
 

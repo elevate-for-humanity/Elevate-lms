@@ -193,15 +193,15 @@ export default function FinalSignoffPage() {
           <h2 className="font-bold text-lg mb-3 print:text-sm print:mb-2">Completion Determination</h2>
           <div className="grid grid-cols-3 gap-3 text-sm print:text-[10px] mb-4">
             <div className="border-2 rounded p-3 text-center print:p-2">
-              <p className="font-bold text-green-700">☐ APPRENTICESHIP COMPLETE</p>
+              <p className="font-bold text-brand-green-700">☐ APPRENTICESHIP COMPLETE</p>
               <p className="text-xs text-gray-500 mt-1">All hours, competencies, and evaluations verified</p>
             </div>
             <div className="border-2 rounded p-3 text-center print:p-2">
-              <p className="font-bold text-orange-600">☐ REMEDIATION REQUIRED</p>
+              <p className="font-bold text-brand-orange-600">☐ REMEDIATION REQUIRED</p>
               <p className="text-xs text-gray-500 mt-1">Specific competencies below standard</p>
             </div>
             <div className="border-2 rounded p-3 text-center print:p-2">
-              <p className="font-bold text-red-600">☐ NOT COMPLETE</p>
+              <p className="font-bold text-brand-red-600">☐ NOT COMPLETE</p>
               <p className="text-xs text-gray-500 mt-1">Hours or competencies not met</p>
             </div>
           </div>

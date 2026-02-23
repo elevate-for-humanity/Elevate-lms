@@ -18,9 +18,9 @@ function fmt(cents: number) {
 
 function StatusBadge({ ok }: { ok: boolean }) {
   return ok ? (
-    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Match</span>
+    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-green-100 text-brand-green-800">Match</span>
   ) : (
-    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">Mismatch</span>
+    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-red-100 text-brand-red-800">Mismatch</span>
   );
 }
 
@@ -90,9 +90,9 @@ export default async function CatalogSanityPage() {
             <div className="text-sm text-gray-500">DB-Only</div>
             <div className={`text-2xl font-bold ${dbOnly.length > 0 ? 'text-yellow-600' : 'text-gray-900'}`}>{dbOnly.length}</div>
           </div>
-          <div className={`rounded-lg border p-4 ${allMatch ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+          <div className={`rounded-lg border p-4 ${allMatch ? 'bg-brand-green-50 border-brand-green-200' : 'bg-brand-red-50 border-brand-red-200'}`}>
             <div className="text-sm text-gray-500">Status</div>
-            <div className={`text-2xl font-bold ${allMatch ? 'text-green-700' : 'text-red-700'}`}>
+            <div className={`text-2xl font-bold ${allMatch ? 'text-brand-green-700' : 'text-brand-red-700'}`}>
               {allMatch ? 'All Match' : 'Mismatches Found'}
             </div>
           </div>
@@ -100,10 +100,10 @@ export default async function CatalogSanityPage() {
 
         {/* Missing from DB */}
         {hardcodedOnly.length > 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <h2 className="font-semibold text-red-800 mb-2">Missing from DB ({hardcodedOnly.length})</h2>
-            <p className="text-sm text-red-700 mb-2">These products exist in hardcoded catalog but not in the products table. Run the migration SQL.</p>
-            <ul className="list-disc list-inside text-sm text-red-700">
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6">
+            <h2 className="font-semibold text-brand-red-800 mb-2">Missing from DB ({hardcodedOnly.length})</h2>
+            <p className="text-sm text-brand-red-700 mb-2">These products exist in hardcoded catalog but not in the products table. Run the migration SQL.</p>
+            <ul className="list-disc list-inside text-sm text-brand-red-700">
               {hardcodedOnly.map(r => <li key={r.slug}>{r.slug} — {r.hc?.name}</li>)}
             </ul>
           </div>
@@ -126,7 +126,7 @@ export default async function CatalogSanityPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {rows.map(r => (
-                <tr key={r.slug} className={!r.inDb ? 'bg-red-50' : !r.priceMatch || !r.nameMatch ? 'bg-yellow-50' : ''}>
+                <tr key={r.slug} className={!r.inDb ? 'bg-brand-red-50' : !r.priceMatch || !r.nameMatch ? 'bg-yellow-50' : ''}>
                   <td className="px-4 py-3 text-sm font-mono">{r.slug}</td>
                   <td className="px-4 py-3 text-sm">{r.db?.name || r.hc?.name || '—'}</td>
                   <td className="px-4 py-3 text-sm">{r.db ? fmt(r.db.price) : '—'}</td>
@@ -140,9 +140,9 @@ export default async function CatalogSanityPage() {
                   <td className="px-4 py-3 text-sm">{r.db?.catalogGroup || '—'}</td>
                   <td className="px-4 py-3 text-sm">
                     {r.inDb ? (
-                      <span className="text-green-600 font-medium">Yes</span>
+                      <span className="text-brand-green-600 font-medium">Yes</span>
                     ) : (
-                      <span className="text-red-600 font-medium">No</span>
+                      <span className="text-brand-red-600 font-medium">No</span>
                     )}
                   </td>
                 </tr>

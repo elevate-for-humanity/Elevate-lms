@@ -80,7 +80,7 @@ export default function HVACProgramContent() {
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mt-6 mb-6 leading-tight">
               HVAC Technician Training<br />
-              <span className="text-green-300">EPA 608 Certification</span>
+              <span className="text-brand-green-300">EPA 608 Certification</span>
             </h1>
 
             <p className="text-xl text-gray-200 mb-4 leading-relaxed">
@@ -89,12 +89,12 @@ export default function HVACProgramContent() {
               OSHA 30, and the credentials employers require.
             </p>
 
-            <p className="text-lg text-green-300 font-semibold mb-8">
+            <p className="text-lg text-brand-green-300 font-semibold mb-8">
               Tuition may be covered through WIOA or Workforce Ready Grant for eligible students referred by WorkOne. Self-pay and payment plans also available.
             </p>
 
             <div className="flex flex-wrap gap-4 mb-8 text-sm text-gray-300">
-              <span className="flex items-center gap-2 bg-green-500/20 backdrop-blur px-4 py-2 rounded-full text-green-300 font-semibold border border-green-400/30">
+              <span className="flex items-center gap-2 bg-brand-green-500/20 backdrop-blur px-4 py-2 rounded-full text-brand-green-300 font-semibold border border-brand-green-400/30">
                 <Award className="w-4 h-4" /> EPA 608 Certification
               </span>
               <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
@@ -130,7 +130,7 @@ export default function HVACProgramContent() {
 
             <Link
               href="/programs/hvac-technician/apply"
-              className="inline-flex items-center justify-center px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-green-600 hover:bg-brand-green-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
             >
               Enroll in Program
             </Link>
@@ -201,7 +201,7 @@ export default function HVACProgramContent() {
                 />
               </div>
               <div className="p-6">
-                <div className="text-3xl font-bold text-green-600 mb-1">36 Hours</div>
+                <div className="text-3xl font-bold text-brand-green-600 mb-1">36 Hours</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Online Coursework</h3>
                 <p className="text-gray-600">
                   Self-paced modules with quizzes and progress tracking. Complete on your
@@ -306,7 +306,7 @@ export default function HVACProgramContent() {
             </p>
             <Link
               href="/programs/hvac-technician/apply"
-              className="inline-flex items-center justify-center px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-green-600 hover:bg-brand-green-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
             >
               Enroll in Program
             </Link>
@@ -354,7 +354,7 @@ export default function HVACProgramContent() {
                     'Unlimited online retesting available',
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                      <CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -387,7 +387,7 @@ export default function HVACProgramContent() {
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
-                  <GraduationCap className="w-5 h-5 text-green-600" />
+                  <GraduationCap className="w-5 h-5 text-brand-green-600" />
                   <h3 className="text-lg font-bold text-gray-900">Program Certificate</h3>
                 </div>
                 <p className="text-gray-600 text-sm">
@@ -411,7 +411,7 @@ export default function HVACProgramContent() {
             <Link href="/apply?program=hvac-technician" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-full hover:bg-brand-red-50 transition-colors whitespace-nowrap">
               Apply
             </Link>
-            <Link href="/programs/hvac-technician/apply" className="bg-green-500 text-white font-bold px-6 py-3 rounded-full hover:bg-green-400 transition-colors whitespace-nowrap">
+            <Link href="/programs/hvac-technician/apply" className="bg-brand-green-500 text-white font-bold px-6 py-3 rounded-full hover:bg-brand-green-400 transition-colors whitespace-nowrap">
               Enroll in Program
             </Link>
           </div>
@@ -551,7 +551,7 @@ export default function HVACProgramContent() {
                 </div>
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-1">{career.role}</h3>
-                  <div className="text-green-600 font-bold mb-3">{career.salary}</div>
+                  <div className="text-brand-green-600 font-bold mb-3">{career.salary}</div>
                   <p className="text-gray-600 text-sm">{career.description}</p>
                 </div>
               </motion.div>
@@ -581,7 +581,7 @@ export default function HVACProgramContent() {
               "You're a veteran transitioning to civilian work"
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">{item}</span>
               </div>
             ))}
@@ -620,7 +620,7 @@ export default function HVACProgramContent() {
               </p>
               <Link
                 href="/programs/hvac-technician/apply"
-                className="inline-flex items-center px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-500 transition"
+                className="inline-flex items-center px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-full hover:bg-brand-green-500 transition"
               >
                 Enroll in Program
               </Link>
@@ -683,7 +683,7 @@ export default function HVACProgramContent() {
 
           <Link
             href="/programs/hvac-technician/apply"
-            className="inline-flex items-center justify-center px-8 py-4 bg-green-500 hover:bg-green-400 text-white font-bold rounded-full transition-all shadow-lg text-lg"
+            className="inline-flex items-center justify-center px-8 py-4 bg-brand-green-500 hover:bg-brand-green-400 text-white font-bold rounded-full transition-all shadow-lg text-lg"
           >
             Enroll in Program
           </Link>

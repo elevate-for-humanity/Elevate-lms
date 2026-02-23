@@ -27,7 +27,7 @@ export default function Error({
           An unexpected error occurred. Please try again.
         </p>
         {error.message && process.env.NODE_ENV === 'development' && (
-          <pre className="text-xs text-left bg-red-50 p-3 rounded mb-4 overflow-auto">
+          <pre className="text-xs text-left bg-brand-red-50 p-3 rounded mb-4 overflow-auto">
             <code>{error.message}</code>
           </pre>
         )}

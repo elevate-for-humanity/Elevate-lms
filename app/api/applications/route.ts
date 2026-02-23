@@ -12,6 +12,7 @@ import {
 } from '@/lib/rateLimit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { sendEmail } from '@/lib/email/resend';
 
 // CORS preflight for cross-origin form submissions
 export async function OPTIONS() {
@@ -218,83 +219,77 @@ export async function POST(req: Request) {
       logger.warn('Auto-approve failed (non-fatal)', autoApproveErr);
     }
 
-    // Send email notifications
+    // Send email notifications — direct call, no self-fetch
     try {
-      // Send confirmation email to applicant
-      await fetch(
-        `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/api/email/send`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: body.email,
-            subject: `Application Received [Ref: ${referenceNumber}] - Elevate for Humanity`,
-            html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #ea580c;">Application Received!</h2>
-              <p>Hi ${body.firstName},</p>
-              <p>We've received your application for our <strong>${body.program}</strong> program.</p>
+      // Confirmation email to applicant
+      const studentEmailResult = await sendEmail({
+        to: body.email,
+        subject: `Application Received [Ref: ${referenceNumber}] - Elevate for Humanity`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #ea580c;">Application Received!</h2>
+            <p>Hi ${body.firstName},</p>
+            <p>We've received your application for our <strong>${body.program}</strong> program.</p>
 
-              <div style="background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 8px; padding: 16px; margin: 20px 0;">
-                <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Application ID:</p>
-                <p style="margin: 0; font-size: 20px; font-weight: bold; font-family: monospace; color: #0f172a;">${data.id}</p>
-                <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b;">Reference: ${referenceNumber}</p>
-              </div>
-
-              <div style="text-align: center; margin: 24px 0;">
-                <a href="https://www.elevateforhumanity.org/apply/track?id=${data.id}&email=${encodeURIComponent(body.email)}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Track Application Status</a>
-              </div>
-
-              <h3 style="color: #0f172a;">What Happens Next?</h3>
-              <ol style="line-height: 1.8;">
-                <li>We review your application and check funding eligibility</li>
-                <li>An advisor will contact you within 1-2 business days via ${body.preferredContact}</li>
-                <li>We'll discuss program details, funding options (WIOA, WRG, JRI), and next steps</li>
-              </ol>
-
-              <div style="background: #fff7ed; border: 2px solid #fed7aa; border-radius: 8px; padding: 16px; margin: 20px 0;">
-                <h3 style="margin-top: 0; color: #ea580c;">Want to Talk Sooner?</h3>
-                <p>Schedule your advisor call now instead of waiting:</p>
-                <a href="https://calendly.com/elevate-for-humanity/advisor-call" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Schedule Call Now</a>
-              </div>
-
-              <p>Questions? Call us at <a href="tel:3173143757" style="color: #ea580c; font-weight: bold;">317-314-3757</a></p>
-              <p>Best regards,<br><strong>Elevate for Humanity Team</strong></p>
+            <div style="background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Application ID:</p>
+              <p style="margin: 0; font-size: 20px; font-weight: bold; font-family: monospace; color: #0f172a;">${data.id}</p>
+              <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b;">Reference: ${referenceNumber}</p>
             </div>
-          `,
-          }),
-        }
-      );
 
-      // Send notification to staff
-      await fetch(
-        `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/api/email/send`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: 'info@elevateforhumanity.org',
-            subject: `New Application [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${body.program}`,
-            html: `
-            <h2>New Application Received</h2>
-            <p><strong>Reference:</strong> ${referenceNumber}</p>
-            <p><strong>Name:</strong> ${body.firstName} ${body.lastName}</p>
-            <p><strong>Email:</strong> ${body.email}</p>
-            <p><strong>Phone:</strong> ${body.phone}</p>
-            <p><strong>Program:</strong> ${body.program}</p>
-            <p><strong>Location:</strong> ${body.city}, ${body.zip}</p>
-            <p><strong>Preferred Contact:</strong> ${body.preferredContact}</p>
-            ${body.hasCaseManager ? `<p><strong>Has Case Manager:</strong> ${body.hasCaseManager}</p>` : ''}
-            ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : ''}
-            ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ''}
-            <p><a href="https://www.elevateforhumanity.org/admin/applications">View in Admin Portal</a></p>
-          `,
-          }),
-        }
-      );
-    } catch (emailError) {
-        logger.error("Unhandled error", emailError instanceof Error ? emailError : undefined);
+            <div style="text-align: center; margin: 24px 0;">
+              <a href="https://www.elevateforhumanity.org/apply/track?id=${data.id}&email=${encodeURIComponent(body.email)}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Track Application Status</a>
+            </div>
+
+            <h3 style="color: #0f172a;">What Happens Next?</h3>
+            <ol style="line-height: 1.8;">
+              <li>We review your application and check funding eligibility</li>
+              <li>An advisor will contact you within 1-2 business days via ${body.preferredContact || 'phone'}</li>
+              <li>We'll discuss program details, funding options (WIOA, WRG, JRI), and next steps</li>
+            </ol>
+
+            <div style="background: #fff7ed; border: 2px solid #fed7aa; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <h3 style="margin-top: 0; color: #ea580c;">Want to Talk Sooner?</h3>
+              <p>Schedule your advisor call now instead of waiting:</p>
+              <a href="https://calendly.com/elevate-for-humanity/advisor-call" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Schedule Call Now</a>
+            </div>
+
+            <p>Questions? Call us at <a href="tel:3173143757" style="color: #ea580c; font-weight: bold;">317-314-3757</a></p>
+            <p>Best regards,<br><strong>Elevate for Humanity Team</strong></p>
+          </div>
+        `,
+      });
+
+      if (!studentEmailResult.success) {
+        logger.error('Failed to send student confirmation email', { error: studentEmailResult.error, email: body.email });
       }
+
+      // Notification email to staff
+      const staffEmailResult = await sendEmail({
+        to: 'info@elevateforhumanity.org',
+        subject: `New Application [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${body.program}`,
+        html: `
+          <h2>New Application Received</h2>
+          <p><strong>Reference:</strong> ${referenceNumber}</p>
+          <p><strong>Name:</strong> ${body.firstName} ${body.lastName}</p>
+          <p><strong>Email:</strong> ${body.email}</p>
+          <p><strong>Phone:</strong> ${body.phone}</p>
+          <p><strong>Program:</strong> ${body.program}</p>
+          <p><strong>Location:</strong> ${body.city || 'N/A'}, ${body.zip || 'N/A'}</p>
+          <p><strong>Preferred Contact:</strong> ${body.preferredContact || 'phone'}</p>
+          ${body.hasCaseManager ? `<p><strong>Has Case Manager:</strong> ${body.hasCaseManager}</p>` : ''}
+          ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : ''}
+          ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ''}
+          <p><a href="https://www.elevateforhumanity.org/admin/applications">View in Admin Portal</a></p>
+        `,
+      });
+
+      if (!staffEmailResult.success) {
+        logger.error('Failed to send staff notification email', { error: staffEmailResult.error });
+      }
+    } catch (emailError) {
+      logger.error('Email send failed', emailError instanceof Error ? emailError : undefined);
+    }
 
     return NextResponse.json(
       {

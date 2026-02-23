@@ -5,16 +5,15 @@ import Image from 'next/image';
 import HomeHeroVideo from './HomeHeroVideo';
 import { InView } from '@/components/ui/InView';
 
-
 // Quiz removed — program cards now serve as the path selector
 
 const programs = [
-  { name: 'Healthcare', href: '/programs/healthcare', image: '/images/programs-hq/healthcare-hero.webp', desc: 'CNA, Medical Assistant, Phlebotomy' },
-  { name: 'Skilled Trades', href: '/programs/skilled-trades', image: '/images/programs-hq/skilled-trades-hero.webp', desc: 'HVAC, Electrical, Welding, Plumbing' },
-  { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.webp', desc: 'Paid apprenticeship — earn while you learn' },
-  { name: 'CDL Training', href: '/programs/cdl', image: '/images/cdl-vibrant.webp', desc: 'Class A & B — start earning $50K+' },
-  { name: 'Technology', href: '/programs/technology', image: '/images/programs-hq/it-support.webp', desc: 'IT Support, Cybersecurity' },
-  { name: 'CPR & First Aid', href: '/programs/cpr-first-aid-hsi', image: '/images/healthcare/healthcare-professional-portrait-1.webp', desc: 'HSI certified — same-day available' },
+  { name: 'Healthcare', href: '/programs/healthcare', image: '/images/programs-hq/healthcare-hero.webp', desc: 'CNA, Medical Assistant, Phlebotomy — launch a career in patient care.', salary: '$32K–$48K', duration: '4–12 weeks', tag: 'WIOA Funded' },
+  { name: 'Skilled Trades', href: '/programs/skilled-trades', image: '/images/programs-hq/skilled-trades-hero.webp', desc: 'HVAC, Electrical, Welding, Plumbing — high-demand, high-pay careers.', salary: '$40K–$65K', duration: '8–20 weeks', tag: 'WIOA Funded' },
+  { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.webp', desc: 'DOL-registered apprenticeship — earn while you learn your craft.', salary: '$30K–$55K', duration: '12 months', tag: 'DOL Registered' },
+  { name: 'CDL Training', href: '/programs/cdl', image: '/images/cdl-vibrant.webp', desc: 'Class A & B commercial driving — one of the fastest paths to $50K+.', salary: '$50K–$75K', duration: '4–6 weeks', tag: 'Job Guarantee' },
+  { name: 'Technology', href: '/programs/technology', image: '/images/programs-hq/it-support.webp', desc: 'IT Support, Cybersecurity — enter the tech industry with certifications.', salary: '$38K–$60K', duration: '8–16 weeks', tag: 'WIOA Funded' },
+  { name: 'CPR & First Aid', href: '/programs/cpr-first-aid-hsi', image: '/images/healthcare/healthcare-professional-portrait-1.webp', desc: 'HSI-certified CPR, First Aid, and BLS — same-day certification available.', salary: 'Required for healthcare jobs', duration: '1 day', tag: 'Same Day' },
 ];
 
 
@@ -70,22 +69,26 @@ export default function HomePage() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', icon: '🎓' },
-              { href: '/funding', label: 'I need funding', desc: 'Most programs are tuition-free. Check your eligibility.', cta: 'Check Eligibility', icon: '💰' },
-              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', icon: '🏢' },
-              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', icon: '🏫' },
+              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/programs-hq/training-classroom.webp', alt: 'Students in a training classroom' },
+              { href: '/funding', label: 'I need funding', desc: 'Most programs are tuition-free. Check your eligibility.', cta: 'Check Eligibility', image: '/images/heroes-hq/funding-hero.webp', alt: 'Funding and financial aid' },
+              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/heroes-hq/employer-hero.webp', alt: 'Employer partnership meeting' },
+              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/programs-hq/business-office.webp', alt: 'Training program office' },
             ].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex flex-col p-5 bg-white rounded-xl border-2 border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all group"
+                className="flex flex-col bg-white rounded-xl border-2 border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all group overflow-hidden"
               >
-                <span className="text-3xl mb-3">{item.icon}</span>
-                <span className="font-bold text-lg text-slate-900 mb-1">{item.label}</span>
-                <span className="text-sm text-slate-600 mb-4 flex-1">{item.desc}</span>
-                <span className="text-brand-red-600 font-semibold text-sm group-hover:underline">
-                  {item.cta} →
-                </span>
+                <div className="relative h-32 sm:h-36 overflow-hidden">
+                  <Image src={item.image} alt={item.alt} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                </div>
+                <div className="p-5 flex flex-col flex-1">
+                  <span className="font-bold text-lg text-slate-900 mb-1">{item.label}</span>
+                  <span className="text-sm text-slate-600 mb-4 flex-1">{item.desc}</span>
+                  <span className="text-brand-red-600 font-semibold text-sm group-hover:underline">
+                    {item.cta} →
+                  </span>
+                </div>
               </Link>
             ))}
           </div>
@@ -116,10 +119,19 @@ export default function HomePage() {
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
+                  <div className="absolute top-3 left-3">
+                    <span className="inline-block bg-white/95 backdrop-blur-sm text-slate-900 text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                      {program.tag}
+                    </span>
+                  </div>
                 </div>
                 <div className="p-5">
                   <h3 className="text-slate-900 font-bold text-lg sm:text-xl mb-1">{program.name}</h3>
-                  <p className="text-slate-600 text-sm mb-4">{program.desc}</p>
+                  <p className="text-slate-600 text-sm mb-3">{program.desc}</p>
+                  <div className="flex items-center gap-3 mb-4 text-xs">
+                    <span className="bg-brand-green-50 text-brand-green-700 font-semibold px-2.5 py-1 rounded-full">{program.salary}</span>
+                    <span className="bg-slate-100 text-slate-600 font-medium px-2.5 py-1 rounded-full">{program.duration}</span>
+                  </div>
                   <span className="inline-block bg-brand-red-600 text-white font-semibold text-sm px-5 py-2.5 rounded-lg group-hover:bg-brand-red-700 transition-colors">
                     Explore Program &rarr;
                   </span>
@@ -262,24 +274,77 @@ export default function HomePage() {
       </section>
       </InView>
 
+      {/* ===== WHY ELEVATE ===== */}
+      <InView animation="fade-up">
+      <section aria-label="Why choose Elevate" className="py-14 sm:py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-10 items-center">
+            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-xl">
+              <Image src="/images/programs-hq/students-learning.webp" alt="Students in a training session at Elevate for Humanity" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+            </div>
+            <div>
+              <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Why Elevate</p>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-6">Not Just Training — A Complete Career Launch System</h2>
+              <div className="space-y-4">
+                {[
+                  { title: '$0 tuition for most programs', desc: 'WIOA, WRG, and JRI funding covers tuition, books, and supplies. You pay nothing.' },
+                  { title: 'Industry-recognized credentials', desc: 'Graduate with certifications employers actually require — CNA, CDL, OSHA, EPA 608, CompTIA.' },
+                  { title: 'Job placement support', desc: 'Resume help, interview prep, and direct connections to hiring employers in Indiana.' },
+                  { title: 'Registered apprenticeships', desc: 'DOL-registered programs where you earn a paycheck while you train.' },
+                  { title: 'Self-service enrollment', desc: 'Apply online in 5 minutes. No appointments, no waiting rooms, no paperwork mailed in.' },
+                ].map((item) => (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 bg-brand-green-100 rounded-full flex items-center justify-center mt-0.5">
+                      <span className="text-brand-green-600 text-xs font-bold">✓</span>
+                    </span>
+                    <div>
+                      <p className="font-bold text-slate-900">{item.title}</p>
+                      <p className="text-slate-500 text-sm">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-8">
+                <Link href="/apply/student" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors shadow-lg shadow-brand-red-600/20">
+                  Apply Now — It&apos;s Free
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      </InView>
+
       {/* ===== TESTIMONIALS ===== */}
       <InView animation="fade-up">
-      <section aria-label="Student testimonials" className="py-10 sm:py-14">
+      <section aria-label="Student testimonials" className="py-10 sm:py-14 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">What Our Students Say</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">Real Students. Real Results.</h2>
+            <p className="text-slate-500 text-lg">Hear from graduates who changed their careers through Elevate.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { quote: 'WIOA paid for my Medical Assistant training, and I started working right after graduation. Now I\'m making $42,000 a year with full benefits.', name: 'Sarah M.', program: 'Medical Assistant' },
-              { quote: 'They provided an extremely informative and hospitable environment. I really enjoyed my classes. Thank you so much!', name: 'Timothy S.', program: 'CDL Training' },
-              { quote: 'Anyone who wants to grow and make more money should try Elevate. You deserve it! The staff is amazing and easy to communicate with.', name: 'Jasmine R.', program: 'CNA Certification' },
+              { quote: 'WIOA paid for my Medical Assistant training, and I started working right after graduation. Now I\'m making $42,000 a year with full benefits.', name: 'Sarah M.', program: 'Medical Assistant', salary: '$42K/yr', photo: '/images/testimonials-hq/person-1.jpg' },
+              { quote: 'They provided an extremely informative and hospitable environment. I really enjoyed my classes. Thank you so much!', name: 'Timothy S.', program: 'CDL Training', salary: '$55K/yr', photo: '/images/testimonials-hq/person-4.jpg' },
+              { quote: 'Anyone who wants to grow and make more money should try Elevate. You deserve it! The staff is amazing and easy to communicate with.', name: 'Jasmine R.', program: 'CNA Certification', salary: '$38K/yr', photo: '/images/testimonials-hq/person-3.jpg' },
             ].map((t) => (
-              <div key={t.name} className="bg-white rounded-xl p-8 border border-slate-200 shadow-sm">
-                <p className="text-slate-800 text-lg mb-6 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
-                <div>
-                  <p className="font-bold text-slate-900 text-base">{t.name}</p>
-                  <p className="text-slate-600 text-base">{t.program}</p>
+              <div key={t.name} className="bg-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-2 mb-4">
+                  {[1,2,3,4,5].map((star) => (
+                    <span key={star} className="text-amber-400 text-sm">★</span>
+                  ))}
+                </div>
+                <p className="text-slate-700 text-base mb-6 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Image src={t.photo} alt={t.name} width={44} height={44} className="rounded-full object-cover w-11 h-11" />
+                    <div>
+                      <p className="font-bold text-slate-900">{t.name}</p>
+                      <p className="text-slate-500 text-sm">{t.program}</p>
+                    </div>
+                  </div>
+                  <span className="text-brand-green-600 font-bold text-sm bg-brand-green-50 px-3 py-1 rounded-full">{t.salary}</span>
                 </div>
               </div>
             ))}

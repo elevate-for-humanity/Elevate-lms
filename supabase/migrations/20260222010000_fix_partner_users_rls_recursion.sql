@@ -14,7 +14,7 @@ STABLE
 SECURITY DEFINER
 SET search_path = public
 AS $$
-  SELECT tenant_id
+  SELECT partner_id
   FROM partner_users
   WHERE user_id = auth.uid()
   LIMIT 1;

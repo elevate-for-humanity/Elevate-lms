@@ -8,9 +8,9 @@ import { InView } from '@/components/ui/InView';
 // Quiz removed — program cards now serve as the path selector
 
 const programs = [
-  { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.webp', desc: 'DOL-registered apprenticeship — earn while you learn your craft.', salary: '$30K–$55K', duration: '12 months', tag: 'DOL Registered' },
+  { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.jpg', desc: 'DOL-registered apprenticeship — earn while you learn your craft.', salary: '$30K–$55K', duration: '12 months', tag: 'DOL Registered' },
   { name: 'Building Technician with HVAC Fundamentals', href: '/programs/hvac-technician', image: '/images/programs-hq/hvac-technician.jpg', desc: 'EPA 608, OSHA safety, and hands-on training for facilities and HVAC careers.', salary: '$40K–$65K', duration: '20 weeks', tag: 'WIOA Funded' },
-  { name: 'Business & Office Administration', href: '/programs/business-office', image: '/images/programs-hq/business-office.webp', desc: 'QuickBooks, Microsoft Office, and business operations training.', salary: '$32K–$48K', duration: '8–12 weeks', tag: 'WIOA Funded' },
+  { name: 'Business & Office Administration', href: '/programs/business-office', image: '/images/programs-hq/business-office.jpg', desc: 'QuickBooks, Microsoft Office, and business operations training.', salary: '$32K–$48K', duration: '8–12 weeks', tag: 'WIOA Funded' },
 ];
 
 
@@ -112,31 +112,31 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {programs.map((program) => (
-              <Link key={program.name} href={program.href} className="group bg-white rounded-xl border-2 border-slate-200 hover:border-brand-red-400 hover:shadow-lg transition-all overflow-hidden">
-                <div className="relative aspect-[16/10] overflow-hidden">
-                  <Image
-                    src={program.image}
-                    alt={program.name}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-3 left-3">
-                    <span className="inline-block bg-white/95 backdrop-blur-sm text-slate-900 text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+              <Link key={program.name} href={program.href} className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={program.image}
+                  alt={program.name}
+                  width={600}
+                  height={375}
+                  loading="eager"
+                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[11px] font-bold text-brand-red-600 bg-brand-red-50 px-2 py-0.5 rounded-full">
                       {program.tag}
                     </span>
+                    <span className="text-[11px] font-medium text-slate-500">{program.duration}</span>
                   </div>
-                </div>
-                <div className="p-5">
-                  <h3 className="text-slate-900 font-bold text-lg sm:text-xl mb-1">{program.name}</h3>
+                  <h3 className="text-slate-900 font-bold text-lg mb-1">{program.name}</h3>
                   <p className="text-slate-600 text-sm mb-3">{program.desc}</p>
-                  <div className="flex items-center gap-3 mb-4 text-xs">
-                    <span className="bg-brand-green-50 text-brand-green-700 font-semibold px-2.5 py-1 rounded-full">{program.salary}</span>
-                    <span className="bg-slate-100 text-slate-600 font-medium px-2.5 py-1 rounded-full">{program.duration}</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-brand-green-700 font-semibold text-sm">{program.salary}</span>
+                    <span className="text-brand-red-600 font-semibold text-sm group-hover:text-brand-red-700 transition-colors">
+                      Explore &rarr;
+                    </span>
                   </div>
-                  <span className="inline-block bg-brand-red-600 text-white font-semibold text-sm px-5 py-2.5 rounded-lg group-hover:bg-brand-red-700 transition-colors">
-                    Explore Program &rarr;
-                  </span>
                 </div>
               </Link>
             ))}

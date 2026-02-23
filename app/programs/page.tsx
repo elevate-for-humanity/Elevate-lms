@@ -1,7 +1,6 @@
-export const dynamic = 'force-dynamic';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-// Programs page - pulls from database with ISR caching
+// Programs page - ISR cached, revalidates every 10 minutes
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';

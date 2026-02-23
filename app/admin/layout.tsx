@@ -79,13 +79,8 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Auth check - bypassed in demo/development mode via lib/auth.ts
-  // Login page lives at /admin-login (outside this layout) to avoid auth loop.
-  try {
-    await requireAdmin();
-  } catch (error) {
-    redirect('/admin-login?redirect=/admin');
-  }
+  // Auth check — redirects to /login?redirect=/admin/dashboard if not authenticated
+  await requireAdmin();
 
   // Get license context for banner
   const context = await getLicenseContext();

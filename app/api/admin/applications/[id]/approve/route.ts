@@ -170,6 +170,25 @@ export async function POST(
       }
     }
 
+    // 4b) Also create program_enrollments record (used by onboarding/dashboard pages)
+    if (program_id) {
+      await supabaseAdmin
+        .from("program_enrollments")
+        .upsert({
+          user_id: userId,
+          program_id,
+          email,
+          full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
+          amount_paid_cents: 0,
+          funding_source: funding_type || 'pending',
+          status: 'active',
+          enrollment_state: 'enrolled',
+        }, { onConflict: 'user_id,program_id', ignoreDuplicates: true })
+        .then(({ error }) => {
+          if (error) logger.error("program_enrollments upsert error:", error);
+        });
+    }
+
     // 5) Update application status
     const { error: updateError } = await supabaseAdmin
       .from("applications")
@@ -210,7 +229,7 @@ export async function POST(
           email,
           name: `${app.first_name || ''} ${app.last_name || ''}`.trim() || 'Student',
           programName,
-          dashboardUrl: `${siteUrl}/learner/dashboard`,
+          dashboardUrl: `${siteUrl}/lms/dashboard`,
         });
         logger.info('Approval email sent', { userId, email });
       }

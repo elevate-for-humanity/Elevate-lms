@@ -252,21 +252,21 @@ export default function HVACProgramContent() {
                 step: 2,
                 title: "Apply or enroll",
                 description: "Funded students: click \"Apply Now\" and submit a short application. We'll coordinate with WorkOne to confirm your funding. Self-pay students: click \"Enroll & Pay\" to register and choose a payment option.",
-                image: "/images/trades/program-hvac-technician.jpg",
+                image: "/images/programs-hq/it-support.jpg",
                 alt: "Student completing enrollment application"
               },
               {
                 step: 3,
                 title: "Complete onboarding",
                 description: "Upload your photo ID, sign the student agreement, and complete a short orientation. Your account and login credentials are created during this step.",
-                image: "/images/trades/program-hvac-overview.jpg",
+                image: "/images/programs-hq/business-office.jpg",
                 alt: "Student completing onboarding on laptop"
               },
               {
                 step: 4,
                 title: "Start class",
                 description: "Once onboarding and funding are confirmed, you're in. You'll get your class schedule, access to the learning platform, and everything you need to begin training.",
-                image: "/images/programs-hq/hvac-technician.jpg",
+                image: "/images/programs-hq/electrical.jpg",
                 alt: "HVAC students in hands-on training lab"
               }
             ].map((item) => (
@@ -521,14 +521,14 @@ export default function HVACProgramContent() {
                 role: "HVAC Service Technician",
                 salary: "$40,000 – $55,000/year",
                 description: "Diagnose and repair heating and cooling systems in homes and businesses. Year-round demand — busy in summer and winter.",
-                image: "/images/trades/hero-program-hvac.jpg",
+                image: "/images/programs-hq/skilled-trades-hero.jpg",
                 alt: "HVAC service technician repairing a residential unit"
               },
               {
                 role: "Installation Specialist",
                 salary: "$42,000 – $58,000/year",
                 description: "Install new HVAC systems in homes and commercial buildings. Strong growth driven by new construction and system upgrades.",
-                image: "/images/trades/program-hvac-overview.jpg",
+                image: "/images/trades/program-building-construction.jpg",
                 alt: "HVAC installer working on a new commercial system"
               },
               {
@@ -660,7 +660,7 @@ export default function HVACProgramContent() {
 
       {/* Final CTA */}
       <section className="relative py-20">
-        <Image src="/images/programs-hq/skilled-trades-hero.jpg" alt="HVAC technician at work" fill quality={90} className="object-cover" />
+        <Image src="/images/trades/hero-program-plumbing.jpg" alt="HVAC technician at work" fill quality={90} className="object-cover" />
         <div className="absolute inset-0 bg-brand-blue-900/85" />
         <div className="relative max-w-4xl mx-auto px-6 lg:px-8 text-center text-white">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Start?</h2>

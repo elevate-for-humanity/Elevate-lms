@@ -25,6 +25,7 @@ export default async function ApplyPage({
   const params = await searchParams;
   const rawProgram = (params?.program || params?.pathway || '').trim();
 
+  // With a program param, resolve and redirect to student form
   if (rawProgram) {
     const entry = resolveProgram(rawProgram);
     if (entry) {
@@ -33,8 +34,10 @@ export default async function ApplyPage({
       }
       redirect(`/apply/student?program=${entry.slug}`);
     }
-    redirect('/apply/student');
   }
+
+  // Default: go straight to student application
+  redirect('/apply/student');
 
   return (
     <div className="min-h-screen bg-white">

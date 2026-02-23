@@ -5,13 +5,50 @@ import { useRouter } from 'next/navigation';
 import { submitStudentApplication } from '../actions';
 import { getActiveProgramsByCategory } from '@/lib/program-registry';
 import { trackEvent } from '@/components/analytics/google-analytics';
+import { CheckCircle, Mail } from 'lucide-react';
 
 const programGroups = getActiveProgramsByCategory();
+
+interface SuccessData {
+  email: string;
+  password: string;
+  referenceNumber: string;
+}
+
+function SuccessPanel({ data }: { data: SuccessData }) {
+  return (
+    <div className="text-center py-8">
+      <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-100 rounded-full mb-6">
+        <CheckCircle className="w-10 h-10 text-brand-green-600" />
+      </div>
+      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Application Submitted!</h2>
+      <div className="flex items-center justify-center gap-2 mb-4">
+        <Mail className="w-5 h-5 text-brand-blue-600" />
+        <p className="text-lg text-gray-700">Check your email to get started.</p>
+      </div>
+      <p className="text-gray-600 max-w-md mx-auto mb-6">
+        We sent an email to <strong>{data.email}</strong> with your login credentials
+        and a link to begin onboarding. Follow the instructions in the email to complete
+        your enrollment.
+      </p>
+      <p className="text-sm text-gray-500 mb-6">
+        Don&apos;t see it? Check your spam folder or contact us at{' '}
+        <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">info@elevateforhumanity.org</a>
+      </p>
+      {data.referenceNumber && (
+        <p className="text-sm text-gray-500">
+          Reference: <span className="font-mono font-bold">{data.referenceNumber}</span>
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default function StudentApplicationForm({ initialProgram = '' }: { initialProgram?: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successData, setSuccessData] = useState<SuccessData | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,7 +80,11 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
 
       if (result.success) {
         trackEvent('application_complete', 'conversion', data.programInterest);
-        router.push(result.redirectTo!);
+        setSuccessData({
+          email: result.email || data.email,
+          password: result.generatedPassword || '',
+          referenceNumber: result.referenceNumber || '',
+        });
       } else {
         setError(
           result.error ||
@@ -57,6 +98,10 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
       );
       setLoading(false);
     }
+  }
+
+  if (successData) {
+    return <SuccessPanel data={successData} />;
   }
 
   return (

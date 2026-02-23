@@ -14,19 +14,26 @@ export const metadata: Metadata = {
 
 async function confirmFunding(formData: FormData) {
   'use server';
-  const { createClient } = await import('@/lib/supabase/server');
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { createClient: createServerClient } = await import('@/lib/supabase/server');
+  const { createAdminClient: createAdmin } = await import('@/lib/supabase/admin');
+  const supabase = await createServerClient();
+  const admin = createAdmin();
+  const db = admin || supabase;
   if (!supabase) throw new Error('Database unavailable');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
   const fundingSource = formData.get('funding_source') as string;
 
-  await db.from('profiles').update({
+  const { error } = await db.from('profiles').update({
     funding_source: fundingSource || 'pending',
     funding_confirmed: true,
   }).eq('id', user.id);
+
+  if (error) {
+    console.error('Funding confirm failed:', error.message);
+    throw new Error('Failed to confirm funding');
+  }
 
   redirect('/onboarding/learner');
 }

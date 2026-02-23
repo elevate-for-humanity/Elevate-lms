@@ -121,15 +121,14 @@ export async function sendWelcomeEmail(params: {
             
             ${miladySection}
             
-            <p><strong>Your Student Dashboard:</strong></p>
-            <ul>
-              <li>Track your progress and hours</li>
-              <li>Access course materials</li>
-              <li>Connect with your instructor</li>
-              <li>View your schedule</li>
-            </ul>
+            <p><strong>To get started:</strong></p>
+            <ol>
+              <li>Click the button below to log in to your student portal</li>
+              <li>Complete the required orientation (about 10 minutes)</li>
+              <li>Once orientation is done, your courses will be unlocked</li>
+            </ol>
             <p style="text-align: center;">
-              <a href="${params.dashboardUrl}" class="button">Go to Dashboard</a>
+              <a href="${params.dashboardUrl}" class="button">Log In to Student Portal</a>
             </p>
             <p>If you have any questions, our support team is here to help. Just reply to this email or call (317) 314-3757.</p>
             <p>Best regards,<br>The Elevate for Humanity Team</p>

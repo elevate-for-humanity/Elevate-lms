@@ -14,14 +14,16 @@ export const metadata: Metadata = {
 
 async function updateProfile(formData: FormData) {
   'use server';
-  const { createClient } = await import('@/lib/supabase/server');
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { createClient: createServerClient } = await import('@/lib/supabase/server');
+  const { createAdminClient: createAdmin } = await import('@/lib/supabase/admin');
+  const supabase = await createServerClient();
+  const admin = createAdmin();
+  const db = admin || supabase;
   if (!supabase) throw new Error('Database unavailable');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  await db.from('profiles').update({
+  const { error } = await db.from('profiles').update({
     full_name: formData.get('full_name') as string,
     phone: formData.get('phone') as string || null,
     address: formData.get('address') as string || null,
@@ -29,6 +31,11 @@ async function updateProfile(formData: FormData) {
     state: formData.get('state') as string || null,
     zip_code: formData.get('zip_code') as string || null,
   }).eq('id', user.id);
+
+  if (error) {
+    console.error('Profile update failed:', error.message);
+    throw new Error('Failed to save profile');
+  }
 
   redirect('/onboarding/learner');
 }

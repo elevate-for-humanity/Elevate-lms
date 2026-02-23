@@ -108,11 +108,16 @@ export default function DocumentUploadPage() {
         .from('documents')
         .insert({
           user_id: user.id,
+          uploaded_by: user.id,
           file_path: uploadData.path,
+          file_url: uploadData.path,
           file_name: file.name,
-          file_type: file.type,
+          file_size: file.size,
+          file_size_bytes: file.size,
+          mime_type: file.type,
           document_type: documentType,
-          description: description || REQUIRED_DOCUMENTS.find((d) => d.type === documentType)?.label || '',
+          status: 'pending',
+          verification_status: 'pending',
         });
 
       if (dbError) throw dbError;

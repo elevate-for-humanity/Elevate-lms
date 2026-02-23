@@ -29,12 +29,8 @@ function LoginForm() {
     try {
       const supabase = createClient();
       
-      if (!supabase) {
-        throw new Error('Authentication service is not available. Please try again later.');
-      }
-      
       const { data, error }: any = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       });
 
@@ -100,7 +96,7 @@ function LoginForm() {
       </section>
 
       {/* Login Form */}
-      <section className="py-12">
+      <section className="py-12 relative z-10">
         <div className="max-w-md mx-auto px-4">
           <div className="bg-white rounded-lg shadow-lg p-8">
             <h1 className="text-3xl font-bold text-center mb-2">Login</h1>
@@ -167,9 +163,9 @@ function LoginForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-8 py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition-all disabled:bg-slate-400 disabled:cursor-not-allowed text-lg"
+                className="w-full px-8 py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition-all disabled:bg-slate-400 disabled:cursor-not-allowed text-lg cursor-pointer"
               >
-                {loading ? 'Logging in...' : 'Login'}
+                {loading ? 'Logging in...' : 'Sign In'}
               </button>
             </form>
 
@@ -190,12 +186,14 @@ function LoginForm() {
               <div className="grid grid-cols-2 gap-3">
                 <Link
                   href="/lms/dashboard"
+                  prefetch={false}
                   className="text-center px-4 py-3 bg-slate-100 text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
                 >
                   Student Portal
                 </Link>
                 <Link
                   href="/admin"
+                  prefetch={false}
                   className="text-center px-4 py-3 bg-slate-100 text-black rounded-lg hover:bg-slate-200 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center"
                 >
                   Admin Portal

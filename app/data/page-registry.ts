@@ -53,8 +53,7 @@ export const NAV_REGISTRY: NavCategory[] = [
     label: 'Students',
     key: 'students',
     items: [
-      { label: 'Apply / Inquiry', href: '/apply', description: 'Start your application' },
-      { label: 'Full Application', href: '/apply/full', description: 'Complete application form' },
+      { label: 'Apply', href: '/apply', description: 'Start your application' },
       { label: 'Enroll', href: '/enroll', description: 'Enroll in a program' },
       { label: 'Funding Options', href: '/funding', description: 'WIOA, WRG, JRI, and more' },
       { label: 'How It Works', href: '/how-it-works', description: 'Our enrollment process' },

@@ -36,32 +36,28 @@ async function resolveCourseId(supabase: any, programInterest: string): Promise<
     'hvac': 'hvac technician',
     'hvac tech': 'hvac technician',
   };
-  const { data: courses } = await supabase.from('training_courses').select('id, title');
+  const { data: courses } = await supabase.from('training_courses').select('id, course_name');
   if (!courses?.length) return null;
-  const exact = courses.find((c: any) => c.title.toLowerCase() === normalized);
+  const exact = courses.find((c: any) => c.course_name?.toLowerCase() === normalized);
   if (exact) return exact.id;
   const alias = ALIASES[normalized];
   if (alias) {
-    const m = courses.find((c: any) => c.title.toLowerCase().includes(alias));
+    const m = courses.find((c: any) => c.course_name?.toLowerCase().includes(alias));
     if (m) return m.id;
   }
   const partial = courses.find((c: any) => {
-    const t = c.title.toLowerCase();
+    const t = (c.course_name || '').toLowerCase();
     return t.includes(normalized) || normalized.includes(t.replace(/\(.*\)/, '').trim());
   });
   return partial?.id || null;
 }
 
 /**
- * Auto-approve: create auth user + profile on application submit.
- * Does NOT enroll — student must complete onboarding + WorkOne approval first.
- */
-/**
  * Creates an auth account and profile so the student can log in and complete
- * onboarding. Application stays 'pending' — approval happens after all
- * onboarding steps (profile, agreements, documents, orientation) are done.
+ * onboarding. Application stays 'pending' until onboarding is complete and
+ * documents are verified, then auto-enrolls.
  *
- * Flow: pending → onboarding → approved → enrolled
+ * Flow: pending → onboarding → docs verified → approved → enrolled
  */
 async function createStudentAccount(
   supabase: any,
@@ -70,10 +66,15 @@ async function createStudentAccount(
   firstName: string,
   lastName: string,
   programInterest: string,
-): Promise<{ userId?: string; accountCreated: boolean; magicLink?: string | null }> {
+): Promise<{ userId?: string; accountCreated: boolean; magicLink?: string | null; generatedPassword?: string }> {
   try {
     const normalizedEmail = email.toLowerCase().trim();
     let userId: string | null = null;
+
+    // Always generate credentials so the student gets them in the email
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    const randomPart = Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    const generatedPassword = `Efh-${randomPart}!`;
 
     // Check profiles first
     const { data: existingProfile } = await supabase
@@ -84,12 +85,13 @@ async function createStudentAccount(
 
     if (existingProfile?.id) {
       userId = existingProfile.id;
+      // Reset password to the new generated one so credentials in the email are valid
+      await supabase.auth.admin.updateUserById(userId, { password: generatedPassword });
     } else {
-      // Create new auth user
-      const tempPassword = `Elevate-${Date.now().toString(36)}!`;
+      // Create new auth user with generated credentials
       const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
         email: normalizedEmail,
-        password: tempPassword,
+        password: generatedPassword,
         email_confirm: true,
         user_metadata: {
           full_name: `${firstName} ${lastName}`,
@@ -117,6 +119,8 @@ async function createStudentAccount(
           const found = batch.users.find((u: any) => u.email?.toLowerCase() === normalizedEmail);
           if (found) {
             userId = found.id;
+            // Reset password so credentials in the email are valid
+            await supabase.auth.admin.updateUserById(userId, { password: generatedPassword });
             await supabase.from('profiles').upsert({
               id: userId,
               email: normalizedEmail,
@@ -133,7 +137,7 @@ async function createStudentAccount(
 
     if (!userId) {
       logger.error('Account creation failed — could not create user', { email: normalizedEmail });
-      return { accountCreated: false };
+      return { accountCreated: false, generatedPassword };
     }
 
     // Resolve course ID for tracking
@@ -148,62 +152,14 @@ async function createStudentAccount(
       .maybeSingle();
     const programId = programRow?.id || courseId || null;
 
-    // Link user to application — auto-approved for instant LMS access
+    // Link user to application — enrollment happens after onboarding completion
     await supabase
       .from('applications')
       .update({
-        status: 'approved',
         user_id: userId,
         program_id: programId,
       })
       .eq('id', applicationId);
-
-    // Create program_enrollments record — active immediately
-    try {
-      await supabase
-        .from('program_enrollments')
-        .insert({
-          user_id: userId,
-          program_id: programId,
-          email: normalizedEmail,
-          full_name: `${firstName} ${lastName}`,
-          amount_paid_cents: 0,
-          funding_source: 'pending',
-          status: 'active',
-          enrollment_state: 'enrolled',
-        });
-    } catch (enrollErr) {
-      logger.error('Failed to create program_enrollment record', enrollErr as Error);
-    }
-
-    // Auto-enroll in all courses for this program — instant LMS access
-    if (programId) {
-      try {
-        const { data: courses } = await supabase
-          .from('training_courses')
-          .select('id')
-          .eq('program_id', programId)
-          .eq('is_active', true);
-
-        if (courses && courses.length > 0) {
-          const courseEnrollments = courses.map((c: { id: string }) => ({
-            user_id: userId,
-            course_id: c.id,
-            status: 'active',
-            progress: 0,
-            enrolled_at: new Date().toISOString(),
-          }));
-
-          await supabase
-            .from('training_enrollments')
-            .upsert(courseEnrollments, { onConflict: 'user_id,course_id', ignoreDuplicates: true });
-
-          logger.info('Auto-enrolled in courses', { userId, courseCount: courses.length });
-        }
-      } catch (courseErr) {
-        logger.error('Failed to auto-enroll in courses', courseErr as Error);
-      }
-    }
 
     // Generate a magic link so the student can log in without setting a password
     let magicLink: string | null = null;
@@ -220,8 +176,8 @@ async function createStudentAccount(
       logger.warn('Could not generate magic link — student will use forgot-password', linkErr as Error);
     }
 
-    logger.info('Student account created — instant LMS access', { applicationId, userId, email: normalizedEmail });
-    return { userId, accountCreated: true, magicLink };
+    logger.info('Student account created — awaiting onboarding completion for enrollment', { applicationId, userId, email: normalizedEmail });
+    return { userId, accountCreated: true, magicLink, generatedPassword };
   } catch (err) {
     logger.error('Account creation failed', err as Error);
     return { accountCreated: false };
@@ -229,9 +185,9 @@ async function createStudentAccount(
 }
 
 /**
- * Application submission with auto-approve and auto-enroll.
- * On submit: save application → create auth user → enroll in course → send welcome email.
- * User accounts are created later upon admin approval.
+ * Application submission.
+ * On submit: save application (pending) → create auth user → send onboarding email.
+ * Enrollment is automatic after onboarding + document verification.
  * All inserts use admin client (service role) to bypass RLS.
  */
 
@@ -314,42 +270,70 @@ async function insertApplication(payload: {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
   const programLabel = payload.programInterest.replace(/-/g, ' ');
 
-  // ── Helper: send both emails (student confirmation + admin notification) ──
-  async function sendApplicationEmails(magicLink?: string | null) {
-    // Build the login step based on whether we have a magic link
-    const loginStep = magicLink
-      ? `<li><strong>Log in now:</strong> <a href="${magicLink}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;margin:8px 0">Start My Onboarding</a></li>`
-      : [
-          `<li><strong>Set your password:</strong> Go to <a href="${siteUrl}/forgot-password">${siteUrl}/forgot-password</a> and enter your email: <strong>${payload.email}</strong></li>`,
-          `<li><strong>Log in:</strong> Go to <a href="${siteUrl}/login">${siteUrl}/login</a></li>`,
-        ].join('');
+  // Auto-enrollment: insert application, create account, enroll in courses, send onboarding email.
 
-    // Student: enrolled — instant LMS access
+  async function sendEnrollmentEmails(magicLink?: string | null, generatedPassword?: string) {
+    const onboardingUrl = `${siteUrl}/onboarding/learner`;
+
+    // Big CTA button — magic link if available, otherwise direct onboarding link
+    const ctaLink = magicLink || `${siteUrl}/login`;
+    const ctaButton = [
+      `<div style="text-align:center;margin:24px 0">`,
+      `<a href="${ctaLink}" style="display:inline-block;padding:16px 32px;background:#2563eb;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:bold;font-size:18px">Start My Onboarding</a>`,
+      `</div>`,
+    ].join('');
+
+    // Credentials box — always shown when password was generated
+    const credentialsBlock = generatedPassword
+      ? [
+          `<div style="background:#f0f9ff;border:2px solid #2563eb;border-radius:8px;padding:20px;margin:20px 0">`,
+          `<p style="margin:0 0 12px;font-weight:bold;font-size:16px;color:#1e40af">Your Login Credentials</p>`,
+          `<table style="width:100%;border-collapse:collapse">`,
+          `<tr><td style="padding:8px 0;color:#64748b;width:80px">Email:</td><td style="padding:8px 0;font-weight:bold">${payload.email}</td></tr>`,
+          `<tr><td style="padding:8px 0;color:#64748b">Password:</td><td style="padding:8px 0;font-weight:bold;font-family:monospace;font-size:16px">${generatedPassword}</td></tr>`,
+          `</table>`,
+          `<p style="margin:12px 0 0;font-size:13px;color:#64748b">Save these credentials. You can change your password at <a href="${siteUrl}/reset-password">${siteUrl}/reset-password</a></p>`,
+          `</div>`,
+        ].join('')
+      : '';
+
+    // Student: application received — complete onboarding
     await sendEmailDirect(
       payload.email,
-      `You're Enrolled — Welcome to ${programLabel} [${referenceNumber}]`,
+      `Welcome to Elevate! Your Login Credentials & Onboarding Link [${referenceNumber}]`,
       [
-        `<h2>Hi ${payload.firstName},</h2>`,
-        `<p>You're enrolled in <strong>${programLabel}</strong> at Elevate for Humanity. Your LMS access is active now.</p>`,
-        `<p>Your reference number: <strong>${referenceNumber}</strong></p>`,
-        `<h3>Get Started:</h3>`,
-        `<ol>`,
-        loginStep,
-        `<li><strong>Start learning:</strong> Your courses are ready in the dashboard</li>`,
+        `<h2 style="color:#111827">Hi ${payload.firstName},</h2>`,
+        `<p>Thank you for applying to <strong>${programLabel}</strong> at Elevate for Humanity. Your account has been created and is ready to go.</p>`,
+        credentialsBlock,
+        ctaButton,
+        `<p style="text-align:center;font-size:13px;color:#64748b;margin-top:-12px">This button logs you in and takes you to your onboarding page.</p>`,
+        `<hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0">`,
+        `<h3 style="color:#111827">What happens next?</h3>`,
+        `<p>After clicking the button above, complete these onboarding steps to get enrolled:</p>`,
+        `<ol style="padding-left:20px;line-height:2">`,
+        `<li>Complete your profile</li>`,
+        `<li>Upload required documents (photo ID, SSN proof, proof of residency)</li>`,
+        `<li>Confirm your funding source</li>`,
+        `<li>Select your schedule</li>`,
+        `<li>Complete orientation</li>`,
         `</ol>`,
-        `<p>If you're applying for WIOA funding, register at <a href="https://indianacareerconnect.com">indianacareerconnect.com</a> — this is required for eligibility.</p>`,
-        `<p>Questions? Reply to this email or call us.</p>`,
+        `<p><strong>Once all steps are done, you are automatically enrolled</strong> and your courses will be available in your student dashboard.</p>`,
+        `<hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0">`,
+        `<p style="font-size:13px;color:#64748b">Reference number: <strong>${referenceNumber}</strong></p>`,
+        `<p style="font-size:13px;color:#64748b">Onboarding page: <a href="${onboardingUrl}">${onboardingUrl}</a></p>`,
+        `<p style="font-size:13px;color:#64748b">If you're applying for WIOA funding, register at <a href="https://indianacareerconnect.com">indianacareerconnect.com</a> — this is required for eligibility.</p>`,
+        `<p>Questions? Reply to this email or call us at (317) 314-3757.</p>`,
         `<p>— Elevate for Humanity</p>`,
       ].join(''),
     ).catch(() => {});
 
-    // Admin notification
+    // Admin notification — student will auto-enroll after onboarding + doc verification
     await sendEmailDirect(
       ADMIN_EMAIL,
-      `[ENROLLED] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`,
+      `[NEW APPLICATION] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`,
       [
         `<h3>New ${payload.source.replace(/-/g, ' ')}</h3>`,
-        `<p style="color:green"><strong>Status: ENROLLED — instant LMS access granted</strong></p>`,
+        `<p style="color:#b45309"><strong>Status: PENDING — student completing onboarding, documents need verification</strong></p>`,
         `<table style="border-collapse:collapse;width:100%;max-width:500px">`,
         `<tr><td style="padding:6px;font-weight:bold">Name</td><td style="padding:6px">${payload.firstName} ${payload.lastName}</td></tr>`,
         `<tr><td style="padding:6px;font-weight:bold">Email</td><td style="padding:6px"><a href="mailto:${payload.email}">${payload.email}</a></td></tr>`,
@@ -359,13 +343,13 @@ async function insertApplication(payload: {
         `<tr><td style="padding:6px;font-weight:bold">Reference</td><td style="padding:6px">${referenceNumber}</td></tr>`,
         payload.supportNotes ? `<tr><td style="padding:6px;font-weight:bold">Details</td><td style="padding:6px">${payload.supportNotes}</td></tr>` : '',
         `</table>`,
-        `<p>Student account created — LMS access is active. Courses auto-enrolled.</p>`,
-        supabase ? `<p><a href="${siteUrl}/admin/applications">View in Admin Dashboard</a></p>` : `<p style="color:orange"><em>Database unavailable — application received via email only.</em></p>`,
+        supabase ? `<p><a href="${siteUrl}/admin/applications/review/${referenceNumber}" style="display:inline-block;padding:10px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;margin:8px 0">Review & Approve</a></p>` : '',
+        supabase ? `<p><a href="${siteUrl}/admin/applications">View All Applications</a></p>` : '',
       ].filter(Boolean).join(''),
     ).catch(() => {});
   }
 
-  // ── Path A: Supabase available — full DB + auto-approve flow ──
+  // Path A: DB available — insert application, admin enrolls later
   if (supabase) {
     try {
       const { data, error } = await supabase
@@ -387,8 +371,8 @@ async function insertApplication(payload: {
 
       if (error) {
         logger.error(`[Application] DB insert failed for ${payload.email}`, new Error(error.message));
-        // Fall through to email-only path
       } else {
+        // Auto-enroll: create account + enroll in courses
         const accountResult = await createStudentAccount(
           supabase,
           data.id,
@@ -398,20 +382,18 @@ async function insertApplication(payload: {
           payload.programInterest,
         );
 
-        await sendApplicationEmails(accountResult.magicLink);
+        await sendEnrollmentEmails(accountResult.magicLink, accountResult.generatedPassword);
         revalidatePath('/admin/applications');
-        return { success: true, applicationId: data.id, referenceNumber };
+        return { success: true, applicationId: data.id, referenceNumber, generatedPassword: accountResult.generatedPassword, email: payload.email };
       }
     } catch (error) {
       logger.error(`[Application] DB error for ${payload.email}`, error as Error);
-      // Fall through to email-only path
     }
   }
 
-  // ── Path B: Email-only — no Supabase or DB insert failed ──
+  // Path B: Email-only fallback
   try {
-    await sendApplicationEmails();
-    logger.info(`[Application] Email-only submission for ${payload.email} [${referenceNumber}]`);
+    await sendEnrollmentEmails();
     return { success: true, applicationId: `email-${referenceNumber}`, referenceNumber };
   } catch (emailError) {
     logger.error(`[Application] Email send failed for ${payload.email}`, emailError as Error);
@@ -440,7 +422,13 @@ export async function submitStudentApplication(data: StudentApplicationData) {
   });
 
   if (result.success) {
-    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/apply/success?ref=${result.referenceNumber}&enrolled=true` };
+    return {
+      success: true,
+      applicationId: result.applicationId,
+      referenceNumber: result.referenceNumber,
+      generatedPassword: result.generatedPassword,
+      email: result.email || data.email,
+    };
   }
   return result;
 }

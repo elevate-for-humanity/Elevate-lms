@@ -74,7 +74,10 @@ export async function getSession() {
     } = await supabase.auth.getUser();
 
     if (error || !user) {
-      if (error) logger.error('Error getting session', error as Error);
+      // AuthSessionMissingError is expected for unauthenticated visitors — don't log as error
+      if (error && error.name !== 'AuthSessionMissingError') {
+        logger.error('Error getting session', error as Error);
+      }
       return null;
     }
 
@@ -91,7 +94,11 @@ export async function getSession() {
       token_type: 'bearer' as const,
     } as any;
   } catch (error) {
-    logger.error('Exception getting session', error as Error);
+    // Don't log auth session errors — they're expected for unauthenticated visitors
+    const errName = (error as any)?.name || '';
+    if (errName !== 'AuthSessionMissingError') {
+      logger.error('Exception getting session', error as Error);
+    }
     return null;
   }
 }
@@ -195,16 +202,19 @@ export async function requireApiAuth() {
 /**
  * Require auth for pages - redirects to login if not authenticated
  */
-export async function requireAuth() {
+export async function requireAuth(redirectTo?: string) {
   const session = await getSession();
   if (!session) {
-    redirect('/login');
+    const loginUrl = redirectTo
+      ? `/login?redirect=${encodeURIComponent(redirectTo)}`
+      : '/login';
+    redirect(loginUrl);
   }
   return session;
 }
 
-export async function requireRole(allowedRoles: UserRole | UserRole[]) {
-  const session = await requireAuth();
+export async function requireRole(allowedRoles: UserRole | UserRole[], redirectTo?: string) {
+  const session = await requireAuth(redirectTo);
   const role = await getUserRole();
 
   const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
@@ -221,7 +231,7 @@ export async function requireStudent() {
 }
 
 export async function requireAdmin() {
-  return requireRole(['admin', 'super_admin', 'staff']);
+  return requireRole(['admin', 'super_admin', 'staff'], '/admin/dashboard');
 }
 
 export async function requireProgramHolder() {

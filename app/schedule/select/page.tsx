@@ -14,9 +14,11 @@ export const metadata: Metadata = {
 
 async function confirmSchedule(formData: FormData) {
   'use server';
-  const { createClient } = await import('@/lib/supabase/server');
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { createClient: createServerClient } = await import('@/lib/supabase/server');
+  const { createAdminClient: createAdmin } = await import('@/lib/supabase/admin');
+  const supabase = await createServerClient();
+  const admin = createAdmin();
+  const db = admin || supabase;
   if (!supabase) throw new Error('Database unavailable');
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');

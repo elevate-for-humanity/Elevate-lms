@@ -54,7 +54,7 @@ const ROLE_CONFIG: Record<string, {
 }> = {
   student: {
     title: 'Application Received',
-    message: 'Your student account has been created. Complete all onboarding steps below — your application will be reviewed and approved once everything is in.',
+    message: 'Your application has been received and your account is ready. Complete the onboarding steps below to get enrolled.',
     steps: STUDENT_STEPS,
     primaryLink: '/forgot-password',
     primaryLabel: 'Set Your Password',
@@ -94,15 +94,15 @@ const ROLE_CONFIG: Record<string, {
 };
 
 const ENROLLED_CONFIG = {
-  title: "You're Enrolled!",
-  message: "Your account is set up. Check your email for a one-click login link to start onboarding.",
+  title: "Application Submitted!",
+  message: "Your account has been created. We sent you an email with a one-click login link — open it to start your onboarding.",
   steps: [
-    { icon: <Mail className="w-5 h-5 text-brand-blue-600" />, title: 'Check your email', description: 'We sent you a login link. Click "Start My Onboarding" in the email to sign in instantly — no password needed.' },
-    { icon: <UserCheck className="w-5 h-5 text-brand-blue-600" />, title: 'Complete onboarding', description: 'Fill in your profile, upload your ID, confirm funding, and complete a short orientation.' },
-    { icon: <BookOpen className="w-5 h-5 text-brand-blue-600" />, title: 'Start learning', description: 'Once onboarding is done, your courses are ready in the dashboard.' },
+    { icon: <Mail className="w-5 h-5 text-brand-blue-600" />, title: 'Check your email now', description: 'Look for an email from Elevate for Humanity. It contains a magic login link — click "Start My Onboarding" to sign in instantly. No password needed. Check your spam folder if you don\'t see it within a few minutes.' },
+    { icon: <UserCheck className="w-5 h-5 text-brand-blue-600" />, title: 'Complete your onboarding steps', description: 'After clicking the link, you\'ll land on your onboarding page. Fill in your profile, upload your ID, confirm funding, and complete a short orientation.' },
+    { icon: <BookOpen className="w-5 h-5 text-brand-blue-600" />, title: 'Get enrolled and start learning', description: 'Once all onboarding steps are done, you\'re automatically enrolled and your courses unlock in the student dashboard.' },
   ],
   primaryLink: '/login',
-  primaryLabel: 'Or Sign In Here',
+  primaryLabel: 'Or Sign In With Password',
 };
 
 export default async function ApplicationSuccessPage({

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 import StudentApplicationForm from './StudentApplicationForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { resolveSlug } from '@/lib/program-registry';
@@ -69,6 +70,26 @@ export default async function StudentApplicationPage({
 
       <section className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <StudentApplicationForm initialProgram={initialProgram} />
+      </section>
+
+      {/* Other application types */}
+      <section className="bg-slate-50 border-t border-slate-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 text-center">
+          <p className="text-slate-600 text-sm mb-3">Not a student?</p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/apply/employer" className="text-brand-blue-600 hover:underline font-medium text-sm">
+              Employer Partnership
+            </Link>
+            <span className="text-slate-300">|</span>
+            <Link href="/apply/program-holder" className="text-brand-blue-600 hover:underline font-medium text-sm">
+              Become a Program Holder
+            </Link>
+            <span className="text-slate-300">|</span>
+            <Link href="/apply/staff" className="text-brand-blue-600 hover:underline font-medium text-sm">
+              Staff Application
+            </Link>
+          </div>
+        </div>
       </section>
     </div>
   );

@@ -111,7 +111,8 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Send alert email when unauthorized copy is detected
+ * Send alert email when unauthorized copy is detected.
+ * Uses Resend via the shared sendEmail helper.
  */
 async function sendAlertEmail(data: {
   domain: string;
@@ -120,54 +121,49 @@ async function sendAlertEmail(data: {
   userAgent: string;
   timestamp: string;
 }) {
-  // Email sending via SendGrid when configured
-  // Set SENDGRID_API_KEY and ALERT_EMAIL_TO in environment variables
+  const { sendEmail } = await import('@/lib/email/resend');
 
-  const emailContent = `
-    🚨 UNAUTHORIZED SITE COPY DETECTED
-
-    Someone has copied your website and is hosting it at:
-    Domain: ${data.domain}
-    Full URL: ${data.url}
-
-    Details:
-    - Referrer: ${data.referrer}
-    - User Agent: ${data.userAgent}
-    - Timestamp: ${data.timestamp}
-
-    IMMEDIATE ACTIONS REQUIRED:
-    1. Screenshot the unauthorized site
-    2. Save all evidence
-    3. Send cease and desist letter
-    4. File DMCA takedown notice
-    5. Contact attorney
-
-    Evidence folder: /Evidence/unauthorized-copies/${data.domain}/
-
-    Legal contacts:
-    - IP Attorney: [YOUR ATTORNEY]
-    - DMCA Agent: legal@elevateforhumanity.org
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: #dc2626; color: white; padding: 20px; text-align: center;">
+        <h1 style="margin: 0;">Unauthorized Site Copy Detected</h1>
+      </div>
+      <div style="padding: 24px; background: #fef2f2; border: 1px solid #fecaca;">
+        <p style="font-size: 16px; font-weight: bold; color: #991b1b;">Someone has copied your website and is hosting it at:</p>
+        <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+          <tr><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; width: 120px;">Domain</td><td style="padding: 8px; border: 1px solid #ddd;"><a href="http://${data.domain}">${data.domain}</a></td></tr>
+          <tr><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Full URL</td><td style="padding: 8px; border: 1px solid #ddd; word-break: break-all;"><a href="${data.url}">${data.url}</a></td></tr>
+          <tr><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Referrer</td><td style="padding: 8px; border: 1px solid #ddd;">${data.referrer || 'Direct / None'}</td></tr>
+          <tr><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">User Agent</td><td style="padding: 8px; border: 1px solid #ddd; font-size: 12px;">${data.userAgent || 'Unknown'}</td></tr>
+          <tr><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Detected At</td><td style="padding: 8px; border: 1px solid #ddd;">${data.timestamp || new Date().toISOString()}</td></tr>
+        </table>
+        <h3 style="color: #991b1b;">Recommended Actions:</h3>
+        <ol>
+          <li>Visit the URL above and screenshot the unauthorized copy</li>
+          <li>Save all evidence (this email is logged in your database)</li>
+          <li>Send a cease and desist letter to the domain host</li>
+          <li>File a DMCA takedown notice with the hosting provider</li>
+        </ol>
+      </div>
+    </div>
   `;
 
-  logger.info('[ALERT EMAIL]', emailContent);
-
-  // Uncomment when you have email service configured:
-  /*
-  const sgMail = require('@sendgrid/mail');
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-  await sgMail.send({
+  const result = await sendEmail({
     to: 'elevate4humanityedu@gmail.com',
-    from: 'alerts@elevateforhumanity.org',
-    subject: '🚨 URGENT: Unauthorized Site Copy Detected',
-    text: emailContent,
-    html: emailContent.replace(/\n/g, '<br>')
+    subject: `ALERT: Unauthorized site copy detected on ${data.domain}`,
+    html,
   });
-  */
+
+  if (result.success) {
+    logger.info('[DMCA] Alert email sent for domain:', data.domain);
+  } else {
+    logger.error('[DMCA] Alert email failed:', result.error);
+  }
 }
 
 /**
- * Log unauthorized access to database for legal evidence
+ * Log unauthorized access to database for legal evidence.
+ * Writes to the unauthorized_access_log table via the admin client.
  */
 async function logUnauthorizedAccess(data: {
   domain: string;
@@ -177,31 +173,33 @@ async function logUnauthorizedAccess(data: {
   timestamp: string;
   ip: string;
 }) {
-  // Database logging for legal evidence
-  // Logs to console and can be extended to database when needed
-
   logger.info('[EVIDENCE LOG]', {
     type: 'UNAUTHORIZED_COPY',
     ...data,
     logged_at: new Date().toISOString(),
   });
 
-  // Uncomment when you have database configured:
-  /*
-  const { createClient } = require('@/lib/supabase/server');
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  try {
+    const db = createAdminClient();
+    const { error } = await db.from('unauthorized_access_log').insert({
+      domain: data.domain,
+      url: data.url,
+      referrer: data.referrer,
+      user_agent: data.userAgent,
+      ip_address: data.ip,
+      detected_at: data.timestamp,
+      logged_at: new Date().toISOString(),
+      status: 'active',
+    });
 
-  await db.from('unauthorized_access_log').insert({
-    domain: data.domain,
-    url: data.url,
-    referrer: data.referrer,
-    user_agent: data.userAgent,
-    ip_address: data.ip,
-    detected_at: data.timestamp,
-    logged_at: new Date().toISOString()
-  });
-  */
+    if (error) {
+      logger.error('[DMCA] Failed to log to database:', error.message);
+    } else {
+      logger.info('[DMCA] Evidence logged to unauthorized_access_log');
+    }
+  } catch (err) {
+    logger.error('[DMCA] Database logging error:', err);
+  }
 }
 
 /**

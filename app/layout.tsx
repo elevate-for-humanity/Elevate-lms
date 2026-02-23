@@ -6,6 +6,7 @@ import PublicLayout from '@/components/layout/PublicLayout';
 import { Toaster } from 'react-hot-toast';
 import CookieConsent from '@/components/CookieConsent';
 import { SkipToContent } from '@/components/ui/SkipToContent';
+import { DMCATrackingPixel } from '@/components/InvisibleWatermark';
 
 import { Inter } from 'next/font/google';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
@@ -262,6 +263,7 @@ export default function RootLayout({
         />
         <PublicLayout>{children}</PublicLayout>
         <CookieConsent />
+        <DMCATrackingPixel />
 
         <Toaster
           position="top-right"

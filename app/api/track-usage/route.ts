@@ -157,7 +157,7 @@ async function sendAlertEmail(data: {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
   await sgMail.send({
-    to: 'elizabeth@elevateforhumanity.org',
+    to: 'elevate4humanityedu@gmail.com',
     from: 'alerts@elevateforhumanity.org',
     subject: '🚨 URGENT: Unauthorized Site Copy Detected',
     text: emailContent,

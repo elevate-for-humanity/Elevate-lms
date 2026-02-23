@@ -176,7 +176,7 @@ Ona`;
 
 // Internal notification
 async function notifyInternal(payload: CalendlyEvent['payload']) {
-  const internalEmail = process.env.LEAD_NOTIFICATION_EMAIL || 'info@elevateforhumanity.org';
+  const internalEmail = process.env.LEAD_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com';
   
   const meetingTime = new Date(payload.scheduled_event.start_time);
   const formattedTime = meetingTime.toLocaleString('en-US', {

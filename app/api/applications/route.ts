@@ -150,14 +150,15 @@ export async function POST(req: Request) {
     let isNewUser = false;
     let passwordSetupLink: string | null = null;
     try {
-      // Check if user already exists
-      const { data: existingUsers } = await supabase.auth.admin.listUsers({ perPage: 1 });
-      const existingUser = existingUsers?.users?.find(
-        (u: any) => u.email?.toLowerCase() === body.email.toLowerCase()
-      );
+      // Check if user already exists by looking up profiles table first (fast, indexed)
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', body.email.toLowerCase())
+        .maybeSingle();
 
-      if (existingUser) {
-        userId = existingUser.id;
+      if (existingProfile) {
+        userId = existingProfile.id;
       } else {
         // Create auth user with random password (student sets it via reset flow)
         const tempPassword = `Elv-${crypto.randomUUID().slice(0, 16)}!`;
@@ -348,7 +349,7 @@ export async function POST(req: Request) {
 
       // Notification email to staff
       const staffEmailResult = await sendEmail({
-        to: 'info@elevateforhumanity.org',
+        to: 'elevate4humanityedu@gmail.com',
         subject: `New Application [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${body.program}`,
         html: `
           <h2>New Application Received</h2>

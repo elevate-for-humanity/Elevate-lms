@@ -7,7 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 const STUCK_THRESHOLD_HOURS = 24;
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'info@elevateforhumanity.org';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'elevate4humanityedu@gmail.com';
 
 /**
  * Cron endpoint to detect partners stuck in approved_pending_user state.

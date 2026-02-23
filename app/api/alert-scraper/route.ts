@@ -136,7 +136,7 @@ This is an automated alert from Elevate for Humanity Security System.
 
     try {
       await sgMail.send({
-        to: process.env.ALERT_EMAIL || 'elizabeth@elevateforhumanity.org',
+        to: process.env.ALERT_EMAIL || 'elevate4humanityedu@gmail.com',
         from: 'security@elevateforhumanity.org',
         subject: `🚨 Scraping Attempt: ${data.type}`,
         text: emailContent,

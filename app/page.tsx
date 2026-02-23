@@ -8,12 +8,9 @@ import { InView } from '@/components/ui/InView';
 // Quiz removed — program cards now serve as the path selector
 
 const programs = [
-  { name: 'Healthcare', href: '/programs/healthcare', image: '/images/programs-hq/healthcare-hero.webp', desc: 'CNA, Medical Assistant, Phlebotomy — launch a career in patient care.', salary: '$32K–$48K', duration: '4–12 weeks', tag: 'WIOA Funded' },
-  { name: 'Skilled Trades', href: '/programs/skilled-trades', image: '/images/programs-hq/skilled-trades-hero.webp', desc: 'HVAC, Electrical, Welding, Plumbing — high-demand, high-pay careers.', salary: '$40K–$65K', duration: '8–20 weeks', tag: 'WIOA Funded' },
   { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.webp', desc: 'DOL-registered apprenticeship — earn while you learn your craft.', salary: '$30K–$55K', duration: '12 months', tag: 'DOL Registered' },
-  { name: 'CDL Training', href: '/programs/cdl', image: '/images/cdl-vibrant.webp', desc: 'Class A & B commercial driving — one of the fastest paths to $50K+.', salary: '$50K–$75K', duration: '4–6 weeks', tag: 'Job Guarantee' },
-  { name: 'Technology', href: '/programs/technology', image: '/images/programs-hq/it-support.webp', desc: 'IT Support, Cybersecurity — enter the tech industry with certifications.', salary: '$38K–$60K', duration: '8–16 weeks', tag: 'WIOA Funded' },
-  { name: 'CPR & First Aid', href: '/programs/cpr-first-aid-hsi', image: '/images/healthcare/healthcare-professional-portrait-1.webp', desc: 'HSI-certified CPR, First Aid, and BLS — same-day certification available.', salary: 'Required for healthcare jobs', duration: '1 day', tag: 'Same Day' },
+  { name: 'Building Technician with HVAC Fundamentals', href: '/programs/hvac-technician', image: '/images/programs-hq/hvac-technician.jpg', desc: 'EPA 608, OSHA safety, and hands-on training for facilities and HVAC careers.', salary: '$40K–$65K', duration: '20 weeks', tag: 'WIOA Funded' },
+  { name: 'Business & Office Administration', href: '/programs/business-office', image: '/images/programs-hq/business-office.webp', desc: 'QuickBooks, Microsoft Office, and business operations training.', salary: '$32K–$48K', duration: '8–12 weeks', tag: 'WIOA Funded' },
 ];
 
 

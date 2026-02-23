@@ -299,8 +299,26 @@ function ModuleAccordion({
 
 export default function HvacCourseViewer({
   course,
+  isAuthenticated = false,
+  userName = null,
+  enrollmentStatus = 'not-enrolled',
+  enrollmentData = null,
+  completedLessonIds = [],
+  progressPercent = 0,
+  lastLessonId = null,
+  lastLessonTitle = null,
+  totalTimeSeconds = 0,
 }: {
   course: CourseDefinition;
+  isAuthenticated?: boolean;
+  userName?: string | null;
+  enrollmentStatus?: 'not-enrolled' | 'enrolled' | 'in-progress' | 'completed';
+  enrollmentData?: any;
+  completedLessonIds?: string[];
+  progressPercent?: number;
+  lastLessonId?: string | null;
+  lastLessonTitle?: string | null;
+  totalTimeSeconds?: number;
 }) {
   const [openModules, setOpenModules] = useState<Set<number>>(
     () => new Set([0]),
@@ -348,15 +366,84 @@ export default function HvacCourseViewer({
             {course.subtitle}
           </p>
 
-          {/* Primary CTA — go straight to first lesson */}
-          <div className="mt-8">
-            <Link
-              href={lessonUrl(FIRST_LESSON_ID)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
-            >
-              <Play className="w-5 h-5" />
-              Start Learning
-            </Link>
+          {/* Enrollment Status + Smart CTA */}
+          {isAuthenticated && enrollmentStatus !== 'not-enrolled' && (
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${
+                enrollmentStatus === 'completed'
+                  ? 'bg-brand-green-500/20 text-brand-green-300 border border-brand-green-400/30'
+                  : enrollmentStatus === 'in-progress'
+                    ? 'bg-brand-blue-500/20 text-brand-blue-300 border border-brand-blue-400/30'
+                    : 'bg-white/10 text-white border border-white/20'
+              }`}>
+                {enrollmentStatus === 'completed' ? 'Completed' : enrollmentStatus === 'in-progress' ? 'In Progress' : 'Enrolled'}
+              </span>
+              {progressPercent > 0 && (
+                <span className="text-sm text-gray-300">{progressPercent}% complete</span>
+              )}
+              {totalTimeSeconds > 0 && (
+                <span className="text-sm text-gray-400">
+                  {Math.round(totalTimeSeconds / 3600)}h {Math.round((totalTimeSeconds % 3600) / 60)}m logged
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Progress Bar */}
+          {isAuthenticated && progressPercent > 0 && (
+            <div className="mt-4 max-w-md">
+              <div className="w-full bg-white/10 rounded-full h-2.5">
+                <div
+                  className="bg-brand-green-500 h-2.5 rounded-full transition-all"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-1">
+                {completedLessonIds.length} of {totalLessons(course.modules)} lessons completed
+              </p>
+            </div>
+          )}
+
+          {/* Dynamic CTA based on enrollment state */}
+          <div className="mt-6 flex flex-wrap gap-3">
+            {enrollmentStatus === 'in-progress' && lastLessonId ? (
+              <Link
+                href={lessonUrl(lastLessonId)}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 transition-colors"
+              >
+                <Play className="w-5 h-5" />
+                Resume Learning
+              </Link>
+            ) : enrollmentStatus === 'completed' ? (
+              <Link
+                href="/credentials"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 transition-colors"
+              >
+                <Award className="w-5 h-5" />
+                View Certificate
+              </Link>
+            ) : enrollmentStatus === 'enrolled' ? (
+              <Link
+                href={lessonUrl(FIRST_LESSON_ID)}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
+              >
+                <Play className="w-5 h-5" />
+                Start Course
+              </Link>
+            ) : (
+              <Link
+                href="/programs/hvac-technician/apply"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
+              >
+                Apply for Enrollment
+              </Link>
+            )}
+
+            {enrollmentStatus === 'in-progress' && lastLessonTitle && (
+              <span className="text-sm text-gray-400 self-center">
+                Last: {lastLessonTitle}
+              </span>
+            )}
           </div>
 
           {/* Stats row */}
@@ -458,16 +545,44 @@ export default function HvacCourseViewer({
 
         {/* Bottom CTA */}
         <div className="mt-12 text-center">
-          <Link
-            href={lessonUrl(FIRST_LESSON_ID)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
-          >
-            <Play className="w-5 h-5" />
-            Start Learning
-          </Link>
+          {enrollmentStatus === 'in-progress' && lastLessonId ? (
+            <Link
+              href={lessonUrl(lastLessonId)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-brand-green-700 transition-colors"
+            >
+              <Play className="w-5 h-5" />
+              Resume Learning
+            </Link>
+          ) : enrollmentStatus === 'enrolled' ? (
+            <Link
+              href={lessonUrl(FIRST_LESSON_ID)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
+            >
+              <Play className="w-5 h-5" />
+              Start Course
+            </Link>
+          ) : enrollmentStatus === 'not-enrolled' ? (
+            <Link
+              href="/programs/hvac-technician/apply"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
+            >
+              Apply for Enrollment
+            </Link>
+          ) : null}
           <p className="mt-3 text-sm text-gray-500">
-            Funding available through WIOA, Next Level Jobs, and Workforce Ready Grants.
+            Approved for workforce-funded participants. Training hours tracked for WIOA compliance reporting.
           </p>
+        </div>
+
+        {/* Workforce Compliance Language */}
+        <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-5">
+          <h3 className="font-bold text-brand-blue-900 text-sm mb-2">Workforce Training Compliance</h3>
+          <ul className="space-y-1 text-sm text-brand-blue-700">
+            <li>• Training hours tracked and reported for workforce partner documentation</li>
+            <li>• Case manager progress reporting available upon request</li>
+            <li>• Measurable skill gains tracked per WIOA performance standards</li>
+            <li>• Completion milestones aligned with credential attainment</li>
+          </ul>
         </div>
       </section>
     </div>

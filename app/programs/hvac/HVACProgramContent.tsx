@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import {
@@ -59,8 +58,6 @@ export default function HVACProgramContent() {
           ]} />
         </div>
       </div>
-
-      <ProgramHeroBanner videoSrc="/videos/hvac-hero-final.mp4" voiceoverSrc="/audio/heroes/skilled-trades.mp3" />
 
       {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
@@ -137,6 +134,66 @@ export default function HVACProgramContent() {
           </div>
         </div>
 
+      </section>
+
+      {/* Program at a Glance — timeline, duration, pacing for case managers */}
+      <section className="py-12 bg-white border-b">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Program at a Glance</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 text-center">
+              <Calendar className="w-6 h-6 text-brand-blue-600 mx-auto mb-2" />
+              <p className="text-sm text-gray-500 uppercase font-semibold mb-1">Start Dates</p>
+              <p className="text-lg font-bold text-gray-900">Rolling Enrollment</p>
+              <p className="text-xs text-gray-500 mt-1">New cohorts begin monthly</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 text-center">
+              <Clock className="w-6 h-6 text-brand-blue-600 mx-auto mb-2" />
+              <p className="text-sm text-gray-500 uppercase font-semibold mb-1">Duration</p>
+              <p className="text-lg font-bold text-gray-900">15–20 Weeks</p>
+              <p className="text-xs text-gray-500 mt-1">Standard track · 400 total hours</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 text-center">
+              <Award className="w-6 h-6 text-brand-blue-600 mx-auto mb-2" />
+              <p className="text-sm text-gray-500 uppercase font-semibold mb-1">Credentials</p>
+              <p className="text-lg font-bold text-gray-900">6 Certifications</p>
+              <p className="text-xs text-gray-500 mt-1">EPA 608 · OSHA 30 · CPR + 3 more</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 text-center">
+              <Briefcase className="w-6 h-6 text-brand-blue-600 mx-auto mb-2" />
+              <p className="text-sm text-gray-500 uppercase font-semibold mb-1">Delivery</p>
+              <p className="text-lg font-bold text-gray-900">Hybrid</p>
+              <p className="text-xs text-gray-500 mt-1">In-person lab + classroom + online</p>
+            </div>
+          </div>
+
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
+            <h3 className="font-bold text-brand-blue-900 mb-3">Scheduling &amp; Completion Timeline</h3>
+            <div className="grid sm:grid-cols-2 gap-6 text-sm text-brand-blue-800">
+              <div>
+                <p className="font-semibold mb-1">Standard Track (15–20 weeks)</p>
+                <ul className="space-y-1 text-brand-blue-700">
+                  <li>• Day and evening options available</li>
+                  <li>• Designed for working adults</li>
+                  <li>• Self-paced online component (complete on your schedule)</li>
+                  <li>• Workforce funding eligible</li>
+                </ul>
+              </div>
+              <div>
+                <p className="font-semibold mb-1">Accelerated Track (6 weeks)</p>
+                <ul className="space-y-1 text-brand-blue-700">
+                  <li>• Intensive schedule, multiple sessions per week</li>
+                  <li>• For workforce agency cohorts and sponsored groups</li>
+                  <li>• Same curriculum, compressed timeline</li>
+                  <li>• Ideal for WorkOne, EmployIndy, and JRI referrals</li>
+                </ul>
+              </div>
+            </div>
+            <p className="text-xs text-brand-blue-600 mt-4">
+              Completion window is workforce-funding eligible. Contact our enrollment team for the next available start date and to confirm your completion timeline meets your funding requirements.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* What You'll Actually Do — image cards */}
@@ -400,21 +457,152 @@ export default function HVACProgramContent() {
         </div>
       </section>
 
-      {/* Mid-page CTA */}
-      <section className="py-8 bg-brand-red-600">
-        <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-white text-center sm:text-left">
-            <p className="font-bold text-lg">Ready to get started?</p>
-            <p className="text-yellow-200 text-sm font-semibold">Do not enroll until you have completed WorkOne verification.</p>
+      {/* Training Authority & Instructor Credentials */}
+      <section className="py-16 bg-slate-50 border-y">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Training Authority &amp; Credentials</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Elevate for Humanity is an authorized testing partner and approved workforce training provider — not a preview or catalog listing.
+            </p>
           </div>
-          <div className="flex gap-3">
-            <Link href="/apply?program=hvac-technician" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-full hover:bg-brand-red-50 transition-colors whitespace-nowrap">
-              Apply
+
+          <div className="grid md:grid-cols-2 gap-8 mb-10">
+            {/* Testing & Provider Authority */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-brand-blue-600" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">Provider Credentials</h3>
+              </div>
+              <ul className="space-y-3">
+                {[
+                  { label: 'EPA Section 608 Approved Testing Site', detail: 'Proctored certification exams administered on-site' },
+                  { label: 'Indiana DWD Listed Training Provider', detail: 'INTraining ID: 10004621' },
+                  { label: 'WIOA Eligible Training Provider (ETPL)', detail: 'Approved for workforce-funded participants' },
+                  { label: 'OSHA Authorized Safety Training', detail: 'OSHA 30-hour General Industry certification' },
+                  { label: '501(c)(3) Nonprofit Organization', detail: 'Selfish Inc. DBA Elevate for Humanity' },
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-brand-green-600 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">{item.label}</p>
+                      <p className="text-gray-500 text-xs">{item.detail}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Instructor Qualifications */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <GraduationCap className="w-5 h-5 text-amber-600" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">Instructor Qualifications</h3>
+              </div>
+              <ul className="space-y-3">
+                {[
+                  'EPA 608 Universal Certified',
+                  'OSHA 30 Certified Trainers',
+                  'Active field experience in HVAC installation and service',
+                  'Workforce training delivery experience',
+                  'CPR/First Aid certified instructors',
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                    <CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-6 bg-slate-50 rounded-lg p-4 border border-slate-200">
+                <h4 className="font-semibold text-gray-900 text-sm mb-2">Training Delivery Model</h4>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div className="flex justify-between">
+                    <span>Classroom instruction (in-person)</span>
+                    <span className="font-semibold text-gray-900">72 hours</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Hands-on lab (in-person, supervised)</span>
+                    <span className="font-semibold text-gray-900">292 hours</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Online coursework (self-paced)</span>
+                    <span className="font-semibold text-gray-900">36 hours</span>
+                  </div>
+                  <div className="flex justify-between border-t border-slate-200 pt-2 mt-2">
+                    <span className="font-semibold">Total program hours</span>
+                    <span className="font-bold text-gray-900">400 hours</span>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  EPA 608 exam: proctored on-site. OSHA 30: online with verified completion. All certifications issued by the respective certifying organizations.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mid-page CTA — enrollment with pricing + BNPL */}
+      <section className="py-14 bg-slate-900">
+        <div className="max-w-5xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-3">Enroll in HVAC Technician Training</h2>
+            <p className="text-slate-300 text-lg max-w-2xl mx-auto">
+              20 weeks, 6 credentials, hands-on training. Tuition: $5,000 — or free through workforce funding.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-4 mb-8">
+            <div className="bg-white/10 rounded-xl p-5 text-center">
+              <p className="text-brand-green-400 text-sm font-semibold uppercase mb-1">Workforce Funded</p>
+              <p className="text-3xl font-black text-white">$0</p>
+              <p className="text-slate-400 text-sm mt-1">WIOA or Workforce Ready Grant</p>
+            </div>
+            <div className="bg-white/10 rounded-xl p-5 text-center">
+              <p className="text-brand-blue-400 text-sm font-semibold uppercase mb-1">Weekly Plan</p>
+              <p className="text-3xl font-black text-white">$1,750</p>
+              <p className="text-slate-400 text-sm mt-1">deposit + ~$162/week</p>
+            </div>
+            <div className="bg-white/10 rounded-xl p-5 text-center">
+              <p className="text-pink-400 text-sm font-semibold uppercase mb-1">BNPL</p>
+              <p className="text-3xl font-black text-white">Affirm / Sezzle</p>
+              <p className="text-slate-400 text-sm mt-1">Split into monthly payments</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+            <Link
+              href="/apply?program=hvac-technician"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-500 text-white font-bold rounded-full transition-all text-lg"
+            >
+              Apply (Funded Students)
             </Link>
-            <Link href="/programs/hvac-technician/apply" className="bg-brand-green-500 text-white font-bold px-6 py-3 rounded-full hover:bg-brand-green-400 transition-colors whitespace-nowrap">
-              Enroll in Program
+            <Link
+              href="/programs/hvac-technician/apply"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-green-500 hover:bg-brand-green-400 text-white font-bold rounded-full transition-all text-lg"
+            >
+              Enroll &amp; Pay
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
           </div>
+
+          <div className="bg-yellow-500/20 border border-yellow-400/40 rounded-lg px-4 py-3 max-w-xl mx-auto">
+            <p className="text-sm text-yellow-100 font-semibold text-center">
+              Using workforce funding? Complete WorkOne verification first at{' '}
+              <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="text-white underline hover:text-yellow-200">
+                indianacareerconnect.com
+              </a>
+            </p>
+          </div>
+
+          <p className="text-center text-slate-500 text-xs mt-4">
+            Visa, Mastercard, Amex, Apple Pay, Google Pay, PayPal, Venmo, Cash App accepted at checkout.
+          </p>
         </div>
       </section>
 
@@ -589,6 +777,21 @@ export default function HVACProgramContent() {
         </div>
       </section>
 
+      {/* CTA after Who This Is For */}
+      <div className="bg-brand-blue-600 py-6">
+        <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-white font-bold text-lg text-center sm:text-left">Sound like you? Start your application today.</p>
+          <div className="flex gap-3">
+            <Link href="/apply?program=hvac-technician" className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-full hover:bg-brand-blue-50 transition-colors whitespace-nowrap">
+              Apply
+            </Link>
+            <Link href="/programs/hvac-technician/apply" className="bg-brand-green-500 text-white font-bold px-6 py-3 rounded-full hover:bg-brand-green-400 transition-colors whitespace-nowrap">
+              Enroll &amp; Pay
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* Funding — plain language */}
       <section className="py-16 bg-brand-blue-50 border-y">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
@@ -657,6 +860,24 @@ export default function HVACProgramContent() {
           </div>
         </div>
       </section>
+
+      {/* CTA after FAQ */}
+      <div className="bg-brand-green-600 py-6">
+        <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-white text-center sm:text-left">
+            <p className="font-bold text-lg">Still have questions? We can help.</p>
+            <p className="text-brand-green-100 text-sm">Call 317-314-3757 or apply online — our team responds within 1 business day.</p>
+          </div>
+          <div className="flex gap-3">
+            <Link href="/apply?program=hvac-technician" className="bg-white text-brand-green-700 font-bold px-6 py-3 rounded-full hover:bg-brand-green-50 transition-colors whitespace-nowrap">
+              Apply
+            </Link>
+            <Link href="/programs/hvac-technician/apply" className="bg-slate-900 text-white font-bold px-6 py-3 rounded-full hover:bg-slate-800 transition-colors whitespace-nowrap">
+              Enroll &amp; Pay
+            </Link>
+          </div>
+        </div>
+      </div>
 
       {/* Final CTA */}
       <section className="relative py-20">

@@ -147,6 +147,8 @@ export async function POST(req: Request) {
 
     // Auto-approve: create auth user, profile, and enrollment record
     let userId: string | null = null;
+    let isNewUser = false;
+    let passwordSetupLink: string | null = null;
     try {
       // Check if user already exists
       const { data: existingUsers } = await supabase.auth.admin.listUsers({ perPage: 1 });
@@ -170,6 +172,7 @@ export async function POST(req: Request) {
         });
         if (!createErr && newUser?.user) {
           userId = newUser.user.id;
+          isNewUser = true;
         } else {
           logger.warn('Auto-approve: could not create user', { email: body.email, error: createErr });
         }
@@ -212,7 +215,27 @@ export async function POST(req: Request) {
           .update({ status: 'approved', user_id: userId, program_id: programRow?.id || null })
           .eq('id', data.id);
 
-        logger.info('Barber application auto-approved', { userId, applicationId: data.id });
+        logger.info('Application auto-approved', { userId, applicationId: data.id, program });
+
+        // Generate password setup link for new users
+        if (isNewUser) {
+          try {
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+            const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+              type: 'recovery',
+              email: body.email,
+              options: { redirectTo: `${siteUrl}/auth/reset-password` },
+            });
+            if (linkError) {
+              logger.warn('[Applications] Password reset link generation failed', linkError);
+            } else if (linkData?.properties?.action_link) {
+              passwordSetupLink = linkData.properties.action_link;
+              logger.info('[Applications] Password setup link generated', { email: body.email });
+            }
+          } catch (linkErr) {
+            logger.warn('[Applications] Password link generation threw', linkErr);
+          }
+        }
       }
     } catch (autoApproveErr) {
       // Non-fatal — application is saved, payment can proceed
@@ -220,43 +243,99 @@ export async function POST(req: Request) {
     }
 
     // Send email notifications — direct call, no self-fetch
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
     try {
-      logger.info('[Applications] Sending confirmation email', { to: body.email, ref: referenceNumber });
-      // Confirmation email to applicant
+      logger.info('[Applications] Sending confirmation email', { to: body.email, ref: referenceNumber, hasPasswordLink: !!passwordSetupLink });
+
+      // Build password setup section (only for new users)
+      const passwordSection = passwordSetupLink ? `
+            <div style="background: #ecfdf5; border: 2px solid #6ee7b7; border-radius: 8px; padding: 20px; margin: 20px 0;">
+              <h3 style="margin-top: 0; color: #065f46;">Your Student Account Is Ready</h3>
+              <p style="margin-bottom: 16px;">We created your student portal account. Set your password to log in:</p>
+              <p style="text-align: center; margin: 16px 0;">
+                <a href="${passwordSetupLink}" style="display: inline-block; background: #059669; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Set Your Password &amp; Log In</a>
+              </p>
+              <p style="color: #64748b; font-size: 13px; margin-bottom: 0;">This link expires in 24 hours. After setting your password, you can log in anytime at <a href="${siteUrl}/signin" style="color: #059669;">${siteUrl}/signin</a></p>
+            </div>
+      ` : '';
+
+      // Confirmation + onboarding email to applicant
       const studentEmailResult = await sendEmail({
         to: body.email,
-        subject: `Application Received [Ref: ${referenceNumber}] - Elevate for Humanity`,
+        subject: `Welcome to Elevate for Humanity — ${body.program} [Ref: ${referenceNumber}]`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #ea580c;">Application Received!</h2>
-            <p>Hi ${body.firstName},</p>
-            <p>We've received your application for our <strong>${body.program}</strong> program.</p>
-
-            <div style="background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 8px; padding: 16px; margin: 20px 0;">
-              <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Application ID:</p>
-              <p style="margin: 0; font-size: 20px; font-weight: bold; font-family: monospace; color: #0f172a;">${data.id}</p>
-              <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b;">Reference: ${referenceNumber}</p>
+            <div style="background: #f97316; color: white; padding: 24px; text-align: center; border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; font-size: 24px;">Welcome to Elevate for Humanity!</h1>
             </div>
 
-            <div style="text-align: center; margin: 24px 0;">
-              <a href="https://www.elevateforhumanity.org/apply/track?id=${data.id}&email=${encodeURIComponent(body.email)}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Track Application Status</a>
+            <div style="padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
+              <p style="font-size: 16px;">Hi ${body.firstName},</p>
+              <p>Your application for <strong>${body.program}</strong> has been received and your enrollment is being processed.</p>
+
+              <div style="background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 8px; padding: 16px; margin: 20px 0;">
+                <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Reference Number:</p>
+                <p style="margin: 0; font-size: 20px; font-weight: bold; font-family: monospace; color: #0f172a;">${referenceNumber}</p>
+                <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b;">Application ID: ${data.id}</p>
+              </div>
+
+              ${passwordSection}
+
+              <h3 style="color: #0f172a;">What Happens Next</h3>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 10px 12px; vertical-align: top; width: 36px;">
+                    <div style="width: 28px; height: 28px; background: #3b82f6; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">1</div>
+                  </td>
+                  <td style="padding: 10px 0;">
+                    <strong>Set your password</strong> using the link above to access your student portal.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 12px; vertical-align: top;">
+                    <div style="width: 28px; height: 28px; background: #3b82f6; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">2</div>
+                  </td>
+                  <td style="padding: 10px 0;">
+                    <strong>Complete orientation</strong> — a short online module (about 10 minutes) that unlocks your coursework.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 12px; vertical-align: top;">
+                    <div style="width: 28px; height: 28px; background: #3b82f6; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">3</div>
+                  </td>
+                  <td style="padding: 10px 0;">
+                    <strong>Advisor contact</strong> — we'll reach out within 1–2 business days via ${body.preferredContact || 'phone'} to discuss funding options and scheduling.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 12px; vertical-align: top;">
+                    <div style="width: 28px; height: 28px; background: #3b82f6; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">4</div>
+                  </td>
+                  <td style="padding: 10px 0;">
+                    <strong>Start training</strong> — once funding is confirmed, you begin your program.
+                  </td>
+                </tr>
+              </table>
+
+              <div style="text-align: center; margin: 24px 0;">
+                <a href="${siteUrl}/apply/track?id=${data.id}&email=${encodeURIComponent(body.email)}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Track Application Status</a>
+              </div>
+
+              <div style="background: #fff7ed; border: 2px solid #fed7aa; border-radius: 8px; padding: 16px; margin: 20px 0;">
+                <h3 style="margin-top: 0; color: #ea580c;">Want to Talk Sooner?</h3>
+                <p style="margin-bottom: 12px;">Schedule your advisor call now instead of waiting:</p>
+                <a href="https://calendly.com/elevate-for-humanity/advisor-call" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Schedule Call Now</a>
+              </div>
+
+              <p>Questions? Call us at <a href="tel:3173143757" style="color: #ea580c; font-weight: bold;">317-314-3757</a> or email <a href="mailto:info@elevateforhumanity.org" style="color: #ea580c;">info@elevateforhumanity.org</a></p>
+
+              <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
+              <p style="color: #64748b; font-size: 13px; text-align: center;">
+                Elevate for Humanity Career &amp; Technical Institute<br />
+                8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240<br />
+                <a href="${siteUrl}" style="color: #3b82f6;">www.elevateforhumanity.org</a>
+              </p>
             </div>
-
-            <h3 style="color: #0f172a;">What Happens Next?</h3>
-            <ol style="line-height: 1.8;">
-              <li>We review your application and check funding eligibility</li>
-              <li>An advisor will contact you within 1-2 business days via ${body.preferredContact || 'phone'}</li>
-              <li>We'll discuss program details, funding options (WIOA, WRG, JRI), and next steps</li>
-            </ol>
-
-            <div style="background: #fff7ed; border: 2px solid #fed7aa; border-radius: 8px; padding: 16px; margin: 20px 0;">
-              <h3 style="margin-top: 0; color: #ea580c;">Want to Talk Sooner?</h3>
-              <p>Schedule your advisor call now instead of waiting:</p>
-              <a href="https://calendly.com/elevate-for-humanity/advisor-call" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Schedule Call Now</a>
-            </div>
-
-            <p>Questions? Call us at <a href="tel:3173143757" style="color: #ea580c; font-weight: bold;">317-314-3757</a></p>
-            <p>Best regards,<br><strong>Elevate for Humanity Team</strong></p>
           </div>
         `,
       });
@@ -280,6 +359,7 @@ export async function POST(req: Request) {
           <p><strong>Program:</strong> ${body.program}</p>
           <p><strong>Location:</strong> ${body.city || 'N/A'}, ${body.zip || 'N/A'}</p>
           <p><strong>Preferred Contact:</strong> ${body.preferredContact || 'phone'}</p>
+          <p><strong>Auto-Approved:</strong> ${userId ? 'Yes' : 'No'} ${isNewUser ? '(new account created)' : '(existing user)'}</p>
           ${body.hasCaseManager ? `<p><strong>Has Case Manager:</strong> ${body.hasCaseManager}</p>` : ''}
           ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : ''}
           ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ''}

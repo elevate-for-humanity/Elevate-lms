@@ -46,16 +46,16 @@ export default function LessonPage() {
     const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
 
-    // Fetch current lesson
+    // Fetch current lesson (use lessons VIEW for consistent column names)
     const { data: lessonData } = await supabase
-      .from('training_lessons')
+      .from('lessons')
       .select('*')
       .eq('id', lessonId)
       .single();
 
-    // Fetch all lessons for this course
+    // Fetch all lessons for this course (lessons VIEW aliases course_id_uuid → course_id)
     const { data: lessonsData } = await supabase
-      .from('training_lessons')
+      .from('lessons')
       .select('*')
       .eq('course_id', courseId)
       .order('order_index');

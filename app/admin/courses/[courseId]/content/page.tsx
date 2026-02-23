@@ -25,7 +25,7 @@ export default async function CourseContentPage({ params }: { params: Promise<{ 
 
   const { data: rawCourse } = await db.from('training_courses').select('*').eq('id', courseId).single();
   const course = rawCourse ? { ...rawCourse, title: rawCourse.course_name } : null;
-  const { data: lessons } = await db.from('training_lessons').select('*').eq('course_id', courseId).order('lesson_number');
+  const { data: lessons } = await db.from('lessons').select('*').eq('course_id', courseId).order('lesson_number');
 
   return (
     <div className="min-h-screen bg-gray-50">

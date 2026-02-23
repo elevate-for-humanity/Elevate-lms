@@ -21,7 +21,7 @@ export default async function LearnPage({ params }: { params: Promise<{ courseId
 
   // Use underlying tables directly to avoid VIEW permission issues
   const { data: course } = await db.from('training_courses').select('*').eq('id', courseId).single();
-  const { data: lessons } = await db.from('training_lessons').select('*').eq('course_id', courseId).order('order_index');
+  const { data: lessons } = await db.from('lessons').select('*').eq('course_id', courseId).order('order_index');
   const { data: enrollment } = await db.from('training_enrollments').select('*').eq('course_id', courseId).eq('user_id', user.id).single();
 
   return (

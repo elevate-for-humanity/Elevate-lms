@@ -1,14 +1,24 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
-import { Volume2, VolumeX } from 'lucide-react';
 
 export default function HomeHeroVideo() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const voiceoverRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [voiceActive, setVoiceActive] = useState(false);
+  const hasPlayedRef = useRef(false);
+  const userInteractedRef = useRef(false);
+
+  // Track any user interaction so browser unlocks audio playback
+  useEffect(() => {
+    const mark = () => { userInteractedRef.current = true; };
+    const events = ['click', 'touchstart', 'scroll', 'keydown'] as const;
+    events.forEach(e => window.addEventListener(e, mark, { once: true, passive: true }));
+    return () => { events.forEach(e => window.removeEventListener(e, mark)); };
+  }, []);
 
   // Autoplay silent video
   useEffect(() => {
@@ -22,32 +32,58 @@ export default function HomeHeroVideo() {
     return () => video.removeEventListener('loadeddata', play);
   }, []);
 
-  // Voiceover plays on user tap only — browsers block autoplay with audio
+  const playVoiceover = useCallback(() => {
+    const audio = voiceoverRef.current;
+    if (!audio || hasPlayedRef.current) return;
+    hasPlayedRef.current = true;
+    audio.currentTime = 0;
+    audio.play()
+      .then(() => setVoiceActive(true))
+      .catch(() => {
+        // Browser blocked — reset so manual tap still works
+        hasPlayedRef.current = false;
+      });
+  }, []);
+
+  // Trigger voiceover when user scrolls past the hero section
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting && !hasPlayedRef.current) {
+          playVoiceover();
+        }
+      },
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [playVoiceover]);
 
   const toggleVoiceover = () => {
-    const voiceover = voiceoverRef.current;
-    if (!voiceover) return;
-
+    const audio = voiceoverRef.current;
+    if (!audio) return;
     if (!voiceActive) {
-      voiceover.currentTime = 0;
-      voiceover.play().catch(() => {});
-      setVoiceActive(true);
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        setVoiceActive(true);
+        hasPlayedRef.current = true;
+      }).catch(() => {});
     } else {
-      voiceover.pause();
+      audio.pause();
       setVoiceActive(false);
     }
   };
 
   return (
-    <>
+    <div ref={containerRef} className="relative w-full h-full">
       <Image src="/images/hero-poster.webp" alt="Elevate for Humanity career training" fill priority sizes="100vw" className="object-cover z-0" />
-      {/* Video has no audio track — purely visual */}
       <video ref={videoRef} className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${isPlaying ? 'opacity-100' : 'opacity-0'}`} loop muted playsInline autoPlay preload="metadata">
         <source src="/videos/homepage-hero-montage.mp4" type="video/mp4" />
       </video>
 
-      {/* Voiceover narration — plays on tap */}
-      <audio ref={voiceoverRef} src="/audio/welcome-voiceover.mp3" preload="none" onEnded={() => setVoiceActive(false)} />
+      <audio ref={voiceoverRef} src="/audio/welcome-voiceover.mp3" preload="auto" onEnded={() => setVoiceActive(false)} />
 
       {isPlaying && (
         <button
@@ -61,17 +97,17 @@ export default function HomeHeroVideo() {
         >
           {voiceActive ? (
             <>
-              <Volume2 className="w-5 h-5" />
+              <span className="text-lg leading-none" aria-hidden="true">&#x1F50A;</span>
               <span className="text-sm font-semibold hidden sm:inline">Narration On</span>
             </>
           ) : (
             <>
-              <VolumeX className="w-5 h-5" />
+              <span className="text-lg leading-none" aria-hidden="true">&#x1F507;</span>
               <span className="text-sm font-bold">Tap for Narration</span>
             </>
           )}
         </button>
       )}
-    </>
+    </div>
   );
 }

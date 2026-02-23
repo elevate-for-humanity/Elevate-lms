@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, ChevronDown } from 'lucide-react';
+
 
 interface NavItem {
   name: string;
@@ -65,7 +65,7 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
       >
-        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        {isOpen ? <span className="text-2xl leading-none" aria-hidden="true">&times;</span> : <span className="text-2xl leading-none" aria-hidden="true">&#9776;</span>}
       </button>
 
       {/* Mobile Menu Overlay */}
@@ -93,11 +93,12 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
                     aria-expanded={expandedItem === item.name}
                   >
                     {item.name}
-                    <ChevronDown
-                      className={`w-5 h-5 transition-transform ${
+                    <span
+                      className={`text-sm leading-none transition-transform inline-block ${
                         expandedItem === item.name ? 'rotate-180' : ''
                       }`}
-                    />
+                      aria-hidden="true"
+                    >&#9660;</span>
                   </button>
                   {expandedItem === item.name && (
                     <div className="pb-3 pl-4">

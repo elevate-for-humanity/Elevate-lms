@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X } from 'lucide-react';
+
 
 export default function CookieConsent() {
   const [showBanner, setShowBanner] = useState(false);
@@ -137,20 +137,7 @@ export default function CookieConsent() {
             <div className="flex-1 pr-4">
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 mt-1">
-                  <svg
-                    className="w-6 h-6 text-brand-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
+                  <span className="text-xl text-brand-blue-600" aria-hidden="true">&#x1F36A;</span>
                 </div>
                 <div>
                   <h3 id="cookie-consent-title" className="font-semibold text-gray-900 mb-1">
@@ -192,7 +179,7 @@ export default function CookieConsent() {
                 className="p-2 text-gray-400 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:ring-offset-2 rounded"
                 aria-label="Close cookie consent banner"
               >
-                <X className="w-5 h-5" />
+                <span className="text-xl leading-none" aria-hidden="true">&times;</span>
               </button>
             </div>
           </div>

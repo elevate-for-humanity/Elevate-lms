@@ -427,8 +427,29 @@ export default async function ProgramDetailPage({
   }
 
   // Render full program template for complete data with breadcrumbs
+  const courseSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: program.name,
+    description: program.shortDescription || program.description,
+    provider: {
+      '@type': 'EducationalOrganization',
+      name: 'Elevate for Humanity Career & Technical Institute',
+      url: 'https://www.elevateforhumanity.org',
+    },
+    url: `https://www.elevateforhumanity.org/programs/${slug}`,
+    ...(program.duration && { timeRequired: program.duration }),
+    ...(program.tuition && { offers: { '@type': 'Offer', price: program.tuition, priceCurrency: 'USD' } }),
+    educationalCredentialAwarded: program.credential || program.name,
+    isAccessibleForFree: program.fundingEligible !== false,
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
+      />
       {/* Breadcrumbs */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">

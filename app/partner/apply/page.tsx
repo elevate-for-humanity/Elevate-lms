@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Building2, ArrowRight, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { trackEvent } from '@/components/analytics/google-analytics';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 const PARTNER_TYPES = [
@@ -51,6 +52,7 @@ export default function PartnerApplyPage() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Submission failed');
+      trackEvent('partner_application', 'conversion', formData.type);
       setSubmitted(true);
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please try again.');

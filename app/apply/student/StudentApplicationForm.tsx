@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { submitStudentApplication } from '../actions';
 import { getActiveProgramsByCategory } from '@/lib/program-registry';
+import { trackEvent } from '@/components/analytics/google-analytics';
 
 const programGroups = getActiveProgramsByCategory();
 
@@ -37,9 +38,11 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
     };
 
     try {
+      trackEvent('form_submit', 'application', data.programInterest);
       const result = await submitStudentApplication(data);
 
       if (result.success) {
+        trackEvent('application_complete', 'conversion', data.programInterest);
         router.push(result.redirectTo!);
       } else {
         setError(

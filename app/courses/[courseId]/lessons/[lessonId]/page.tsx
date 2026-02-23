@@ -46,26 +46,13 @@ export default function LessonPage() {
     const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
 
-    // Fetch current lesson (use lessons VIEW for consistent column names)
-    const { data: lessonData } = await supabase
-      .from('lessons')
-      .select('*')
-      .eq('id', lessonId)
-      .single();
+    // Fetch course + lessons via public API (bypasses RLS)
+    const apiRes = await fetch(`/api/courses/${courseId}/lessons/public`);
+    const apiData = apiRes.ok ? await apiRes.json() : { course: null, lessons: [] };
 
-    // Fetch all lessons for this course (use lessons VIEW which aliases course_id_uuid → course_id)
-    const { data: lessonsData } = await supabase
-      .from('lessons')
-      .select('*')
-      .eq('course_id', courseId)
-      .order('order_index');
-
-    // Fetch course info
-    const { data: courseData } = await supabase
-      .from('training_courses')
-      .select('*')
-      .eq('id', courseId)
-      .single();
+    const courseData = apiData.course;
+    const lessonsData: any[] = apiData.lessons || [];
+    const lessonData = lessonsData.find((l: any) => l.id === lessonId) || null;
 
     // Fetch user progress via server API (bypasses RLS recursion)
     const {

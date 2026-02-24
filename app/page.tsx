@@ -9,8 +9,8 @@ import { InView } from '@/components/ui/InView';
 
 const programs = [
   { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.jpg', desc: 'DOL-registered apprenticeship — earn while you learn your craft.', salary: '$30K–$55K', duration: '12 months', tag: 'DOL Registered' },
-  { name: 'Building Technician with HVAC Fundamentals', href: '/programs/hvac-technician', image: '/images/programs-hq/hvac-technician.jpg', desc: 'EPA 608, OSHA safety, and hands-on training for facilities and HVAC careers.', salary: '$40K–$65K', duration: '20 weeks', tag: 'WIOA Funded' },
-  { name: 'Business & Office Administration', href: '/programs/business-office', image: '/images/programs-hq/business-office.jpg', desc: 'QuickBooks, Microsoft Office, and business operations training.', salary: '$32K–$48K', duration: '8–12 weeks', tag: 'WIOA Funded' },
+  { name: 'Building Technician with HVAC Fundamentals', href: '/programs/hvac-technician', image: '/images/pexels/homepage-welding-sparks.jpg', desc: 'EPA 608, OSHA safety, and hands-on training for facilities and HVAC careers.', salary: '$40K–$65K', duration: '20 weeks', tag: 'WIOA Funded' },
+  { name: 'Business & Office Administration', href: '/programs/business-office', image: '/images/pexels/homepage-office-team.jpg', desc: 'QuickBooks, Microsoft Office, and business operations training.', salary: '$32K–$48K', duration: '8–12 weeks', tag: 'WIOA Funded' },
 ];
 
 
@@ -71,10 +71,10 @@ export default function HomePage() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/programs-hq/training-classroom.webp', alt: 'Students in a training classroom' },
-              { href: '/funding', label: 'I need funding', desc: 'Most programs are tuition-free. Check your eligibility.', cta: 'Check Eligibility', image: '/images/heroes-hq/funding-hero.webp', alt: 'Funding and financial aid' },
-              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/heroes-hq/employer-hero.webp', alt: 'Employer partnership meeting' },
-              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/programs-hq/business-office.webp', alt: 'Training program office' },
+              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/pexels/homepage-students-diverse.jpg', alt: 'Diverse group of students collaborating in a training session' },
+              { href: '/funding', label: 'I need funding', desc: 'Most programs are tuition-free. Check your eligibility.', cta: 'Check Eligibility', image: '/images/pexels/homepage-financial-planning.jpg', alt: 'Financial planning and funding consultation' },
+              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/pexels/homepage-handshake-hiring.jpg', alt: 'Employer and candidate shaking hands at a hiring event' },
+              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/pexels/homepage-woman-laptop.jpg', alt: 'Woman working on laptop managing a training platform' },
             ].map((item) => (
               <Link
                 key={item.href}

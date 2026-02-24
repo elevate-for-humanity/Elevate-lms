@@ -115,7 +115,7 @@ export default async function AdminPWAPage() {
                 <div className="font-semibold text-slate-900 text-sm truncate">Enrollment #{e.id.slice(0, 8)}</div>
                 <div className="text-xs text-slate-500">{new Date(e.enrolled_at).toLocaleDateString()}</div>
               </div>
-              <span className={`text-xs font-medium px-2 py-1 rounded-full ${e.status === 'active' ? 'bg-green-100 text-green-700' : e.status === 'completed' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
+              <span className={`text-xs font-medium px-2 py-1 rounded-full ${e.status === 'active' ? 'bg-green-100 text-green-700' : e.status === 'completed' ? 'bg-brand-blue-100 text-brand-blue-700' : 'bg-slate-100 text-slate-600'}`}>
                 {e.status}
               </span>
             </div>

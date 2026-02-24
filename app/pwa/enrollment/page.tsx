@@ -99,7 +99,7 @@ export default async function EnrollmentPWAPage() {
               </div>
               <span className={`text-xs font-medium px-2 py-1 rounded-full ${
                 app.status === 'approved' ? 'bg-green-100 text-green-700' :
-                app.status === 'enrolled' ? 'bg-blue-100 text-blue-700' :
+                app.status === 'enrolled' ? 'bg-brand-blue-100 text-brand-blue-700' :
                 app.status === 'pending' || !app.status ? 'bg-amber-100 text-amber-700' :
                 'bg-slate-100 text-slate-600'
               }`}>

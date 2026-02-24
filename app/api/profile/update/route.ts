@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       logger.error('[Profile] Update failed:', error.message);
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: 'Profile update failed' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to load profile' }, { status: 500 });
     }
 
     return NextResponse.json({ profile });

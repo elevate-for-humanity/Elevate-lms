@@ -46,13 +46,9 @@ export async function verifyTableSchema(
     };
   }
 
-  // Get all columns for the table
+  // Get all columns for the table via RPC (PostgREST can't query information_schema directly)
   const { data: columns, error } = await supabase
-    .from('information_schema.columns')
-    .select('column_name, data_type, is_nullable, column_default')
-    .eq('table_schema', 'public')
-    .eq('table_name', tableName)
-    .order('ordinal_position');
+    .rpc('get_table_columns', { p_table_name: tableName });
 
   if (error) {
     logger.error('Schema verification error:', error);

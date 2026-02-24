@@ -158,7 +158,7 @@ export default function HVACCurriculumPage() {
 
 function LessonTypeBadge({ type }: { type: string }) {
   const styles: Record<string, string> = {
-    video: 'bg-blue-100 text-blue-700',
+    video: 'bg-brand-blue-100 text-brand-blue-700',
     reading: 'bg-amber-100 text-amber-700',
     quiz: 'bg-red-100 text-red-700',
     lab: 'bg-green-100 text-green-700',

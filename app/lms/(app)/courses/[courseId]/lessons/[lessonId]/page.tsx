@@ -47,45 +47,26 @@ export default function LessonPage() {
     const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
 
-    // Fetch current lesson (use lessons VIEW for consistent column names)
+    // 1. Fetch lesson data first
     const { data: lessonData } = await supabase
       .from('lessons')
       .select('*')
       .eq('id', lessonId)
       .single();
 
-    // Fetch all lessons for this course (lessons VIEW aliases course_id_uuid → course_id)
     const { data: lessonsData } = await supabase
       .from('lessons')
       .select('*')
       .eq('course_id', courseId)
       .order('order_index');
 
-    // Fetch course info
     const { data: courseData } = await supabase
       .from('training_courses')
       .select('*')
       .eq('id', courseId)
       .single();
 
-    // Fetch user progress via server API (bypasses RLS recursion)
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (user && lessonsData) {
-      const progressRes = await fetch(`/api/lms/progress?courseId=${courseId}`);
-      const progressData = progressRes.ok ? await progressRes.json() : { progress: [] };
-      const allProgress = progressData.progress;
-
-      if (allProgress) {
-        const completedIds = new Set(
-          allProgress.filter((p: any) => p.completed).map((p: any) => p.lesson_id)
-        );
-        setCompletedLessonIds(completedIds);
-        setIsCompleted(completedIds.has(lessonId));
-      }
-    }
-
+    // 2. Set state IMMEDIATELY so the UI renders
     if (lessonData) {
       setLesson({
         ...lessonData,
@@ -105,6 +86,28 @@ export default function LessonPage() {
         totalLessons: lessonsData?.length || 0,
         completedLessons: completedCount,
       });
+    }
+
+    // 3. Fetch user progress in background (don't block lesson render)
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user && lessonsData) {
+        const progressRes = await fetch(`/api/lms/progress?courseId=${courseId}`);
+        const progressData = progressRes.ok ? await progressRes.json() : { progress: [] };
+        const allProgress = progressData.progress;
+
+        if (allProgress) {
+          const completedIds = new Set(
+            allProgress.filter((p: any) => p.completed).map((p: any) => p.lesson_id)
+          );
+          setCompletedLessonIds(completedIds);
+          setIsCompleted(completedIds.has(lessonId));
+        }
+      }
+    } catch {
+      // Auth/progress fetch failed — lesson still renders fine
     }
   };
 
@@ -181,19 +184,20 @@ export default function LessonPage() {
     }
   };
 
-  // Timeout: if lesson hasn't loaded after 10s, show error
+  // Timeout: if lesson hasn't loaded after 30s, show error
   const [loadTimeout, setLoadTimeout] = useState(false);
   useEffect(() => {
+    if (lesson) { setLoadTimeout(false); return; }
     const timer = setTimeout(() => {
-      if (!lesson) setLoadTimeout(true);
-    }, 10000);
+      setLoadTimeout(true);
+    }, 30000);
     return () => clearTimeout(timer);
   }, [lesson]);
 
   if (!lesson) {
     if (loadTimeout) {
       return (
-        <div className="flex items-center justify-center h-screen bg-slate-50">
+        <div className="flex items-center justify-center h-[100dvh] bg-slate-50">
           <div className="text-center max-w-md">
             <div className="w-12 h-12 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <BookOpen className="w-6 h-6 text-brand-red-600" />
@@ -214,7 +218,7 @@ export default function LessonPage() {
     }
 
     return (
-      <div className="flex h-screen bg-slate-50">
+      <div className="flex h-[100dvh] bg-slate-50">
         {/* Skeleton sidebar */}
         <aside className="hidden md:block w-80 bg-white border-r p-4">
           <div className="h-5 bg-slate-200 rounded w-3/4 mb-4 animate-pulse" />
@@ -241,14 +245,14 @@ export default function LessonPage() {
   }
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-[100dvh] bg-slate-50">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Lms", href: "/lms" }, { label: "[Lessonid]" }]} />
       </div>
 {/* Mobile Sidebar Toggle */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="md:hidden fixed top-4 left-4 z-50 bg-white p-3 rounded-lg shadow-lg"
+        className="md:hidden fixed top-16 left-4 z-50 bg-white p-3 rounded-lg shadow-lg"
       >
         <svg
           className="w-6 h-6"
@@ -275,7 +279,7 @@ export default function LessonPage() {
 
       {/* Sidebar - Lesson List */}
       <aside
-        className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-80 bg-white border-r overflow-y-auto transition-transform duration-300 fixed md:relative h-full z-40`}
+        className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-80 max-w-[85vw] md:max-w-none bg-white border-r overflow-y-auto transition-transform duration-300 fixed md:relative h-full z-40`}
       >
         <div className="p-6 border-b">
           <Link
@@ -406,6 +410,10 @@ export default function LessonPage() {
               lessonTitle={lesson.title}
               moduleTitle={course?.title}
               transcript={lesson.transcript ?? null}
+              lessonContent={lesson.content ?? null}
+              lessonNumber={currentIndex + 1}
+              totalLessons={lessons.length}
+              durationMinutes={lesson.duration_minutes ?? undefined}
               onComplete={() => {
                 if (!isCompleted) {
                   setIsCompleted(true);
@@ -575,25 +583,27 @@ export default function LessonPage() {
             <button
               onClick={goToPrevious}
               disabled={!hasPrevious}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition ${
+              aria-label="Previous Lesson"
+              className={`flex items-center gap-2 px-3 sm:px-6 py-3 rounded-lg text-sm sm:text-base font-semibold transition ${
                 hasPrevious
                   ? 'bg-slate-100 hover:bg-slate-200 text-black'
                   : 'bg-slate-50 text-slate-400 cursor-not-allowed'
               }`}
             >
               <ChevronLeft className="w-5 h-5" />
-              Previous Lesson
+              <span className="hidden sm:inline">Previous Lesson</span>
             </button>
             <button
               onClick={goToNext}
               disabled={!hasNext}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition ${
+              aria-label="Next Lesson"
+              className={`flex items-center gap-2 px-3 sm:px-6 py-3 rounded-lg text-sm sm:text-base font-semibold transition ${
                 hasNext
                   ? 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white'
                   : 'bg-slate-50 text-slate-400 cursor-not-allowed'
               }`}
             >
-              Next Lesson
+              <span className="hidden sm:inline">Next Lesson</span>
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>

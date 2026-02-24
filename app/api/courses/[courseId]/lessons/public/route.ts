@@ -36,7 +36,7 @@ export async function GET(
   // Fetch published lessons via admin client (bypasses RLS)
   const { data: lessons, error: lessonsErr } = await supabase
     .from('lessons')
-    .select('id, course_id, title, content, video_url, lesson_number, order_index, duration_minutes, is_required, is_published, content_type')
+    .select('id, course_id, title, content, video_url, lesson_number, order_index, duration_minutes, is_required, is_published, content_type, quiz_id, quiz_questions, passing_score, description, topics')
     .eq('course_id', courseId)
     .eq('is_published', true)
     .order('lesson_number');

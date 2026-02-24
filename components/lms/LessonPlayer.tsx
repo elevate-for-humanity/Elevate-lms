@@ -23,6 +23,7 @@ interface LessonPlayerProps {
   lessonNumber?: number;
   totalLessons?: number;
   durationMinutes?: number;
+  captionUrl?: string | null;
   onProgress?: (percent: number) => void;
   onComplete?: () => void;
 }
@@ -34,6 +35,7 @@ export default function LessonPlayer({
   lessonNumber,
   totalLessons,
   durationMinutes,
+  captionUrl,
   onProgress,
   onComplete,
 }: LessonPlayerProps) {
@@ -50,6 +52,7 @@ export default function LessonPlayer({
   const [isLoading, setIsLoading] = React.useState(true);
   const [hasError, setHasError] = React.useState(false);
   const hideControlsTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const maxWatchedRef = React.useRef(0); // Track furthest point watched
 
   // Use direct Supabase URL — CSP media-src allows it, CORS is open
   const mediaSrc = videoUrl;
@@ -70,7 +73,17 @@ export default function LessonPlayer({
     const onEnded = () => { setIsPlaying(false); setEnded(true); onComplete?.(); };
     const onTimeUpdate = () => {
       setCurrentTime(v.currentTime);
-      if (v.duration && onProgress) onProgress((v.currentTime / v.duration) * 100);
+      // Track the furthest point watched (no skipping ahead)
+      if (v.currentTime > maxWatchedRef.current) {
+        maxWatchedRef.current = v.currentTime;
+      }
+      if (v.duration && onProgress) onProgress((maxWatchedRef.current / v.duration) * 100);
+    };
+    const onSeeking = () => {
+      // Prevent seeking past max watched point + small buffer
+      if (v.currentTime > maxWatchedRef.current + 2) {
+        v.currentTime = maxWatchedRef.current;
+      }
     };
     const onLoaded = () => {
       if (v.duration && !isNaN(v.duration)) setDuration(v.duration);
@@ -86,6 +99,7 @@ export default function LessonPlayer({
     v.addEventListener("pause", onPause);
     v.addEventListener("ended", onEnded);
     v.addEventListener("timeupdate", onTimeUpdate);
+    v.addEventListener("seeking", onSeeking);
     v.addEventListener("loadedmetadata", onLoaded);
     v.addEventListener("waiting", onWaiting);
     v.addEventListener("canplay", onCanPlay);
@@ -98,6 +112,7 @@ export default function LessonPlayer({
       v.removeEventListener("pause", onPause);
       v.removeEventListener("ended", onEnded);
       v.removeEventListener("timeupdate", onTimeUpdate);
+      v.removeEventListener("seeking", onSeeking);
       v.removeEventListener("loadedmetadata", onLoaded);
       v.removeEventListener("waiting", onWaiting);
       v.removeEventListener("canplay", onCanPlay);
@@ -178,7 +193,9 @@ export default function LessonPlayer({
   const skip = (seconds: number) => {
     const v = videoRef.current;
     if (!v) return;
-    v.currentTime = Math.max(0, Math.min(v.duration || 0, v.currentTime + seconds));
+    const target = v.currentTime + seconds;
+    // Allow rewind freely, but forward only up to max watched
+    v.currentTime = Math.max(0, Math.min(maxWatchedRef.current + 2, target));
   };
 
   const seekFromEvent = (
@@ -250,6 +267,15 @@ export default function LessonPlayer({
             onClick={togglePlay}
           >
             <source src={mediaSrc} type="video/mp4" />
+            {captionUrl && (
+              <track
+                kind="captions"
+                src={captionUrl}
+                srcLang="en"
+                label="English"
+                default
+              />
+            )}
           </video>
 
           {/* Loading / buffering indicator */}

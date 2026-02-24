@@ -225,7 +225,7 @@ export async function POST(req: Request) {
             const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
               type: 'recovery',
               email: body.email,
-              options: { redirectTo: `${siteUrl}/auth/reset-password` },
+              options: { redirectTo: `${siteUrl}/update-password` },
             });
             if (linkError) {
               logger.warn('[Applications] Password reset link generation failed', linkError);
@@ -257,7 +257,7 @@ export async function POST(req: Request) {
               <p style="text-align: center; margin: 16px 0;">
                 <a href="${passwordSetupLink}" style="display: inline-block; background: #059669; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Set Your Password &amp; Log In</a>
               </p>
-              <p style="color: #64748b; font-size: 13px; margin-bottom: 0;">This link expires in 24 hours. After setting your password, you can log in anytime at <a href="${siteUrl}/signin" style="color: #059669;">${siteUrl}/signin</a></p>
+              <p style="color: #64748b; font-size: 13px; margin-bottom: 0;">This link expires in 24 hours. After setting your password, you can log in anytime at <a href="${siteUrl}/login" style="color: #059669;">${siteUrl}/login</a></p>
             </div>
       ` : '';
 

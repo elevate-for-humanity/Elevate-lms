@@ -122,15 +122,14 @@ export default function LessonPlayer({
 
   return (
     <div className="w-full">
-      {/* Hidden video element used as audio engine — MP4 container requires <video>.
-          Visually hidden so no black frame is ever shown. */}
+      {/* Video element as audio engine — MP4 container requires <video>.
+          Rendered at 0x0 with opacity-0 so browsers still load the media. */}
       <video
         ref={audioRef}
         src={videoUrl}
-        preload="metadata"
+        preload="auto"
         playsInline
-        className="sr-only"
-        aria-hidden="true"
+        style={{ width: 0, height: 0, opacity: 0, position: "absolute", pointerEvents: "none" }}
       />
 
       {/* Player card */}

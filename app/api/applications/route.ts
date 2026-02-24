@@ -245,6 +245,7 @@ export async function POST(req: Request) {
 
     // Send email notifications — direct call, no self-fetch
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+    let emailStatus: { student: string; staff: string } = { student: 'not-attempted', staff: 'not-attempted' };
     try {
       logger.info('[Applications] Sending confirmation email', { to: body.email, ref: referenceNumber, hasPasswordLink: !!passwordSetupLink });
 
@@ -373,8 +374,13 @@ export async function POST(req: Request) {
       } else {
         logger.error('[Applications] Staff email FAILED', { error: staffEmailResult.error });
       }
+      emailStatus = {
+        student: studentEmailResult.success ? 'sent' : studentEmailResult.error || 'failed',
+        staff: staffEmailResult.success ? 'sent' : staffEmailResult.error || 'failed',
+      };
     } catch (emailError) {
       logger.error('[Applications] Email send threw exception', emailError instanceof Error ? emailError : undefined);
+      emailStatus = { student: 'exception', staff: 'exception' };
     }
 
     return NextResponse.json(
@@ -384,6 +390,7 @@ export async function POST(req: Request) {
         email: data.email,
         program: data.program_id,
         referenceNumber: referenceNumber,
+        emailStatus,
       },
       { status: 200 }
     );

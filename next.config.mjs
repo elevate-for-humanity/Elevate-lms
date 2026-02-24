@@ -267,6 +267,33 @@ const nextConfig = {
       { source: '/programs/technology/cybersecurity', destination: '/programs/cybersecurity-analyst', permanent: true },
 
       // ============================================
+      // OLD URL ALIASES → CORRECT EXISTING PAGES
+      // ============================================
+      { source: '/for-students', destination: '/student-portal', permanent: true },
+      { source: '/forgotpassword', destination: '/reset-password', permanent: true },
+      { source: '/resetpassword', destination: '/reset-password', permanent: true },
+      { source: '/verifyemail', destination: '/verify-email', permanent: true },
+      { source: '/lms/messages/new', destination: '/lms/messages', permanent: true },
+      { source: '/lms/messages/support/new', destination: '/lms/messages', permanent: true },
+      { source: '/programs/building-maintenance-tech', destination: '/programs/hvac-technician', permanent: true },
+      { source: '/programs/building-services-technician', destination: '/programs/hvac-technician', permanent: true },
+      { source: '/programs/business-financial', destination: '/programs/tax-preparation', permanent: true },
+      { source: '/programs/cpr-first-aid', destination: '/programs/cna', permanent: true },
+      { source: '/programs/cpr-first-aid-hsi', destination: '/programs/cna', permanent: true },
+      { source: '/programs/direct-support-professional', destination: '/programs/peer-recovery-specialist', permanent: true },
+      { source: '/programs/drug-collector', destination: '/drug-testing/training', permanent: true },
+      { source: '/programs/esthetician-apprenticeship', destination: '/programs/cosmetology-apprenticeship', permanent: true },
+      { source: '/programs/professional-esthetician', destination: '/programs/cosmetology-apprenticeship', permanent: true },
+      { source: '/programs/forklift', destination: '/programs/skilled-trades', permanent: true },
+      { source: '/programs/it-support', destination: '/programs/it-help-desk', permanent: true },
+      { source: '/programs/jri', destination: '/programs/peer-recovery-specialist', permanent: true },
+      { source: '/programs/phlebotomy', destination: '/programs/healthcare', permanent: true },
+      { source: '/programs/business-startup-marketing', destination: '/programs/entrepreneurship', permanent: true },
+      { source: '/programs/emergency-health-safety-tech', destination: '/programs/healthcare', permanent: true },
+      { source: '/programs/home-health-aide', destination: '/programs/cna', permanent: true },
+      { source: '/programs/public-safety-reentry-specialist', destination: '/programs/peer-recovery-specialist', permanent: true },
+
+      // ============================================
       // APP ALIAS REDIRECTS (Rule B: auth/app path renames)
       // Centralized here instead of scattered in-page redirect() calls.
       // proxy.ts handles auth; these are pure path consolidation.
@@ -297,7 +324,6 @@ const nextConfig = {
       { source: '/dashboard/sub-offices/new', destination: '/dashboard', permanent: true },
 
       // Employer
-      { source: '/employer-portal/wotc', destination: '/employer-portal', permanent: true },
       { source: '/employer/apprenticeship', destination: '/employer', permanent: true },
       { source: '/employer/apprenticeship/new', destination: '/employer', permanent: true },
       { source: '/employer/login', destination: '/login', permanent: true },
@@ -306,14 +332,11 @@ const nextConfig = {
 
       // LMS
       { source: '/lms/catalog', destination: '/lms/courses', permanent: true },
-      { source: '/lms/messages/new', destination: '/lms', permanent: true },
-      { source: '/lms/messages/support/new', destination: '/lms', permanent: true },
 
       // Mentor / Mentorship
       { source: '/mentor', destination: '/mentor/dashboard', permanent: false },
       { source: '/mentor/apply', destination: '/mentorship', permanent: true },
       { source: '/mentorship/apply', destination: '/apply', permanent: true },
-      { source: '/mentorship/become-mentor', destination: '/contact', permanent: true },
 
       // Partner (app-side) - skip /partner-with-us and /partners intermediaries
       { source: '/partner/refer', destination: '/platform/partners', permanent: true },
@@ -335,7 +358,6 @@ const nextConfig = {
 
       // Student portal
       { source: '/student-portal/messages', destination: '/lms/chat', permanent: true },
-      { source: '/student-portal/profile', destination: '/lms/profile', permanent: true },
       { source: '/student-portal/settings', destination: '/lms/settings', permanent: true },
 
       // ============================================
@@ -402,31 +424,16 @@ const nextConfig = {
       // Barber & Beauty
       { source: '/programs/barber', destination: '/programs/barber-apprenticeship', permanent: true },
       { source: '/programs/beauty', destination: '/programs/barber-apprenticeship', permanent: true },
-      { source: '/programs/esthetician-apprenticeship', destination: '/programs/esthetician', permanent: true },
-      { source: '/programs/professional-esthetician', destination: '/programs/esthetician', permanent: true },
-      { source: '/programs/nail-technician-apprenticeship', destination: '/programs/nail-technician', permanent: true },
       // Business
-      { source: '/programs/business', destination: '/programs/business-startup', permanent: true },
-      { source: '/programs/business-financial', destination: '/programs/business-startup', permanent: true },
-      // Tax
-      { source: '/programs/tax-preparation', destination: '/programs/tax-prep', permanent: true },
-      { source: '/programs/tax-entrepreneurship', destination: '/programs/tax-prep', permanent: true },
-      { source: '/programs/tax-prep-financial-services', destination: '/programs/tax-prep', permanent: true },
+      // Tax — real page is /programs/tax-preparation
+      { source: '/programs/tax-prep', destination: '/programs/tax-preparation', permanent: true },
+      { source: '/programs/tax-entrepreneurship', destination: '/programs/tax-preparation', permanent: true },
+      { source: '/programs/tax-prep-financial-services', destination: '/programs/tax-preparation', permanent: true },
       // Healthcare aliases
-      { source: '/programs/drug-collector', destination: '/programs/drug-alcohol-specimen-collector', permanent: true },
-      { source: '/programs/phlebotomy', destination: '/programs/phlebotomy-technician', permanent: true },
-      { source: '/programs/cpr-first-aid-hsi', destination: '/programs/cpr-cert', permanent: true },
-      { source: '/programs/cpr-first-aid', destination: '/programs/cpr-cert', permanent: true },
       // Human Services
-      { source: '/programs/jri', destination: '/programs/peer-recovery-specialist-jri', permanent: true },
-      { source: '/programs/direct-support-professional', destination: '/programs/dsp-training', permanent: true },
       // Skilled Trades aliases
-      { source: '/programs/forklift', destination: '/programs/forklift-operator', permanent: true },
-      { source: '/programs/building-maintenance-tech', destination: '/programs/building-maintenance-wrg', permanent: true },
-      { source: '/programs/building-services-technician', destination: '/programs/building-maintenance-wrg', permanent: true },
       // Technology aliases
       { source: '/programs/cybersecurity', destination: '/programs/cybersecurity-analyst', permanent: true },
-      { source: '/programs/it-support', destination: '/programs/it-support-specialist', permanent: true },
 
       // Career consolidation — /career-center handled by Netlify (Rule A)
       { source: '/career-fair/:path*', destination: '/career-services/:path*', permanent: true },
@@ -437,9 +444,6 @@ const nextConfig = {
       { source: '/partner-playbook/:path*', destination: '/partners/:path*', permanent: true },
 
       // Auth consolidation
-      { source: '/forgotpassword', destination: '/auth/forgot-password', permanent: true },
-      { source: '/resetpassword', destination: '/auth/reset-password', permanent: true },
-      { source: '/verifyemail', destination: '/auth/verify-email', permanent: true },
 
       // Legal consolidation
       { source: '/privacy', destination: '/privacy-policy', permanent: true },
@@ -449,7 +453,6 @@ const nextConfig = {
       { source: '/verifycertificate/:path*', destination: '/verify/:path*', permanent: true },
 
       // Misc redirects
-      { source: '/for-students', destination: '/lms', permanent: true },
       { source: '/dashboards/:path*', destination: '/lms/:path*', permanent: true },
       // /portals base route has its own page — only redirect sub-paths
       { source: '/portals/:slug/:path*', destination: '/lms/:slug/:path*', permanent: true },
@@ -468,7 +471,6 @@ const nextConfig = {
       { source: '/board/:path*', destination: '/admin/:path*', permanent: true },
       { source: '/receptionist/:path*', destination: '/staff-portal/:path*', permanent: true },
       { source: '/delegate/:path*', destination: '/admin/:path*', permanent: true },
-      { source: '/study-groups/:path*', destination: '/lms', permanent: true },
       { source: '/forum/:path*', destination: '/blog', permanent: true },
       // /news/page.tsx exists (137 lines) — do not redirect away from it
       // { source: '/news/:path*', destination: '/blog/:path*', permanent: true },
@@ -499,7 +501,6 @@ const nextConfig = {
       { source: '/apply/full', destination: '/apply/student', permanent: true },
 
       // Duplicate status pages → canonical /apply/track
-      { source: '/apply/status', destination: '/apply/track', permanent: true },
 
       // Duplicate success pages → canonical /apply/success
       { source: '/apply/confirmation', destination: '/apply/success', permanent: true },
@@ -513,7 +514,6 @@ const nextConfig = {
       { source: '/resources/:path*', destination: '/blog', permanent: true },
       { source: '/career-uplift-services/:path*', destination: '/career-services', permanent: true },
       // /community/page.tsx exists (371 lines) — do not redirect away from it
-      // { source: '/community', destination: '/blog', permanent: true },
       { source: '/video', destination: '/videos', permanent: true },
       
       // LMS redirects
@@ -537,8 +537,7 @@ const nextConfig = {
       { source: '/ai-instructor', destination: '/ai-tutor', permanent: true },
       
       // Marketing redirects
-      // Removed: /success-stories has its own full page (179 lines) — do not redirect away from it
-      // { source: '/success-stories', destination: '/testimonials', permanent: true },
+      { source: '/success-stories', destination: '/testimonials', permanent: true },
       { source: '/for-workforce-boards', destination: '/workforce-board', permanent: true },
       { source: '/get-started', destination: '/start', permanent: true },
       
@@ -549,6 +548,112 @@ const nextConfig = {
       // /outcomes/indiana is a public page — do not redirect it
       // Other outcomes sub-routes redirect to programs until data exists
       { source: '/metrics', destination: '/programs', permanent: false },
+
+      // ============================================
+      // DEAD LINK FIXES — public-facing
+      // ============================================
+      { source: '/forgot-password', destination: '/reset-password', permanent: true },
+      { source: '/tax-preparation', destination: '/programs/tax-preparation', permanent: true },
+      { source: '/tax-faq', destination: '/supersonic-fast-cash', permanent: true },
+      { source: '/refund-advance', destination: '/supersonic-fast-cash', permanent: true },
+      { source: '/chat', destination: '/support/chat', permanent: false },
+      { source: '/policies/privacy', destination: '/privacy-policy', permanent: true },
+      { source: '/policies/terms', destination: '/terms-of-service', permanent: true },
+      { source: '/policies/grievance', destination: '/grievance', permanent: true },
+      { source: '/legal/privacy', destination: '/privacy-policy', permanent: true },
+      { source: '/legal/terms-of-service', destination: '/terms-of-service', permanent: true },
+      { source: '/legal/governance/lms', destination: '/terms-of-service', permanent: true },
+      { source: '/legal/governance/store', destination: '/terms-of-service', permanent: true },
+      { source: '/license-agreement', destination: '/terms-of-service', permanent: true },
+      { source: '/support/documentation', destination: '/help/articles', permanent: true },
+      { source: '/supersonic/status', destination: '/supersonic-fast-cash', permanent: true },
+      { source: '/tax/upload', destination: '/tax', permanent: false },
+
+      // ============================================
+      // DEAD LINK FIXES — internal/app (behind auth)
+      // ============================================
+      { source: '/billing', destination: '/lms/settings/billing', permanent: false },
+      { source: '/pricing', destination: '/store', permanent: false },
+      { source: '/pricing/build', destination: '/store', permanent: false },
+      { source: '/pricing/independent', destination: '/store', permanent: false },
+      { source: '/pricing/program-holder', destination: '/store', permanent: false },
+      { source: '/pricing/sponsor-licensing', destination: '/store', permanent: false },
+      { source: '/store/demo', destination: '/store', permanent: false },
+      { source: '/store/orders', destination: '/store', permanent: false },
+      { source: '/store/licenses/managed', destination: '/store', permanent: false },
+      { source: '/store/licenses/source-use', destination: '/store', permanent: false },
+      { source: '/store/add-ons/community-hub/checkout', destination: '/store', permanent: false },
+      { source: '/store/ai-studio/checkout', destination: '/store', permanent: false },
+      { source: '/store/ai-studio/demo', destination: '/store', permanent: false },
+      { source: '/store/request-license', destination: '/store', permanent: false },
+      { source: '/license/demo', destination: '/store', permanent: false },
+      { source: '/partners/login', destination: '/login', permanent: true },
+      { source: '/marketplace/apply', destination: '/apply', permanent: true },
+      { source: '/apply/instructor', destination: '/apply', permanent: true },
+      { source: '/help', destination: '/help/articles', permanent: false },
+      { source: '/help/admin', destination: '/help/articles', permanent: true },
+      { source: '/help/instructors', destination: '/help/articles', permanent: true },
+      { source: '/employer-portal/post-position', destination: '/employer', permanent: true },
+      { source: '/employer/opportunities/new', destination: '/employer', permanent: true },
+      { source: '/employer/postings', destination: '/employer', permanent: true },
+      { source: '/volunteer/apply', destination: '/volunteer', permanent: false },
+      { source: '/suboffice-onboarding/apply', destination: '/apply', permanent: false },
+      { source: '/pwa/shop-owner/verify', destination: '/login', permanent: false },
+
+      // ============================================
+      // DEAD LINK FIXES — admin (behind admin auth)
+      // ============================================
+      { source: '/admin/ferpa/access-requests', destination: '/admin/ferpa', permanent: false },
+      { source: '/admin/ferpa/activity', destination: '/admin/ferpa', permanent: false },
+      { source: '/admin/ferpa/audit-log', destination: '/admin/ferpa', permanent: false },
+      { source: '/admin/ferpa/consent-forms', destination: '/admin/ferpa', permanent: false },
+      { source: '/admin/ferpa/directory-info', destination: '/admin/ferpa', permanent: false },
+      { source: '/admin/ferpa/reports', destination: '/admin/ferpa', permanent: false },
+      { source: '/admin/funding/allocations', destination: '/admin/funding', permanent: false },
+      { source: '/admin/crm/follow-ups/new', destination: '/admin/crm', permanent: false },
+
+      // ============================================
+      // DEAD LINK FIXES — feature/app routes
+      // ============================================
+      { source: '/ai/course-builder', destination: '/admin/course-builder', permanent: false },
+      { source: '/ai/generate-asset', destination: '/admin/course-generator', permanent: false },
+      { source: '/ai/instructor', destination: '/ai-tutor', permanent: false },
+      { source: '/apps/grants/settings', destination: '/admin/settings', permanent: false },
+      { source: '/apps/sam-gov/settings', destination: '/admin/settings', permanent: false },
+      { source: '/apps/website-builder/settings', destination: '/admin/settings', permanent: false },
+      { source: '/community/activity', destination: '/community', permanent: false },
+      { source: '/community/events/create', destination: '/community', permanent: false },
+      { source: '/creator/community/collaborate', destination: '/creator/community', permanent: false },
+      { source: '/creator/community/events', destination: '/creator/community', permanent: false },
+      { source: '/creator/community/forums', destination: '/creator/community', permanent: false },
+      { source: '/creator/community/resources', destination: '/creator/community', permanent: false },
+      { source: '/creator/products/new', destination: '/creator/products', permanent: false },
+      { source: '/instructor/grading', destination: '/instructor', permanent: false },
+      { source: '/franchise/admin/preparers', destination: '/franchise/admin', permanent: false },
+      { source: '/franchise/admin/reports/comparison', destination: '/franchise/admin', permanent: false },
+      { source: '/franchise/admin/reports/preparers', destination: '/franchise/admin', permanent: false },
+      { source: '/franchise/admin/reports/returns', destination: '/franchise/admin', permanent: false },
+      { source: '/franchise/admin/reports/revenue', destination: '/franchise/admin', permanent: false },
+      { source: '/franchise/admin/returns', destination: '/franchise/admin', permanent: false },
+      { source: '/franchise/admin/settings', destination: '/franchise/admin', permanent: false },
+
+      // ============================================
+      // DEAD LINK FIXES — directories without index pages
+      // ============================================
+      { source: '/checkout', destination: '/store', permanent: false },
+      { source: '/creator', destination: '/creator/dashboard', permanent: false },
+      { source: '/eligibility', destination: '/eligibility/quiz', permanent: false },
+      { source: '/ferpa/training', destination: '/ferpa', permanent: false },
+      { source: '/licenses', destination: '/licenses/purchase', permanent: false },
+      { source: '/lms/collaborate/calendar', destination: '/lms/collaborate', permanent: false },
+      { source: '/lms/messages/support', destination: '/lms/messages', permanent: false },
+      { source: '/partners', destination: '/partners/join', permanent: false },
+      { source: '/program-holder/courses', destination: '/program-holder', permanent: false },
+      { source: '/store/licenses', destination: '/store', permanent: false },
+      { source: '/dashboards', destination: '/lms/dashboard', permanent: true },
+      { source: '/student/courses', destination: '/lms/courses', permanent: true },
+      { source: '/cm/learners', destination: '/lms/dashboard', permanent: false },
+      { source: '/lessons', destination: '/lms/courses', permanent: false },
     ];
   },
   async headers() {

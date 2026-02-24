@@ -2,9 +2,9 @@
 -- Each pair was verified: identical schemas, identical row data (same IDs),
 -- and all code references have been migrated to the canonical table.
 
--- 1. lessons (480 rows) — exact duplicate of training_lessons (480 rows, same IDs)
+-- 1. lessons (480 rows) — view duplicating training_lessons (480 rows, same IDs)
 --    Code refs migrated: 4 files → training_lessons
-DROP TABLE IF EXISTS public.lessons;
+DROP VIEW IF EXISTS public.lessons CASCADE;
 
 -- 2. partner_courses (329 rows) — exact duplicate of partner_lms_courses (329 rows, same IDs)
 --    Code refs migrated: 6 files → partner_lms_courses

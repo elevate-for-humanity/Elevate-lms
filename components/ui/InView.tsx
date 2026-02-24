@@ -69,9 +69,11 @@ export function InView({
   className = '',
 }: InViewProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const el = ref.current;
     if (!el) return;
 
@@ -86,11 +88,17 @@ export function InView({
 
   const anim = animations[animation];
 
+  // Before JS hydrates, render fully visible (no opacity-0).
+  // After hydration, apply the animation classes.
+  const animClass = mounted
+    ? `transition-all ease-out will-change-[transform,opacity] ${visible ? anim.visible : anim.hidden}`
+    : '';
+
   return (
     <div
       ref={ref}
-      className={`transition-all ease-out will-change-[transform,opacity] ${visible ? anim.visible : anim.hidden} ${className}`}
-      style={{ transitionDuration: `${duration}ms`, transitionDelay: `${delay}ms` }}
+      className={`${animClass} ${className}`}
+      style={mounted ? { transitionDuration: `${duration}ms`, transitionDelay: `${delay}ms` } : undefined}
     >
       {children}
     </div>

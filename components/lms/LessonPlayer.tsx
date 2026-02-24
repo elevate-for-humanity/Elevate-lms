@@ -120,13 +120,22 @@ export default function LessonPlayer({
 
   const progressPct = duration > 0 ? (currentTime / duration) * 100 : 0;
 
+  // Proxy Supabase URLs through same-origin to avoid cross-origin media blocks
+  // in preview environments (Gitpod). Direct URLs work fine on Netlify production.
+  const mediaSrc = React.useMemo(() => {
+    if (videoUrl && videoUrl.includes('supabase.co/storage/')) {
+      return `/api/media-proxy?url=${encodeURIComponent(videoUrl)}`;
+    }
+    return videoUrl;
+  }, [videoUrl]);
+
   return (
     <div className="w-full">
       {/* Video element as audio engine — MP4 container requires <video>.
           Rendered at 0x0 with opacity-0 so browsers still load the media. */}
       <video
         ref={audioRef}
-        src={videoUrl}
+        src={mediaSrc}
         preload="auto"
         playsInline
         style={{ width: 0, height: 0, opacity: 0, position: "absolute", pointerEvents: "none" }}

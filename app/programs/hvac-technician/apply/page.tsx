@@ -236,20 +236,9 @@ export default function HvacApplyPage() {
 
         <div className="grid lg:grid-cols-5 gap-8">
 
-          {/* Left Column - Pricing Summary */}
+          {/* Left Column - Program Info (pricing only shows for self-pay) */}
           <div className="lg:col-span-2">
             <div className="bg-brand-blue-600 rounded-2xl p-6 text-white sticky top-8">
-              <div className="flex items-center gap-3 mb-4">
-                <CreditCard className="w-6 h-6" />
-                <h2 className="text-lg font-bold">Program Cost</h2>
-              </div>
-
-              <div className="bg-white/10 rounded-xl p-4 mb-4">
-                <div className="text-center">
-                  <div className="text-brand-blue-200 text-xs uppercase mb-1">Total Tuition</div>
-                  <div className="text-3xl font-black">${PRICING.fullPrice.toLocaleString()}</div>
-                </div>
-              </div>
 
               <div className="bg-white/10 rounded-xl p-4 mb-4">
                 <div className="grid grid-cols-2 gap-4 text-center">
@@ -264,19 +253,7 @@ export default function HvacApplyPage() {
                 </div>
               </div>
 
-              <div className="bg-brand-green-500/20 rounded-xl p-4 mt-4">
-                <div className="text-center">
-                  <div className="text-brand-green-200 text-xs uppercase mb-1">Payment Options</div>
-                  <div className="text-sm text-white mt-2 space-y-1">
-                    <p><strong>Pay in Full:</strong> Card, Apple Pay, Google Pay</p>
-                    <p><strong>Weekly Plan:</strong> ${PRICING.depositAmount.toLocaleString()} deposit + ${weeklyDollars}/wk</p>
-                    <p><strong>Affirm:</strong> Split into monthly payments</p>
-                    <p><strong>Sezzle:</strong> 4 payments over 6 weeks</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white/10 rounded-xl p-4 mt-4">
+              <div className="bg-white/10 rounded-xl p-4 mb-4">
                 <h3 className="font-bold text-sm mb-2">Credentials Earned</h3>
                 <ul className="text-xs text-brand-blue-200 space-y-1">
                   <li>• Residential HVAC Certification 1</li>
@@ -288,10 +265,52 @@ export default function HvacApplyPage() {
                 </ul>
               </div>
 
+              {/* Pricing card — only for self-pay */}
+              {formData.fundingInterest === 'self-pay' && (
+                <>
+                  <div className="flex items-center gap-3 mb-4">
+                    <CreditCard className="w-6 h-6" />
+                    <h2 className="text-lg font-bold">Program Cost</h2>
+                  </div>
+
+                  <div className="bg-white/10 rounded-xl p-4 mb-4">
+                    <div className="text-center">
+                      <div className="text-brand-blue-200 text-xs uppercase mb-1">Total Tuition</div>
+                      <div className="text-3xl font-black">${PRICING.fullPrice.toLocaleString()}</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-brand-green-500/20 rounded-xl p-4">
+                    <div className="text-center">
+                      <div className="text-brand-green-200 text-xs uppercase mb-1">Payment Options</div>
+                      <div className="text-sm text-white mt-2 space-y-1">
+                        <p><strong>Pay in Full:</strong> Card, Apple Pay, Google Pay</p>
+                        <p><strong>Weekly Plan:</strong> ${PRICING.depositAmount.toLocaleString()} deposit + ${weeklyDollars}/wk</p>
+                        <p><strong>Affirm:</strong> Split into monthly payments</p>
+                        <p><strong>Sezzle:</strong> 4 payments over 6 weeks</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Funding note — for non-self-pay */}
+              {formData.fundingInterest && formData.fundingInterest !== 'self-pay' && (
+                <div className="bg-brand-green-500/20 rounded-xl p-4">
+                  <div className="text-center">
+                    <div className="text-brand-green-200 text-xs uppercase mb-1">Tuition</div>
+                    <div className="text-2xl font-black">May be covered</div>
+                    <p className="text-sm text-brand-green-100 mt-2">
+                      through workforce funding for eligible students
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div className="mt-4 flex items-start gap-2">
                 <Info className="w-4 h-4 text-brand-blue-200 flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-brand-blue-200">
-                  WIOA and Workforce Ready Grant funding may cover full tuition for eligible students. Select &quot;Funding assistance&quot; below.
+                  Select your funding option in the form. WIOA and Workforce Ready Grant may cover full tuition for eligible students.
                 </p>
               </div>
             </div>

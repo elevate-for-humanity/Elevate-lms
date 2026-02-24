@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import {
   Clock, DollarSign, TrendingUp, ArrowRight,
   Award, Calendar, ChevronDown, ChevronUp,
@@ -59,20 +60,13 @@ export default function HVACProgramContent() {
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
-          src="/images/trades/hero-program-hvac.jpg"
-          alt="HVAC technician working on a commercial heating and cooling unit"
-          fill
-          quality={90} className="object-cover"
-          priority
-        />
+      {/* Video Hero Banner */}
+      <ProgramHeroBanner videoSrc="/videos/hvac-hero-final.mp4" voiceoverSrc="/audio/heroes/skilled-trades.mp3" />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
-
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-24 w-full">
-          <div className="max-w-2xl">
+      {/* Hero Content */}
+      <section className="bg-slate-900 py-12 lg:py-16">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="max-w-3xl">
             <FundingBadge type="funded" />
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mt-6 mb-6 leading-tight">
@@ -90,33 +84,41 @@ export default function HVACProgramContent() {
               Tuition may be covered through WIOA or Workforce Ready Grant for eligible students referred by WorkOne. Self-pay and payment plans also available.
             </p>
 
-            <div className="flex flex-wrap gap-4 mb-8 text-sm text-gray-300">
-              <span className="flex items-center gap-2 bg-brand-green-500/20 backdrop-blur px-4 py-2 rounded-full text-brand-green-300 font-semibold border border-brand-green-400/30">
+            <div className="flex flex-wrap gap-3 mb-8 text-sm text-gray-300">
+              <span className="flex items-center gap-2 bg-brand-green-500/20 px-4 py-2 rounded-full text-brand-green-300 font-semibold border border-brand-green-400/30">
                 <Award className="w-4 h-4" /> EPA 608 Certification
               </span>
-              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
+              <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
                 <Clock className="w-4 h-4" /> 400 Hours
               </span>
-              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
+              <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
                 <Calendar className="w-4 h-4" /> Flexible Scheduling
               </span>
-              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
+              <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
                 <TrendingUp className="w-4 h-4" /> 4-Star Indiana Top Job
               </span>
-              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
+              <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
                 <DollarSign className="w-4 h-4" /> $48K Avg Starting Salary
               </span>
             </div>
 
-            <Link
-              href="/apply?program=hvac-technician"
-              className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-500 text-white font-bold rounded-full transition-all shadow-lg text-lg mb-4"
-            >
-              Apply
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Link>
+            <div className="flex flex-wrap gap-4 mb-6">
+              <Link
+                href="/apply?program=hvac-technician"
+                className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
+              >
+                Apply
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
+              <Link
+                href="/programs/hvac-technician/apply"
+                className="inline-flex items-center justify-center px-8 py-4 bg-brand-green-600 hover:bg-brand-green-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
+              >
+                Enroll in Program
+              </Link>
+            </div>
 
-            <div className="bg-yellow-500/20 border border-yellow-400/40 rounded-lg px-4 py-3 max-w-xl mb-4">
+            <div className="bg-yellow-500/20 border border-yellow-400/40 rounded-lg px-4 py-3 max-w-xl">
               <p className="text-sm text-yellow-100 font-semibold">
                 Do not proceed with enrollment until you have completed WorkOne verification.{' '}
                 <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="text-white underline hover:text-yellow-200">
@@ -124,16 +126,8 @@ export default function HVACProgramContent() {
                 </a>
               </p>
             </div>
-
-            <Link
-              href="/programs/hvac-technician/apply"
-              className="inline-flex items-center justify-center px-8 py-4 bg-brand-green-600 hover:bg-brand-green-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
-            >
-              Enroll in Program
-            </Link>
           </div>
         </div>
-
       </section>
 
       {/* Program at a Glance — timeline, duration, pacing for case managers */}

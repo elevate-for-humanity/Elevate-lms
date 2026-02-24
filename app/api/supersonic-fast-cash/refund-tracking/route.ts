@@ -99,13 +99,13 @@ export async function POST(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     // Read from the VIEW only — never from sfc_tax_returns directly.
-    // View exposes: public_tracking_code, status (mapped), rejection_reason (sanitized),
+    // View exposes: tracking_id, status (mapped), rejection_reason (sanitized),
     // created_at, updated_at, client_first_name, client_last_initial.
     // Does NOT expose: efile_submission_id, raw last_error, user_id, email, phone, notes.
     const { data, error } = await supabase
       .from('sfc_tax_return_public_status')
-      .select('public_tracking_code, status, rejection_reason, created_at, updated_at, client_first_name, client_last_initial')
-      .eq('public_tracking_code', trackingCode)
+      .select('tracking_id, status, rejection_reason, created_at, updated_at, client_first_name, client_last_initial')
+      .eq('tracking_id', trackingCode)
       .maybeSingle();
 
     if (error || !data) {
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
     // All masking is done in SQL — the route only formats the response
     return jsonResponse({
       success: true,
-      trackingCode: data.public_tracking_code,
+      trackingCode: data.tracking_id,
       status: data.status,
       statusMessage: statusMessages[data.status] || 'Status is being updated.',
       clientName: data.client_first_name

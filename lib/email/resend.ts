@@ -52,7 +52,7 @@ export async function sendEmail(options: EmailOptions) {
 
     if (!resp.ok) {
       logger.error(`[Email] Resend ${resp.status}:`, data);
-      return { success: false, error: `Resend error ${resp.status}` };
+      return { success: false, error: `Resend error ${resp.status}: ${data?.message || data?.error || JSON.stringify(data)}`, from };
     }
 
     return { success: true, data };

@@ -32,9 +32,11 @@ const getOfficialDomains = () => {
   return [
     domain,
     'www.elevateforhumanity.org',
-    'www.www.elevateforhumanity.org',
+    'elevateforhumanity.org',
+    'elevate317.netlify.app',
+    '.netlify.app',          // Netlify deploy previews
+    '.gitpod.dev',           // Gitpod dev environments
     'localhost',
-    
   ];
 };
 
@@ -58,40 +60,23 @@ export async function POST(request: NextRequest) {
     );
 
     if (isUnauthorized) {
-      // ALERT! Someone copied your site
-      logger.error('🚨 UNAUTHORIZED SITE COPY DETECTED!');
-      logger.error('Domain:', domain);
-      logger.error('URL:', url);
-      logger.error('Referrer:', referrer);
-      logger.error('User Agent:', userAgent);
-      logger.error('Timestamp:', timestamp);
+      logger.error('[DMCA] Unauthorized site copy detected:', domain, url);
 
-      // Send alert email (implement this)
-      await sendAlertEmail({
-        domain,
-        url,
-        referrer,
-        userAgent,
-        timestamp,
-      });
+      const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
 
-      // Log to database for evidence
-      await logUnauthorizedAccess({
-        domain,
-        url,
-        referrer,
-        userAgent,
-        timestamp,
-        ip: request.ip || request.headers.get('x-forwarded-for') || 'unknown',
-      });
+      // Run all three in parallel: alert owner, log evidence, send DMCA takedown
+      await Promise.allSettled([
+        sendAlertEmail({ domain, url, referrer, userAgent, timestamp }),
+        logUnauthorizedAccess({ domain, url, referrer, userAgent, timestamp, ip }),
+        sendDMCATakedown({ domain, url, timestamp }),
+      ]);
 
-      // Return response indicating unauthorized use
       return NextResponse.json(
         {
           status: 'unauthorized',
           message:
             'This appears to be an unauthorized copy of Elevate for Humanity',
-          action: 'Legal team has been notified',
+          action: 'Legal team has been notified. DMCA takedown initiated.',
         },
         { status: 403 }
       );
@@ -203,6 +188,193 @@ async function logUnauthorizedAccess(data: {
 }
 
 /**
+ * Resolve hosting provider abuse contacts and send a formal DMCA takedown notice.
+ * Uses common abuse email patterns and known provider mappings.
+ */
+async function sendDMCATakedown(data: {
+  domain: string;
+  url: string;
+  timestamp: string;
+}) {
+  const { sendEmail } = await import('@/lib/email/resend');
+
+  // Check if we already sent a takedown for this domain in the last 24h (avoid spam)
+  try {
+    const db = createAdminClient();
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: existing } = await db
+      .from('unauthorized_access_log')
+      .select('id')
+      .eq('domain', data.domain)
+      .eq('cease_desist_sent', true)
+      .gte('logged_at', oneDayAgo)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      logger.info('[DMCA] Takedown already sent for', data.domain, 'in last 24h — skipping');
+      return;
+    }
+  } catch {
+    // Continue even if dedup check fails
+  }
+
+  // Known hosting provider abuse emails by domain pattern
+  const abuseContacts: Record<string, string> = {
+    'vercel.app': 'dmca@vercel.com',
+    'vercel.com': 'dmca@vercel.com',
+    'netlify.app': 'abuse@netlify.com',
+    'netlify.com': 'abuse@netlify.com',
+    'github.io': 'dmca@github.com',
+    'pages.dev': 'abuse@cloudflare.com',
+    'cloudflare.com': 'abuse@cloudflare.com',
+    'herokuapp.com': 'abuse@heroku.com',
+    'render.com': 'abuse@render.com',
+    'onrender.com': 'abuse@render.com',
+    'railway.app': 'abuse@railway.app',
+    'fly.dev': 'abuse@fly.io',
+    'azurewebsites.net': 'abuse@microsoft.com',
+    'web.app': 'abuse@google.com',
+    'firebaseapp.com': 'abuse@google.com',
+    'amplifyapp.com': 'abuse@amazonaws.com',
+    'godaddysites.com': 'abuse@godaddy.com',
+    'wixsite.com': 'abuse@wix.com',
+    'squarespace.com': 'abuse@squarespace.com',
+    'shopify.com': 'abuse@shopify.com',
+    'myshopify.com': 'abuse@shopify.com',
+    'hostinger.com': 'abuse@hostinger.com',
+    'bluehost.com': 'abuse@bluehost.com',
+    'siteground.com': 'abuse@siteground.com',
+    'namecheap.com': 'abuse@namecheap.com',
+  };
+
+  // Find matching abuse contact
+  let abuseEmail: string | null = null;
+  for (const [pattern, email] of Object.entries(abuseContacts)) {
+    if (data.domain.endsWith(pattern)) {
+      abuseEmail = email;
+      break;
+    }
+  }
+
+  // Formal DMCA takedown notice (17 U.S.C. § 512(c))
+  const dmcaNotice = `
+DMCA TAKEDOWN NOTICE PURSUANT TO 17 U.S.C. § 512(c)
+
+Date: ${new Date().toISOString().split('T')[0]}
+
+To Whom It May Concern:
+
+I am writing to report an instance of copyright infringement on a website hosted by your service.
+
+COPYRIGHTED WORK:
+The website located at https://www.elevateforhumanity.org, including all text, images, code, course content, and design elements, is the copyrighted property of Elevate for Humanity Career & Technical Institute.
+
+INFRINGING MATERIAL:
+An unauthorized copy of our website has been detected at:
+- Domain: ${data.domain}
+- URL: ${data.url}
+- First detected: ${data.timestamp}
+
+This material was copied without authorization and infringes on our copyright.
+
+REQUESTED ACTION:
+I request that you immediately remove or disable access to the infringing material described above.
+
+GOOD FAITH STATEMENT:
+I have a good faith belief that the use of the copyrighted material described above is not authorized by the copyright owner, its agent, or the law.
+
+ACCURACY STATEMENT:
+The information in this notification is accurate, and under penalty of perjury, I am authorized to act on behalf of the copyright owner.
+
+CONTACT INFORMATION:
+Elevate for Humanity Career & Technical Institute
+8888 Keystone Crossing Suite 1300
+Indianapolis, IN 46240
+Email: elevate4humanityedu@gmail.com
+Phone: (317) 314-3757
+Website: https://www.elevateforhumanity.org
+
+This notice is sent pursuant to the Digital Millennium Copyright Act (17 U.S.C. § 512(c)).
+
+Sincerely,
+Elevate for Humanity Career & Technical Institute
+  `.trim();
+
+  const dmcaHtml = `
+    <div style="font-family: 'Courier New', monospace; max-width: 700px; margin: 0 auto; padding: 24px; border: 2px solid #991b1b; background: #fff;">
+      <div style="text-align: center; padding: 16px; background: #991b1b; color: white; margin: -24px -24px 24px -24px;">
+        <h1 style="margin: 0; font-size: 18px;">DMCA TAKEDOWN NOTICE</h1>
+        <p style="margin: 4px 0 0; font-size: 12px;">Pursuant to 17 U.S.C. § 512(c)</p>
+      </div>
+      <pre style="white-space: pre-wrap; font-size: 13px; line-height: 1.6;">${dmcaNotice}</pre>
+    </div>
+  `;
+
+  // Send to hosting provider if we found their abuse contact
+  if (abuseEmail) {
+    const providerResult = await sendEmail({
+      to: abuseEmail,
+      subject: `DMCA Takedown Notice — Unauthorized copy of elevateforhumanity.org on ${data.domain}`,
+      html: dmcaHtml,
+      text: dmcaNotice,
+    });
+
+    if (providerResult.success) {
+      logger.info('[DMCA] Takedown notice sent to hosting provider:', abuseEmail);
+    } else {
+      logger.error('[DMCA] Failed to send to provider:', abuseEmail, providerResult.error);
+    }
+  } else {
+    logger.info('[DMCA] No known abuse contact for domain:', data.domain);
+  }
+
+  // Always send a copy to yourself with the DMCA notice + who to contact
+  await sendEmail({
+    to: 'elevate4humanityedu@gmail.com',
+    subject: `DMCA Takedown ${abuseEmail ? 'SENT' : 'MANUAL ACTION NEEDED'}: ${data.domain}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: ${abuseEmail ? '#059669' : '#d97706'}; color: white; padding: 16px; text-align: center;">
+          <h2 style="margin: 0;">${abuseEmail ? 'Automatic DMCA Takedown Sent' : 'Manual DMCA Takedown Required'}</h2>
+        </div>
+        <div style="padding: 20px; background: #f9fafb; border: 1px solid #e5e7eb;">
+          <p><strong>Clone domain:</strong> <a href="http://${data.domain}">${data.domain}</a></p>
+          <p><strong>Clone URL:</strong> <a href="${data.url}">${data.url}</a></p>
+          <p><strong>Detected:</strong> ${data.timestamp}</p>
+          ${abuseEmail
+            ? `<p><strong>Takedown sent to:</strong> ${abuseEmail}</p>
+               <p style="color: #059669;">The hosting provider has been notified. Most providers respond within 24-72 hours.</p>`
+            : `<p style="color: #d97706;"><strong>Could not identify hosting provider.</strong> You need to:</p>
+               <ol>
+                 <li>Look up the domain's hosting provider at <a href="https://who.is/whois/${data.domain}">who.is</a></li>
+                 <li>Find their abuse/DMCA contact</li>
+                 <li>Forward the DMCA notice below to them</li>
+               </ol>`
+          }
+          <hr style="margin: 20px 0;" />
+          <details>
+            <summary style="cursor: pointer; font-weight: bold;">View DMCA Notice Text</summary>
+            <pre style="white-space: pre-wrap; font-size: 12px; background: white; padding: 16px; border: 1px solid #ddd; margin-top: 8px;">${dmcaNotice}</pre>
+          </details>
+        </div>
+      </div>
+    `,
+  });
+
+  // Mark in database that takedown was sent
+  try {
+    const db = createAdminClient();
+    await db
+      .from('unauthorized_access_log')
+      .update({ cease_desist_sent: true, cease_desist_date: new Date().toISOString() })
+      .eq('domain', data.domain)
+      .eq('cease_desist_sent', false);
+  } catch {
+    // Non-fatal
+  }
+}
+
+/**
  * GET endpoint to check tracking status
  */
 export async function GET(request: NextRequest) {
@@ -211,9 +383,8 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 // Only allow from authorized domains
   const origin = request.headers.get('origin') || '';
-  const isAuthorized = OFFICIAL_DOMAINS.some((domain) =>
-    origin.includes(domain)
-  );
+  const officialDomains = getOfficialDomains();
+  const isAuthorized = officialDomains.some((d) => origin.includes(d));
 
   if (!isAuthorized && origin !== '') {
     return NextResponse.json({ error: 'Unauthorized domain' }, { status: 403 });
@@ -222,6 +393,6 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     status: 'active',
     message: 'DMCA tracking is active',
-    official_domains: OFFICIAL_DOMAINS,
+    official_domains: officialDomains,
   });
 }

@@ -24,7 +24,10 @@ export default function LessonPlayer({
   onProgress,
   onComplete,
 }: LessonPlayerProps) {
-  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+  // Use <video> as the playback engine because the MP4 container
+  // (content-type video/mp4) is rejected by <audio> in most browsers.
+  // The element is hidden — all visuals come from the branded UI below.
+  const audioRef = React.useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [hasStarted, setHasStarted] = React.useState(false);
   const [currentTime, setCurrentTime] = React.useState(0);
@@ -119,8 +122,16 @@ export default function LessonPlayer({
 
   return (
     <div className="w-full">
-      {/* Hidden audio element — no video tag, no black frame */}
-      <audio ref={audioRef} src={videoUrl} preload="metadata" />
+      {/* Hidden video element used as audio engine — MP4 container requires <video>.
+          Visually hidden so no black frame is ever shown. */}
+      <video
+        ref={audioRef}
+        src={videoUrl}
+        preload="metadata"
+        playsInline
+        className="sr-only"
+        aria-hidden="true"
+      />
 
       {/* Player card */}
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 shadow-xl">

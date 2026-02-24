@@ -195,14 +195,12 @@ export default async function CourseDetailPage({
                       <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
                         isCompleted
                           ? 'bg-brand-green-100'
-                          : isEnrolled
-                            ? 'bg-brand-blue-100'
-                            : 'bg-slate-100'
+                          : 'bg-brand-blue-100'
                       }`}>
                         {isCompleted ? (
                           <span className="text-brand-green-600 font-bold text-sm">✓</span>
                         ) : (
-                          <span className={`font-bold ${isEnrolled ? 'text-brand-blue-600' : 'text-slate-400'}`}>
+                          <span className="font-bold text-brand-blue-600">
                             {index + 1}
                           </span>
                         )}
@@ -215,44 +213,32 @@ export default async function CourseDetailPage({
                           <p className="text-slate-600 text-sm">{lesson.description}</p>
                         )}
                       </div>
-                      {isEnrolled && (
-                        <div className="flex-shrink-0">
-                          {isCompleted ? (
-                            <span className="text-xs font-semibold text-brand-green-600 bg-brand-green-50 px-2 py-1 rounded-full">Done</span>
-                          ) : (
-                            <Play className="w-5 h-5 text-brand-blue-500" />
-                          )}
-                        </div>
-                      )}
-                      {!isEnrolled && (
-                        <span className="text-slate-300 text-xs flex-shrink-0">🔒</span>
-                      )}
+                      <div className="flex-shrink-0">
+                        {isCompleted ? (
+                          <span className="text-xs font-semibold text-brand-green-600 bg-brand-green-50 px-2 py-1 rounded-full">Done</span>
+                        ) : (
+                          <Play className="w-5 h-5 text-brand-blue-500" />
+                        )}
+                      </div>
                     </div>
                   );
 
-                  if (isEnrolled) {
-                    return (
-                      <Link
-                        key={lesson.id}
-                        href={`/lms/courses/${courseId}/lessons/${lesson.id}`}
-                        className={`block border-2 rounded-xl p-5 transition-colors ${
-                          isCompleted
-                            ? 'border-brand-green-200 bg-brand-green-50/30 hover:border-brand-green-300'
-                            : 'border-gray-200 bg-white hover:border-brand-blue-400 hover:shadow-sm'
-                        }`}
-                      >
-                        {lessonContent}
-                      </Link>
-                    );
-                  }
+                  const lessonHref = isEnrolled
+                    ? `/lms/courses/${courseId}/lessons/${lesson.id}`
+                    : `/courses/${courseId}/lessons/${lesson.id}`;
 
                   return (
-                    <div
+                    <Link
                       key={lesson.id}
-                      className="border-2 border-gray-200 rounded-xl p-5 bg-slate-50/50"
+                      href={lessonHref}
+                      className={`block border-2 rounded-xl p-5 transition-colors ${
+                        isCompleted
+                          ? 'border-brand-green-200 bg-brand-green-50/30 hover:border-brand-green-300'
+                          : 'border-gray-200 bg-white hover:border-brand-blue-400 hover:shadow-sm'
+                      }`}
                     >
                       {lessonContent}
-                    </div>
+                    </Link>
                   );
                 })
               ) : (

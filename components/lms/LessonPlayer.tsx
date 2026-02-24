@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Play, Volume2, BookOpen } from "lucide-react";
+import { Play, Pause, Volume2, BookOpen, RotateCcw } from "lucide-react";
 
 interface LessonPlayerProps {
   videoUrl: string;
@@ -13,10 +13,8 @@ interface LessonPlayerProps {
 }
 
 /**
- * Audio-first lesson player for AI-generated narrated lessons (MP4 with
- * static/blank video track). Shows a branded overlay instead of a black
- * frame, surfaces the audio controls prominently, and provides an
- * optional transcript panel.
+ * Audio-first lesson player for AI-generated narrated lessons.
+ * Uses <audio> instead of <video> — no black frame is possible.
  */
 export default function LessonPlayer({
   videoUrl,
@@ -26,77 +24,89 @@ export default function LessonPlayer({
   onProgress,
   onComplete,
 }: LessonPlayerProps) {
-  const videoRef = React.useRef<HTMLVideoElement | null>(null);
-  const [hasStarted, setHasStarted] = React.useState(false);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = React.useState(false);
-  const [showOverlay, setShowOverlay] = React.useState(true);
+  const [hasStarted, setHasStarted] = React.useState(false);
   const [currentTime, setCurrentTime] = React.useState(0);
   const [duration, setDuration] = React.useState(0);
+  const [ended, setEnded] = React.useState(false);
 
   React.useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
+    const a = audioRef.current;
+    if (!a) return;
 
-    v.muted = false;
-    if (typeof v.volume === "number") v.volume = 1;
+    a.volume = 1;
 
     const onPlay = () => {
-      setHasStarted(true);
       setIsPlaying(true);
-      setShowOverlay(false);
+      setHasStarted(true);
     };
     const onPause = () => setIsPlaying(false);
     const onEnded = () => {
       setIsPlaying(false);
+      setEnded(true);
       onComplete?.();
     };
     const onTimeUpdate = () => {
-      const t = v.currentTime;
-      const d = v.duration;
-      setCurrentTime(t);
-      if (d && onProgress) onProgress((t / d) * 100);
+      setCurrentTime(a.currentTime);
+      if (a.duration && onProgress) {
+        onProgress((a.currentTime / a.duration) * 100);
+      }
     };
     const onLoaded = () => {
-      if (v.duration && !isNaN(v.duration)) setDuration(v.duration);
+      if (a.duration && !isNaN(a.duration)) setDuration(a.duration);
     };
 
-    v.addEventListener("play", onPlay);
-    v.addEventListener("pause", onPause);
-    v.addEventListener("ended", onEnded);
-    v.addEventListener("timeupdate", onTimeUpdate);
-    v.addEventListener("loadedmetadata", onLoaded);
+    a.addEventListener("play", onPlay);
+    a.addEventListener("pause", onPause);
+    a.addEventListener("ended", onEnded);
+    a.addEventListener("timeupdate", onTimeUpdate);
+    a.addEventListener("loadedmetadata", onLoaded);
 
     return () => {
-      v.removeEventListener("play", onPlay);
-      v.removeEventListener("pause", onPause);
-      v.removeEventListener("ended", onEnded);
-      v.removeEventListener("timeupdate", onTimeUpdate);
-      v.removeEventListener("loadedmetadata", onLoaded);
+      a.removeEventListener("play", onPlay);
+      a.removeEventListener("pause", onPause);
+      a.removeEventListener("ended", onEnded);
+      a.removeEventListener("timeupdate", onTimeUpdate);
+      a.removeEventListener("loadedmetadata", onLoaded);
     };
   }, [onComplete, onProgress]);
 
-  const start = async () => {
-    const v = videoRef.current;
-    if (!v) return;
+  const play = async () => {
+    const a = audioRef.current;
+    if (!a) return;
     try {
-      v.muted = false;
-      if (typeof v.volume === "number") v.volume = 1;
-      await v.play();
+      a.volume = 1;
+      await a.play();
     } catch (e) {
-      // If autoplay policy blocks, hide overlay so native controls are visible
       console.error("LessonPlayer play() blocked:", e);
-      setShowOverlay(false);
     }
   };
 
   const togglePlay = async () => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (v.paused) {
-      await start();
+    const a = audioRef.current;
+    if (!a) return;
+    if (a.paused) {
+      await play();
     } else {
-      v.pause();
+      a.pause();
     }
+  };
+
+  const restart = async () => {
+    const a = audioRef.current;
+    if (!a) return;
+    a.currentTime = 0;
+    setEnded(false);
+    await play();
+  };
+
+  const seek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const a = audioRef.current;
+    if (!a || !duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    a.currentTime = pct * duration;
   };
 
   const fmt = (s: number) => {
@@ -105,125 +115,124 @@ export default function LessonPlayer({
     return `${m}:${sec.toString().padStart(2, "0")}`;
   };
 
+  const progressPct = duration > 0 ? (currentTime / duration) * 100 : 0;
+
   return (
     <div className="w-full">
-      {/* Player container */}
-      <div className="relative w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-950">
-        <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
-          {/* Branded overlay — replaces black screen perception */}
-          {showOverlay && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-              <div className="mx-auto max-w-2xl px-6 text-center text-white">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-blue-600/20">
-                  <BookOpen className="h-8 w-8 text-brand-blue-400" />
-                </div>
+      {/* Hidden audio element — no video tag, no black frame */}
+      <audio ref={audioRef} src={videoUrl} preload="metadata" />
 
-                {moduleTitle && (
-                  <p className="text-xs uppercase tracking-wider text-slate-400">
-                    {moduleTitle}
-                  </p>
-                )}
-
-                <h2 className="mt-2 text-xl font-semibold sm:text-2xl">
-                  {lessonTitle}
-                </h2>
-
-                <p className="mt-3 text-sm text-slate-300">
-                  Narrated instructional lesson. Click below to begin audio-guided training.
-                </p>
-
-                <button
-                  type="button"
-                  onClick={start}
-                  className="mt-6 inline-flex items-center gap-2 rounded-lg bg-brand-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-blue-700"
-                >
-                  <Play className="h-4 w-4" />
-                  Start Lesson
-                </button>
-
-                <p className="mt-3 flex items-center justify-center gap-1 text-xs text-slate-400">
-                  <Volume2 className="h-3 w-3" />
-                  Ensure your volume is on
-                </p>
-              </div>
+      {/* Player card */}
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 shadow-xl">
+        <div className="px-6 py-10 sm:px-10 sm:py-14">
+          <div className="mx-auto max-w-lg text-center">
+            {/* Icon */}
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-brand-blue-600/20">
+              <BookOpen className="h-8 w-8 text-brand-blue-400" />
             </div>
-          )}
 
-          {/* Hidden video element — drives audio playback */}
-          <video
-            ref={videoRef}
-            className="absolute inset-0 h-full w-full"
-            src={videoUrl}
-            preload="metadata"
-            playsInline
-          />
+            {/* Module label */}
+            {moduleTitle && (
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                {moduleTitle}
+              </p>
+            )}
 
-          {/* Post-start: branded playback panel (replaces black video frame) */}
-          {hasStarted && !showOverlay && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-              {/* Animated audio indicator */}
-              <div className="mb-6 flex items-end gap-1">
-                {[1, 2, 3, 4, 5].map((i) => (
+            {/* Lesson title */}
+            <h2 className="mt-2 text-xl font-bold text-white sm:text-2xl">
+              {lessonTitle}
+            </h2>
+
+            {/* Status text */}
+            <p className="mt-2 text-sm text-slate-400">
+              {!hasStarted
+                ? "Narrated lesson \u2014 click play to begin"
+                : ended
+                  ? "Lesson complete"
+                  : isPlaying
+                    ? "Playing..."
+                    : "Paused"}
+            </p>
+
+            {/* Audio visualizer bars */}
+            {hasStarted && (
+              <div className="mt-5 flex items-end justify-center gap-1">
+                {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                   <div
                     key={i}
-                    className={`w-1.5 rounded-full bg-brand-blue-500 transition-all duration-300 ${
-                      isPlaying ? "animate-pulse" : ""
-                    }`}
+                    className="w-1 rounded-full bg-brand-blue-500 transition-all duration-150"
                     style={{
-                      height: isPlaying ? `${12 + Math.random() * 20}px` : "6px",
-                      animationDelay: `${i * 0.1}s`,
+                      height: isPlaying
+                        ? `${8 + ((Math.sin(Date.now() / 200 + i * 0.8) + 1) / 2) * 20}px`
+                        : "4px",
                     }}
                   />
                 ))}
               </div>
+            )}
 
-              {moduleTitle && (
-                <p className="text-xs uppercase tracking-wider text-slate-400">
-                  {moduleTitle}
-                </p>
-              )}
-              <h3 className="mt-1 text-lg font-semibold text-white sm:text-xl">
-                {lessonTitle}
-              </h3>
-              <p className="mt-1 text-sm text-slate-400">
-                {isPlaying ? "Playing narration..." : "Paused"}
-                {duration > 0 && ` — ${fmt(currentTime)} / ${fmt(duration)}`}
-              </p>
-
-              {/* Play/pause toggle */}
-              <button
-                type="button"
-                onClick={togglePlay}
-                className="mt-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-blue-600 text-white transition hover:bg-brand-blue-700"
-                aria-label={isPlaying ? "Pause" : "Play"}
-              >
-                {isPlaying ? (
-                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                    <rect x="6" y="4" width="4" height="16" rx="1" />
-                    <rect x="14" y="4" width="4" height="16" rx="1" />
-                  </svg>
-                ) : (
-                  <Play className="h-6 w-6 ml-0.5" />
-                )}
-              </button>
-
-              {/* Progress bar */}
-              {duration > 0 && (
-                <div className="mt-5 w-full max-w-md px-6">
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
-                    <div
-                      className="h-full rounded-full bg-brand-blue-500 transition-all duration-300"
-                      style={{ width: `${(currentTime / duration) * 100}%` }}
-                    />
-                  </div>
-                </div>
+            {/* Play / Pause / Restart button */}
+            <div className="mt-6">
+              {ended ? (
+                <button
+                  type="button"
+                  onClick={restart}
+                  className="inline-flex items-center gap-2 rounded-full bg-brand-blue-600 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-blue-700"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Replay Lesson
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={togglePlay}
+                  className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-blue-600 text-white shadow-lg transition hover:bg-brand-blue-700 hover:shadow-xl"
+                  aria-label={isPlaying ? "Pause" : "Play"}
+                >
+                  {isPlaying ? (
+                    <Pause className="h-6 w-6" />
+                  ) : (
+                    <Play className="h-6 w-6 ml-0.5" />
+                  )}
+                </button>
               )}
             </div>
-          )}
+
+            {/* Progress bar + time */}
+            {(hasStarted || duration > 0) && (
+              <div className="mt-6">
+                <div
+                  className="mx-auto h-2 max-w-md cursor-pointer overflow-hidden rounded-full bg-slate-700"
+                  onClick={seek}
+                  role="progressbar"
+                  aria-valuenow={Math.round(progressPct)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                >
+                  <div
+                    className="h-full rounded-full bg-brand-blue-500 transition-all duration-200"
+                    style={{ width: `${progressPct}%` }}
+                  />
+                </div>
+                <div className="mt-2 flex justify-between text-xs text-slate-500">
+                  <span>{fmt(currentTime)}</span>
+                  <span>{duration > 0 ? fmt(duration) : "--:--"}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Volume hint */}
+            {!hasStarted && (
+              <p className="mt-4 flex items-center justify-center gap-1 text-xs text-slate-500">
+                <Volume2 className="h-3 w-3" />
+                Make sure your volume is on
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Info panel below player */}
+      {/* Info panel */}
       <div className="mt-4 rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
           {lessonTitle}
@@ -235,7 +244,7 @@ export default function LessonPlayer({
         )}
         <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
           This lesson uses audio narration to guide you through the material.
-          If the screen appears static, that is expected — the narration is the instruction.
+          The screen displays lesson information while the audio plays.
         </p>
 
         {transcript && (

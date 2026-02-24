@@ -30,7 +30,7 @@ export default function HomePage() {
       </div>
 
       {/* ===== HERO ===== */}
-      <section className="relative h-[320px] sm:h-[400px] md:h-[480px]">
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
         <HomeHeroVideo />
         {/* Gradient overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 z-[11]" />
@@ -69,24 +69,21 @@ export default function HomePage() {
           <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
             Choose your path below. Each option takes you directly to the information you need — everything starts online.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="space-y-5 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
             {[
-              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/pexels/homepage-students-diverse.jpg', alt: 'Diverse group of students collaborating in a training session' },
-              { href: '/funding', label: 'I need funding', desc: 'Most programs are tuition-free. Check your eligibility.', cta: 'Check Eligibility', image: '/images/pexels/homepage-financial-planning.jpg', alt: 'Financial planning and funding consultation' },
-              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/pexels/homepage-handshake-hiring.jpg', alt: 'Employer and candidate shaking hands at a hiring event' },
-              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/pexels/homepage-woman-laptop.jpg', alt: 'Woman working on laptop managing a training platform' },
+              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/pexels/homepage-students-diverse.jpg', alt: 'Diverse group of students collaborating in a training session', color: 'bg-brand-red-600' },
+              { href: '/funding', label: 'I need funding', desc: 'Most programs are tuition-free. Check your eligibility.', cta: 'Check Eligibility', image: '/images/pexels/homepage-financial-planning.jpg', alt: 'Financial planning and funding consultation', color: 'bg-brand-blue-600' },
+              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/pexels/homepage-handshake-hiring.jpg', alt: 'Employer and candidate shaking hands at a hiring event', color: 'bg-brand-green-600' },
+              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/pexels/homepage-woman-laptop.jpg', alt: 'Woman working on laptop managing a training platform', color: 'bg-brand-orange-500' },
             ].map((item) => (
-              <div
-                key={item.href}
-                className="flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
-              >
-                <div className="relative h-[180px] overflow-hidden">
-                  <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
+              <div key={item.href} className="rounded-xl overflow-hidden border border-slate-200">
+                <div className="relative h-[180px]">
+                  <Image src={item.image} alt={item.alt} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover" />
+                  <div className={`absolute top-3 left-3 ${item.color} text-white text-xs font-bold px-3 py-1 rounded-full`}>{item.label}</div>
                 </div>
-                <div className="p-5 flex flex-col flex-1">
-                  <span className="font-bold text-lg text-slate-900 mb-1">{item.label}</span>
-                  <span className="text-sm text-slate-600 mb-4 flex-1">{item.desc}</span>
-                  <Link href={item.href} className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors text-center">
+                <div className="p-5">
+                  <p className="text-slate-600 text-sm leading-relaxed mb-4">{item.desc}</p>
+                  <Link href={item.href} className={`inline-block ${item.color} hover:opacity-90 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-opacity`}>
                     {item.cta}
                   </Link>
                 </div>
@@ -111,29 +108,18 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {programs.map((program) => (
-              <div key={program.name} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <Image
-                    src={program.image}
-                    alt={program.name}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover"
-                    priority
-                  />
+              <div key={program.name} className="rounded-xl overflow-hidden border border-slate-200">
+                <div className="relative h-[180px]">
+                  <Image src={program.image} alt={program.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
+                  <div className="absolute top-3 left-3 bg-brand-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">{program.tag}</div>
+                  <div className="absolute top-3 right-3 bg-black/60 text-white text-xs font-medium px-2 py-0.5 rounded-full">{program.duration}</div>
                 </div>
-                <div className="p-5 flex flex-col flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[11px] font-bold text-brand-red-600 bg-brand-red-50 px-2 py-0.5 rounded-full">
-                      {program.tag}
-                    </span>
-                    <span className="text-[11px] font-medium text-slate-500">{program.duration}</span>
-                  </div>
-                  <h3 className="text-slate-900 font-bold text-lg mb-1">{program.name}</h3>
-                  <p className="text-slate-600 text-sm mb-3 flex-1">{program.desc}</p>
+                <div className="p-5">
+                  <h3 className="font-bold text-slate-900 text-lg mb-1">{program.name}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed mb-3">{program.desc}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-brand-green-700 font-semibold text-sm">{program.salary}</span>
-                    <Link href={program.href} className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-4 py-2 rounded-lg transition-colors">
+                    <Link href={program.href} className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-4 py-2 rounded-lg transition-colors">
                       Explore
                     </Link>
                   </div>
@@ -167,20 +153,17 @@ export default function HomePage() {
               { title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification.', href: '/how-it-works', image: '/images/workforce-2.webp' },
               { title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates.', href: '/career-services', image: '/images/workforce-3.webp' },
             ].map((step) => (
-              <div key={step.title} className="text-center">
-                <Image
-                  src={step.image}
-                  alt={step.title}
-                  width={800}
-                  height={533}
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="w-full h-auto rounded-lg mb-4"
-                />
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{step.title}</h3>
-                <p className="text-slate-700 text-base mb-4">{step.desc}</p>
-                <Link href={step.href} className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
-                  Learn More
-                </Link>
+              <div key={step.title} className="rounded-xl overflow-hidden border border-slate-200">
+                <div className="relative h-[180px]">
+                  <Image src={step.image} alt={step.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover" />
+                </div>
+                <div className="p-5 text-center">
+                  <h3 className="font-bold text-slate-900 text-lg mb-2">{step.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed mb-4">{step.desc}</p>
+                  <Link href={step.href} className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
+                    Learn More
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
@@ -205,7 +188,9 @@ export default function HomePage() {
               { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/homepage/government-agencies.webp', external: true },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
-                <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-auto" />
+                <div className="relative h-[180px]">
+                  <Image src={item.image} alt={item.label} fill sizes="(max-width: 640px) 100vw, 50vw" className="object-cover" />
+                </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-lg mb-1">{item.label}</h3>
                   <p className="text-slate-600 text-sm mb-4">{item.desc}</p>
@@ -251,7 +236,9 @@ export default function HomePage() {
               { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/artlist/cropped/hero-training-8-wide.webp' },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
-                <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-48 object-cover" />
+                <div className="relative h-[180px]">
+                  <Image src={item.image} alt={item.label} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover" />
+                </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-lg mb-1">{item.label}</h3>
                   <p className="text-slate-600 text-sm mb-4">{item.desc}</p>
@@ -279,8 +266,8 @@ export default function HomePage() {
       <section aria-label="Why choose Elevate" className="py-14 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
-            <div className="rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/programs-hq/students-learning.webp" alt="Students in a training session at Elevate for Humanity" width={800} height={600} className="w-full object-cover" />
+            <div className="relative h-[280px] sm:h-[340px] rounded-2xl overflow-hidden shadow-xl">
+              <Image src="/images/programs-hq/students-learning.webp" alt="Students in a training session at Elevate for Humanity" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
             </div>
             <div>
               <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Why Elevate</p>

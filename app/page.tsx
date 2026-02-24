@@ -8,7 +8,7 @@ import { InView } from '@/components/ui/InView';
 // Quiz removed — program cards now serve as the path selector
 
 const programs = [
-  { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.jpg', desc: 'DOL-registered apprenticeship — earn while you learn your craft.', salary: '$30K–$55K', duration: '12 months', tag: 'DOL Registered' },
+  { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/pexels/homepage-barber-cutting.jpg', desc: 'DOL-registered apprenticeship — earn while you learn your craft.', salary: '$30K–$55K', duration: '12 months', tag: 'DOL Registered' },
   { name: 'Building Technician with HVAC Fundamentals', href: '/programs/hvac-technician', image: '/images/pexels/homepage-welding-sparks.jpg', desc: 'EPA 608, OSHA safety, and hands-on training for facilities and HVAC careers.', salary: '$40K–$65K', duration: '20 weeks', tag: 'WIOA Funded' },
   { name: 'Business & Office Administration', href: '/programs/business-office', image: '/images/pexels/homepage-office-team.jpg', desc: 'QuickBooks, Microsoft Office, and business operations training.', salary: '$32K–$48K', duration: '8–12 weeks', tag: 'WIOA Funded' },
 ];
@@ -30,7 +30,7 @@ export default function HomePage() {
       </div>
 
       {/* ===== HERO ===== */}
-      <section className="relative h-[70vh] min-h-[480px] max-h-[650px]">
+      <section className="relative h-[320px] sm:h-[400px] md:h-[480px]">
         <HomeHeroVideo />
         {/* Gradient overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 z-[11]" />
@@ -69,27 +69,28 @@ export default function HomePage() {
           <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
             Choose your path below. Each option takes you directly to the information you need — everything starts online.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
               { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/pexels/homepage-students-diverse.jpg', alt: 'Diverse group of students collaborating in a training session' },
               { href: '/funding', label: 'I need funding', desc: 'Most programs are tuition-free. Check your eligibility.', cta: 'Check Eligibility', image: '/images/pexels/homepage-financial-planning.jpg', alt: 'Financial planning and funding consultation' },
               { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/pexels/homepage-handshake-hiring.jpg', alt: 'Employer and candidate shaking hands at a hiring event' },
               { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/pexels/homepage-woman-laptop.jpg', alt: 'Woman working on laptop managing a training platform' },
             ].map((item) => (
-              <Link
+              <div
                 key={item.href}
-                href={item.href}
-                className="flex flex-col bg-white rounded-xl border-2 border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all group overflow-hidden"
+                className="flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
               >
-                <Image src={item.image} alt={item.alt} width={400} height={200} className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300" />
+                <div className="relative h-[180px] overflow-hidden">
+                  <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
+                </div>
                 <div className="p-5 flex flex-col flex-1">
                   <span className="font-bold text-lg text-slate-900 mb-1">{item.label}</span>
                   <span className="text-sm text-slate-600 mb-4 flex-1">{item.desc}</span>
-                  <span className="text-brand-red-600 font-semibold text-sm group-hover:underline">
-                    {item.cta} →
-                  </span>
+                  <Link href={item.href} className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors text-center">
+                    {item.cta}
+                  </Link>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </div>
@@ -110,17 +111,18 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {programs.map((program) => (
-              <Link key={program.name} href={program.href} className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={program.image}
-                  alt={program.name}
-                  width={600}
-                  height={375}
-                  loading="eager"
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="p-5">
+              <div key={program.name} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <Image
+                    src={program.image}
+                    alt={program.name}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+                <div className="p-5 flex flex-col flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-[11px] font-bold text-brand-red-600 bg-brand-red-50 px-2 py-0.5 rounded-full">
                       {program.tag}
@@ -128,15 +130,15 @@ export default function HomePage() {
                     <span className="text-[11px] font-medium text-slate-500">{program.duration}</span>
                   </div>
                   <h3 className="text-slate-900 font-bold text-lg mb-1">{program.name}</h3>
-                  <p className="text-slate-600 text-sm mb-3">{program.desc}</p>
+                  <p className="text-slate-600 text-sm mb-3 flex-1">{program.desc}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-brand-green-700 font-semibold text-sm">{program.salary}</span>
-                    <span className="text-brand-red-600 font-semibold text-sm group-hover:text-brand-red-700 transition-colors">
-                      Explore &rarr;
-                    </span>
+                    <Link href={program.href} className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold text-sm px-4 py-2 rounded-lg transition-colors">
+                      Explore
+                    </Link>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
 

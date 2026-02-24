@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { SignatureCanvas } from '@/components/SignatureCanvas';
 import { Circle, AlertTriangle, FileText, Pen } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
 
 interface Agreement {
   type: string;
@@ -28,35 +27,6 @@ interface Props {
 }
 
 type SignatureMethod = 'checkbox' | 'typed' | 'drawn';
-
-// Hook to load and save agreement signatures
-function useAgreementDB(userId: string) {
-  const supabase = createClient();
-
-  const loadPreviousSignatures = async () => {
-    const { data } = await supabase
-      .from('agreement_signatures')
-      .select('agreement_type, signed_at, signature_method')
-      .eq('user_id', userId);
-    return data || [];
-  };
-
-  const saveSignature = async (agreementType: string, signatureData: any, method: SignatureMethod) => {
-    await supabase
-      .from('agreement_signatures')
-      .insert({
-        user_id: userId,
-        agreement_type: agreementType,
-        signature_data: signatureData,
-        signature_method: method,
-        signed_at: new Date().toISOString(),
-        ip_address: null, // Set server-side
-        user_agent: navigator.userAgent
-      });
-  };
-
-  return { loadPreviousSignatures, saveSignature };
-}
 
 export default function AgreementSigningForm({
   userId,

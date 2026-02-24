@@ -1,13 +1,15 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
 // ── Data fetching (all queries scoped to this student) ─────────
+// Uses admin client to bypass RLS — auth is verified before calling this.
 
 async function getStudentData(userId: string, email: string) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
+  if (!supabase) return { profile: null, programEnrollments: [], courseEnrollments: [], applications: [], appointments: [] };
 
   const [profileRes, progEnrollRes, courseEnrollRes, appRes, apptRes] = await Promise.all([
     // Profile — onboarding state
@@ -17,10 +19,10 @@ async function getStudentData(userId: string, email: string) {
       .eq('id', userId)
       .single(),
 
-    // Program enrollments — what program(s) is this student in?
+    // Program enrollments (no join — FK points to training_programs, not programs)
     supabase
       .from('program_enrollments')
-      .select('id, program_id, program_slug, status, enrollment_state, next_required_action, enrolled_at, started_at, completed_at, funding_source, programs(id, name, slug, category, image_url, credential_name, total_cost)')
+      .select('id, program_id, program_slug, status, enrollment_state, next_required_action, enrolled_at, started_at, completed_at, funding_source')
       .eq('user_id', userId)
       .order('enrolled_at', { ascending: false }),
 
@@ -48,9 +50,27 @@ async function getStudentData(userId: string, email: string) {
       .limit(5),
   ]);
 
+  // Enrich program enrollments with program details from apprenticeship_programs
+  const enrollments = progEnrollRes.data || [];
+  const programIds = [...new Set(enrollments.map((pe: any) => pe.program_id).filter(Boolean))];
+  let programMap: Record<string, any> = {};
+  if (programIds.length > 0) {
+    const { data: programs } = await supabase
+      .from('apprenticeship_programs')
+      .select('id, name, slug, is_etpl_approved')
+      .in('id', programIds);
+    for (const p of (programs || [])) {
+      programMap[p.id] = p;
+    }
+  }
+  const enrichedEnrollments = enrollments.map((pe: any) => ({
+    ...pe,
+    program: programMap[pe.program_id] || null,
+  }));
+
   return {
     profile: profileRes.data,
-    programEnrollments: progEnrollRes.data || [],
+    programEnrollments: enrichedEnrollments,
     courseEnrollments: courseEnrollRes.data || [],
     applications: appRes.data || [],
     appointments: apptRes.data || [],
@@ -187,37 +207,25 @@ export default async function StudentPWAPage() {
         )}
       </div>
 
-      {/* My Program — from program_enrollments */}
+      {/* My Program — from program_enrollments + training_programs lookup */}
       {programEnrollments.length > 0 && (
         <div className="px-4 mt-6">
           <h2 className="text-base font-bold text-slate-900 mb-2">My Program</h2>
           {programEnrollments.map((pe: any) => {
-            const program = pe.programs;
+            const program = pe.program;
             return (
               <div key={pe.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-2">
-                {program?.image_url && (
-                  <div className="relative h-28">
-                    <Image src={program.image_url} alt={program?.name || 'Program'} fill className="object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute bottom-3 left-3 right-3">
-                      <div className="text-white font-bold text-sm">{program?.name || formatSlug(pe.program_slug)}</div>
-                      {program?.category && <div className="text-white/80 text-xs">{program.category}</div>}
-                    </div>
-                  </div>
-                )}
-                {!program?.image_url && (
-                  <div className="p-4 pb-2">
-                    <div className="font-bold text-slate-900">{program?.name || formatSlug(pe.program_slug)}</div>
-                    {program?.category && <div className="text-xs text-slate-500">{program.category}</div>}
-                  </div>
-                )}
+                <div className="p-4 pb-2">
+                  <div className="font-bold text-slate-900">{program?.name || formatSlug(pe.program_slug)}</div>
+                  {program?.category && <div className="text-xs text-slate-500 capitalize">{program.category}</div>}
+                </div>
                 <div className="p-4 pt-2 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor(pe.enrollment_state || pe.status)}`}>
                       {pe.enrollment_state || pe.status}
                     </span>
-                    {program?.credential_name && (
-                      <span className="text-xs text-slate-500">→ {program.credential_name}</span>
+                    {program?.is_etpl_approved && (
+                      <span className="text-xs text-brand-green-600 font-medium">ETPL Approved</span>
                     )}
                   </div>
                   {pe.next_required_action && (

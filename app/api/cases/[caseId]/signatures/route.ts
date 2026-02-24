@@ -99,11 +99,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
 
     const { caseId } = await params;
 
+    // agreement_acceptances: subject_type, subject_id, agreement_key, agreement_version, accepted_name, accepted_email, accepted_at
     const { data: signatures, error } = await db
-      .from('apprentice_agreements')
-      .select('id, signer_role, signer_name, signer_email, agreement_type, agreement_version, signed_at, created_at')
-      .eq('case_id', caseId)
-      .order('created_at', { ascending: true });
+      .from('agreement_acceptances')
+      .select('id, subject_type, subject_id, agreement_key, agreement_version, accepted_name, accepted_email, accepted_at')
+      .eq('subject_id', caseId)
+      .order('accepted_at', { ascending: true });
 
     if (error) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/apprentice/handbook
- * Get student's handbook progress and acknowledgments
+ * Get student's handbook acknowledgment status
  */
 export async function GET(request: NextRequest) {
   try {
@@ -18,37 +18,39 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+    const db = createAdminClient() || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const programSlug = searchParams.get('program') || 'barber-apprenticeship';
-
-    // Get acknowledged sections
-    const { data: acknowledgments } = await db
+    // Check handbook acknowledgment (handbook_acknowledgments: user_id, handbook_version, acknowledged_at, ip_address, user_agent)
+    const { data: acknowledgment } = await db
       .from('handbook_acknowledgments')
-      .select('section_id')
-      .eq('student_id', user.id)
-      .eq('program_slug', programSlug);
+      .select('id, handbook_version, acknowledged_at')
+      .eq('user_id', user.id)
+      .order('acknowledged_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    // Get signed agreement
+    // Check apprentice agreement (agreement_acceptances: subject_type, subject_id, agreement_key, agreement_version, accepted_name)
     const { data: agreement } = await db
-      .from('apprentice_agreements')
-      .select('*')
-      .eq('student_id', user.id)
-      .eq('program_slug', programSlug)
-      .eq('agreement_type', 'apprentice_agreement')
-      .single();
+      .from('agreement_acceptances')
+      .select('id, agreement_key, agreement_version, accepted_name, accepted_at')
+      .eq('subject_id', user.id)
+      .eq('agreement_key', 'apprentice_agreement')
+      .order('accepted_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
     return NextResponse.json({
-      acknowledgedSections: acknowledgments?.map(a => a.section_id) || [],
+      handbookAcknowledged: !!acknowledgment,
+      handbookVersion: acknowledgment?.handbook_version || null,
+      acknowledgedAt: acknowledgment?.acknowledged_at || null,
       agreementSigned: !!agreement,
-      signature: agreement?.full_legal_name,
-      signedAt: agreement?.signed_at,
+      signature: agreement?.accepted_name || null,
+      signedAt: agreement?.accepted_at || null,
     });
   } catch (error) {
     logger.error('[Handbook API] Error:', error);
@@ -58,7 +60,7 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/apprentice/handbook
- * Acknowledge a section or sign the agreement
+ * Acknowledge handbook or sign apprentice agreement
  */
 export async function POST(request: NextRequest) {
   try {
@@ -66,7 +68,7 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+    const db = createAdminClient() || supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -74,60 +76,46 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { programSlug, action, sectionId, sectionTitle, signature, acknowledgedSections } = body;
+    const { action, signature, handbookVersion } = body;
 
     if (action === 'acknowledge') {
-      // Acknowledge a section
       const { error } = await db
         .from('handbook_acknowledgments')
-        .upsert({
-          student_id: user.id,
-          program_slug: programSlug,
-          section_id: sectionId,
-          section_title: sectionTitle,
+        .insert({
+          user_id: user.id,
+          handbook_version: handbookVersion || '2025.1',
           acknowledged_at: new Date().toISOString(),
-        }, {
-          onConflict: 'student_id,program_slug,section_id',
+          ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '0.0.0.0',
+          user_agent: request.headers.get('user-agent') || 'unknown',
         });
 
       if (error) {
         logger.error('[Handbook API] Acknowledge error:', error);
-        return NextResponse.json({ error: 'Failed to acknowledge section' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to acknowledge handbook' }, { status: 500 });
       }
 
       return NextResponse.json({ success: true });
     }
 
     if (action === 'sign') {
-      // Sign the agreement
       const { error } = await db
-        .from('apprentice_agreements')
-        .upsert({
-          student_id: user.id,
-          program_slug: programSlug,
-          agreement_type: 'apprentice_agreement',
+        .from('agreement_acceptances')
+        .insert({
+          subject_type: 'apprentice',
+          subject_id: user.id,
+          agreement_key: 'apprentice_agreement',
           agreement_version: '2025.1',
-          full_legal_name: signature,
-          signature_data: signature,
-          signature_type: 'typed',
-          acknowledged_sections: acknowledgedSections,
-          ip_address: request.headers.get('x-forwarded-for') || 'unknown',
+          accepted_name: signature,
+          accepted_email: user.email || '',
+          accepted_at: new Date().toISOString(),
+          accepted_ip: request.headers.get('x-forwarded-for') || 'unknown',
           user_agent: request.headers.get('user-agent') || 'unknown',
-          signed_at: new Date().toISOString(),
-        }, {
-          onConflict: 'student_id,program_slug,agreement_type',
         });
 
       if (error) {
         logger.error('[Handbook API] Sign error:', error);
         return NextResponse.json({ error: 'Failed to sign agreement' }, { status: 500 });
       }
-
-      // Update student enrollment to mark handbook complete
-      await db
-        .from('student_enrollments')
-        .update({ handbook_signed: true, handbook_signed_at: new Date().toISOString() })
-        .eq('student_id', user.id);
 
       return NextResponse.json({ success: true });
     }

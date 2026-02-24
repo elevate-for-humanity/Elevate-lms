@@ -90,42 +90,100 @@ export default async function LearnerOnboardingPage() {
     redirect('/login?redirect=/onboarding/learner');
   }
 
-  const { data: profile } = await db
-    .from('profiles')
-    .select('*, onboarding_completed, funding_confirmed, funding_source, orientation_completed, schedule_selected, enrollment_status')
-    .eq('id', user.id)
-    .single();
+  // Fetch all data in parallel
+  const [
+    profileResult,
+    enrollmentResult,
+    docCountResult,
+    agreementsResult,
+    handbookResult,
+    idDocResult,
+    orientationResult,
+  ] = await Promise.all([
+    db.from('profiles')
+      .select('*, onboarding_completed, funding_confirmed, funding_source, orientation_completed, schedule_selected, enrollment_status, full_name, first_name, last_name, phone, address')
+      .eq('id', user.id)
+      .single(),
+    db.from('program_enrollments')
+      .select('id, program_id, program_slug, status, enrollment_state')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    db.from('documents')
+      .select('document_type', { count: 'exact' })
+      .eq('user_id', user.id),
+    db.from('agreement_acceptances')
+      .select('agreement_key')
+      .eq('subject_id', user.id),
+    db.from('handbook_acknowledgments')
+      .select('id')
+      .eq('user_id', user.id)
+      .limit(1),
+    // Check identity via documents table (id_verifications has no user_id column)
+    db.from('documents')
+      .select('id, status')
+      .eq('user_id', user.id)
+      .eq('document_type', 'photo_id')
+      .limit(1)
+      .maybeSingle(),
+    db.from('orientation_completions')
+      .select('id')
+      .eq('user_id', user.id)
+      .limit(1),
+  ]);
 
-  const { data: enrollment } = await db
-    .from('program_enrollments')
-    .select('*, programs(name)')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single();
+  const profile = profileResult.data;
+  const enrollment = enrollmentResult.data;
+  const docCount = docCountResult.count || 0;
+  const signedAgreementTypes = new Set(
+    (agreementsResult.data || []).map((a: any) => a.agreement_key),
+  );
+  const handbookAcknowledged = (handbookResult.data?.length || 0) > 0;
+  // Identity verified if user has uploaded a photo_id document
+  const identityVerified = !!idDocResult.data;
+  const orientationDone = profile?.orientation_completed || (orientationResult.data?.length || 0) > 0;
 
-  // Check completed steps
+  // Look up program name from apprenticeship_programs (FK target for program_enrollments)
+  let enrollmentProgramName: string | null = null;
+  if (enrollment?.program_id) {
+    const { data: prog } = await db
+      .from('apprenticeship_programs')
+      .select('name')
+      .eq('id', enrollment.program_id)
+      .maybeSingle();
+    enrollmentProgramName = prog?.name || null;
+  }
+
+  // Determine completed steps from real DB state
   const completedSteps: string[] = [];
+
+  if (orientationDone) completedSteps.push('orientation');
 
   if (profile?.full_name && profile?.phone) {
     completedSteps.push('profile');
+  } else if (profile?.first_name && profile?.last_name && profile?.phone) {
+    completedSteps.push('profile');
   }
 
-  const { count: docCount } = await db
-    .from('documents')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id);
-
-  if (docCount && docCount > 0) {
+  if (docCount > 0) {
     completedSteps.push('documents');
+  }
+
+  if (identityVerified) {
+    completedSteps.push('verification');
+  }
+
+  if (handbookAcknowledged) {
+    completedSteps.push('handbook');
+  }
+
+  if (signedAgreementTypes.size > 0) {
+    completedSteps.push('agreements');
   }
 
   if (profile?.funding_confirmed) {
     completedSteps.push('funding');
-  }
-
-  if (profile?.orientation_completed) {
-    completedSteps.push('orientation');
   }
 
   if (profile?.schedule_selected) {
@@ -150,7 +208,7 @@ export default async function LearnerOnboardingPage() {
   // Auto-enroll when all onboarding steps are complete
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
   const studentName = profile?.first_name || 'Student';
-  const programName = enrollment?.programs?.name || 'your selected program';
+  const programName = enrollmentProgramName || 'your selected program';
   let justEnrolled = false;
 
   if (isOnboardingComplete && profile?.enrollment_status !== 'active') {
@@ -252,8 +310,8 @@ export default async function LearnerOnboardingPage() {
               Welcome to Elevate for Humanity
             </h1>
             <p className="text-lg text-slate-300 mb-6 leading-relaxed">
-              {enrollment?.programs?.name
-                ? `Complete your onboarding for ${enrollment.programs.name} to begin training.`
+              {enrollmentProgramName
+                ? `Complete your onboarding for ${enrollmentProgramName} to begin training.`
                 : 'Complete these steps to finalize your enrollment and start your training program.'}
             </p>
 

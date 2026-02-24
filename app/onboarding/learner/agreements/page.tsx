@@ -57,12 +57,10 @@ export default function AgreementsPage() {
     supabase.auth.getUser().then(({ data, error }) => {
       if (error || !data?.user) { router.push('/login'); return; }
 
-      supabase
-        .from('agreement_acceptances')
-        .select('agreement_type')
-        .eq('user_id', data.user.id)
-        .then(({ data: agreements }) => {
-          const types = new Set((agreements || []).map((a: any) => a.agreement_type));
+      fetch('/api/compliance/record?type=agreements')
+        .then(res => res.json())
+        .then(result => {
+          const types = new Set((result.data || []).map((a: any) => a.agreement_type));
           setSignedTypes(types);
 
           // Auto-open first unsigned agreement
@@ -70,7 +68,8 @@ export default function AgreementsPage() {
           if (firstUnsigned) setActiveAgreement(firstUnsigned.type);
 
           setLoading(false);
-        });
+        })
+        .catch(() => setLoading(false));
     });
   }, [router]);
 

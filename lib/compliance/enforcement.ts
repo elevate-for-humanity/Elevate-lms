@@ -59,10 +59,7 @@ export async function getOnboardingProgress(userId: string): Promise<Record<stri
   }
 }
 
-export async function checkComplianceStatus(userId: string): Promise<{
-  isCompliant: boolean;
-  missingSteps: string[];
-}> {
+export async function checkComplianceStatus(userId: string, context?: string): Promise<ComplianceStatus> {
   const progress = await getOnboardingProgress(userId);
   
   const requiredSteps = [
@@ -79,12 +76,24 @@ export async function checkComplianceStatus(userId: string): Promise<{
   return {
     isCompliant: missingSteps.length === 0,
     missingSteps,
+    canAccess: missingSteps.length === 0,
+    onboardingComplete: !missingSteps.includes('profile') && !missingSteps.includes('verification'),
+    agreementsComplete: !missingSteps.includes('agreements'),
+    handbookComplete: true, // checked separately via API
+    missingAgreements: missingSteps.includes('agreements') ? ['enrollment', 'participation', 'ferpa'] : [],
+    redirectTo: missingSteps.length > 0 ? '/onboarding/learner' : null,
   };
 }
 
 export type ComplianceStatus = {
   isCompliant: boolean;
   missingSteps: string[];
+  canAccess: boolean;
+  onboardingComplete: boolean;
+  agreementsComplete: boolean;
+  handbookComplete: boolean;
+  missingAgreements: string[];
+  redirectTo: string | null;
 };
 
 export interface AgreementAcceptanceParams {
@@ -106,41 +115,29 @@ export interface AgreementAcceptanceParams {
 export async function recordAgreementAcceptance(
   params: AgreementAcceptanceParams
 ): Promise<{ success: boolean; acceptanceId?: string; error?: string }> {
-  const supabase = createClient();
-  
-  if (!supabase) {
-    logger.warn('[Compliance] Supabase not configured, skipping agreement recording');
-    return { success: false, error: 'Database not configured' };
-  }
-
   try {
-    const { data, error } = await supabase
-      .from('agreement_acceptances')
-      .insert({
-        user_id: params.userId,
-        agreement_type: params.agreementType,
-        document_version: params.documentVersion,
-        signer_name: params.signerName,
-        signer_email: params.signerEmail,
-        auth_email: params.authEmail,
-        signature_method: params.signatureMethod,
-        signature_data: params.signatureData,
-        signature_typed: params.signatureTyped,
-        acceptance_context: params.acceptanceContext,
-        program_id: params.programId,
-        tenant_id: params.tenantId,
-        organization_id: params.organizationId,
-        signed_at: new Date().toISOString(),
-      })
-      .select('id')
-      .single();
-
-    if (error) {
-      logger.error('[Compliance] Failed to record agreement acceptance:', error);
-      return { success: false, error: 'Operation failed' };
-    }
-
-    return { success: true, acceptanceId: data?.id };
+    const res = await fetch('/api/compliance/record', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'agreement_acceptance',
+        agreementType: params.agreementType,
+        documentVersion: params.documentVersion,
+        signerName: params.signerName,
+        signerEmail: params.signerEmail,
+        authEmail: params.authEmail,
+        signatureMethod: params.signatureMethod,
+        signatureData: params.signatureData,
+        signatureTyped: params.signatureTyped,
+        acceptanceContext: params.acceptanceContext,
+        programId: params.programId,
+        tenantId: params.tenantId,
+        organizationId: params.organizationId,
+      }),
+    });
+    const result = await res.json();
+    if (!res.ok || !result.success) throw new Error(result.error || 'Failed');
+    return { success: true, acceptanceId: result.acceptanceId };
   } catch (error) {
     logger.error('[Compliance] Failed to record agreement acceptance:', error);
     return { success: false, error: 'Failed to record agreement' };
@@ -168,13 +165,13 @@ export async function recordHandbookAcknowledgment({
   handbookVersion: string;
 }): Promise<{ success: boolean; error?: string }> {
   try {
-    const client = createClient();
-    const { error } = await client.from('handbook_acknowledgments').insert({
-      user_id: userId,
-      handbook_version: handbookVersion,
-      acknowledged_at: new Date().toISOString(),
+    const res = await fetch('/api/compliance/record', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'handbook_acknowledgment', handbookVersion }),
     });
-    if (error) throw error;
+    const result = await res.json();
+    if (!res.ok || !result.success) throw new Error(result.error || 'Failed');
     return { success: true };
   } catch (error) {
     logger.error('[Compliance] Failed to record handbook acknowledgment:', error);

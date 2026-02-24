@@ -73,15 +73,16 @@ export default function DocumentsPage() {
       if (authErr || !data?.user) { router.push('/login'); return; }
       setUserId(data.user.id);
 
-      supabase
-        .from('documents')
-        .select('document_type')
-        .eq('user_id', data.user.id)
-        .then(({ data: docs }) => {
-          const types = new Set((docs || []).map((d: any) => d.document_type));
+      // Fetch uploaded documents via API route (bypasses RLS)
+      fetch('/api/documents/upload')
+        .then(res => res.json())
+        .then(result => {
+          const docs = result.documents || [];
+          const types = new Set(docs.map((d: any) => d.document_type));
           setUploadedTypes(types);
           setLoading(false);
-        });
+        })
+        .catch(() => setLoading(false));
     });
   }, [router]);
 
@@ -90,7 +91,7 @@ export default function DocumentsPage() {
   const handleUpload = async (docType: string, file: File) => {
     if (!userId) return;
     if (file.size > MAX_FILE_SIZE) {
-      setError(`File too large. Maximum size is 10MB.`);
+      setError('File too large. Maximum size is 10MB.');
       return;
     }
     if (!ACCEPTED_TYPES.includes(file.type)) {
@@ -102,38 +103,27 @@ export default function DocumentsPage() {
     setError('');
 
     try {
-      const supabase = createClient();
-      if (!supabase) throw new Error('Not connected');
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('documentType', docType);
 
-      const ext = file.name.split('.').pop() || 'pdf';
-      const filePath = `documents/${userId}/${docType}-${Date.now()}.${ext}`;
+      const res = await fetch('/api/documents/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-      const { error: uploadErr } = await supabase.storage
-        .from('student-documents')
-        .upload(filePath, file, { upsert: true });
+      const result = await res.json();
 
-      if (uploadErr) {
-        // If bucket doesn't exist, record the document reference anyway
-        // The admin can set up storage later
+      if (!res.ok || !result.success) {
+        setError(result.error?.message || result.message || 'Upload failed. Please try again.');
+        return;
       }
-
-      // Record in documents table
-      await supabase.from('documents').upsert({
-        user_id: userId,
-        document_type: docType,
-        file_name: file.name,
-        file_path: filePath,
-        file_size: file.size,
-        mime_type: file.type,
-        status: 'pending_review',
-        uploaded_at: new Date().toISOString(),
-      }, { onConflict: 'user_id,document_type' });
 
       const updated = new Set(uploadedTypes);
       updated.add(docType);
       setUploadedTypes(updated);
     } catch (err) {
-      setError('Upload failed. Please try again.');
+      setError('Upload failed. Please check your connection and try again.');
     } finally {
       setUploading(null);
     }

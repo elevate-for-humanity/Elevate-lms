@@ -25,12 +25,33 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   // Parse form data
   const formData = await request.formData();
   const file = formData.get('file') as File;
-  const documentType = formData.get('documentType') as string;
+  const rawDocumentType = formData.get('documentType') as string;
   const metadata = formData.get('metadata') as string;
 
-  if (!file || !documentType) {
+  if (!file || !rawDocumentType) {
     throw APIErrors.validation('file and documentType', 'File and document type are required');
   }
+
+  // Map frontend document types to DB-valid values
+  // DB constraint: photo_id, school_transcript, certificate, out_of_state_license,
+  //   shop_license, barber_license, ce_certificate, employment_verification, ipla_packet, other
+  const docTypeMap: Record<string, string> = {
+    government_id: 'photo_id',
+    photo_id: 'photo_id',
+    ssn_proof: 'other',
+    residency_proof: 'other',
+    selective_service: 'other',
+    resume: 'other',
+    school_transcript: 'school_transcript',
+    certificate: 'certificate',
+    out_of_state_license: 'out_of_state_license',
+    shop_license: 'shop_license',
+    barber_license: 'barber_license',
+    ce_certificate: 'ce_certificate',
+    employment_verification: 'employment_verification',
+    ipla_packet: 'ipla_packet',
+  };
+  const documentType = docTypeMap[rawDocumentType] || 'other';
 
   // Validate file size (10MB max)
   const maxSize = 10 * 1024 * 1024;
@@ -57,8 +78,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const fileExt = file.name.split('.').pop();
   const fileName = `${user.id}/${documentType}/${Date.now()}.${fileExt}`;
 
-  // Upload to Supabase Storage
-  const { data: uploadData, error: uploadError } = await supabase.storage
+  // Upload to Supabase Storage (use admin client to bypass RLS)
+  const { data: uploadData, error: uploadError } = await db.storage
     .from('documents')
     .upload(fileName, file, {
       contentType: file.type,
@@ -72,7 +93,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     // Get public URL
     const {
       data: { publicUrl },
-    } = supabase.storage.from('documents').getPublicUrl(fileName);
+    } = db.storage.from('documents').getPublicUrl(fileName);
 
   // Parse and validate metadata
   let parsedMetadata = {};
@@ -83,7 +104,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         throw APIErrors.validation('metadata', 'Metadata must be a valid JSON object');
       }
     } catch (parseError) {
-      await supabase.storage.from('documents').remove([fileName]);
+      await db.storage.from('documents').remove([fileName]);
       if (parseError instanceof Error && parseError.name === 'SyntaxError') {
         throw APIErrors.validation('metadata', 'Invalid JSON format');
       }
@@ -100,17 +121,18 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       file_name: file.name,
       file_size: file.size,
       file_url: publicUrl,
+      file_path: fileName,
       mime_type: file.type,
-      status: 'pending',
+      status: 'pending_review',
       uploaded_by: user.id,
-      metadata: parsedMetadata,
+      metadata: { ...parsedMetadata, original_type: rawDocumentType },
     })
     .select()
     .single();
 
   if (dbError) {
     // Clean up uploaded file
-    await supabase.storage.from('documents').remove([fileName]);
+    await db.storage.from('documents').remove([fileName]);
     throw APIErrors.database('Failed to save document record');
   }
 

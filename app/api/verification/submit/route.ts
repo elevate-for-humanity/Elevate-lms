@@ -28,19 +28,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if verification already exists
-    const { data: existing } = await db
-      .from('id_verifications')
-      .select('id, status')
+    // Check if verification documents already uploaded for this user
+    const { data: existingDocs } = await db
+      .from('documents')
+      .select('id')
       .eq('user_id', user.id)
-      .single();
+      .eq('document_type', 'photo_id')
+      .limit(1);
 
-    if (existing && existing.status !== 'rejected') {
-      return NextResponse.json(
-        { error: 'Verification already submitted' },
-        { status: 400 }
-      );
-    }
+    // Allow re-submission (user may need to retry after a failed upload)
 
     // Parse form data
     const formData = await request.formData();
@@ -93,8 +89,8 @@ export async function POST(request: NextRequest) {
     // Upload ID front
     const idFrontExt = idFront.name.split('.').pop();
     const idFrontPath = `${user.id}/id-front-${Date.now()}.${idFrontExt}`;
-    const { error: frontError } = await supabase.storage
-      .from('id-documents')
+    const { error: frontError } = await db.storage
+      .from('documents')
       .upload(idFrontPath, idFront, {
         contentType: idFront.type,
         upsert: false,
@@ -109,15 +105,15 @@ export async function POST(request: NextRequest) {
 
     const {
       data: { publicUrl: idFrontUrl },
-    } = supabase.storage.from('id-documents').getPublicUrl(idFrontPath);
+    } = db.storage.from('documents').getPublicUrl(idFrontPath);
 
     // Upload ID back (if provided)
     let idBackUrl = null;
     if (idBack) {
       const idBackExt = idBack.name.split('.').pop();
       const idBackPath = `${user.id}/id-back-${Date.now()}.${idBackExt}`;
-      const { error: backError } = await supabase.storage
-        .from('id-documents')
+      const { error: backError } = await db.storage
+        .from('documents')
         .upload(idBackPath, idBack, {
           contentType: idBack.type,
           upsert: false,
@@ -126,7 +122,7 @@ export async function POST(request: NextRequest) {
       if (!backError) {
         const {
           data: { publicUrl },
-        } = supabase.storage.from('id-documents').getPublicUrl(idBackPath);
+        } = db.storage.from('documents').getPublicUrl(idBackPath);
         idBackUrl = publicUrl;
       }
     }
@@ -134,8 +130,8 @@ export async function POST(request: NextRequest) {
     // Upload selfie
     const selfieExt = selfie.name.split('.').pop();
     const selfiePath = `${user.id}/selfie-${Date.now()}.${selfieExt}`;
-    const { error: selfieError } = await supabase.storage
-      .from('id-documents')
+    const { error: selfieError } = await db.storage
+      .from('documents')
       .upload(selfiePath, selfie, {
         contentType: selfie.type,
         upsert: false,
@@ -143,9 +139,9 @@ export async function POST(request: NextRequest) {
 
     if (selfieError) {
       // Clean up ID front
-      await supabase.storage.from('id-documents').remove([idFrontPath]);
+      await db.storage.from('documents').remove([idFrontPath]);
       if (idBackUrl) {
-        await supabase.storage.from('id-documents').remove([idBackPath]);
+        await db.storage.from('documents').remove([idBackPath]);
       }
       return NextResponse.json(
         { error: 'Failed to upload selfie' },
@@ -155,7 +151,7 @@ export async function POST(request: NextRequest) {
 
     const {
       data: { publicUrl: selfieUrl },
-    } = supabase.storage.from('id-documents').getPublicUrl(selfiePath);
+    } = db.storage.from('documents').getPublicUrl(selfiePath);
 
     // Get IP and user agent
     const ip =
@@ -164,42 +160,37 @@ export async function POST(request: NextRequest) {
       'unknown';
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
-    // Create verification record
+    // Create verification record (schema: id, first_name, last_name, id_type, status, rejection_reason, verified_at)
     const { data: verification, error: dbError } = await db
       .from('id_verifications')
       .insert({
-        user_id: user.id,
         first_name: firstName,
-        middle_name: middleName || null,
         last_name: lastName,
-        date_of_birth: dateOfBirth,
-        ssn_last_4: ssnLast4 || null,
-        street_address: streetAddress,
-        address_line_2: addressLine2 || null,
-        city: city,
-        state: state,
-        zip_code: zipCode,
         id_type: idType,
-        id_number: idNumber,
-        id_state: idState || null,
-        id_expiration_date: idExpiration || null,
-        id_front_url: idFrontUrl,
-        id_back_url: idBackUrl,
-        selfie_url: selfieUrl,
         status: 'pending',
-        ip_address: ip,
-        user_agent: userAgent,
       })
       .select()
       .single();
 
+    // Store uploaded files in documents table for admin review
+    if (verification) {
+      const docRows = [
+        { user_id: user.id, document_type: 'photo_id' as const, file_name: 'id-front.jpg', file_url: idFrontUrl, file_path: idFrontPath, mime_type: 'image/jpeg', status: 'pending_review' },
+      ];
+      if (idBackUrl) {
+        docRows.push({ user_id: user.id, document_type: 'photo_id' as const, file_name: 'id-back.jpg', file_url: idBackUrl, file_path: idBackPath, mime_type: 'image/jpeg', status: 'pending_review' });
+      }
+      docRows.push({ user_id: user.id, document_type: 'other' as const, file_name: 'selfie.jpg', file_url: selfieUrl, file_path: selfiePath, mime_type: 'image/jpeg', status: 'pending_review' });
+      await db.from('documents').insert(docRows);
+    }
+
     if (dbError) {
       // Clean up uploaded files
-      await supabase.storage
-        .from('id-documents')
+      await db.storage
+        .from('documents')
         .remove([idFrontPath, selfiePath]);
       if (idBackUrl) {
-        await supabase.storage.from('id-documents').remove([idBackPath]);
+        await db.storage.from('documents').remove([idBackPath]);
       }
       return NextResponse.json(
         { error: 'Failed to save verification' },
@@ -236,24 +227,20 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user's verification
-    const { data: verification, error } = await db
-      .from('id_verifications')
-      .select('*')
+    // Check if user has uploaded ID documents
+    const { data: docs } = await db
+      .from('documents')
+      .select('id, document_type, status, file_url, created_at')
       .eq('user_id', user.id)
-      .single();
+      .in('document_type', ['photo_id', 'other'])
+      .order('created_at', { ascending: false });
 
-    if (error && error.code !== 'PGRST116') {
-      // PGRST116 = no rows returned
-      return NextResponse.json(
-        { error: 'Failed to fetch verification' },
-        { status: 500 }
-      );
-    }
+    const hasId = (docs || []).some(d => d.document_type === 'photo_id');
+    const status = hasId ? 'submitted' : 'not_started';
 
     return NextResponse.json({
       success: true,
-      verification: verification || null,
+      verification: { status, documents: docs || [] },
     });
   } catch (error) {
     return NextResponse.json(

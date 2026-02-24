@@ -137,18 +137,19 @@ export async function checkSignatureCompleteness(caseId: string): Promise<Signat
 export async function addSignature(params: SignatureParams): Promise<{ success: boolean; completeness: SignatureCompleteness }> {
   const supabase = createAdminClient();
 
+  // agreement_acceptances: subject_type, subject_id, agreement_key, agreement_version, accepted_name, accepted_email, accepted_ip, user_agent
   const { data: signature, error } = await supabase
-    .from('apprentice_agreements')
+    .from('agreement_acceptances')
     .insert({
-      case_id: params.caseId,
-      student_id: params.signerId,
-      signer_role: params.signerRole,
-      signer_name: params.signerName,
-      signer_email: params.signerEmail,
-      agreement_type: params.agreementType,
+      subject_type: params.signerRole === 'host_shop' ? 'host_shop' : 'apprentice',
+      subject_id: params.signerId,
+      agreement_key: params.agreementType,
       agreement_version: params.agreementVersion || '1.0',
-      signature_data: params.signatureData,
-      signed_at: new Date().toISOString(),
+      accepted_name: params.signerName,
+      accepted_email: params.signerEmail,
+      accepted_at: new Date().toISOString(),
+      accepted_ip: '0.0.0.0',
+      user_agent: 'case-management',
     })
     .select('id')
     .single();

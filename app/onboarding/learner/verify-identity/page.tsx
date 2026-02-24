@@ -23,16 +23,18 @@ export default async function VerifyIdentityPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/onboarding/learner/verify-identity');
 
-  const { data: verification } = await db
-    .from('id_verifications')
-    .select('status, created_at')
+  // Check identity via documents table (id_verifications has no user_id column)
+  const { data: idDoc } = await db
+    .from('documents')
+    .select('id, status, created_at')
     .eq('user_id', user.id)
+    .eq('document_type', 'photo_id')
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  const isVerified = verification?.status === 'verified';
-  const isPending = verification?.status === 'pending';
+  const isVerified = idDoc?.status === 'approved' || idDoc?.status === 'verified';
+  const isPending = !!idDoc && !isVerified;
 
   return (
     <div className="min-h-screen bg-gray-50">

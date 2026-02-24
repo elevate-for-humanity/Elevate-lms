@@ -5,17 +5,16 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
-import { checkComplianceStatusWithClient, type ComplianceStatus, REQUIRED_AGREEMENTS } from './enforcement';
+import { checkComplianceStatus, type ComplianceStatus } from './enforcement';
 
 /**
  * Check compliance status (server-side)
  */
 export async function checkComplianceStatusServer(
   userId: string,
-  context: keyof typeof REQUIRED_AGREEMENTS = 'student'
+  context: string = 'student'
 ): Promise<ComplianceStatus> {
-  const supabase = await createClient();
-  return checkComplianceStatusWithClient(supabase, userId, context);
+  return checkComplianceStatus(userId, context);
 }
 
 /**

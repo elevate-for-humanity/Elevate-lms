@@ -34,14 +34,17 @@ export default async function VerifyIdentityPage() {
 
   if (!user) redirect('/login');
 
-  // Check if verification already exists
+  // Check if user has uploaded ID documents (id_verifications has no user_id column)
   const { data: verification } = await db
-    .from('id_verifications')
-    .select('*')
+    .from('documents')
+    .select('id, status, created_at')
     .eq('user_id', user.id)
-    .single();
+    .eq('document_type', 'photo_id')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
-  if (verification && verification.status === 'approved') {
+  if (verification && (verification.status === 'approved' || verification.status === 'verified')) {
     return (
       <div className="min-h-screen bg-slate-50">
         <section className="bg-white border-b py-8">
@@ -71,7 +74,7 @@ export default async function VerifyIdentityPage() {
             <div className="mt-6 p-4 bg-white rounded-lg border border-brand-green-200">
               <p className="text-sm text-black">
                 <strong>Verified on:</strong>{' '}
-                {new Date(verification.verified_at).toLocaleDateString()}
+                {new Date(verification.created_at).toLocaleDateString()}
               </p>
             </div>
           </div>
@@ -80,7 +83,7 @@ export default async function VerifyIdentityPage() {
     );
   }
 
-  if (verification && verification.status === 'pending') {
+  if (verification && (verification.status === 'pending' || verification.status === 'pending_review')) {
     return (
       <div className="min-h-screen bg-slate-50">
         <section className="bg-white border-b py-8">
@@ -147,13 +150,11 @@ export default async function VerifyIdentityPage() {
               Unfortunately, we were unable to verify your identity with the
               information provided.
             </p>
-            {verification.rejection_reason && (
-              <div className="p-4 bg-white rounded-lg border border-brand-red-200 mb-4">
-                <p className="text-sm text-black">
-                  <strong>Reason:</strong> {verification.rejection_reason}
-                </p>
-              </div>
-            )}
+            <div className="p-4 bg-white rounded-lg border border-brand-red-200 mb-4">
+              <p className="text-sm text-black">
+                Please contact support at (317) 314-3757 for details on why your verification was not approved.
+              </p>
+            </div>
             <p className="text-brand-red-800">
               Please submit a new verification with updated information below.
             </p>

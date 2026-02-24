@@ -82,16 +82,14 @@ export function AgreementSignature({
       setSignerEmail(data.user.email || '');
       setLoading(false);
 
-      // Load existing agreements for this user and type from DB
-      supabase
-        .from('agreement_acceptances')
-        .select('id, agreement_type, document_version, signed_at, signature_method')
-        .eq('user_id', data.user.id)
-        .eq('agreement_type', agreementType)
-        .order('signed_at', { ascending: false })
-        .then(({ data: agreements }) => {
-          if (agreements) setExistingAgreements(agreements);
-        });
+      // Load existing agreements via API (bypasses RLS)
+      fetch('/api/compliance/record?type=agreements')
+        .then(res => res.json())
+        .then(result => {
+          const matching = (result.data || []).filter((a: any) => a.agreement_type === agreementType);
+          if (matching.length) setExistingAgreements(matching);
+        })
+        .catch(() => {});
     });
   }, [router, agreementType]);
 

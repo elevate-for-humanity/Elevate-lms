@@ -167,15 +167,13 @@ export default function HandbookPage() {
       if (authErr || !data?.user) { router.push('/login'); return; }
       setUserId(data.user.id);
 
-      supabase
-        .from('handbook_acknowledgments')
-        .select('id')
-        .eq('user_id', data.user.id)
-        .limit(1)
-        .then(({ data: acks }) => {
-          if (acks && acks.length > 0) setAlreadyAcknowledged(true);
+      fetch('/api/compliance/record?type=handbook')
+        .then(res => res.json())
+        .then(result => {
+          if (result.data && result.data.length > 0) setAlreadyAcknowledged(true);
           setLoading(false);
-        });
+        })
+        .catch(() => setLoading(false));
     });
   }, [router]);
 

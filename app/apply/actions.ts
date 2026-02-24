@@ -274,82 +274,154 @@ async function insertApplication(payload: {
 
   async function sendEnrollmentEmails(magicLink?: string | null, generatedPassword?: string) {
     const onboardingUrl = `${siteUrl}/onboarding/learner`;
-
-    // Big CTA button — magic link if available, otherwise direct onboarding link
     const ctaLink = magicLink || `${siteUrl}/login`;
-    const ctaButton = [
-      `<div style="text-align:center;margin:24px 0">`,
-      `<a href="${ctaLink}" style="display:inline-block;padding:16px 32px;background:#2563eb;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:bold;font-size:18px">Start My Onboarding</a>`,
-      `</div>`,
-    ].join('');
-
-    // Credentials box — always shown when password was generated
-    const credentialsBlock = generatedPassword
-      ? [
-          `<div style="background:#f0f9ff;border:2px solid #2563eb;border-radius:8px;padding:20px;margin:20px 0">`,
-          `<p style="margin:0 0 12px;font-weight:bold;font-size:16px;color:#1e40af">Your Login Credentials</p>`,
-          `<table style="width:100%;border-collapse:collapse">`,
-          `<tr><td style="padding:8px 0;color:#64748b;width:80px">Email:</td><td style="padding:8px 0;font-weight:bold">${payload.email}</td></tr>`,
-          `<tr><td style="padding:8px 0;color:#64748b">Password:</td><td style="padding:8px 0;font-weight:bold;font-family:monospace;font-size:16px">${generatedPassword}</td></tr>`,
-          `</table>`,
-          `<p style="margin:12px 0 0;font-size:13px;color:#64748b">Save these credentials. You can change your password at <a href="${siteUrl}/reset-password">${siteUrl}/reset-password</a></p>`,
-          `</div>`,
-        ].join('')
-      : '';
-
-    // Student: application received — complete onboarding
     const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
+
+    // ── Shared email chrome — clean white layout, single accent ──
     const emailHeader = [
-      `<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#333">`,
-      `<div style="text-align:center;padding:24px 0;border-bottom:2px solid #2563eb">`,
-      `<img src="${logoUrl}" alt="Elevate for Humanity" width="180" style="max-width:180px;height:auto" />`,
+      `<div style="max-width:600px;margin:0 auto;font-family:Georgia,serif;color:#1a1a1a;background:#ffffff">`,
+      `<div style="text-align:center;padding:32px 24px 24px">`,
+      `<img src="${logoUrl}" alt="Elevate for Humanity" width="160" style="max-width:160px;height:auto" />`,
       `</div>`,
-      `<div style="padding:24px">`,
+      `<div style="padding:0 32px 32px">`,
     ].join('');
     const emailFooter = [
-      `<hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0">`,
-      `<div style="text-align:center;font-size:12px;color:#94a3b8;padding:16px 0">`,
+      `<div style="border-top:1px solid #e0e0e0;margin-top:32px;padding-top:20px;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#999">`,
       `<p style="margin:0 0 4px">Elevate for Humanity Career & Technical Institute</p>`,
       `<p style="margin:0 0 4px">8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</p>`,
-      `<p style="margin:0"><a href="${siteUrl}" style="color:#2563eb">www.elevateforhumanity.org</a> | (317) 314-3757</p>`,
+      `<p style="margin:0"><a href="${siteUrl}" style="color:#999;text-decoration:underline">www.elevateforhumanity.org</a> &nbsp;|&nbsp; (317) 314-3757</p>`,
       `</div>`,
       `</div></div>`,
     ].join('');
 
+    // ── ETPL program lists ──
+    const etplPrograms = [
+      'Building Maintenance', 'Building Maintenance Technician',
+      'Business Startup & Marketing', 'CDL (Commercial Driver\'s License)',
+      'Cybersecurity', 'Cybersecurity Fundamentals',
+      'Drug & Alcohol Specimen Collector', 'Electrical Apprenticeship',
+      'Emergency Health & Safety Tech', 'Home Health Aide',
+      'HVAC Technician', 'IT Support Specialist', 'Medical Assistant',
+      'Peer Recovery Specialist', 'Phlebotomy Technician',
+      'Plumbing Apprenticeship', 'Public Safety Reentry Specialist',
+      'Welding Certification',
+    ];
+    const waitlistPrograms = [
+      'Barber Apprenticeship', 'Beauty Career Educator',
+      'CNA (Certified Nursing Assistant)', 'Cosmetology Apprenticeship',
+      'Esthetician Apprenticeship', 'Nail Technician', 'Tax Preparation',
+    ];
+
+    const etplList = etplPrograms.map(p => `<li style="padding:1px 0">${p}</li>`).join('');
+    const waitlistList = waitlistPrograms.map(p => `<li style="padding:1px 0">${p}</li>`).join('');
+
+    // Credentials section
+    const credentialsBlock = generatedPassword
+      ? [
+          `<table style="width:100%;border-collapse:collapse;margin:20px 0;border:1px solid #e0e0e0">`,
+          `<tr style="background:#f9f9f9"><td colspan="2" style="padding:12px 16px;font-weight:bold;font-size:14px;border-bottom:1px solid #e0e0e0">Your Login</td></tr>`,
+          `<tr><td style="padding:10px 16px;color:#666;width:80px;border-bottom:1px solid #f0f0f0">Email</td><td style="padding:10px 16px;border-bottom:1px solid #f0f0f0">${payload.email}</td></tr>`,
+          `<tr><td style="padding:10px 16px;color:#666">Password</td><td style="padding:10px 16px;font-family:Consolas,monospace;font-size:15px;letter-spacing:0.5px">${generatedPassword}</td></tr>`,
+          `</table>`,
+          `<p style="margin:0 0 20px;font-size:13px;color:#888;font-family:Arial,sans-serif">If the password doesn't work when pasted, please type it out manually. You can change it anytime at <a href="${siteUrl}/reset-password" style="color:#888">${siteUrl}/reset-password</a></p>`,
+        ].join('')
+      : '';
+
     await sendEmailDirect(
       payload.email,
-      `Welcome to Elevate! Your Login Credentials & Onboarding Link [${referenceNumber}]`,
+      `Welcome to Elevate for Humanity — ${programLabel} [${referenceNumber}]`,
       [
         emailHeader,
-        `<h2 style="color:#111827">Hi ${payload.firstName},</h2>`,
-        `<p>Thank you for applying to <strong>${programLabel}</strong> at Elevate for Humanity. Your account has been created and is ready to go.</p>`,
+
+        `<h2 style="font-weight:normal;font-size:22px;margin:0 0 20px;color:#1a1a1a">Hi ${payload.firstName},</h2>`,
+
+        `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">Thank you for your interest in <strong>${programLabel}</strong> at Elevate for Humanity. We received your inquiry and we'd love to help you take the next step.</p>`,
+
+        `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">We've created an account for you so you can get started right away. Below you'll find your login information, details about funding, and how to connect with our team.</p>`,
+
+        // Credentials
         credentialsBlock,
-        ctaButton,
-        `<p style="text-align:center;font-size:13px;color:#64748b;margin-top:-12px">This button logs you in and takes you to your onboarding page.</p>`,
-        `<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px 16px;margin:16px 0;text-align:center">`,
-        `<p style="margin:0;font-size:13px;color:#92400e"><strong>For the best experience, use a laptop, desktop, or iPad.</strong> Cell phones may not display all onboarding steps correctly.</p>`,
+
+        // CTA — schedule meeting
+        `<div style="text-align:center;margin:28px 0">`,
+        `<a href="${siteUrl}/schedule-consultation" style="display:inline-block;padding:14px 40px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-weight:bold;font-size:15px">Schedule a Meeting with an Advisor</a>`,
         `</div>`,
-        `<hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0">`,
-        `<h3 style="color:#111827">What happens next?</h3>`,
-        `<p>After clicking the button above, complete these onboarding steps to get enrolled:</p>`,
-        `<ol style="padding-left:20px;line-height:2">`,
+        `<p style="text-align:center;font-size:13px;color:#888;font-family:Arial,sans-serif;margin:-12px 0 24px">We'll walk you through your options — no commitment required.</p>`,
+
+        // Divider
+        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
+
+        // Funding section
+        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">How Funding Works</h3>`,
+
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">Many of our programs are listed on Indiana's <strong>Eligible Training Provider List (ETPL)</strong>, which means they can be fully funded through WIOA or other workforce grants — at no cost to you.</p>`,
+
+        // ETPL programs
+        `<p style="font-size:14px;font-weight:bold;margin:20px 0 8px">Programs eligible for federal funding:</p>`,
+        `<ul style="margin:0 0 16px;padding-left:20px;font-size:13px;color:#444;font-family:Arial,sans-serif;line-height:1.8">`,
+        etplList,
+        `</ul>`,
+
+        // IndianaCareerConnect instructions
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 8px"><strong>If your program is on this list</strong>, here's what to do:</p>`,
+        `<ol style="margin:0 0 16px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
+        `<li>Visit <a href="https://www.indianacareerconnect.com" style="color:#1a1a1a;font-weight:bold">www.indianacareerconnect.com</a> and create an account</li>`,
+        `<li>Schedule an appointment with your local WorkOne office</li>`,
+        `<li>Let them know you'd like to enroll in <strong>${programLabel}</strong> at Elevate for Humanity</li>`,
+        `<li>They'll confirm your eligibility and issue a training voucher</li>`,
+        `</ol>`,
+
+        // Divider
+        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
+
+        // Waiting list
+        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Programs Coming Soon</h3>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 8px">The following programs are in the process of being added to the ETPL. Once approved, they'll be eligible for federal funding. In the meantime, you can join the waiting list and we'll notify you as soon as funding opens up:</p>`,
+        `<ul style="margin:0 0 16px;padding-left:20px;font-size:13px;color:#444;font-family:Arial,sans-serif;line-height:1.8">`,
+        waitlistList,
+        `</ul>`,
+
+        // Divider
+        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
+
+        // Self-pay
+        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Don't Want to Wait? Start Now</h3>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">If you'd rather not wait for funding approval — or if your program isn't on the ETPL yet — you can begin classes right away with one of these options:</p>`,
+        `<ul style="margin:0 0 16px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
+        `<li><strong>Self-Pay</strong> — pay tuition upfront and start immediately</li>`,
+        `<li><strong>Buy Now, Pay Later</strong> — split your tuition into monthly payments</li>`,
+        `<li><strong>Deposit + Payment Plan</strong> — put down a deposit and pay the balance over time</li>`,
+        `</ul>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 16px">To discuss which option works best for you, <a href="${siteUrl}/schedule-consultation" style="color:#1a1a1a;font-weight:bold">schedule a Zoom meeting</a> with our enrollment team or call us at <strong>(317) 314-3757</strong>.</p>`,
+
+        // Divider
+        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
+
+        // Onboarding
+        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Getting Started</h3>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">While you explore your funding options, you can go ahead and begin your onboarding:</p>`,
+        `<ol style="margin:0 0 20px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
         `<li>Complete your profile</li>`,
-        `<li>Upload required documents (photo ID, SSN proof, proof of residency)</li>`,
+        `<li>Upload your documents (photo ID, SSN proof, proof of residency)</li>`,
         `<li>Confirm your funding source</li>`,
         `<li>Select your schedule</li>`,
         `<li>Complete orientation</li>`,
         `</ol>`,
-        `<p><strong>Once all steps are done, you are automatically enrolled</strong> and your courses will be available in your student dashboard.</p>`,
-        `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;margin:20px 0">`,
-        `<strong style="color:#1e40af">Need Help? Schedule a Free Consultation</strong>`,
-        `<p style="margin:8px 0 0">Have questions about the program, funding, or enrollment? Book a free consultation with our enrollment team:</p>`,
-        `<p style="margin:8px 0 0"><a href="${siteUrl}/schedule-consultation" style="color:#dc2626;font-weight:bold">Schedule a Consultation</a> &middot; Call <strong>(317) 314-3757</strong></p>`,
+
+        `<div style="text-align:center;margin:24px 0">`,
+        `<a href="${ctaLink}" style="display:inline-block;padding:14px 40px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-weight:bold;font-size:15px">Log In & Start Onboarding</a>`,
         `</div>`,
-        `<hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0">`,
-        `<p style="font-size:13px;color:#64748b">Reference number: <strong>${referenceNumber}</strong></p>`,
-        `<p style="font-size:13px;color:#64748b">Onboarding page: <a href="${onboardingUrl}">${onboardingUrl}</a></p>`,
-        `<p style="font-size:13px;color:#64748b">If you're applying for WIOA funding, register at <a href="https://indianacareerconnect.com">indianacareerconnect.com</a> — this is required for eligibility.</p>`,
-        `<p>Questions? Reply to this email or call us at (317) 314-3757.</p>`,
+
+        // Device note
+        `<p style="text-align:center;font-size:12px;color:#999;font-family:Arial,sans-serif;margin:0 0 24px">For the best experience, please use a laptop, desktop, or iPad.</p>`,
+
+        // Closing
+        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 8px">If you have any questions at all, just reply to this email or give us a call at <strong>(317) 314-3757</strong>. We're here to help.</p>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 4px">Looking forward to working with you,</p>`,
+        `<p style="font-size:14px;margin:0 0 4px"><strong>The Elevate for Humanity Team</strong></p>`,
+        `<p style="font-size:12px;color:#999;font-family:Arial,sans-serif;margin:16px 0 0">Ref: ${referenceNumber}</p>`,
+
         emailFooter,
       ].join(''),
     ).catch((err) => { logger.error('[Apply] Student confirmation email failed:', err instanceof Error ? err.message : err); });

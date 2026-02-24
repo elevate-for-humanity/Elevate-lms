@@ -44,27 +44,18 @@ export function ComplianceGate({
       setUserId(data.user.id);
 
       try {
-        // Direct DB query to check compliance status
-        const { data: complianceData } = await supabase
-          .from('user_compliance_status')
-          .select('onboarding_complete, agreements_complete, handbook_complete, missing_agreements')
-          .eq('user_id', data.user.id)
-          .eq('context', context)
-          .single();
-
-        // Also check agreement_acceptances directly
-        const { data: agreements } = await supabase
-          .from('agreement_acceptances')
-          .select('agreement_type, signed_at')
-          .eq('user_id', data.user.id);
+        // Check compliance via API (bypasses RLS)
+        const compRes = await fetch('/api/compliance/record');
+        const compData = compRes.ok ? await compRes.json() : { handbook: [], agreements: [] };
 
         const complianceStatus = await checkComplianceStatus(data.user.id, context);
         
-        // Merge direct DB data with library check
-        if (complianceData) {
-          complianceStatus.onboardingComplete = complianceData.onboarding_complete;
-          complianceStatus.agreementsComplete = complianceData.agreements_complete;
-          complianceStatus.handbookComplete = complianceData.handbook_complete;
+        // Merge API data with library check
+        if (compData.handbook?.length > 0) {
+          complianceStatus.handbookComplete = true;
+        }
+        if (compData.agreements?.length > 0) {
+          complianceStatus.agreementsComplete = true;
         }
 
         setStatus(complianceStatus);

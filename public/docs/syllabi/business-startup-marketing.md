@@ -137,7 +137,7 @@ Launch your own business in 5 weeks! Learn entrepreneurship, digital marketing, 
 
 **Elevate for Humanity**  
 Website: www.elevateforhumanity.org  
-Email: info@elevateforhumanity.org  
+Email: elevate4humanityedu@gmail.com  
 Phone: (317) 314-3757
 
 ---

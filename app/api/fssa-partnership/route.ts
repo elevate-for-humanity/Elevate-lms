@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     try {
       await resend.emails.send({
         from: 'FSSA Partnership <noreply@elevateforhumanity.org>',
-        to: 'info@elevateforhumanity.org',
+        to: 'elevate4humanityedu@gmail.com',
         subject: `🎯 FSSA Partnership Request: ${data.organization}`,
         html: `
           <h2>New FSSA/WorkOne Partnership Request</h2>

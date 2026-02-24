@@ -33649,7 +33649,7 @@ _No code references found._
 | REF | `components/admin/AdminNav.tsx` | 116 | Component: admin/AdminNav | `{ href: '/admin/partner-inquiries', label: 'Partner Inquiries' },` |
 | REF | `components/admin/AutoFlowCharts.tsx` | 31 | Component: admin/AutoFlowCharts | `{ stage: 'Inquiries', count: 150, percentage: 100 },` |
 | REF | `components/admin/IntelligentDataProcessor.tsx` | 317 | Component: admin/IntelligentDataProcessor | `{ stage: 'Inquiries', count: Math.round(students.length * 1.5) },` |
-| REF | `lib/chat/scripts.ts` | 166 | Lib: chat/scripts | `message: "For refund inquiries, please contact our finance team at info@elevateforhumanity.org or call (317) 314-3757.` |
+| REF | `lib/chat/scripts.ts` | 166 | Lib: chat/scripts | `message: "For refund inquiries, please contact our finance team at elevate4humanityedu@gmail.com or call (317) 314-3757.` |
 | REF | `lib/handbooks/program-holder-responsibilities.ts` | 360 | Lib: handbooks/program-holder-responsibilities | `• Respond to payment inquiries promptly` |
 | REF | `lib/handbooks/program-holder-responsibilities.ts` | 725 | Lib: handbooks/program-holder-responsibilities | `✓ Handle inquiries and communications` |
 | REF | `lib/navigation/site-nav.config.ts` | 217 | Lib: navigation/site-nav.config | `description: 'Sales and partnership inquiries',` |

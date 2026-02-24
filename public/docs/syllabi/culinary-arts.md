@@ -251,7 +251,7 @@ Apprentices earn wages while training:
 
 **Elevate for Humanity**  
 Website: www.elevateforhumanity.org  
-Email: info@elevateforhumanity.org  
+Email: elevate4humanityedu@gmail.com  
 Phone: (317) 314-3757
 
 **Indiana DWD/WorkOne Funding:**  

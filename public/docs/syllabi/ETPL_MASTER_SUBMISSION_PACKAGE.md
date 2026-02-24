@@ -3,7 +3,7 @@
 
 **Submission Date:** November 2024  
 **Provider:** Elevate for Humanity  
-**Contact:** info@elevateforhumanity.org  
+**Contact:** elevate4humanityedu@gmail.com  
 **Phone:** (317) 314-3757  
 **Website:** www.elevateforhumanity.org  
 
@@ -36,7 +36,7 @@
 
 **Primary Contact:**  
 Name: [Program Director Name]  
-Email: info@elevateforhumanity.org  
+Email: elevate4humanityedu@gmail.com  
 Phone: (317) 314-3757
 
 **Physical Address:**  
@@ -299,7 +299,7 @@ I certify that the information contained in this ETPL submission package is true
 For questions about this submission or any programs:
 
 **Elevate for Humanity**  
-Email: info@elevateforhumanity.org  
+Email: elevate4humanityedu@gmail.com  
 Phone: (317) 314-3757  
 Website: www.elevateforhumanity.org
 

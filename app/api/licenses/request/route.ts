@@ -93,7 +93,7 @@ This request was submitted via the Platform Licensing page.
           },
           body: JSON.stringify({
             from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
-            to: process.env.LICENSE_NOTIFICATION_EMAIL || 'info@elevateforhumanity.org',
+            to: process.env.LICENSE_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com',
             subject: `[License Request] ${licenseType === 'source_use' ? 'Enterprise Source-Use' : 'Managed LMS'} - ${organizationName}`,
             text: emailBody,
           }),

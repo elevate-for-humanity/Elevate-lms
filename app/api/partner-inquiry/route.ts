@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     try {
       await getResend().emails.send({
         from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
-        to: process.env.NOTIFY_EMAIL_TO || 'info@elevateforhumanity.org',
+        to: process.env.NOTIFY_EMAIL_TO || 'elevate4humanityedu@gmail.com',
         subject: `New Partner Inquiry: ${data.fullName} (${data.relationshipType})`,
         text:
           `New Partner Inquiry\n\n` +

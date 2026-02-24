@@ -36,7 +36,7 @@
 | Legal entity name on site | ✅ PASS | JSON-LD: `"legalName":"2EXCLUSIVE LLC-S"` |
 | Physical Indiana address | ✅ PASS | JSON-LD: `"streetAddress":"7009 East 56th Street, Suite EE1"` |
 | Contact phone | ✅ PASS | JSON-LD: `"telephone":"+1-317-314-3757"` |
-| Contact email | ✅ PASS | `info@elevateforhumanity.org` in contact page |
+| Contact email | ✅ PASS | `Elevate4humanityedu@gmail.com` in contact page |
 | Footer legal links | ✅ PASS | Privacy, Terms, Accessibility in `SiteFooter.tsx:146-158` |
 | Student Consumer Info hub | ❌ FAIL | `/disclosures` returns 404, `/consumer-information` returns 404 |
 

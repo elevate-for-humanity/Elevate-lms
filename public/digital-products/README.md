@@ -71,7 +71,7 @@ Digital products are updated regularly. Check your customer portal for:
 
 Need help with digital products?
 
-- Email: info@elevateforhumanity.org
+- Email: Elevate4humanityedu@gmail.com
 - Documentation: https://docs.www.elevateforhumanity.org
 - Community: https://community.www.elevateforhumanity.org
 

@@ -218,13 +218,22 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
         // Step 3: Create enrollment if we have both
         if (userId && courseId) {
-          // Check for existing enrollment
+          // Resolve the actual program_id from programs table
+          const programSlug = (before.program_interest || '').toLowerCase().replace(/\s+/g, '-').trim();
+          const { data: programRow } = await auth.db
+            .from('programs')
+            .select('id, name')
+            .eq('slug', programSlug)
+            .maybeSingle();
+          const programId = programRow?.id || courseId;
+
+          // Check for existing course-level enrollment
           const { data: existingEnrollment } = await auth.db
-            .from('program_enrollments')
+            .from('enrollments')
             .select('id')
             .eq('user_id', userId)
             .eq('course_id', courseId)
-            .single();
+            .maybeSingle();
 
           if (existingEnrollment) {
             enrollmentResult = { id: existingEnrollment.id, alreadyExists: true };
@@ -239,13 +248,32 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             enrollmentResult = enrollment;
           }
 
+          // Upsert program_enrollments — links student to their program
+          await auth.db
+            .from('program_enrollments')
+            .upsert({
+              user_id: userId,
+              program_id: programId,
+              program_slug: programSlug,
+              email: before.email,
+              full_name: `${before.first_name || ''} ${before.last_name || ''}`.trim(),
+              phone: before.phone || null,
+              status: 'active',
+              enrollment_state: 'enrolled',
+              enrollment_confirmed_at: new Date().toISOString(),
+              funding_source: 'pending',
+              amount_paid_cents: 0,
+            }, { onConflict: 'user_id,program_id', ignoreDuplicates: false })
+            .then(({ error: peErr }) => {
+              if (peErr) logger.error('[Approve] program_enrollments upsert failed:', peErr.message);
+            });
+
           // Update application with resolved IDs and enrolled status
-          // Use direct Supabase update since program_id/user_id aren't in the Zod schema
           await auth.db
             .from('applications')
             .update({
               status: 'enrolled',
-              program_id: courseId,
+              program_id: programId,
               user_id: userId,
             })
             .eq('id', id);
@@ -264,6 +292,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
           logger.info('Auto-enrollment completed', {
             applicationId: id,
             userId,
+            programId,
             courseId,
             enrollmentId: enrollmentResult?.id,
           });

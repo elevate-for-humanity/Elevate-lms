@@ -66,7 +66,7 @@ async function createStudentAccount(
   firstName: string,
   lastName: string,
   programInterest: string,
-): Promise<{ userId?: string; accountCreated: boolean; magicLink?: string | null; generatedPassword?: string }> {
+): Promise<{ userId?: string; accountCreated: boolean; magicLink?: string | null; generatedPassword?: string; programId?: string | null }> {
   try {
     const normalizedEmail = email.toLowerCase().trim();
     let userId: string | null = null;
@@ -176,8 +176,8 @@ async function createStudentAccount(
       logger.warn('Could not generate magic link — student will use forgot-password', linkErr as Error);
     }
 
-    logger.info('Student account created — awaiting onboarding completion for enrollment', { applicationId, userId, email: normalizedEmail });
-    return { userId, accountCreated: true, magicLink, generatedPassword };
+    logger.info('Student account created — awaiting onboarding completion for enrollment', { applicationId, userId, email: normalizedEmail, programId });
+    return { userId, accountCreated: true, magicLink, generatedPassword, programId };
   } catch (err) {
     logger.error('Account creation failed', err as Error);
     return { accountCreated: false };
@@ -386,6 +386,30 @@ async function insertApplication(payload: {
           payload.lastName,
           payload.programInterest,
         );
+
+        // Create program_enrollments row — links student to their program
+        if (accountResult.userId && accountResult.programId) {
+          const programSlug = payload.programInterest.toLowerCase().replace(/\s+/g, '-').trim();
+          await supabase
+            .from('program_enrollments')
+            .upsert({
+              user_id: accountResult.userId,
+              program_id: accountResult.programId,
+              program_slug: programSlug,
+              email: payload.email,
+              full_name: `${payload.firstName} ${payload.lastName}`.trim(),
+              phone: payload.phone || null,
+              status: 'active',
+              enrollment_state: 'onboarding',
+              next_required_action: 'Complete Onboarding',
+              funding_source: 'pending',
+              amount_paid_cents: 0,
+            }, { onConflict: 'user_id,program_id', ignoreDuplicates: true })
+            .then(({ error: peError }) => {
+              if (peError) logger.error('[Apply] program_enrollments insert failed:', peError.message);
+              else logger.info('[Apply] program_enrollments created', { userId: accountResult.userId, programId: accountResult.programId });
+            });
+        }
 
         await sendEnrollmentEmails(accountResult.magicLink, accountResult.generatedPassword);
         revalidatePath('/admin/applications');

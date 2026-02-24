@@ -89,7 +89,7 @@ const APPT_LABELS: Record<string, string> = {
 
 function SignedOutView() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       <div className="relative h-56 sm:h-64">
         <Image src="/images/programs-hq/students-learning.jpg" alt="Students in classroom" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-b from-brand-blue-900/80 to-brand-blue-900/95" />
@@ -99,26 +99,14 @@ function SignedOutView() {
           <p className="text-blue-200 text-sm mt-1">Sign in to view your program and progress</p>
         </div>
       </div>
-      <div className="max-w-md mx-auto px-4 -mt-6 relative z-10">
+      <div className="max-w-md mx-auto px-4 -mt-6 relative z-10 w-full">
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center">
           <h2 className="text-lg font-bold text-slate-900 mb-2">Welcome</h2>
           <p className="text-slate-500 text-sm mb-5">Sign in to access your courses, track progress, and manage your enrollment.</p>
-          <Link href="/signin" className="block w-full bg-brand-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-brand-blue-700 transition-colors mb-3">
+          <Link href="/login" className="block w-full bg-brand-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-brand-blue-700 transition-colors">
             Sign In
           </Link>
-          <Link href="/apply" className="block w-full bg-brand-red-600 text-white font-semibold py-3 rounded-lg hover:bg-brand-red-700 transition-colors">
-            Apply Now
-          </Link>
-        </div>
-        <div className="mt-6 grid grid-cols-2 gap-3 pb-8">
-          <Link href="/programs" className="bg-white border border-slate-200 rounded-xl p-4 text-center hover:bg-slate-50">
-            <div className="text-2xl mb-1">📚</div>
-            <div className="text-xs font-semibold text-slate-900">Browse Programs</div>
-          </Link>
-          <Link href="/schedule-consultation" className="bg-white border border-slate-200 rounded-xl p-4 text-center hover:bg-slate-50">
-            <div className="text-2xl mb-1">📅</div>
-            <div className="text-xs font-semibold text-slate-900">Book Consultation</div>
-          </Link>
+          <p className="text-xs text-slate-400 mt-4">Need help? Call <a href="tel:+13173143757" className="text-brand-blue-600">(317) 314-3757</a></p>
         </div>
       </div>
     </div>
@@ -193,14 +181,9 @@ export default async function StudentPWAPage() {
             Complete Onboarding →
           </Link>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
-            <Link href="/apply" className="bg-brand-red-600 text-white rounded-xl p-4 text-center font-semibold text-sm hover:bg-brand-red-700">
-              Apply to a Program
-            </Link>
-            <Link href="/schedule-consultation" className="bg-brand-blue-600 text-white rounded-xl p-4 text-center font-semibold text-sm hover:bg-brand-blue-700">
-              Book Consultation
-            </Link>
-          </div>
+          <Link href="/apply" className="block w-full bg-brand-red-600 text-white rounded-xl p-4 text-center font-semibold hover:bg-brand-red-700 transition-colors">
+            Apply to a Program
+          </Link>
         )}
       </div>
 
@@ -384,27 +367,9 @@ export default async function StudentPWAPage() {
         </div>
       )}
 
-      {/* Help */}
-      <div className="px-4 mt-6 pb-8">
-        <h2 className="text-base font-bold text-slate-900 mb-2">Help & Resources</h2>
-        <div className="grid grid-cols-2 gap-3">
-          <Link href="/schedule-consultation" className="bg-white border border-slate-200 rounded-xl p-4 text-center hover:bg-slate-50">
-            <div className="text-xl mb-1">📅</div>
-            <div className="text-xs font-semibold text-slate-900">Schedule Meeting</div>
-          </Link>
-          <Link href="/funding" className="bg-white border border-slate-200 rounded-xl p-4 text-center hover:bg-slate-50">
-            <div className="text-xl mb-1">💰</div>
-            <div className="text-xs font-semibold text-slate-900">Funding Options</div>
-          </Link>
-          <Link href="/support" className="bg-white border border-slate-200 rounded-xl p-4 text-center hover:bg-slate-50">
-            <div className="text-xl mb-1">💬</div>
-            <div className="text-xs font-semibold text-slate-900">Get Support</div>
-          </Link>
-          <a href="tel:+13173143757" className="bg-white border border-slate-200 rounded-xl p-4 text-center hover:bg-slate-50">
-            <div className="text-xl mb-1">📞</div>
-            <div className="text-xs font-semibold text-slate-900">(317) 314-3757</div>
-          </a>
-        </div>
+      {/* Footer */}
+      <div className="px-4 mt-8 pb-8 text-center">
+        <p className="text-xs text-slate-400">Need help? Call <a href="tel:+13173143757" className="text-brand-blue-600">(317) 314-3757</a></p>
       </div>
     </div>
   );

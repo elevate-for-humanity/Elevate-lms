@@ -1,0 +1,369 @@
+{
+  "quiz_id": "epa608-core-quiz-1",
+  "title": "EPA 608 Core - Quiz 1",
+  "section": "Core",
+  "test": "Test 1",
+  "passing_score": 70,
+  "questions": [
+    {
+      "id": "core-q1-001",
+      "stem": "What is being done in the U.S. to stop damage to the stratospheric ozone layer?",
+      "options": [
+        "Using coal instead of nuclear power to produce electricity",
+        "Eliminating the use of CFCs and HCFCs refrigerants",
+        "Enforcing strict emission requirements on two-cycle engines",
+        "All of the above"
+      ],
+      "correct": 1,
+      "correct_letter": "B"
+    },
+    {
+      "id": "core-q1-002",
+      "stem": "How much can a technician be fined for venting a non-exempt refrigerant from a system?",
+      "options": [
+        "$14,439 per day per violation",
+        "$27,539 per day per violation",
+        "$37,839 per day per violation",
+        "$44,539 per day per violation"
+      ],
+      "correct": 3,
+      "correct_letter": "D"
+    },
+    {
+      "id": "core-q1-003",
+      "stem": "What is a violation of the Clean Air Act or EPA's regulations?",
+      "options": [
+        "Failing to keep required records",
+        "Failing to meet the required evacuation levels before opening or disposing of appliances",
+        "Knowingly releasing CFC, HCFC, or HFC refrigerants while repairing appliances",
+        "All of the above"
+      ],
+      "correct": 3,
+      "correct_letter": "D"
+    },
+    {
+      "id": "core-q1-004",
+      "stem": "State and local governments __________________.",
+      "options": [
+        "Cannot make any laws related to refrigerant recovery",
+        "Can establish laws to reduce the federal refrigerant recovery requirements",
+        "Can make laws that are stricter requirements than the federal regulations",
+        "Can temporarily suspend the prohibition on the manufacture of R-22 for up to 6 months"
+      ],
+      "correct": 2,
+      "correct_letter": "C"
+    },
+    {
+      "id": "core-q1-005",
+      "stem": "The ___________ program identifies alternative refrigerants for use.",
+      "options": [
+        "SNAP",
+        "E-Star",
+        "The ASHRAE-approved (AA)",
+        "Energy Star"
+      ],
+      "correct": 0,
+      "correct_letter": "A"
+    },
+    {
+      "id": "core-q1-006",
+      "stem": "The Montreal Protocol is ________________________.",
+      "options": [
+        "An international treaty that addresses ozone-depleting substances and their alternatives",
+        "A test procedure or protocol to use when measuring GWP",
+        "A test procedure or protocol to use when measuring ODP",
+        "An international treaty that certified technicians and recovery equipment"
+      ],
+      "correct": 0,
+      "correct_letter": "A"
+    },
+    {
+      "id": "core-q1-007",
+      "stem": "The production and import of new R-22 in the U.S. to service existing systems is banned beginning in ________.",
+      "options": [
+        "2019",
+        "2020",
+        "2023",
+        "2024"
+      ],
+      "correct": 1,
+      "correct_letter": "B"
+    },
+    {
+      "id": "core-q1-008",
+      "stem": "After a refrigerant is phased-out, supplies of that refrigerant for equipment servicing can only come from __________________.",
+      "options": [
+        "Recovered and reclaimed gas",
+        "Third-World countries",
+        "Chinese and Indian manufacturers under a special permit",
+        "Exemptions granted under the Montreal Protocol"
+      ],
+      "correct": 0,
+      "correct_letter": "A"
+    },
+    {
+      "id": "core-q1-009",
+      "stem": "Technicians who violate Clean Air Act provisions __________________.",
+      "options": [
+        "Can lose their certification",
+        "Will have their equipment confiscated",
+        "Will be required to take mandatory training",
+        "May be required to pass an online test"
+      ],
+      "correct": 0,
+      "correct_letter": "A"
+    },
+    {
+      "id": "core-q1-010",
+      "stem": "Which is a violation of EPA or Clean Air Act regulations?",
+      "options": [
+        "Failing to evacuate refrigerant in a system to the required evacuation level",
+        "Failing to evacuate refrigerant in a leaking system to at least 0 psig",
+        "Adding nitrogen to a fully charged system, and then calling the mixture a 'leak check gas' and venting the mixture to the atmosphere",
+        "All of the above"
+      ],
+      "correct": 1,
+      "correct_letter": "B"
+    },
+    {
+      "id": "core-q1-011",
+      "stem": "Reclaimed refrigerant must be tested to meet __________________ before it can be resold.",
+      "options": [
+        "AHRI 700",
+        "AEPA 700",
+        "ASHRAE 700",
+        "UL 700"
+      ],
+      "correct": 0,
+      "correct_letter": "A"
+    },
+    {
+      "id": "core-q1-012",
+      "stem": "If technicians lose their certification card, they must_________________.",
+      "options": [
+        "Order a replacement from the EPA within 100 days",
+        "Request a replacement from the company that provided the certification",
+        "Have the refrigerant supply house certify to the EPA that they had a certification card",
+        "Order a replacement from the EPA within 30 days or face permanent loss of certification"
+      ],
+      "correct": 1,
+      "correct_letter": "B"
+    },
+    {
+      "id": "core-q1-013",
+      "stem": "Distributors must verify __________________ before they can sell refrigerant.",
+      "options": [
+        "The quality of the refrigerant",
+        "That the net weight on the refrigerant container is accurate",
+        "That the purchaser owns a certified recovery device",
+        "That the purchaser employs at least one Section 608 certified technician"
+      ],
+      "correct": 3,
+      "correct_letter": "D"
+    },
+    {
+      "id": "core-q1-014",
+      "stem": "What does NOT require Section 608 certification?",
+      "options": [
+        "Recovering refrigerant",
+        "Rewiring a condenser fan",
+        "Replacing an evaporator",
+        "Attaching a piercing self-tapping Schrader valve"
+      ],
+      "correct": 1,
+      "correct_letter": "B"
+    },
+    {
+      "id": "core-q1-015",
+      "stem": "What refrigerant servicing does NOT require Section 608 certification?",
+      "options": [
+        "Carbon dioxide refrigerant",
+        "Propane",
+        "R-1234yf",
+        "R-134a"
+      ],
+      "correct": 0,
+      "correct_letter": "A"
+    },
+    {
+      "id": "core-q1-016",
+      "stem": "Which of the following is a lawful use of HCFC-22?",
+      "options": [
+        "Assembling 'dry-charge' components into a system and then charging with reclaimed R-22",
+        "Servicing existing R-22 systems",
+        "Charging any new system designed for R-407C with reclaimed or recovered R-22",
+        "All of the above"
+      ],
+      "correct": 1,
+      "correct_letter": "B"
+    },
+    {
+      "id": "core-q1-017",
+      "stem": "When servicing an R-22 system you CANNOT _______.",
+      "options": [
+        "Add R-22 to top off the system after the repair is completed",
+        "Retrofit the unit to R-407C",
+        "Use recovered or recycled R-22 from the same owner",
+        "Top off the unit with R-407C"
+      ],
+      "correct": 3,
+      "correct_letter": "D"
+    },
+    {
+      "id": "core-q1-018",
+      "stem": "How should disposable cylinders be discarded?",
+      "options": [
+        "Vent the remaining refrigerant and render the cylinder useless.",
+        "Recover all remaining refrigerant, render the cylinders useless, and recycle the metal.",
+        "Don't discard them; approved recyclers can refill them for reuse.",
+        "Reuse the cylinders as nitrogen gas tanks."
+      ],
+      "correct": 1,
+      "correct_letter": "B"
+    },
+    {
+      "id": "core-q1-019",
+      "stem": "Before disposing of any appliance containing refrigerant __________________.",
+      "options": [
+        "Recover the refrigerant",
+        "Vent the refrigerant so safety issues are not violated and no one is harmed",
+        "Purge the refrigerant with nitrogen",
+        "Seal the appliance to prevent any refrigerant from escaping"
+      ],
+      "correct": 0,
+      "correct_letter": "A"
+    },
+    {
+      "id": "core-q1-020",
+      "stem": "The EPA's 'safe disposal requirements' make the __________________ responsible for ensuring that all refrigerant has been removed from household refrigerators before they are disposed.",
+      "options": [
+        "Final person in the disposal chain",
+        "Equipment owner",
+        "Last person to service the unit",
+        "Either B or C"
+      ],
+      "correct": 0,
+      "correct_letter": "A"
+    },
+    {
+      "id": "core-q1-021",
+      "stem": "All CFC, HCFC, and HFC refrigerant recovery devices must _________________.",
+      "options": [
+        "Be portable",
+        "Contain a heavy-duty splash shield",
+        "Have a two-stage vacuum pump",
+        "Meet EPA standards"
+      ],
+      "correct": 3,
+      "correct_letter": "D"
+    },
+    {
+      "id": "core-q1-022",
+      "stem": "Which appliances are NOT covered by EPA regulations?",
+      "options": [
+        "Mini-fridges",
+        "Ice makers",
+        "Commercial refrigeration equipment",
+        "Desiccant dehumidifiers"
+      ],
+      "correct": 3,
+      "correct_letter": "D"
+    },
+    {
+      "id": "core-q1-023",
+      "stem": "A 'self-contained' recovery device ________________.",
+      "options": [
+        "Cannot be used anymore",
+        "Removes refrigerant with the assistance of components in the appliance",
+        "Must have the recovery tank inside the recovery unit",
+        "Can only be used on a system with 5 pounds or less of refrigerant"
+      ],
+      "correct": 1,
+      "correct_letter": "B"
+    },
+    {
+      "id": "core-q1-024",
+      "stem": "EPA regulations require appliances to have ___________.",
+      "options": [
+        "A service aperture or process stub",
+        "Purge valves or purge units",
+        "King valves",
+        "Oversized filter driers"
+      ],
+      "correct": 0,
+      "correct_letter": "A"
+    },
+    {
+      "id": "core-q1-025",
+      "stem": "A ________________ recovery device uses the compressor in the appliance and/or the pressure of the refrigerant in the appliance.",
+      "options": [
+        "System-dependent",
+        "Pressure-dependent",
+        "Compressor-dependent",
+        "Self-sufficient"
+      ],
+      "correct": 0,
+      "correct_letter": "A"
+    },
+    {
+      "id": "core-q1-026",
+      "stem": "When disposing of an appliance with 5-50 pounds of refrigerant, you must record_______________.",
+      "options": [
+        "The type of refrigerant recovered",
+        "The quantity of refrigerant, by type, recovered from the appliance during the past 12 months",
+        "The quantity of refrigerant, by type, sent for reclamation or destruction",
+        "All of the above"
+      ],
+      "correct": 0,
+      "correct_letter": "A"
+    },
+    {
+      "id": "core-q1-027",
+      "stem": "What happens when EPA regulations change after a technician is certified?",
+      "options": [
+        "The technician has 18 months to get recertified.",
+        "The technician has a responsibility to keep up with changes in EPA regulations.",
+        "If certified after 2002, the technician has 18 months to get recertified.",
+        "The technician must attend an 8-hour refresher class to become recertified."
+      ],
+      "correct": 1,
+      "correct_letter": "B"
+    },
+    {
+      "id": "core-q1-028",
+      "stem": "What does a Section 608 certification allow a technician to do?",
+      "options": [
+        "Import virgin CFC from other countries",
+        "Purchase or handle controlled refrigerants",
+        "Service motor vehicle air conditioners using R-134a only",
+        "Service any type of motor vehicle air conditioner in electric vehicles"
+      ],
+      "correct": 1,
+      "correct_letter": "B"
+    },
+    {
+      "id": "core-q1-029",
+      "stem": "What action violates the EPA's prohibition on venting?",
+      "options": [
+        "Small accidental release of refrigerant when servicing a unit",
+        "Opening the system without properly recovering the refrigerant first",
+        "A catastrophic failure of a system",
+        "Refrigerant lost when connecting or disconnecting low loss hoses"
+      ],
+      "correct": 1,
+      "correct_letter": "B"
+    },
+    {
+      "id": "core-q1-030",
+      "stem": "All refrigerants _________________.",
+      "options": [
+        "Deplete the stratospheric ozone layer",
+        "Contain chlorine",
+        "Must be recovered before opening or disposing of appliances",
+        "Are toxic to sea life"
+      ],
+      "correct": 2,
+      "correct_letter": "C"
+    }
+  ]
+}

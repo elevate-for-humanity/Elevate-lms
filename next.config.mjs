@@ -603,7 +603,7 @@ const nextConfig = {
           "font-src 'self' data: https://fonts.gstatic.com",
           "connect-src 'self' https://*.supabase.co https://api.stripe.com wss://*.supabase.co https://us06web.zoom.us",
           "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://js.stripe.com https://us06web.zoom.us",
-          "media-src 'self' data: blob: https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev https://cms-artifacts.artlist.io",
+          "media-src 'self' data: blob: https://*.supabase.co https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev https://cms-artifacts.artlist.io",
           "worker-src 'self' blob:",
           "object-src 'none'",
           "base-uri 'self'",

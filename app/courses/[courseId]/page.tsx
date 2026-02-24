@@ -19,10 +19,10 @@ export async function generateMetadata({
       description: 'Workforce training course at Elevate for Humanity.',
     };
   }
-  
+
   const { data: course } = await db
     .from('training_courses')
-    .select('title, description')
+    .select('course_name, description')
     .eq('id', courseId)
     .single();
 
@@ -34,18 +34,45 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${course.title} | Elevate for Humanity`,
-    description: course.description || `Learn ${course.title} with Elevate for Humanity workforce training programs.`,
+    title: `${course.course_name} | Elevate for Humanity`,
+    description: course.description || `Learn ${course.course_name} with Elevate for Humanity workforce training programs.`,
     alternates: {
       canonical: `https://www.elevateforhumanity.org/courses/${courseId}`,
     },
   };
 }
+
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, Users, Award, BookOpen, Play } from 'lucide-react';
+import { Clock, Users, Award, BookOpen, Play, ChevronDown, Shield, Wrench } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+// Map lesson_number ranges to module order_index
+const LESSON_MODULE_MAP: Record<number, number[]> = {
+  1: [1, 2, 3, 4],
+  2: [5, 6, 7, 8, 9],
+  3: [10, 11, 12, 13, 14],
+  4: [15, 16, 17, 18, 19, 20],
+  5: [21, 22, 23, 24, 25, 26],
+  6: [27, 28, 29, 30, 31, 32, 33, 34],
+  7: [35, 36, 37, 38, 39],
+  8: [40, 41, 42, 43, 44, 45, 46],
+  9: [47, 48, 49, 50, 51, 52],
+  10: [53, 54, 55, 56, 57, 58, 59],
+  11: [60, 61, 62, 63, 64],
+  12: [65, 66, 67, 68, 69, 70],
+  13: [71, 72, 73, 74, 75, 76],
+  14: [77, 85],
+  15: [90, 91, 92, 93, 94, 95],
+};
+
+function getModuleForLesson(lessonNumber: number): number {
+  for (const [moduleIdx, lessons] of Object.entries(LESSON_MODULE_MAP)) {
+    if (lessons.includes(lessonNumber)) return parseInt(moduleIdx);
+  }
+  return 0;
+}
 
 export default async function CourseDetailPage({
   params,
@@ -57,7 +84,6 @@ export default async function CourseDetailPage({
   const _admin = createAdminClient();
   const db = _admin || supabase;
 
-  // Fetch course details
   const { data: course, error } = await db
     .from('training_courses')
     .select('*')
@@ -68,14 +94,22 @@ export default async function CourseDetailPage({
     notFound();
   }
 
-  // Fetch lessons
+  // Fetch published lessons
   const { data: lessons } = await db
     .from('training_lessons')
     .select('*')
     .eq('course_id', courseId)
+    .eq('is_published', true)
+    .order('lesson_number');
+
+  // Fetch modules
+  const { data: modules } = await db
+    .from('course_modules')
+    .select('*')
+    .eq('course_id', courseId)
     .order('order_index');
 
-  // Check if user is enrolled
+  // Check enrollment
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -94,7 +128,6 @@ export default async function CourseDetailPage({
     enrollment = data;
 
     if (enrollment) {
-      // Fetch lesson progress for this user + course
       const { data: progressData } = await db
         .from('lesson_progress')
         .select('lesson_id, completed')
@@ -113,147 +146,239 @@ export default async function CourseDetailPage({
 
   const isEnrolled = !!enrollment;
   const firstLesson = lessons?.[0];
-  // Find the first incomplete lesson for "Continue" button
   const nextLesson = isEnrolled
     ? lessons?.find((l: any) => !completedLessonIds.has(l.id)) || firstLesson
     : firstLesson;
 
+  // Group lessons by module
+  const moduleGroups = (modules || []).map((mod: any) => {
+    const moduleLessons = (lessons || []).filter(
+      (l: any) => getModuleForLesson(l.lesson_number) === mod.order_index
+    );
+    const completedCount = moduleLessons.filter((l: any) => completedLessonIds.has(l.id)).length;
+    return { ...mod, lessons: moduleLessons, completedCount };
+  });
+
+  // Hero image based on course type
+  const heroImage = '/images/programs-hq/hvac-technician.jpg';
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-50">
       <Breadcrumbs
         items={[
+          { label: 'Programs', href: '/programs' },
           { label: 'Courses', href: '/courses' },
-          { label: course.title },
+          { label: course.course_name },
         ]}
       />
 
-      {/* Hero */}
-      <section className="bg-slate-900 py-16">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          {isEnrolled && (
-            <span className="inline-block bg-brand-green-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-wider">
-              Enrolled
-            </span>
-          )}
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{course.title}</h1>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-6">{course.description}</p>
+      {/* Hero Banner */}
+      <section className="relative overflow-hidden bg-slate-900">
+        <div className="absolute inset-0">
+          <Image
+            src={heroImage}
+            alt={`${course.course_name} training program`}
+            fill
+            className="object-cover opacity-30"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent" />
+        </div>
 
-          {isEnrolled && nextLesson && (
-            <Link
-              href={`/lms/courses/${courseId}/lessons/${nextLesson.id}`}
-              className="inline-flex items-center gap-2 bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors"
-            >
-              <Play className="w-5 h-5" />
-              {completedLessonIds.size > 0 ? 'Continue Learning' : 'Start Learning'}
-            </Link>
-          )}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+          <div className="max-w-3xl">
+            {isEnrolled && (
+              <span className="inline-flex items-center gap-1.5 bg-brand-green-500/20 text-brand-green-300 text-xs font-bold px-3 py-1.5 rounded-full mb-4 uppercase tracking-wider border border-brand-green-500/30">
+                <span className="w-2 h-2 rounded-full bg-brand-green-400 animate-pulse" />
+                Enrolled
+              </span>
+            )}
 
-          {isEnrolled && (
-            <div className="max-w-md mx-auto mt-6">
-              <div className="flex items-center justify-between text-sm text-slate-400 mb-2">
-                <span>{completedLessonIds.size} of {lessons?.length || 0} lessons complete</span>
-                <span>{progressPercent}%</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 leading-tight">
+              {course.course_name}
+            </h1>
+            <p className="text-lg text-slate-300 mb-8 leading-relaxed max-w-2xl">
+              {course.description}
+            </p>
+
+            {/* Stats row */}
+            <div className="flex flex-wrap gap-6 mb-8">
+              <div className="flex items-center gap-2 text-slate-300">
+                <Clock className="w-5 h-5 text-brand-blue-400" />
+                <span className="text-sm font-medium">{course.duration_hours || 375} hours</span>
               </div>
-              <div className="w-full bg-slate-700 rounded-full h-2.5">
-                <div
-                  className="bg-brand-green-500 h-2.5 rounded-full transition-all"
-                  style={{ width: `${progressPercent}%` }}
-                />
+              <div className="flex items-center gap-2 text-slate-300">
+                <BookOpen className="w-5 h-5 text-brand-blue-400" />
+                <span className="text-sm font-medium">{lessons?.length || 0} lessons</span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-300">
+                <Shield className="w-5 h-5 text-brand-blue-400" />
+                <span className="text-sm font-medium">15 weeks</span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-300">
+                <Award className="w-5 h-5 text-brand-blue-400" />
+                <span className="text-sm font-medium">EPA 608 + OSHA 30</span>
               </div>
             </div>
-          )}
+
+            {/* CTA — always allow starting the course */}
+            {firstLesson && (
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link
+                  href={`/courses/${courseId}/lessons/${(isEnrolled && nextLesson ? nextLesson : firstLesson).id}`}
+                  className="inline-flex items-center justify-center gap-2 bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all hover:shadow-lg hover:shadow-brand-orange-500/25"
+                >
+                  <Play className="w-5 h-5" />
+                  {isEnrolled && completedLessonIds.size > 0 ? 'Continue Learning' : 'Start Course'}
+                </Link>
+                {!user && (
+                  <Link
+                    href={`/login?next=/courses/${courseId}`}
+                    className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-4 rounded-xl font-semibold transition-all backdrop-blur-sm"
+                  >
+                    Sign In to Track Progress
+                  </Link>
+                )}
+              </div>
+            )}
+
+            {/* Progress bar for enrolled */}
+            {isEnrolled && (
+              <div className="max-w-md mt-6">
+                <div className="flex items-center justify-between text-sm text-slate-400 mb-2">
+                  <span>{completedLessonIds.size} of {lessons?.length || 0} lessons complete</span>
+                  <span className="font-bold text-white">{progressPercent}%</span>
+                </div>
+                <div className="w-full bg-white/10 rounded-full h-2.5">
+                  <div
+                    className="bg-brand-green-500 h-2.5 rounded-full transition-all"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* Course Content */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid lg:grid-cols-3 gap-12">
-          {/* Main Content */}
+      {/* Course Curriculum — grouped by week/module */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+          {/* Main: Module accordion */}
           <div className="lg:col-span-2">
-            <h2 className="text-3xl font-black text-black mb-6">
-              What You&apos;ll Learn
-            </h2>
-            <div className="prose prose-lg max-w-none mb-12">
-              <p className="text-black">{course.description}</p>
-            </div>
-
-            {/* Lessons */}
-            <h2 className="text-3xl font-black text-black mb-6">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">
               Course Curriculum
-              {isEnrolled && (
-                <span className="text-base font-normal text-slate-500 ml-3">
-                  {completedLessonIds.size}/{lessons?.length || 0} completed
-                </span>
-              )}
             </h2>
+            <p className="text-slate-500 mb-8">
+              15-week program &middot; {lessons?.length || 0} lessons &middot; EPA 608 Universal + OSHA 30 + CPR
+            </p>
+
             <div className="space-y-3">
-              {lessons && lessons.length > 0 ? (
-                lessons.map((lesson: any, index: number) => {
-                  const isCompleted = completedLessonIds.has(lesson.id);
-                  const lessonContent = (
-                    <div className="flex items-start gap-4">
-                      <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-                        isCompleted
-                          ? 'bg-brand-green-100'
-                          : 'bg-brand-blue-100'
+              {moduleGroups.map((mod: any) => {
+                const allDone = mod.lessons.length > 0 && mod.completedCount === mod.lessons.length;
+                return (
+                  <details
+                    key={mod.id}
+                    className={`group rounded-xl border-2 transition-colors ${
+                      allDone
+                        ? 'border-brand-green-200 bg-brand-green-50/30'
+                        : 'border-slate-200 bg-white hover:border-brand-blue-200'
+                    }`}
+                  >
+                    <summary className="flex items-center gap-4 p-4 sm:p-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                      {/* Module number badge */}
+                      <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-bold text-sm sm:text-base ${
+                        allDone
+                          ? 'bg-brand-green-100 text-brand-green-700'
+                          : 'bg-brand-blue-100 text-brand-blue-700'
                       }`}>
-                        {isCompleted ? (
-                          <span className="text-brand-green-600 font-bold text-sm">✓</span>
-                        ) : (
-                          <span className="font-bold text-brand-blue-600">
-                            {index + 1}
-                          </span>
-                        )}
+                        {allDone ? '✓' : mod.order_index}
                       </div>
-                      <div className="flex-1">
-                        <h3 className={`text-lg font-bold mb-1 ${isCompleted ? 'text-brand-green-700' : 'text-black'}`}>
-                          {lesson.title}
-                        </h3>
-                        {lesson.description && (
-                          <p className="text-slate-600 text-sm">{lesson.description}</p>
-                        )}
+
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-slate-900 text-sm sm:text-base">{mod.title}</h3>
+                        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                          {mod.lessons.length} lessons
+                          {isEnrolled && ` · ${mod.completedCount}/${mod.lessons.length} complete`}
+                        </p>
                       </div>
-                      <div className="flex-shrink-0">
-                        {isCompleted ? (
-                          <span className="text-xs font-semibold text-brand-green-600 bg-brand-green-50 px-2 py-1 rounded-full">Done</span>
-                        ) : (
-                          <Play className="w-5 h-5 text-brand-blue-500" />
-                        )}
-                      </div>
+
+                      {/* Progress ring for enrolled */}
+                      {isEnrolled && mod.lessons.length > 0 && (
+                        <div className="hidden sm:flex items-center gap-2">
+                          <div className="w-8 h-8 relative">
+                            <svg className="w-8 h-8 -rotate-90" viewBox="0 0 32 32">
+                              <circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" strokeWidth="3" className="text-slate-200" />
+                              <circle
+                                cx="16" cy="16" r="14" fill="none" stroke="currentColor" strokeWidth="3"
+                                className={allDone ? 'text-brand-green-500' : 'text-brand-blue-500'}
+                                strokeDasharray={`${(mod.completedCount / mod.lessons.length) * 88} 88`}
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+
+                      <ChevronDown className="w-5 h-5 text-slate-400 transition-transform group-open:rotate-180 flex-shrink-0" />
+                    </summary>
+
+                    {/* Module description */}
+                    {mod.description && (
+                      <p className="px-5 pb-2 text-sm text-slate-500 -mt-1">{mod.description}</p>
+                    )}
+
+                    {/* Lesson list */}
+                    <div className="px-3 pb-3 sm:px-4 sm:pb-4">
+                      {mod.lessons.map((lesson: any, idx: number) => {
+                        const isCompleted = completedLessonIds.has(lesson.id);
+                        const lessonHref = `/courses/${courseId}/lessons/${lesson.id}`;
+
+                        return (
+                          <Link
+                            key={lesson.id}
+                            href={lessonHref}
+                            className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                              isCompleted
+                                ? 'bg-brand-green-50 hover:bg-brand-green-100'
+                                : 'hover:bg-slate-50'
+                            }`}
+                          >
+                            <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                              isCompleted
+                                ? 'bg-brand-green-200 text-brand-green-700'
+                                : 'bg-slate-100 text-slate-500'
+                            }`}>
+                              {isCompleted ? '✓' : idx + 1}
+                            </div>
+                            <span className={`flex-1 text-sm font-medium truncate ${
+                              isCompleted ? 'text-brand-green-800' : 'text-slate-700'
+                            }`}>
+                              {lesson.title}
+                            </span>
+                            {lesson.duration_minutes && (
+                              <span className="text-xs text-slate-400 flex-shrink-0">
+                                {lesson.duration_minutes} min
+                              </span>
+                            )}
+                            {!isCompleted && (
+                              <Play className="w-4 h-4 text-brand-blue-400 flex-shrink-0" />
+                            )}
+                          </Link>
+                        );
+                      })}
                     </div>
-                  );
-
-                  const lessonHref = isEnrolled
-                    ? `/lms/courses/${courseId}/lessons/${lesson.id}`
-                    : `/courses/${courseId}/lessons/${lesson.id}`;
-
-                  return (
-                    <Link
-                      key={lesson.id}
-                      href={lessonHref}
-                      className={`block border-2 rounded-xl p-5 transition-colors ${
-                        isCompleted
-                          ? 'border-brand-green-200 bg-brand-green-50/30 hover:border-brand-green-300'
-                          : 'border-gray-200 bg-white hover:border-brand-blue-400 hover:shadow-sm'
-                      }`}
-                    >
-                      {lessonContent}
-                    </Link>
-                  );
-                })
-              ) : (
-                <p className="text-black">
-                  Course content is being prepared. Check back soon!
-                </p>
-              )}
+                  </details>
+                );
+              })}
             </div>
           </div>
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 sticky top-24">
-              <h3 className="text-2xl font-black text-black mb-6">
-                {isEnrolled ? 'Your Progress' : 'Course Details'}
+            <div className="bg-white border-2 border-slate-200 rounded-2xl p-6 sm:p-8 sticky top-24">
+              <h3 className="text-xl font-black text-slate-900 mb-6">
+                {isEnrolled ? 'Your Progress' : 'Program Details'}
               </h3>
 
               {isEnrolled && (
@@ -273,67 +398,74 @@ export default async function CourseDetailPage({
 
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-3">
-                  <Award className="h-8 w-8 text-brand-blue-600" />
+                  <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center">
+                    <Clock className="h-5 w-5 text-brand-blue-600" />
+                  </div>
                   <div>
-                    <div className="font-bold text-black">Certificate</div>
-                    <div className="text-sm text-slate-600">Upon completion</div>
+                    <div className="font-bold text-slate-900 text-sm">Duration</div>
+                    <div className="text-sm text-slate-500">15 weeks &middot; {course.duration_hours || 375} hours</div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <Clock className="h-8 w-8 text-brand-blue-600" />
+                  <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center">
+                    <BookOpen className="h-5 w-5 text-brand-blue-600" />
+                  </div>
                   <div>
-                    <div className="font-bold text-black">Duration</div>
-                    <div className="text-sm text-slate-600">
-                      {course.duration || 'Self-paced'}
-                    </div>
+                    <div className="font-bold text-slate-900 text-sm">Lessons</div>
+                    <div className="text-sm text-slate-500">{lessons?.length || 0} video lessons + quizzes</div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <BookOpen className="h-8 w-8 text-brand-blue-600" />
+                  <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center">
+                    <Award className="h-5 w-5 text-brand-blue-600" />
+                  </div>
                   <div>
-                    <div className="font-bold text-black">Lessons</div>
-                    <div className="text-sm text-slate-600">
-                      {lessons?.length || 0} lessons
-                    </div>
+                    <div className="font-bold text-slate-900 text-sm">Certifications</div>
+                    <div className="text-sm text-slate-500">EPA 608 Universal, OSHA 30, CPR</div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <Users className="h-8 w-8 text-brand-blue-600" />
+                  <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center">
+                    <Wrench className="h-5 w-5 text-brand-blue-600" />
+                  </div>
                   <div>
-                    <div className="font-bold text-black">Access</div>
-                    <div className="text-sm text-slate-600">Lifetime access</div>
+                    <div className="font-bold text-slate-900 text-sm">Hands-On</div>
+                    <div className="text-sm text-slate-500">Lab exercises + OJT internship</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center">
+                    <Users className="h-5 w-5 text-brand-blue-600" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-slate-900 text-sm">Access</div>
+                    <div className="text-sm text-slate-500">Lifetime access after enrollment</div>
                   </div>
                 </div>
               </div>
 
-              {isEnrolled ? (
-                <div className="space-y-3">
-                  {nextLesson && (
-                    <Link
-                      href={`/lms/courses/${courseId}/lessons/${nextLesson.id}`}
-                      className="block w-full text-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-6 py-4 rounded-xl font-bold transition-colors"
-                    >
-                      {completedLessonIds.size > 0 ? 'Continue Learning' : 'Start Course'}
-                    </Link>
-                  )}
+              <div className="space-y-3">
+                {firstLesson && (
+                  <Link
+                    href={`/courses/${courseId}/lessons/${(isEnrolled && nextLesson ? nextLesson : firstLesson).id}`}
+                    className="block w-full text-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-6 py-4 rounded-xl font-bold transition-colors"
+                  >
+                    {isEnrolled && completedLessonIds.size > 0 ? 'Continue Learning' : 'Start Course'}
+                  </Link>
+                )}
+                {isEnrolled && (
                   <Link
                     href="/lms/dashboard"
                     className="block w-full text-center border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-xl font-semibold hover:border-slate-400 transition-colors"
                   >
                     Back to Dashboard
                   </Link>
-                </div>
-              ) : (
-                <Link
-                  href={user ? `/courses/${courseId}/enroll` : `/login?next=/courses/${courseId}`}
-                  className="block w-full text-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-6 py-4 rounded-xl font-bold transition-colors"
-                >
-                  {user ? 'Enroll Now' : 'Sign In to Enroll'}
-                </Link>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -33,18 +33,30 @@ export async function GET(
     return NextResponse.json({ error: 'Course not found' }, { status: 404 });
   }
 
-  // Fetch lessons via admin client (bypasses RLS)
+  // Fetch published lessons via admin client (bypasses RLS)
   const { data: lessons, error: lessonsErr } = await supabase
     .from('lessons')
     .select('id, course_id, title, content, video_url, lesson_number, order_index, duration_minutes, is_required, is_published, content_type')
     .eq('course_id', courseId)
-    .order('order_index');
+    .eq('is_published', true)
+    .order('lesson_number');
 
   if (lessonsErr) {
     return NextResponse.json({ error: 'Failed to load lessons' }, { status: 500 });
   }
 
+  // Fetch course modules for week grouping
+  const { data: modules } = await supabase
+    .from('course_modules')
+    .select('id, title, description, order_index')
+    .eq('course_id', courseId)
+    .order('order_index');
+
   // Normalize course_name → title for frontend compatibility
   const normalizedCourse = { ...course, title: course.course_name };
-  return NextResponse.json({ course: normalizedCourse, lessons: lessons || [] });
+  return NextResponse.json({
+    course: normalizedCourse,
+    lessons: lessons || [],
+    modules: modules || [],
+  });
 }

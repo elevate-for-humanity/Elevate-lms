@@ -129,45 +129,33 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const openaiKey = process.env.OPENAI_API_KEY;
+  // Use the unified AI service (auto-selects Gemini or OpenAI)
+  let aiAvailable = false;
+  try {
+    const { isAIAvailable } = await import('@/lib/ai/ai-service');
+    aiAvailable = isAIAvailable();
+  } catch {}
 
-  if (!openaiKey) {
+  if (!aiAvailable) {
     const fallback = `The ${program.name} program is available at Elevate for Humanity. Apply at elevateforhumanity.org${program.applyUrl} or contact us for details.`;
-    await logRequest(fallback.length, 'no_api_key');
+    await logRequest(fallback.length, 'no_ai_provider');
     return NextResponse.json({ message: fallback, fallback: true }, { headers });
   }
 
   const systemPrompt = buildSystemPrompt(programSlug);
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${openaiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: message },
-        ],
-        temperature: 0.3,
-        max_tokens: MAX_OUTPUT_TOKENS,
-      }),
+    const { aiChat } = await import('@/lib/ai/ai-service');
+    const result = await aiChat({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message },
+      ],
+      temperature: 0.3,
+      maxTokens: MAX_OUTPUT_TOKENS,
     });
 
-    if (!response.ok) {
-      logger.error('OpenAI API error in public tutor', new Error(`Status ${response.status}`));
-      await logRequest(0, `openai_${response.status}`);
-      return NextResponse.json(
-        { message: `I'm having trouble right now. Apply directly at elevateforhumanity.org${program.applyUrl}`, fallback: true },
-        { headers }
-      );
-    }
-
-    const data = await response.json();
-    const answer = data.choices?.[0]?.message?.content
+    const answer = result.content
       || `I can help with ${program.name} questions. Please try rephrasing.`;
 
     await logRequest(answer.length, null);

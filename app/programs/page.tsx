@@ -250,7 +250,7 @@ export default async function ProgramsPage() {
                 slug: 'hvac-technician',
                 href: '/programs/hvac-technician',
                 programId: '#10004322',
-                duration: '20 weeks',
+                duration: '15 weeks',
                 cost: '$5,000',
                 credentials: [
                   { name: 'Residential HVAC Certification 1', partner: 'Industry Certification Body' },

@@ -28,7 +28,7 @@ export const PROGRAMS: ProgramEntry[] = [
   { slug: 'cpr-cert', name: 'CPR, AED & First Aid', category: 'Healthcare', formType: 'apply', active: true },
 
   // Skilled Trades
-  { slug: 'hvac-technician', name: 'HVAC Technician', category: 'Skilled Trades', formType: 'apply', active: true },
+  { slug: 'hvac-technician', name: 'HVAC Technician', category: 'Skilled Trades', formType: 'apply', active: true, dedicatedApplyPage: '/programs/hvac-technician/apply' },
   { slug: 'cdl-training', name: 'CDL (Commercial Driver License)', category: 'Skilled Trades', formType: 'apply', active: true },
   { slug: 'building-maintenance-wrg', name: 'Building Maintenance Technician', category: 'Skilled Trades', formType: 'apply', active: true },
 

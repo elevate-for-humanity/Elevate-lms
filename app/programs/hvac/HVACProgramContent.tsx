@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import {
   Clock, DollarSign, TrendingUp, ArrowRight,
   Award, Calendar, ChevronDown, ChevronUp,
@@ -23,7 +22,7 @@ export default function HVACProgramContent() {
     },
     {
       question: "How long is the program?",
-      answer: "400 hours total. That includes classroom instruction, self-paced online coursework, and hands-on lab time working with real HVAC equipment. Flexible scheduling is available — day and evening options."
+      answer: "15 weeks (approximately 375 hours total). That includes classroom instruction, self-paced online coursework, and hands-on lab time working with real HVAC equipment. Flexible scheduling is available — day and evening options."
     },
     {
       question: "How much does this program cost?",
@@ -31,7 +30,7 @@ export default function HVACProgramContent() {
     },
     {
       question: "What certifications do I get?",
-      answer: "You'll earn your EPA 608 Certification (required by federal law to purchase and handle all refrigerant types — the highest level covering all four categories), OSHA 30 Safety Certification, and a program completion certificate. The EPA 608 is what employers require."
+      answer: "You'll earn 6 industry-recognized credentials: Residential HVAC Certification 1 & 2, EPA 608 Universal Certification (required by federal law to handle refrigerants), OSHA 30 Safety Certification, CPR/First Aid, and Rise Up. The EPA 608 is what employers require."
     },
     {
       question: "What jobs can I get after this?",
@@ -43,7 +42,7 @@ export default function HVACProgramContent() {
     },
     {
       question: "What happens after I graduate?",
-      answer: "You'll have your EPA 608 and OSHA 30 certifications, a portfolio of documented job site hours, and connections to local HVAC employers. Our career services team helps with resume writing, interview prep, and direct introductions to hiring managers. Many graduates start working within weeks of completing the program."
+      answer: "You'll have all 6 industry credentials (EPA 608, OSHA 30, Residential HVAC Cert 1 & 2, CPR, and Rise Up), a portfolio of documented job site hours, and connections to local HVAC employers. Our career services team helps with resume writing, interview prep, and direct introductions to hiring managers. Many graduates start working within weeks of completing the program."
     }
   ];
 
@@ -60,13 +59,20 @@ export default function HVACProgramContent() {
         </div>
       </div>
 
-      {/* Video Hero Banner */}
-      <ProgramHeroBanner videoSrc="/videos/hvac-hero-final.mp4" voiceoverSrc="/audio/heroes/skilled-trades.mp3" />
+      {/* Hero */}
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        <Image
+          src="/images/trades/hero-program-hvac.jpg"
+          alt="HVAC technician working on a commercial heating and cooling unit"
+          fill
+          quality={90} className="object-cover"
+          priority
+        />
 
-      {/* Hero Content */}
-      <section className="bg-slate-900 py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="max-w-3xl">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
+
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-24 w-full">
+          <div className="max-w-2xl">
             <FundingBadge type="funded" />
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mt-6 mb-6 leading-tight">
@@ -75,50 +81,42 @@ export default function HVACProgramContent() {
             </h1>
 
             <p className="text-xl text-gray-200 mb-4 leading-relaxed">
-              400-hour program covering HVAC fundamentals, refrigerant handling, and hands-on
-              employer site experience. Graduate with your EPA 608 Certification,
-              OSHA 30, and the credentials employers require.
+              15-week program covering HVAC fundamentals, refrigerant handling, and hands-on
+              employer site experience. Graduate with 6 industry credentials including EPA 608,
+              OSHA 30, Residential HVAC Cert 1 &amp; 2, CPR, and Rise Up.
             </p>
 
             <p className="text-lg text-brand-green-300 font-semibold mb-8">
               Tuition may be covered through WIOA or Workforce Ready Grant for eligible students referred by WorkOne. Self-pay and payment plans also available.
             </p>
 
-            <div className="flex flex-wrap gap-3 mb-8 text-sm text-gray-300">
-              <span className="flex items-center gap-2 bg-brand-green-500/20 px-4 py-2 rounded-full text-brand-green-300 font-semibold border border-brand-green-400/30">
+            <div className="flex flex-wrap gap-4 mb-8 text-sm text-gray-300">
+              <span className="flex items-center gap-2 bg-brand-green-500/20 backdrop-blur px-4 py-2 rounded-full text-brand-green-300 font-semibold border border-brand-green-400/30">
                 <Award className="w-4 h-4" /> EPA 608 Certification
               </span>
-              <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
-                <Clock className="w-4 h-4" /> 400 Hours
+              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
+                <Clock className="w-4 h-4" /> 20 Weeks
               </span>
-              <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
                 <Calendar className="w-4 h-4" /> Flexible Scheduling
               </span>
-              <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
                 <TrendingUp className="w-4 h-4" /> 4-Star Indiana Top Job
               </span>
-              <span className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
                 <DollarSign className="w-4 h-4" /> $48K Avg Starting Salary
               </span>
             </div>
 
-            <div className="flex flex-wrap gap-4 mb-6">
-              <Link
-                href="/apply?program=hvac-technician"
-                className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
-              >
-                Apply
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-              <Link
-                href="/programs/hvac-technician/apply"
-                className="inline-flex items-center justify-center px-8 py-4 bg-brand-green-600 hover:bg-brand-green-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
-              >
-                Enroll in Program
-              </Link>
-            </div>
+            <Link
+              href="/apply?program=hvac-technician"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-500 text-white font-bold rounded-full transition-all shadow-lg text-lg mb-4"
+            >
+              Apply
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Link>
 
-            <div className="bg-yellow-500/20 border border-yellow-400/40 rounded-lg px-4 py-3 max-w-xl">
+            <div className="bg-yellow-500/20 border border-yellow-400/40 rounded-lg px-4 py-3 max-w-xl mb-4">
               <p className="text-sm text-yellow-100 font-semibold">
                 Do not proceed with enrollment until you have completed WorkOne verification.{' '}
                 <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="text-white underline hover:text-yellow-200">
@@ -126,8 +124,23 @@ export default function HVACProgramContent() {
                 </a>
               </p>
             </div>
+
+            <Link
+              href="/programs/hvac-technician/apply"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-green-600 hover:bg-brand-green-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
+            >
+              Enroll in Program
+            </Link>
+
+            <Link
+              href="/programs/hvac-technician/course"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full transition-all border border-white/30 text-lg"
+            >
+              Preview Full Course
+            </Link>
           </div>
         </div>
+
       </section>
 
       {/* Program at a Glance — timeline, duration, pacing for case managers */}
@@ -144,7 +157,7 @@ export default function HVACProgramContent() {
             <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 text-center">
               <Clock className="w-6 h-6 text-brand-blue-600 mx-auto mb-2" />
               <p className="text-sm text-gray-500 uppercase font-semibold mb-1">Duration</p>
-              <p className="text-lg font-bold text-gray-900">15–20 Weeks</p>
+              <p className="text-lg font-bold text-gray-900">15 Weeks</p>
               <p className="text-xs text-gray-500 mt-1">Standard track · 400 total hours</p>
             </div>
             <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 text-center">
@@ -165,7 +178,7 @@ export default function HVACProgramContent() {
             <h3 className="font-bold text-brand-blue-900 mb-3">Scheduling &amp; Completion Timeline</h3>
             <div className="grid sm:grid-cols-2 gap-6 text-sm text-brand-blue-800">
               <div>
-                <p className="font-semibold mb-1">Standard Track (15–20 weeks)</p>
+                <p className="font-semibold mb-1">Standard Track (15 weeks)</p>
                 <ul className="space-y-1 text-brand-blue-700">
                   <li>• Day and evening options available</li>
                   <li>• Designed for working adults</li>
@@ -213,7 +226,7 @@ export default function HVACProgramContent() {
                 />
               </div>
               <div className="p-6">
-                <div className="text-3xl font-bold text-brand-blue-600 mb-1">72 Hours</div>
+                <div className="text-3xl font-bold text-brand-blue-600 mb-1">120 Hours</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Classroom Instruction</h3>
                 <p className="text-gray-600">
                   Instructor-led classes covering HVAC theory, electrical fundamentals,
@@ -232,7 +245,7 @@ export default function HVACProgramContent() {
                 />
               </div>
               <div className="p-6">
-                <div className="text-3xl font-bold text-yellow-600 mb-1">292 Hours</div>
+                <div className="text-3xl font-bold text-yellow-600 mb-1">240 Hours</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Hands-On Lab</h3>
                 <p className="text-gray-600">
                   Work with real HVAC equipment — furnaces, condensers, refrigerant systems,
@@ -252,7 +265,7 @@ export default function HVACProgramContent() {
                 />
               </div>
               <div className="p-6">
-                <div className="text-3xl font-bold text-brand-green-600 mb-1">36 Hours</div>
+                <div className="text-3xl font-bold text-brand-green-600 mb-1">40 Hours</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Online Coursework</h3>
                 <p className="text-gray-600">
                   Self-paced modules with quizzes and progress tracking. Complete on your
@@ -370,10 +383,10 @@ export default function HVACProgramContent() {
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Industry Certification Included
+              6 Industry Credentials Included
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              This is not just a class — it is a full certification pathway. You graduate with the credentials HVAC employers require, including proctored exam access through an approved testing partner.
+              This is not just a class — it is a full certification pathway. You graduate with 6 industry-recognized credentials that HVAC employers require, including proctored exam access through approved testing partners.
             </p>
           </div>
 
@@ -414,12 +427,33 @@ export default function HVACProgramContent() {
             </div>
           </div>
 
-          {/* OSHA 30 + Program Certificate */}
-          <div className="grid md:grid-cols-2 gap-8">
+          {/* Remaining 5 credentials */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-              <div className="relative h-48">
-                <Image src="/images/trades/program-construction-training.jpg" alt="OSHA 30 safety certification training" fill quality={90} className="object-cover" />
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Award className="w-5 h-5 text-brand-blue-600" />
+                  <h3 className="text-lg font-bold text-gray-900">Residential HVAC Cert 1</h3>
+                </div>
+                <p className="text-gray-600 text-sm">
+                  Industry-recognized certification covering residential heating and cooling system installation, maintenance, and service fundamentals.
+                </p>
               </div>
+            </div>
+
+            <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Award className="w-5 h-5 text-brand-blue-600" />
+                  <h3 className="text-lg font-bold text-gray-900">Residential HVAC Cert 2</h3>
+                </div>
+                <p className="text-gray-600 text-sm">
+                  Advanced certification in refrigeration diagnostics, system troubleshooting, and repair procedures for residential HVAC equipment.
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
                   <Shield className="w-5 h-5 text-yellow-600" />
@@ -433,17 +467,25 @@ export default function HVACProgramContent() {
             </div>
 
             <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-              <div className="relative h-48">
-                <Image src="/images/trades/program-building-technology.jpg" alt="Program completion certificate and training portfolio" fill quality={90} className="object-cover" />
-              </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
-                  <GraduationCap className="w-5 h-5 text-brand-green-600" />
-                  <h3 className="text-lg font-bold text-gray-900">Program Certificate</h3>
+                  <Shield className="w-5 h-5 text-brand-red-500" />
+                  <h3 className="text-lg font-bold text-gray-900">CPR / First Aid</h3>
                 </div>
                 <p className="text-gray-600 text-sm">
-                  Documents your 400 hours of instruction, employer site visits, and exam preparation.
-                  Includes your apprenticeship application portfolio with documented OJT hours.
+                  Emergency response certification. Required on many job sites and by most HVAC employers for field technicians.
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Briefcase className="w-5 h-5 text-indigo-600" />
+                  <h3 className="text-lg font-bold text-gray-900">Rise Up</h3>
+                </div>
+                <p className="text-gray-600 text-sm">
+                  Workplace readiness certification covering professional conduct, communication, teamwork, and career success skills.
                 </p>
               </div>
             </div>
@@ -529,7 +571,7 @@ export default function HVACProgramContent() {
                   </div>
                   <div className="flex justify-between border-t border-slate-200 pt-2 mt-2">
                     <span className="font-semibold">Total program hours</span>
-                    <span className="font-bold text-gray-900">400 hours</span>
+                    <span className="font-bold text-gray-900">375 hours</span>
                   </div>
                 </div>
                 <p className="text-xs text-gray-500 mt-3">
@@ -547,7 +589,7 @@ export default function HVACProgramContent() {
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-white mb-3">Enroll in HVAC Technician Training</h2>
             <p className="text-slate-300 text-lg max-w-2xl mx-auto">
-              20 weeks, 6 credentials, hands-on training. Tuition: $5,000 — or free through workforce funding.
+              15 weeks, 6 credentials, hands-on training. Tuition: $5,000 — or free through workforce funding.
             </p>
           </div>
 
@@ -667,14 +709,14 @@ export default function HVACProgramContent() {
           {/* Track options */}
           <div className="mt-6 grid sm:grid-cols-2 gap-4">
             <div className="bg-white rounded-xl border border-slate-200 p-5">
-              <h3 className="font-bold text-gray-900 mb-1">Standard Track — 15 Weeks</h3>
+              <h3 className="font-bold text-gray-900 mb-1">Standard EPA 608 Track — 15 Weeks</h3>
               <p className="text-sm text-gray-600">
-                Flexible scheduling with day and evening options. Designed for working adults. Covers all material at a steady pace with time for review between sessions.
+                EPA 608 certification prep within the 15-week program. Flexible scheduling with day and evening options. Covers all material at a steady pace with time for review between sessions.
               </p>
             </div>
             <div className="bg-white rounded-xl border-2 border-brand-red-200 p-5">
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-bold text-gray-900">Accelerated Track — 6 Weeks</h3>
+                <h3 className="font-bold text-gray-900">Accelerated EPA 608 Track — 6 Weeks</h3>
                 <span className="text-xs font-bold bg-brand-red-100 text-brand-red-700 px-2 py-0.5 rounded-full">Workforce Cohorts</span>
               </div>
               <p className="text-sm text-gray-600">

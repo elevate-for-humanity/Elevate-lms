@@ -5,8 +5,7 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Proxies Supabase storage media through the same origin.
- * Needed because some preview environments (Gitpod) block cross-origin media loads.
- * In production on Netlify, the direct Supabase URLs work fine.
+ * Supports Range requests for video seeking.
  */
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.searchParams.get('url');
@@ -25,16 +24,31 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
   }
 
-  const upstream = await fetch(url);
-  if (!upstream.ok) {
+  // Forward Range header for video seeking
+  const reqHeaders: HeadersInit = {};
+  const rangeHeader = request.headers.get('Range');
+  if (rangeHeader) {
+    reqHeaders['Range'] = rangeHeader;
+  }
+
+  const upstream = await fetch(url, { headers: reqHeaders });
+  if (!upstream.ok && upstream.status !== 206) {
     return new NextResponse('Upstream error', { status: upstream.status });
   }
 
   const headers = new Headers();
   headers.set('Content-Type', upstream.headers.get('Content-Type') || 'video/mp4');
-  headers.set('Content-Length', upstream.headers.get('Content-Length') || '');
+  if (upstream.headers.get('Content-Length')) {
+    headers.set('Content-Length', upstream.headers.get('Content-Length')!);
+  }
+  if (upstream.headers.get('Content-Range')) {
+    headers.set('Content-Range', upstream.headers.get('Content-Range')!);
+  }
   headers.set('Accept-Ranges', 'bytes');
   headers.set('Cache-Control', 'public, max-age=86400');
 
-  return new NextResponse(upstream.body, { status: 200, headers });
+  return new NextResponse(upstream.body, {
+    status: upstream.status,
+    headers,
+  });
 }

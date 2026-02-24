@@ -1,116 +1,204 @@
 "use client";
 
 import * as React from "react";
-import { Play, Pause, Volume2, BookOpen, RotateCcw } from "lucide-react";
+import {
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  RotateCcw,
+  Maximize2,
+  Minimize2,
+  BookOpen,
+  SkipForward,
+  SkipBack,
+} from "lucide-react";
 
 interface LessonPlayerProps {
   videoUrl: string;
   lessonTitle: string;
   moduleTitle?: string;
   transcript?: string | null;
+  lessonContent?: string | null;
+  lessonNumber?: number;
+  totalLessons?: number;
+  durationMinutes?: number;
   onProgress?: (percent: number) => void;
   onComplete?: () => void;
 }
 
-/**
- * Audio-first lesson player for AI-generated narrated lessons.
- * Uses <audio> instead of <video> — no black frame is possible.
- */
 export default function LessonPlayer({
   videoUrl,
   lessonTitle,
   moduleTitle,
-  transcript,
+  lessonNumber,
+  totalLessons,
+  durationMinutes,
   onProgress,
   onComplete,
 }: LessonPlayerProps) {
-  // Use <video> as the playback engine because the MP4 container
-  // (content-type video/mp4) is rejected by <audio> in most browsers.
-  // The element is hidden — all visuals come from the branded UI below.
-  const audioRef = React.useRef<HTMLVideoElement | null>(null);
+  const videoRef = React.useRef<HTMLVideoElement | null>(null);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [hasStarted, setHasStarted] = React.useState(false);
   const [currentTime, setCurrentTime] = React.useState(0);
   const [duration, setDuration] = React.useState(0);
   const [ended, setEnded] = React.useState(false);
+  const [muted, setMuted] = React.useState(false);
+  const [isFullscreen, setIsFullscreen] = React.useState(false);
+  const [showControls, setShowControls] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [hasError, setHasError] = React.useState(false);
+  const hideControlsTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Use direct Supabase URL — CSP media-src allows it, CORS is open
+  const mediaSrc = videoUrl;
+
+  // Detect mobile for adaptive preload strategy
+  const isMobile = React.useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+  }, []);
+
+  // Video event listeners
   React.useEffect(() => {
-    const a = audioRef.current;
-    if (!a) return;
+    const v = videoRef.current;
+    if (!v) return;
 
-    a.volume = 1;
-
-    const onPlay = () => {
-      setIsPlaying(true);
-      setHasStarted(true);
-    };
+    const onPlay = () => { setIsPlaying(true); setHasStarted(true); setIsLoading(false); };
     const onPause = () => setIsPlaying(false);
-    const onEnded = () => {
-      setIsPlaying(false);
-      setEnded(true);
-      onComplete?.();
-    };
+    const onEnded = () => { setIsPlaying(false); setEnded(true); onComplete?.(); };
     const onTimeUpdate = () => {
-      setCurrentTime(a.currentTime);
-      if (a.duration && onProgress) {
-        onProgress((a.currentTime / a.duration) * 100);
-      }
+      setCurrentTime(v.currentTime);
+      if (v.duration && onProgress) onProgress((v.currentTime / v.duration) * 100);
     };
     const onLoaded = () => {
-      if (a.duration && !isNaN(a.duration)) setDuration(a.duration);
+      if (v.duration && !isNaN(v.duration)) setDuration(v.duration);
+      setIsLoading(false);
     };
+    const onWaiting = () => setIsLoading(true);
+    const onCanPlay = () => setIsLoading(false);
+    const onPlaying = () => setIsLoading(false);
+    const onStalled = () => setIsLoading(true);
+    const onError = () => { setIsLoading(false); setHasError(true); };
 
-    a.addEventListener("play", onPlay);
-    a.addEventListener("pause", onPause);
-    a.addEventListener("ended", onEnded);
-    a.addEventListener("timeupdate", onTimeUpdate);
-    a.addEventListener("loadedmetadata", onLoaded);
+    v.addEventListener("play", onPlay);
+    v.addEventListener("pause", onPause);
+    v.addEventListener("ended", onEnded);
+    v.addEventListener("timeupdate", onTimeUpdate);
+    v.addEventListener("loadedmetadata", onLoaded);
+    v.addEventListener("waiting", onWaiting);
+    v.addEventListener("canplay", onCanPlay);
+    v.addEventListener("playing", onPlaying);
+    v.addEventListener("stalled", onStalled);
+    v.addEventListener("error", onError);
 
     return () => {
-      a.removeEventListener("play", onPlay);
-      a.removeEventListener("pause", onPause);
-      a.removeEventListener("ended", onEnded);
-      a.removeEventListener("timeupdate", onTimeUpdate);
-      a.removeEventListener("loadedmetadata", onLoaded);
+      v.removeEventListener("play", onPlay);
+      v.removeEventListener("pause", onPause);
+      v.removeEventListener("ended", onEnded);
+      v.removeEventListener("timeupdate", onTimeUpdate);
+      v.removeEventListener("loadedmetadata", onLoaded);
+      v.removeEventListener("waiting", onWaiting);
+      v.removeEventListener("canplay", onCanPlay);
+      v.removeEventListener("playing", onPlaying);
+      v.removeEventListener("stalled", onStalled);
+      v.removeEventListener("error", onError);
     };
   }, [onComplete, onProgress]);
 
+  // Fullscreen listener
+  React.useEffect(() => {
+    const onChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  // Auto-hide controls after 3s of no mouse movement during playback
+  const resetControlsTimer = React.useCallback(() => {
+    setShowControls(true);
+    if (hideControlsTimer.current) clearTimeout(hideControlsTimer.current);
+    if (isPlaying) {
+      hideControlsTimer.current = setTimeout(() => setShowControls(false), 3000);
+    }
+  }, [isPlaying]);
+
+  React.useEffect(() => {
+    if (!isPlaying) setShowControls(true);
+    else resetControlsTimer();
+    return () => { if (hideControlsTimer.current) clearTimeout(hideControlsTimer.current); };
+  }, [isPlaying, resetControlsTimer]);
+
   const play = async () => {
-    const a = audioRef.current;
-    if (!a) return;
+    const v = videoRef.current;
+    if (!v) return;
+    setIsLoading(true);
+    setHasStarted(true);
     try {
-      a.volume = 1;
-      await a.play();
+      await v.play();
     } catch (e) {
-      console.error("LessonPlayer play() blocked:", e);
+      // Autoplay blocked — user will need to tap again
+      setIsPlaying(false);
+      setIsLoading(false);
     }
   };
 
   const togglePlay = async () => {
-    const a = audioRef.current;
-    if (!a) return;
-    if (a.paused) {
-      await play();
-    } else {
-      a.pause();
-    }
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) await play();
+    else v.pause();
   };
 
   const restart = async () => {
-    const a = audioRef.current;
-    if (!a) return;
-    a.currentTime = 0;
+    const v = videoRef.current;
+    if (!v) return;
+    v.currentTime = 0;
     setEnded(false);
     await play();
   };
 
-  const seek = (e: React.MouseEvent<HTMLDivElement>) => {
-    const a = audioRef.current;
-    if (!a || !duration) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    a.currentTime = pct * duration;
+  const toggleMute = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !muted;
+    setMuted(!muted);
   };
+
+  const toggleFullscreen = async () => {
+    const el = containerRef.current;
+    if (!el) return;
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    } else {
+      await el.requestFullscreen();
+    }
+  };
+
+  const skip = (seconds: number) => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.currentTime = Math.max(0, Math.min(v.duration || 0, v.currentTime + seconds));
+  };
+
+  const seekFromEvent = (
+    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
+    target: HTMLDivElement,
+  ) => {
+    const v = videoRef.current;
+    if (!v || !duration) return;
+    const rect = target.getBoundingClientRect();
+    const clientX =
+      "touches" in e ? e.touches[0]?.clientX ?? e.changedTouches[0]?.clientX ?? 0 : e.clientX;
+    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    v.currentTime = pct * duration;
+  };
+
+  const seek = (e: React.MouseEvent<HTMLDivElement>) => seekFromEvent(e, e.currentTarget);
+  const [isSeeking, setIsSeeking] = React.useState(false);
+  const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => { setIsSeeking(true); seekFromEvent(e, e.currentTarget); };
+  const onTouchMove = (e: React.TouchEvent<HTMLDivElement>) => { if (isSeeking) seekFromEvent(e, e.currentTarget); };
+  const onTouchEnd = () => setIsSeeking(false);
 
   const fmt = (s: number) => {
     const m = Math.floor(s / 60);
@@ -120,162 +208,219 @@ export default function LessonPlayer({
 
   const progressPct = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-  // Proxy Supabase URLs through same-origin to avoid cross-origin media blocks
-  // in preview environments (Gitpod). Direct URLs work fine on Netlify production.
-  const mediaSrc = React.useMemo(() => {
-    if (videoUrl && videoUrl.includes('supabase.co/storage/')) {
-      return `/api/media-proxy?url=${encodeURIComponent(videoUrl)}`;
-    }
-    return videoUrl;
-  }, [videoUrl]);
+  // Keyboard shortcuts
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      switch (e.key) {
+        case " ":
+        case "k":
+          e.preventDefault();
+          togglePlay();
+          break;
+        case "m":
+          toggleMute();
+          break;
+        case "f":
+          toggleFullscreen();
+          break;
+        case "ArrowLeft":
+          skip(-10);
+          break;
+        case "ArrowRight":
+          skip(10);
+          break;
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  });
 
   return (
-    <div className="w-full">
-      {/* Video element as audio engine — MP4 container requires <video>.
-          Rendered at 0x0 with opacity-0 so browsers still load the media. */}
-      <video
-        ref={audioRef}
-        src={mediaSrc}
-        preload="auto"
-        playsInline
-        style={{ width: 0, height: 0, opacity: 0, position: "absolute", pointerEvents: "none" }}
-      />
+    <div ref={containerRef} className="w-full" onMouseMove={resetControlsTimer}>
+      {/* Video container with 16:9 aspect ratio */}
+      <div className="relative overflow-hidden rounded-2xl bg-black shadow-2xl">
+        <div className="relative aspect-video">
+          {/* Actual video element — metadata-only preload for fast initial render */}
+          <video
+            ref={videoRef}
+            preload="metadata"
+            playsInline
+            className="absolute inset-0 h-full w-full object-contain bg-black"
+            onClick={togglePlay}
+          >
+            <source src={mediaSrc} type="video/mp4" />
+          </video>
 
-      {/* Player card */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 shadow-xl">
-        <div className="px-6 py-10 sm:px-10 sm:py-14">
-          <div className="mx-auto max-w-lg text-center">
-            {/* Icon */}
-            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-brand-blue-600/20">
-              <BookOpen className="h-8 w-8 text-brand-blue-400" />
+          {/* Loading / buffering indicator */}
+          {isLoading && hasStarted && !ended && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 pointer-events-none">
+              <div className="h-10 w-10 sm:h-12 sm:w-12 animate-spin rounded-full border-4 border-white/30 border-t-white" />
+              <p className="mt-3 text-xs text-white/60 sm:text-sm">Buffering...</p>
             </div>
+          )}
 
-            {/* Module label */}
-            {moduleTitle && (
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                {moduleTitle}
-              </p>
-            )}
-
-            {/* Lesson title */}
-            <h2 className="mt-2 text-xl font-bold text-white sm:text-2xl">
-              {lessonTitle}
-            </h2>
-
-            {/* Status text */}
-            <p className="mt-2 text-sm text-slate-400">
-              {!hasStarted
-                ? "Narrated lesson \u2014 click play to begin"
-                : ended
-                  ? "Lesson complete"
-                  : isPlaying
-                    ? "Playing..."
-                    : "Paused"}
-            </p>
-
-            {/* Audio visualizer bars */}
-            {hasStarted && (
-              <div className="mt-5 flex items-end justify-center gap-1">
-                {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-                  <div
-                    key={i}
-                    className="w-1 rounded-full bg-brand-blue-500 transition-all duration-150"
-                    style={{
-                      height: isPlaying
-                        ? `${8 + ((Math.sin(Date.now() / 200 + i * 0.8) + 1) / 2) * 20}px`
-                        : "4px",
-                    }}
-                  />
-                ))}
+          {/* Error state */}
+          {hasError && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900">
+              <div className="mb-4 rounded-full bg-red-500/20 p-4">
+                <svg className="h-8 w-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
               </div>
-            )}
-
-            {/* Play / Pause / Restart button */}
-            <div className="mt-6">
-              {ended ? (
-                <button
-                  type="button"
-                  onClick={restart}
-                  className="inline-flex items-center gap-2 rounded-full bg-brand-blue-600 px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-blue-700"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  Replay Lesson
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={togglePlay}
-                  className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-blue-600 text-white shadow-lg transition hover:bg-brand-blue-700 hover:shadow-xl"
-                  aria-label={isPlaying ? "Pause" : "Play"}
-                >
-                  {isPlaying ? (
-                    <Pause className="h-6 w-6" />
-                  ) : (
-                    <Play className="h-6 w-6 ml-0.5" />
-                  )}
-                </button>
-              )}
+              <p className="text-sm text-white/70">Video could not be loaded</p>
+              <button
+                type="button"
+                onClick={() => { setHasError(false); videoRef.current?.load(); }}
+                className="mt-3 rounded-lg bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/20"
+              >
+                Retry
+              </button>
             </div>
+          )}
 
-            {/* Progress bar + time */}
-            {(hasStarted || duration > 0) && (
-              <div className="mt-6">
-                <div
-                  className="mx-auto h-2 max-w-md cursor-pointer overflow-hidden rounded-full bg-slate-700"
-                  onClick={seek}
-                  role="progressbar"
-                  aria-valuenow={Math.round(progressPct)}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                >
+          {/* Pre-start overlay */}
+          {!hasStarted && !hasError && (
+            <div
+              className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 cursor-pointer"
+              onClick={play}
+            >
+              {/* Top bar */}
+              <div className="absolute left-0 right-0 top-0 flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-white/10 backdrop-blur-sm sm:h-8 sm:w-8">
+                    <BookOpen className="h-3.5 w-3.5 text-white sm:h-4 sm:w-4" />
+                  </div>
+                  <div>
+                    {moduleTitle && (
+                      <p className="text-[10px] font-medium uppercase tracking-wider text-white/50 sm:text-xs">
+                        {moduleTitle}
+                      </p>
+                    )}
+                    <p className="text-xs font-medium text-white/70 sm:text-sm">
+                      {lessonNumber && totalLessons ? `Lesson ${lessonNumber} of ${totalLessons}` : "Lesson"}
+                    </p>
+                  </div>
+                </div>
+                {durationMinutes && (
+                  <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-medium text-white/60 backdrop-blur-sm sm:text-xs">
+                    {durationMinutes} min
+                  </span>
+                )}
+              </div>
+
+              <h2 className="mb-3 max-w-lg text-center text-xl font-bold text-white sm:text-3xl md:text-4xl px-4">
+                {lessonTitle}
+              </h2>
+              {moduleTitle && (
+                <p className="mb-8 text-sm text-white/50 sm:text-base">{moduleTitle}</p>
+              )}
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); play(); }}
+                className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-blue-600 text-white shadow-lg shadow-brand-blue-600/30 transition hover:scale-105 hover:bg-brand-blue-500 hover:shadow-xl sm:h-20 sm:w-20"
+                aria-label="Play video"
+              >
+                <Play className="ml-1 h-7 w-7 sm:h-8 sm:w-8" />
+              </button>
+              <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-white/40 sm:text-sm">
+                <Volume2 className="h-3.5 w-3.5" />
+                Make sure your volume is on
+              </p>
+            </div>
+          )}
+
+          {/* End card overlay */}
+          {ended && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80">
+              <div className="mb-4 text-5xl text-brand-green-400">&#10003;</div>
+              <h2 className="mb-2 text-2xl font-bold text-white sm:text-3xl">Lesson Complete</h2>
+              <p className="mb-6 text-sm text-white/50">{lessonTitle}</p>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); restart(); }}
+                className="inline-flex items-center gap-2 rounded-full bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Replay
+              </button>
+            </div>
+          )}
+
+          {/* Controls overlay — shown on hover/tap */}
+          {hasStarted && !ended && (
+            <div
+              className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-3 pb-2 pt-10 transition-opacity duration-300 sm:px-5 sm:pb-3 ${
+                showControls ? "opacity-100" : "opacity-0 pointer-events-none"
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Progress bar */}
+              <div
+                className="group mb-2 flex cursor-pointer items-center py-1"
+                onClick={seek}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+                role="slider"
+                aria-valuenow={Math.round(progressPct)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Video progress"
+                tabIndex={0}
+              >
+                <div className="h-1 w-full overflow-hidden rounded-full bg-white/20 transition-all group-hover:h-1.5">
                   <div
-                    className="h-full rounded-full bg-brand-blue-500 transition-all duration-200"
+                    className="h-full rounded-full bg-brand-blue-500 transition-all duration-150"
                     style={{ width: `${progressPct}%` }}
                   />
                 </div>
-                <div className="mt-2 flex justify-between text-xs text-slate-500">
-                  <span>{fmt(currentTime)}</span>
-                  <span>{duration > 0 ? fmt(duration) : "--:--"}</span>
+              </div>
+
+              {/* Controls row */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1 sm:gap-3">
+                  {/* Play/Pause */}
+                  <button type="button" onClick={ended ? restart : togglePlay} className="rounded-full p-1.5 text-white/80 transition hover:bg-white/10 hover:text-white" aria-label={isPlaying ? "Pause" : "Play"}>
+                    {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="ml-0.5 h-5 w-5" />}
+                  </button>
+
+                  {/* Skip back 10s */}
+                  <button type="button" onClick={() => skip(-10)} className="hidden rounded-full p-1.5 text-white/60 transition hover:bg-white/10 hover:text-white sm:block" aria-label="Back 10 seconds">
+                    <SkipBack className="h-4 w-4" />
+                  </button>
+
+                  {/* Skip forward 10s */}
+                  <button type="button" onClick={() => skip(10)} className="hidden rounded-full p-1.5 text-white/60 transition hover:bg-white/10 hover:text-white sm:block" aria-label="Forward 10 seconds">
+                    <SkipForward className="h-4 w-4" />
+                  </button>
+
+                  {/* Mute */}
+                  <button type="button" onClick={toggleMute} className="rounded-full p-1.5 text-white/60 transition hover:bg-white/10 hover:text-white" aria-label={muted ? "Unmute" : "Mute"}>
+                    {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                  </button>
+
+                  {/* Time */}
+                  <span className="ml-1 text-xs tabular-nums text-white/50">
+                    {fmt(currentTime)} / {duration > 0 ? fmt(duration) : "--:--"}
+                  </span>
+                </div>
+
+                {/* Right side */}
+                <div className="flex items-center gap-1">
+                  {lessonNumber && totalLessons && (
+                    <span className="mr-2 hidden text-xs text-white/40 sm:inline">
+                      Lesson {lessonNumber}/{totalLessons}
+                    </span>
+                  )}
+                  <button type="button" onClick={toggleFullscreen} className="rounded-full p-1.5 text-white/60 transition hover:bg-white/10 hover:text-white" aria-label="Fullscreen">
+                    {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
-            )}
-
-            {/* Volume hint */}
-            {!hasStarted && (
-              <p className="mt-4 flex items-center justify-center gap-1 text-xs text-slate-500">
-                <Volume2 className="h-3 w-3" />
-                Make sure your volume is on
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Info panel */}
-      <div className="mt-4 rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-          {lessonTitle}
-        </h3>
-        {moduleTitle && (
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Module: {moduleTitle}
-          </p>
-        )}
-        <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
-          This lesson uses audio narration to guide you through the material.
-          The screen displays lesson information while the audio plays.
-        </p>
-
-        {transcript && (
-          <details className="mt-4">
-            <summary className="cursor-pointer text-sm font-semibold text-brand-blue-600 dark:text-brand-blue-400">
-              View lesson transcript
-            </summary>
-            <div className="mt-2 whitespace-pre-wrap text-sm text-slate-600 dark:text-slate-300">
-              {transcript}
             </div>
-          </details>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

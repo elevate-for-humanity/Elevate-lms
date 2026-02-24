@@ -325,7 +325,7 @@ async function insertApplication(payload: {
         `<p>Questions? Reply to this email or call us at (317) 314-3757.</p>`,
         `<p>— Elevate for Humanity</p>`,
       ].join(''),
-    ).catch(() => {});
+    ).catch((err) => { logger.error('[Apply] Student confirmation email failed:', err instanceof Error ? err.message : err); });
 
     // Admin notification — student will auto-enroll after onboarding + doc verification
     await sendEmailDirect(
@@ -346,7 +346,7 @@ async function insertApplication(payload: {
         supabase ? `<p><a href="${siteUrl}/admin/applications/review/${referenceNumber}" style="display:inline-block;padding:10px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;margin:8px 0">Review & Approve</a></p>` : '',
         supabase ? `<p><a href="${siteUrl}/admin/applications">View All Applications</a></p>` : '',
       ].filter(Boolean).join(''),
-    ).catch(() => {});
+    ).catch((err) => { logger.error('[Apply] Admin notification email failed:', err instanceof Error ? err.message : err); });
   }
 
   // Path A: DB available — insert application, admin enrolls later

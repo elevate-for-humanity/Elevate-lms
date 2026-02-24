@@ -1,6 +1,4 @@
 "use client";
-import { createAdminClient } from '@/lib/supabase/admin';
-export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';

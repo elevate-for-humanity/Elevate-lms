@@ -24,7 +24,7 @@ import {
 } from '@/lib/pricing';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 600;
 
 export const metadata: Metadata = {
   title: 'License the Elevate LMS + Workforce Hub | Elevate for Humanity',

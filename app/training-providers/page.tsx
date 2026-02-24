@@ -4,8 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Phone, ArrowRight } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/training-providers',

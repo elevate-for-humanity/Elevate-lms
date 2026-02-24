@@ -8,7 +8,7 @@ import { SocialShare } from '@/components/blog/SocialShare';
 import { ArrowLeft, Calendar, User, Clock, Tag } from 'lucide-react';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 600;
 
 type Params = Promise<{ slug: string }>;
 

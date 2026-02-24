@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 import { notFound } from 'next/navigation';

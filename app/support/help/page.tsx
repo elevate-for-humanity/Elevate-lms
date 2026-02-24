@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 600;
 
 const categories = [
   { name: 'Enrollment', slug: 'Enrollment', color: 'bg-brand-blue-100 text-brand-blue-600' },

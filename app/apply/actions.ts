@@ -66,15 +66,19 @@ async function createStudentAccount(
   firstName: string,
   lastName: string,
   programInterest: string,
-): Promise<{ userId?: string; accountCreated: boolean; magicLink?: string | null; generatedPassword?: string; programId?: string | null }> {
+  userPassword?: string,
+): Promise<{ userId?: string; accountCreated: boolean; magicLink?: string | null; programId?: string | null }> {
   try {
     const normalizedEmail = email.toLowerCase().trim();
     let userId: string | null = null;
 
-    // Always generate credentials so the student gets them in the email
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-    const randomPart = Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-    const generatedPassword = `Efh-${randomPart}!`;
+    // Use the password the student provided on the application form.
+    // Fall back to a generated password only if none was provided (e.g. admin-initiated enrollment).
+    const password = userPassword || (() => {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+      const randomPart = Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+      return `Efh-${randomPart}!`;
+    })();
 
     // Check profiles first
     const { data: existingProfile } = await supabase
@@ -85,13 +89,13 @@ async function createStudentAccount(
 
     if (existingProfile?.id) {
       userId = existingProfile.id;
-      // Reset password to the new generated one so credentials in the email are valid
-      await supabase.auth.admin.updateUserById(userId, { password: generatedPassword });
+      // Update password to the one the student provided
+      await supabase.auth.admin.updateUserById(userId, { password });
     } else {
-      // Create new auth user with generated credentials
+      // Create new auth user with student-provided password
       const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
         email: normalizedEmail,
-        password: generatedPassword,
+        password,
         email_confirm: true,
         user_metadata: {
           full_name: `${firstName} ${lastName}`,
@@ -119,8 +123,8 @@ async function createStudentAccount(
           const found = batch.users.find((u: any) => u.email?.toLowerCase() === normalizedEmail);
           if (found) {
             userId = found.id;
-            // Reset password so credentials in the email are valid
-            await supabase.auth.admin.updateUserById(userId, { password: generatedPassword });
+            // Update password to the one the student provided
+            await supabase.auth.admin.updateUserById(userId, { password });
             await supabase.from('profiles').upsert({
               id: userId,
               email: normalizedEmail,
@@ -137,7 +141,7 @@ async function createStudentAccount(
 
     if (!userId) {
       logger.error('Account creation failed — could not create user', { email: normalizedEmail });
-      return { accountCreated: false, generatedPassword };
+      return { accountCreated: false };
     }
 
     // Resolve course ID for tracking
@@ -177,7 +181,7 @@ async function createStudentAccount(
     }
 
     logger.info('Student account created — awaiting onboarding completion for enrollment', { applicationId, userId, email: normalizedEmail, programId });
-    return { userId, accountCreated: true, magicLink, generatedPassword, programId };
+    return { userId, accountCreated: true, magicLink, programId };
   } catch (err) {
     logger.error('Account creation failed', err as Error);
     return { accountCreated: false };
@@ -203,6 +207,7 @@ export interface BaseApplicationData {
 
 export interface StudentApplicationData extends BaseApplicationData {
   role: 'student';
+  password: string;
   dateOfBirth?: string;
   address?: string;
   city?: string;
@@ -259,12 +264,13 @@ async function insertApplication(payload: {
   lastName: string;
   email: string;
   phone: string;
+  password?: string;
   city: string;
   zip: string;
   programInterest: string;
   supportNotes: string;
   source: string;
-}): Promise<{ success: true; applicationId: string; referenceNumber: string } | { success: false; error: string }> {
+}): Promise<{ success: true; applicationId: string; referenceNumber: string; email?: string } | { success: false; error: string }> {
   const supabase = createAdminClient();
   const referenceNumber = generateReferenceNumber();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
@@ -272,7 +278,7 @@ async function insertApplication(payload: {
 
   // Auto-enrollment: insert application, create account, enroll in courses, send onboarding email.
 
-  async function sendEnrollmentEmails(magicLink?: string | null, generatedPassword?: string) {
+  async function sendEnrollmentEmails(magicLink?: string | null) {
     const onboardingUrl = `${siteUrl}/onboarding/learner`;
     const ctaLink = magicLink || `${siteUrl}/login`;
     const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
@@ -315,17 +321,15 @@ async function insertApplication(payload: {
     const etplList = etplPrograms.map(p => `<li style="padding:1px 0">${p}</li>`).join('');
     const waitlistList = waitlistPrograms.map(p => `<li style="padding:1px 0">${p}</li>`).join('');
 
-    // Credentials section
-    const credentialsBlock = generatedPassword
-      ? [
-          `<table style="width:100%;border-collapse:collapse;margin:20px 0;border:1px solid #e0e0e0">`,
-          `<tr style="background:#f9f9f9"><td colspan="2" style="padding:12px 16px;font-weight:bold;font-size:14px;border-bottom:1px solid #e0e0e0">Your Login</td></tr>`,
-          `<tr><td style="padding:10px 16px;color:#666;width:80px;border-bottom:1px solid #f0f0f0">Email</td><td style="padding:10px 16px;border-bottom:1px solid #f0f0f0">${payload.email}</td></tr>`,
-          `<tr><td style="padding:10px 16px;color:#666">Password</td><td style="padding:10px 16px;font-family:Consolas,monospace;font-size:15px;letter-spacing:0.5px">${generatedPassword}</td></tr>`,
-          `</table>`,
-          `<p style="margin:0 0 20px;font-size:13px;color:#888;font-family:Arial,sans-serif">If the password doesn't work when pasted, please type it out manually. You can change it anytime at <a href="${siteUrl}/reset-password" style="color:#888">${siteUrl}/reset-password</a></p>`,
-        ].join('')
-      : '';
+    // Login reminder — no password in email, student set it on the form
+    const credentialsBlock = [
+      `<table style="width:100%;border-collapse:collapse;margin:20px 0;border:1px solid #e0e0e0">`,
+      `<tr style="background:#f9f9f9"><td colspan="2" style="padding:12px 16px;font-weight:bold;font-size:14px;border-bottom:1px solid #e0e0e0">Your Login</td></tr>`,
+      `<tr><td style="padding:10px 16px;color:#666;width:80px;border-bottom:1px solid #f0f0f0">Email</td><td style="padding:10px 16px;border-bottom:1px solid #f0f0f0">${payload.email}</td></tr>`,
+      `<tr><td style="padding:10px 16px;color:#666">Password</td><td style="padding:10px 16px">The password you created on the application form</td></tr>`,
+      `</table>`,
+      `<p style="margin:0 0 20px;font-size:13px;color:#888;font-family:Arial,sans-serif">Forgot your password? Reset it anytime at <a href="${siteUrl}/reset-password" style="color:#888">${siteUrl}/reset-password</a></p>`,
+    ].join('');
 
     await sendEmailDirect(
       payload.email,
@@ -337,7 +341,7 @@ async function insertApplication(payload: {
 
         `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">Thank you for your interest in <strong>${programLabel}</strong> at Elevate for Humanity. We received your inquiry and we'd love to help you take the next step.</p>`,
 
-        `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">We've created an account for you so you can get started right away. Below you'll find your login information, details about funding, and how to connect with our team.</p>`,
+        `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">We've created your account. You can log in using the email and password you provided on the application form. Below you'll find details about funding and how to connect with our team.</p>`,
 
         // Credentials
         credentialsBlock,
@@ -481,6 +485,7 @@ async function insertApplication(payload: {
           payload.firstName,
           payload.lastName,
           payload.programInterest,
+          payload.password,
         );
 
         // Create program_enrollments row — links student to their program
@@ -507,9 +512,9 @@ async function insertApplication(payload: {
             });
         }
 
-        await sendEnrollmentEmails(accountResult.magicLink, accountResult.generatedPassword);
+        await sendEnrollmentEmails(accountResult.magicLink);
         revalidatePath('/admin/applications');
-        return { success: true, applicationId: data.id, referenceNumber, generatedPassword: accountResult.generatedPassword, email: payload.email };
+        return { success: true, applicationId: data.id, referenceNumber, email: payload.email };
       }
     } catch (error) {
       logger.error(`[Application] DB error for ${payload.email}`, error as Error);
@@ -532,6 +537,7 @@ export async function submitStudentApplication(data: StudentApplicationData) {
     lastName: data.lastName,
     email: data.email,
     phone: data.phone,
+    password: data.password,
     city: data.city || 'Not provided',
     zip: data.zipCode || '00000',
     programInterest: data.programInterest || 'Not specified',
@@ -551,7 +557,6 @@ export async function submitStudentApplication(data: StudentApplicationData) {
       success: true,
       applicationId: result.applicationId,
       referenceNumber: result.referenceNumber,
-      generatedPassword: result.generatedPassword,
       email: result.email || data.email,
     };
   }

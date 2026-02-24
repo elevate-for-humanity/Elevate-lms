@@ -11,7 +11,6 @@ const programGroups = getActiveProgramsByCategory();
 
 interface SuccessData {
   email: string;
-  password: string;
   referenceNumber: string;
 }
 
@@ -27,9 +26,9 @@ function SuccessPanel({ data }: { data: SuccessData }) {
         <p className="text-lg text-gray-700">Check your email to get started.</p>
       </div>
       <p className="text-gray-600 max-w-md mx-auto mb-6">
-        We sent an email to <strong>{data.email}</strong> with your login credentials
-        and a link to begin onboarding. Follow the instructions in the email to complete
-        your enrollment.
+        We sent a confirmation email to <strong>{data.email}</strong> with
+        instructions to begin onboarding. You can log in using the email and
+        password you provided on this form.
       </p>
       <p className="text-sm text-gray-500 mb-6">
         Don&apos;t see it? Check your spam folder or contact us at{' '}
@@ -57,11 +56,26 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
 
     const formData = new FormData(e.currentTarget);
 
+    const password = formData.get('password') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+
+    if (!password || password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      setLoading(false);
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      setLoading(false);
+      return;
+    }
+
     const data = {
       firstName: formData.get('firstName') as string,
       lastName: formData.get('lastName') as string,
       email: formData.get('email') as string,
       phone: formData.get('phone') as string,
+      password,
       dateOfBirth: formData.get('dateOfBirth') as string,
       address: formData.get('address') as string,
       city: formData.get('city') as string,
@@ -82,7 +96,6 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
         trackEvent('application_complete', 'conversion', data.programInterest);
         setSuccessData({
           email: result.email || data.email,
-          password: result.generatedPassword || '',
           referenceNumber: result.referenceNumber || '',
         });
       } else {
@@ -179,6 +192,41 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
               id="phone"
               name="phone"
               required
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-black mb-2"
+            >
+              Create Password *
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              minLength={8}
+              placeholder="At least 8 characters"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="confirmPassword"
+              className="block text-sm font-medium text-black mb-2"
+            >
+              Confirm Password *
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              required
+              minLength={8}
               className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             />
           </div>

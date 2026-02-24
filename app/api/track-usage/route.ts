@@ -134,7 +134,7 @@ async function sendAlertEmail(data: {
   `;
 
   const result = await sendEmail({
-    to: 'elevate4humanityedu@gmail.com',
+    to: 'info@elevateforhumanity.org',
     subject: `ALERT: Unauthorized site copy detected on ${data.domain}`,
     html,
   });
@@ -290,7 +290,7 @@ CONTACT INFORMATION:
 Elevate for Humanity Career & Technical Institute
 8888 Keystone Crossing Suite 1300
 Indianapolis, IN 46240
-Email: elevate4humanityedu@gmail.com
+Email: info@elevateforhumanity.org
 Phone: (317) 314-3757
 Website: https://www.elevateforhumanity.org
 
@@ -330,7 +330,7 @@ Elevate for Humanity Career & Technical Institute
 
   // Always send a copy to yourself with the DMCA notice + who to contact
   await sendEmail({
-    to: 'elevate4humanityedu@gmail.com',
+    to: 'info@elevateforhumanity.org',
     subject: `DMCA Takedown ${abuseEmail ? 'SENT' : 'MANUAL ACTION NEEDED'}: ${data.domain}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

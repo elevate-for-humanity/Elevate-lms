@@ -96,7 +96,7 @@ export async function POST(req: Request) {
 
         await resend.emails.send({
           from: 'Elevate for Humanity <noreply@elevateforhumanity.org>',
-          to: 'elevate4humanityedu@gmail.com',
+          to: 'info@elevateforhumanity.org',
           subject: `Meeting Request from ${data.name}`,
           html: `
             <h2>New Meeting Request</h2>

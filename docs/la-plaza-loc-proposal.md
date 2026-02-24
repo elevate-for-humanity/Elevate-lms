@@ -296,5 +296,5 @@ All exam fees are included in program pricing. Participants are scheduled for ex
 Elizabeth Greene, CEO
 Elevate for Humanity
 317-314-3757 | 317-760-7908
-elevate4humanityedu@gmail.com
+info@elevateforhumanity.org
 www.elevateforhumanity.org

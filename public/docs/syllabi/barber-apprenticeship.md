@@ -260,7 +260,7 @@ To obtain Indiana barber license, graduates must:
 
 **Elevate for Humanity**  
 Website: www.elevateforhumanity.org  
-Email: elevate4humanityedu@gmail.com  
+Email: info@elevateforhumanity.org  
 Phone: (317) 314-3757
 
 **Indiana State Board of Barber Examiners:**  

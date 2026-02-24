@@ -247,7 +247,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
           try {
             const { sendEmail } = await import('@/lib/email/resend');
             await sendEmail({
-              to: 'elevate4humanityedu@gmail.com',
+              to: 'info@elevateforhumanity.org',
               subject: `New Barber Apprentice - ${customerName || customerEmail}`,
               html: `
 <p>New barber apprentice enrolled:</p>
@@ -425,7 +425,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
             // Also send internal notification
             try {
               await sendEmail({
-                to: process.env.REPLY_TO_EMAIL || 'elevate4humanityedu@gmail.com',
+                to: process.env.REPLY_TO_EMAIL || 'info@elevateforhumanity.org',
                 subject: `New Barber Enrollment: ${customerName || customerEmail}`,
                 html: `
                   <h2>New Barber Apprenticeship Enrollment</h2>

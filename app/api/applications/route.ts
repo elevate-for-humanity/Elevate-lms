@@ -350,7 +350,7 @@ export async function POST(req: Request) {
 
       // Notification email to staff
       const staffEmailResult = await sendEmail({
-        to: 'elevate4humanityedu@gmail.com',
+        to: 'info@elevateforhumanity.org',
         subject: `New Application [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${body.program}`,
         html: `
           <h2>New Application Received</h2>

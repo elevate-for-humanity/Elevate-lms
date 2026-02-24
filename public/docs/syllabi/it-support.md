@@ -221,7 +221,7 @@ After CompTIA A+, students can pursue:
 
 **Elevate for Humanity**  
 Website: www.elevateforhumanity.org  
-Email: elevate4humanityedu@gmail.com  
+Email: info@elevateforhumanity.org  
 Phone: (317) 314-3757
 
 **Indiana DWD/WorkOne Funding:**  

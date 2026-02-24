@@ -66,7 +66,7 @@ describe('GovernmentPage', () => {
 
     it('should have valid contact information format', () => {
       const phone = '(317) 314-3757';
-      const email = 'elevate4humanityedu@gmail.com';
+      const email = 'info@elevateforhumanity.org';
       
       // Phone format validation
       expect(phone).toMatch(/\(\d{3}\)\s\d{3}-\d{4}/);

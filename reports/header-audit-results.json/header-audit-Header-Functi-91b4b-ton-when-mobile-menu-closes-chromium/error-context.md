@@ -35,8 +35,8 @@
             - text: Go Home
         - generic [ref=e35]:
           - paragraph [ref=e36]: "If this problem persists, please contact support:"
-          - link "elevate4humanityedu@gmail.com" [ref=e37] [cursor=pointer]:
-            - /url: mailto:elevate4humanityedu@gmail.com
+          - link "info@elevateforhumanity.org" [ref=e37] [cursor=pointer]:
+            - /url: mailto:info@elevateforhumanity.org
     - generic [ref=e40]:
       - generic [ref=e42]:
         - button [ref=e44] [cursor=pointer]:

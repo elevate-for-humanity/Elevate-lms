@@ -296,7 +296,7 @@ export default function FAQPage() {
         <div className="text-sm text-gray-600">(317) 314-3757</div>
       </Link>
       <Link
-        href="mailto:elevate4humanityedu@gmail.com"
+        href="mailto:info@elevateforhumanity.org"
         className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition border-2 border-gray-200 hover:border-blue-600"
       >
         <Mail className="w-10 h-10 text-blue-600 mx-auto mb-4" />

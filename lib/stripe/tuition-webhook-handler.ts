@@ -261,7 +261,7 @@ async function sendAdminEnrollmentNotification(
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) return;
 
-  const adminEmail = process.env.ADMIN_EMAIL || 'elevate4humanityedu@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL || 'info@elevateforhumanity.org';
   const resend = new Resend(resendKey);
 
   try {

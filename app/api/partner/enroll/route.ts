@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
     // Get partner course details
     const { data: partnerCourse, error: courseError } = await db
-      .from('partner_courses')
+      .from('partner_lms_courses')
       .select(`
         *,
         provider:partner_lms_providers(*)

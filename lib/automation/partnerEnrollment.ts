@@ -66,7 +66,7 @@ export async function autoEnrollPartnerCourse(
 
     // 3) Load partner course metadata
     const { data: course, error: courseError } = await supabase
-      .from('partner_courses')
+      .from('partner_lms_courses')
       .select('*')
       .eq('id', payload.courseId)
       .maybeSingle();

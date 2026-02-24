@@ -39,7 +39,7 @@ export default async function PartnerCoursesPage() {
 
   // Fetch all partner courses
   const { data: courses, count } = await db
-    .from('partner_courses')
+    .from('partner_lms_courses')
     .select('*, partner_lms_providers(provider_name, provider_type)', {
       count: 'exact',
     })

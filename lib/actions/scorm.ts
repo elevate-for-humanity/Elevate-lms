@@ -112,7 +112,7 @@ export async function enrollInPartnerCourse(data: {
 
   // Get partner course details
   const { data: partnerCourse, error: courseError } = await supabase
-    .from('partner_courses')
+    .from('partner_lms_courses')
     .select(`
       *,
       provider:partner_lms_providers(*)

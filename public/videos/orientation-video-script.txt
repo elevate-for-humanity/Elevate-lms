@@ -1,101 +1,168 @@
 STUDENT ORIENTATION VIDEO SCRIPT — Elevate for Humanity
 ========================================================
 
-Duration: 3-4 minutes
+Duration: 8-10 minutes
 Tone: Warm, welcoming, professional, encouraging
 Target: New students beginning their training journey
+Avatar: Orientation Guide (public/videos/avatars/orientation-guide.mp4)
 
 ========================================================
-FULL SCRIPT WITH SCENE DIRECTIONS
+FULL SCRIPT
 ========================================================
 
-[Scene 1 – Welcome / Founder or Staff Speaking to Camera]
+[Scene 1 – Welcome]
 Welcome to Elevate for Humanity.
 
-If you're watching this, you've already taken the most important step—you decided to invest in yourself. That takes courage, and we're honored to be part of your journey.
+If you're watching this, you've already taken the most important step — you decided to invest in yourself. That takes courage, and we're honored to be part of your journey.
 
-[Scene 2 – Campus/Training Facility B-Roll]
-At Elevate for Humanity, we do things differently. We believe that your zip code, your past, or your bank account should never determine your future. That's why our programs are designed to remove every barrier between you and a real career.
+I'm going to walk you through everything you need to know before your training begins. This video covers your program structure, your rights and responsibilities, important policies, and how to get help. Please watch the entire video — you'll need to acknowledge that you've reviewed this material to complete your onboarding.
 
-[Scene 3 – Students in Classroom + Online Learning]
-Here's what you need to know about how our programs work:
+[Scene 2 – About Elevate for Humanity]
+At Elevate for Humanity, we believe that your zip code, your past, or your bank account should never determine your future. We are a workforce development training provider registered on Indiana's INTraining system under provider 2Exclusive LLC-S. Our programs are approved by the Indiana Department of Workforce Development and the U.S. Department of Labor.
 
-First, your training is funded. Through partnerships with WIOA, the Workforce Ready Grant, JRI, and registered apprenticeships, most students pay nothing out of pocket. No loans. No debt. Just opportunity.
+We offer career training in healthcare, skilled trades, technology, barbering, business, and public safety. Every program is designed to get you job-ready with industry-recognized credentials.
 
-[Scene 4 – Hybrid Learning Demonstration]
-Second, we meet you where you are. Our hybrid learning model means you can complete coursework online, attend hands-on labs in person, and move at a pace that fits your life. Whether you're a parent, working full-time, or starting fresh—we built this for you.
+[Scene 3 – How Your Training Is Funded]
+Let's talk about how your training is paid for.
 
-[Scene 5 – Hands-On Training / Lab Work]
-Third, you'll learn by doing. Every program includes real, hands-on training. You won't just read about skills—you'll practice them until they become second nature. Our instructors are industry professionals who've done the work and want to help you succeed.
+Most of our students pay nothing out of pocket. Through partnerships with WIOA — the Workforce Innovation and Opportunity Act — the Workforce Ready Grant, the Justice Reinvestment Initiative, and registered apprenticeships, your tuition, books, and supplies may be fully covered.
 
-[Scene 6 – Career Services / Job Placement]
-Fourth, we don't stop at graduation. Our career services team will help you build your resume, prepare for interviews, and connect with employers who are actively hiring. Many of our graduates have job offers before they even finish their program.
+If you're using WIOA funding, you must be registered at Indiana Career Connect — that's indianacareerconnect.com. Your WorkOne case manager will confirm your eligibility. If you haven't done this yet, please do it as soon as possible. It's required.
 
-[Scene 7 – Student Success Stories / Testimonials]
-You're joining a community of people who decided to change their lives. People who started exactly where you are right now. And they made it. You will too.
+For students who don't qualify for grant funding, we offer self-pay options including payment plans and Buy Now, Pay Later through Klarna, Afterpay, Sezzle, Affirm, or Zip. Our team will work with you to find the best option.
 
-[Scene 8 – Expectations and Commitment]
-Now, here's what we expect from you:
+[Scene 4 – Program Structure]
+Here's how our programs are structured.
 
-Show up. Whether it's online or in person, attendance matters. Your instructors are here to help, but they can't help if you're not present.
+Every program has two parts: Related Technical Instruction, which we call RTI, and On-the-Job Training, which we call OJT.
 
-Ask questions. There are no dumb questions here. If you're confused, speak up. That's how you learn.
+RTI is your classroom learning. It's delivered online through our Learning Management System — the Elevate LMS. You'll log in, complete lessons, watch videos, take quizzes, and submit assignments. Your progress is tracked automatically.
 
-Stay committed. Some days will be hard. Some lessons will challenge you. But every successful graduate will tell you—it's worth it.
+OJT is your hands-on training. This happens at employer partner sites where you'll practice real skills under supervision. Your OJT hours are logged and verified by your site supervisor.
 
-[Scene 9 – Support Resources]
-If you ever feel stuck, reach out. Your student advisor is here to help with scheduling, funding questions, or anything else. Our support team is available through the student portal, by email, or by phone.
+Program lengths vary. Some certifications like CPR and First Aid are one day. Others like HVAC Technician are 20 weeks. Barber Apprenticeship is 15 months. Your specific program timeline was shared with you during enrollment.
 
-You are not alone in this.
+[Scene 5 – Using the LMS]
+Let me walk you through the Elevate LMS — this is where you'll spend most of your time.
 
-[Scene 10 – Final Message / Call to Action]
+After completing onboarding, you'll access your student dashboard at elevateforhumanity.org/lms/dashboard. From there you can see your enrolled courses, track your progress, view upcoming assignments, and access your grades.
+
+Each course is organized into modules and lessons. Complete them in order. Some lessons include videos, some include readings, and some include hands-on activities. At the end of each module, you'll take a quiz or assessment.
+
+A minimum passing score of 70% is required on all assessments. If you don't pass, you can review the material and retake the assessment. Your instructor is available to help.
+
+All quiz and assessment scores are tracked in the LMS. Certification exams are proctored — that means no unauthorized materials, no phones, and no outside help during exams.
+
+[Scene 6 – Credentials]
+When you complete your program, you'll earn industry-recognized credentials. These aren't just certificates from us — they're issued by national certifying bodies.
+
+For example, OSHA certifications are issued by OSHA and CareerSafe. CPR certifications come from the American Heart Association or American Red Cross. EPA 608 certification is issued by the EPA. Barber licenses are issued by the Indiana Professional Licensing Agency.
+
+These credentials are what employers look for. They prove you have the skills to do the job.
+
+[Scene 7 – Attendance Policy]
+Now let's talk about attendance. This is important.
+
+You must maintain a minimum 80% attendance rate. Attendance is tracked daily — both for online RTI sessions and in-person OJT.
+
+If you're going to be absent, you must notify your instructor within 24 hours. Three unexcused absences may result in academic probation. Two consecutive unexcused absences will trigger an intervention meeting with your advisor.
+
+If you miss class, make-up work must be completed within one week.
+
+Chronic tardiness counts too — three or more late arrivals per month counts as an unexcused absence.
+
+We understand that life happens. If you're dealing with transportation issues, childcare, health problems, or anything else, talk to your case manager. We have supportive services that can help. But you have to communicate with us.
+
+[Scene 8 – Code of Conduct and Dress Code]
+As a student at Elevate for Humanity, you are expected to maintain professional conduct at all times — in class, online, and at employer partner sites.
+
+This means treating instructors, staff, and fellow students with respect. It means completing your own work — plagiarism or cheating results in disciplinary action. It means following all safety protocols, especially in lab and OJT environments.
+
+Dress code: Professional attire is required during clinical and practical sessions. Closed-toe shoes are required in all lab environments. Your program may have additional dress code requirements — check with your instructor.
+
+Drug and alcohol policy: You must be free from the influence of drugs and alcohol during all training activities. Some employer partners require drug screening and background checks. Failure to pass may affect your placement.
+
+[Scene 9 – Your Rights]
+You have rights as a student, and we take them seriously.
+
+You have the right to a safe, respectful learning environment free from discrimination and harassment. You have the right to access your educational records under FERPA — the Family Educational Rights and Privacy Act. You have the right to reasonable accommodations if you have a documented disability. You have the right to file a grievance if you believe you've been treated unfairly.
+
+Your FERPA rights mean that your educational records are private. We will not share your grades, attendance, or personal information with anyone without your written consent — except as required by law or by your funding agency.
+
+During onboarding, you'll be asked to sign a FERPA consent form. This authorizes us to share your progress with your funding source — like WorkOne or your employer sponsor. You can revoke this consent at any time.
+
+[Scene 10 – Your Responsibilities]
+Along with your rights come responsibilities.
+
+You are responsible for attending all scheduled sessions and completing all assignments on time. You are responsible for maintaining academic integrity — all work must be your own. You are responsible for following all safety protocols and the student code of conduct. You are responsible for communicating with your instructor and advisor if you're struggling.
+
+You are also responsible for keeping your contact information up to date in your student profile. If your phone number, email, or address changes, update it immediately.
+
+[Scene 11 – Required Agreements and Documents]
+As part of your onboarding, you'll need to complete several important steps.
+
+First, you'll sign your Enrollment Agreement. This outlines the terms of your enrollment, your program details, and your financial obligations.
+
+Second, you'll sign a Participation Agreement. This confirms that you understand and agree to follow program policies.
+
+Third, you'll sign a FERPA Consent form, which I mentioned earlier.
+
+Fourth, you'll acknowledge the Student Handbook. This means you've read and understand our policies on attendance, conduct, dress code, safety, and grievance procedures.
+
+Fifth, you'll upload required documents. This typically includes a government-issued photo ID, proof of Social Security number, and proof of Indiana residency. Some programs may require additional documents.
+
+Sixth, you'll verify your identity by uploading a photo of your ID and a selfie.
+
+All of these steps are available in your onboarding checklist. Complete them in order, and you'll be automatically enrolled in your program.
+
+[Scene 12 – Grievance Procedures]
+If you ever have a concern or complaint, we have a formal grievance process.
+
+Step one: Talk to your instructor or advisor. Most issues can be resolved informally.
+
+Step two: If the issue isn't resolved, submit a written grievance through the student portal or by emailing info@elevateforhumanity.org.
+
+Step three: The program director will review your grievance and respond within five business days.
+
+Step four: If you're not satisfied with the response, you can appeal to the executive director.
+
+We take every grievance seriously. You will not face retaliation for filing a complaint.
+
+[Scene 13 – Support Services]
+You are not alone in this journey. We have support services available to help you succeed.
+
+Career services: Resume writing, interview preparation, and direct connections to 50+ employer partners. Available during and after your program.
+
+Case management: Your case manager can help with transportation assistance, childcare referrals, work clothing, and other supportive services.
+
+Tutoring: Additional instruction is available upon request. If you're struggling with course material, ask your instructor.
+
+Technical support: If you're having trouble with the LMS, email, or your account, contact our support team through the student portal or call (317) 314-3757.
+
+[Scene 14 – Career Services]
+We don't stop at graduation. Our career services team works with you throughout your program and after you complete it.
+
+We'll help you build a professional resume that highlights your new credentials. We'll do mock interviews so you're prepared and confident. And we'll connect you directly with employers who are actively hiring in your field.
+
+Many of our graduates receive job offers before they even finish their program. That's because our employer partners trust the quality of our training.
+
+[Scene 15 – What Happens Next]
+Here's what happens after you finish this orientation.
+
+Go back to your onboarding checklist. Complete any remaining steps — your profile, identity verification, documents, agreements, handbook acknowledgment, funding confirmation, and schedule selection.
+
+Once all steps are complete, you'll be automatically enrolled in your program. Your courses will appear in your student dashboard, and you can begin your training immediately.
+
+Your first day of class will be confirmed by your advisor. You'll receive an email with your schedule, your instructor's contact information, and any materials you need to bring.
+
+[Scene 16 – Closing]
 This is your moment. Not tomorrow. Not someday. Right now.
 
-You have everything you need to succeed. The training is here. The support is here. The opportunity is here.
+You have everything you need to succeed. The training is here. The funding is here. The support is here. The employers are waiting.
 
 All that's left is you showing up and doing the work.
 
-Welcome to Elevate for Humanity. Let's build your future together.
-
-========================================================
-VOICEOVER ONLY VERSION (No scene directions)
-========================================================
-
-Welcome to Elevate for Humanity.
-
-If you're watching this, you've already taken the most important step—you decided to invest in yourself. That takes courage, and we're honored to be part of your journey.
-
-At Elevate for Humanity, we do things differently. We believe that your zip code, your past, or your bank account should never determine your future. That's why our programs are designed to remove every barrier between you and a real career.
-
-Here's what you need to know about how our programs work:
-
-First, your training is funded. Through partnerships with WIOA, the Workforce Ready Grant, JRI, and registered apprenticeships, most students pay nothing out of pocket. No loans. No debt. Just opportunity.
-
-Second, we meet you where you are. Our hybrid learning model means you can complete coursework online, attend hands-on labs in person, and move at a pace that fits your life. Whether you're a parent, working full-time, or starting fresh—we built this for you.
-
-Third, you'll learn by doing. Every program includes real, hands-on training. You won't just read about skills—you'll practice them until they become second nature. Our instructors are industry professionals who've done the work and want to help you succeed.
-
-Fourth, we don't stop at graduation. Our career services team will help you build your resume, prepare for interviews, and connect with employers who are actively hiring. Many of our graduates have job offers before they even finish their program.
-
-You're joining a community of people who decided to change their lives. People who started exactly where you are right now. And they made it. You will too.
-
-Now, here's what we expect from you:
-
-Show up. Whether it's online or in person, attendance matters. Your instructors are here to help, but they can't help if you're not present.
-
-Ask questions. There are no dumb questions here. If you're confused, speak up. That's how you learn.
-
-Stay committed. Some days will be hard. Some lessons will challenge you. But every successful graduate will tell you—it's worth it.
-
-If you ever feel stuck, reach out. Your student advisor is here to help with scheduling, funding questions, or anything else. Our support team is available through the student portal, by email, or by phone.
-
-You are not alone in this.
-
-This is your moment. Not tomorrow. Not someday. Right now.
-
-You have everything you need to succeed. The training is here. The support is here. The opportunity is here.
-
-All that's left is you showing up and doing the work.
+I believe in you. Your instructors believe in you. And every graduate who came before you is proof that this works.
 
 Welcome to Elevate for Humanity. Let's build your future together.
 
@@ -103,22 +170,24 @@ Welcome to Elevate for Humanity. Let's build your future together.
 PRODUCTION NOTES
 ========================================================
 
-Recommended Voice: Warm, professional female or male voice
+Voice: Warm, professional
 Pacing: Moderate, with pauses between sections
+Duration: 8-10 minutes
 Background Music: Soft, inspiring instrumental (low volume)
-Video Style: Mix of talking head, B-roll footage, student testimonials
 
-Suggested Stock Footage:
-- Diverse students in classroom settings
-- Hands-on training (healthcare, trades, beauty)
-- Computer/online learning
-- Graduation ceremonies
-- Job interviews / workplace scenes
-- Indianapolis cityscape
+Section Timing:
+- Welcome: 0:00 - 0:45
+- About Elevate: 0:45 - 1:30
+- Funding: 1:30 - 2:30
+- Program Structure (RTI/OJT): 2:30 - 3:30
+- LMS Walkthrough: 3:30 - 4:30
+- Credentials: 4:30 - 5:00
+- Attendance: 5:00 - 5:45
+- Conduct & Dress Code: 5:45 - 6:30
+- Rights (FERPA): 6:30 - 7:15
+- Responsibilities & Agreements: 7:15 - 8:00
+- Grievance: 8:00 - 8:30
+- Support & Career Services: 8:30 - 9:15
+- Next Steps & Closing: 9:15 - 10:00
 
-Tools for Production:
-- Voiceover: ElevenLabs, Murf.ai, WellSaid Labs, or professional talent
-- Stock Video: Pexels, Artlist, Storyblocks
-- Editing: DaVinci Resolve, Adobe Premiere, CapCut
-
-========================================================
+Avatar: orientation-guide (public/videos/avatars/orientation-guide.mp4)

@@ -298,10 +298,29 @@ async function insertApplication(payload: {
       : '';
 
     // Student: application received — complete onboarding
+    const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
+    const emailHeader = [
+      `<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#333">`,
+      `<div style="text-align:center;padding:24px 0;border-bottom:2px solid #2563eb">`,
+      `<img src="${logoUrl}" alt="Elevate for Humanity" width="180" style="max-width:180px;height:auto" />`,
+      `</div>`,
+      `<div style="padding:24px">`,
+    ].join('');
+    const emailFooter = [
+      `<hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0">`,
+      `<div style="text-align:center;font-size:12px;color:#94a3b8;padding:16px 0">`,
+      `<p style="margin:0 0 4px">Elevate for Humanity Career & Technical Institute</p>`,
+      `<p style="margin:0 0 4px">8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</p>`,
+      `<p style="margin:0"><a href="${siteUrl}" style="color:#2563eb">www.elevateforhumanity.org</a> | (317) 314-3757</p>`,
+      `</div>`,
+      `</div></div>`,
+    ].join('');
+
     await sendEmailDirect(
       payload.email,
       `Welcome to Elevate! Your Login Credentials & Onboarding Link [${referenceNumber}]`,
       [
+        emailHeader,
         `<h2 style="color:#111827">Hi ${payload.firstName},</h2>`,
         `<p>Thank you for applying to <strong>${programLabel}</strong> at Elevate for Humanity. Your account has been created and is ready to go.</p>`,
         credentialsBlock,
@@ -328,7 +347,7 @@ async function insertApplication(payload: {
         `<p style="font-size:13px;color:#64748b">Onboarding page: <a href="${onboardingUrl}">${onboardingUrl}</a></p>`,
         `<p style="font-size:13px;color:#64748b">If you're applying for WIOA funding, register at <a href="https://indianacareerconnect.com">indianacareerconnect.com</a> — this is required for eligibility.</p>`,
         `<p>Questions? Reply to this email or call us at (317) 314-3757.</p>`,
-        `<p>— Elevate for Humanity</p>`,
+        emailFooter,
       ].join(''),
     ).catch((err) => { logger.error('[Apply] Student confirmation email failed:', err instanceof Error ? err.message : err); });
 
@@ -337,6 +356,7 @@ async function insertApplication(payload: {
       ADMIN_EMAIL,
       `[NEW APPLICATION] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`,
       [
+        emailHeader,
         `<h3>New ${payload.source.replace(/-/g, ' ')}</h3>`,
         `<p style="color:#b45309"><strong>Status: PENDING — student completing onboarding, documents need verification</strong></p>`,
         `<table style="border-collapse:collapse;width:100%;max-width:500px">`,
@@ -350,6 +370,7 @@ async function insertApplication(payload: {
         `</table>`,
         supabase ? `<p><a href="${siteUrl}/admin/applications/review/${referenceNumber}" style="display:inline-block;padding:10px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;margin:8px 0">Review & Approve</a></p>` : '',
         supabase ? `<p><a href="${siteUrl}/admin/applications">View All Applications</a></p>` : '',
+        emailFooter,
       ].filter(Boolean).join(''),
     ).catch((err) => { logger.error('[Apply] Admin notification email failed:', err instanceof Error ? err.message : err); });
   }

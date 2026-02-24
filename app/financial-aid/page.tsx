@@ -42,6 +42,13 @@ const fundingOptions = [
     coverage: 'Split into monthly payments',
     icon: Clock,
   },
+  {
+    title: 'Buy Now, Pay Later (BNPL)',
+    description: 'Split tuition into 4–6 installments with Klarna, Afterpay, Sezzle, Affirm, or Zip.',
+    eligibility: ['No hard credit check for most providers', 'Instant approval available', 'Self-pay students', 'Set up at enrollment'],
+    coverage: 'Pay over 4–6 installments',
+    icon: DollarSign,
+  },
 ];
 
 const steps = [

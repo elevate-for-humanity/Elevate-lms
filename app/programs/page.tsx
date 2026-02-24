@@ -396,7 +396,7 @@ export default async function ProgramsPage() {
               },
               {
                 name: 'CPR, AED & First Aid Certification',
-                image: '/images/programs-hq/healthcare-hero.jpg',
+                image: '/images/programs-hq/phlebotomy.jpg',
                 slug: 'cpr-first-aid-hsi',
                 href: '/programs/healthcare',
                 programId: '#10004674',

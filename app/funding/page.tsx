@@ -159,7 +159,7 @@ export default function FundingPage() {
             {[
               { title: 'Pay in Full', desc: 'One-time payment at enrollment. Some programs offer a discount for full payment.', tag: 'Best Value', href: '/apply', linkText: 'Apply Now →' },
               { title: 'Payment Plan', desc: 'Split your tuition into monthly installments. No interest. Set up at enrollment.', tag: 'Flexible', href: '/apply', linkText: 'Apply Now →' },
-              { title: 'Sezzle / Affirm', desc: 'Buy now, pay later. Break payments into 4-6 installments with Sezzle or Affirm.', tag: 'BNPL', href: '/apply', linkText: 'Apply Now →' },
+              { title: 'Buy Now, Pay Later', desc: 'Split payments into 4–6 installments with Klarna, Afterpay, Sezzle, Affirm, or Zip. No hard credit check for most providers.', tag: 'BNPL', href: '/apply', linkText: 'Apply Now →' },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col">
                 <span className="text-xs font-bold text-brand-blue-600 bg-brand-blue-50 px-2 py-1 rounded-full self-start">{item.tag}</span>

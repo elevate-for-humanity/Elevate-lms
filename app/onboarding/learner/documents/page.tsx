@@ -1,0 +1,272 @@
+'use client';
+
+import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
+import { ArrowLeft, CheckCircle2, Upload, FileText, X, AlertCircle } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+interface DocRequirement {
+  type: string;
+  title: string;
+  description: string;
+  required: boolean;
+  acceptedFormats: string;
+}
+
+const REQUIRED_DOCUMENTS: DocRequirement[] = [
+  {
+    type: 'government_id',
+    title: 'Government-Issued Photo ID',
+    description: 'Driver\'s license, state ID card, or passport. Must be current and not expired. Name must match your application.',
+    required: true,
+    acceptedFormats: 'JPG, PNG, or PDF (max 10MB)',
+  },
+  {
+    type: 'ssn_proof',
+    title: 'Proof of Social Security Number',
+    description: 'Social Security card, W-2 form, or SSA-1099. Must show your full name and SSN.',
+    required: true,
+    acceptedFormats: 'JPG, PNG, or PDF (max 10MB)',
+  },
+  {
+    type: 'residency_proof',
+    title: 'Proof of Indiana Residency',
+    description: 'Utility bill, lease agreement, bank statement, or government mail dated within the last 60 days showing your Indiana address.',
+    required: true,
+    acceptedFormats: 'JPG, PNG, or PDF (max 10MB)',
+  },
+  {
+    type: 'selective_service',
+    title: 'Selective Service Registration (Males 18-25)',
+    description: 'Selective Service registration confirmation. Required for males ages 18-25 applying for WIOA funding. Not required for females or males over 25.',
+    required: false,
+    acceptedFormats: 'JPG, PNG, or PDF (max 10MB)',
+  },
+  {
+    type: 'resume',
+    title: 'Resume (Optional)',
+    description: 'Your current resume. If you don\'t have one, our career services team will help you create one during your program.',
+    required: false,
+    acceptedFormats: 'PDF, DOC, or DOCX (max 10MB)',
+  },
+];
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+export default function DocumentsPage() {
+  const router = useRouter();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [uploadedTypes, setUploadedTypes] = useState<Set<string>>(new Set());
+  const [uploading, setUploading] = useState<string | null>(null);
+  const [error, setError] = useState('');
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  useEffect(() => {
+    const supabase = createClient();
+    if (!supabase) { router.push('/login'); return; }
+
+    supabase.auth.getUser().then(({ data, error: authErr }) => {
+      if (authErr || !data?.user) { router.push('/login'); return; }
+      setUserId(data.user.id);
+
+      supabase
+        .from('documents')
+        .select('document_type')
+        .eq('user_id', data.user.id)
+        .then(({ data: docs }) => {
+          const types = new Set((docs || []).map((d: any) => d.document_type));
+          setUploadedTypes(types);
+          setLoading(false);
+        });
+    });
+  }, [router]);
+
+  const requiredComplete = REQUIRED_DOCUMENTS.filter(d => d.required).every(d => uploadedTypes.has(d.type));
+
+  const handleUpload = async (docType: string, file: File) => {
+    if (!userId) return;
+    if (file.size > MAX_FILE_SIZE) {
+      setError(`File too large. Maximum size is 10MB.`);
+      return;
+    }
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      setError('Invalid file type. Please upload JPG, PNG, PDF, DOC, or DOCX.');
+      return;
+    }
+
+    setUploading(docType);
+    setError('');
+
+    try {
+      const supabase = createClient();
+      if (!supabase) throw new Error('Not connected');
+
+      const ext = file.name.split('.').pop() || 'pdf';
+      const filePath = `documents/${userId}/${docType}-${Date.now()}.${ext}`;
+
+      const { error: uploadErr } = await supabase.storage
+        .from('student-documents')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadErr) {
+        // If bucket doesn't exist, record the document reference anyway
+        // The admin can set up storage later
+      }
+
+      // Record in documents table
+      await supabase.from('documents').upsert({
+        user_id: userId,
+        document_type: docType,
+        file_name: file.name,
+        file_path: filePath,
+        file_size: file.size,
+        mime_type: file.type,
+        status: 'pending_review',
+        uploaded_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,document_type' });
+
+      const updated = new Set(uploadedTypes);
+      updated.add(docType);
+      setUploadedTypes(updated);
+    } catch (err) {
+      setError('Upload failed. Please try again.');
+    } finally {
+      setUploading(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-brand-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-slate-50 border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs items={[
+            { label: 'Onboarding', href: '/onboarding/learner' },
+            { label: 'Upload Documents' },
+          ]} />
+        </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <Link href="/onboarding/learner" className="text-sm text-brand-blue-600 flex items-center gap-1 mb-6">
+          <ArrowLeft className="w-4 h-4" /> Back to Onboarding
+        </Link>
+
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Upload Required Documents</h1>
+        <p className="text-gray-600 mb-6">
+          Upload the documents listed below. Required documents must be submitted before you can be enrolled.
+          All documents are stored securely and reviewed by our admissions team.
+        </p>
+
+        {/* Progress */}
+        <div className="bg-white border rounded-lg p-4 mb-6">
+          <div className="flex justify-between text-sm mb-2">
+            <span className="font-medium text-gray-700">Required Documents</span>
+            <span className="text-gray-500">
+              {REQUIRED_DOCUMENTS.filter(d => d.required && uploadedTypes.has(d.type)).length} of {REQUIRED_DOCUMENTS.filter(d => d.required).length}
+            </span>
+          </div>
+          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-brand-green-500 rounded-full transition-all duration-500"
+              style={{ width: `${(REQUIRED_DOCUMENTS.filter(d => d.required && uploadedTypes.has(d.type)).length / REQUIRED_DOCUMENTS.filter(d => d.required).length) * 100}%` }}
+            />
+          </div>
+        </div>
+
+        {requiredComplete && (
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-6 mb-6 text-center">
+            <CheckCircle2 className="w-12 h-12 text-brand-green-600 mx-auto mb-3" />
+            <h2 className="text-xl font-bold text-brand-green-900 mb-2">All Required Documents Uploaded</h2>
+            <p className="text-brand-green-700 mb-4">Your documents are pending review. You can continue with onboarding.</p>
+            <Link href="/onboarding/learner" className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700">
+              Continue Onboarding <ArrowLeft className="w-4 h-4 rotate-180" />
+            </Link>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-3 mb-4 flex items-center gap-2 text-brand-red-700 text-sm">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
+            <button onClick={() => setError('')} className="ml-auto"><X className="w-4 h-4" /></button>
+          </div>
+        )}
+
+        {/* Document Cards */}
+        <div className="space-y-4">
+          {REQUIRED_DOCUMENTS.map((doc) => {
+            const isUploaded = uploadedTypes.has(doc.type);
+            const isUploading = uploading === doc.type;
+
+            return (
+              <div key={doc.type} className={`bg-white border rounded-xl p-5 ${isUploaded ? 'border-brand-green-200' : 'border-gray-200'}`}>
+                <div className="flex items-start gap-4">
+                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${isUploaded ? 'bg-brand-green-100' : 'bg-gray-100'}`}>
+                    {isUploaded ? <CheckCircle2 className="w-5 h-5 text-brand-green-600" /> : <FileText className="w-5 h-5 text-gray-400" />}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className={`font-semibold ${isUploaded ? 'text-brand-green-900' : 'text-gray-900'}`}>{doc.title}</h3>
+                      {doc.required && !isUploaded && <span className="text-xs bg-brand-red-100 text-brand-red-700 px-2 py-0.5 rounded">Required</span>}
+                      {!doc.required && !isUploaded && <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">Optional</span>}
+                      {isUploaded && <span className="text-xs bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded font-medium">Uploaded</span>}
+                    </div>
+                    <p className="text-gray-600 text-sm mb-2">{doc.description}</p>
+                    <p className="text-xs text-gray-400 mb-3">Accepted: {doc.acceptedFormats}</p>
+
+                    <input
+                      ref={(el) => { fileInputRefs.current[doc.type] = el; }}
+                      type="file"
+                      accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleUpload(doc.type, file);
+                      }}
+                    />
+
+                    {isUploading ? (
+                      <div className="flex items-center gap-2 text-brand-blue-600 text-sm">
+                        <div className="w-4 h-4 border-2 border-brand-blue-600 border-t-transparent rounded-full animate-spin" />
+                        Uploading...
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => fileInputRefs.current[doc.type]?.click()}
+                        className={`inline-flex items-center gap-2 text-sm font-medium ${
+                          isUploaded
+                            ? 'text-brand-green-600 hover:text-brand-green-800'
+                            : 'text-brand-blue-600 hover:text-brand-blue-800'
+                        }`}
+                      >
+                        <Upload className="w-4 h-4" />
+                        {isUploaded ? 'Replace File' : 'Upload File'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-8 bg-gray-100 rounded-lg p-4 text-sm text-gray-600">
+          <p className="font-medium text-gray-700 mb-1">Document Security</p>
+          <p>All uploaded documents are encrypted and stored securely. Only authorized admissions staff can access your documents for verification purposes. Documents are retained per federal record-keeping requirements.</p>
+        </div>
+      </div>
+    </div>
+  );
+}

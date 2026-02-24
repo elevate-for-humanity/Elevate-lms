@@ -81,9 +81,7 @@ export default function HomePage() {
                 href={item.href}
                 className="flex flex-col bg-white rounded-xl border-2 border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all group overflow-hidden"
               >
-                <div className="relative h-32 sm:h-36 overflow-hidden">
-                  <Image src={item.image} alt={item.alt} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
-                </div>
+                <Image src={item.image} alt={item.alt} width={400} height={200} className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300" />
                 <div className="p-5 flex flex-col flex-1">
                   <span className="font-bold text-lg text-slate-900 mb-1">{item.label}</span>
                   <span className="text-sm text-slate-600 mb-4 flex-1">{item.desc}</span>
@@ -251,9 +249,7 @@ export default function HomePage() {
               { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/artlist/cropped/hero-training-8-wide.webp' },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
-                <div className="relative aspect-[3/2]">
-                  <Image src={item.image} alt={item.label} fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
-                </div>
+                <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-48 object-cover" />
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-lg mb-1">{item.label}</h3>
                   <p className="text-slate-600 text-sm mb-4">{item.desc}</p>
@@ -281,8 +277,8 @@ export default function HomePage() {
       <section aria-label="Why choose Elevate" className="py-14 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/programs-hq/students-learning.webp" alt="Students in a training session at Elevate for Humanity" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+            <div className="rounded-2xl overflow-hidden shadow-xl">
+              <Image src="/images/programs-hq/students-learning.webp" alt="Students in a training session at Elevate for Humanity" width={800} height={600} className="w-full object-cover" />
             </div>
             <div>
               <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Why Elevate</p>

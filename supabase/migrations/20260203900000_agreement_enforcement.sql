@@ -3,28 +3,28 @@
 -- Immutable, append-only, bound to auth.uid()
 
 -- 1. Create the canonical agreement table
-CREATE TABLE IF NOT EXISTS public.license_agreement_acceptances (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  organization_id UUID REFERENCES public.organizations(id),
-  
-  -- Agreement details
-  agreement_type TEXT NOT NULL, -- 'terms_of_service', 'privacy_policy', 'handbook', 'enrollment_agreement', 'data_processing'
-  document_version TEXT NOT NULL, -- e.g., '2024.1', '2024.2'
-  document_url TEXT, -- Link to the actual document
-  
-  -- Signer context (captured at signing time)
-  role_at_signing TEXT NOT NULL, -- 'student', 'partner', 'employer', 'admin', 'workforce_board'
-  email_at_signing TEXT NOT NULL, -- Must match auth.users.email
-  ip_address INET,
-  user_agent TEXT,
-  
-  -- Timestamps
-  accepted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  
-  -- Immutability constraint
-  CONSTRAINT no_future_acceptance CHECK (accepted_at <= NOW())
-);
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql] CREATE TABLE IF NOT EXISTS public.license_agreement_acceptances (
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   organization_id UUID REFERENCES public.organizations(id),
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   -- Agreement details
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   agreement_type TEXT NOT NULL, -- 'terms_of_service', 'privacy_policy', 'handbook', 'enrollment_agreement', 'data_processing'
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   document_version TEXT NOT NULL, -- e.g., '2024.1', '2024.2'
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   document_url TEXT, -- Link to the actual document
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   -- Signer context (captured at signing time)
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   role_at_signing TEXT NOT NULL, -- 'student', 'partner', 'employer', 'admin', 'workforce_board'
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   email_at_signing TEXT NOT NULL, -- Must match auth.users.email
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   ip_address INET,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   user_agent TEXT,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   -- Timestamps
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   accepted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   -- Immutability constraint
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   CONSTRAINT no_future_acceptance CHECK (accepted_at <= NOW())
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql] );
 
 -- 2. Create indexes for fast lookups
 ALTER TABLE public.license_agreement_acceptances ADD COLUMN IF NOT EXISTS user_id UUID;

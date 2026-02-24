@@ -79,15 +79,15 @@ CREATE TABLE IF NOT EXISTS agreement_acceptances (
 );
 
 -- 5. Apprentice Assignments (links apprentice to host shop)
-CREATE TABLE IF NOT EXISTS apprentice_assignments (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  apprentice_application_id UUID NOT NULL,
-  host_shop_application_id UUID NOT NULL,
-  start_date DATE NOT NULL,
-  end_date DATE,
-  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'ended')),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+-- [DUPLICATE: canonical in 20260101000001_barber_hvac_reference.sql] CREATE TABLE IF NOT EXISTS apprentice_assignments (
+-- [DUPLICATE: canonical in 20260101000001_barber_hvac_reference.sql]   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+-- [DUPLICATE: canonical in 20260101000001_barber_hvac_reference.sql]   apprentice_application_id UUID NOT NULL,
+-- [DUPLICATE: canonical in 20260101000001_barber_hvac_reference.sql]   host_shop_application_id UUID NOT NULL,
+-- [DUPLICATE: canonical in 20260101000001_barber_hvac_reference.sql]   start_date DATE NOT NULL,
+-- [DUPLICATE: canonical in 20260101000001_barber_hvac_reference.sql]   end_date DATE,
+-- [DUPLICATE: canonical in 20260101000001_barber_hvac_reference.sql]   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'ended')),
+-- [DUPLICATE: canonical in 20260101000001_barber_hvac_reference.sql]   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+-- [DUPLICATE: canonical in 20260101000001_barber_hvac_reference.sql] );
 
 -- 6. Hour Entries (source-aware, auditable ledger)
 CREATE TABLE IF NOT EXISTS hour_entries (

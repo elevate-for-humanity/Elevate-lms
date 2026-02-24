@@ -91,23 +91,23 @@ COMMENT ON TABLE shop_recommendations IS 'Persisted shop routing recommendations
 -- ============================================
 -- 4. Partner Documents Table (if not exists)
 -- ============================================
-CREATE TABLE IF NOT EXISTS partner_documents (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  partner_id UUID NOT NULL,
-  document_type TEXT NOT NULL,
-  file_name TEXT NOT NULL,
-  file_url TEXT NOT NULL,
-  file_size INTEGER,
-  mime_type TEXT,
-  status TEXT DEFAULT 'pending', -- 'pending', 'uploaded', 'verified', 'rejected'
-  extracted_data JSONB DEFAULT '{}',
-  ocr_confidence DECIMAL(5,4),
-  verified_at TIMESTAMPTZ,
-  verified_by TEXT, -- 'system' or user_id
-  rejection_reason TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql] CREATE TABLE IF NOT EXISTS partner_documents (
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   partner_id UUID NOT NULL,
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   document_type TEXT NOT NULL,
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   file_name TEXT NOT NULL,
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   file_url TEXT NOT NULL,
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   file_size INTEGER,
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   mime_type TEXT,
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   status TEXT DEFAULT 'pending', -- 'pending', 'uploaded', 'verified', 'rejected'
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   extracted_data JSONB DEFAULT '{}',
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   ocr_confidence DECIMAL(5,4),
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   verified_at TIMESTAMPTZ,
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   verified_by TEXT, -- 'system' or user_id
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   rejection_reason TEXT,
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   created_at TIMESTAMPTZ DEFAULT NOW(),
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql]   updated_at TIMESTAMPTZ DEFAULT NOW()
+-- [DUPLICATE: canonical in 20260124000001_partner_documents_system.sql] );
 
 CREATE INDEX idx_partner_documents_partner ON partner_documents(partner_id);
 CREATE INDEX idx_partner_documents_type ON partner_documents(document_type);

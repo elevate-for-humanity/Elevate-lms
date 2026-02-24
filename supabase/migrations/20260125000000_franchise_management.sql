@@ -135,56 +135,56 @@ ADD COLUMN IF NOT EXISTS office_revenue DECIMAL(10,2); -- Office's cut
 -- CLIENT MANAGEMENT (per office)
 -- ============================================
 
-CREATE TABLE IF NOT EXISTS tax_clients (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  
-  -- Office relationship
-  office_id UUID NOT NULL,
-  
-  -- Client info (encrypted SSN stored separately)
-  first_name VARCHAR(100) NOT NULL,
-  last_name VARCHAR(100) NOT NULL,
-  email VARCHAR(255),
-  phone VARCHAR(20),
-  
-  -- Address
-  address_street VARCHAR(255),
-  address_city VARCHAR(100),
-  address_state VARCHAR(2),
-  address_zip VARCHAR(10),
-  
-  -- Tax info (non-sensitive)
-  filing_status VARCHAR(50),
-  dependents_count INTEGER DEFAULT 0,
-  
-  -- Encrypted sensitive data reference
-  ssn_encrypted TEXT, -- Encrypted SSN
-  ssn_last_four VARCHAR(4), -- For display/lookup
-  
-  -- Spouse info (if MFJ)
-  spouse_first_name VARCHAR(100),
-  spouse_last_name VARCHAR(100),
-  spouse_ssn_encrypted TEXT,
-  spouse_ssn_last_four VARCHAR(4),
-  
-  -- Preferred preparer
-  preferred_preparer_id UUID,
-  
-  -- History
-  client_since DATE DEFAULT CURRENT_DATE,
-  returns_filed INTEGER DEFAULT 0,
-  total_fees_paid DECIMAL(12,2) DEFAULT 0,
-  last_return_date DATE,
-  last_return_id UUID,
-  
-  -- Status
-  status VARCHAR(20) DEFAULT 'active', -- active, inactive, do_not_serve
-  
-  -- Metadata
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  notes TEXT
-);
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql] CREATE TABLE IF NOT EXISTS tax_clients (
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   -- Office relationship
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   office_id UUID NOT NULL,
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   -- Client info (encrypted SSN stored separately)
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   first_name VARCHAR(100) NOT NULL,
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   last_name VARCHAR(100) NOT NULL,
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   email VARCHAR(255),
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   phone VARCHAR(20),
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   -- Address
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   address_street VARCHAR(255),
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   address_city VARCHAR(100),
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   address_state VARCHAR(2),
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   address_zip VARCHAR(10),
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   -- Tax info (non-sensitive)
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   filing_status VARCHAR(50),
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   dependents_count INTEGER DEFAULT 0,
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   -- Encrypted sensitive data reference
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   ssn_encrypted TEXT, -- Encrypted SSN
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   ssn_last_four VARCHAR(4), -- For display/lookup
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   -- Spouse info (if MFJ)
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   spouse_first_name VARCHAR(100),
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   spouse_last_name VARCHAR(100),
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   spouse_ssn_encrypted TEXT,
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   spouse_ssn_last_four VARCHAR(4),
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   -- Preferred preparer
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   preferred_preparer_id UUID,
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   -- History
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   client_since DATE DEFAULT CURRENT_DATE,
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   returns_filed INTEGER DEFAULT 0,
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   total_fees_paid DECIMAL(12,2) DEFAULT 0,
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   last_return_date DATE,
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   last_return_id UUID,
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   -- Status
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   status VARCHAR(20) DEFAULT 'active', -- active, inactive, do_not_serve
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   -- Metadata
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   created_at TIMESTAMPTZ DEFAULT NOW(),
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   updated_at TIMESTAMPTZ DEFAULT NOW(),
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql]   notes TEXT
+-- [DUPLICATE: canonical in 20260124150000_tax_software_tables.sql] );
 -- If table already exists from 20260124150000, add columns unique to this schema
 ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS office_id UUID;
 ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS filing_status VARCHAR(50);
@@ -289,37 +289,37 @@ CREATE TABLE IF NOT EXISTS preparer_payouts (
 -- FRANCHISE FEES/ROYALTIES
 -- ============================================
 
-CREATE TABLE IF NOT EXISTS franchise_royalties (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  
-  office_id UUID NOT NULL,
-  
-  -- Period
-  period_start DATE NOT NULL,
-  period_end DATE NOT NULL,
-  
-  -- Activity
-  returns_count INTEGER DEFAULT 0,
-  gross_revenue DECIMAL(12,2) DEFAULT 0,
-  
-  -- Fees owed to franchisor
-  per_return_fees DECIMAL(12,2) DEFAULT 0,
-  revenue_share DECIMAL(12,2) DEFAULT 0,
-  software_fees DECIMAL(12,2) DEFAULT 0,
-  other_fees DECIMAL(12,2) DEFAULT 0,
-  total_owed DECIMAL(12,2) DEFAULT 0,
-  
-  -- Payment
-  status VARCHAR(20) DEFAULT 'pending', -- pending, invoiced, paid, overdue
-  invoiced_at TIMESTAMPTZ,
-  invoice_number VARCHAR(50),
-  due_date DATE,
-  paid_at TIMESTAMPTZ,
-  payment_reference VARCHAR(100),
-  
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql] CREATE TABLE IF NOT EXISTS franchise_royalties (
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   office_id UUID NOT NULL,
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   -- Period
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   period_start DATE NOT NULL,
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   period_end DATE NOT NULL,
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   -- Activity
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   returns_count INTEGER DEFAULT 0,
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   gross_revenue DECIMAL(12,2) DEFAULT 0,
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   -- Fees owed to franchisor
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   per_return_fees DECIMAL(12,2) DEFAULT 0,
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   revenue_share DECIMAL(12,2) DEFAULT 0,
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   software_fees DECIMAL(12,2) DEFAULT 0,
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   other_fees DECIMAL(12,2) DEFAULT 0,
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   total_owed DECIMAL(12,2) DEFAULT 0,
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   -- Payment
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   status VARCHAR(20) DEFAULT 'pending', -- pending, invoiced, paid, overdue
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   invoiced_at TIMESTAMPTZ,
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   invoice_number VARCHAR(50),
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   due_date DATE,
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   paid_at TIMESTAMPTZ,
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   payment_reference VARCHAR(100),
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   created_at TIMESTAMPTZ DEFAULT NOW(),
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql]   updated_at TIMESTAMPTZ DEFAULT NOW()
+-- [DUPLICATE: canonical in 20250124000001_franchise_system.sql] );
 
 -- ============================================
 -- AUDIT LOG (for compliance)

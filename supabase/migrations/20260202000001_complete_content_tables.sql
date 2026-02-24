@@ -67,21 +67,21 @@ CREATE TABLE IF NOT EXISTS success_stories (
 -- ============================================================================
 -- 4. PARTNERS TABLE
 -- ============================================================================
-CREATE TABLE IF NOT EXISTS partners (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  partner_type TEXT NOT NULL CHECK (partner_type IN ('government', 'workforce', 'employer', 'training', 'certification', 'community')),
-  description TEXT,
-  logo_url TEXT,
-  website_url TEXT,
-  contact_name TEXT,
-  contact_email TEXT,
-  featured BOOLEAN DEFAULT false,
-  is_active BOOLEAN DEFAULT true,
-  display_order INTEGER DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql] CREATE TABLE IF NOT EXISTS partners (
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql]   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql]   name TEXT NOT NULL,
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql]   partner_type TEXT NOT NULL CHECK (partner_type IN ('government', 'workforce', 'employer', 'training', 'certification', 'community')),
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql]   description TEXT,
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql]   logo_url TEXT,
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql]   website_url TEXT,
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql]   contact_name TEXT,
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql]   contact_email TEXT,
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql]   featured BOOLEAN DEFAULT false,
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql]   is_active BOOLEAN DEFAULT true,
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql]   display_order INTEGER DEFAULT 0,
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql]   created_at TIMESTAMPTZ DEFAULT NOW(),
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql]   updated_at TIMESTAMPTZ DEFAULT NOW()
+-- [DUPLICATE: canonical in 20260124000002_partner_shop_system.sql] );
 
 -- ============================================================================
 -- 5. SITE CONTENT TABLE (CMS-style content blocks)

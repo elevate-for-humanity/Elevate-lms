@@ -14,19 +14,19 @@ CREATE TABLE IF NOT EXISTS copilot_deployments (
 );
 
 -- Timeclock shifts table
-CREATE TABLE IF NOT EXISTS timeclock_shifts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  apprentice_id UUID NOT NULL,
-  site_id UUID,
-  clock_in_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  clock_out_at TIMESTAMPTZ,
-  lunch_start_at TIMESTAMPTZ,
-  lunch_end_at TIMESTAMPTZ,
-  total_hours DECIMAL(5,2),
-  notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- [DUPLICATE: canonical in 20260131000001_timeclock_schema.sql] CREATE TABLE IF NOT EXISTS timeclock_shifts (
+-- [DUPLICATE: canonical in 20260131000001_timeclock_schema.sql]   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+-- [DUPLICATE: canonical in 20260131000001_timeclock_schema.sql]   apprentice_id UUID NOT NULL,
+-- [DUPLICATE: canonical in 20260131000001_timeclock_schema.sql]   site_id UUID,
+-- [DUPLICATE: canonical in 20260131000001_timeclock_schema.sql]   clock_in_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+-- [DUPLICATE: canonical in 20260131000001_timeclock_schema.sql]   clock_out_at TIMESTAMPTZ,
+-- [DUPLICATE: canonical in 20260131000001_timeclock_schema.sql]   lunch_start_at TIMESTAMPTZ,
+-- [DUPLICATE: canonical in 20260131000001_timeclock_schema.sql]   lunch_end_at TIMESTAMPTZ,
+-- [DUPLICATE: canonical in 20260131000001_timeclock_schema.sql]   total_hours DECIMAL(5,2),
+-- [DUPLICATE: canonical in 20260131000001_timeclock_schema.sql]   notes TEXT,
+-- [DUPLICATE: canonical in 20260131000001_timeclock_schema.sql]   created_at TIMESTAMPTZ DEFAULT NOW(),
+-- [DUPLICATE: canonical in 20260131000001_timeclock_schema.sql]   updated_at TIMESTAMPTZ DEFAULT NOW()
+-- [DUPLICATE: canonical in 20260131000001_timeclock_schema.sql] );
 -- If table already exists from 20260131, add the missing column
 ALTER TABLE timeclock_shifts ADD COLUMN IF NOT EXISTS notes TEXT;
 
@@ -118,18 +118,18 @@ CREATE TABLE IF NOT EXISTS social_media_posts (
 );
 
 -- Social media settings
-CREATE TABLE IF NOT EXISTS social_media_settings (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  platform TEXT NOT NULL UNIQUE,
-  access_token TEXT,
-  refresh_token TEXT,
-  expires_at TIMESTAMPTZ,
-  organization_id TEXT,
-  organizations JSONB DEFAULT '[]',
-  enabled BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- [DUPLICATE: canonical in 20260126000002_create_social_media_settings.sql] CREATE TABLE IF NOT EXISTS social_media_settings (
+-- [DUPLICATE: canonical in 20260126000002_create_social_media_settings.sql]   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+-- [DUPLICATE: canonical in 20260126000002_create_social_media_settings.sql]   platform TEXT NOT NULL UNIQUE,
+-- [DUPLICATE: canonical in 20260126000002_create_social_media_settings.sql]   access_token TEXT,
+-- [DUPLICATE: canonical in 20260126000002_create_social_media_settings.sql]   refresh_token TEXT,
+-- [DUPLICATE: canonical in 20260126000002_create_social_media_settings.sql]   expires_at TIMESTAMPTZ,
+-- [DUPLICATE: canonical in 20260126000002_create_social_media_settings.sql]   organization_id TEXT,
+-- [DUPLICATE: canonical in 20260126000002_create_social_media_settings.sql]   organizations JSONB DEFAULT '[]',
+-- [DUPLICATE: canonical in 20260126000002_create_social_media_settings.sql]   enabled BOOLEAN DEFAULT FALSE,
+-- [DUPLICATE: canonical in 20260126000002_create_social_media_settings.sql]   created_at TIMESTAMPTZ DEFAULT NOW(),
+-- [DUPLICATE: canonical in 20260126000002_create_social_media_settings.sql]   updated_at TIMESTAMPTZ DEFAULT NOW()
+-- [DUPLICATE: canonical in 20260126000002_create_social_media_settings.sql] );
 
 -- Add user_id column to apprentices if not exists
 DO $$

@@ -22,42 +22,42 @@ CREATE INDEX idx_doc_extractions_status ON documents_extractions(status);
 CREATE INDEX idx_doc_extractions_doc_type ON documents_extractions(doc_type);
 
 -- 2. Automated Decisions - audit trail for all system decisions
-CREATE TABLE IF NOT EXISTS automated_decisions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  subject_type TEXT NOT NULL, -- application, partner, transfer_hours, routing, document
-  subject_id UUID NOT NULL,
-  decision TEXT NOT NULL CHECK (decision IN ('approved', 'rejected', 'needs_review', 'recommended', 'assigned', 'flagged')),
-  reason_codes TEXT[] NOT NULL DEFAULT '{}',
-  input_snapshot JSONB NOT NULL DEFAULT '{}', -- extracted fields + context at decision time
-  ruleset_version TEXT NOT NULL DEFAULT '1.0.0',
-  actor TEXT NOT NULL DEFAULT 'system',
-  overridden_by UUID,
-  overridden_at TIMESTAMPTZ,
-  override_reason TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql] CREATE TABLE IF NOT EXISTS automated_decisions (
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   subject_type TEXT NOT NULL, -- application, partner, transfer_hours, routing, document
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   subject_id UUID NOT NULL,
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   decision TEXT NOT NULL CHECK (decision IN ('approved', 'rejected', 'needs_review', 'recommended', 'assigned', 'flagged')),
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   reason_codes TEXT[] NOT NULL DEFAULT '{}',
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   input_snapshot JSONB NOT NULL DEFAULT '{}', -- extracted fields + context at decision time
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   ruleset_version TEXT NOT NULL DEFAULT '1.0.0',
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   actor TEXT NOT NULL DEFAULT 'system',
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   overridden_by UUID,
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   overridden_at TIMESTAMPTZ,
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   override_reason TEXT,
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   created_at TIMESTAMPTZ DEFAULT NOW()
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql] );
 
 CREATE INDEX idx_auto_decisions_subject ON automated_decisions(subject_type, subject_id);
 CREATE INDEX idx_auto_decisions_decision ON automated_decisions(decision);
 CREATE INDEX idx_auto_decisions_created ON automated_decisions(created_at DESC);
 
 -- 3. Review Queue - unified queue for human review
-CREATE TABLE IF NOT EXISTS review_queue (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  queue_type TEXT NOT NULL, -- transcript_review, partner_docs_review, routing_review, document_review
-  subject_type TEXT NOT NULL,
-  subject_id UUID NOT NULL,
-  priority INT NOT NULL DEFAULT 5 CHECK (priority BETWEEN 1 AND 10), -- 1 = highest
-  reasons TEXT[] NOT NULL DEFAULT '{}',
-  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'resolved', 'escalated')),
-  assigned_to UUID,
-  resolved_by UUID,
-  resolved_at TIMESTAMPTZ,
-  resolution TEXT,
-  metadata JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql] CREATE TABLE IF NOT EXISTS review_queue (
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   queue_type TEXT NOT NULL, -- transcript_review, partner_docs_review, routing_review, document_review
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   subject_type TEXT NOT NULL,
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   subject_id UUID NOT NULL,
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   priority INT NOT NULL DEFAULT 5 CHECK (priority BETWEEN 1 AND 10), -- 1 = highest
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   reasons TEXT[] NOT NULL DEFAULT '{}',
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'resolved', 'escalated')),
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   assigned_to UUID,
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   resolved_by UUID,
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   resolved_at TIMESTAMPTZ,
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   resolution TEXT,
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   metadata JSONB DEFAULT '{}',
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   created_at TIMESTAMPTZ DEFAULT NOW(),
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql]   updated_at TIMESTAMPTZ DEFAULT NOW()
+-- [DUPLICATE: canonical in 20260205000002_automation_infrastructure.sql] );
 
 CREATE INDEX idx_review_queue_status ON review_queue(status);
 CREATE INDEX idx_review_queue_type ON review_queue(queue_type);

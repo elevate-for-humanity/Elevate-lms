@@ -313,20 +313,20 @@ ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
 -- ============ AUDIT LOGS ============
 -- AT-13: Every privileged action must be logged
 
-CREATE TABLE IF NOT EXISTS public.audit_logs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  actor_id UUID NOT NULL REFERENCES public.profiles(id),
-  actor_role TEXT NOT NULL,
-  action TEXT NOT NULL CHECK (action IN ('create', 'update', 'delete', 'status_change', 'approve', 'reject', 'login', 'logout')),
-  resource_type TEXT NOT NULL,
-  resource_id UUID,
-  before_state JSONB,
-  after_state JSONB,
-  ip_address TEXT,
-  user_agent TEXT,
-  notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql] CREATE TABLE IF NOT EXISTS public.audit_logs (
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql]   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql]   actor_id UUID NOT NULL REFERENCES public.profiles(id),
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql]   actor_role TEXT NOT NULL,
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql]   action TEXT NOT NULL CHECK (action IN ('create', 'update', 'delete', 'status_change', 'approve', 'reject', 'login', 'logout')),
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql]   resource_type TEXT NOT NULL,
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql]   resource_id UUID,
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql]   before_state JSONB,
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql]   after_state JSONB,
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql]   ip_address TEXT,
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql]   user_agent TEXT,
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql]   notes TEXT,
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql]   created_at TIMESTAMPTZ DEFAULT NOW()
+-- [DUPLICATE: canonical in 20260118000001_audit_logs.sql] );
 
 ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS actor_id UUID;
 ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS actor_role TEXT;

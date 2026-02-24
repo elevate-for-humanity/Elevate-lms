@@ -53,50 +53,50 @@ END $$;
 -- PART 2: License Agreement Acceptances (Immutable)
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS license_agreement_acceptances (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE RESTRICT, -- RESTRICT prevents deletion of users with agreements
-  organization_id UUID REFERENCES organizations(id) ON DELETE RESTRICT,
-  tenant_id UUID REFERENCES tenants(id) ON DELETE RESTRICT,
-  
-  -- Agreement details
-  agreement_type agreement_type NOT NULL,
-  document_version TEXT NOT NULL,
-  document_hash TEXT, -- SHA-256 hash of document content at signing time
-  document_url TEXT,
-  
-  -- Digital signature fields (legally binding)
-  signer_name TEXT NOT NULL,
-  signer_title TEXT,
-  signer_email TEXT NOT NULL,
-  auth_email TEXT NOT NULL, -- Email from auth.users at signing time (validated)
-  signature_data TEXT, -- Base64 encoded drawn signature
-  signature_typed TEXT, -- Typed signature
-  signature_method signature_method NOT NULL DEFAULT 'checkbox',
-  
-  -- Acceptance metadata (immutable audit trail)
-  accepted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  ip_address INET NOT NULL,
-  user_agent TEXT NOT NULL,
-  
-  -- Context
-  acceptance_context TEXT, -- 'enrollment', 'onboarding', 'checkout', 'renewal'
-  program_id UUID REFERENCES programs(id),
-  stripe_session_id TEXT,
-  
-  -- Legal acknowledgment
-  legal_acknowledgment BOOLEAN NOT NULL DEFAULT TRUE,
-  intent_statement TEXT NOT NULL DEFAULT 'I acknowledge that I have read, understand, and agree to be bound by the terms of this agreement. I understand this constitutes a legally binding electronic signature.',
-  
-  -- Role at time of signing (for audit)
-  role_at_signing TEXT,
-  
-  -- Immutability marker
-  is_immutable BOOLEAN NOT NULL DEFAULT TRUE,
-  
-  -- Unique constraint: one acceptance per user per agreement type per version
-  UNIQUE(user_id, agreement_type, document_version)
-);
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql] CREATE TABLE IF NOT EXISTS license_agreement_acceptances (
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE RESTRICT, -- RESTRICT prevents deletion of users with agreements
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   organization_id UUID REFERENCES organizations(id) ON DELETE RESTRICT,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   tenant_id UUID REFERENCES tenants(id) ON DELETE RESTRICT,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   -- Agreement details
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   agreement_type agreement_type NOT NULL,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   document_version TEXT NOT NULL,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   document_hash TEXT, -- SHA-256 hash of document content at signing time
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   document_url TEXT,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   -- Digital signature fields (legally binding)
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   signer_name TEXT NOT NULL,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   signer_title TEXT,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   signer_email TEXT NOT NULL,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   auth_email TEXT NOT NULL, -- Email from auth.users at signing time (validated)
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   signature_data TEXT, -- Base64 encoded drawn signature
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   signature_typed TEXT, -- Typed signature
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   signature_method signature_method NOT NULL DEFAULT 'checkbox',
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   -- Acceptance metadata (immutable audit trail)
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   accepted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   ip_address INET NOT NULL,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   user_agent TEXT NOT NULL,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   -- Context
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   acceptance_context TEXT, -- 'enrollment', 'onboarding', 'checkout', 'renewal'
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   program_id UUID REFERENCES programs(id),
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   stripe_session_id TEXT,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   -- Legal acknowledgment
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   legal_acknowledgment BOOLEAN NOT NULL DEFAULT TRUE,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   intent_statement TEXT NOT NULL DEFAULT 'I acknowledge that I have read, understand, and agree to be bound by the terms of this agreement. I understand this constitutes a legally binding electronic signature.',
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   -- Role at time of signing (for audit)
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   role_at_signing TEXT,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   -- Immutability marker
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   is_immutable BOOLEAN NOT NULL DEFAULT TRUE,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   -- Unique constraint: one acceptance per user per agreement type per version
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   UNIQUE(user_id, agreement_type, document_version)
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql] );
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_laa_user ON license_agreement_acceptances(user_id);
@@ -109,21 +109,21 @@ CREATE INDEX IF NOT EXISTS idx_laa_accepted_at ON license_agreement_acceptances(
 -- PART 3: Agreement Versions (Document Version Control)
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS agreement_versions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  agreement_type agreement_type NOT NULL,
-  version TEXT NOT NULL,
-  document_hash TEXT NOT NULL, -- SHA-256 hash of document content
-  document_url TEXT NOT NULL,
-  effective_date DATE NOT NULL,
-  expiry_date DATE, -- NULL means currently active
-  summary_of_changes TEXT,
-  requires_re_acceptance BOOLEAN DEFAULT FALSE, -- If true, users must re-sign
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  created_by UUID REFERENCES auth.users(id),
-  
-  UNIQUE(agreement_type, version)
-);
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql] CREATE TABLE IF NOT EXISTS agreement_versions (
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   agreement_type agreement_type NOT NULL,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   version TEXT NOT NULL,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   document_hash TEXT NOT NULL, -- SHA-256 hash of document content
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   document_url TEXT NOT NULL,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   effective_date DATE NOT NULL,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   expiry_date DATE, -- NULL means currently active
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   summary_of_changes TEXT,
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   requires_re_acceptance BOOLEAN DEFAULT FALSE, -- If true, users must re-sign
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   created_by UUID REFERENCES auth.users(id),
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql]   UNIQUE(agreement_type, version)
+-- [DUPLICATE: canonical in 20260203000002_agreement_compliance_final.sql] );
 
 CREATE INDEX IF NOT EXISTS idx_av_type ON agreement_versions(agreement_type);
 CREATE INDEX IF NOT EXISTS idx_av_effective ON agreement_versions(effective_date);

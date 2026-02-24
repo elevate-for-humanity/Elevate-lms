@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Clock, ThumbsUp, ThumbsDown, Share2, Printer } from 'lucide-react';

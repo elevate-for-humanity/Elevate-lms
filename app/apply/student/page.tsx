@@ -5,7 +5,7 @@ import StudentApplicationForm from './StudentApplicationForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { resolveSlug } from '@/lib/program-registry';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 600;
 
 export const metadata: Metadata = {
   title: 'Student Application | Elevate for Humanity',

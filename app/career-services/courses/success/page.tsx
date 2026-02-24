@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Thank you for your purchase. Access your courses now.',
 };
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 600;
 
 export default async function CourseSuccessPage({
   searchParams,

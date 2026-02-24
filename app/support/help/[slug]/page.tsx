@@ -6,7 +6,7 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { ArrowLeft, ThumbsUp, ThumbsDown, Eye } from 'lucide-react';
 import { sanitizeRichHtml } from '@/lib/security/sanitize-html';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 600;
 
 type Params = Promise<{ slug: string }>;
 

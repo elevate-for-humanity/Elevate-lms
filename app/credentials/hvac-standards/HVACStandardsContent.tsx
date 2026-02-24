@@ -334,7 +334,7 @@ export default function HVACStandardsContent() {
                   <li>EPA 608 section exams: 25 questions each</li>
                   <li>EPA 608 Universal exam: 105 questions</li>
                   <li>Cumulative mastery exams at Modules 5, 10, and 13</li>
-                  <li>Unlimited retakes with question randomization</li>
+                  <li>Exam fees and retesting policies vary by certifying organization</li>
                   <li>Wrong-answer explanations for remediation</li>
                 </ul>
               </div>

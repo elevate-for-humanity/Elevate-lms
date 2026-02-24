@@ -98,7 +98,7 @@ export default function AccreditationPage() {
             Our Credentials
           </h2>
           <p className="text-center text-gray-600 max-w-2xl mx-auto mb-12">
-            Elevate for Humanity Training Center is a workforce training provider
+            Elevate for Humanity Career & Technical Institute is a workforce training provider
             offering industry-recognized certification programs aligned with
             employer demand and workforce standards.
           </p>
@@ -178,7 +178,7 @@ export default function AccreditationPage() {
           <h2 className="text-xl font-bold mb-4">Important Information</h2>
           <div className="space-y-3 text-gray-600 text-sm">
             <p>
-              Elevate for Humanity Training Center is a workforce training
+              Elevate for Humanity Career & Technical Institute is a workforce training
               provider offering industry-recognized certification programs.
               Programs are not institutionally accredited degree programs. They
               are aligned with industry certification standards and include
@@ -188,7 +188,7 @@ export default function AccreditationPage() {
             <p>
               Certification outcomes are issued by the respective certifying
               organizations upon successful completion of required examinations.
-              Elevate for Humanity Training Center provides training,
+              Elevate for Humanity Career & Technical Institute provides training,
               preparation, and authorized proctored testing access but does not
               independently issue federal or state licenses.
             </p>

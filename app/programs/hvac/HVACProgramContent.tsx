@@ -386,7 +386,7 @@ export default function HVACProgramContent() {
               6 Industry Credentials Included
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              This is not just a class — it is a full certification pathway. You graduate with 6 industry-recognized credentials that HVAC employers require, including proctored exam access through approved testing partners.
+              This is not just a class — it is a full certification pathway. You graduate with 6 industry-recognized credentials that HVAC employers require, including proctored EPA 608 exams administered on-site through EPA-approved certifying organizations.
             </p>
           </div>
 
@@ -414,8 +414,8 @@ export default function HVACProgramContent() {
                     'Type III — low-pressure systems (Weeks 12–14)',
                     'Study kits provided to every student at no cost',
                     'Practice exams and full test bank for exam readiness',
-                    'Proctored certification exam access through approved testing partner',
-                    'Unlimited online retesting available',
+                    'EPA 608 certification exam proctored on-site through ESCO Institute and Mainstream Engineering',
+                    'Exam fees and retesting policies vary by certifying organization',
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
                       <CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" />
@@ -514,7 +514,7 @@ export default function HVACProgramContent() {
               </div>
               <ul className="space-y-3">
                 {[
-                  { label: 'EPA Section 608 Approved Testing Site', detail: 'Proctored certification exams administered on-site' },
+                  { label: 'Authorized EPA 608 Proctoring Site', detail: 'Exams administered through ESCO Institute (Proctor ID: 358010) and Mainstream Engineering (QwikTest)' },
                   { label: 'Indiana DWD Listed Training Provider', detail: 'INTraining ID: 10004621' },
                   { label: 'WIOA Eligible Training Provider (ETPL)', detail: 'Approved for workforce-funded participants' },
                   { label: 'OSHA Authorized Safety Training', detail: 'OSHA 30-hour General Industry certification' },
@@ -650,7 +650,7 @@ export default function HVACProgramContent() {
               EPA 608 Certification — 15-Week Curriculum
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Structured progression from Core fundamentals through all three specialty types, ending with a proctored certification exam administered through an approved testing partner.
+              Structured progression from Core fundamentals through all three specialty types, ending with a proctored certification exam administered through EPA-approved certifying organizations.
             </p>
           </div>
 
@@ -700,8 +700,8 @@ export default function HVACProgramContent() {
                 <p className="text-sm text-gray-600 mt-1">Passing score per section (18 of 25)</p>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-900">Unlimited</div>
-                <p className="text-sm text-gray-600 mt-1">Online retesting at no extra cost</p>
+                <div className="text-2xl font-bold text-gray-900">Varies</div>
+                <p className="text-sm text-gray-600 mt-1">Exam fees set by certifying organization</p>
               </div>
             </div>
           </div>

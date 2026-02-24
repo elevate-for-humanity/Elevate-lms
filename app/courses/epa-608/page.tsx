@@ -7,7 +7,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const metadata: Metadata = {
   title: 'EPA Section 608 Certification Prep | Elevate for Humanity',
   description:
-    'Complete 15-week EPA 608 Universal certification preparation. Covers Core, Type I, II, and III with study kits, practice exams, and proctored exam access through an approved testing partner.',
+    'Complete 15-week EPA 608 Universal certification preparation. Covers Core, Type I, II, and III with study kits, practice exams, and proctored exam access through EPA-approved certifying organizations.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/courses/epa-608',
   },
@@ -68,8 +68,8 @@ export default function EPA608CoursePage() {
               { icon: BookOpen, title: '15-Week Structured Curriculum', desc: 'Industry-aligned certification prep curriculum covering all four EPA 608 exam sections with structured weekly progression.' },
               { icon: CheckCircle, title: 'Study Kits Provided Free', desc: 'Every student receives a study kit at no cost — reference materials, practice questions, and exam prep guides.' },
               { icon: Shield, title: 'Full Practice Test Bank', desc: 'Practice exams for Core, Type I, Type II, and Type III sections. Take them as many times as needed.' },
-              { icon: Award, title: 'Proctored Exam Access', desc: 'Certification exam administered through an approved testing partner. No need to find a testing center on your own.' },
-              { icon: Users, title: 'Unlimited Online Retesting', desc: 'If you don\'t pass on the first attempt, retake the exam online at no additional cost.' },
+              { icon: Award, title: 'Proctored Exam Access', desc: 'Certification exam administered on-site through EPA-approved certifying organizations (ESCO Institute and Mainstream Engineering).' },
+              { icon: Users, title: 'Retesting Available', desc: 'Exam fees and retesting policies vary by certifying organization.' },
               { icon: Clock, title: 'Certification Does Not Expire', desc: 'Once you pass, your EPA 608 certification is valid for life. No renewal required.' },
             ].map((item, i) => (
               <div key={i} className="flex gap-4 p-5 rounded-xl border border-slate-200 bg-slate-50/50">
@@ -139,9 +139,9 @@ export default function EPA608CoursePage() {
             <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
               <h3 className="font-bold text-slate-900 mb-3">What You Should Know</h3>
               <ul className="space-y-2 text-sm text-slate-700">
-                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Exam is proctored through an approved testing partner</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Exams proctored on-site through ESCO Institute and Mainstream Engineering</li>
                 <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Available online — no travel to a testing center required</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Unlimited retesting at no additional cost</li>
+                <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Exam fees and retesting policies vary by certifying organization</li>
                 <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Certification does not expire</li>
                 <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" /> Recognized nationwide by all HVAC employers</li>
               </ul>

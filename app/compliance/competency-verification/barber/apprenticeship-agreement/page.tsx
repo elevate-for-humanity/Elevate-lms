@@ -41,7 +41,7 @@ export default function ApprenticeshipAgreementPage() {
       <div className="max-w-3xl mx-auto px-4 pb-12 print:px-8 print:pb-0 print:max-w-none">
         {/* Document header */}
         <div className="text-center border-b-2 border-gray-900 pb-6 mb-6 print:pb-4 print:mb-4">
-          <p className="text-xs uppercase tracking-widest text-gray-500 mb-2 print:text-[9px]">Elevate for Humanity Career and Technical Institute</p>
+          <p className="text-xs uppercase tracking-widest text-gray-500 mb-2 print:text-[9px]">Elevate for Humanity Career & Technical Institute</p>
           <h2 className="text-2xl font-bold text-gray-900 print:text-xl">BARBERING APPRENTICESHIP AGREEMENT</h2>
           <p className="text-sm text-gray-600 mt-1 print:text-[10px]">Workplace-Based Apprenticeship Program</p>
           <p className="text-xs text-gray-500 mt-1 print:text-[9px]">RAPIDS Registration: 2025-IN-132301 | Occupation: Barber (DOT 330.371-010)</p>
@@ -55,7 +55,7 @@ export default function ApprenticeshipAgreementPage() {
           <div className="space-y-3 text-sm print:text-[10px] print:space-y-2">
             <div className="grid grid-cols-[200px_1fr] gap-2 print:grid-cols-[160px_1fr]">
               <span className="font-semibold text-gray-900">Sponsor / Program Administrator:</span>
-              <span>Elevate for Humanity Career and Technical Institute</span>
+              <span>Elevate for Humanity Career & Technical Institute</span>
             </div>
             <div className="grid grid-cols-[200px_1fr] gap-2 print:grid-cols-[160px_1fr]">
               <span className="font-semibold text-gray-900">Apprentice:</span>
@@ -325,7 +325,7 @@ export default function ApprenticeshipAgreementPage() {
 
           {/* Document footer */}
           <div className="border-t-2 border-gray-900 pt-4 mt-8 text-center text-xs text-gray-500 print:text-[9px] print:pt-3 print:mt-4">
-            <p>Elevate for Humanity Career and Technical Institute</p>
+            <p>Elevate for Humanity Career & Technical Institute</p>
             <p>RAPIDS Registration: 2025-IN-132301 | Indianapolis, Indiana</p>
             <p className="mt-1">This agreement is maintained in the apprentice compliance file and filed with RAPIDS documentation.</p>
           </div>

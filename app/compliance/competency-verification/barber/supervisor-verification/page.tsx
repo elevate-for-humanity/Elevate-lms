@@ -38,7 +38,7 @@ export default function SupervisorVerificationPage() {
 
       {/* Print header */}
       <div className="hidden print:block px-8 pt-8 pb-4 border-b-2 border-gray-900">
-        <p className="text-[9px] uppercase tracking-widest text-gray-500 mb-1">Elevate for Humanity Career and Technical Institute</p>
+        <p className="text-[9px] uppercase tracking-widest text-gray-500 mb-1">Elevate for Humanity Career & Technical Institute</p>
         <h1 className="text-lg font-bold">LICENSED BARBER SUPERVISOR VERIFICATION FORM</h1>
         <p className="text-[10px] text-gray-600">Barbering Apprenticeship Program | RAPIDS ID: 2025-IN-132301</p>
       </div>

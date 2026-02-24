@@ -87,7 +87,7 @@ export default function PartnersPage() {
                 title: 'Participants earn credentials',
                 time: 'End of program',
                 image: '/images/heroes-hq/success-hero.jpg',
-                desc: 'Participants take their certification exams. We report results to you: who passed, what credential was issued, and by which authority. Certification pathways include EPA Section 608 preparation with proctored exam administration through an approved testing partner. Credentials are issued by recognized third parties (Indiana ISDH, Indiana BMV, EPA, OSHA, Certiport, AWS, Indiana PLA) — not by Elevate.',
+                desc: 'Participants take their certification exams. We report results to you: who passed, what credential was issued, and by which authority. Certification pathways include EPA Section 608 preparation with proctored exam administration through EPA-approved certifying organizations (ESCO Institute and Mainstream Engineering). Credentials are issued by recognized third parties (Indiana ISDH, Indiana BMV, EPA, OSHA, Certiport, AWS, Indiana PLA) — not by Elevate.',
               },
               {
                 step: 6,

@@ -65,7 +65,7 @@ export function PricingTiers({
         'One exam retake voucher',
         'Extended support period',
         'Priority scheduling',
-        'Guaranteed certification path',
+        'Structured certification preparation pathway',
       ],
     },
   ];

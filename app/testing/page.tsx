@@ -29,13 +29,13 @@ const examCategories = [
   },
   {
     name: 'EPA Section 608 Certification',
-    provider: 'EPA-approved proctor',
+    provider: 'ESCO Institute & Mainstream Engineering',
     image: '/images/Content_PATHWAY_TRADES.jpg',
-    description: 'Universal certification exam covering Core, Type I, II, and III refrigerant handling. Required by federal law for HVAC technicians.',
+    description: 'Universal certification exam covering Core, Type I, II, and III refrigerant handling. Required by federal law for HVAC technicians. Exam fees and retesting policies vary by certifying organization.',
     exams: [
       'EPA 608 Universal Certification Exam',
     ],
-    access: 'Proctored exam administered during program or scheduled separately',
+    access: 'Proctored on-site through EPA-approved certifying organizations',
   },
   {
     name: 'OSHA Safety Certifications',

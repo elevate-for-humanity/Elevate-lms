@@ -103,7 +103,7 @@ function getLessonContent(lesson: (typeof allLessons)[0]) {
           <ul className="list-disc list-inside space-y-1">
             <li>Multiple choice and short answer questions</li>
             <li>Covers material from this module</li>
-            <li>Unlimited retakes allowed</li>
+            <li>Exam fees and retesting policies vary by certifying organization</li>
             <li>Must pass to unlock next module</li>
           </ul>
         </div>

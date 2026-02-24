@@ -38,7 +38,7 @@ export default function BecomeMentorForm() {
 
     try {
       const supabase = createClient();
-      const { error: insertError } = await supabase.from('mentor_applications').insert({
+      const { error: insertError } = await supabase.from('mentorships').insert({
         first_name: form.first_name,
         last_name: form.last_name,
         email: form.email,

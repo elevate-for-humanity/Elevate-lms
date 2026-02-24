@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 export default async function AuthoritativeDocsPage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: dbRows } = await db.from('governance_documents').select('*').limit(50);
+  const { data: dbRows } = await db.from('compliance_documents').select('*').limit(50);
 const documents = (dbRows as any[]) || [];
 
   const currentDate = new Date().toLocaleDateString('en-US', {

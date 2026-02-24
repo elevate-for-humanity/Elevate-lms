@@ -93,7 +93,7 @@ export async function POST(req: Request) {
         // Notify shop owner that all docs are approved and onboarding is complete
         try {
           const { data: shop } = await db
-            .from('host_shops')
+            .from('shops')
             .select('owner_id, name')
             .eq('id', doc.shop_id)
             .single();

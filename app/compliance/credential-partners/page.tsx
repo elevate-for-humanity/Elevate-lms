@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 export default async function CredentialPartnersPage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: dbRows } = await db.from('compliance_records').select('*').limit(50);
+  const { data: dbRows } = await db.from('compliance_audits').select('*').limit(50);
 const CREDENTIAL_PARTNERS = (dbRows as any[]) || [];
 
   return (

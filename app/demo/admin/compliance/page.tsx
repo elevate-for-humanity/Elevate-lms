@@ -9,7 +9,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 export default async function DemoCompliancePage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: dbRows } = await db.from('compliance_records').select('*').limit(50);
+  const { data: dbRows } = await db.from('compliance_audits').select('*').limit(50);
 const checks = (dbRows as any[]) || [];
 
   return (

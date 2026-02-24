@@ -147,7 +147,7 @@ artifacts/
 # Netlify handler size: exclude generated media and dev artifacts
 public/generated/
 public/generated-images/
-reports/
+/reports/
 audit-packet/
 lighthouse-*.json
 deno.lock

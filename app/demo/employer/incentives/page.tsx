@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import Image from 'next/image';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { DollarSign, Clock } from 'lucide-react';
 
@@ -15,6 +16,11 @@ const incentives = (dbRows as any[]) || [];
   return (
     <DemoPageShell title="Incentives" description="OJT reimbursements, WOTC tax credits, and hiring incentives." portal="employer">
       <div className="grid sm:grid-cols-3 gap-4 mb-6">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+      </section>
         <div className="bg-white rounded-xl border p-4">
           <div className="flex items-center gap-2 mb-1"><DollarSign className="w-4 h-4 text-brand-green-600" /><span className="text-xs text-gray-500">Total Earned</span></div>
           <div className="text-2xl font-bold text-gray-900">$18,425</div>

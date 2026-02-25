@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import Image from 'next/image';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { FileText, Download, Clock } from 'lucide-react';
 
@@ -15,6 +16,11 @@ const docs = (dbRows as any[]) || [];
   return (
     <DemoPageShell title="Documents" description="Contracts, MOUs, and compliance documents." portal="employer">
       <div className="space-y-3">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+      </section>
         {docs.map((d, i) => (
           <div key={i} className="bg-white rounded-xl border p-4 flex items-center justify-between hover:shadow-sm transition">
             <div className="flex items-center gap-3">

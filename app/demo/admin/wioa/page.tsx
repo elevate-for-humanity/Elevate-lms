@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import Image from 'next/image';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { Clock, AlertTriangle } from 'lucide-react';
 
@@ -15,6 +16,11 @@ const participants = (dbRows as any[]) || [];
   return (
     <DemoPageShell title="WIOA" description="WIOA eligibility, Individual Training Accounts, and participant tracking." portal="admin">
       <div className="grid sm:grid-cols-3 gap-4 mb-6">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+      </section>
         <div className="bg-white rounded-xl border p-4">
           <div className="text-2xl font-bold text-gray-900">182</div>
           <div className="text-xs text-gray-500">WIOA Participants</div>

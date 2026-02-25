@@ -1,4 +1,5 @@
 
+import Image from 'next/image';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -12,6 +13,11 @@ export default function StudentPortalResourcesPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/success-hero.jpg" alt="Student portal" fill sizes="100vw" className="object-cover" priority />
+      </section>
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Student Portal", href: "/student-portal" }, { label: "Resources" }]} />
       </div>

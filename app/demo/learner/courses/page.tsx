@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import Image from 'next/image';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { Play, Lock } from 'lucide-react';
 
@@ -15,6 +16,11 @@ const courses = (dbRows as any[]) || [];
   return (
     <DemoPageShell title="Courses" description="Your enrolled courses and module progress." portal="learner">
       <div className="space-y-4">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+      </section>
         {courses.map((c, i) => (
           <div key={i} className={`bg-white rounded-xl border p-5 ${c.status === 'Locked' ? 'opacity-60' : 'hover:shadow-sm'} transition`}>
             <div className="flex items-start justify-between mb-3">

@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import Image from 'next/image';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 
 import { createClient } from '@/lib/supabase/server';
@@ -14,6 +15,11 @@ const apprentices = (dbRows as any[]) || [];
   return (
     <DemoPageShell title="Apprenticeships" description="Track apprentice hours, wage progression, and mentor assignments." portal="employer">
       <div className="space-y-4">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+      </section>
         {apprentices.map((a, i) => {
           const pct = Math.round((a.hoursLogged / a.hoursRequired) * 100);
           return (

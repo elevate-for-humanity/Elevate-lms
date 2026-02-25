@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -70,6 +71,11 @@ export default function GenerateReportPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
+      </section>
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Ferpa", href: "/ferpa" }, { label: "Generate" }]} />
       </div>

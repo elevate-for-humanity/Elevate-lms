@@ -1,4 +1,5 @@
 
+import Image from 'next/image';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Download, Presentation } from 'lucide-react';
@@ -105,6 +106,11 @@ export default function CapitalReadinessSlidesPage() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
+      </section>
       {/* Header */}
       <header className="border-b border-slate-200 py-4">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">

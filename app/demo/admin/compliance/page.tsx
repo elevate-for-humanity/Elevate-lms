@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import Image from 'next/image';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { AlertTriangle, XCircle } from 'lucide-react';
 
@@ -15,6 +16,11 @@ const checks = (dbRows as any[]) || [];
   return (
     <DemoPageShell title="Compliance" description="Compliance status across WIOA, FERPA, and program requirements." portal="admin">
       <div className="bg-white rounded-xl border overflow-hidden">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+      </section>
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-xs text-gray-500 border-b bg-gray-50">

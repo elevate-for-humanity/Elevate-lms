@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { logger } from '@/lib/logger';
 import React from 'react';
 
@@ -75,6 +76,11 @@ function CheckoutForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <PaymentElement />
 
       {error && (

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { DEMO_STUDENTS } from '@/lib/demo/sandbox-data';
@@ -52,6 +53,11 @@ export default function DemoApplicationsPage() {
       {/* Toast */}
       {toast && (
         <div className="fixed top-20 right-4 z-50 bg-brand-green-600 text-white px-4 py-3 rounded-lg shadow-xl text-sm font-medium animate-fade-in-up">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+      </section>
           {toast}
         </div>
       )}

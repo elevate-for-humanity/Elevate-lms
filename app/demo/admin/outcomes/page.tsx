@@ -1,4 +1,5 @@
 
+import Image from 'next/image';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { DEMO_PROGRAMS } from '@/lib/demo/sandbox-data';
 
@@ -7,6 +8,11 @@ export default function DemoOutcomesPage() {
   return (
     <DemoPageShell title="Outcomes" description="Program completion rates, credential attainment, and employment outcomes." portal="admin">
       <div className="grid sm:grid-cols-3 gap-4 mb-6">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+      </section>
         <div className="bg-white rounded-xl border p-4 text-center">
           <div className="text-3xl font-bold text-gray-900">78%</div>
           <div className="text-xs text-gray-500 mt-1">Completion Rate</div>

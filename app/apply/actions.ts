@@ -332,7 +332,26 @@ async function insertApplication(payload: {
 
         `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">Thank you for your interest in <strong>${programLabel}</strong> at Elevate for Humanity. We received your inquiry and we'd love to help you take the next step.</p>`,
 
-        `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">We've created your account. You can log in using the email and password you provided on the application form. Below you'll find details about funding and how to connect with our team.</p>`,
+        `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">We've created your account. You can log in using the email and password you provided on the application form.</p>`,
+
+        // Onboarding — first thing after greeting
+        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Your Next Steps</h3>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">Log in and complete your onboarding to secure your spot:</p>`,
+        `<ol style="margin:0 0 20px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
+        `<li>Complete your profile</li>`,
+        `<li>Upload your documents (photo ID, proof of residency)</li>`,
+        `<li>Confirm your funding source</li>`,
+        `<li>Select your schedule</li>`,
+        `<li>Complete orientation</li>`,
+        `</ol>`,
+
+        `<div style="text-align:center;margin:24px 0">`,
+        `<a href="${ctaLink}" style="display:inline-block;padding:14px 40px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-weight:bold;font-size:15px">Log In &amp; Start Onboarding</a>`,
+        `</div>`,
+        `<p style="text-align:center;font-size:12px;color:#999;font-family:Arial,sans-serif;margin:0 0 24px">For the best experience, please use a laptop, desktop, or iPad.</p>`,
+
+        // Divider
+        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
 
         // Credentials
         credentialsBlock,
@@ -388,27 +407,6 @@ async function insertApplication(payload: {
         `<li><strong>Deposit + Payment Plan</strong> — put down a deposit and pay the balance over time</li>`,
         `</ul>`,
         `<p style="font-size:14px;line-height:1.7;margin:0 0 16px">To discuss which option works best for you, <a href="${siteUrl}/schedule-consultation" style="color:#1a1a1a;font-weight:bold">schedule a Zoom meeting</a> with our enrollment team or call us at <strong>(317) 314-3757</strong>.</p>`,
-
-        // Divider
-        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
-
-        // Onboarding
-        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Getting Started</h3>`,
-        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">While you explore your funding options, you can go ahead and begin your onboarding:</p>`,
-        `<ol style="margin:0 0 20px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
-        `<li>Complete your profile</li>`,
-        `<li>Upload your documents (photo ID, proof of residency)</li>`,
-        `<li>Confirm your funding source</li>`,
-        `<li>Select your schedule</li>`,
-        `<li>Complete orientation</li>`,
-        `</ol>`,
-
-        `<div style="text-align:center;margin:24px 0">`,
-        `<a href="${ctaLink}" style="display:inline-block;padding:14px 40px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-weight:bold;font-size:15px">Log In & Start Onboarding</a>`,
-        `</div>`,
-
-        // Device note
-        `<p style="text-align:center;font-size:12px;color:#999;font-family:Arial,sans-serif;margin:0 0 24px">For the best experience, please use a laptop, desktop, or iPad.</p>`,
 
         // Closing
         `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,

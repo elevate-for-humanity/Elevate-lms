@@ -1,5 +1,6 @@
 
 'use client';
+import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { useEffect, useState } from 'react';
@@ -55,6 +56,11 @@ export default function LicensingPage() {
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Licensing' }]} />
       <h1 className="text-3xl font-bold mb-8 mt-4">License Management</h1>
 

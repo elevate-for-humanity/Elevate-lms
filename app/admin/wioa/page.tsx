@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { Metadata } from 'next';
@@ -80,6 +81,11 @@ export default async function WIOAPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Wioa" }]} />
       <div className="flex justify-between items-center mb-8">
         <div>

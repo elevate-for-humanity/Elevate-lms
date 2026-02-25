@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import React from 'react';
@@ -81,6 +82,11 @@ export default function AdminNextStepsPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Next Steps' }]} />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mt-4">
         <div>

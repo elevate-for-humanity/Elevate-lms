@@ -184,16 +184,16 @@ export default function CNAProgramPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/programs/cna-certification/enroll"
+              href="/apply/student?program=cna-certification"
               className="bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
             >
-              Enroll Now — $1,200
+              Apply for Enrollment
             </Link>
             <Link
-              href="/apply/student?program=cna-certification"
+              href="/apply/intake?program=cna-certification"
               className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition"
             >
-              Apply with Workforce Funding
+              Request Information
             </Link>
           </div>
         </div>

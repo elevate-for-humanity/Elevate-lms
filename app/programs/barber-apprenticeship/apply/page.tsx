@@ -285,7 +285,7 @@ export default function BarberApprenticeshipApplyPage() {
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Enroll & Pay</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Apply for Enrollment</h1>
             <p className="text-lg text-slate-300 max-w-3xl mx-auto">Barber Apprenticeship Program</p>
           </div>
         </div>

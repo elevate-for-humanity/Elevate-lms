@@ -112,7 +112,7 @@ export default function HomePage() {
                   width={800}
                   height={533}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="w-full h-auto rounded-lg mb-4"
+                  className="w-full h-48 object-cover rounded-lg mb-4"
                 />
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{step.title}</h3>
                 <p className="text-slate-700 text-base mb-4">{step.desc}</p>
@@ -143,7 +143,7 @@ export default function HomePage() {
               { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/homepage-new/government.jpg', external: true },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
-                <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-auto" />
+                <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-48 object-cover" />
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-lg mb-1">{item.label}</h3>
                   <p className="text-slate-600 text-sm mb-4">{item.desc}</p>
@@ -189,7 +189,7 @@ export default function HomePage() {
               { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/homepage-new/post-jobs.jpg' },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
-                <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-auto object-cover" />
+                <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-48 object-cover" />
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-lg mb-1">{item.label}</h3>
                   <p className="text-slate-600 text-sm mb-4">{item.desc}</p>
@@ -218,7 +218,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div className="rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/homepage-new/why-elevate.jpg" alt="Students in a training session at Elevate for Humanity" width={800} height={600} className="w-full h-auto object-cover" />
+              <Image src="/images/homepage-new/why-elevate.jpg" alt="Students in a training session at Elevate for Humanity" width={800} height={600} className="w-full h-72 sm:h-80 lg:h-96 object-cover" />
             </div>
             <div>
               <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Why Elevate</p>

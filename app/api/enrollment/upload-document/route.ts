@@ -59,8 +59,8 @@ export async function POST(req: Request) {
       .insert({
         user_id: user.id,
         enrollment_id: enrollmentId || null,
-        name: file.name,
-        type: documentType,
+        file_name: file.name,
+        document_type: documentType,
         file_url: urlData.publicUrl,
         file_path: fileName,
         file_size: file.size,

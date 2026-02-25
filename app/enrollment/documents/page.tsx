@@ -36,6 +36,7 @@ export default function DocumentsPage() {
   const [uploading, setUploading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     async function checkEnrollment() {
@@ -46,6 +47,7 @@ export default function DocumentsPage() {
         router.push('/login');
         return;
       }
+      setUserId(user.id);
 
       const { data, error } = await supabase
         .from('program_enrollments')
@@ -85,7 +87,7 @@ export default function DocumentsPage() {
   }, [router]);
 
   async function handleFileUpload(docId: string, file: File) {
-    if (!enrollmentId) return;
+    if (!enrollmentId || !userId) return;
     
     setUploading(docId);
     setError(null);
@@ -93,9 +95,9 @@ export default function DocumentsPage() {
     try {
       const supabase = createClient();
       
-      // Upload to Supabase Storage
+      // Upload to Supabase Storage — path must start with userId for RLS
       const fileExt = file.name.split('.').pop();
-      const fileName = `${enrollmentId}/${docId}.${fileExt}`;
+      const fileName = `${userId}/${enrollmentId}/${docId}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
         .from('enrollment-documents')

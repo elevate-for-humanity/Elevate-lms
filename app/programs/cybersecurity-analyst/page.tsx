@@ -4,7 +4,7 @@ export const revalidate = 86400;
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, DollarSign, Award, CheckCircle, Users, Shield, TrendingUp, Lock, ArrowRight, Phone } from 'lucide-react';
+import { Clock, DollarSign, Award, Users, Shield, TrendingUp, Lock, ArrowRight, Phone } from 'lucide-react';
 import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import PageAvatar from '@/components/PageAvatar';
@@ -44,7 +44,6 @@ export default function Page() {
       <section className="relative w-full -mt-[72px]">
         <div className="relative min-h-[70vh] w-full overflow-hidden">
           <Image src="/images/programs-hq/cybersecurity.jpg" alt="Cybersecurity Analyst Training" fill className="object-cover" priority />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
           <div className="relative z-10 flex items-center justify-center min-h-[70vh]">
             <div className="max-w-5xl mx-auto px-6 text-center text-white">
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 border border-white/30">
@@ -150,7 +149,7 @@ export default function Page() {
               <h3 className="text-xl font-bold mb-4">Industries Hiring</h3>
               <ul className="space-y-3">
                 {['Healthcare systems', 'Financial institutions', 'Government agencies', 'Defense contractors', 'Technology companies', 'Insurance companies', 'Manufacturing', 'Every business with a network'].map((i) => (
-                  <li key={i} className="flex items-start gap-2"><CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" /><span>{i}</span></li>
+                  <li key={i} className="flex items-start gap-2"><span className="w-2 h-2 bg-brand-green-500 rounded-full mt-2 flex-shrink-0" /><span>{i}</span></li>
                 ))}
               </ul>
             </div>

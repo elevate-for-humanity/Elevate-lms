@@ -1,9 +1,15 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { CAREERS, PARTNER_REQUIREMENTS, PARTNER_BENEFITS } from '../barber-program-data';
 
 export function BarberPartnership() {
   return (
     <>
+      {/* Career Image */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[360px]">
+        <Image src="/images/barber/barber-shop-interior.jpg" alt="Professional barbershop interior" fill sizes="100vw" className="object-cover" />
+      </section>
+
       {/* Section 7 — Career Pathways */}
       <section className="py-16 bg-brand-red-600">
         <div className="max-w-5xl mx-auto px-4">

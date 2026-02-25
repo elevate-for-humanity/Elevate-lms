@@ -4,7 +4,7 @@ export const revalidate = 86400;
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ExternalLink, Clock, DollarSign, Award, CheckCircle, Users, BookOpen, Calculator, TrendingUp, Briefcase , ArrowRight, Phone } from 'lucide-react';
+import { ExternalLink, Clock, DollarSign, Award, Users, BookOpen, Calculator, TrendingUp, Briefcase , ArrowRight, Phone } from 'lucide-react';
 import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import PageAvatar from '@/components/PageAvatar';
@@ -58,7 +58,6 @@ export default function Page() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
           <div className="relative z-10 flex items-center justify-center min-h-[70vh]">
             <div className="max-w-5xl mx-auto px-6 text-center text-white">
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 border border-white/30">
@@ -163,19 +162,19 @@ export default function Page() {
               </p>
               <ul className="space-y-2">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="w-2 h-2 bg-brand-green-500 rounded-full mt-2 flex-shrink-0" />
                   <span>Accounts payable & receivable</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="w-2 h-2 bg-brand-green-500 rounded-full mt-2 flex-shrink-0" />
                   <span>Payroll processing</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="w-2 h-2 bg-brand-green-500 rounded-full mt-2 flex-shrink-0" />
                   <span>Financial statements & reporting</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="w-2 h-2 bg-brand-green-500 rounded-full mt-2 flex-shrink-0" />
                   <span>General ledger management</span>
                 </li>
               </ul>
@@ -194,19 +193,19 @@ export default function Page() {
               </p>
               <ul className="space-y-2">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="w-2 h-2 bg-brand-green-500 rounded-full mt-2 flex-shrink-0" />
                   <span>QuickBooks setup & navigation</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="w-2 h-2 bg-brand-green-500 rounded-full mt-2 flex-shrink-0" />
                   <span>Invoicing & billing</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="w-2 h-2 bg-brand-green-500 rounded-full mt-2 flex-shrink-0" />
                   <span>Bank reconciliation</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="w-2 h-2 bg-brand-green-500 rounded-full mt-2 flex-shrink-0" />
                   <span>Reports & financial analysis</span>
                 </li>
               </ul>
@@ -315,7 +314,7 @@ export default function Page() {
                   'Self-employed / freelance bookkeeping',
                 ].map((industry) => (
                   <li key={industry} className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                    <span className="w-2 h-2 bg-brand-green-500 rounded-full mt-2 flex-shrink-0" />
                     <span>{industry}</span>
                   </li>
                 ))}

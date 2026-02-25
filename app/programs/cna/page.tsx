@@ -1,14 +1,17 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
   Clock,
   DollarSign,
   GraduationCap,
   MapPin,
-  CheckCircle,
+
   ArrowRight,
-  Heart,
+
   Shield,
   Users,
   Calendar,
@@ -46,46 +49,19 @@ export default function CNAProgramPage() {
         <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'CNA Certification' }]} />
       </div>
 
-      {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[320px] md:h-[420px] w-full overflow-hidden">
-          <Image
-            src="/images/programs-hq/cna-training.jpg"
-            alt="CNA training classroom with students practicing patient care"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/60 via-slate-900/35 to-transparent" />
-          <div className="absolute inset-0 flex items-center">
-            <div className="max-w-5xl mx-auto px-4">
-              <div className="inline-flex items-center gap-2 bg-brand-green-500/90 text-white text-sm font-semibold px-3 py-1 rounded-full mb-4">
-                <Heart className="w-4 h-4" /> Now Enrolling
-              </div>
-              <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 drop-shadow-lg">
-                Certified Nursing Assistant (CNA)
-              </h1>
-              <p className="text-lg text-white/90 max-w-2xl drop-shadow">
-                Start your healthcare career in as little as 4 weeks. Hands-on clinical training, exam prep, and job placement support included.
-              </p>
-              <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                <Link
-                  href="/programs/cna-certification/enroll"
-                  className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold transition shadow-lg"
-                >
-                  Enroll Now <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link
-                  href="/apply/student?program=cna-certification"
-                  className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-white/10 transition"
-                >
-                  Apply with Funding
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Video Hero */}
+      <ProgramHeroBanner videoSrc="/videos/cna-hero.mp4" />
+
+      {/* Hero Image — no text overlay */}
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+        <Image
+          src="/images/programs-hq/cna-training.jpg"
+          alt="CNA training classroom with students practicing patient care"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
       </section>
 
       {/* Quick Stats */}
@@ -136,7 +112,7 @@ export default function CNAProgramPage() {
               <ul className="space-y-3">
                 {curriculum.map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-brand-green-500 mt-0.5 flex-shrink-0" />
+                    <span className="w-2 h-2 bg-brand-green-500 rounded-full mt-2 flex-shrink-0" />
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}

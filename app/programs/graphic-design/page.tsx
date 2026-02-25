@@ -4,7 +4,7 @@ export const revalidate = 86400;
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, DollarSign, Award, CheckCircle, Users, Palette, TrendingUp, Pen , ArrowRight, Phone } from 'lucide-react';
+import { Clock, DollarSign, Award, Users, Palette, TrendingUp, Pen , ArrowRight, Phone } from 'lucide-react';
 import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import PageAvatar from '@/components/PageAvatar';
@@ -41,7 +41,6 @@ export default function Page() {
       <section className="relative w-full -mt-[72px]">
         <div className="relative min-h-[70vh] w-full overflow-hidden">
           <Image src="/images/programs-hq/business-office.jpg" alt="Graphic Design Professional Training" fill className="object-cover" priority />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
           <div className="relative z-10 flex items-center justify-center min-h-[70vh]">
             <div className="max-w-5xl mx-auto px-6 text-center text-white">
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 border border-white/30">

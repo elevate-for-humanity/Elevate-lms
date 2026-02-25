@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Calendar, Clock, BookOpen, GraduationCap } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -61,7 +62,12 @@ export default function AcademicCalendarPage() {
         </div>
       </div>
 
-      {/* Hero */}
+      {/* Hero Image */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Academic calendar and important dates" fill sizes="100vw" className="object-cover" priority />
+      </section>
+
+      {/* Title */}
       <section className="bg-brand-blue-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-4">Academic Calendar</h1>

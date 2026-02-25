@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   Heart, Users, Shield, Target, ArrowRight, 
   GraduationCap 
@@ -58,10 +59,14 @@ export default function MissionPage() {
         </div>
       </div>
 
-      {/* Hero */}
+      {/* Hero Image */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Our mission to elevate communities" fill sizes="100vw" className="object-cover" priority />
+      </section>
+
+      {/* Title */}
       <div className="bg-brand-blue-600 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <Heart className="w-12 h-12 mx-auto mb-6 text-brand-blue-200" />
           <h1 className="text-3xl md:text-4xl font-bold mb-6">
             Our Mission
           </h1>

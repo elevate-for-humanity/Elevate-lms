@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
+import Image from 'next/image';
 import DonationForm from '@/components/DonationForm';
 import {
   Heart,
@@ -93,7 +94,12 @@ export default async function DonatePage() {
         </div>
       </div>
 
-      {/* Hero */}
+      {/* Hero Image */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+        <Image src="/images/heroes-hq/funding-hero.jpg" alt="Support workforce development" fill sizes="100vw" className="object-cover" priority />
+      </section>
+
+      {/* Title */}
       <section className="bg-teal-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full mb-6">

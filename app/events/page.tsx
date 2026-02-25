@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Calendar, MapPin, Clock, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -119,13 +120,14 @@ export default async function EventsPage() {
         </div>
       </div>
 
-      {/* Hero */}
-      <div className="bg-rose-600 text-white py-16">
+      {/* Hero Image */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+        <Image src="/images/heroes-hq/success-stories-hero.jpg" alt="Upcoming events and workshops" fill sizes="100vw" className="object-cover" priority />
+      </section>
+
+      {/* Title */}
+      <div className="bg-rose-600 text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-3 mb-4">
-            <Calendar className="w-8 h-8 text-rose-300" />
-            <span className="text-rose-300 font-medium">Community</span>
-          </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Events</h1>
           <p className="text-xl text-rose-100 max-w-2xl">
             Join us for workshops, info sessions, career fairs, and networking events.

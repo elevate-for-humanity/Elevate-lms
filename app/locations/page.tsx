@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
+import Image from 'next/image';
 import { MapPin, Phone, Mail, Clock, Navigation } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -79,18 +80,18 @@ export default async function LocationsPage() {
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="bg-brand-blue-600 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <MapPin className="h-20 w-20 text-white mx-auto mb-6" />
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6">
-              Our Locations
-            </h1>
-            <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
-              Visit us in Indianapolis to learn more about our programs and services.
-            </p>
-          </div>
+      {/* Hero Image */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Training locations in Indianapolis" fill sizes="100vw" className="object-cover" priority />
+      </section>
+
+      {/* Title */}
+      <section className="bg-brand-blue-600 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-4">Our Locations</h1>
+          <p className="text-xl text-white/90 max-w-3xl mx-auto">
+            Visit us in Indianapolis to learn more about our programs and services.
+          </p>
         </div>
       </section>
 

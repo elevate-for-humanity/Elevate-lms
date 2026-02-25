@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Phone } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -72,6 +73,11 @@ export default async function TuitionFeesPage() {
           <Breadcrumbs items={[{ label: 'Tuition & Fees' }]} />
         </div>
       </div>
+
+      {/* Hero Image */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+        <Image src="/images/heroes-hq/funding-hero.jpg" alt="Tuition and fee information" fill sizes="100vw" className="object-cover" priority />
+      </section>
 
       {/* Header */}
       <div className="bg-gray-900 text-white py-16">

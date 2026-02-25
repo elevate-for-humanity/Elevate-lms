@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, BarChart3, Calendar, Database, Users, Clock, CheckCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -19,6 +20,11 @@ export default function OutcomesMethodologyPage() {
           <Breadcrumbs items={[{ label: 'Governance', href: '/governance' }, { label: 'Outcomes Methodology' }]} />
         </div>
       </div>
+
+      {/* Hero Image */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+        <Image src="/images/heroes-hq/success-hero.jpg" alt="Student outcomes and placement rates" fill sizes="100vw" className="object-cover" priority />
+      </section>
 
       <div className="bg-slate-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">

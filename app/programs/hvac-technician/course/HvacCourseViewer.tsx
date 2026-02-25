@@ -432,7 +432,7 @@ export default function HvacCourseViewer({
               </Link>
             ) : (
               <Link
-                href="/programs/hvac-technician/apply"
+                href="/apply/student?program=hvac-technician"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
               >
                 Apply for Enrollment
@@ -563,7 +563,7 @@ export default function HvacCourseViewer({
             </Link>
           ) : enrollmentStatus === 'not-enrolled' ? (
             <Link
-              href="/programs/hvac-technician/apply"
+              href="/apply/student?program=hvac-technician"
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               Apply for Enrollment

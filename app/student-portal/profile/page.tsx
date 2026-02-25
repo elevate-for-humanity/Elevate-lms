@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import {
   User,
@@ -164,6 +165,11 @@ export default function StudentProfilePage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/success-hero.jpg" alt="Student profile" fill sizes="100vw" className="object-cover" priority />
+      </section>
+
       <div className="max-w-2xl mx-auto px-4 py-8">
         <Link href="/student-portal/onboarding" className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 mb-6">
           <ArrowLeft className="w-4 h-4" />

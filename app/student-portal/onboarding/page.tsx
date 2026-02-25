@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { updateOnboardingProgress } from '@/lib/compliance/enforcement';
 import {
@@ -209,8 +210,13 @@ export default function StudentOnboardingPage() {
   const nextStep = getNextStep();
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
-      <div className="max-w-3xl mx-auto px-4">
+    <div className="min-h-screen bg-slate-50">
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/success-hero.jpg" alt="Student onboarding" fill sizes="100vw" className="object-cover" priority />
+      </section>
+
+      <div className="max-w-3xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">

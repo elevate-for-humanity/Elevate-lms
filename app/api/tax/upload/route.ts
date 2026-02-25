@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     // Generate unique file path
     const timestamp = Date.now();
     const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const filePath = `tax-documents/${user.email}/${timestamp}_${sanitizedFileName}`;
+    const filePath = `${user.id}/tax-documents/${timestamp}_${sanitizedFileName}`;
 
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage

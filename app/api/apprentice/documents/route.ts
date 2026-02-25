@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     // Generate unique filename
     const timestamp = Date.now();
     const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const storagePath = `apprentice-documents/${user.id}/${docType.document_type}/${timestamp}_${safeFileName}`;
+    const storagePath = `${user.id}/apprentice-documents/${docType.document_type}/${timestamp}_${safeFileName}`;
 
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage

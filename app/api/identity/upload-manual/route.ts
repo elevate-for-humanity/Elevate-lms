@@ -72,8 +72,8 @@ export async function POST(request: NextRequest) {
 
     // Upload files to Supabase Storage
     const timestamp = Date.now();
-    const idFrontPath = `identity-verification/${userId}/id-front-${timestamp}.${idFront.name.split('.').pop()}`;
-    const selfiePath = `identity-verification/${userId}/selfie-${timestamp}.${selfie.name.split('.').pop()}`;
+    const idFrontPath = `${userId}/identity-verification/id-front-${timestamp}.${idFront.name.split('.').pop()}`;
+    const selfiePath = `${userId}/identity-verification/selfie-${timestamp}.${selfie.name.split('.').pop()}`;
 
     // Upload ID front
     const { data: idFrontData, error: idFrontError } = await supabase.storage
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     // Upload ID back if provided
     let idBackPath = null;
     if (idBack) {
-      idBackPath = `identity-verification/${userId}/id-back-${timestamp}.${idBack.name.split('.').pop()}`;
+      idBackPath = `${userId}/identity-verification/id-back-${timestamp}.${idBack.name.split('.').pop()}`;
       const { error: idBackError } = await supabase.storage
         .from('documents')
         .upload(idBackPath, idBack, {

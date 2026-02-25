@@ -103,15 +103,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const {
-      data: { publicUrl: idFrontUrl },
-    } = db.storage.from('documents').getPublicUrl(idFrontPath);
+    // Bucket is private — store file_path only, generate signed URLs on-demand
 
     // Upload ID back (if provided)
-    let idBackUrl = null;
+    let idBackPath: string | null = null;
     if (idBack) {
       const idBackExt = idBack.name.split('.').pop();
-      const idBackPath = `${user.id}/id-back-${Date.now()}.${idBackExt}`;
+      idBackPath = `${user.id}/id-back-${Date.now()}.${idBackExt}`;
       const { error: backError } = await db.storage
         .from('documents')
         .upload(idBackPath, idBack, {
@@ -119,11 +117,8 @@ export async function POST(request: NextRequest) {
           upsert: false,
         });
 
-      if (!backError) {
-        const {
-          data: { publicUrl },
-        } = db.storage.from('documents').getPublicUrl(idBackPath);
-        idBackUrl = publicUrl;
+      if (backError) {
+        idBackPath = null;
       }
     }
 
@@ -140,7 +135,7 @@ export async function POST(request: NextRequest) {
     if (selfieError) {
       // Clean up ID front
       await db.storage.from('documents').remove([idFrontPath]);
-      if (idBackUrl) {
+      if (idBackPath) {
         await db.storage.from('documents').remove([idBackPath]);
       }
       return NextResponse.json(
@@ -148,10 +143,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    const {
-      data: { publicUrl: selfieUrl },
-    } = db.storage.from('documents').getPublicUrl(selfiePath);
 
     // Get IP and user agent
     const ip =
@@ -175,12 +166,12 @@ export async function POST(request: NextRequest) {
     // Store uploaded files in documents table for admin review
     if (verification) {
       const docRows = [
-        { user_id: user.id, document_type: 'photo_id' as const, file_name: 'id-front.jpg', file_url: idFrontUrl, file_path: idFrontPath, mime_type: 'image/jpeg', status: 'pending_review' },
+        { user_id: user.id, document_type: 'photo_id' as const, file_name: 'id-front.jpg', file_url: null, file_path: idFrontPath, mime_type: 'image/jpeg', status: 'pending_review' },
       ];
-      if (idBackUrl) {
-        docRows.push({ user_id: user.id, document_type: 'photo_id' as const, file_name: 'id-back.jpg', file_url: idBackUrl, file_path: idBackPath, mime_type: 'image/jpeg', status: 'pending_review' });
+      if (idBackPath) {
+        docRows.push({ user_id: user.id, document_type: 'photo_id' as const, file_name: 'id-back.jpg', file_url: null, file_path: idBackPath, mime_type: 'image/jpeg', status: 'pending_review' });
       }
-      docRows.push({ user_id: user.id, document_type: 'other' as const, file_name: 'selfie.jpg', file_url: selfieUrl, file_path: selfiePath, mime_type: 'image/jpeg', status: 'pending_review' });
+      docRows.push({ user_id: user.id, document_type: 'other' as const, file_name: 'selfie.jpg', file_url: null, file_path: selfiePath, mime_type: 'image/jpeg', status: 'pending_review' });
       await db.from('documents').insert(docRows);
     }
 
@@ -189,7 +180,7 @@ export async function POST(request: NextRequest) {
       await db.storage
         .from('documents')
         .remove([idFrontPath, selfiePath]);
-      if (idBackUrl) {
+      if (idBackPath) {
         await db.storage.from('documents').remove([idBackPath]);
       }
       return NextResponse.json(

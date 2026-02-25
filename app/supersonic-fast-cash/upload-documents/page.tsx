@@ -143,10 +143,7 @@ export default function UploadDocumentsPage() {
 
         if (error) throw error;
 
-        // Get public URL
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from('documents').getPublicUrl(filePath);
+        // Bucket is private — store file_path only
 
         // Save to database
         await supabase.from('tax_documents').insert({

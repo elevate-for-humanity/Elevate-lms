@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { prepareSSNForStorage } from '@/lib/security/ssn';
 
 export async function createWOTCApplication(formData: FormData) {
   const supabase = await createClient();
@@ -16,11 +17,16 @@ export async function createWOTCApplication(formData: FormData) {
 
   // Get target groups as array
   const targetGroups = formData.getAll('targetGroups') as string[];
+
+  // Hash SSN — never store plaintext
+  const rawSsn = formData.get('ssn') as string;
+  const ssnData = rawSsn ? prepareSSNForStorage(rawSsn) : { ssn_hash: '', ssn_last4: '' };
   
   const applicationData = {
     employee_first_name: formData.get('firstName') as string,
     employee_last_name: formData.get('lastName') as string,
-    employee_ssn: formData.get('ssn') as string,
+    employee_ssn_hash: ssnData.ssn_hash,
+    employee_ssn_last4: ssnData.ssn_last4,
     employee_dob: formData.get('dob') as string,
     employer_name: formData.get('employerName') as string,
     employer_ein: formData.get('ein') as string,
@@ -42,7 +48,8 @@ export async function createWOTCApplication(formData: FormData) {
     .single();
 
   if (error) {
-    console.error('WOTC insert error:', error);
+    // Log without exposing sensitive data
+    console.error('WOTC insert error:', error?.message || 'unknown');
     return { error: 'Operation failed' };
   }
 
@@ -60,11 +67,16 @@ export async function updateWOTCApplication(id: string, formData: FormData) {
   }
 
   const targetGroups = formData.getAll('targetGroups') as string[];
+
+  // Hash SSN — never store plaintext
+  const rawSsn = formData.get('ssn') as string;
+  const ssnData = rawSsn ? prepareSSNForStorage(rawSsn) : { ssn_hash: '', ssn_last4: '' };
   
   const updateData = {
     employee_first_name: formData.get('firstName') as string,
     employee_last_name: formData.get('lastName') as string,
-    employee_ssn: formData.get('ssn') as string,
+    employee_ssn_hash: ssnData.ssn_hash,
+    employee_ssn_last4: ssnData.ssn_last4,
     employee_dob: formData.get('dob') as string,
     employer_name: formData.get('employerName') as string,
     employer_ein: formData.get('ein') as string,

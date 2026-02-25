@@ -84,11 +84,19 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
     setIsSaving(true);
     try {
       const supabase = createClient();
+
+      // Strip full SSN before persisting — store only last 4 digits
+      const safeData = { ...formData };
+      if (typeof safeData.ssn === 'string' && safeData.ssn.replace(/\D/g, '').length === 9) {
+        const digits = safeData.ssn.replace(/\D/g, '');
+        (safeData as any).ssn_last4 = digits.slice(-4);
+        safeData.ssn = '';
+      }
       
       const draftData = {
         user_id: userId,
         tax_year: taxYear,
-        data: formData,
+        data: safeData,
         completed_sections: completedSections,
         status: 'draft',
         updated_at: new Date().toISOString(),

@@ -107,11 +107,22 @@ export default async function WIOAVerifyPage({
   // Load documents for this participant
   const { data: documents } = await db
     .from('documents')
-    .select('id, title, file_url, document_type, status, created_at')
+    .select('id, title, file_url, file_path, document_type, status, created_at')
     .eq('user_id', participant.user_id)
     .order('created_at', { ascending: false });
 
-  const docs = documents || [];
+  // Generate signed URLs for private bucket documents
+  const docs = await Promise.all(
+    (documents || []).map(async (doc) => {
+      if (doc.file_path) {
+        const { data: signedData } = await db.storage
+          .from('documents')
+          .createSignedUrl(doc.file_path, 3600);
+        return { ...doc, file_url: signedData?.signedUrl || doc.file_url };
+      }
+      return doc;
+    })
+  );
   const address = participant.address as any;
   const missingDocs = docs.filter(d => d.status === 'missing' || !d.file_url);
 

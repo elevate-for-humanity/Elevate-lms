@@ -74,6 +74,17 @@ export default async function ReviewDetailPage({
       .select('*')
       .eq('id', item.subject_id)
       .single();
+
+    // Generate signed URL for private bucket
+    if (doc?.file_path) {
+      const { data: signedData } = await db.storage
+        .from('documents')
+        .createSignedUrl(doc.file_path, 3600);
+      if (signedData?.signedUrl) {
+        doc.file_url = signedData.signedUrl;
+      }
+    }
+
     document = doc;
     subject = doc;
 

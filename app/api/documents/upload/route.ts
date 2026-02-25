@@ -90,10 +90,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     throw APIErrors.external('Supabase Storage', 'Failed to upload file');
   }
 
-    // Get public URL
-    const {
-      data: { publicUrl },
-    } = db.storage.from('documents').getPublicUrl(fileName);
+    // Bucket is private — do not use getPublicUrl().
+    // Store file_path only; generate signed URLs on-demand for viewing.
 
   // Parse and validate metadata
   let parsedMetadata = {};
@@ -120,7 +118,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       document_type: documentType,
       file_name: file.name,
       file_size: file.size,
-      file_url: publicUrl,
+      file_url: null,
       file_path: fileName,
       mime_type: file.type,
       status: 'pending_review',

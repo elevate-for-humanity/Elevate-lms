@@ -174,26 +174,104 @@ export default function HVACProgramContent() {
         </div>
       </section>
 
-      {/* Funding — compact */}
+      {/* Funding */}
       <section className="bg-white py-14">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-3">Funding</h2>
-          <p className="text-gray-600 mb-6">Most students pay nothing out of pocket.</p>
-          <ol className="space-y-3">
-            {[
-              { step: '1', title: 'Register at Indiana Career Connect', desc: 'Free account at indianacareerconnect.com. Takes 10 minutes.' },
-              { step: '2', title: 'Meet with a WorkOne Career Coach', desc: 'They determine your WIOA or Workforce Ready Grant eligibility.' },
-              { step: '3', title: 'Apply to Our Program', desc: 'We coordinate with WorkOne. Once approved, you start with your cohort.' },
-            ].map((s) => (
-              <li key={s.step} className="flex gap-4 items-start bg-gray-50 rounded-xl p-5 border border-gray-200">
-                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-blue-600 text-white font-bold flex items-center justify-center text-sm">{s.step}</span>
+          <p className="text-gray-600 mb-6">Most students pay nothing out of pocket. Here is exactly how to get started.</p>
+
+          <ol className="space-y-4 mb-10">
+            {/* Step 1 */}
+            <li className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <div className="flex gap-4 items-start">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-blue-600 text-white font-bold flex items-center justify-center text-sm">1</span>
                 <div>
-                  <p className="font-bold text-gray-900">{s.title}</p>
-                  <p className="text-sm text-gray-600">{s.desc}</p>
+                  <p className="font-bold text-gray-900 mb-1">Register at Indiana Career Connect</p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Create a free account at the state workforce portal. This is required before you can
+                    be referred to any WIOA-funded training program. Takes about 10 minutes.
+                  </p>
+                  <Link
+                    href="https://indianacareerconnect.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-bold py-2 px-5 rounded-lg transition"
+                  >
+                    Go to Indiana Career Connect →
+                  </Link>
                 </div>
-              </li>
-            ))}
+              </div>
+            </li>
+
+            {/* Step 2 */}
+            <li className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <div className="flex gap-4 items-start">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-blue-600 text-white font-bold flex items-center justify-center text-sm">2</span>
+                <div>
+                  <p className="font-bold text-gray-900 mb-1">Visit WorkOne Indy and Meet with a Career Coach</p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Walk in or call to schedule an appointment. Tell them you want to enroll in
+                    HVAC Technician Training at Elevate for Humanity. They will determine your
+                    eligibility for WIOA or the Indiana Workforce Ready Grant and complete the paperwork.
+                  </p>
+                  <div className="bg-white rounded-lg p-4 border border-gray-200 mb-3">
+                    <p className="font-bold text-gray-900 text-sm">WorkOne Indy — Southeast</p>
+                    <p className="text-sm text-gray-600">2511 E. 46th Street, Suite N, Indianapolis, IN 46205</p>
+                    <p className="text-sm text-gray-600">Phone: <Link href="tel:+13178908800" className="text-brand-blue-600 hover:underline">(317) 890-8800</Link></p>
+                    <p className="text-sm text-gray-600">Hours: Mon–Fri, 8:00 AM – 4:30 PM</p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <Link
+                      href="https://www.workoneindy.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-bold py-2 px-5 rounded-lg transition"
+                    >
+                      WorkOne Indy Website →
+                    </Link>
+                    <Link
+                      href="https://maps.google.com/?q=2511+E+46th+Street+Suite+N+Indianapolis+IN+46205"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block border-2 border-gray-300 hover:border-gray-400 text-gray-900 text-sm font-bold py-2 px-5 rounded-lg transition"
+                    >
+                      Get Directions →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            {/* Step 3 */}
+            <li className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <div className="flex gap-4 items-start">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-blue-600 text-white font-bold flex items-center justify-center text-sm">3</span>
+                <div>
+                  <p className="font-bold text-gray-900 mb-1">Apply to Our Program</p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Once WorkOne approves your funding, apply on our site. We coordinate directly
+                    with WorkOne to confirm your enrollment and funding. Once everything is approved,
+                    you start training with your cohort.
+                  </p>
+                  <Link
+                    href="/apply/student?program=hvac-technician"
+                    className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-bold py-2 px-5 rounded-lg transition"
+                  >
+                    Apply for Enrollment →
+                  </Link>
+                </div>
+              </div>
+            </li>
           </ol>
+
+          {/* Self-pay note */}
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <p className="text-sm text-gray-600">
+              <span className="font-bold text-gray-900">Self-pay option:</span> If you don&apos;t qualify for workforce funding,
+              tuition is $5,000 with weekly payment plans available. Contact us at{' '}
+              <Link href="tel:+13173143757" className="text-brand-blue-600 hover:underline">(317) 314-3757</Link> to discuss options.
+            </p>
+          </div>
         </div>
       </section>
 

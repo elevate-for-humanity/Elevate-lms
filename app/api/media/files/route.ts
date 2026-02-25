@@ -1,0 +1,24 @@
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+
+export async function GET() {
+  try {
+    const supabase = await createClient();
+    const _admin = createAdminClient(); const db = _admin || supabase;
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
+    const { data: files } = await db.storage.from('media').list('', {
+      limit: 100,
+      sortBy: { column: 'created_at', order: 'desc' },
+    });
+
+    return NextResponse.json({ files: files || [] });
+  } catch {
+    return NextResponse.json({ files: [] });
+  }
+}

@@ -62,10 +62,10 @@ export default function HomePage() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/programs-hq/training-classroom.webp', alt: 'Students in a training classroom' },
-              { href: '/funding', label: 'I need funding', desc: 'Most programs are tuition-free. Check your eligibility.', cta: 'Check Eligibility', image: '/images/heroes-hq/funding-hero.webp', alt: 'Funding and financial aid' },
-              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/heroes-hq/employer-hero.webp', alt: 'Employer partnership meeting' },
-              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/programs-hq/business-office.webp', alt: 'Training program office' },
+              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/programs-hq/training-classroom.jpg', alt: 'Students in a training classroom' },
+              { href: '/funding', label: 'I need funding', desc: 'Most programs are tuition-free. Check your eligibility.', cta: 'Check Eligibility', image: '/images/heroes-hq/funding-hero.jpg', alt: 'Funding and financial aid' },
+              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/heroes-hq/employer-hero.jpg', alt: 'Employer partnership meeting' },
+              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/programs-hq/business-office.jpg', alt: 'Training program office' },
             ].map((item) => (
               <Link
                 key={item.href}
@@ -102,10 +102,10 @@ export default function HomePage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { title: 'Apply Online', desc: 'Fill out a short application — takes about 5 minutes. No account needed.', href: '/apply/student', image: '/images/workforce-1.webp' },
-              { title: 'Choose a Program', desc: 'Pick the career path that fits your goals and schedule.', href: '/programs', image: '/images/Content_PATHWAY_TRADES.webp' },
-              { title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification.', href: '/how-it-works', image: '/images/workforce-2.webp' },
-              { title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates.', href: '/career-services', image: '/images/workforce-3.webp' },
+              { title: 'Apply Online', desc: 'Fill out a short application — takes about 5 minutes. No account needed.', href: '/apply/student', image: '/images/workforce-1.jpg' },
+              { title: 'Choose a Program', desc: 'Pick the career path that fits your goals and schedule.', href: '/programs', image: '/images/Content_PATHWAY_TRADES.jpg' },
+              { title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification.', href: '/how-it-works', image: '/images/workforce-2.jpg' },
+              { title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates.', href: '/career-services', image: '/images/workforce-3.jpg' },
             ].map((step) => (
               <div key={step.title} className="text-center">
                 <Image
@@ -139,10 +139,10 @@ export default function HomePage() {
           </p>
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
-              { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/community-healthcare-worker.webp' },
-              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/heroes-hq/funding-hero.webp' },
-              { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/funding/funding-jri-program.webp' },
-              { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/homepage/government-agencies.webp', external: true },
+              { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/community-healthcare-worker.jpg' },
+              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/heroes-hq/funding-hero.jpg' },
+              { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/funding/funding-jri-program.jpg' },
+              { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/homepage/government-agencies.jpg', external: true },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
                 <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-auto" />
@@ -185,10 +185,10 @@ export default function HomePage() {
           </p>
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
-              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. Background checks and drug screening are completed where required by employer or program.', href: '/career-services', image: '/images/programs-hq/students-learning.webp' },
-              { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives employers $2,400 per qualifying hire (up to $9,600 for qualified veterans). Targeted groups include formerly incarcerated, TANF/SNAP recipients, and long-term unemployed. We help file Form 8850 within the 28-day deadline.', href: '/employer', image: '/images/programs-hq/business-training.webp' },
-              { label: 'OJT Reimbursement', desc: 'On-the-Job Training funding reimburses 50-75% of a new hire\'s wages during their training period. You train them your way while the workforce board covers most of the cost.', href: '/ojt-and-funding', image: '/images/heroes-hq/employer-hero.webp' },
-              { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/artlist/cropped/hero-training-8-wide.webp' },
+              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. Background checks and drug screening are completed where required by employer or program.', href: '/career-services', image: '/images/programs-hq/students-learning.jpg' },
+              { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives employers $2,400 per qualifying hire (up to $9,600 for qualified veterans). Targeted groups include formerly incarcerated, TANF/SNAP recipients, and long-term unemployed. We help file Form 8850 within the 28-day deadline.', href: '/employer', image: '/images/programs-hq/business-training.jpg' },
+              { label: 'OJT Reimbursement', desc: 'On-the-Job Training funding reimburses 50-75% of a new hire\'s wages during their training period. You train them your way while the workforce board covers most of the cost.', href: '/ojt-and-funding', image: '/images/heroes-hq/employer-hero.jpg' },
+              { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/artlist/cropped/hero-training-8-wide.jpg' },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
                 <div className="relative aspect-[3/2]">
@@ -222,7 +222,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/programs-hq/students-learning.webp" alt="Students in a training session at Elevate for Humanity" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+              <Image src="/images/programs-hq/students-learning.jpg" alt="Students in a training session at Elevate for Humanity" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
             </div>
             <div>
               <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Why Elevate</p>

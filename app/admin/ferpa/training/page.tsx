@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
@@ -64,10 +65,16 @@ export default async function FERPATrainingPage() {
   const pendingUsers = allUsers?.filter(u => !trainedUserIds.includes(u.id)) || [];
 
   return (
-    <FERPATrainingDashboard
-      trainingRecords={trainingRecords || []}
-      pendingUsers={pendingUsers}
-      currentUser={profile}
-    />
+    <>
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="FERPA training administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
+      <FERPATrainingDashboard
+        trainingRecords={trainingRecords || []}
+        pendingUsers={pendingUsers}
+        currentUser={profile}
+      />
+    </>
   );
 }

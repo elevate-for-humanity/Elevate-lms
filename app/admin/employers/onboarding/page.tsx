@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
@@ -37,6 +38,11 @@ export default async function EmployerOnboardingReview() {
 
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Onboarding" }]} />
       </div>

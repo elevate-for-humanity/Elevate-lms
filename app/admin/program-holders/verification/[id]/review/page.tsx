@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
@@ -83,12 +84,18 @@ export default async function ReviewVerificationPage({
     .order('created_at', { ascending: false });
 
   return (
-    <VerificationReviewForm
-      holder={holder}
-      documents={documents || []}
-      banking={banking}
-      verificationHistory={verificationHistory || []}
-      adminUserId={user.id}
-    />
+    <>
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Verification review" fill sizes="100vw" className="object-cover" priority />
+      </section>
+      <VerificationReviewForm
+        holder={holder}
+        documents={documents || []}
+        banking={banking}
+        verificationHistory={verificationHistory || []}
+        adminUserId={user.id}
+      />
+    </>
   );
 }

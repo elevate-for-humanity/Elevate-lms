@@ -1,4 +1,5 @@
 
+import Image from 'next/image';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -36,6 +37,11 @@ export default function DataGovernancePage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Reports and analytics" fill sizes="100vw" className="object-cover" priority />
+      </section>
       {/* Header */}
       <section className="bg-slate-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">

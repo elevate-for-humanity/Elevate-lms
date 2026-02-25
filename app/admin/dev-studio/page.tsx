@@ -258,6 +258,11 @@ export default function DevStudioPage() {
 
   return (
     <div className="h-screen flex flex-col bg-slate-900">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <div className="bg-slate-800 px-4 py-2">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Dev Studio' }]} />
       </div>

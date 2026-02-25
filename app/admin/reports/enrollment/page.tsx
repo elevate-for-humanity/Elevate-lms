@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -56,6 +57,11 @@ export default async function EnrollmentReportPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Reports and analytics" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <Link 

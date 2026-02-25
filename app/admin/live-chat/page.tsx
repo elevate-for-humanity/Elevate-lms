@@ -337,7 +337,12 @@ function ActionButton({ title, description, href }: ActionButtonProps) {
       rel="noopener noreferrer"
       className="p-4 border-2 border-gray-200 rounded-lg hover:border-brand-blue-500 hover:bg-gray-50 transition-colors"
     >
-      <div className="font-medium text-black mb-1">{title}</div>
+      <div className="font-medium text-black mb-1">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/contact-hero.jpg" alt="Communications" fill sizes="100vw" className="object-cover" priority />
+      </section>{title}</div>
       <div className="text-sm text-black mb-2">{description}</div>
       <div className="flex items-center text-sm text-brand-blue-600">
         <span>Open</span>

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Scale, Phone, Mail, AlertTriangle } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -22,6 +23,11 @@ export default function GrievancePage() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Grievance Procedure' }]} />
       </div>
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/contact-hero.jpg" alt="Grievance process" fill sizes="100vw" className="object-cover" priority />
+      </section>
 
       {/* Header */}
       <section className="bg-gray-900 text-white py-16">

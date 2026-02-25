@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import AICareerCounseling from '@/components/AICareerCounseling';
 
 export const metadata: Metadata = {
@@ -11,5 +12,12 @@ export const metadata: Metadata = {
 };
 
 export default function CareerCounselingPage() {
-  return <AICareerCounseling />;
+  return (
+    <div>
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Career counseling and job placement" fill sizes="100vw" className="object-cover" priority />
+      </section>
+      <AICareerCounseling />
+    </div>
+  );
 }

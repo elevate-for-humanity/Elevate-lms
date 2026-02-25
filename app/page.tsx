@@ -20,32 +20,29 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ===== HERO ===== */}
-      <section className="relative h-[70vh] min-h-[480px] max-h-[650px]">
+      {/* ===== HERO VIDEO ===== */}
+      <section className="relative h-[50vh] min-h-[320px] max-h-[500px]">
         <HomeHeroVideo />
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 z-[11]" />
-        {/* Hero content overlaid on video */}
-        <div className="absolute inset-0 z-[12] flex items-end">
-          <div className="w-full pb-10 sm:pb-14">
-            <div className="max-w-5xl mx-auto px-6 text-center">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.08] drop-shadow-lg">
-                Your New Career Starts Here.
-                <span className="block text-brand-red-400 mt-1">No Tuition. No Debt.</span>
-              </h1>
-              <p className="text-base sm:text-lg text-white/85 mt-4 leading-relaxed max-w-2xl mx-auto drop-shadow">
-                Free career training in healthcare, skilled trades, CDL, and technology.
-                Funded by WIOA for eligible Indiana residents.
-              </p>
-              <div className="flex flex-wrap justify-center gap-3 mt-6">
-                <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg text-base sm:text-lg transition-all shadow-lg shadow-brand-red-600/30">
-                  Apply Now — It&apos;s Free
-                </Link>
-                <Link href="/programs" className="bg-white/15 backdrop-blur-sm border border-white/30 text-white font-bold px-8 py-3.5 rounded-lg text-base sm:text-lg hover:bg-white/25 transition-all">
-                  Browse Programs
-                </Link>
-              </div>
-            </div>
+      </section>
+
+      {/* ===== HERO CTA ===== */}
+      <section className="bg-slate-900 py-12 sm:py-16">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.08]">
+            Your New Career Starts Here.
+            <span className="block text-brand-red-400 mt-1">No Tuition. No Debt.</span>
+          </h1>
+          <p className="text-base sm:text-lg text-slate-300 mt-4 leading-relaxed max-w-2xl mx-auto">
+            Free career training in healthcare, skilled trades, CDL, and technology.
+            Funded by WIOA for eligible Indiana residents.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3 mt-6">
+            <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg text-base sm:text-lg transition-all shadow-lg shadow-brand-red-600/30">
+              Apply Now — It&apos;s Free
+            </Link>
+            <Link href="/programs" className="bg-white/15 border border-white/30 text-white font-bold px-8 py-3.5 rounded-lg text-base sm:text-lg hover:bg-white/25 transition-all">
+              Browse Programs
+            </Link>
           </div>
         </div>
       </section>

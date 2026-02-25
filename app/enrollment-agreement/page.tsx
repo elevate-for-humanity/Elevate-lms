@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Phone } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -20,6 +21,11 @@ export default function EnrollmentAgreementPage() {
           <Breadcrumbs items={[{ label: 'Enrollment Agreement' }]} />
         </div>
       </div>
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Enrollment agreement" fill sizes="100vw" className="object-cover" priority />
+      </section>
 
       {/* Header */}
       <div className="bg-gray-900 text-white py-16">

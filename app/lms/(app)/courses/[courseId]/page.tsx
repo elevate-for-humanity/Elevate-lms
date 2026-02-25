@@ -155,18 +155,18 @@ export default async function CoursePage({ params }: { params: Params }) {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Course Header — image hero */}
-      <div className="relative text-white">
-        <div className="absolute inset-0">
-          <Image
-            src={course.thumbnail_url || '/images/programs-hq/training-classroom.jpg'}
-            alt={course.course_name}
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/45 to-slate-900/25" />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 py-12">
+      <div className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+        <Image
+          src={course.thumbnail_url || '/images/programs-hq/training-classroom.jpg'}
+          alt={course.course_name}
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
+        />
+      </div>
+      <div className="bg-slate-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <nav className="flex items-center gap-2 text-white/70 text-sm mb-4">
@@ -177,10 +177,10 @@ export default async function CoursePage({ params }: { params: Params }) {
                 <span className="text-white">{course.course_name}</span>
               </nav>
 
-              <h1 className="text-3xl md:text-4xl font-black mb-4 drop-shadow-lg">{course.course_name}</h1>
+              <h1 className="text-3xl md:text-4xl font-black mb-4">{course.course_name}</h1>
               
               {course.description && (
-                <p className="text-white/85 text-lg mb-6 drop-shadow max-w-xl">{course.description}</p>
+                <p className="text-white/85 text-lg mb-6 max-w-xl">{course.description}</p>
               )}
 
               <div className="flex flex-wrap items-center gap-6 text-sm text-white/90">

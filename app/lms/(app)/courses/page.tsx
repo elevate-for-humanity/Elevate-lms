@@ -108,24 +108,24 @@ export default async function InteractiveCoursesPage() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Courses" }]} />
         </div>
-      {/* Hero Banner with Image */}
-      <section className="relative overflow-hidden">
-        <div className="relative h-[240px] md:h-[300px]">
-          <Image
-            src={LMS_HEROES.courses}
-            alt="Students in a training classroom"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/60 via-slate-900/30 to-transparent" />
-          <div className="absolute inset-0 flex items-center">
-            <div className="max-w-5xl mx-auto px-8">
-              <span className="inline-block text-xs font-bold uppercase tracking-wider text-brand-blue-300 mb-2">Student Portal</span>
-              <h1 className="text-4xl md:text-5xl font-black text-white mb-3 drop-shadow-lg">My Courses</h1>
-              <p className="text-lg text-white/85 max-w-2xl drop-shadow">Engaging lessons with quizzes, assignments, and hands-on activities</p>
-            </div>
-          </div>
+      {/* Hero Image — no text overlay */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+        <Image
+          src={LMS_HEROES.courses}
+          alt="Students in a training classroom"
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
+        />
+      </section>
+
+      {/* Title */}
+      <section className="bg-slate-900 py-8">
+        <div className="max-w-5xl mx-auto px-8">
+          <span className="inline-block text-xs font-bold uppercase tracking-wider text-brand-blue-300 mb-2">Student Portal</span>
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-3">My Courses</h1>
+          <p className="text-lg text-slate-300 max-w-2xl">Engaging lessons with quizzes, assignments, and hands-on activities</p>
         </div>
       </section>
 

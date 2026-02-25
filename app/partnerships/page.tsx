@@ -21,20 +21,21 @@ export default function PartnershipsPage() {
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="relative h-[40vh] min-h-[300px]">
+      {/* Hero Image — no text overlay */}
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
         <Image src="/images/heroes-hq/employer-hero.jpg" alt="Workforce partnership meeting" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/50 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-8">
-          <div className="max-w-5xl mx-auto">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">
-              Workforce Partnerships
-            </h1>
-            <p className="text-lg text-slate-200 max-w-2xl">
-              ETPL-listed training provider serving Marion County and Central Indiana.
-              Refer WIOA, WRG, and JRI participants directly. We handle enrollment, training, credentialing, and placement reporting.
-            </p>
-          </div>
+      </section>
+
+      {/* Title */}
+      <section className="bg-slate-900 py-12">
+        <div className="max-w-5xl mx-auto px-4">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">
+            Workforce Partnerships
+          </h1>
+          <p className="text-lg text-slate-300 max-w-2xl">
+            ETPL-listed training provider serving Marion County and Central Indiana.
+            Refer WIOA, WRG, and JRI participants directly. We handle enrollment, training, credentialing, and placement reporting.
+          </p>
         </div>
       </section>
 

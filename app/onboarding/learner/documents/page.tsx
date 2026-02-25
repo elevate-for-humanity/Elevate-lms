@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { normalizeSsn, formatSsn, isValidSsn } from '@/lib/ssn';
 import { ArrowLeft, CheckCircle2, Upload, FileText, X, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -63,6 +64,9 @@ export default function DocumentsPage() {
   const [uploadedTypes, setUploadedTypes] = useState<Set<string>>(new Set());
   const [uploading, setUploading] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const [ssnDisplay, setSsnDisplay] = useState('');
+  const [ssnDigits, setSsnDigits] = useState('');
+  const [ssnSaved, setSsnSaved] = useState(false);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   useEffect(() => {
@@ -188,42 +192,40 @@ export default function DocumentsPage() {
                 inputMode="numeric"
                 autoComplete="off"
                 maxLength={11}
-                placeholder="XXX-XX-XXXX"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500 font-mono tracking-wider"
+                placeholder="123-45-6789"
+                value={ssnDisplay}
                 onChange={(e) => {
-                  const digits = e.target.value.replace(/\D/g, '').slice(0, 9);
-                  let formatted = digits;
-                  if (digits.length > 5) formatted = `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`;
-                  else if (digits.length > 3) formatted = `${digits.slice(0, 3)}-${digits.slice(3)}`;
-                  e.target.value = formatted;
+                  const digits = normalizeSsn(e.target.value);
+                  setSsnDigits(digits);
+                  setSsnDisplay(formatSsn(digits));
                 }}
+                disabled={ssnSaved}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500 font-mono tracking-wider disabled:bg-gray-100"
               />
             </div>
             <button
               type="button"
-              className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium"
+              disabled={ssnSaved}
+              className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium disabled:opacity-50"
               onClick={async () => {
-                const input = document.getElementById('ssn-input') as HTMLInputElement;
-                const val = input?.value?.replace(/\D/g, '');
-                if (!val || val.length !== 9) { setError('Enter a valid 9-digit SSN (e.g. 123-45-6789).'); return; }
+                if (!isValidSsn(ssnDigits)) {
+                  setError('Enter a valid 9-digit SSN (e.g. 123-45-6789).');
+                  return;
+                }
                 try {
-                  const res = await fetch('/api/documents/upload', {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ssn_last4: val.slice(-4) }),
-                  });
-                  if (!res.ok) {
-                    const supabase = createClient();
-                    const { data: { user } } = await supabase.auth.getUser();
-                    if (!user) { setError('Please log in.'); return; }
-                    const { error: err } = await supabase.from('profiles').update({ ssn_last4: val.slice(-4) }).eq('id', user.id);
-                    if (err) { setError('Failed to save. Please try again.'); return; }
+                  const supabase = createClient();
+                  const { data: { user } } = await supabase.auth.getUser();
+                  if (!user) { setError('Please log in.'); return; }
+                  const { error: err } = await supabase.from('profiles').update({ ssn_last4: ssnDigits.slice(-4) }).eq('id', user.id);
+                  if (err) {
+                    setError('Failed to save: ' + err.message);
+                    return;
                   }
                   setError('');
-                  input.value = '***-**-' + val.slice(-4);
-                  input.disabled = true;
-                } catch {
-                  setError('Failed to save. Please try again.');
+                  setSsnDisplay('***-**-' + ssnDigits.slice(-4));
+                  setSsnSaved(true);
+                } catch (e: any) {
+                  setError('Failed to save: ' + (e?.message || 'unknown error'));
                 }
               }}
             >Save</button>

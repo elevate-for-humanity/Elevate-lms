@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { normalizeSsn, formatSsn, isValidSsn } from '@/lib/ssn';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -54,6 +55,9 @@ export default function DocumentUploadPage() {
   const [uploadedTypes, setUploadedTypes] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [ssnDisplay, setSsnDisplay] = useState('');
+  const [ssnDigits, setSsnDigits] = useState('');
+  const [ssnSaved, setSsnSaved] = useState(false);
 
   useEffect(() => {
     loadUploadedDocuments();
@@ -178,40 +182,42 @@ export default function DocumentUploadPage() {
           {/* Social Security Number */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
             <h2 className="text-lg font-semibold mb-1">Social Security Number</h2>
-            <p className="text-sm text-gray-500 mb-4">Enter your SSN. This is stored securely and never displayed after submission.</p>
+            <p className="text-sm text-gray-500 mb-4">Enter your SSN. It is stored securely and never displayed after submission.</p>
             <div className="flex gap-3 items-end">
               <div className="flex-1">
                 <label htmlFor="ssn" className="block text-sm font-medium text-gray-700 mb-1">SSN *</label>
                 <input
                   id="ssn"
-                  type="password"
+                  type="text"
                   inputMode="numeric"
                   autoComplete="off"
                   maxLength={11}
-                  placeholder="XXX-XX-XXXX"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500 font-mono tracking-wider"
+                  placeholder="123-45-6789"
+                  value={ssnDisplay}
                   onChange={(e) => {
-                    const digits = e.target.value.replace(/\D/g, '').slice(0, 9);
-                    let formatted = digits;
-                    if (digits.length > 5) formatted = `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`;
-                    else if (digits.length > 3) formatted = `${digits.slice(0, 3)}-${digits.slice(3)}`;
-                    e.target.value = formatted;
+                    const digits = normalizeSsn(e.target.value);
+                    setSsnDigits(digits);
+                    setSsnDisplay(formatSsn(digits));
                   }}
+                  disabled={ssnSaved}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange-500 font-mono tracking-wider disabled:bg-gray-100"
                 />
               </div>
-              <Button type="button" className="px-6 py-2" onClick={async () => {
-                const input = document.getElementById('ssn') as HTMLInputElement;
-                const val = input?.value?.replace(/\D/g, '');
-                if (!val || val.length !== 9) { setError('Enter a valid 9-digit SSN (e.g. 123-45-6789).'); return; }
-                const supabase = createClient();
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) { setError('Please log in.'); return; }
-                const { error: err } = await supabase.from('profiles').update({ ssn_last4: val.slice(-4) }).eq('id', user.id);
-                if (err) { setError('Failed to save. Please try again.'); return; }
-                setSuccess('SSN saved securely.');
-                setError(null);
-                input.value = '***-**-' + val.slice(-4);
-                input.disabled = true;
+              <Button type="button" className="px-6 py-2" disabled={ssnSaved} onClick={async () => {
+                if (!isValidSsn(ssnDigits)) { setError('Enter a valid 9-digit SSN (e.g. 123-45-6789).'); return; }
+                try {
+                  const supabase = createClient();
+                  const { data: { user } } = await supabase.auth.getUser();
+                  if (!user) { setError('Please log in.'); return; }
+                  const { error: err } = await supabase.from('profiles').update({ ssn_last4: ssnDigits.slice(-4) }).eq('id', user.id);
+                  if (err) { setError('Failed to save: ' + err.message); return; }
+                  setSuccess('SSN saved securely.');
+                  setError(null);
+                  setSsnDisplay('***-**-' + ssnDigits.slice(-4));
+                  setSsnSaved(true);
+                } catch (e: any) {
+                  setError('Failed to save: ' + (e?.message || 'unknown error'));
+                }
               }}>Save</Button>
             </div>
           </div>

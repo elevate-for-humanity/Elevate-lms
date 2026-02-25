@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { normalizeSsn, formatSsn, isValidSsn } from '@/lib/ssn';
 import { updateOnboardingProgress } from '@/lib/compliance/enforcement';
 import {
   Upload,
@@ -263,17 +264,10 @@ export default function OnboardingDocumentsPage() {
     }
   };
 
-  const formatSsnInput = (value: string) => {
-    const digits = value.replace(/\D/g, '').slice(0, 9);
-    if (digits.length <= 3) return digits;
-    if (digits.length <= 5) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-    return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`;
-  };
-
   const handleSsnSave = async () => {
     if (!user || ssnSaved) return;
-    const digits = ssn.replace(/\D/g, '');
-    if (digits.length !== 9) {
+    const digits = normalizeSsn(ssn);
+    if (!isValidSsn(digits)) {
       setError('Please enter a valid 9-digit Social Security number.');
       return;
     }
@@ -402,7 +396,7 @@ export default function OnboardingDocumentsPage() {
                     type="text"
                     inputMode="numeric"
                     value={ssn}
-                    onChange={(e) => setSsn(formatSsnInput(e.target.value))}
+                    onChange={(e) => setSsn(formatSsn(e.target.value))}
                     placeholder="000-00-0000"
                     className="w-48 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 font-mono tracking-wider"
                     maxLength={11}

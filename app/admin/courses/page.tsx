@@ -87,6 +87,11 @@ export default async function AdminCoursesPage() {
         </div>
       </div>
 
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Course management" fill sizes="100vw" className="object-cover" priority />
+      </section>
+
       {/* Admin Header */}
       <section className="bg-brand-blue-700 text-white py-8">
         <div className="container mx-auto px-4">

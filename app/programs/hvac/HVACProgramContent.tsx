@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function HVACProgramContent() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const router = useRouter();
 
   return (
     <>
@@ -75,22 +76,28 @@ export default function HVACProgramContent() {
 
           {/* CTA Buttons */}
           <div className="grid sm:grid-cols-2 gap-6 mb-4">
-            <Link href="/apply/student?program=hvac-technician" className="block bg-brand-blue-600 hover:bg-brand-blue-700 text-white rounded-xl p-6 transition">
+            <button
+              onClick={() => router.push('/apply/student?program=hvac-technician')}
+              className="text-left bg-brand-blue-600 hover:bg-brand-blue-700 text-white rounded-xl p-6 transition cursor-pointer"
+            >
               <span className="text-xl font-bold block mb-2">Apply for Enrollment</span>
               <span className="text-sm text-blue-100 block leading-relaxed">
                 Ready to start training? Complete your enrollment application to create an account,
                 upload your documents, and begin onboarding. Our admissions team will review your
                 application and contact you about funding eligibility.
               </span>
-            </Link>
-            <Link href="/apply/intake?program=hvac-technician" className="block border-2 border-gray-200 hover:border-gray-300 rounded-xl p-6 transition">
+            </button>
+            <button
+              onClick={() => router.push('/apply/intake?program=hvac-technician')}
+              className="text-left border-2 border-gray-200 hover:border-gray-300 rounded-xl p-6 transition cursor-pointer"
+            >
               <span className="text-xl font-bold text-gray-900 block mb-2">Submit an Inquiry</span>
               <span className="text-sm text-gray-500 block leading-relaxed">
                 Have questions before you apply? Submit an inquiry and our admissions team will
                 contact you within 1 business day. We can answer questions about the program,
                 schedule, funding options, and what to expect.
               </span>
-            </Link>
+            </button>
           </div>
         </div>
       </section>
@@ -101,16 +108,27 @@ export default function HVACProgramContent() {
           <h2 className="text-3xl font-bold text-gray-900 mb-8">What You Will Learn</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {[
-              { title: 'HVAC Fundamentals', desc: 'Heating, ventilation, air conditioning, and refrigeration principles. System types, components, and how they work together.' },
-              { title: 'Electrical for HVAC', desc: 'Wiring diagrams, circuit testing, motor controls, and electrical safety. Read schematics and troubleshoot electrical faults.' },
-              { title: 'Refrigerant Handling', desc: 'EPA 608 exam prep — refrigerant types, recovery, recycling, and reclamation. Federal regulations and safe handling procedures.' },
-              { title: 'Installation & Service', desc: 'Equipment sizing, ductwork layout, brazing, system startup, and preventive maintenance using real equipment.' },
-              { title: 'Troubleshooting', desc: 'Systematic diagnosis of heating and cooling failures. Use gauges, meters, and diagnostic tools to isolate problems.' },
-              { title: 'Safety & Compliance', desc: 'OSHA 30 certification, lockout/tagout, fall protection, confined spaces, and job site safety protocols.' },
+              { title: 'HVAC Fundamentals', desc: 'Heating, ventilation, air conditioning, and refrigeration principles. System types, components, and how they work together.', img: '/images/trades/program-hvac-overview.jpg', alt: 'HVAC system overview and components' },
+              { title: 'Electrical for HVAC', desc: 'Wiring diagrams, circuit testing, motor controls, and electrical safety. Read schematics and troubleshoot electrical faults.', img: '/images/trades/electrical.jpg', alt: 'Electrical wiring and circuit components for HVAC systems' },
+              { title: 'Refrigerant Handling', desc: 'EPA 608 exam prep — refrigerant types, recovery, recycling, and reclamation. Federal regulations and safe handling procedures.', img: '/images/programs-hq/hvac-technician.jpg', alt: 'Technician handling refrigerant gauges on an HVAC unit' },
+              { title: 'Installation & Service', desc: 'Equipment sizing, ductwork layout, brazing, system startup, and preventive maintenance using real equipment.', img: '/images/trades/program-hvac-technician.jpg', alt: 'HVAC technician installing ductwork and equipment' },
+              { title: 'Troubleshooting', desc: 'Systematic diagnosis of heating and cooling failures. Use gauges, meters, and diagnostic tools to isolate problems.', img: '/images/trades/program-building-technology.jpg', alt: 'Technician using diagnostic tools on building systems' },
+              { title: 'Safety & Compliance', desc: 'OSHA 30 certification, lockout/tagout, fall protection, confined spaces, and job site safety protocols.', img: '/images/programs-hq/skilled-trades-hero.jpg', alt: 'Skilled trades workers following safety protocols on a job site' },
             ].map((item) => (
-              <div key={item.title} className="bg-white rounded-xl p-6 border border-gray-200">
-                <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{item.desc}</p>
+              <div key={item.title} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="relative h-44">
+                  <Image
+                    src={item.img}
+                    alt={item.alt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{item.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -124,16 +142,27 @@ export default function HVACProgramContent() {
           <p className="text-gray-600 mb-8">Graduate with every certification Indiana HVAC employers require for hiring.</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { name: 'EPA 608 Universal Certification', issuer: 'EPA-approved certifying organization' },
-              { name: 'Residential HVAC Certification 1', issuer: 'Elevate for Humanity' },
-              { name: 'Residential HVAC Certification 2', issuer: 'Elevate for Humanity' },
-              { name: 'OSHA 30 Safety Certification', issuer: 'OSHA / Department of Labor' },
-              { name: 'CPR / First Aid', issuer: 'American Heart Association' },
-              { name: 'Rise Up', issuer: 'National Retail Federation Foundation' },
+              { name: 'EPA 608 Universal Certification', issuer: 'EPA-approved certifying organization', img: '/images/programs-hq/hvac-technician.jpg', alt: 'Technician working with refrigerant gauges' },
+              { name: 'Residential HVAC Certification 1', issuer: 'Elevate for Humanity', img: '/images/trades/program-hvac-overview.jpg', alt: 'Residential HVAC system components' },
+              { name: 'Residential HVAC Certification 2', issuer: 'Elevate for Humanity', img: '/images/trades/program-hvac-technician.jpg', alt: 'HVAC technician performing advanced service' },
+              { name: 'OSHA 30 Safety Certification', issuer: 'OSHA / Department of Labor', img: '/images/trades/program-construction-training.jpg', alt: 'Workers following safety protocols on a construction site' },
+              { name: 'CPR / First Aid', issuer: 'American Heart Association', img: '/images/programs-hq/healthcare-hero.jpg', alt: 'Healthcare and first aid training' },
+              { name: 'Rise Up', issuer: 'National Retail Federation Foundation', img: '/images/programs-hq/training-classroom.jpg', alt: 'Students in a professional training classroom' },
             ].map((cred) => (
-              <div key={cred.name} className="rounded-xl p-5 border border-gray-200">
-                <p className="font-semibold text-gray-900 text-sm mb-1">{cred.name}</p>
-                <p className="text-xs text-gray-500">{cred.issuer}</p>
+              <div key={cred.name} className="rounded-xl border border-gray-200 overflow-hidden">
+                <div className="relative h-32">
+                  <Image
+                    src={cred.img}
+                    alt={cred.alt}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <p className="font-semibold text-gray-900 text-sm mb-1">{cred.name}</p>
+                  <p className="text-xs text-gray-500">{cred.issuer}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -237,18 +266,18 @@ export default function HVACProgramContent() {
             Apply for enrollment to begin the process, or submit an inquiry if you have questions first.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply/student?program=hvac-technician"
-              className="bg-white text-slate-900 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+            <button
+              onClick={() => router.push('/apply/student?program=hvac-technician')}
+              className="bg-white text-slate-900 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition cursor-pointer"
             >
               Apply for Enrollment
-            </Link>
-            <Link
-              href="/apply/intake?program=hvac-technician"
-              className="border-2 border-white/30 text-white px-8 py-4 rounded-lg font-bold hover:bg-white/10 transition"
+            </button>
+            <button
+              onClick={() => router.push('/apply/intake?program=hvac-technician')}
+              className="border-2 border-white/30 text-white px-8 py-4 rounded-lg font-bold hover:bg-white/10 transition cursor-pointer"
             >
               Submit an Inquiry
-            </Link>
+            </button>
           </div>
         </div>
       </section>

@@ -165,12 +165,12 @@ export default function OnboardingDocumentsPage() {
         .insert({
           user_id: user.id,
           document_type: documentId,
-          category: 'onboarding',
           file_name: file.name,
           file_size: file.size,
-          file_type: file.type,
+          mime_type: file.type,
           file_url: urlData.publicUrl,
-          storage_path: fileName,
+          file_path: fileName,
+          status: 'pending',
         })
         .select()
         .single();

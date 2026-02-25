@@ -35,10 +35,14 @@ export default function CareerApplicationPage({ params }: { params: Promise<{ id
       const supabase = createClient();
       let resumeUrl = '';
 
+      // Get user first — RLS requires auth.uid() as first path segment
+      const { data: { user } } = await supabase.auth.getUser();
+
       // Upload resume if provided
       if (resume) {
         const ext = resume.name.split('.').pop();
-        const path = `job-applications/${id}/${Date.now()}.${ext}`;
+        const userPrefix = user?.id || 'anonymous';
+        const path = `${userPrefix}/job-applications/${id}/${Date.now()}.${ext}`;
         const { error: uploadErr } = await supabase.storage
           .from('documents')
           .upload(path, resume);
@@ -46,8 +50,6 @@ export default function CareerApplicationPage({ params }: { params: Promise<{ id
         const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path);
         resumeUrl = urlData.publicUrl;
       }
-
-      const { data: { user } } = await supabase.auth.getUser();
 
       const { error: insertErr } = await supabase
         .from('job_applications')

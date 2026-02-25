@@ -125,10 +125,14 @@ export default function UploadDocumentsPage() {
       try {
         const supabase = createClient();
 
+        // Get authenticated user — RLS requires auth.uid() as first path segment
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('You must be signed in to upload documents.');
+
         // Upload to Supabase Storage
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `tax-documents/${fileName}`;
+        const filePath = `${user.id}/tax-documents/${fileName}`;
 
         const { data, error }: any = await supabase.storage
           .from('documents')

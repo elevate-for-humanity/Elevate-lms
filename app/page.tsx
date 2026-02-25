@@ -62,10 +62,10 @@ export default function HomePage() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/homepage-new/train.jpg', alt: 'Students in a training classroom' },
-              { href: '/funding', label: 'I need funding', desc: 'Most programs are tuition-free. Check your eligibility.', cta: 'Check Eligibility', image: '/images/homepage-new/funding.jpg', alt: 'Funding and financial aid' },
-              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/homepage-new/employer.jpg', alt: 'Employer partnership meeting' },
-              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/homepage-new/school.jpg', alt: 'Training program office' },
+              { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/hp/train.jpg', alt: 'Students in a training classroom' },
+              { href: '/funding', label: 'I need funding', desc: 'Most programs are tuition-free. Check your eligibility.', cta: 'Check Eligibility', image: '/images/hp/funding.jpg', alt: 'Funding and financial aid' },
+              { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/hp/employer.jpg', alt: 'Employer partnership meeting' },
+              { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/hp/school.jpg', alt: 'Training program office' },
             ].map((item) => (
               <Link
                 key={item.href}
@@ -100,9 +100,9 @@ export default function HomePage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { title: 'Apply Online', desc: 'Fill out a short application — takes about 5 minutes. No account needed.', href: '/apply/student', image: '/images/homepage-new/apply-online.jpg' },
-              { title: 'Choose a Program', desc: 'Pick the career path that fits your goals and schedule.', href: '/programs', image: '/images/homepage-new/choose-program.jpg' },
-              { title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification.', href: '/how-it-works', image: '/images/homepage-new/complete-training.jpg' },
+              { title: 'Apply Online', desc: 'Fill out a short application — takes about 5 minutes. No account needed.', href: '/apply/student', image: '/images/hp/apply-online.jpg' },
+              { title: 'Choose a Program', desc: 'Pick the career path that fits your goals and schedule.', href: '/programs', image: '/images/hp/choose-program.jpg' },
+              { title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification.', href: '/how-it-works', image: '/images/hp/complete-training.jpg' },
               { title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates.', href: '/career-services', image: '/images/workforce-3.jpg' },
             ].map((step) => (
               <div key={step.title} className="text-center">
@@ -137,10 +137,10 @@ export default function HomePage() {
           </p>
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
-              { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/homepage-new/wioa.jpg' },
-              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/homepage-new/grants.jpg' },
-              { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/homepage-new/healthcare.jpg' },
-              { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/homepage-new/government.jpg', external: true },
+              { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/hp/wioa.jpg' },
+              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/hp/grants.jpg' },
+              { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/hp/healthcare.jpg' },
+              { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/hp/government.jpg', external: true },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
                 <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-48 object-cover" />
@@ -183,10 +183,10 @@ export default function HomePage() {
           </p>
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
-              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. Background checks and drug screening are completed where required by employer or program.', href: '/career-services', image: '/images/homepage-new/candidates.jpg' },
-              { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives employers $2,400 per qualifying hire (up to $9,600 for qualified veterans). Targeted groups include formerly incarcerated, TANF/SNAP recipients, and long-term unemployed. We help file Form 8850 within the 28-day deadline.', href: '/employer', image: '/images/homepage-new/wotc.jpg' },
-              { label: 'OJT Reimbursement', desc: 'On-the-Job Training funding reimburses 50-75% of a new hire\'s wages during their training period. You train them your way while the workforce board covers most of the cost.', href: '/ojt-and-funding', image: '/images/homepage-new/ojt.jpg' },
-              { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/homepage-new/post-jobs.jpg' },
+              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. Background checks and drug screening are completed where required by employer or program.', href: '/career-services', image: '/images/hp/candidates.jpg' },
+              { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives employers $2,400 per qualifying hire (up to $9,600 for qualified veterans). Targeted groups include formerly incarcerated, TANF/SNAP recipients, and long-term unemployed. We help file Form 8850 within the 28-day deadline.', href: '/employer', image: '/images/hp/wotc.jpg' },
+              { label: 'OJT Reimbursement', desc: 'On-the-Job Training funding reimburses 50-75% of a new hire\'s wages during their training period. You train them your way while the workforce board covers most of the cost.', href: '/ojt-and-funding', image: '/images/hp/ojt.jpg' },
+              { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/hp/post-jobs.jpg' },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
                 <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-48 object-cover" />
@@ -218,7 +218,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div className="rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/homepage-new/why-elevate.jpg" alt="Students in a training session at Elevate for Humanity" width={800} height={600} className="w-full h-72 sm:h-80 lg:h-96 object-cover" />
+              <Image src="/images/hp/why-elevate.jpg" alt="Students in a training session at Elevate for Humanity" width={800} height={600} className="w-full h-72 sm:h-80 lg:h-96 object-cover" />
             </div>
             <div>
               <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Why Elevate</p>

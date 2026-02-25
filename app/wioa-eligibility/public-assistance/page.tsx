@@ -126,7 +126,7 @@ export default async function PublicAssistancePage() {
             </li>
             <li className="flex items-start gap-3">
               <span className="text-slate-400 flex-shrink-0">•</span>
-              <span>Social Security card</span>
+              <span>Social Security number (entered online)</span>
             </li>
           </ul>
         </div>

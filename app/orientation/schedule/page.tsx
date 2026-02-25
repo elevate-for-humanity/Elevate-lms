@@ -113,7 +113,7 @@ export default function OrientationSchedulePage() {
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">What to Bring</h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {['Government-issued photo ID', 'Social Security card or proof of eligibility', 'Proof of address (utility bill, lease)', 'Any prior transcripts or certifications'].map((item) => (
+            {['Government-issued photo ID', 'Proof of Indiana residency (utility bill, lease)', 'Proof of income (if applying for WIOA funding)', 'Any prior transcripts or certifications'].map((item) => (
               <div key={item} className="bg-white border border-gray-200 rounded-lg p-4 text-center">
                 <p className="text-gray-800 font-medium text-sm">{item}</p>
               </div>

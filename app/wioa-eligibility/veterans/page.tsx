@@ -69,7 +69,7 @@ export default async function VeteransPage() {
     'DD-214 (Certificate of Release or Discharge from Active Duty)',
     'Valid government-issued ID',
     'Proof of Indiana residency',
-    'Social Security card',
+    'Social Security number (entered online)',
   ];
 
   return (

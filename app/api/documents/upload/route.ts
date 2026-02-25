@@ -38,7 +38,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const docTypeMap: Record<string, string> = {
     government_id: 'photo_id',
     photo_id: 'photo_id',
-    ssn_proof: 'other',
+    income_proof: 'other',
     residency_proof: 'other',
     selective_service: 'other',
     resume: 'other',

@@ -195,7 +195,7 @@ export async function POST(
       type: 'magiclink',
       email: partnerEmail,
       options: {
-        redirectTo: `${siteUrl}/partner/dashboard`,
+        redirectTo: `${siteUrl}/partner-portal`,
       },
     });
 

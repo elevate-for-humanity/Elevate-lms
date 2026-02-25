@@ -1,6 +1,6 @@
 
 'use client';
-
+import Image from 'next/image';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -52,7 +52,7 @@ export default function PartnerLoginPage() {
 
         if (profile?.role === 'partner' || profile?.role === 'partner_admin') {
           // They have partner role but no partner_users entry - allow access
-          router.push('/partner/dashboard');
+          router.push('/partner-portal');
           return;
         }
 
@@ -72,7 +72,7 @@ export default function PartnerLoginPage() {
       }
 
       // Success - redirect to partner dashboard
-      router.push('/partner/dashboard');
+      router.push('/partner-portal');
       router.refresh();
 
     } catch (err: any) {
@@ -96,7 +96,7 @@ export default function PartnerLoginPage() {
       const { error: magicLinkError } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/partner/dashboard`,
+          emailRedirectTo: `${window.location.origin}/partner-portal`,
         },
       });
 
@@ -115,6 +115,11 @@ export default function PartnerLoginPage() {
 
   return (
     <div className="min-h-screen bg-brand-blue-800 flex items-center justify-center px-4">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner login" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">

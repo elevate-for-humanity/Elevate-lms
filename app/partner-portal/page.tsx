@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -125,6 +126,11 @@ export default async function PartnerPortalPage() {
 
   return (
     <div>
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner portal" fill sizes="100vw" className="object-cover" priority />
+      </section>
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>

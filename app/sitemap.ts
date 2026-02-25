@@ -77,7 +77,7 @@ const EXCLUDED_PREFIXES = [
   '/program-holder/verify-identity',
   '/partner/login',
   '/partner/settings',
-  '/partner/dashboard',
+  '/partner-portal',
   '/partner/onboarding',
   '/pwa',
   '/shop/dashboard',

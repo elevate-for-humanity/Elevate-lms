@@ -1,6 +1,6 @@
 
 'use client';
-
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { BookOpen, Upload, AlertCircle } from 'lucide-react';
@@ -115,6 +115,11 @@ export default function CreateCoursePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Create course" fill sizes="100vw" className="object-cover" priority />
+      </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

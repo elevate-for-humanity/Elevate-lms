@@ -210,7 +210,11 @@ export default async function InteractiveCoursesPage() {
                         {(course.students || 0).toLocaleString()}
                       </span>
                     </div>
-                    {isEnrolled ? (
+                    {isEnrolled && enrollment?.status === 'pending_approval' ? (
+                      <div className="block w-full bg-amber-100 text-amber-800 text-center py-2 rounded-lg font-medium cursor-not-allowed">
+                        Pending Admin Approval
+                      </div>
+                    ) : isEnrolled ? (
                       <Link
                         href={`/lms/courses/${course.id}`}
                         className="block w-full bg-brand-green-600 hover:bg-brand-green-700 text-white text-center py-2 rounded-lg font-medium transition"

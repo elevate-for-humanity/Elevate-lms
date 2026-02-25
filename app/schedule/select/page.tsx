@@ -25,24 +25,21 @@ async function confirmSchedule(formData: FormData) {
 
   const cohortId = formData.get('cohort_id') as string;
 
-  // Update profile
+  // Update profile — schedule selected but enrollment still pending admin approval
   await db.from('profiles').update({
-    enrollment_status: 'active',
     schedule_selected: true,
     selected_cohort: cohortId || 'HVAC-2026-C1',
   }).eq('id', user.id);
 
-  // Ensure training_enrollments row exists (may already exist from approve step)
+  // Ensure training_enrollments row exists (pending approval)
   const { data: existing } = await db
     .from('training_enrollments')
     .select('id')
     .eq('user_id', user.id)
-    .eq('status', 'active')
     .limit(1)
     .maybeSingle();
 
   if (!existing) {
-    // Look up the HVAC course to create enrollment
     const { data: hvacCourse } = await db
       .from('training_courses')
       .select('id')
@@ -55,7 +52,7 @@ async function confirmSchedule(formData: FormData) {
       await db.from('training_enrollments').insert({
         user_id: user.id,
         course_id: hvacCourse.id,
-        status: 'active',
+        status: 'pending_approval',
         enrolled_at: new Date().toISOString(),
       });
     }

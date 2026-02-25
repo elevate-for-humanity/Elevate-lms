@@ -38,38 +38,66 @@ function LoginForm() {
 
       if (!data?.user) throw new Error('Login succeeded but no user returned');
 
-      // Check user role
+      // Fetch profile — role + onboarding status drive routing
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, onboarding_completed')
         .eq('id', data.user.id)
         .single();
 
       if (profileError) {
-        console.warn('Profile query failed:', profileError.message);
+        console.error('Profile fetch failed:', profileError.message);
+        setError('Unable to load your profile. Please try again or contact support.');
+        setLoading(false);
+        return;
       }
 
-      // Redirect to next parameter if provided, otherwise based on role
+      if (!profile) {
+        // Profile row missing — send to onboarding to create one
+        router.push('/onboarding/learner');
+        return;
+      }
+
+      // Explicit redirect param takes priority
       if (next) {
         router.push(next);
-      } else if (
-        profile?.role === 'admin' ||
-        profile?.role === 'super_admin' ||
-        profile?.role === 'org_admin'
-      ) {
-        router.push('/admin/dashboard');
-      } else if (profile?.role === 'program_holder') {
-        router.push('/program-holder/dashboard');
-      } else if (profile?.role === 'partner') {
-        router.push('/partner');
-      } else if (profile?.role === 'employer') {
-        router.push('/employer/dashboard');
-      } else if (profile?.role === 'workforce_board') {
-        router.push('/workforce-board');
-      } else if (profile?.role === 'student') {
-        router.push('/lms/dashboard');
-      } else {
-        router.push('/lms/dashboard');
+        return;
+      }
+
+      const role = profile.role;
+      const onboardingDone = profile.onboarding_completed === true;
+
+      // Students must complete onboarding before accessing LMS
+      if (role === 'student' && !onboardingDone) {
+        router.push('/onboarding/learner');
+        return;
+      }
+
+      switch (role) {
+        case 'admin':
+        case 'super_admin':
+        case 'org_admin':
+          router.push('/admin/dashboard');
+          break;
+        case 'program_holder':
+          router.push('/program-holder/dashboard');
+          break;
+        case 'partner':
+          router.push('/partner');
+          break;
+        case 'employer':
+          router.push('/employer/dashboard');
+          break;
+        case 'workforce_board':
+          router.push('/workforce-board');
+          break;
+        case 'student':
+          router.push('/lms/dashboard');
+          break;
+        default:
+          // Unknown or null role — safe default
+          router.push('/lms/dashboard');
+          break;
       }
     } catch (err: any) {
       const msg = err?.message || 'Invalid email or password';

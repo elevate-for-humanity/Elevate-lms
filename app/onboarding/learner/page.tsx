@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { BookOpen, FileText, CreditCard, Calendar, User, ArrowRight, Phone, Mail, HelpCircle } from 'lucide-react';
+import { BookOpen, FileText, CreditCard, Calendar, User, ArrowRight, Phone, Mail, HelpCircle, ClipboardCheck } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
@@ -223,60 +223,112 @@ export default async function LearnerOnboardingPage() {
 
     if (application) {
       let programId = application.program_id;
-      if (!programId && application.program_interest) {
-        const slug = application.program_interest.toLowerCase().replace(/\s+/g, '-').trim();
-        const { data: programRow } = await db.from('programs').select('id').eq('slug', slug).maybeSingle();
+      const programSlug = application.program_interest?.toLowerCase().replace(/\s+/g, '-').trim() || '';
+
+      // Resolve program ID from slug if not set on the application
+      if (!programId && programSlug) {
+        const { data: programRow } = await db.from('programs').select('id').eq('slug', programSlug).eq('is_active', true).maybeSingle();
         programId = programRow?.id || null;
       }
 
       await db.from('applications').update({ status: 'approved', updated_at: new Date().toISOString() }).eq('id', application.id);
 
-      const programSlug = application.program_interest?.toLowerCase().replace(/\s+/g, '-').trim() || '';
-
       if (programId) {
         await db.from('program_enrollments').upsert({
           user_id: user.id, program_id: programId, program_slug: programSlug, email: user.email,
           full_name: `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim(),
-          amount_paid_cents: 0, funding_source: 'pending', status: 'active', enrollment_state: 'enrolled',
+          amount_paid_cents: 0, funding_source: 'pending', status: 'pending_approval', enrollment_state: 'pending_approval',
         }, { onConflict: 'user_id,program_id', ignoreDuplicates: true });
 
-        const { data: courses } = await db.from('training_courses').select('id').eq('program_id', programId).eq('is_active', true);
+        // Find courses for this program
+        let { data: courses } = await db.from('training_courses').select('id, program_id').eq('program_id', programId).eq('is_active', true);
+
+        // Fallback: program_id mismatch across programs/training_courses tables.
+        // Use controlled keyword from the program name (not user free text).
+        if ((!courses || courses.length === 0) && programSlug) {
+          const SLUG_TO_TOKEN: Record<string, string> = {
+            'hvac-technician': 'HVAC', 'hvac': 'HVAC', 'hvac-2024': 'HVAC',
+            'cna-training': 'CNA', 'cna': 'CNA', 'cna-certification': 'CNA',
+            'cdl': 'CDL', 'cdl-commercial-driving': 'CDL',
+            'welding': 'Welding', 'welding-certification': 'Welding',
+            'phlebotomy': 'Phlebotomy', 'phlebotomy-technician': 'Phlebotomy',
+            'barber': 'Barber', 'barber-apprenticeship': 'Barber',
+            'medical-assistant': 'Medical Assistant',
+            'cybersecurity': 'Cybersecurity',
+            'it-support': 'IT Support', 'it-support-specialist': 'IT Support',
+            'electrical': 'Electrical', 'electrical-apprenticeship': 'Electrical',
+            'plumbing': 'Plumbing', 'plumbing-apprenticeship': 'Plumbing',
+            'tax-preparation': 'Tax Preparation',
+          };
+          const token = SLUG_TO_TOKEN[programSlug];
+          if (token) {
+            const { data: fallback } = await db.from('training_courses').select('id, program_id').ilike('course_name', `%${token}%`).eq('is_active', true);
+            // Only use fallback if all results belong to a single program (no ambiguity)
+            if (fallback && fallback.length > 0) {
+              const programIds = new Set(fallback.map((c: any) => c.program_id).filter(Boolean));
+              if (programIds.size <= 1) {
+                courses = fallback;
+              } else {
+                logger.error('Ambiguous course fallback — multiple program_ids', { programSlug, token, programIds: [...programIds] });
+              }
+            }
+          }
+        }
+
         if (courses && courses.length > 0) {
           await db.from('training_enrollments').upsert(
-            courses.map((c: any) => ({ user_id: user.id, course_id: c.id, status: 'active', progress: 0, enrolled_at: new Date().toISOString() })),
+            courses.map((c: any) => ({ user_id: user.id, course_id: c.id, status: 'pending_approval', progress: 0, enrolled_at: new Date().toISOString() })),
             { onConflict: 'user_id,course_id', ignoreDuplicates: true }
           );
+        } else {
+          logger.error('No active courses found for auto-enrollment', { programId, programSlug, userId: user.id });
         }
       }
 
-      await db.from('profiles').update({ enrollment_status: 'active' }).eq('id', user.id);
+      await db.from('profiles').update({ enrollment_status: 'pending_approval' }).eq('id', user.id);
       justEnrolled = true;
 
+      // Email 1: Student — onboarding complete, pending admin review
       try {
         await sendEmail({
           to: user.email!,
-          subject: `You're Enrolled! Welcome to ${programName} — Elevate for Humanity`,
+          subject: `Onboarding Complete — ${programName} | Elevate for Humanity`,
           html: [
-            `<h2>Hi ${studentName},</h2>`,
-            `<p>Your onboarding is complete and all documents have been verified. You are now enrolled in <strong>${programName}</strong>.</p>`,
-            `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin:12px 0">`,
-            `<p style="margin:0 0 8px;font-weight:bold">Your Login:</p>`,
-            `<p style="margin:0">Email: <strong>${user.email}</strong></p>`,
-            `<p style="margin:8px 0 0;font-size:13px;color:#64748b">Use the password from your welcome email. Forgot it? <a href="${siteUrl}/reset-password">Reset it here</a></p>`,
+            `<h2 style="font-weight:normal;font-size:22px;margin:0 0 20px;color:#1a1a1a">Hi ${studentName},</h2>`,
+            `<p style="font-size:15px;line-height:1.6;color:#334155">Your onboarding for <strong>${programName}</strong> is complete. All your documents and information have been submitted.</p>`,
+            `<div style="background:#fffbeb;border:1px solid #fbbf24;border-radius:8px;padding:16px;margin:16px 0">`,
+            `<p style="margin:0 0 8px;font-weight:bold;color:#92400e">What happens next?</p>`,
+            `<p style="margin:0;color:#78350f;font-size:14px">An administrator will review your enrollment. Once approved, you will receive a separate email confirming your start date and course access.</p>`,
             `</div>`,
-            `<p><strong>Next steps:</strong></p>`,
-            `<ol>`,
-            `<li>Log in to your student portal</li>`,
-            `<li>Complete the required orientation (about 10 minutes)</li>`,
-            `<li>Once orientation is done, your courses will be unlocked</li>`,
-            `</ol>`,
-            `<p style="text-align:center"><a href="${siteUrl}/lms/dashboard" style="display:inline-block;padding:12px 24px;background:#f97316;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold">Log In to Student Portal</a></p>`,
-            `<p>Questions? Reply to this email or call (317) 314-3757.</p>`,
-            `<p>— Elevate for Humanity</p>`,
+            `<p style="font-size:14px;color:#475569">You do not need to take any further action at this time. We will contact you directly once your enrollment has been reviewed.</p>`,
+            `<p style="font-size:14px;color:#475569">Questions? Reply to this email or call <strong>(317) 314-3757</strong>.</p>`,
+            `<p style="font-size:14px;color:#64748b;margin-top:24px">— Elevate for Humanity</p>`,
           ].join(''),
         });
       } catch (emailErr) {
-        logger.warn('Failed to send enrollment email', emailErr as Error);
+        logger.warn('Failed to send student onboarding-complete email', emailErr as Error);
+      }
+
+      // Email 2: Admin — new student needs enrollment approval
+      try {
+        const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com';
+        await sendEmail({
+          to: adminEmail,
+          subject: `Action Required: ${studentName} completed onboarding for ${programName}`,
+          html: [
+            `<h2 style="font-weight:normal;font-size:22px;margin:0 0 20px;color:#1a1a1a">New Student Enrollment Pending Approval</h2>`,
+            `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin:12px 0">`,
+            `<p style="margin:0 0 8px"><strong>Student:</strong> ${studentName} (${user.email})</p>`,
+            `<p style="margin:0 0 8px"><strong>Program:</strong> ${programName}</p>`,
+            `<p style="margin:0"><strong>Submitted:</strong> ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>`,
+            `</div>`,
+            `<p style="font-size:15px;color:#334155">This student has completed all onboarding steps and is waiting for admin approval to begin coursework.</p>`,
+            `<p style="text-align:center;margin:24px 0"><a href="${siteUrl}/admin/enrollments" style="display:inline-block;padding:12px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold">Review Enrollments</a></p>`,
+            `<p style="font-size:13px;color:#64748b">— Elevate LMS Notifications</p>`,
+          ].join(''),
+        });
+      } catch (emailErr) {
+        logger.warn('Failed to send admin enrollment notification', emailErr as Error);
       }
     }
   }
@@ -333,24 +385,24 @@ export default async function LearnerOnboardingPage() {
       </section>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {/* Enrolled success banner */}
-        {(justEnrolled || profile?.enrollment_status === 'active') && (
+        {/* Enrollment approved — student can access courses */}
+        {profile?.enrollment_status === 'active' && (
           <div className="relative overflow-hidden bg-brand-green-50 border-2 border-brand-green-200 rounded-2xl p-6 sm:p-8 mb-10">
             <div className="absolute top-0 right-0 w-32 h-32 bg-brand-green-100 rounded-full -translate-y-1/2 translate-x-1/2 opacity-50" />
             <div className="relative flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
               <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden flex-shrink-0">
                 <Image
                   src="/images/heroes-hq/success-stories-hero.jpg"
-                  alt="Enrollment success"
+                  alt="Enrollment approved"
                   width={80}
                   height={80}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-black text-brand-green-900 mb-1">You&apos;re Enrolled!</h2>
+                <h2 className="text-2xl font-black text-brand-green-900 mb-1">You&apos;re Approved!</h2>
                 <p className="text-brand-green-700">
-                  Your onboarding is complete. Log in to your student portal to access your courses and begin training.
+                  Your enrollment has been approved. Log in to your student portal to access your courses and begin training.
                 </p>
               </div>
               <Link
@@ -360,6 +412,28 @@ export default async function LearnerOnboardingPage() {
                 Go to Student Portal
                 <ArrowRight className="w-5 h-5" />
               </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Pending admin approval banner */}
+        {(justEnrolled || profile?.enrollment_status === 'pending_approval') && profile?.enrollment_status !== 'active' && (
+          <div className="relative overflow-hidden bg-amber-50 border-2 border-amber-300 rounded-2xl p-6 sm:p-8 mb-10">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100 rounded-full -translate-y-1/2 translate-x-1/2 opacity-50" />
+            <div className="relative flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+                <ClipboardCheck className="w-10 h-10 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-black text-amber-900 mb-1">Onboarding Complete — Pending Admin Approval</h2>
+                <p className="text-amber-800 mb-2">
+                  All your onboarding steps are done. An administrator will review your enrollment and documents.
+                </p>
+                <p className="text-amber-700 text-sm">
+                  You will receive an email once your enrollment is approved with instructions on when you can start class.
+                  No further action is needed from you at this time.
+                </p>
+              </div>
             </div>
           </div>
         )}

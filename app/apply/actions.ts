@@ -5,7 +5,10 @@ import { revalidatePath } from 'next/cache';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 
-const ADMIN_EMAIL = 'info@elevateforhumanity.org';
+const ADMIN_EMAILS = [
+  'info@elevateforhumanity.org',
+  'elevate4humanityedu@gmail.com',
+];
 
 async function sendEmailDirect(to: string, subject: string, html: string) {
   try {
@@ -418,11 +421,10 @@ async function insertApplication(payload: {
       ].join(''),
     ).catch((err) => { logger.error('[Apply] Student confirmation email failed:', err instanceof Error ? err.message : err); });
 
-    // Admin notification — student will auto-enroll after onboarding + doc verification
-    const adminEmailPromise = sendEmailDirect(
-      ADMIN_EMAIL,
-      `[NEW APPLICATION] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`,
-      [
+    // Admin notification — send to each admin address individually so a
+    // Resend suppression on one does not block the others.
+    const adminSubject = `[NEW APPLICATION] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`;
+    const adminHtml = [
         emailHeader,
         `<h3>New ${payload.source.replace(/-/g, ' ')}</h3>`,
         `<p style="color:#b45309"><strong>Status: PENDING — student completing onboarding, documents need verification</strong></p>`,
@@ -438,10 +440,19 @@ async function insertApplication(payload: {
         supabase ? `<p><a href="${siteUrl}/admin/applications/review/${referenceNumber}" style="display:inline-block;padding:10px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;margin:8px 0">Review & Approve</a></p>` : '',
         supabase ? `<p><a href="${siteUrl}/admin/applications">View All Applications</a></p>` : '',
         emailFooter,
-      ].filter(Boolean).join(''),
-    ).catch((err) => { logger.error('[Apply] Admin notification email failed:', err instanceof Error ? err.message : err); });
+      ].filter(Boolean).join('');
 
-    await Promise.all([studentEmailPromise, adminEmailPromise]);
+    await Promise.allSettled(
+      ADMIN_EMAILS.map((addr) =>
+        sendEmailDirect(addr, adminSubject, adminHtml)
+      ),
+    ).then((results) => {
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          logger.error(`[Apply] Admin notification to ${ADMIN_EMAILS[i]} failed:`, r.reason);
+        }
+      });
+    });
   }
 
   // Path A: DB available — insert application, admin enrolls later

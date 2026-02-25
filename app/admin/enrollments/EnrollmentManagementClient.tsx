@@ -14,7 +14,7 @@ interface Enrollment {
   enrolled_at: string;
   completed_at: string | null;
   student?: { id: string; full_name: string | null; email: string } | null;
-  course?: { id: string; title: string } | null;
+  course?: { id: string; title: string; course_name?: string } | null;
 }
 
 interface User {
@@ -218,6 +218,69 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
     }
   };
 
+  const approveEnrollment = async (enrollment: Enrollment) => {
+    try {
+      const { data: { user: adminUser } } = await supabase.auth.getUser();
+
+      const { error: updateError } = await supabase
+        .from('training_enrollments')
+        .update({
+          status: 'active',
+          approved_at: new Date().toISOString(),
+          approved_by: adminUser?.id || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', enrollment.id);
+
+      if (updateError) throw updateError;
+
+      // Also update program_enrollments and profile
+      await supabase
+        .from('program_enrollments')
+        .update({ status: 'active', enrollment_state: 'enrolled' })
+        .eq('user_id', enrollment.user_id);
+
+      await supabase
+        .from('profiles')
+        .update({ enrollment_status: 'active' })
+        .eq('id', enrollment.user_id);
+
+      // Send approval email to student
+      try {
+        const studentName = enrollment.student?.full_name || 'Student';
+        const studentEmail = enrollment.student?.email;
+        const courseName = enrollment.course?.course_name || enrollment.course?.title || 'your program';
+        if (studentEmail) {
+          await fetch('/api/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: studentEmail,
+              subject: `You're Approved! Start ${courseName} — Elevate for Humanity`,
+              html: [
+                `<h2 style="font-weight:normal;font-size:22px;margin:0 0 20px;color:#1a1a1a">Hi ${studentName},</h2>`,
+                `<p style="font-size:15px;line-height:1.6;color:#334155">Your enrollment in <strong>${courseName}</strong> has been approved. You can now access your coursework.</p>`,
+                `<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:16px;margin:16px 0">`,
+                `<p style="margin:0 0 8px;font-weight:bold;color:#166534">You're ready to start</p>`,
+                `<p style="margin:0;color:#15803d;font-size:14px">Log in to your student portal to begin your first lesson. Your courses are now unlocked.</p>`,
+                `</div>`,
+                `<p style="text-align:center;margin:24px 0"><a href="${window.location.origin}/lms/dashboard" style="display:inline-block;padding:12px 24px;background:#f97316;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold">Go to Student Portal</a></p>`,
+                `<p style="font-size:14px;color:#475569">Questions? Reply to this email or call <strong>(317) 314-3757</strong>.</p>`,
+                `<p style="font-size:14px;color:#64748b;margin-top:24px">— Elevate for Humanity</p>`,
+              ].join(''),
+            }),
+          });
+        }
+      } catch {
+        // Email failure doesn't block approval
+      }
+
+      setEnrollments(enrollments.map(e => e.id === enrollment.id ? { ...e, status: 'active', approved_at: new Date().toISOString() } : e));
+    } catch (err: any) {
+      setError('Failed to approve enrollment');
+    }
+  };
+
   const filteredEnrollments = enrollments.filter(enrollment => {
     const studentName = enrollment.student?.full_name || enrollment.student?.email || '';
     const courseName = enrollment.course?.course_name || enrollment.course?.title || '';
@@ -293,6 +356,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
             className="px-4 py-2 border rounded-lg"
           >
             <option value="all">All Status</option>
+            <option value="pending_approval">Pending Approval</option>
             <option value="active">Active</option>
             <option value="completed">Completed</option>
             <option value="pending">Pending</option>
@@ -333,6 +397,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         enrollment.status === 'completed' ? 'bg-brand-green-100 text-brand-green-700' :
                         enrollment.status === 'active' ? 'bg-brand-blue-100 text-brand-blue-700' :
+                        enrollment.status === 'pending_approval' ? 'bg-amber-100 text-amber-700' :
                         enrollment.status === 'withdrawn' ? 'bg-gray-100 text-gray-600' :
                         'bg-yellow-100 text-yellow-700'
                       }`}>
@@ -356,8 +421,11 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
+                      {enrollment.status === 'pending_approval' && (
+                        <button onClick={() => approveEnrollment(enrollment)} className="px-3 py-1 text-sm text-white bg-brand-green-600 rounded hover:bg-brand-green-700 font-medium">Approve</button>
+                      )}
                       <button onClick={() => openEditModal(enrollment)} className="px-3 py-1 text-sm border rounded hover:bg-gray-50">Edit</button>
-                      {enrollment.status !== 'completed' && (
+                      {enrollment.status !== 'completed' && enrollment.status !== 'pending_approval' && (
                         <button onClick={() => markComplete(enrollment)} className="px-3 py-1 text-sm text-brand-green-600 border border-brand-green-200 rounded hover:bg-brand-green-50">Complete</button>
                       )}
                       <button onClick={() => toggleAtRisk(enrollment)} className={`px-3 py-1 text-sm border rounded ${enrollment.at_risk ? 'text-gray-600 border-gray-200 hover:bg-gray-50' : 'text-brand-red-600 border-brand-red-200 hover:bg-brand-red-50'}`}>

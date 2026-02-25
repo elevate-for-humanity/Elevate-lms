@@ -38,6 +38,7 @@ export default function LessonPage() {
   const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
   const [courseCompleted, setCourseCompleted] = useState(false);
   const [certificate, setCertificate] = useState<any>(null);
+  const [enrollmentBlocked, setEnrollmentBlocked] = useState(false);
 
   useEffect(() => {
     fetchLessonData();
@@ -47,7 +48,23 @@ export default function LessonPage() {
     const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
 
-    // 1. Fetch lesson data first
+    // Check enrollment approval status first
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: enrollment } = await supabase
+        .from('training_enrollments')
+        .select('status, approved_at')
+        .eq('user_id', user.id)
+        .eq('course_id', courseId)
+        .maybeSingle();
+
+      if (!enrollment || (!enrollment.approved_at && enrollment.status === 'pending_approval')) {
+        setEnrollmentBlocked(true);
+        return;
+      }
+    }
+
+    // 1. Fetch lesson data
     const { data: lessonData } = await supabase
       .from('training_lessons')
       .select('*')
@@ -66,7 +83,7 @@ export default function LessonPage() {
       .eq('id', courseId)
       .single();
 
-    // 2. Set state IMMEDIATELY so the UI renders
+    // 2. Set state
     if (lessonData) {
       setLesson({
         ...lessonData,
@@ -88,11 +105,8 @@ export default function LessonPage() {
       });
     }
 
-    // 3. Fetch user progress in background (don't block lesson render)
+    // 3. Fetch user progress in background
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
       if (user && lessonsData) {
         const progressRes = await fetch(`/api/lms/progress?courseId=${courseId}`);
         const progressData = progressRes.ok ? await progressRes.json() : { progress: [] };
@@ -193,6 +207,31 @@ export default function LessonPage() {
     }, 30000);
     return () => clearTimeout(timer);
   }, [lesson]);
+
+  if (enrollmentBlocked) {
+    return (
+      <div className="flex items-center justify-center h-[100dvh] bg-slate-50">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <ClipboardList className="w-8 h-8 text-amber-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Enrollment Pending Approval</h2>
+          <p className="text-slate-600 mb-2">
+            Your enrollment is being reviewed by an administrator. You will receive an email once approved.
+          </p>
+          <p className="text-slate-500 text-sm mb-6">
+            Course access is locked until an admin approves your enrollment.
+          </p>
+          <Link
+            href="/lms/dashboard"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-brand-blue-700"
+          >
+            Back to Dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!lesson) {
     if (loadTimeout) {

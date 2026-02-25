@@ -102,13 +102,15 @@ export default async function CoursePage({ params }: { params: Params }) {
     notFound();
   }
 
-  // Check enrollment
+  // Check enrollment and approval status
   const { data: enrollment } = await db
-    .from('program_enrollments')
-    .select('*')
+    .from('training_enrollments')
+    .select('status, approved_at, approved_by')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
-    .single();
+    .maybeSingle();
+
+  const isPendingApproval = enrollment?.status === 'pending_approval' || (enrollment && !enrollment.approved_at);
 
   // Fetch lessons
   const { data: lessons } = await db
@@ -222,7 +224,23 @@ export default async function CoursePage({ params }: { params: Params }) {
                 </div>
               )}
 
-              {enrollment ? (
+              {enrollment && isPendingApproval ? (
+                <>
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Lock className="w-5 h-5 text-amber-600" />
+                      <span className="font-semibold text-amber-900">Pending Admin Approval</span>
+                    </div>
+                    <p className="text-amber-700 text-sm">
+                      Your enrollment is being reviewed. You&apos;ll receive an email when approved and can begin lessons.
+                    </p>
+                  </div>
+                  <div className="w-full flex items-center justify-center gap-2 bg-slate-200 text-slate-500 py-3 rounded-xl font-semibold cursor-not-allowed">
+                    <Lock className="w-5 h-5" />
+                    Course Locked
+                  </div>
+                </>
+              ) : enrollment ? (
                 <>
                   {/* Progress */}
                   <div className="mb-4">
@@ -297,9 +315,9 @@ export default async function CoursePage({ params }: { params: Params }) {
                 {typedLessons.map((lesson, index) => {
                   const progress = progressMap.get(lesson.id);
                   const isCompleted = progress?.completed;
-                  // Lock if not enrolled, OR if enrolled but previous lesson not done (sequential)
+                  // Lock if: pending approval, not enrolled, or previous lesson not done (sequential)
                   const previousDone = index === 0 || progressMap.get(typedLessons[index - 1]?.id)?.completed;
-                  const isLocked = (!enrollment && index > 0) || (enrollment && !isCompleted && !previousDone);
+                  const isLocked = isPendingApproval || (!enrollment && index > 0) || (enrollment && !isPendingApproval && !isCompleted && !previousDone);
 
                   return (
                     <div

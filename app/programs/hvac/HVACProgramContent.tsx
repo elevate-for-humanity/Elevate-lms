@@ -1,19 +1,68 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
+import { createBrowserClient } from '@supabase/ssr';
 import {
   Clock, DollarSign, TrendingUp, ArrowRight,
   Award, Calendar, ChevronDown, ChevronUp,
-  GraduationCap, Briefcase, Shield, CheckCircle
+  GraduationCap, Briefcase, Shield,
 } from 'lucide-react';
+
+interface CourseModule {
+  id: string;
+  title: string;
+  description: string | null;
+  order_index: number;
+}
+
+interface ProgramData {
+  title: string;
+  description: string;
+  estimated_weeks: number | null;
+  estimated_hours: number | null;
+  salary_min: number | null;
+  salary_max: number | null;
+  credential_name: string | null;
+  career_outcomes: string[] | null;
+  what_you_learn: string[] | null;
+  placement_rate: number | null;
+  completion_rate: number | null;
+  total_cost: string | null;
+  industry_demand: string | null;
+}
 
 export default function HVACProgramContent() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [program, setProgram] = useState<ProgramData | null>(null);
+  const [modules, setModules] = useState<CourseModule[]>([]);
+
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    Promise.all([
+      supabase
+        .from('programs')
+        .select('title, description, estimated_weeks, estimated_hours, salary_min, salary_max, credential_name, career_outcomes, what_you_learn, placement_rate, completion_rate, total_cost, industry_demand')
+        .eq('slug', 'hvac-technician')
+        .single(),
+      supabase
+        .from('course_modules')
+        .select('id, title, description, order_index')
+        .eq('course_id', 'f0593164-55be-5867-98e7-8a86770a8dd0')
+        .order('order_index'),
+    ]).then(([programRes, modulesRes]) => {
+      if (programRes.data) setProgram(programRes.data as ProgramData);
+      if (modulesRes.data) setModules(modulesRes.data as CourseModule[]);
+    });
+  }, []);
 
   const faqs = [
     {
@@ -48,6 +97,9 @@ export default function HVACProgramContent() {
 
   return (
     <>
+      {/* Video Hero Banner */}
+      <ProgramHeroBanner videoSrc="/videos/hvac-technician.mp4" />
+
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -59,88 +111,16 @@ export default function HVACProgramContent() {
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="relative h-48 md:h-64 overflow-hidden">
+      {/* Hero Image — no text overlay */}
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
         <Image
           src="/images/trades/hero-program-hvac.jpg"
           alt="HVAC technician working on a commercial heating and cooling unit"
           fill
-          quality={90} className="object-cover"
+          sizes="100vw"
+          className="object-cover"
           priority
         />
-
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
-
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-24 w-full">
-          <div className="max-w-2xl">
-            <FundingBadge type="funded" />
-
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mt-6 mb-6 leading-tight">
-              HVAC Technician Training<br />
-              <span className="text-brand-green-300">EPA 608 Certification</span>
-            </h1>
-
-            <p className="text-xl text-gray-200 mb-4 leading-relaxed">
-              15-week program covering HVAC fundamentals, refrigerant handling, and hands-on
-              employer site experience. Graduate with 6 industry credentials including EPA 608,
-              OSHA 30, Residential HVAC Cert 1 &amp; 2, CPR, and Rise Up.
-            </p>
-
-            <p className="text-lg text-brand-green-300 font-semibold mb-8">
-              Tuition may be covered through WIOA or Workforce Ready Grant for eligible students referred by WorkOne. Self-pay and payment plans also available.
-            </p>
-
-            <div className="flex flex-wrap gap-4 mb-8 text-sm text-gray-300">
-              <span className="flex items-center gap-2 bg-brand-green-500/20 backdrop-blur px-4 py-2 rounded-full text-brand-green-300 font-semibold border border-brand-green-400/30">
-                <Award className="w-4 h-4" /> EPA 608 Certification
-              </span>
-              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
-                <Clock className="w-4 h-4" /> 20 Weeks
-              </span>
-              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
-                <Calendar className="w-4 h-4" /> Flexible Scheduling
-              </span>
-              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
-                <TrendingUp className="w-4 h-4" /> 4-Star Indiana Top Job
-              </span>
-              <span className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
-                <DollarSign className="w-4 h-4" /> $48K Avg Starting Salary
-              </span>
-            </div>
-
-            <Link
-              href="/programs/hvac-technician/apply"
-              className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-500 text-white font-bold rounded-full transition-all shadow-lg text-lg mb-4"
-            >
-              Apply
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Link>
-
-            <div className="bg-yellow-500/20 border border-yellow-400/40 rounded-lg px-4 py-3 max-w-xl mb-4">
-              <p className="text-sm text-yellow-100 font-semibold">
-                Do not proceed with enrollment until you have completed WorkOne verification.{' '}
-                <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="text-white underline hover:text-yellow-200">
-                  Start at indianacareerconnect.com
-                </a>
-              </p>
-            </div>
-
-            <Link
-              href="/programs/hvac-technician/apply"
-              className="inline-flex items-center justify-center px-8 py-4 bg-brand-green-600 hover:bg-brand-green-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
-            >
-              Enroll in Program
-            </Link>
-
-            <Link
-              href="/programs/hvac-technician/course"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full transition-all border border-white/30 text-lg"
-            >
-              Preview Full Course
-            </Link>
-          </div>
-        </div>
-
       </section>
 
       {/* Program at a Glance — timeline, duration, pacing for case managers */}
@@ -258,7 +238,7 @@ export default function HVACProgramContent() {
             <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
               <div className="relative h-56">
                 <Image
-                  src="/images/programs-hq/technology-hero.jpg"
+                  src="/images/hvac/hvac-student-learning.jpg"
                   alt="Student completing HVAC coursework online at their own pace"
                   fill
                   quality={90} className="object-cover"
@@ -316,21 +296,21 @@ export default function HVACProgramContent() {
                 step: 2,
                 title: "Apply or enroll",
                 description: "Funded students: click \"Apply Now\" and submit a short application. We'll coordinate with WorkOne to confirm your funding. Self-pay students: click \"Enroll & Pay\" to register and choose a payment option.",
-                image: "/images/programs-hq/it-support.jpg",
+                image: "/images/hvac/hvac-tools-equipment.jpg",
                 alt: "Student completing enrollment application"
               },
               {
                 step: 3,
                 title: "Complete onboarding",
                 description: "Upload your photo ID, sign the student agreement, and complete a short orientation. Your account and login credentials are created during this step.",
-                image: "/images/programs-hq/business-office.jpg",
+                image: "/images/hvac/hvac-advisor-meeting.jpg",
                 alt: "Student completing onboarding on laptop"
               },
               {
                 step: 4,
                 title: "Start class",
                 description: "Once onboarding and funding are confirmed, you're in. You'll get your class schedule, access to the learning platform, and everything you need to begin training.",
-                image: "/images/programs-hq/electrical.jpg",
+                image: "/images/hvac/hvac-student-learning.jpg",
                 alt: "HVAC students in hands-on training lab"
               }
             ].map((item) => (
@@ -418,7 +398,7 @@ export default function HVACProgramContent() {
                     'Exam fees and retesting policies vary by certifying organization',
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                      <CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" />
+                      <span className="w-1.5 h-1.5 bg-brand-green-600 rounded-full mt-2 shrink-0" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -521,7 +501,7 @@ export default function HVACProgramContent() {
                   { label: '501(c)(3) Nonprofit Organization', detail: 'Selfish Inc. DBA Elevate for Humanity' },
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-brand-green-600 mt-0.5 shrink-0" />
+                    <span className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 shrink-0" />
                     <div>
                       <p className="font-semibold text-gray-900 text-sm">{item.label}</p>
                       <p className="text-gray-500 text-xs">{item.detail}</p>
@@ -548,7 +528,7 @@ export default function HVACProgramContent() {
                   'CPR/First Aid certified instructors',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                    <CheckCircle className="w-4 h-4 text-brand-green-600 mt-0.5 shrink-0" />
+                    <span className="w-1.5 h-1.5 bg-brand-green-600 rounded-full mt-2 shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -745,21 +725,21 @@ export default function HVACProgramContent() {
                 role: "HVAC Service Technician",
                 salary: "$40,000 – $55,000/year",
                 description: "Diagnose and repair heating and cooling systems in homes and businesses. Year-round demand — busy in summer and winter.",
-                image: "/images/programs-hq/skilled-trades-hero.jpg",
+                image: "/images/hvac/hvac-service-tech.jpg",
                 alt: "HVAC service technician repairing a residential unit"
               },
               {
                 role: "Installation Specialist",
                 salary: "$42,000 – $58,000/year",
                 description: "Install new HVAC systems in homes and commercial buildings. Strong growth driven by new construction and system upgrades.",
-                image: "/images/trades/program-building-construction.jpg",
+                image: "/images/hvac/hvac-installation.jpg",
                 alt: "HVAC installer working on a new commercial system"
               },
               {
                 role: "Refrigeration Technician",
                 salary: "$50,000 – $70,000/year",
                 description: "Specialized work on commercial refrigeration and industrial cooling. Higher pay because fewer technicians have this skill set.",
-                image: "/images/trades/program-electrical-training.jpg",
+                image: "/images/hvac/hvac-commercial.jpg",
                 alt: "Refrigeration technician working on commercial equipment"
               }
             ].map((career, index) => (
@@ -805,7 +785,7 @@ export default function HVACProgramContent() {
               "You're a veteran transitioning to civilian work"
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
-                <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                <span className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
                 <span className="text-gray-700">{item}</span>
               </div>
             ))}
@@ -833,7 +813,7 @@ export default function HVACProgramContent() {
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <div className="flex flex-col md:flex-row gap-8 items-center">
             <div className="relative w-full md:w-80 h-64 flex-shrink-0 rounded-2xl overflow-hidden">
-              <Image src="/images/programs-hq/students-learning.jpg" alt="Student meeting with a funding advisor" fill quality={90} className="object-cover" />
+              <Image src="/images/hvac/hvac-advisor-meeting.jpg" alt="Student meeting with a funding advisor" fill quality={90} className="object-cover" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">How Funding Works</h2>
@@ -917,7 +897,7 @@ export default function HVACProgramContent() {
 
       {/* Final CTA */}
       <section className="relative py-20">
-        <Image src="/images/trades/hero-program-plumbing.jpg" alt="HVAC technician at work" fill quality={90} className="object-cover" />
+        <Image src="/images/trades/hero-program-hvac.jpg" alt="HVAC technician at work" fill quality={90} className="object-cover" />
         <div className="absolute inset-0 bg-brand-blue-900/85" />
         <div className="relative max-w-4xl mx-auto px-6 lg:px-8 text-center text-white">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Start?</h2>

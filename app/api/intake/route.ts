@@ -13,7 +13,7 @@ function determineFundingTag(body: Record<string, string>): string {
 }
 
 export async function POST(req: Request) {
-    const rateLimited = await applyRateLimit(req, 'strict');
+    const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 
   const supabase = createAdminClient();

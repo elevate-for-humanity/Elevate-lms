@@ -1,14 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function HVACProgramContent() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const router = useRouter();
 
   return (
     <>
@@ -76,9 +75,9 @@ export default function HVACProgramContent() {
 
           {/* CTA Buttons */}
           <div className="grid sm:grid-cols-2 gap-6 mb-4">
-            <button
-              onClick={() => router.push('/apply/student?program=hvac-technician')}
-              className="text-left bg-brand-blue-600 hover:bg-brand-blue-700 text-white rounded-xl p-6 transition cursor-pointer"
+            <Link
+              href="/apply/student?program=hvac-technician"
+              className="block bg-brand-blue-600 hover:bg-brand-blue-700 text-white rounded-xl p-6 transition"
             >
               <span className="text-xl font-bold block mb-2">Apply for Enrollment</span>
               <span className="text-sm text-blue-100 block leading-relaxed">
@@ -86,10 +85,10 @@ export default function HVACProgramContent() {
                 upload your documents, and begin onboarding. Our admissions team will review your
                 application and contact you about funding eligibility.
               </span>
-            </button>
-            <button
-              onClick={() => router.push('/apply/intake?program=hvac-technician')}
-              className="text-left border-2 border-gray-200 hover:border-gray-300 rounded-xl p-6 transition cursor-pointer"
+            </Link>
+            <Link
+              href="/apply/intake?program=hvac-technician"
+              className="block border-2 border-gray-200 hover:border-gray-300 rounded-xl p-6 transition"
             >
               <span className="text-xl font-bold text-gray-900 block mb-2">Submit an Inquiry</span>
               <span className="text-sm text-gray-500 block leading-relaxed">
@@ -97,7 +96,7 @@ export default function HVACProgramContent() {
                 contact you within 1 business day. We can answer questions about the program,
                 schedule, funding options, and what to expect.
               </span>
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -266,18 +265,18 @@ export default function HVACProgramContent() {
             Apply for enrollment to begin the process, or submit an inquiry if you have questions first.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => router.push('/apply/student?program=hvac-technician')}
-              className="bg-white text-slate-900 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition cursor-pointer"
+            <Link
+              href="/apply/student?program=hvac-technician"
+              className="inline-block bg-white text-slate-900 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-center"
             >
               Apply for Enrollment
-            </button>
-            <button
-              onClick={() => router.push('/apply/intake?program=hvac-technician')}
-              className="border-2 border-white/30 text-white px-8 py-4 rounded-lg font-bold hover:bg-white/10 transition cursor-pointer"
+            </Link>
+            <Link
+              href="/apply/intake?program=hvac-technician"
+              className="inline-block border-2 border-white/30 text-white px-8 py-4 rounded-lg font-bold hover:bg-white/10 transition text-center"
             >
               Submit an Inquiry
-            </button>
+            </Link>
           </div>
         </div>
       </section>

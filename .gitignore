@@ -151,3 +151,4 @@ public/generated-images/
 audit-packet/
 lighthouse-*.json
 deno.lock
+eng.traineddata

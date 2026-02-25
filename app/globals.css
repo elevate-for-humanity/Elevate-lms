@@ -78,8 +78,6 @@
   color: #374151;
 }
 
-
-
 /* ============================================================================
    PREVENT FLASH OF UNSTYLED CONTENT ON FIRST LOAD
    ============================================================================ */
@@ -283,6 +281,10 @@ html, body {
     outline: 3px solid #2563eb;
     outline-offset: 2px;
     border-radius: 4px;
+  }
+  .theme {
+    --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
+    --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
   }
 }
 
@@ -1223,18 +1225,18 @@ html {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
+
   /* Ensure images don't overflow on mobile - exclude absolute/fill images */
   img:not([data-nimg="fill"]):not([style*="absolute"]) {
     max-width: 100%;
   }
-  
+
   /* Fix any absolute/fixed elements that might overflow - exclude images */
   [class*="fixed"]:not(img),
   [class*="absolute"]:not(img) {
     max-width: 100vw;
   }
-  
+
   /* Ensure text doesn't cause horizontal scroll */
   h1, h2, h3, h4, h5, h6, p {
     word-wrap: break-word;
@@ -1618,8 +1620,6 @@ footer a:hover {
    Removed - Let component styles control header appearance
    ============================================================================ */
 
-
-
 /* Toast animations */
 @keyframes slide-in {
   from { transform: translateX(100%); opacity: 0; }
@@ -1822,3 +1822,24 @@ header[role="banner"] a.\!text-white {
 
 /* Trust badge/label overrides removed — Tailwind controls text color */
 
+@theme inline {
+  @keyframes shimmer-slide {
+  to {
+    transform: translate(calc(100cqw - 100%), 0);
+    }
+  }
+  @keyframes spin-around {
+  0% {
+    transform: translateZ(0) rotate(0);
+    }
+  15%, 35% {
+    transform: translateZ(0) rotate(90deg);
+    }
+  65%, 85% {
+    transform: translateZ(0) rotate(270deg);
+    }
+  100% {
+    transform: translateZ(0) rotate(360deg);
+    }
+  }
+}

@@ -109,7 +109,7 @@ export default function HVACProgramContent() {
             </div>
 
             <Link
-              href="/apply?program=hvac-technician"
+              href="/programs/hvac-technician/apply"
               className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-500 text-white font-bold rounded-full transition-all shadow-lg text-lg mb-4"
             >
               Apply
@@ -359,7 +359,7 @@ export default function HVACProgramContent() {
 
           <div className="mt-10 flex flex-col items-center gap-4">
             <Link
-              href="/apply?program=hvac-technician"
+              href="/programs/hvac-technician/apply"
               className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-500 text-white font-bold rounded-full transition-all shadow-lg text-lg"
             >
               Apply

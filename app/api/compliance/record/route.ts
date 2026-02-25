@@ -32,15 +32,18 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'agreement_acceptance') {
-      const { data, error } = await db.from('agreement_acceptances').insert({
-        subject_type: 'apprentice',
-        subject_id: user.id,
-        agreement_key: params.agreementType || params.agreementKey,
-        agreement_version: params.documentVersion || params.agreementVersion || '1.0',
-        accepted_name: params.signerName || params.acceptedName,
-        accepted_email: params.signerEmail || params.acceptedEmail || user.email,
+      const { data, error } = await db.from('license_agreement_acceptances').insert({
+        user_id: user.id,
+        agreement_type: params.agreementType || params.agreementKey,
+        document_version: params.documentVersion || params.agreementVersion || '1.0',
+        signer_name: params.signerName || params.acceptedName,
+        signer_email: params.signerEmail || params.acceptedEmail || user.email,
+        signature_method: params.signatureMethod || 'checkbox',
+        signature_data: params.signatureData || null,
+        signature_typed: params.signatureTyped || null,
+        acceptance_context: params.acceptanceContext || null,
         accepted_at: new Date().toISOString(),
-        accepted_ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '0.0.0.0',
+        ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '0.0.0.0',
         user_agent: request.headers.get('user-agent') || 'unknown',
       }).select('id').single();
       if (error) {
@@ -90,24 +93,21 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === 'agreements') {
-      const { data } = await db.from('agreement_acceptances')
-        .select('id, agreement_key, agreement_version, accepted_at')
-        .eq('subject_id', user.id);
-      // Map to expected field names for frontend compatibility
-      const mapped = (data || []).map((a: any) => ({ ...a, agreement_type: a.agreement_key }));
-      return NextResponse.json({ data: mapped });
+      const { data } = await db.from('license_agreement_acceptances')
+        .select('id, agreement_type, document_version, accepted_at')
+        .eq('user_id', user.id);
+      return NextResponse.json({ data: data || [] });
     }
 
     // Return all
     const [handbook, agreements] = await Promise.all([
       db.from('handbook_acknowledgments').select('handbook_version, acknowledged_at').eq('user_id', user.id),
-      db.from('agreement_acceptances').select('id, agreement_key, agreement_version, accepted_at').eq('subject_id', user.id),
+      db.from('license_agreement_acceptances').select('id, agreement_type, document_version, accepted_at').eq('user_id', user.id),
     ]);
-    const mappedAgreements = (agreements.data || []).map((a: any) => ({ ...a, agreement_type: a.agreement_key }));
 
     return NextResponse.json({
       handbook: handbook.data || [],
-      agreements: mappedAgreements,
+      agreements: agreements.data || [],
     });
   } catch (err) {
     logger.error('[Compliance] GET error:', err instanceof Error ? err.message : err);

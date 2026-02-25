@@ -128,7 +128,7 @@ export default function CosmetologyApprenticeshipPage() {
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Cosmetology Career</h2>
           <p className="text-white mb-6 text-sm">Earn while you learn. Apply today.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=cosmetology-apprenticeship" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-red-50 transition-colors text-center">
+            <Link href="/programs/cosmetology-apprenticeship/apply" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-red-50 transition-colors text-center">
               Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
             <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

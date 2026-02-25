@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase/client';
 export async function updateOnboardingProgress(
   userId: string,
   step: string,
-  status: 'completed' | 'pending' | 'skipped'
+  value: boolean
 ): Promise<void> {
   const supabase = createClient();
   
@@ -18,16 +18,29 @@ export async function updateOnboardingProgress(
     return;
   }
 
+  // Map step names to onboarding_progress column names
+  const columnMap: Record<string, string> = {
+    profile: 'profile_completed',
+    agreements: 'agreements_completed',
+    handbook: 'handbook_acknowledged',
+    documents: 'documents_uploaded',
+  };
+
+  const column = columnMap[step];
+  if (!column) {
+    logger.warn(`[Compliance] Unknown onboarding step: ${step}`);
+    return;
+  }
+
   try {
     await supabase
       .from('onboarding_progress')
       .upsert({
         user_id: userId,
-        step,
-        status,
+        [column]: value,
         updated_at: new Date().toISOString(),
       }, {
-        onConflict: 'user_id,step'
+        onConflict: 'user_id'
       });
   } catch (error) {
     logger.error('[Compliance] Failed to update onboarding progress:', error);

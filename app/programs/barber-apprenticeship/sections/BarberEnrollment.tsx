@@ -188,7 +188,7 @@ export function BarberEnrollment() {
             Pay in full, use a payment plan, or apply for Buy Now Pay Later with Klarna, Afterpay, or Affirm.
           </p>
           <div className="flex flex-wrap gap-4 justify-center mb-6">
-            <Link href="/apply?program=barber-apprenticeship" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/programs/barber-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Apply as Student <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/partners/barbershop-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">

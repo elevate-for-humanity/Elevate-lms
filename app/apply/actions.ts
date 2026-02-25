@@ -115,26 +115,28 @@ async function createStudentAccount(
           role: 'student',
         }, { onConflict: 'id' });
       } else if (createError) {
-        // User may exist in auth but not profiles — scan for them
-        let page = 1;
-        while (page <= 6 && !userId) {
-          const { data: batch } = await supabase.auth.admin.listUsers({ page, perPage: 100 });
-          if (!batch?.users?.length) break;
-          const found = batch.users.find((u: any) => u.email?.toLowerCase() === normalizedEmail);
-          if (found) {
-            userId = found.id;
-            // Update password to the one the student provided
-            await supabase.auth.admin.updateUserById(userId, { password });
-            await supabase.from('profiles').upsert({
+        // User exists in auth but not profiles — look up directly by email
+        const { data: authLookup } = await supabase.rpc('get_user_id_by_email', { lookup_email: normalizedEmail }).maybeSingle();
+        if (authLookup?.id) {
+          userId = authLookup.id;
+        } else {
+          // Fallback: single-page listUsers filtered lookup
+          const { data: batch } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
+          const found = batch?.users?.find((u: any) => u.email?.toLowerCase() === normalizedEmail);
+          if (found) userId = found.id;
+        }
+        if (userId) {
+          await Promise.all([
+            supabase.auth.admin.updateUserById(userId, { password }),
+            supabase.from('profiles').upsert({
               id: userId,
               email: normalizedEmail,
               first_name: firstName,
               last_name: lastName,
               full_name: `${firstName} ${lastName}`,
               role: 'student',
-            }, { onConflict: 'id' });
-          }
-          page++;
+            }, { onConflict: 'id' }),
+          ]);
         }
       }
     }
@@ -144,41 +146,26 @@ async function createStudentAccount(
       return { accountCreated: false };
     }
 
-    // Resolve course ID for tracking
-    const courseId = await resolveCourseId(supabase, programInterest);
-
-    // Resolve program ID from programs table (used by enrollment system)
+    // Resolve course, program, and generate magic link in parallel
     const slug = programInterest.toLowerCase().replace(/\s+/g, '-').trim();
-    const { data: programRow } = await supabase
-      .from('programs')
-      .select('id')
-      .eq('slug', slug)
-      .maybeSingle();
-    const programId = programRow?.id || courseId || null;
-
-    // Link user to application — enrollment happens after onboarding completion
-    await supabase
-      .from('applications')
-      .update({
-        user_id: userId,
-        program_id: programId,
-      })
-      .eq('id', applicationId);
-
-    // Generate a magic link so the student can log in without setting a password
-    let magicLink: string | null = null;
-    try {
-      const { data: linkData } = await supabase.auth.admin.generateLink({
+    const [courseId, programResult, linkResult] = await Promise.all([
+      resolveCourseId(supabase, programInterest),
+      supabase.from('programs').select('id').eq('slug', slug).maybeSingle(),
+      supabase.auth.admin.generateLink({
         type: 'magiclink',
         email: normalizedEmail,
         options: { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/onboarding/learner` },
-      });
-      if (linkData?.properties?.action_link) {
-        magicLink = linkData.properties.action_link;
-      }
-    } catch (linkErr) {
-      logger.warn('Could not generate magic link — student will use forgot-password', linkErr as Error);
-    }
+      }).catch((err: any) => { logger.warn('Could not generate magic link', err); return null; }),
+    ]);
+
+    const programId = programResult?.data?.id || courseId || null;
+    const magicLink = linkResult && 'data' in linkResult ? linkResult.data?.properties?.action_link || null : null;
+
+    // Link user to application
+    await supabase
+      .from('applications')
+      .update({ user_id: userId, program_id: programId })
+      .eq('id', applicationId);
 
     logger.info('Student account created — awaiting onboarding completion for enrollment', { applicationId, userId, email: normalizedEmail, programId });
     return { userId, accountCreated: true, magicLink, programId };
@@ -331,7 +318,8 @@ async function insertApplication(payload: {
       `<p style="margin:0 0 20px;font-size:13px;color:#888;font-family:Arial,sans-serif">Forgot your password? Reset it anytime at <a href="${siteUrl}/reset-password" style="color:#888">${siteUrl}/reset-password</a></p>`,
     ].join('');
 
-    await sendEmailDirect(
+    // Send student + admin emails in parallel
+    const studentEmailPromise = sendEmailDirect(
       payload.email,
       `Welcome to Elevate for Humanity — ${programLabel} [${referenceNumber}]`,
       [
@@ -431,7 +419,7 @@ async function insertApplication(payload: {
     ).catch((err) => { logger.error('[Apply] Student confirmation email failed:', err instanceof Error ? err.message : err); });
 
     // Admin notification — student will auto-enroll after onboarding + doc verification
-    await sendEmailDirect(
+    const adminEmailPromise = sendEmailDirect(
       ADMIN_EMAIL,
       `[NEW APPLICATION] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`,
       [
@@ -452,6 +440,8 @@ async function insertApplication(payload: {
         emailFooter,
       ].filter(Boolean).join(''),
     ).catch((err) => { logger.error('[Apply] Admin notification email failed:', err instanceof Error ? err.message : err); });
+
+    await Promise.all([studentEmailPromise, adminEmailPromise]);
   }
 
   // Path A: DB available — insert application, admin enrolls later

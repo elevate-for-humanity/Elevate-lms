@@ -180,63 +180,62 @@ export async function POST(req: Request) {
       }
 
       if (userId) {
-        // Upsert profile
-        await supabase.from('profiles').upsert({
-          id: userId,
-          email: body.email,
-          full_name: `${body.firstName} ${body.lastName}`,
-          phone: body.phone,
-          role: 'student',
-          enrollment_status: 'active',
-        }, { onConflict: 'id' });
+        // Run profile upsert, program lookup, and password link generation in parallel
+        const [, programResult, linkResult] = await Promise.all([
+          // Upsert profile
+          supabase.from('profiles').upsert({
+            id: userId,
+            email: body.email,
+            full_name: `${body.firstName} ${body.lastName}`,
+            phone: body.phone,
+            role: 'student',
+            enrollment_status: 'active',
+          }, { onConflict: 'id' }),
 
-        // Resolve program ID
-        const { data: programRow } = await supabase
-          .from('programs')
-          .select('id')
-          .eq('slug', body.programSlug || 'barber-apprenticeship')
-          .maybeSingle();
+          // Resolve program ID
+          supabase
+            .from('programs')
+            .select('id')
+            .eq('slug', body.programSlug || 'barber-apprenticeship')
+            .maybeSingle(),
 
-        // Create enrollment record
-        await supabase.from('program_enrollments').insert({
-          user_id: userId,
-          program_id: programRow?.id || null,
-          email: body.email,
-          full_name: `${body.firstName} ${body.lastName}`,
-          amount_paid_cents: 0,
-          funding_source: body.fundingType || 'self-pay',
-          status: 'pending',
-          enrollment_state: 'approved',
-          next_required_action: 'COMPLETE_PAYMENT',
-        });
+          // Generate password setup link for new users (runs in parallel)
+          isNewUser
+            ? supabase.auth.admin.generateLink({
+                type: 'recovery',
+                email: body.email,
+                options: { redirectTo: `${(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org')}/update-password` },
+              }).catch((err: any) => { logger.warn('[Applications] Password link generation threw', err); return null; })
+            : Promise.resolve(null),
+        ]);
 
-        // Update application with user_id and approved status
-        await supabase
-          .from('applications')
-          .update({ status: 'approved', user_id: userId, program_id: programRow?.id || null })
-          .eq('id', data.id);
+        const programRow = programResult?.data;
+
+        if (linkResult && 'data' in linkResult && linkResult.data?.properties?.action_link) {
+          passwordSetupLink = linkResult.data.properties.action_link;
+          logger.info('[Applications] Password setup link generated', { email: body.email });
+        }
+
+        // Create enrollment record + update application status in parallel
+        await Promise.all([
+          supabase.from('program_enrollments').insert({
+            user_id: userId,
+            program_id: programRow?.id || null,
+            email: body.email,
+            full_name: `${body.firstName} ${body.lastName}`,
+            amount_paid_cents: 0,
+            funding_source: body.fundingType || 'self-pay',
+            status: 'pending',
+            enrollment_state: 'approved',
+            next_required_action: 'COMPLETE_PAYMENT',
+          }),
+          supabase
+            .from('applications')
+            .update({ status: 'approved', user_id: userId, program_id: programRow?.id || null })
+            .eq('id', data.id),
+        ]);
 
         logger.info('Application auto-approved', { userId, applicationId: data.id, program });
-
-        // Generate password setup link for new users
-        if (isNewUser) {
-          try {
-            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-            const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
-              type: 'recovery',
-              email: body.email,
-              options: { redirectTo: `${siteUrl}/update-password` },
-            });
-            if (linkError) {
-              logger.warn('[Applications] Password reset link generation failed', linkError);
-            } else if (linkData?.properties?.action_link) {
-              passwordSetupLink = linkData.properties.action_link;
-              logger.info('[Applications] Password setup link generated', { email: body.email });
-            }
-          } catch (linkErr) {
-            logger.warn('[Applications] Password link generation threw', linkErr);
-          }
-        }
       }
     } catch (autoApproveErr) {
       // Non-fatal — application is saved, payment can proceed
@@ -275,12 +274,6 @@ export async function POST(req: Request) {
               <p style="font-size: 16px;">Hi ${body.firstName},</p>
               <p>Your application for <strong>${body.program}</strong> has been received and your enrollment is being processed.</p>
 
-              <div style="background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 8px; padding: 16px; margin: 20px 0;">
-                <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Reference Number:</p>
-                <p style="margin: 0; font-size: 20px; font-weight: bold; font-family: monospace; color: #0f172a;">${referenceNumber}</p>
-                <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b;">Application ID: ${data.id}</p>
-              </div>
-
               ${passwordSection}
 
               <h3 style="color: #0f172a;">What Happens Next</h3>
@@ -290,7 +283,7 @@ export async function POST(req: Request) {
                     <div style="width: 28px; height: 28px; background: #3b82f6; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">1</div>
                   </td>
                   <td style="padding: 10px 0;">
-                    <strong>Set your password</strong> using the link above to access your student portal.
+                    <strong>Set your password</strong> using the green button above to access your student portal.
                   </td>
                 </tr>
                 <tr>
@@ -319,14 +312,20 @@ export async function POST(req: Request) {
                 </tr>
               </table>
 
-              <div style="text-align: center; margin: 24px 0;">
-                <a href="${siteUrl}/apply/track?id=${data.id}&email=${encodeURIComponent(body.email)}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Track Application Status</a>
-              </div>
-
               <div style="background: #fff7ed; border: 2px solid #fed7aa; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <h3 style="margin-top: 0; color: #ea580c;">Want to Talk Sooner?</h3>
                 <p style="margin-bottom: 12px;">Schedule your advisor call now instead of waiting:</p>
                 <a href="https://calendly.com/elevate-for-humanity/advisor-call" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Schedule Call Now</a>
+              </div>
+
+              <div style="background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 8px; padding: 16px; margin: 20px 0;">
+                <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Reference Number:</p>
+                <p style="margin: 0; font-size: 20px; font-weight: bold; font-family: monospace; color: #0f172a;">${referenceNumber}</p>
+                <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b;">Application ID: ${data.id}</p>
+              </div>
+
+              <div style="text-align: center; margin: 24px 0;">
+                <a href="${siteUrl}/apply/track?id=${data.id}&email=${encodeURIComponent(body.email)}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Track Application Status</a>
               </div>
 
               <p>Questions? Call us at <a href="tel:3173143757" style="color: #ea580c; font-weight: bold;">317-314-3757</a> or email <a href="mailto:info@elevateforhumanity.org" style="color: #ea580c;">info@elevateforhumanity.org</a></p>
@@ -342,14 +341,8 @@ export async function POST(req: Request) {
         `,
       });
 
-      if (studentEmailResult.success) {
-        logger.info('[Applications] Student email sent', { to: body.email, id: studentEmailResult.data?.id });
-      } else {
-        logger.error('[Applications] Student email FAILED', { error: studentEmailResult.error, to: body.email });
-      }
-
-      // Notification email to staff
-      const staffEmailResult = await sendEmail({
+      // Send staff email in parallel (don't wait for it to finish before responding)
+      const staffEmailPromise = sendEmail({
         to: 'elevate4humanityedu@gmail.com',
         subject: `New Application [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${body.program}`,
         html: `

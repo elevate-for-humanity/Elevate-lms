@@ -37,14 +37,6 @@ const REQUIRED_DOCUMENTS: RequiredDocument[] = [
     maxSize: 10,
   },
   {
-    id: 'social_security_card',
-    name: 'Social Security Card',
-    description: 'Copy of your Social Security card for employment verification',
-    required: true,
-    acceptedTypes: ['image/jpeg', 'image/png', 'application/pdf'],
-    maxSize: 10,
-  },
-  {
     id: 'transfer_hours',
     name: 'Transfer Hours Documentation',
     description: 'Transcripts or certificates from previous training programs',
@@ -70,12 +62,20 @@ const REQUIRED_DOCUMENTS: RequiredDocument[] = [
   },
 ];
 
+interface ValidationCheck {
+  name: string;
+  passed: boolean;
+  detail: string;
+}
+
 interface UploadedFile {
   documentId: string;
   fileName: string;
   fileSize: number;
   uploadedAt: string;
   url?: string;
+  validationStatus?: 'validating' | 'verified' | 'pending_review' | 'rejected';
+  validationChecks?: ValidationCheck[];
 }
 
 export default function OnboardingDocumentsPage() {
@@ -85,6 +85,9 @@ export default function OnboardingDocumentsPage() {
   const [uploading, setUploading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, UploadedFile>>({});
+  const [ssn, setSsn] = useState('');
+  const [ssnSaved, setSsnSaved] = useState(false);
+  const [ssnSaving, setSsnSaving] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -116,6 +119,17 @@ export default function OnboardingDocumentsPage() {
           };
         }
         setUploadedFiles(uploaded);
+      }
+
+      // Check if SSN last-4 already saved
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('ssn_last_4')
+        .eq('id', data.user.id)
+        .single();
+      if (profile?.ssn_last_4) {
+        setSsn(`***-**-${profile.ssn_last_4}`);
+        setSsnSaved(true);
       }
 
       setLoading(false);
@@ -165,6 +179,7 @@ export default function OnboardingDocumentsPage() {
         .insert({
           user_id: user.id,
           document_type: documentId,
+          category: 'onboarding',
           file_name: file.name,
           file_size: file.size,
           mime_type: file.type,
@@ -185,8 +200,38 @@ export default function OnboardingDocumentsPage() {
           fileSize: file.size,
           uploadedAt: docRecord.created_at,
           url: urlData.publicUrl,
+          validationStatus: 'validating',
         },
       }));
+
+      // Run server-side validation
+      try {
+        const valResponse = await fetch('/api/onboarding/validate-document', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ documentId: docRecord.id, documentType: documentId }),
+        });
+        const valResult = await valResponse.json();
+        setUploadedFiles((prev) => ({
+          ...prev,
+          [documentId]: {
+            ...prev[documentId],
+            validationStatus: valResult.status || 'pending_review',
+            validationChecks: valResult.checks || [],
+          },
+        }));
+
+        if (valResult.status === 'rejected') {
+          const failedCheck = valResult.checks?.find((c: ValidationCheck) => !c.passed);
+          setError(failedCheck?.detail || 'Document did not pass validation. Please re-upload.');
+        }
+      } catch {
+        // Validation failed — mark as pending review (non-blocking)
+        setUploadedFiles((prev) => ({
+          ...prev,
+          [documentId]: { ...prev[documentId], validationStatus: 'pending_review' },
+        }));
+      }
 
       // Check if all required documents are uploaded
       const requiredDocs = REQUIRED_DOCUMENTS.filter((d) => d.required);
@@ -232,6 +277,38 @@ export default function OnboardingDocumentsPage() {
     } catch (err) {
       console.error('Delete error:', err);
       setError('Failed to remove file');
+    }
+  };
+
+  const formatSsnInput = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 9);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 5) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`;
+  };
+
+  const handleSsnSave = async () => {
+    if (!user || ssnSaved) return;
+    const digits = ssn.replace(/\D/g, '');
+    if (digits.length !== 9) {
+      setError('Please enter a valid 9-digit Social Security number.');
+      return;
+    }
+    setSsnSaving(true);
+    setError(null);
+    try {
+      const supabase = createClient();
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ ssn_last_4: digits.slice(-4) })
+        .eq('id', user.id);
+      if (updateError) throw updateError;
+      setSsn(`***-**-${digits.slice(-4)}`);
+      setSsnSaved(true);
+    } catch {
+      setError('Failed to save. Please try again.');
+    } finally {
+      setSsnSaving(false);
     }
   };
 
@@ -308,29 +385,97 @@ export default function OnboardingDocumentsPage() {
           </div>
         )}
 
+        {/* Social Security Number */}
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <div className="flex items-start gap-4">
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${ssnSaved ? 'bg-brand-green-100' : 'bg-slate-100'}`}>
+              {ssnSaved ? (
+                <Check className="w-6 h-6 text-brand-green-600" />
+              ) : (
+                <FileText className="w-6 h-6 text-slate-400" />
+              )}
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-semibold text-slate-900">Social Security Number</h3>
+                <span className="text-xs bg-brand-red-100 text-brand-red-700 px-2 py-0.5 rounded-full">Required</span>
+              </div>
+              <p className="text-sm text-slate-600 mb-3">
+                Only the last 4 digits are stored. Used for employment verification and funding eligibility.
+              </p>
+              {ssnSaved ? (
+                <div className="flex items-center gap-2 bg-slate-50 rounded-lg p-3">
+                  <span className="text-sm font-mono text-slate-700">{ssn}</span>
+                  <span className="text-xs text-brand-green-600 font-medium">Saved</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={ssn}
+                    onChange={(e) => setSsn(formatSsnInput(e.target.value))}
+                    placeholder="000-00-0000"
+                    className="w-48 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 font-mono tracking-wider"
+                    maxLength={11}
+                    autoComplete="off"
+                  />
+                  <button
+                    onClick={handleSsnSave}
+                    disabled={ssn.replace(/\D/g, '').length !== 9 || ssnSaving}
+                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                      ssn.replace(/\D/g, '').length === 9 && !ssnSaving
+                        ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
+                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                    }`}
+                  >
+                    {ssnSaving ? 'Saving...' : 'Save'}
+                  </button>
+                </div>
+              )}
+              <p className="text-xs text-slate-500 mt-2">
+                Your full SSN is never stored. We only keep the last 4 digits for verification.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Document Upload Cards */}
         <div className="space-y-4 mb-8">
           {REQUIRED_DOCUMENTS.map((doc) => {
             const uploaded = uploadedFiles[doc.id];
             const isUploading = uploading === doc.id;
+            const vStatus = uploaded?.validationStatus;
+            const borderColor = !uploaded ? 'border-transparent'
+              : vStatus === 'verified' ? 'border-brand-green-500'
+              : vStatus === 'rejected' ? 'border-brand-red-500'
+              : vStatus === 'validating' ? 'border-brand-blue-400'
+              : 'border-amber-400';
+            const iconBg = !uploaded ? 'bg-slate-100'
+              : vStatus === 'verified' ? 'bg-brand-green-100'
+              : vStatus === 'rejected' ? 'bg-brand-red-100'
+              : vStatus === 'validating' ? 'bg-brand-blue-100'
+              : 'bg-amber-100';
 
             return (
               <div
                 key={doc.id}
-                className={`bg-white rounded-xl shadow-sm p-6 border-2 transition-colors ${
-                  uploaded ? 'border-brand-green-500' : 'border-transparent'
-                }`}
+                className={`bg-white rounded-xl shadow-sm p-6 border-2 transition-colors ${borderColor}`}
               >
                 <div className="flex items-start gap-4">
                   <div
-                    className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      uploaded ? 'bg-brand-green-100' : 'bg-slate-100'
-                    }`}
+                    className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${iconBg}`}
                   >
-                    {uploaded ? (
+                    {!uploaded ? (
+                      <FileText className="w-6 h-6 text-slate-400" />
+                    ) : vStatus === 'validating' ? (
+                      <Loader2 className="w-6 h-6 text-brand-blue-600 animate-spin" />
+                    ) : vStatus === 'rejected' ? (
+                      <AlertCircle className="w-6 h-6 text-brand-red-600" />
+                    ) : vStatus === 'verified' ? (
                       <Check className="w-6 h-6 text-brand-green-600" />
                     ) : (
-                      <FileText className="w-6 h-6 text-slate-400" />
+                      <Check className="w-6 h-6 text-amber-600" />
                     )}
                   </div>
 

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { withErrorHandling, APIErrors } from '@/lib/api';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { NextRequest, NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 // OCR processing moved to Netlify function: /.netlify/functions/ocr-extract
@@ -10,6 +11,9 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
 
@@ -159,6 +163,9 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 });
 
 export const GET = withErrorHandling(async (request: NextRequest) => {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
 

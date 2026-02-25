@@ -321,8 +321,8 @@ async function insertApplication(payload: {
       `<p style="margin:0 0 20px;font-size:13px;color:#888;font-family:Arial,sans-serif">Forgot your password? Reset it anytime at <a href="${siteUrl}/reset-password" style="color:#888">${siteUrl}/reset-password</a></p>`,
     ].join('');
 
-    // Send student + admin emails in parallel
-    const studentEmailPromise = sendEmailDirect(
+    // Send student confirmation email — must await so it actually sends
+    await sendEmailDirect(
       payload.email,
       `Welcome to Elevate for Humanity — ${programLabel} [${referenceNumber}]`,
       [

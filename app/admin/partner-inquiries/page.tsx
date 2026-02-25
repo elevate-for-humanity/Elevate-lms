@@ -13,19 +13,6 @@ import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-async function requireAdmin(supabase: any) {
-  const { data }: any = await supabase.auth.getUser();
-  if (!data?.user) return false;
-
-  const { data: profile } = await db
-    .from('user_profiles')
-    .select('role')
-    .eq('user_id', data.user.id)
-    .single();
-
-  return profile?.role === 'admin';
-}
-
 export default async function PartnerInquiriesAdminPage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
@@ -33,8 +20,6 @@ export default async function PartnerInquiriesAdminPage() {
   if (!supabase) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Partner Inquiries" }]} />
         </div>
@@ -45,9 +30,17 @@ export default async function PartnerInquiriesAdminPage() {
       </div>
     );
   }
-  const isAdmin = await requireAdmin(supabase);
 
-  if (!isAdmin) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-12">
         <h1 className="text-2xl font-bold">Access denied</h1>
@@ -67,11 +60,13 @@ export default async function PartnerInquiriesAdminPage() {
     const status = String(formData.get('status'));
     const notes = String(formData.get('internal_notes') || '');
 
-    const supabase2 = await createClient();
-    await supabase2
-      .from('partner_inquiries')
-      .update({ status, notes, reviewed_at: new Date().toISOString() })
-      .eq('id', id);
+    const adminDb = createAdminClient();
+    if (adminDb) {
+      await adminDb
+        .from('partner_inquiries')
+        .update({ status, notes, reviewed_at: new Date().toISOString() })
+        .eq('id', id);
+    }
 
     redirect('/admin/partner-inquiries');
   }

@@ -11,8 +11,8 @@ import { cookies } from 'next/headers';
 import { getPartnerClient, PartnerType } from '@/lib/partners';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-function getSupabaseServerClient() {
-  const cookieStore = cookies();
+async function getSupabaseServerClient() {
+  const cookieStore = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -31,10 +31,10 @@ interface Params {
 }
 
 export async function GET(_req: Request, { params }: Params) {
-  
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-const supabase = getSupabaseServerClient();
+  const rateLimited = await applyRateLimit(_req, 'api');
+  if (rateLimited) return rateLimited;
+
+  const supabase = await getSupabaseServerClient();
   const { enrollmentId } = await params;
 
   const { data: enrollment, error } = await supabase

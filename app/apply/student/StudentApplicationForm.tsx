@@ -30,8 +30,14 @@ function SuccessPanel({ data }: { data: SuccessData }) {
         instructions to begin onboarding. You can log in using the email and
         password you provided on this form.
       </p>
+      <a
+        href="/onboarding/learner"
+        className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-8 py-3 rounded-lg transition-colors mb-4"
+      >
+        Start Onboarding
+      </a>
       <p className="text-sm text-gray-500 mb-6">
-        Don&apos;t see it? Check your spam folder or contact us at{' '}
+        Don&apos;t see the email? Check your spam folder or contact us at{' '}
         <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">info@elevateforhumanity.org</a>
       </p>
       {data.referenceNumber && (

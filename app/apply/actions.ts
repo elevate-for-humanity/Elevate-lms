@@ -397,7 +397,7 @@ async function insertApplication(payload: {
         `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">While you explore your funding options, you can go ahead and begin your onboarding:</p>`,
         `<ol style="margin:0 0 20px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
         `<li>Complete your profile</li>`,
-        `<li>Upload your documents (photo ID, SSN proof, proof of residency)</li>`,
+        `<li>Upload your documents (photo ID, proof of residency)</li>`,
         `<li>Confirm your funding source</li>`,
         `<li>Select your schedule</li>`,
         `<li>Complete orientation</li>`,

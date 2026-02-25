@@ -125,11 +125,11 @@ export default function OnboardingDocumentsPage() {
       // Check if SSN last-4 already saved
       const { data: profile } = await supabase
         .from('profiles')
-        .select('ssn_last_4')
+        .select('ssn_last4')
         .eq('id', data.user.id)
         .single();
-      if (profile?.ssn_last_4) {
-        setSsn(`***-**-${profile.ssn_last_4}`);
+      if (profile?.ssn_last4) {
+        setSsn(`***-**-${profile.ssn_last4}`);
         setSsnSaved(true);
       }
 
@@ -301,7 +301,7 @@ export default function OnboardingDocumentsPage() {
       const supabase = createClient();
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ ssn_last_4: digits.slice(-4) })
+        .update({ ssn_last4: digits.slice(-4) })
         .eq('id', user.id);
       if (updateError) throw updateError;
       setSsn(`***-**-${digits.slice(-4)}`);

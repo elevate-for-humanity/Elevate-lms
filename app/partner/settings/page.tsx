@@ -1,22 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { Settings, Building2, User, Bell, Save } from 'lucide-react';
+import { Building2, User, Bell, Save } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createBrowserClient } from '@supabase/ssr';
 export default function PartnerSettingsPage() {
-  const [dbRows, setDbRows] = useState<any[]>([]);
-  useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-    supabase.from('partners').select('*').limit(50)
-      .then(({ data }) => { if (data) setDbRows(data); });
-  }, []);
-
   const [saved, setSaved] = useState(false);
   // Settings loaded from user profile/organization
   const [settings, setSettings] = useState({

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
+import Image from 'next/image';
 import { LifeBuoy, MessageSquare, Phone, Mail, FileText, Clock } from 'lucide-react';
 import SupportForm from '@/components/support/SupportForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -55,6 +56,11 @@ export default async function SupportPage() {
           <Breadcrumbs items={[{ label: 'Support' }]} />
         </div>
       </div>
+
+      {/* Hero Image */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+        <Image src="/images/heroes-hq/contact-hero.jpg" alt="Student support services" fill sizes="100vw" className="object-cover" priority />
+      </section>
 
       <div className="bg-brand-blue-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">

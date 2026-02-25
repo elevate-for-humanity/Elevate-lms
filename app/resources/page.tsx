@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FileText, ExternalLink, GraduationCap, DollarSign, Briefcase, Shield } from 'lucide-react';
 
@@ -74,6 +75,11 @@ export default function ResourcesPage() {
           <Breadcrumbs items={[{ label: 'Resources' }]} />
         </div>
       </div>
+
+      {/* Hero Image */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Resource hub for students and partners" fill sizes="100vw" className="object-cover" priority />
+      </section>
 
       <section className="bg-slate-900 py-14 sm:py-20">
         <div className="max-w-6xl mx-auto px-4">

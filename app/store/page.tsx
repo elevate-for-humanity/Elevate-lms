@@ -17,6 +17,11 @@ export default function StorePage() {
   return (
     <div className="bg-white min-h-screen">
 
+      {/* Hero Image */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px]">
+        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Elevate LMS platform" fill sizes="100vw" className="object-cover" priority />
+      </section>
+
       {/* ============ HERO — Video on the right, pitch on the left ============ */}
       <section className="py-12 sm:py-20">
         <div className="max-w-7xl mx-auto px-6">

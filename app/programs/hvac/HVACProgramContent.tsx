@@ -145,7 +145,7 @@ export default function HVACProgramContent() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/apply?program=hvac-technician" className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition">
+                <Link href="/apply/student?program=hvac-technician" className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition">
                   Apply with Workforce Funding
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
@@ -256,7 +256,7 @@ export default function HVACProgramContent() {
           <h2 className="text-2xl font-bold text-white mb-2">Ready to Start?</h2>
           <p className="text-brand-blue-100 mb-6">Tuition may be fully covered through workforce funding. Self-pay options start at $1,750 down.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=hvac-technician" className="inline-flex items-center justify-center px-6 py-3 bg-white text-brand-blue-600 font-semibold rounded-lg hover:bg-brand-blue-50 transition">
+            <Link href="/apply/student?program=hvac-technician" className="inline-flex items-center justify-center px-6 py-3 bg-white text-brand-blue-600 font-semibold rounded-lg hover:bg-brand-blue-50 transition">
               Apply with Workforce Funding
             </Link>
             <Link href="/programs/hvac-technician/apply" className="inline-flex items-center justify-center px-6 py-3 border-2 border-white/40 text-white font-semibold rounded-lg hover:bg-white/10 transition">
@@ -315,7 +315,7 @@ export default function HVACProgramContent() {
               </div>
               <p className="text-sm text-gray-500 mb-6">Not using workforce funding? Self-pay: $5,000 with weekly plans, Affirm, and Sezzle.</p>
               <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/apply?program=hvac-technician" className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition">
+                <Link href="/apply/student?program=hvac-technician" className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition">
                   Apply with Workforce Funding
                 </Link>
                 <Link href="/programs/hvac-technician/apply" className="inline-flex items-center justify-center px-6 py-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-semibold rounded-lg transition">
@@ -378,7 +378,7 @@ export default function HVACProgramContent() {
           <h2 className="text-3xl font-bold text-white mb-3">Start Your HVAC Career</h2>
           <p className="text-gray-400 mb-8 max-w-xl mx-auto">15 weeks. 6 credentials. 160 clock hours. Apply today — our team responds within 1 business day.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
-            <Link href="/apply?program=hvac-technician" className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold rounded-lg transition text-lg">
+            <Link href="/apply/student?program=hvac-technician" className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold rounded-lg transition text-lg">
               Apply with Workforce Funding
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>

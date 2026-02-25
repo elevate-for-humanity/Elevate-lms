@@ -60,17 +60,13 @@ export default function DocumentUploadPage() {
   }, []);
 
   async function loadUploadedDocuments() {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data: docs } = await supabase
-      .from('documents')
-      .select('document_type')
-      .eq('user_id', user.id);
-
-    if (docs) {
+    try {
+      const res = await fetch('/api/documents/upload');
+      const result = await res.json();
+      const docs = result.documents || [];
       setUploadedTypes(docs.map((d: { document_type: string }) => d.document_type));
+    } catch {
+      // Silently fail — user may not be logged in yet
     }
   }
 
@@ -87,40 +83,18 @@ export default function DocumentUploadPage() {
     setSuccess(null);
 
     try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('documentType', documentType);
+      if (description) formData.append('metadata', JSON.stringify({ description }));
 
-      if (!user) {
-        setError('Please log in to upload documents.');
-        return;
-      }
+      const res = await fetch('/api/documents/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/${documentType}-${Date.now()}.${fileExt}`;
-
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('documents')
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      const { error: dbError } = await supabase
-        .from('documents')
-        .insert({
-          user_id: user.id,
-          uploaded_by: user.id,
-          file_path: uploadData.path,
-          file_url: uploadData.path,
-          file_name: file.name,
-          file_size: file.size,
-          file_size_bytes: file.size,
-          mime_type: file.type,
-          document_type: documentType,
-          status: 'pending',
-          verification_status: 'pending',
-        });
-
-      if (dbError) throw dbError;
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Upload failed');
 
       setSuccess(`${REQUIRED_DOCUMENTS.find((d) => d.type === documentType)?.label || 'Document'} uploaded.`);
       setFile(null);
@@ -132,8 +106,8 @@ export default function DocumentUploadPage() {
       if (fileInput) fileInput.value = '';
 
       await loadUploadedDocuments();
-    } catch (err) {
-      setError('Failed to upload document. Please try again.');
+    } catch (err: any) {
+      setError(err?.message || 'Failed to upload document. Please try again.');
     } finally {
       setUploading(false);
     }

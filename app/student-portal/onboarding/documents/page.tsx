@@ -159,39 +159,21 @@ export default function OnboardingDocumentsPage() {
     setError(null);
 
     try {
-      const supabase = createClient();
+      // Upload via API route (bypasses storage RLS)
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('documentType', documentId);
+      formData.append('metadata', JSON.stringify({ category: 'onboarding' }));
 
-      // Upload to storage
-      const fileName = `${user.id}/${documentId}/${Date.now()}-${file.name}`;
-      const { data: uploadData, error: uploadError } = await supabase!.storage
-        .from('documents')
-        .upload(fileName, file);
+      const uploadRes = await fetch('/api/documents/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-      if (uploadError) throw uploadError;
+      const uploadResult = await uploadRes.json();
+      if (!uploadRes.ok) throw new Error(uploadResult.error || 'Upload failed');
 
-      // Get public URL
-      const { data: urlData } = supabase!.storage
-        .from('documents')
-        .getPublicUrl(fileName);
-
-      // Save document record
-      const { data: docRecord, error: docError } = await supabase!
-        .from('documents')
-        .insert({
-          user_id: user.id,
-          document_type: documentId,
-          category: 'onboarding',
-          file_name: file.name,
-          file_size: file.size,
-          mime_type: file.type,
-          file_url: urlData.publicUrl,
-          file_path: fileName,
-          status: 'pending',
-        })
-        .select()
-        .single();
-
-      if (docError) throw docError;
+      const docRecord = uploadResult.document;
 
       setUploadedFiles((prev) => ({
         ...prev,
@@ -200,7 +182,7 @@ export default function OnboardingDocumentsPage() {
           fileName: file.name,
           fileSize: file.size,
           uploadedAt: docRecord.created_at,
-          url: urlData.publicUrl,
+          url: docRecord.file_url || '',
           validationStatus: 'validating',
         },
       }));

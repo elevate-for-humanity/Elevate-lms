@@ -136,6 +136,7 @@ export default function HomePage() {
             {[
               { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/hp/wioa.jpg' },
               { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/hp/grants.jpg' },
+              { label: 'Next Level Jobs', desc: 'Indiana employer training grant covering certification costs in high-demand fields like IT, healthcare, and skilled trades.', href: '/funding/state-programs', image: '/images/heroes-hq/funding-hero.jpg' },
               { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/hp/healthcare.jpg' },
               { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/hp/government.jpg', external: true },
             ].map((item) => (

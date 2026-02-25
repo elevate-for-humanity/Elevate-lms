@@ -24,10 +24,7 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
 
-      {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Instructor portal" fill sizes="100vw" className="object-cover" priority />
-      </section>
+      
         <p className="text-gray-600">Service Unavailable</p>
       </div>
     );
@@ -78,6 +75,11 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
 
   return (
     <div className="min-h-screen bg-gray-50">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Instructor portal" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <div className="max-w-5xl mx-auto px-4 py-8">
         <nav className="text-sm mb-4">
           <ol className="flex items-center space-x-2 text-gray-500">

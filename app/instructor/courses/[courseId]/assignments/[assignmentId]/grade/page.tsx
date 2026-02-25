@@ -22,11 +22,6 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
   if (!supabase) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Instructor portal" fill sizes="100vw" className="object-cover" priority />
-      </section>
         <p className="text-gray-600">Service Unavailable</p>
       </div>
     );
@@ -115,15 +110,21 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
   } : undefined;
 
   return (
-    <SpeedGraderWrapper
-      courseId={courseId}
-      assignment={{
-        id: assignment.id,
-        title: assignment.title,
-        points: assignment.max_points || 100,
-        rubric,
-      }}
-      submissions={formattedSubmissions}
-    />
+    <>
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="Instructor portal" fill sizes="100vw" className="object-cover" priority />
+      </section>
+      <SpeedGraderWrapper
+        courseId={courseId}
+        assignment={{
+          id: assignment.id,
+          title: assignment.title,
+          points: assignment.max_points || 100,
+          rubric,
+        }}
+        submissions={formattedSubmissions}
+      />
+    </>
   );
 }

@@ -34,10 +34,7 @@ export default async function AdminInboxPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
 
-      {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
+      
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Inbox" }]} />
         </div>
@@ -104,6 +101,11 @@ export default async function AdminInboxPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <h1 className="text-3xl font-bold text-zinc-900">Admin Inbox</h1>
       <p className="mt-2 text-zinc-700">One place to review everything.</p>
 

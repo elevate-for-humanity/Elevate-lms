@@ -22,11 +22,6 @@ export default async function CompleteFERPATrainingPage() {
   if (!supabase) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-
-      {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
-      </section>
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
           <p className="text-gray-600">Please try again later.</p>
@@ -59,9 +54,15 @@ export default async function CompleteFERPATrainingPage() {
     .single();
 
   return (
-    <FERPATrainingForm
-      user={profile}
-      existingTraining={existingTraining}
-    />
+    <>
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
+      </section>
+      <FERPATrainingForm
+        user={profile}
+        existingTraining={existingTraining}
+      />
+    </>
   );
 }

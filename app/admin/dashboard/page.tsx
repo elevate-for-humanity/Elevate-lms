@@ -138,11 +138,6 @@ export default async function AdminDashboardPage() {
   if (!supabase) {
     return (
       <div className="p-8 text-center">
-
-      {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
-        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
-      </section>
         <p className="text-gray-600">Database unavailable. Check Supabase configuration.</p>
       </div>
     );
@@ -150,5 +145,13 @@ export default async function AdminDashboardPage() {
 
   const data = await getDashboardData(supabase, db);
 
-  return <DashboardClient data={data} />;
+  return (
+    <>
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
+      <DashboardClient data={data} />
+    </>
+  );
 }

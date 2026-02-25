@@ -5,15 +5,6 @@ import Image from 'next/image';
 import HomeHeroVideo from './HomeHeroVideo';
 import { InView } from '@/components/ui/InView';
 
-// Quiz removed — program cards now serve as the path selector
-
-const programs = [
-  { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.jpg', desc: 'DOL-registered apprenticeship — earn while you learn your craft.', salary: '$30K–$55K', duration: '12 months', tag: 'DOL Registered' },
-  { name: 'Building Technician with HVAC Fundamentals', href: '/programs/hvac-technician', image: '/images/programs-hq/hvac-technician.jpg', desc: 'EPA 608, OSHA safety, and hands-on training for facilities and HVAC careers.', salary: '$40K–$65K', duration: '15 weeks', tag: 'WIOA Funded' },
-  { name: 'Business & Office Administration', href: '/programs/business-office', image: '/images/programs-hq/business-office.jpg', desc: 'QuickBooks, Microsoft Office, and business operations training.', salary: '$32K–$48K', duration: '8–12 weeks', tag: 'WIOA Funded' },
-];
-
-
 
 export default function HomePage() {
   return (
@@ -98,58 +89,7 @@ export default function HomePage() {
       </section>
       </InView>
 
-      {/* ===== WHAT KIND OF WORK EXCITES YOU ===== */}
-      <InView animation="fade-up">
-      <section aria-label="Programs and pathways" className="py-14 sm:py-20 bg-white border-t border-slate-100">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Choose Your Path</p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">What Kind of Work Excites You?</h2>
-            <p className="text-lg text-slate-700 max-w-2xl mx-auto">
-              Pick a field and start training in weeks. Most programs are fully funded.
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {programs.map((program) => (
-              <Link key={program.name} href={program.href} className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={program.image}
-                  alt={program.name}
-                  width={600}
-                  height={375}
-                  loading="eager"
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="p-5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[11px] font-bold text-brand-red-600 bg-brand-red-50 px-2 py-0.5 rounded-full">
-                      {program.tag}
-                    </span>
-                    <span className="text-[11px] font-medium text-slate-500">{program.duration}</span>
-                  </div>
-                  <h3 className="text-slate-900 font-bold text-lg mb-1">{program.name}</h3>
-                  <p className="text-slate-600 text-sm mb-3">{program.desc}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-brand-green-700 font-semibold text-sm">{program.salary}</span>
-                    <span className="text-brand-red-600 font-semibold text-sm group-hover:text-brand-red-700 transition-colors">
-                      Explore &rarr;
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          <div className="text-center mt-10">
-            <Link href="/programs" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-10 py-4 rounded-lg transition-colors">
-              View All Programs
-            </Link>
-          </div>
-        </div>
-      </section>
-      </InView>
 
       {/* ===== HOW IT WORKS ===== */}
       <InView animation="fade-up">

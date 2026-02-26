@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
+import { BNPL_CHECKOUT_LABEL } from '@/lib/bnpl-config';
 import { Check, Shield, Users, BarChart3, Lock, Headphones, ArrowRight, AlertTriangle } from 'lucide-react';
 import { LicenseDemo } from '@/components/store/LicenseDemo';
 
@@ -265,7 +266,7 @@ export default function ManagedPlatformPage() {
                   <p className="text-sm text-slate-600 mt-1">
                     ${(plan.monthlyPrice * 12).toLocaleString()}/year + ${plan.setupFee.toLocaleString()} one-time setup
                   </p>
-                  <p className="text-xs text-slate-400 mt-0.5">Stripe, Affirm & Sezzle BNPL accepted</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Stripe, {BNPL_CHECKOUT_LABEL}</p>
                 </div>
 
                 <ul className="space-y-3 mb-8">

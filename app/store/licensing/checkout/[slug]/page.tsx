@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { logger } from '@/lib/logger';
 import React from 'react';
+import { BNPL_CHECKOUT_LABEL } from '@/lib/bnpl-config';
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -110,7 +111,7 @@ function CheckoutForm({
 
       <div className="space-y-2 mt-2">
         <p className="text-xs text-center text-gray-600">
-          Secure payment powered by Stripe. Card, Affirm, and Sezzle BNPL accepted.
+          Secure payment powered by Stripe. Card and {BNPL_CHECKOUT_LABEL}.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-slate-400">
           <span className="flex items-center gap-1"><Lock size={12} /> SSL Encrypted</span>
@@ -265,7 +266,7 @@ export default function LicenseCheckoutPage() {
                   </p>
                 )}
                 <p className="text-xs text-slate-400 text-right mt-2">
-                  Affirm & Sezzle BNPL options available below
+                  {BNPL_CHECKOUT_LABEL} — options available below
                 </p>
               </div>
             </div>

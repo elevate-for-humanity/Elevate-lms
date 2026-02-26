@@ -43,7 +43,7 @@ const config: ProgramPageConfig = {
   ],
   faqs: [
     { question: 'Do I need accounting experience?', answer: 'No. This program starts from the basics — what debits and credits are, how a chart of accounts works. No math beyond basic arithmetic is required.' },
-    { question: 'Is this program eligible for WIOA funding?', answer: 'This is a self-pay program at $1,500. Payment plans are available (6 weekly payments of $250). BNPL options through Affirm are also available.' },
+    { question: 'Is this program eligible for WIOA funding?', answer: 'Yes. This program is ETPL approved. WIOA and Workforce Ready Grant funding available for eligible participants. Self-pay is $2,800 with payment plans available.' },
     { question: 'What software will I learn?', answer: 'QuickBooks Online — the most widely used small business accounting software. You will also be prepared for the QuickBooks Certified User exam.' },
   ],
   applyHref: '/apply?program=bookkeeping',

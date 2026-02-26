@@ -36,12 +36,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default: 'Elevate for Humanity | Career Training Programs — WIOA Funded',
+    default: 'Elevate for Humanity | Career Training at No Cost for Eligible Participants',
     template: '%s | Elevate for Humanity',
   },
 
   description:
-    'Learn job-ready skills through free training programs in healthcare, skilled trades, CDL, and technology. WIOA funding covers tuition for eligible Indiana residents. Enroll today and start your career.',
+    'Nonprofit workforce development institute in Indianapolis. Career training in healthcare, skilled trades, CDL, technology, and business at no cost to eligible Indiana residents through WIOA and state funding. Enroll today.',
 
   // Homepage canonical - child pages should override with their own
   alternates: {
@@ -78,24 +78,24 @@ export const metadata: Metadata = {
     type: 'website',
     url: SITE_URL,
     siteName: 'Elevate for Humanity',
-    title: 'Elevate for Humanity | Career Training Programs — WIOA Funded',
+    title: 'Elevate for Humanity | Career Training at No Cost for Eligible Participants',
     description:
-      'Learn job-ready skills through free training programs in healthcare, skilled trades, CDL, and technology. WIOA funding covers tuition for eligible Indiana residents.',
+      'Learn job-ready skills through career training programs in healthcare, skilled trades, CDL, and technology. Training at no cost to eligible Indiana residents through WIOA and state funding.',
     images: [
       {
         url: '/images/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Elevate for Humanity — free workforce training programs',
+        alt: 'Elevate for Humanity — workforce training programs in Indianapolis',
       },
     ],
   },
 
   twitter: {
     card: 'summary_large_image',
-    title: 'Elevate for Humanity | Career Training Programs — WIOA Funded',
+    title: 'Elevate for Humanity | Career Training at No Cost for Eligible Participants',
     description:
-      'Learn job-ready skills through free training programs in healthcare, skilled trades, CDL, and technology. WIOA funding covers tuition for eligible Indiana residents.',
+      'Learn job-ready skills through career training programs in healthcare, skilled trades, CDL, and technology. Training at no cost to eligible Indiana residents through WIOA and state funding.',
     images: ['/images/og-image.jpg'],
   },
 

@@ -9,7 +9,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Our Mission | Elevate for Humanity',
-  description: 'Our mission is to create pathways out of poverty and into prosperity through free career training for justice-involved individuals, low-income families, veterans, and anyone facing barriers to employment.',
+  description: 'Our mission is to create pathways out of poverty and into prosperity through career training at no cost to eligible participants — justice-involved individuals, low-income families, veterans, and anyone facing barriers to employment.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/mission',
   },

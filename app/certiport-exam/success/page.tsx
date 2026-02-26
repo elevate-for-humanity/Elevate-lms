@@ -64,8 +64,8 @@ function SuccessContent() {
             </h3>
             <p className="text-brand-blue-800 text-sm">
               Elevate for Humanity Career & Technical Institute<br />
-              7009 E 56th St, Suite F<br />
-              Indianapolis, IN 46226
+              8888 Keystone Crossing, Suite 1300<br />
+              Indianapolis, IN 46240
             </p>
           </div>
 

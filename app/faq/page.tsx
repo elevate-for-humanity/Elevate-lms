@@ -2,24 +2,14 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { FAQStructuredData } from '@/components/seo/CourseStructuredData';
+import { MessageSquare } from 'lucide-react';
 import FAQSearch from './FAQSearch';
 
-const SITE_URL = 'https://www.elevateforhumanity.org';
-
 export const metadata: Metadata = {
-  title: 'Frequently Asked Questions | Elevate for Humanity',
-  description: 'Answers about free career training, WIOA eligibility, program length, certifications, job placement, and enrollment at Elevate for Humanity in Indianapolis.',
+  title: 'FAQ | Elevate For Humanity',
+  description: 'Frequently asked questions about our career training programs, eligibility, funding, and services. Training at no cost to eligible participants.',
   alternates: {
-    canonical: `${SITE_URL}/faq`,
-  },
-  openGraph: {
-    title: 'FAQ | Elevate for Humanity',
-    description: 'Answers about free career training, WIOA eligibility, certifications, and enrollment.',
-    url: `${SITE_URL}/faq`,
-    siteName: 'Elevate for Humanity',
-    images: [{ url: `${SITE_URL}/images/heroes-hq/how-it-works-hero.jpg`, width: 1200, height: 630, alt: 'Elevate for Humanity FAQ' }],
-    type: 'website',
+    canonical: 'https://www.elevateforhumanity.org/faq',
   },
 };
 
@@ -69,86 +59,66 @@ export default function FAQPage() {
     { id: '28', question: 'How do I file a complaint or grievance?', answer: 'We take all concerns seriously. You can file a grievance through our formal process outlined in the Student Handbook, speak with your program coordinator, or contact us at our main office. See our Grievance Policy page for full details.', category: 'Support', display_order: 28 },
   ];
 
+  // Group FAQs by category
   const categories = [...new Set(faqs.map((faq: FAQ) => faq.category))];
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* FAQ structured data — enables Google rich results with logo */}
-      <FAQStructuredData faqs={faqs.map(f => ({ question: f.question, answer: f.answer }))} />
-
-      {/* Hero with logo and branded overlay */}
-      <section className="relative h-[280px] sm:h-[340px] overflow-hidden">
-        <Image
-          src="/images/heroes-hq/how-it-works-hero.jpg"
-          alt="Students in a career training session at Elevate for Humanity"
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/60 to-transparent" />
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-5xl mx-auto px-6 w-full">
-            <div className="flex items-center gap-3 mb-4">
-              <Image
-                src="/logo.png"
-                alt="Elevate for Humanity"
-                width={44}
-                height={44}
-                className="rounded-lg"
-              />
-              <span className="text-white/70 text-sm font-medium tracking-wide">Elevate for Humanity</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
-              Frequently Asked Questions
-            </h1>
-            <p className="text-white/80 text-base sm:text-lg mt-3 max-w-xl">
-              Everything you need to know about our programs, eligibility, funding, and enrollment.
-            </p>
-          </div>
-        </div>
-      </section>
-
+    <div className="min-h-screen bg-gray-50">
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
-        <div className="max-w-5xl mx-auto px-6 py-3">
+        <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'FAQ' }]} />
         </div>
       </div>
 
+      {/* Hero */}
+      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
+        <Image
+          src="/images/heroes/training-provider-3.jpg"
+          alt="Get answers to your questions"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center px-4">
+            Frequently Asked Questions
+          </h1>
+        </div>
+      </section>
+
       {/* Quick Links */}
-      <section className="py-6 bg-white border-b border-slate-100">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="flex flex-wrap gap-2 justify-center">
-            <Link href="/wioa-eligibility" className="px-4 py-2 bg-brand-green-50 text-brand-green-700 rounded-full text-sm font-semibold hover:bg-brand-green-100 transition-colors border border-brand-green-200">
-              Check Eligibility
+      <section className="py-8 bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link href="/wioa-eligibility" className="px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium hover:bg-brand-green-200 transition-colors">
+              WIOA Eligibility
             </Link>
-            <Link href="/funding" className="px-4 py-2 bg-brand-blue-50 text-brand-blue-700 rounded-full text-sm font-semibold hover:bg-brand-blue-100 transition-colors border border-brand-blue-200">
+            <Link href="/funding" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               Funding Options
             </Link>
-            <Link href="/programs" className="px-4 py-2 bg-brand-red-50 text-brand-red-700 rounded-full text-sm font-semibold hover:bg-brand-red-100 transition-colors border border-brand-red-200">
+            <Link href="/programs" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               Training Programs
             </Link>
-            <Link href="/how-it-works" className="px-4 py-2 bg-brand-orange-50 text-brand-orange-700 rounded-full text-sm font-semibold hover:bg-brand-orange-100 transition-colors border border-brand-orange-200">
+            <Link href="/how-it-works" className="px-4 py-2 bg-brand-orange-100 text-brand-orange-800 rounded-full text-sm font-medium hover:bg-brand-orange-200 transition-colors">
               How It Works
             </Link>
-            <Link href="/contact" className="px-4 py-2 bg-slate-50 text-slate-700 rounded-full text-sm font-semibold hover:bg-slate-100 transition-colors border border-slate-200">
+            <Link href="/contact" className="px-4 py-2 bg-gray-100 text-gray-800 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
               Contact Us
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Main FAQ Content */}
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        {/* Category jump links */}
+      <div className="max-w-4xl mx-auto px-4 py-16">
+        {/* Category filters */}
         {categories.length > 1 && (
-          <div className="flex flex-wrap gap-2 mb-10">
+          <div className="flex flex-wrap gap-2 mb-8">
             {categories.map((cat) => (
-              <a
-                key={cat}
-                href={`#${cat.toLowerCase().replace(/\s+/g, '-')}`}
-                className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-sm font-medium text-slate-700 hover:bg-slate-100 hover:border-slate-300 transition-colors"
+              <a 
+                key={cat} 
+                href={`#${cat}`} 
+                className="px-4 py-2 bg-white border rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 capitalize"
               >
                 {cat}
               </a>
@@ -159,23 +129,14 @@ export default function FAQPage() {
         {/* FAQ List with Search */}
         <FAQSearch faqs={faqs} />
 
-        {/* CTA */}
-        <div className="mt-14 bg-slate-900 rounded-2xl p-8 sm:p-10 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">Still have questions?</h2>
-          <p className="text-slate-300 mb-6 max-w-md mx-auto">
-            Our team is available Monday–Friday, 9 AM – 5 PM EST. We respond within one business day.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition-colors">
-              Contact Us
-            </Link>
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-white text-slate-900 px-6 py-3 rounded-lg font-bold hover:bg-slate-50 transition-colors">
-              Apply Now
-            </Link>
-          </div>
-          <p className="text-slate-500 text-xs mt-4">
-            Call <a href="tel:+13173143757" className="text-slate-400 hover:text-white transition-colors">(317) 314-3757</a> or email <a href="mailto:info@elevateforhumanity.org" className="text-slate-400 hover:text-white transition-colors">info@elevateforhumanity.org</a>
-          </p>
+        {/* Contact CTA */}
+        <div className="mt-12 bg-brand-orange-50 rounded-xl p-8 text-center">
+          <MessageSquare className="w-12 h-12 text-brand-orange-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-2">Still have questions?</h2>
+          <p className="text-gray-600 mb-4">Our team is here to help you find the answers you need.</p>
+          <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-orange-600">
+            Contact Us
+          </Link>
         </div>
       </div>
     </div>

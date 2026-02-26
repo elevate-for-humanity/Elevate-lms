@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 
-import { notFound, permanentRedirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { createPublicClient } from '@/lib/supabase/server';
 import fs from 'fs';
 import path from 'path';
@@ -89,25 +89,8 @@ export async function generateStaticParams() {
     // DB unavailable at build time — static data only
   }
 
-  // Slugs that have their own dedicated page.tsx — exclude from [slug] generation
-  const DEDICATED = new Set([
-    'barber-apprenticeship', 'bookkeeping', 'business', 'cad-drafting',
-    'cdl-training', 'cna', 'cosmetology-apprenticeship', 'cpr-first-aid',
-    'culinary-apprenticeship', 'cybersecurity-analyst', 'diesel-mechanic',
-    'electrical', 'entrepreneurship', 'graphic-design', 'hvac-technician',
-    'it-help-desk', 'medical-assistant', 'nail-technician-apprenticeship',
-    'network-administration', 'network-support-technician',
-    'office-administration', 'peer-recovery-specialist',
-    'pharmacy-technician', 'plumbing', 'project-management',
-    'sanitation-infection-control', 'software-development',
-    'tax-preparation', 'web-development', 'welding',
-    'healthcare', 'skilled-trades', 'technology',
-    'micro-programs', 'federal-funded', 'apprenticeships',
-    // Redirect-only pages (have page.tsx that calls redirect())
-    'cna-certification',
-  ]);
-
-  const uniqueSlugs = [...new Set(programSlugs)].filter(s => !DEDICATED.has(s));
+  // Remove duplicates
+  const uniqueSlugs = [...new Set(programSlugs)];
 
   return uniqueSlugs.map((slug) => ({ slug }));
 }
@@ -178,48 +161,16 @@ export default async function ProgramDetailPage({
     return notFound();
   }
 
-  // Redirect broken slugs that were linked from nav/listing/external sources.
-  // These have no data and no dedicated page — redirect to a safe destination.
-  const BROKEN_SLUG_REDIRECTS: Record<string, string> = {
-    'cpr-first-aid-hsi': '/programs/cpr-first-aid',
-    'cdl': '/programs/cdl-training',
-    'cdl-class-a': '/programs/cdl-training',
-    'forklift': '/programs/skilled-trades',
-    'tax-entrepreneurship': '/programs/bookkeeping',
-    'phlebotomy-technician': '/programs/healthcare',
-    'certified-nursing-assistant': '/programs/cna',
-    'medical-coding-billing': '/programs/healthcare',
-    'cosmetology': '/programs/cosmetology-apprenticeship',
-  };
-  const redirectTo = BROKEN_SLUG_REDIRECTS[slug];
-  if (redirectTo) {
-    // Guard against redirect loops — target must not resolve back to this slug
-    if (redirectTo === `/programs/${slug}`) {
-      console.error(`[redirect-loop] ${slug} redirects to itself`);
-      return notFound();
-    }
-    permanentRedirect(redirectTo);
-  }
-
   // Slugs that have dedicated page.tsx files (real content, not redirects).
   // The catch-all must skip these to avoid shadowing them.
   // Redirect-only pages (cdl, cna, hvac, beauty, etc.) are NOT listed here
   // because Next.js serves the redirect page first, not the catch-all.
-  // Every program with a dedicated page.tsx must be listed here so the
-  // [slug] catch-all yields to the static route instead of shadowing it.
   const DEDICATED_PAGES = [
-    // Individual programs (ProgramPageLayout)
-    'barber-apprenticeship', 'bookkeeping', 'business', 'cad-drafting',
-    'cdl-training', 'cna', 'cosmetology-apprenticeship', 'cpr-first-aid',
-    'culinary-apprenticeship', 'cybersecurity-analyst', 'diesel-mechanic',
-    'electrical', 'entrepreneurship', 'graphic-design', 'hvac-technician',
-    'it-help-desk', 'medical-assistant', 'nail-technician-apprenticeship',
-    'network-administration', 'network-support-technician',
-    'office-administration', 'peer-recovery-specialist',
-    'pharmacy-technician', 'plumbing', 'project-management',
-    'sanitation-infection-control', 'software-development',
-    'tax-preparation', 'web-development', 'welding',
-    // Category landing pages
+    'hvac-technician', 'electrical', 'plumbing', 'welding',
+    'cdl-training', 'medical-assistant', 'diesel-mechanic',
+    'barber-apprenticeship', 'cosmetology-apprenticeship',
+    'culinary-apprenticeship', 'sanitation-infection-control',
+    // Category landing pages (not individual programs)
     'healthcare', 'skilled-trades', 'technology',
     'micro-programs', 'federal-funded', 'apprenticeships',
   ];
@@ -483,14 +434,13 @@ export default async function ProgramDetailPage({
     provider: {
       '@type': 'EducationalOrganization',
       name: 'Elevate for Humanity Career & Technical Institute',
-      legalName: '2Exclusive LLC-S',
       url: 'https://www.elevateforhumanity.org',
     },
     url: `https://www.elevateforhumanity.org/programs/${slug}`,
     ...(program.duration && { timeRequired: program.duration }),
     ...(program.tuition && { offers: { '@type': 'Offer', price: program.tuition, priceCurrency: 'USD' } }),
     educationalCredentialAwarded: program.credential || program.name,
-    isAccessibleForFree: program.fundingEligible !== false,
+    isAccessibleForFree: !program.price && program.fundingEligible !== false,
   };
 
   return (

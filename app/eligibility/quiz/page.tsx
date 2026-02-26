@@ -3,8 +3,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingEligibilityQuiz } from '@/components/eligibility/FundingEligibilityQuiz';
 
 export const metadata: Metadata = {
-  title: 'Free Training Eligibility Quiz | Check If You Qualify | Elevate for Humanity',
-  description: 'Take our 2-minute quiz to see if you qualify for free workforce training through WIOA, EmployIndy, or other funding programs. No obligation.',
+  title: 'Training Eligibility Quiz | Check If You Qualify | Elevate for Humanity',
+  description: 'Take our 2-minute quiz to see if you qualify for no-cost workforce training through WIOA, EmployIndy, or other funding programs. No obligation.',
 };
 
 export default function EligibilityQuizPage() {

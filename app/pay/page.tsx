@@ -3,11 +3,12 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CreditCard, DollarSign } from 'lucide-react';
+import { ACTIVE_BNPL_PROVIDERS, BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 
 export const metadata: Metadata = {
   title: 'Payment Options | Elevate for Humanity',
   description:
-    'See tuition payment options: pay in full, payment plans, or buy now pay later with Klarna, Afterpay, or Zip.',
+    'See tuition payment options: pay in full, payment plans, or buy now pay later.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/pay',
   },
@@ -25,7 +26,7 @@ export default function PayPage() {
         </h1>
         <p className="text-black mb-6">
           If you&apos;re not using WIOA/WRG/JRI or other funding, you can pay with
-          card, bank transfer, or split your payment with Klarna, Afterpay, or Zip.
+          card, bank transfer, or split your payment with {BNPL_PROVIDER_NAMES}.
         </p>
 
         {/* Funding Check */}
@@ -77,13 +78,12 @@ export default function PayPage() {
               <div className="flex-1">
                 <h3 className="text-xl font-bold text-black mb-2">Pay in 4</h3>
                 <p className="text-slate-600 mb-4">
-                  Split your payment into 4 interest-free installments with Klarna, 
-                  Afterpay, or Zip. Get instant approval at checkout.
+                  Split your payment into interest-free installments. Get instant approval at checkout.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm font-medium">Klarna</span>
-                  <span className="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium">Afterpay</span>
-                  <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 rounded-full text-sm font-medium">Zip</span>
+                  {ACTIVE_BNPL_PROVIDERS.map((p) => (
+                    <span key={p.id} className={`px-3 py-1 ${p.badgeBg} ${p.badgeText} rounded-full text-sm font-medium`}>{p.name}</span>
+                  ))}
                 </div>
               </div>
             </div>

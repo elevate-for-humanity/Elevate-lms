@@ -3,6 +3,7 @@
 import type { Program } from '@/app/data/programs';
 import Link from 'next/link';
 import { ApprenticeshipBadge } from '@/components/programs/ApprenticeshipBadge';
+import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 import { ProgramAppointmentBanner } from '@/components/programs/ProgramAppointmentBanner';
 import ProgramHowItWorks from '@/components/program/ProgramHowItWorks';
 import ProgramFAQ from '@/components/program/ProgramFAQ';
@@ -154,7 +155,7 @@ export function ProgramDetails({ program }: { program: Program }) {
                     </svg>
                     <div>
                       <p className="text-xs font-semibold text-brand-blue-900 mb-1">
-                        Can't Wait for Funding? Pay in 4 with Klarna/Afterpay/Zip
+                        {`Can't Wait for Funding? Pay in 4 with ${BNPL_PROVIDER_NAMES}`}
                       </p>
                       <p className="text-xs text-brand-blue-800">
                         Start training immediately and split your payment into
@@ -257,7 +258,7 @@ export function ProgramDetails({ program }: { program: Program }) {
                     Pay Now / See Payment Options
                   </Link>
                   <p className="text-xs text-center text-black">
-                    Stripe • Klarna • Afterpay • Zip • Pay in 4 available
+                    {`Stripe • ${BNPL_PROVIDER_NAMES} • Pay in 4 available`}
                   </p>
                 </div>
 
@@ -292,7 +293,7 @@ export function ProgramDetails({ program }: { program: Program }) {
                   </ul>
                   <div className="mt-2 pt-2 border-t border-purple-200">
                     <p className="text-xs text-black">
-                      <strong>How it works:</strong> Click "Pay Now" → Select Klarna, Afterpay, or Zip at checkout → Get instant approval → Start training today
+                      <strong>How it works:</strong> Click &quot;Pay Now&quot; → Select your BNPL provider at checkout → Get instant approval → Start training today
                     </p>
                   </div>
                   <p className="text-xs text-gray-500 mt-2">

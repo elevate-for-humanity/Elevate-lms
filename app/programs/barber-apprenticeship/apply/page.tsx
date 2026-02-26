@@ -4,6 +4,7 @@ import Turnstile from '@/components/Turnstile';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Loader2, CreditCard, Calculator, Info } from 'lucide-react';
+import { ACTIVE_BNPL_PROVIDERS } from '@/lib/bnpl-config';
 
 // Pricing constants - matches lib/programs/pricing.ts
 const PRICING = {
@@ -371,7 +372,7 @@ export default function BarberApprenticeshipApplyPage() {
                   <div className="text-brand-green-200 text-xs uppercase mb-1">Payment Options</div>
                   <div className="text-sm text-white mt-2 space-y-1">
                     <p><strong>Pay in Full:</strong> Card or Bank</p>
-                    <p><strong>Affirm/Klarna:</strong> Split into payments</p>
+                    <p><strong>BNPL:</strong> Split into payments</p>
                   </div>
                 </div>
               </div>
@@ -772,9 +773,9 @@ export default function BarberApprenticeshipApplyPage() {
                       <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 rounded-full text-xs font-bold">Link</span>
                     </div>
                     <div className="flex flex-wrap gap-2 justify-center mb-2">
-                      <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-bold">Klarna</span>
-                      <span className="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-bold">Afterpay</span>
-                      <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 rounded-full text-xs font-bold">Zip</span>
+                      {ACTIVE_BNPL_PROVIDERS.map((p) => (
+                        <span key={p.id} className={`px-3 py-1 ${p.badgeBg} ${p.badgeText} rounded-full text-xs font-bold`}>{p.name}</span>
+                      ))}
                     </div>
                     <div className="flex flex-wrap gap-2 justify-center">
                       <span className="px-3 py-1 bg-brand-green-500 text-white rounded-full text-xs font-bold">Cash App</span>

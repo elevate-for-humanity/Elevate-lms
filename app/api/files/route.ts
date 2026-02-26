@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -142,6 +143,15 @@ const supabase = await createClient();
   if (error) {
     return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
   }
+
+  // Audit: log file deletion
+  await auditLog({
+    actorId: user.id,
+    action: AuditAction.DOCUMENT_DELETED,
+    entity: 'file',
+    entityId: id,
+    metadata: { storage_path: file?.storage_path },
+  });
 
   return NextResponse.json({ success: true });
 }

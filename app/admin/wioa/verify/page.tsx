@@ -118,6 +118,21 @@ export default async function WIOAVerifyPage({
         const { data: signedData } = await db.storage
           .from('documents')
           .createSignedUrl(doc.file_path, 60);
+
+        // Audit: log document access
+        await db.from('admin_audit_events').insert({
+          actor_id: user.id,
+          action: 'DOCUMENT_VIEWED',
+          entity_type: 'document',
+          entity_id: doc.id,
+          metadata: {
+            document_type: doc.document_type,
+            document_owner_id: participant.user_id,
+            context: 'wioa_verify',
+          },
+          created_at: new Date().toISOString(),
+        }).catch(() => {});
+
         return { ...doc, file_url: signedData?.signedUrl || doc.file_url };
       }
       return doc;

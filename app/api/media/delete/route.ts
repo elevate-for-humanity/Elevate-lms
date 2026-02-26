@@ -8,6 +8,7 @@ export const maxDuration = 60;
 import { toErrorMessage } from '@/lib/safe';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 
 // Allowed bucket names (whitelist)
 const ALLOWED_BUCKETS = ['media', 'documents', 'avatars', 'course-content'];
@@ -77,10 +78,13 @@ export async function POST(req: Request) {
       return Response.json({ error: toErrorMessage(error) }, { status: 500 });
     }
 
-    logger.info('Media deleted successfully', {
-      userId: user.id,
-      path,
-      bucket,
+    // Audit: log file deletion
+    await auditLog({
+      actorId: user.id,
+      action: AuditAction.DOCUMENT_DELETED,
+      entity: AuditEntity.DOCUMENT,
+      entityId: path,
+      metadata: { bucket, reason: 'user_initiated' },
     });
 
     return Response.json({ ok: true });

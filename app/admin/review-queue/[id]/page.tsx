@@ -83,6 +83,20 @@ export default async function ReviewDetailPage({
       if (signedData?.signedUrl) {
         doc.file_url = signedData.signedUrl;
       }
+
+      // Audit: log document access
+      await db.from('admin_audit_events').insert({
+        actor_id: user.id,
+        action: 'DOCUMENT_VIEWED',
+        entity_type: 'document',
+        entity_id: doc.id,
+        metadata: {
+          document_type: doc.document_type,
+          document_owner_id: doc.user_id,
+          context: 'review_queue',
+        },
+        created_at: new Date().toISOString(),
+      }).catch(() => {});
     }
 
     document = doc;

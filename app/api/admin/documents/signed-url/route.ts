@@ -11,7 +11,11 @@ export const dynamic = 'force-dynamic';
  * Generate a short-lived signed URL for a document in a private bucket.
  * Admin-only — requires authenticated user with admin/super_admin role.
  *
- * GET /api/admin/documents/signed-url?path=<file_path>&bucket=<bucket_name>
+ * Accepts either:
+ *   ?id=<document_id>  — resolves path server-side (preferred)
+ *   ?path=<file_path>&bucket=<bucket_name>  — direct path (legacy)
+ *
+ * Server-side resolution prevents client-supplied path enumeration.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -39,14 +43,35 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const filePath = searchParams.get('path');
-    const bucket = searchParams.get('bucket') || 'documents';
+    const documentId = searchParams.get('id');
+    let filePath = searchParams.get('path');
+    let bucket = searchParams.get('bucket') || 'documents';
+    let documentOwnerId: string | null = null;
+    let documentType: string | null = null;
 
-    if (!filePath) {
-      return NextResponse.json({ error: 'Missing path parameter' }, { status: 400 });
+    // Preferred: resolve path from document ID server-side
+    if (documentId) {
+      const { data: doc } = await db
+        .from('documents')
+        .select('file_path, user_id, document_type')
+        .eq('id', documentId)
+        .single();
+
+      if (!doc?.file_path) {
+        return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+      }
+
+      filePath = doc.file_path;
+      documentOwnerId = doc.user_id;
+      documentType = doc.document_type;
+      bucket = 'documents';
     }
 
-    // Path traversal protection
+    if (!filePath) {
+      return NextResponse.json({ error: 'Missing id or path parameter' }, { status: 400 });
+    }
+
+    // Path traversal protection (for legacy path parameter)
     if (filePath.includes('..') || filePath.startsWith('/')) {
       return NextResponse.json({ error: 'Invalid path' }, { status: 400 });
     }
@@ -65,30 +90,33 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await db.storage
       .from(bucket)
-      .createSignedUrl(filePath, 60); // 60-second expiry for PII documents
+      .createSignedUrl(filePath, 60);
 
     if (error || !data?.signedUrl) {
       return NextResponse.json({ error: 'Failed to generate URL' }, { status: 500 });
     }
 
-    // Log document access to immutable audit trail
-    // Extract document owner from file path (format: user_id/filename)
-    const pathSegments = filePath.split('/');
-    const documentOwnerId = pathSegments.length > 1 ? pathSegments[0] : null;
+    // Extract owner from path if not already known (format: user_id/filename)
+    if (!documentOwnerId) {
+      const pathSegments = filePath.split('/');
+      documentOwnerId = pathSegments.length > 1 ? pathSegments[0] : null;
+    }
 
+    // Log document access to immutable audit trail
     await db.from('admin_audit_events').insert({
       actor_id: user.id,
       action: 'DOCUMENT_VIEWED',
       entity_type: 'document',
-      entity_id: filePath,
+      entity_id: documentId || filePath,
       metadata: {
         bucket,
         admin_role: profile.role,
         document_owner_id: documentOwnerId,
+        document_type: documentType,
+        resolution: documentId ? 'server_side' : 'client_path',
       },
       created_at: new Date().toISOString(),
     }).then(null, (err: Error) => {
-      // Non-blocking — don't fail the request if audit logging fails
       logger.warn('[SignedURL] Audit log insert failed', { error: err.message });
     });
 

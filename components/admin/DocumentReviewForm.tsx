@@ -36,7 +36,7 @@ export function DocumentReviewForm({ document, adminId }: Props) {
     setRefreshing(true);
     try {
       const res = await fetch(
-        `/api/admin/documents/signed-url?path=${encodeURIComponent(document.file_path)}&bucket=documents`
+        `/api/admin/documents/signed-url?id=${encodeURIComponent(document.id)}`
       );
       if (res.ok) {
         const { url } = await res.json();

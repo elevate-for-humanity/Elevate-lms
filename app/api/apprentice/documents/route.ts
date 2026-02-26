@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -268,6 +269,19 @@ export async function DELETE(request: NextRequest) {
       logger.error('[Documents API] Delete error:', error);
       return NextResponse.json({ error: 'Failed to delete document' }, { status: 500 });
     }
+
+    // Audit: log document deletion
+    await auditLog({
+      actorId: user.id,
+      actorRole: 'student',
+      action: AuditAction.DOCUMENT_DELETED,
+      entity: AuditEntity.DOCUMENT,
+      entityId: docId,
+      metadata: {
+        document_type: doc.document_type,
+        reason: 'user_initiated',
+      },
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

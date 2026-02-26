@@ -204,17 +204,23 @@ export default function AccreditationPage() {
           <h2 className="text-3xl font-bold text-center mb-8">
             Legal Entity Attribution
           </h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-slate-50 rounded-xl p-6 border">
               <h3 className="font-bold text-lg mb-3">2Exclusive LLC-S</h3>
-              <p className="text-xs text-brand-blue-600 font-medium mb-3">Legal Entity — DBA Elevate for Humanity</p>
+              <p className="text-xs text-brand-blue-600 font-medium mb-3">Legal Entity — DBA Elevate for Humanity Career &amp; Technical Institute</p>
               <p className="text-gray-600 text-sm mb-3">
-                The registered business entity operating workforce training programs
-                under the DBA &quot;Elevate for Humanity.&quot; Holds ITAP/INDOT registration
-                and serves as the training provider of record for ETPL-listed programs.
+                Indiana-registered LLC operating workforce training programs under
+                the DBA &quot;Elevate for Humanity Career &amp; Technical Institute.&quot;
+                Holds ITAP/INDOT registration and serves as the training provider
+                of record for ETPL-listed programs. Delivers certification programs,
+                apprenticeship training, and career pathway services as an Indiana
+                DWD-approved training provider.
               </p>
               <p className="text-xs text-gray-500">
-                Registrations: ITAP/INDOT, ETPL provider
+                Registrations: ITAP/INDOT, ETPL provider, DOL RAPIDS sponsor
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Programs: HVAC, CDL, CNA, Electrical, Welding, IT Support, Barber, Business
               </p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6 border">
@@ -230,21 +236,9 @@ export default function AccreditationPage() {
                 SAM.gov UEI: VX2GK5S8SZH8 &middot; CAGE: 0Q856
               </p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6 border">
-              <h3 className="font-bold text-lg mb-3">Elevate for Humanity Career &amp; Technical Institute</h3>
-              <p className="text-xs text-brand-blue-600 font-medium mb-3">Operating Name — Training Division</p>
-              <p className="text-gray-600 text-sm mb-3">
-                The workforce training division. Delivers ETPL-listed certification
-                programs, apprenticeship training, and career pathway services.
-                Operates as an Indiana DWD-approved training provider.
-              </p>
-              <p className="text-xs text-gray-500">
-                Programs: HVAC, CDL, CNA, Electrical, Welding, IT Support, Barber, Business
-              </p>
-            </div>
           </div>
           <p className="text-center text-gray-500 text-sm mt-6">
-            All entities operate under unified leadership. &quot;Elevate for Humanity&quot; is a DBA of 2Exclusive LLC-S.
+            All entities operate under unified leadership. &quot;Elevate for Humanity Career &amp; Technical Institute&quot; is a DBA of 2Exclusive LLC-S.
             Selfish Inc is the 501(c)(3) nonprofit entity.
           </p>
         </div>

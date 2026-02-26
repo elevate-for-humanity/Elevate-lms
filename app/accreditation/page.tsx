@@ -64,12 +64,6 @@ export default function AccreditationPage() {
       icon: CheckCircle,
     },
     {
-      name: 'NCCER Accredited Training Sponsor',
-      description:
-        'Accredited by the National Center for Construction Education and Research for standardized craft training and assessment.',
-      icon: Award,
-    },
-    {
       name: 'ITAP / INDOT Registration',
       description:
         '2Exclusive LLC-S registered with INDOT\'s Indiana Transportation Advancement Program for transportation and construction-aligned workforce services.',
@@ -204,15 +198,41 @@ export default function AccreditationPage() {
         </div>
       </section>
 
-      {/* Organizational Structure */}
+      {/* Legal Entity Attribution */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-8">
-            Organizational Structure
+            Legal Entity Attribution
           </h2>
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-slate-50 rounded-xl p-6 border">
+              <h3 className="font-bold text-lg mb-3">2Exclusive LLC-S</h3>
+              <p className="text-xs text-brand-blue-600 font-medium mb-3">Legal Entity — DBA Elevate for Humanity</p>
+              <p className="text-gray-600 text-sm mb-3">
+                The registered business entity operating workforce training programs
+                under the DBA &quot;Elevate for Humanity.&quot; Holds ITAP/INDOT registration
+                and serves as the training provider of record for ETPL-listed programs.
+              </p>
+              <p className="text-xs text-gray-500">
+                Registrations: ITAP/INDOT, ETPL provider
+              </p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-6 border">
+              <h3 className="font-bold text-lg mb-3">Selfish Inc</h3>
+              <p className="text-xs text-brand-blue-600 font-medium mb-3">501(c)(3) Nonprofit Organization</p>
+              <p className="text-gray-600 text-sm mb-3">
+                IRS-recognized tax-exempt charitable organization. Registered on
+                SAM.gov and Candid/GuideStar. Provides governance, fiscal oversight,
+                and community support services including barrier reduction for
+                justice-involved individuals, veterans, and low-income participants.
+              </p>
+              <p className="text-xs text-gray-500">
+                SAM.gov UEI: VX2GK5S8SZH8 &middot; CAGE: 0Q856
+              </p>
+            </div>
             <div className="bg-slate-50 rounded-xl p-6 border">
               <h3 className="font-bold text-lg mb-3">Elevate for Humanity Career &amp; Technical Institute</h3>
+              <p className="text-xs text-brand-blue-600 font-medium mb-3">Operating Name — Training Division</p>
               <p className="text-gray-600 text-sm mb-3">
                 The workforce training division. Delivers ETPL-listed certification
                 programs, apprenticeship training, and career pathway services.
@@ -222,23 +242,10 @@ export default function AccreditationPage() {
                 Programs: HVAC, CDL, CNA, Electrical, Welding, IT Support, Barber, Business
               </p>
             </div>
-            <div className="bg-slate-50 rounded-xl p-6 border">
-              <h3 className="font-bold text-lg mb-3">Elevate for Humanity Foundation</h3>
-              <p className="text-gray-600 text-sm mb-3">
-                The 501(c)(3) nonprofit parent organization. Provides governance,
-                fiscal oversight, and community support services including barrier
-                reduction for justice-involved individuals, veterans, and
-                low-income participants.
-              </p>
-              <p className="text-xs text-gray-500">
-                Services: Funding navigation, career counseling, employer partnerships
-              </p>
-            </div>
           </div>
           <p className="text-center text-gray-500 text-sm mt-6">
-            Both entities operate under unified leadership and share a mission of
-            workforce development and economic mobility for underserved communities
-            in Indiana.
+            All entities operate under unified leadership. &quot;Elevate for Humanity&quot; is a DBA of 2Exclusive LLC-S.
+            Selfish Inc is the 501(c)(3) nonprofit entity.
           </p>
         </div>
       </section>

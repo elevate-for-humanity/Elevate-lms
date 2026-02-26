@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContext, logAdminAccess } from '@/lib/tenant';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -80,6 +81,8 @@ export async function POST(
       adminUserId: tenantContext.userId,
       correlationId: job.correlation_id,
     });
+
+    await logAdminAudit({ action: AdminAction.JOB_RETRIED, actorId: tenantContext.userId, entityType: 'dead_letter_jobs', entityId: jobId, metadata: { job_type: job.job_type }, req: request });
 
     return NextResponse.json({
       success: true,

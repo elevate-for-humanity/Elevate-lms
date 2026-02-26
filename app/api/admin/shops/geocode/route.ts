@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { geocodeAddress, buildAddressString, isGeocodingResult } from '@/lib/geo/geocode';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export const dynamic = 'force-dynamic';
 
@@ -94,6 +95,8 @@ export async function POST(req: Request) {
           geocode_error: null,
         })
         .eq('id', shop_id);
+
+      await logAdminAudit({ action: AdminAction.SHOP_GEOCODED, actorId: user.id, entityType: 'shops', entityId: shop_id, metadata: { source: result.source }, req });
 
       return NextResponse.json({
         success: true,

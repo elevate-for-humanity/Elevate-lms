@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -113,6 +114,8 @@ export async function POST(req: Request) {
     if (error) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
+
+    await logAdminAudit({ action: AdminAction.ENROLLMENT_JOB_UPDATED, actorId: user.id, entityType: 'enrollment_jobs', entityId: job_id, metadata: { retry: true }, req });
 
     return NextResponse.json({ success: true, message: 'Job reset for retry' });
   }

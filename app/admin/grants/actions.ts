@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export async function createGrantOpportunity(formData: FormData) {
   const supabase = await createClient();
@@ -13,6 +14,8 @@ export async function createGrantOpportunity(formData: FormData) {
   if (!user) {
     return { error: 'Not authenticated' };
   }
+  const { data: _p } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (!_p || !['admin', 'super_admin'].includes(_p.role)) return { error: 'Forbidden' };
 
   const focusAreas = (formData.get('focusAreas') as string)
     ?.split(',')
@@ -45,6 +48,8 @@ export async function createGrantOpportunity(formData: FormData) {
     return { error: 'Operation failed' };
   }
 
+  await logAdminAudit({ action: AdminAction.GRANT_CREATED, actorId: user.id, entityType: 'grant_opportunities', entityId: data.id, metadata: { title: grantData.title } });
+
   revalidatePath('/admin/grants');
   redirect('/admin/grants');
 }
@@ -57,6 +62,8 @@ export async function updateGrantOpportunity(id: string, formData: FormData) {
   if (!user) {
     return { error: 'Not authenticated' };
   }
+  const { data: _p } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (!_p || !['admin', 'super_admin'].includes(_p.role)) return { error: 'Forbidden' };
 
   const focusAreas = (formData.get('focusAreas') as string)
     ?.split(',')
@@ -88,6 +95,8 @@ export async function updateGrantOpportunity(id: string, formData: FormData) {
     return { error: 'Operation failed' };
   }
 
+  await logAdminAudit({ action: AdminAction.GRANT_UPDATED, actorId: user.id, entityType: 'grant_opportunities', entityId: id, metadata: { title: updateData.title } });
+
   revalidatePath('/admin/grants');
   revalidatePath(`/admin/grants/${id}`);
   redirect('/admin/grants');
@@ -96,6 +105,7 @@ export async function updateGrantOpportunity(id: string, formData: FormData) {
 export async function deleteGrantOpportunity(id: string) {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
+  const { data: { user } } = await supabase.auth.getUser();
   
   const { error } = await db
     .from('grant_opportunities')
@@ -104,6 +114,10 @@ export async function deleteGrantOpportunity(id: string) {
 
   if (error) {
     return { error: 'Operation failed' };
+  }
+
+  if (user) {
+    await logAdminAudit({ action: AdminAction.GRANT_DELETED, actorId: user.id, entityType: 'grant_opportunities', entityId: id, metadata: {} });
   }
 
   revalidatePath('/admin/grants');
@@ -118,6 +132,8 @@ export async function createGrantApplication(formData: FormData) {
   if (!user) {
     return { error: 'Not authenticated' };
   }
+  const { data: _p } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (!_p || !['admin', 'super_admin'].includes(_p.role)) return { error: 'Forbidden' };
 
   const applicationData = {
     grant_id: formData.get('grantId') as string,
@@ -138,6 +154,8 @@ export async function createGrantApplication(formData: FormData) {
     console.error('Grant application insert error:', error);
     return { error: 'Operation failed' };
   }
+
+  await logAdminAudit({ action: AdminAction.GRANT_APPLICATION_CREATED, actorId: user.id, entityType: 'grant_applications', entityId: data.id, metadata: { grant_id: applicationData.grant_id, status: applicationData.status } });
 
   revalidatePath('/admin/grants');
   redirect('/admin/grants');
@@ -176,6 +194,12 @@ export async function updateGrantApplicationStatus(
 
   if (error) {
     return { error: 'Operation failed' };
+  }
+
+  const supabase2 = await createClient();
+  const { data: { user: reviewer } } = await supabase2.auth.getUser();
+  if (reviewer) {
+    await logAdminAudit({ action: AdminAction.GRANT_APPLICATION_UPDATED, actorId: reviewer.id, entityType: 'grant_applications', entityId: id, metadata: { new_status: status, amount_awarded: amountAwarded } });
   }
 
   revalidatePath('/admin/grants');

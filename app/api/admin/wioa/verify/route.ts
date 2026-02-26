@@ -6,6 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
@@ -40,6 +41,15 @@ export async function POST(request: NextRequest) {
       .eq('id', participantId);
 
     if (error) throw error;
+
+    await logAdminAudit({
+      action: AdminAction.WIOA_ELIGIBILITY_VERIFIED,
+      actorId: user?.id || 'unknown',
+      entityType: 'wioa_participants',
+      entityId: participantId,
+      metadata: { decision: action },
+      req: request,
+    });
 
     // Redirect back to the verification list
     return NextResponse.redirect(new URL('/admin/wioa/verify', request.url));

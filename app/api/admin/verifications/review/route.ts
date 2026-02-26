@@ -7,6 +7,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,6 +77,15 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    await logAdminAudit({
+      action: AdminAction.VERIFICATION_REVIEWED,
+      actorId: user.id,
+      entityType: 'id_verifications',
+      entityId: verificationId,
+      metadata: { decision: action, user_id: verification.user_id },
+      req: request,
+    });
 
     const userProfile = verification.profiles as any;
     if (userProfile?.email) {

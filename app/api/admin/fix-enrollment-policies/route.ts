@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export const POST = withAuth(
   async (req: NextRequest, user) => {
@@ -62,6 +63,8 @@ export const POST = withAuth(
           { status: 500 }
         );
       }
+
+      await logAdminAudit({ action: AdminAction.ENROLLMENT_POLICIES_FIXED, actorId: user.id, entityType: 'rls_policies', entityId: BULK_ENTITY_ID, metadata: {}, req: request });
 
       return NextResponse.json({
         success: true,

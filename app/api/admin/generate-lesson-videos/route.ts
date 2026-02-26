@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 import {
   generateNaturalVoiceover,
   generateVoiceover,
@@ -250,6 +251,9 @@ export async function POST(request: NextRequest) {
     for (const r of results) {
       if (r.method) methods[r.method] = (methods[r.method] || 0) + 1;
     }
+
+    const { data: { user: actor } } = await supabase.auth.getUser();
+    if (actor) await logAdminAudit({ action: AdminAction.LESSON_VIDEO_GENERATED, actorId: actor.id, entityType: 'training_lessons', entityId: BULK_ENTITY_ID, metadata: { generated: successful, failed, methods }, req: request });
 
     return NextResponse.json({
       success: true,

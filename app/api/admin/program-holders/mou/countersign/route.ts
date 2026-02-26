@@ -1,5 +1,6 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -100,6 +101,15 @@ export const POST = withAuth(
         logger.error('Failed to send MOU archive email:', emailErr instanceof Error ? emailErr : new Error(String(emailErr)));
       }
     }
+
+    await logAdminAudit({
+      action: AdminAction.MOU_COUNTERSIGNED,
+      actorId: user.id,
+      entityType: 'program_holders',
+      entityId: holderId,
+      metadata: { holder_name: updated.name },
+      req,
+    });
 
     return Response.json(updated);
   },

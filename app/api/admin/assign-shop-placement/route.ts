@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { canMatchApprentice, hasVerifiedDocuments } from '@/lib/documents';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 /**
  * MANDATORY VERIFICATION ENFORCEMENT:
@@ -129,6 +130,8 @@ export async function POST(req: Request) {
       // Error: $1
       // Continue - placement was successful
     }
+
+    await logAdminAudit({ action: AdminAction.SHOP_PLACEMENT_ASSIGNED, actorId: user.id, entityType: 'shop_placements', entityId: studentId, metadata: { shop_name: shopName }, req });
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

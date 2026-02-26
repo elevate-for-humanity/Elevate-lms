@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -59,6 +60,8 @@ export const POST = withAuth(
     if (dbError) {
       return NextResponse.json({ error: 'Database operation failed' }, { status: 500 });
     }
+
+    await logAdminAudit({ action: AdminAction.VIDEO_UPLOADED, actorId: user.id, entityType: 'videos', entityId: videoData.id, metadata: { file_name: file.name }, req: request });
 
     return NextResponse.json({
       success: true,

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export async function createProgram(formData: FormData) {
   const supabase = await createClient();
@@ -53,6 +54,8 @@ export async function createProgram(formData: FormData) {
   if (error) {
     throw new Error('Operation failed');
   }
+
+  await logAdminAudit({ action: AdminAction.PROGRAM_CREATED, actorId: user.id, entityType: 'programs', entityId: BULK_ENTITY_ID, metadata: { name, slug } });
 
   revalidatePath('/admin/programs');
   redirect('/admin/programs');
@@ -109,6 +112,8 @@ export async function updateProgram(id: string, formData: FormData) {
     throw new Error('Operation failed');
   }
 
+  await logAdminAudit({ action: AdminAction.PROGRAM_UPDATED, actorId: user.id, entityType: 'programs', entityId: id, metadata: { name } });
+
   revalidatePath('/admin/programs');
   redirect('/admin/programs');
 }
@@ -140,6 +145,8 @@ export async function deleteProgram(id: string) {
   if (error) {
     throw new Error('Operation failed');
   }
+
+  await logAdminAudit({ action: AdminAction.PROGRAM_DELETED, actorId: user.id, entityType: 'programs', entityId: id, metadata: {} });
 
   revalidatePath('/admin/programs');
 }

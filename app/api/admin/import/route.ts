@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -385,6 +386,21 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
     }
+
+    await logAdminAudit({
+      action: AdminAction.BULK_IMPORT_EXECUTED,
+      actorId: user.id,
+      entityType: type,
+      entityId: BULK_ENTITY_ID,
+      metadata: {
+        import_type: type,
+        total_records: records.length,
+        imported: result.imported,
+        failed: result.failed,
+        file_name: file.name,
+      },
+      req: request,
+    });
 
     return NextResponse.json(result);
   } catch (error) {

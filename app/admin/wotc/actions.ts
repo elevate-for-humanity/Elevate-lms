@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export async function createWOTCApplication(formData: FormData) {
   const supabase = await createClient();
@@ -14,6 +15,8 @@ export async function createWOTCApplication(formData: FormData) {
   if (!user) {
     return { error: 'Not authenticated' };
   }
+  const { data: _p } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (!_p || !['admin', 'super_admin'].includes(_p.role)) return { error: 'Forbidden' };
 
   // Get target groups as array
   const targetGroups = formData.getAll('targetGroups') as string[];
@@ -53,6 +56,14 @@ export async function createWOTCApplication(formData: FormData) {
     return { error: 'Operation failed' };
   }
 
+  await logAdminAudit({
+    action: AdminAction.WOTC_APPLICATION_CREATED,
+    actorId: user.id,
+    entityType: 'wotc_applications',
+    entityId: data.id,
+    metadata: { employer_name: applicationData.employer_name, ssn_last4: ssnData.ssn_last4 },
+  });
+
   revalidatePath('/admin/wotc');
   redirect('/admin/wotc');
 }
@@ -65,6 +76,8 @@ export async function updateWOTCApplication(id: string, formData: FormData) {
   if (!user) {
     return { error: 'Not authenticated' };
   }
+  const { data: _p2 } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (!_p2 || !['admin', 'super_admin'].includes(_p2.role)) return { error: 'Forbidden' };
 
   const targetGroups = formData.getAll('targetGroups') as string[];
 
@@ -97,6 +110,14 @@ export async function updateWOTCApplication(id: string, formData: FormData) {
   if (error) {
     return { error: 'Operation failed' };
   }
+
+  await logAdminAudit({
+    action: AdminAction.WOTC_APPLICATION_UPDATED,
+    actorId: user.id,
+    entityType: 'wotc_applications',
+    entityId: id,
+    metadata: { employer_name: updateData.employer_name },
+  });
 
   revalidatePath('/admin/wotc');
   revalidatePath(`/admin/wotc/${id}`);
@@ -159,6 +180,8 @@ export async function deleteWOTCApplication(id: string) {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
   
+  const { data: { user } } = await supabase.auth.getUser();
+
   const { error } = await db
     .from('wotc_applications')
     .delete()
@@ -166,6 +189,16 @@ export async function deleteWOTCApplication(id: string) {
 
   if (error) {
     return { error: 'Operation failed' };
+  }
+
+  if (user) {
+    await logAdminAudit({
+      action: AdminAction.WOTC_APPLICATION_DELETED,
+      actorId: user.id,
+      entityType: 'wotc_applications',
+      entityId: id,
+      metadata: {},
+    });
   }
 
   revalidatePath('/admin/wotc');

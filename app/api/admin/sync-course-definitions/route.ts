@@ -6,6 +6,7 @@ import { HVAC_QUIZ_MAP, getUniversalExam } from '@/lib/courses/hvac-quizzes';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { v5 as uuidv5 } from 'uuid';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -211,6 +212,8 @@ export async function POST(request: NextRequest) {
 
     const totalLessons = results.reduce((sum, r) => sum + r.lessonsUpserted, 0);
     const errors = results.filter((r) => r.error);
+
+    await logAdminAudit({ action: AdminAction.COURSE_DEFINITIONS_SYNCED, actorId: auth.user.id, entityType: 'course_definitions', entityId: BULK_ENTITY_ID, metadata: { courses_synced: results.length, total_lessons: totalLessons, errors: errors.length }, req: request });
 
     return NextResponse.json({
       success: errors.length === 0,

@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export async function POST(req: Request) {
   try {
@@ -54,12 +55,20 @@ export async function POST(req: Request) {
       .eq('id', shop_document_id);
 
     if (error) {
-      // Error: $1
       return NextResponse.json(
         { error: toErrorMessage(error) },
         { status: 500 }
       );
     }
+
+    await logAdminAudit({
+      action: AdminAction.SHOP_DOC_REVIEWED,
+      actorId: user.id,
+      entityType: 'shop_documents',
+      entityId: shop_document_id,
+      metadata: { approved: !!approved },
+      req,
+    });
 
     // Check if all required docs are now approved
     const { data: doc } = await db

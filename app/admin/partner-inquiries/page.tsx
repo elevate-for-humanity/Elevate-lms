@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,6 +68,10 @@ export default async function PartnerInquiriesAdminPage() {
         .update({ status, notes, reviewed_at: new Date().toISOString() })
         .eq('id', id);
     }
+
+    const supabase2 = await createClient();
+    const { data: { user: actor } } = await supabase2.auth.getUser();
+    if (actor) await logAdminAudit({ action: AdminAction.PARTNER_INQUIRY_REVIEWED, actorId: actor.id, entityType: 'partner_inquiries', entityId: id, metadata: { new_status: status } });
 
     redirect('/admin/partner-inquiries');
   }

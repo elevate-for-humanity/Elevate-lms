@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -98,6 +99,8 @@ export async function POST(req: Request) {
 
   if (error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+
+  await logAdminAudit({ action: AdminAction.NEXT_STEPS_UPDATED, actorId: user.id, entityType: 'next_steps', entityId: body.id, metadata: {}, req: request });
 
   return NextResponse.json({ ok: true, row: data });
 }

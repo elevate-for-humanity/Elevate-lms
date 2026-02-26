@@ -1,5 +1,4 @@
 export const runtime = 'nodejs';
-import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -7,6 +6,7 @@ import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { withAuth } from '@/lib/with-auth';
 import { toErrorMessage } from '@/lib/safe';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export const POST = withAuth(
   async (req, context) => {
@@ -39,6 +39,15 @@ export const POST = withAuth(
     if (error) {
       return new Response(toErrorMessage(error), { status: 500 });
     }
+
+    await logAdminAudit({
+      action: AdminAction.PROGRAM_HOLDER_UPDATED,
+      actorId: user.id,
+      entityType: 'program_holders',
+      entityId: id,
+      metadata: { fields_updated: Object.keys(updates) },
+      req,
+    });
 
     return Response.json({ ok: true });
   },

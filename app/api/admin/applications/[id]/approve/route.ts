@@ -11,6 +11,7 @@ import { requireApiAuth } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export async function POST(
   req: NextRequest,
@@ -239,6 +240,15 @@ export async function POST(
     } catch (emailErr) {
       logger.warn('Failed to send approval email (non-critical)', emailErr);
     }
+
+    await logAdminAudit({
+      action: AdminAction.APPLICATION_APPROVED,
+      actorId: user.id,
+      entityType: 'applications',
+      entityId: applicationId,
+      metadata: { created_user_id: userId, program_id: program_id || null, funding_type: funding_type || null },
+      req,
+    });
 
     return NextResponse.json({
       message: program_id

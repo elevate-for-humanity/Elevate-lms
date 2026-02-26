@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export async function GET(req: NextRequest) {
   try {
@@ -142,6 +143,8 @@ export async function POST(req: NextRequest) {
       // Error: $1
       throw error;
     }
+
+    await logAdminAudit({ action: AdminAction.INCENTIVE_CREATED, actorId: user.id, entityType: 'employer_incentives', entityId: incentive.id, metadata: { program_type, amount }, req });
 
     return NextResponse.json({
       success: true,

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -161,6 +162,8 @@ export async function POST(req: Request) {
       reminder_type,
       status: sent ? 'sent' : 'failed',
     });
+
+    if (sent) await logAdminAudit({ action: AdminAction.REMINDER_SENT, actorId: user.id, entityType: 'sms_reminders', entityId: app.id, metadata: { reminder_type, phone_last4: app.phone?.slice(-4) }, req: request });
 
     return NextResponse.json({
       success: sent,

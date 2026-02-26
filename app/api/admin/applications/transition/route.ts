@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -124,6 +125,15 @@ export async function POST(request: NextRequest) {
       logger.error("Failed to log state event:", eventError);
       // Don't fail the request, just log the error
     }
+
+    await logAdminAudit({
+      action: AdminAction.APPLICATION_STATUS_CHANGED,
+      actorId: user.id,
+      entityType: application_type,
+      entityId: application_id,
+      metadata: { from_state: oldState, to_state: new_state, reason },
+      req: request,
+    });
 
     return NextResponse.json({
       success: true,

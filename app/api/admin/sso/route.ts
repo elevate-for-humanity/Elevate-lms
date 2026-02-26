@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole, handleRBACError } from '@/lib/rbac';
 import { withAuth } from '@/lib/with-auth';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 // GET /api/admin/sso - List SSO connections
 export const GET = withAuth(
@@ -94,6 +95,8 @@ export const POST = withAuth(
         .single();
 
       if (error) throw error;
+
+      await logAdminAudit({ action: AdminAction.SSO_CONFIG_CREATED, actorId: user.id, entityType: 'sso_connections', entityId: data.id, metadata: { provider, domain }, req });
 
       return NextResponse.json({ connection: data }, { status: 201 });
     } catch (err: any) {

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export async function createAffiliate(formData: FormData) {
   const supabase = await createClient();
@@ -12,6 +13,8 @@ export async function createAffiliate(formData: FormData) {
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
+  const { data: _profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (!_profile || !['admin', 'super_admin'].includes(_profile.role)) throw new Error('Forbidden');
 
   const name = formData.get('name') as string;
   const email = formData.get('email') as string;
@@ -41,6 +44,8 @@ export async function createAffiliate(formData: FormData) {
     });
     if (fallbackError) throw new Error(fallbackError.message);
   }
+
+  await logAdminAudit({ action: AdminAction.AFFILIATE_CREATED, actorId: user.id, entityType: 'affiliates', entityId: BULK_ENTITY_ID, metadata: { name, email } });
 
   revalidatePath('/admin/affiliates');
   redirect('/admin/affiliates');

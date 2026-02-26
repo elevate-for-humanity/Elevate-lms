@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export const POST = withAuth(
   async (req: NextRequest, user) => {
@@ -63,6 +64,8 @@ export const POST = withAuth(
           );
         }
       }
+
+      await logAdminAudit({ action: AdminAction.EXTERNAL_PROGRESS_UPDATED, actorId: (user as any).id || (user as any).user?.id, entityType: 'external_partner_progress', entityId: body.id, metadata: { status: body.status }, req });
 
       return NextResponse.json({ success: true });
     } catch (err: any) {

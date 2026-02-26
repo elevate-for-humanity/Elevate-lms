@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 // Using Node.js runtime for email compatibility
 export const maxDuration = 60;
@@ -29,6 +30,11 @@ export async function POST(req: Request) {
       .eq('id', productId);
 
     if (error) throw error;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await logAdminAudit({ action: AdminAction.PRODUCT_REJECTED, actorId: user.id, entityType: 'marketplace_products', entityId: productId, metadata: { reason }, req });
+    }
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

@@ -26,9 +26,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const isAdmin =
-      user.email?.includes('admin') || user.email?.includes('elevate');
-    if (!isAdmin) {
+    const { data: adminProfile } = await db
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!adminProfile || !['admin', 'super_admin'].includes(adminProfile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

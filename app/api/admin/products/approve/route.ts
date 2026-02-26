@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 // Using Node.js runtime for email compatibility
 export const maxDuration = 60;
@@ -65,6 +66,8 @@ export async function POST(req: Request) {
         logger.warn('Failed to send product approval email', emailErr);
       }
     }
+
+    await logAdminAudit({ action: AdminAction.PRODUCT_APPROVED, actorId: user.id, entityType: 'marketplace_products', entityId: productId, metadata: { title: product?.title }, req });
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

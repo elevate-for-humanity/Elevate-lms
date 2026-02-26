@@ -1,7 +1,8 @@
 
+import Image from 'next/image';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Mail, Clock, ArrowRight } from 'lucide-react';
+import { Mail, Clock, ArrowRight, CheckCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -12,6 +13,11 @@ export default function PartnerOnboardingSuccessPage() {
 
   return (
     <div className="min-h-screen bg-slate-800">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Onboarding complete" fill sizes="100vw" className="object-cover" priority />
+      </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -23,7 +29,7 @@ export default function PartnerOnboardingSuccessPage() {
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
           <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-slate-400 flex-shrink-0">•</span>
+            <CheckCircle className="w-10 h-10 text-brand-green-600" />
           </div>
           
           <h1 className="text-2xl font-bold text-slate-900 mb-2">

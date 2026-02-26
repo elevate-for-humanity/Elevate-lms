@@ -49,7 +49,7 @@ export default function WIOAPage() {
       <p>You must provide:</p>
       <ul>
         <li>Government-issued photo ID</li>
-        <li>Social Security card</li>
+        <li>Social Security number (entered securely online)</li>
         <li>Proof of citizenship or work authorization</li>
         <li>Selective Service registration (males 18-25)</li>
         <li>Income verification (if applicable)</li>

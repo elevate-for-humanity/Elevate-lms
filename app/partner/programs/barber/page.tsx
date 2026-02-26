@@ -180,7 +180,7 @@ export default function BarberPartnerPage() {
                 Start Onboarding
               </Link>
               <Link
-                href="/partner/dashboard"
+                href="/partner-portal"
                 className="inline-flex items-center justify-center gap-2 w-full px-6 py-4 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -204,6 +204,11 @@ export default function BarberPartnerPage() {
 
   return (
     <div className="min-h-screen bg-slate-100">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/programs-hq/barber-hero.jpg" alt="Barber program" fill sizes="100vw" className="object-cover" priority />
+      </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -214,7 +219,7 @@ export default function BarberPartnerPage() {
       {/* Header */}
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <Link href="/partner/dashboard" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4">
+          <Link href="/partner-portal" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
           </Link>

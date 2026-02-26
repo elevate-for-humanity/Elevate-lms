@@ -1,5 +1,5 @@
 'use client';
-
+import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -166,6 +166,11 @@ export default function PartnerOnboardingPage() {
 
   return (
     <div className="min-h-screen bg-slate-800">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner onboarding" fill sizes="100vw" className="object-cover" priority />
+      </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

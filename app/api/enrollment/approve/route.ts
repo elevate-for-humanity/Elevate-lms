@@ -67,7 +67,7 @@ export async function POST() {
         `<li>✅ FERPA consent signed</li>`,
         `<li>✅ Student handbook policies acknowledged</li>`,
         `<li>✅ Government ID uploaded</li>`,
-        `<li>✅ Social Security card uploaded</li>`,
+        `<li>✅ Social Security number verified</li>`,
         `<li>✅ Transfer hours documentation uploaded</li>`,
         `<li>✅ All onboarding steps completed</li>`,
         `</ul>`,
@@ -97,7 +97,7 @@ export async function POST() {
         `<tr><td style="padding:6px;font-weight:bold">Reference</td><td style="padding:6px">${refNumber}</td></tr>`,
         `<tr><td style="padding:6px;font-weight:bold">Status</td><td style="padding:6px;color:green"><strong>APPROVED — All requirements verified</strong></td></tr>`,
         `</table>`,
-        `<p>Verified: profile, enrollment agreement, handbook agreement, FERPA consent, handbook policies, government ID, SSN card, transfer hours, onboarding steps.</p>`,
+        `<p>Verified: profile, enrollment agreement, handbook agreement, FERPA consent, handbook policies, government ID, SSN on file, transfer hours, onboarding steps.</p>`,
         `<p><a href="${SITE_URL}/admin/applications">View in Admin Dashboard</a></p>`,
       ].join(''),
     }).catch((err) => logger.error('Failed to send admin approval email', err as Error));

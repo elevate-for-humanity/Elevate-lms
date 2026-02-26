@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
@@ -69,8 +70,27 @@ export default async function ReviewDocumentPage({
     redirect('/admin/documents/review');
   }
 
+  // Generate signed URL for private bucket document
+  let viewUrl = document.file_url;
+  if (document.file_path) {
+    const { data: signedData } = await db.storage
+      .from('documents')
+      .createSignedUrl(document.file_path, 3600);
+    if (signedData?.signedUrl) {
+      viewUrl = signedData.signedUrl;
+    }
+  }
+
+  // Pass signed URL to client component via the document object
+  const documentWithUrl = { ...document, file_url: viewUrl };
+
   return (
     <div className="min-h-screen bg-slate-50">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <section className="bg-white border-b py-8">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl font-bold text-black mb-2">
@@ -83,7 +103,7 @@ export default async function ReviewDocumentPage({
       </section>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <DocumentReviewForm document={document} adminId={user.id} />
+        <DocumentReviewForm document={documentWithUrl} adminId={user.id} />
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { normalizeSsn, formatSsn, isValidSsn } from '@/lib/ssn';
 import { updateOnboardingProgress } from '@/lib/compliance/enforcement';
 import {
   Upload,
@@ -125,11 +126,11 @@ export default function OnboardingDocumentsPage() {
       // Check if SSN last-4 already saved
       const { data: profile } = await supabase
         .from('profiles')
-        .select('ssn_last_4')
+        .select('ssn_last4')
         .eq('id', data.user.id)
         .single();
-      if (profile?.ssn_last_4) {
-        setSsn(`***-**-${profile.ssn_last_4}`);
+      if (profile?.ssn_last4) {
+        setSsn(`***-**-${profile.ssn_last4}`);
         setSsnSaved(true);
       }
 
@@ -159,39 +160,21 @@ export default function OnboardingDocumentsPage() {
     setError(null);
 
     try {
-      const supabase = createClient();
+      // Upload via API route (bypasses storage RLS)
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('documentType', documentId);
+      formData.append('metadata', JSON.stringify({ category: 'onboarding' }));
 
-      // Upload to storage
-      const fileName = `${user.id}/${documentId}/${Date.now()}-${file.name}`;
-      const { data: uploadData, error: uploadError } = await supabase!.storage
-        .from('documents')
-        .upload(fileName, file);
+      const uploadRes = await fetch('/api/documents/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-      if (uploadError) throw uploadError;
+      const uploadResult = await uploadRes.json();
+      if (!uploadRes.ok) throw new Error(uploadResult.error || 'Upload failed');
 
-      // Get public URL
-      const { data: urlData } = supabase!.storage
-        .from('documents')
-        .getPublicUrl(fileName);
-
-      // Save document record
-      const { data: docRecord, error: docError } = await supabase!
-        .from('documents')
-        .insert({
-          user_id: user.id,
-          document_type: documentId,
-          category: 'onboarding',
-          file_name: file.name,
-          file_size: file.size,
-          mime_type: file.type,
-          file_url: urlData.publicUrl,
-          file_path: fileName,
-          status: 'pending',
-        })
-        .select()
-        .single();
-
-      if (docError) throw docError;
+      const docRecord = uploadResult.document;
 
       setUploadedFiles((prev) => ({
         ...prev,
@@ -200,7 +183,7 @@ export default function OnboardingDocumentsPage() {
           fileName: file.name,
           fileSize: file.size,
           uploadedAt: docRecord.created_at,
-          url: urlData.publicUrl,
+          url: docRecord.file_url || '',
           validationStatus: 'validating',
         },
       }));
@@ -281,17 +264,10 @@ export default function OnboardingDocumentsPage() {
     }
   };
 
-  const formatSsnInput = (value: string) => {
-    const digits = value.replace(/\D/g, '').slice(0, 9);
-    if (digits.length <= 3) return digits;
-    if (digits.length <= 5) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-    return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`;
-  };
-
   const handleSsnSave = async () => {
     if (!user || ssnSaved) return;
-    const digits = ssn.replace(/\D/g, '');
-    if (digits.length !== 9) {
+    const digits = normalizeSsn(ssn);
+    if (!isValidSsn(digits)) {
       setError('Please enter a valid 9-digit Social Security number.');
       return;
     }
@@ -301,7 +277,7 @@ export default function OnboardingDocumentsPage() {
       const supabase = createClient();
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ ssn_last_4: digits.slice(-4) })
+        .update({ ssn_last4: digits.slice(-4) })
         .eq('id', user.id);
       if (updateError) throw updateError;
       setSsn(`***-**-${digits.slice(-4)}`);
@@ -420,7 +396,7 @@ export default function OnboardingDocumentsPage() {
                     type="text"
                     inputMode="numeric"
                     value={ssn}
-                    onChange={(e) => setSsn(formatSsnInput(e.target.value))}
+                    onChange={(e) => setSsn(formatSsn(e.target.value))}
                     placeholder="000-00-0000"
                     className="w-48 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 font-mono tracking-wider"
                     maxLength={11}

@@ -131,10 +131,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
     }
 
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from('documents')
-      .getPublicUrl(storagePath);
+    // Bucket is private — store file_path only, generate signed URLs on-demand
 
     // Delete any existing document of this type (replace)
     await db
@@ -151,7 +148,7 @@ export async function POST(request: NextRequest) {
         document_type_id: documentTypeId,
         program_slug: programSlug,
         file_name: file.name,
-        file_url: urlData.publicUrl,
+        file_url: null,
         file_size_bytes: file.size,
         mime_type: file.type,
         status: 'pending',

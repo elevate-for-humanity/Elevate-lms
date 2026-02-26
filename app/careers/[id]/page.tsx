@@ -38,17 +38,16 @@ export default function CareerApplicationPage({ params }: { params: Promise<{ id
       // Get user first — RLS requires auth.uid() as first path segment
       const { data: { user } } = await supabase.auth.getUser();
 
-      // Upload resume if provided
+      // Upload resume if provided — via API route (bypasses storage RLS)
       if (resume) {
-        const ext = resume.name.split('.').pop();
-        const userPrefix = user?.id || 'anonymous';
-        const path = `${userPrefix}/job-applications/${id}/${Date.now()}.${ext}`;
-        const { error: uploadErr } = await supabase.storage
-          .from('documents')
-          .upload(path, resume);
-        if (uploadErr) throw new Error('Resume upload failed: ' + uploadErr.message);
-        const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path);
-        resumeUrl = urlData.publicUrl;
+        const fd = new FormData();
+        fd.append('file', resume);
+        fd.append('documentType', 'resume');
+        fd.append('metadata', JSON.stringify({ jobPostingId: id }));
+        const uploadRes = await fetch('/api/documents/upload', { method: 'POST', body: fd });
+        const uploadResult = await uploadRes.json();
+        if (!uploadRes.ok) throw new Error(uploadResult.error || 'Resume upload failed');
+        resumeUrl = uploadResult.document?.file_url || '';
       }
 
       const { error: insertErr } = await supabase

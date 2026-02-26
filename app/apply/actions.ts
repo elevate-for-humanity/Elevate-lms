@@ -5,8 +5,10 @@ import { revalidatePath } from 'next/cache';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 
+// info@elevateforhumanity.org removed — domain MX points to Resend/SES inbound
+// but no mailbox exists there, so emails bounce and get re-suppressed in a loop.
+// Use only the Gmail address until MX records are updated or Resend forwarding is configured.
 const ADMIN_EMAILS = [
-  'info@elevateforhumanity.org',
   'elevate4humanityedu@gmail.com',
 ];
 
@@ -321,8 +323,41 @@ async function insertApplication(payload: {
       `<p style="margin:0 0 20px;font-size:13px;color:#888;font-family:Arial,sans-serif">Forgot your password? Reset it anytime at <a href="${siteUrl}/reset-password" style="color:#888">${siteUrl}/reset-password</a></p>`,
     ].join('');
 
-    // Send student + admin emails in parallel
-    const studentEmailPromise = sendEmailDirect(
+    // Admin notification FIRST — send before student email so serverless
+    // timeout doesn't prevent admin from being notified about new applications.
+    const adminSubject = `[NEW APPLICATION] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`;
+    const adminHtml = [
+        emailHeader,
+        `<h3>New ${payload.source.replace(/-/g, ' ')}</h3>`,
+        `<p style="color:#b45309"><strong>Status: PENDING — student completing onboarding, documents need verification</strong></p>`,
+        `<table style="border-collapse:collapse;width:100%;max-width:500px">`,
+        `<tr><td style="padding:6px;font-weight:bold">Name</td><td style="padding:6px">${payload.firstName} ${payload.lastName}</td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">Email</td><td style="padding:6px"><a href="mailto:${payload.email}">${payload.email}</a></td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">Phone</td><td style="padding:6px"><a href="tel:${payload.phone}">${payload.phone}</a></td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">Program</td><td style="padding:6px">${programLabel}</td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">City / ZIP</td><td style="padding:6px">${payload.city} ${payload.zip}</td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">Reference</td><td style="padding:6px">${referenceNumber}</td></tr>`,
+        payload.supportNotes ? `<tr><td style="padding:6px;font-weight:bold">Details</td><td style="padding:6px">${payload.supportNotes}</td></tr>` : '',
+        `</table>`,
+        supabase ? `<p><a href="${siteUrl}/admin/applications/review/${referenceNumber}" style="display:inline-block;padding:10px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;margin:8px 0">Review & Approve</a></p>` : '',
+        supabase ? `<p><a href="${siteUrl}/admin/applications">View All Applications</a></p>` : '',
+        emailFooter,
+      ].filter(Boolean).join('');
+
+    await Promise.allSettled(
+      ADMIN_EMAILS.map((addr) =>
+        sendEmailDirect(addr, adminSubject, adminHtml)
+      ),
+    ).then((results) => {
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          logger.error(`[Apply] Admin notification to ${ADMIN_EMAILS[i]} failed:`, r.reason);
+        }
+      });
+    });
+
+    // Send student confirmation email
+    await sendEmailDirect(
       payload.email,
       `Welcome to Elevate for Humanity — ${programLabel} [${referenceNumber}]`,
       [
@@ -332,7 +367,26 @@ async function insertApplication(payload: {
 
         `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">Thank you for your interest in <strong>${programLabel}</strong> at Elevate for Humanity. We received your inquiry and we'd love to help you take the next step.</p>`,
 
-        `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">We've created your account. You can log in using the email and password you provided on the application form. Below you'll find details about funding and how to connect with our team.</p>`,
+        `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">We've created your account. You can log in using the email and password you provided on the application form.</p>`,
+
+        // Onboarding — first thing after greeting
+        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Your Next Steps</h3>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">Log in and complete your onboarding to secure your spot:</p>`,
+        `<ol style="margin:0 0 20px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
+        `<li>Complete your profile</li>`,
+        `<li>Upload your documents (photo ID, proof of residency)</li>`,
+        `<li>Confirm your funding source</li>`,
+        `<li>Select your schedule</li>`,
+        `<li>Complete orientation</li>`,
+        `</ol>`,
+
+        `<div style="text-align:center;margin:24px 0">`,
+        `<a href="${ctaLink}" style="display:inline-block;padding:14px 40px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-weight:bold;font-size:15px">Log In &amp; Start Onboarding</a>`,
+        `</div>`,
+        `<p style="text-align:center;font-size:12px;color:#999;font-family:Arial,sans-serif;margin:0 0 24px">For the best experience, please use a laptop, desktop, or iPad.</p>`,
+
+        // Divider
+        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
 
         // Credentials
         credentialsBlock,
@@ -389,27 +443,6 @@ async function insertApplication(payload: {
         `</ul>`,
         `<p style="font-size:14px;line-height:1.7;margin:0 0 16px">To discuss which option works best for you, <a href="${siteUrl}/schedule-consultation" style="color:#1a1a1a;font-weight:bold">schedule a Zoom meeting</a> with our enrollment team or call us at <strong>(317) 314-3757</strong>.</p>`,
 
-        // Divider
-        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
-
-        // Onboarding
-        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Getting Started</h3>`,
-        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">While you explore your funding options, you can go ahead and begin your onboarding:</p>`,
-        `<ol style="margin:0 0 20px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
-        `<li>Complete your profile</li>`,
-        `<li>Upload your documents (photo ID, SSN proof, proof of residency)</li>`,
-        `<li>Confirm your funding source</li>`,
-        `<li>Select your schedule</li>`,
-        `<li>Complete orientation</li>`,
-        `</ol>`,
-
-        `<div style="text-align:center;margin:24px 0">`,
-        `<a href="${ctaLink}" style="display:inline-block;padding:14px 40px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-weight:bold;font-size:15px">Log In & Start Onboarding</a>`,
-        `</div>`,
-
-        // Device note
-        `<p style="text-align:center;font-size:12px;color:#999;font-family:Arial,sans-serif;margin:0 0 24px">For the best experience, please use a laptop, desktop, or iPad.</p>`,
-
         // Closing
         `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
         `<p style="font-size:14px;line-height:1.7;margin:0 0 8px">If you have any questions at all, just reply to this email or give us a call at <strong>(317) 314-3757</strong>. We're here to help.</p>`,
@@ -420,39 +453,6 @@ async function insertApplication(payload: {
         emailFooter,
       ].join(''),
     ).catch((err) => { logger.error('[Apply] Student confirmation email failed:', err instanceof Error ? err.message : err); });
-
-    // Admin notification — send to each admin address individually so a
-    // Resend suppression on one does not block the others.
-    const adminSubject = `[NEW APPLICATION] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`;
-    const adminHtml = [
-        emailHeader,
-        `<h3>New ${payload.source.replace(/-/g, ' ')}</h3>`,
-        `<p style="color:#b45309"><strong>Status: PENDING — student completing onboarding, documents need verification</strong></p>`,
-        `<table style="border-collapse:collapse;width:100%;max-width:500px">`,
-        `<tr><td style="padding:6px;font-weight:bold">Name</td><td style="padding:6px">${payload.firstName} ${payload.lastName}</td></tr>`,
-        `<tr><td style="padding:6px;font-weight:bold">Email</td><td style="padding:6px"><a href="mailto:${payload.email}">${payload.email}</a></td></tr>`,
-        `<tr><td style="padding:6px;font-weight:bold">Phone</td><td style="padding:6px"><a href="tel:${payload.phone}">${payload.phone}</a></td></tr>`,
-        `<tr><td style="padding:6px;font-weight:bold">Program</td><td style="padding:6px">${programLabel}</td></tr>`,
-        `<tr><td style="padding:6px;font-weight:bold">City / ZIP</td><td style="padding:6px">${payload.city} ${payload.zip}</td></tr>`,
-        `<tr><td style="padding:6px;font-weight:bold">Reference</td><td style="padding:6px">${referenceNumber}</td></tr>`,
-        payload.supportNotes ? `<tr><td style="padding:6px;font-weight:bold">Details</td><td style="padding:6px">${payload.supportNotes}</td></tr>` : '',
-        `</table>`,
-        supabase ? `<p><a href="${siteUrl}/admin/applications/review/${referenceNumber}" style="display:inline-block;padding:10px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;margin:8px 0">Review & Approve</a></p>` : '',
-        supabase ? `<p><a href="${siteUrl}/admin/applications">View All Applications</a></p>` : '',
-        emailFooter,
-      ].filter(Boolean).join('');
-
-    await Promise.allSettled(
-      ADMIN_EMAILS.map((addr) =>
-        sendEmailDirect(addr, adminSubject, adminHtml)
-      ),
-    ).then((results) => {
-      results.forEach((r, i) => {
-        if (r.status === 'rejected') {
-          logger.error(`[Apply] Admin notification to ${ADMIN_EMAILS[i]} failed:`, r.reason);
-        }
-      });
-    });
   }
 
   // Path A: DB available — insert application, admin enrolls later

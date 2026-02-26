@@ -1,113 +1,31 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createBrowserClient } from '@supabase/ssr';
-import {
-  Clock, DollarSign, TrendingUp, ArrowRight,
-  Award, Calendar, ChevronDown, ChevronUp,
-  GraduationCap, Briefcase, Shield,
-} from 'lucide-react';
-
-interface CourseModule {
-  id: string;
-  title: string;
-  description: string | null;
-  order_index: number;
-}
-
-interface ProgramData {
-  title: string;
-  description: string;
-  estimated_weeks: number | null;
-  estimated_hours: number | null;
-  salary_min: number | null;
-  salary_max: number | null;
-  credential_name: string | null;
-  career_outcomes: string[] | null;
-  what_you_learn: string[] | null;
-  placement_rate: number | null;
-  completion_rate: number | null;
-  total_cost: string | null;
-  industry_demand: string | null;
-}
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function HVACProgramContent() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [program, setProgram] = useState<ProgramData | null>(null);
-  const [modules, setModules] = useState<CourseModule[]>([]);
-
-  useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-    Promise.all([
-      supabase
-        .from('programs')
-        .select('title, description, estimated_weeks, estimated_hours, salary_min, salary_max, credential_name, career_outcomes, what_you_learn, placement_rate, completion_rate, total_cost, industry_demand')
-        .eq('slug', 'hvac-technician')
-        .single(),
-      supabase
-        .from('course_modules')
-        .select('id, title, description, order_index')
-        .eq('course_id', 'f0593164-55be-5867-98e7-8a86770a8dd0')
-        .order('order_index'),
-    ]).then(([programRes, modulesRes]) => {
-      if (programRes.data) setProgram(programRes.data as ProgramData);
-      if (modulesRes.data) setModules(modulesRes.data as CourseModule[]);
-    });
-  }, []);
-
-  const faqs = [
-    {
-      question: "Do I need any experience to enroll?",
-      answer: "No. This program is built for complete beginners. We start with the basics — what heating and cooling systems are, how they work, and how to work on them safely."
-    },
-    {
-      question: "How long is the program?",
-      answer: "15 weeks (approximately 160 clock hours). That includes 110 hours of classroom instruction and 50 hours of on-the-job training at employer partner sites."
-    },
-    {
-      question: "How much does it cost?",
-      answer: "If you qualify for WIOA or Workforce Ready Grant funding through WorkOne, your tuition may be fully covered. Self-pay tuition is $5,000 with weekly payment plans, Affirm, and Sezzle financing available."
-    },
-    {
-      question: "What certifications do I get?",
-      answer: "6 credentials: EPA 608 Universal (required by federal law to handle refrigerants), Residential HVAC 1 & 2, OSHA 30 Safety, CPR/First Aid, and Rise Up."
-    },
-    {
-      question: "What jobs can I get after this?",
-      answer: "HVAC Service Technician, Installation Specialist, or Maintenance Technician. Starting pay is $18–22/hour ($38K–$46K/year). Experienced technicians earn $60K–$80K+."
-    },
-    {
-      question: "Can I work while in the program?",
-      answer: "Yes. Flexible scheduling with day and evening options. Online coursework is self-paced. Most students keep their current job while training."
-    },
-    {
-      question: "What is OJT?",
-      answer: "On-the-Job Training — 50 hours of supervised, hands-on work at an HVAC employer site. You apply classroom skills to real service calls, installations, and maintenance under a licensed technician."
-    }
-  ];
-
-  const credentials = [
-    { name: 'EPA 608 Universal Certification', issuer: 'EPA-approved certifying organization', required: true },
-    { name: 'Residential HVAC Certification 1', issuer: 'Elevate for Humanity', required: false },
-    { name: 'Residential HVAC Certification 2', issuer: 'Elevate for Humanity', required: false },
-    { name: 'OSHA 30 Safety Certification', issuer: 'OSHA / DOL', required: false },
-    { name: 'CPR / First Aid', issuer: 'American Heart Association', required: false },
-    { name: 'Rise Up', issuer: 'National Retail Federation Foundation', required: false },
-  ];
 
   return (
     <>
-      <ProgramHeroBanner videoSrc="/videos/hvac-technician.mp4" />
+      {/* Hero */}
+      <section className="relative h-[300px] sm:h-[400px] md:h-[480px]">
+        <Image
+          src="/images/trades/hero-program-hvac.jpg"
+          alt="HVAC technician servicing a commercial air conditioning unit"
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
+        />
+      </section>
 
+      {/* Breadcrumbs */}
       <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-6 py-3">
+        <div className="max-w-5xl mx-auto px-6 py-3">
           <Breadcrumbs items={[
             { label: 'Programs', href: '/programs' },
             { label: 'Skilled Trades', href: '/programs/skilled-trades' },
@@ -116,174 +34,84 @@ export default function HVACProgramContent() {
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="bg-white py-12">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
-            <div>
-              <p className="text-sm font-semibold text-brand-blue-600 uppercase tracking-wide mb-2">15-Week Program</p>
-              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">HVAC Technician Training</h1>
-              <p className="text-lg text-gray-600 mb-6">
-                Earn 6 industry credentials including EPA 608 Universal Certification. 110 hours of classroom instruction plus 50 hours of on-the-job training at employer partner sites.
-              </p>
+      {/* Program Overview + CTA */}
+      <section className="bg-white py-14">
+        <div className="max-w-5xl mx-auto px-6">
+          <h1 className="text-4xl font-bold text-gray-900 mb-6">HVAC Technician Training</h1>
 
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                {[
-                  { icon: Clock, label: 'Duration', value: '15 Weeks' },
-                  { icon: Award, label: 'Credentials', value: '6 Included' },
-                  { icon: DollarSign, label: 'Starting Salary', value: '$38K–$46K' },
-                  { icon: TrendingUp, label: 'Job Demand', value: '4-Star IN Top Job' },
-                ].map((stat) => (
-                  <div key={stat.label} className="flex items-center gap-3">
-                    <stat.icon className="w-5 h-5 text-gray-400" />
-                    <div>
-                      <p className="text-sm text-gray-500">{stat.label}</p>
-                      <p className="font-semibold text-gray-900">{stat.value}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          <p className="text-lg text-gray-700 mb-4 leading-relaxed">
+            15-week program. 160 clock hours — 110 classroom, 50 on-the-job training.
+            Graduate with 6 industry credentials. Most students qualify for full tuition
+            coverage through WIOA or the Indiana Workforce Ready Grant.
+          </p>
 
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/apply?program=hvac-technician" className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition">
-                  Apply with Workforce Funding
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-                <Link href="/programs/hvac-technician/apply" className="inline-flex items-center justify-center px-6 py-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-semibold rounded-lg transition">
-                  Enroll &amp; Pay Tuition
-                </Link>
-              </div>
-              <p className="text-xs text-gray-500 mt-3">
-                Workforce funding (WIOA / Workforce Ready Grant) may cover full tuition. Self-pay: $5,000 with installment plans.
-              </p>
-            </div>
-
-            <div className="relative h-80 lg:h-[420px] rounded-2xl overflow-hidden">
-              <Image src="/images/trades/hero-program-hvac.jpg" alt="HVAC technician working on a commercial air conditioning unit" fill quality={90} className="object-cover" priority />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* What You'll Learn */}
-      <section className="bg-gray-50 py-16">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">What You&apos;ll Learn</h2>
-          <p className="text-gray-600 mb-8 max-w-2xl">Hands-on training covering residential and light commercial HVAC systems.</p>
-          <div className="grid md:grid-cols-2 gap-6">
+          {/* Key Details */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
             {[
-              { title: 'HVAC Fundamentals', desc: 'Heating, ventilation, air conditioning, and refrigeration principles. System types, components, and how they work together.' },
-              { title: 'Electrical for HVAC', desc: 'Wiring diagrams, circuit testing, motor controls, and electrical safety. Read schematics and troubleshoot electrical faults.' },
-              { title: 'Refrigerant Handling', desc: 'EPA 608 exam prep — refrigerant types, recovery, recycling, and reclamation. Federal regulations and safe handling.' },
-              { title: 'Installation & Service', desc: 'Equipment sizing, ductwork, brazing, system startup, and preventive maintenance with real equipment.' },
-              { title: 'Troubleshooting', desc: 'Systematic diagnosis of heating and cooling failures. Use gauges, meters, and diagnostic tools to isolate problems.' },
-              { title: 'Safety & Compliance', desc: 'OSHA 30 certification, lockout/tagout, fall protection, confined spaces, and job site safety protocols.' },
+              { label: 'Duration', value: '15 Weeks' },
+              { label: 'Clock Hours', value: '160 Hours' },
+              { label: 'Credentials', value: '6 Included' },
+              { label: 'Self-Pay', value: '$5,000' },
             ].map((item) => (
-              <div key={item.title} className="bg-white rounded-xl p-6 border border-gray-200">
-                <h3 className="font-semibold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-600">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Credentials */}
-      <section className="bg-white py-16">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">6 Industry Credentials Included</h2>
-          <p className="text-gray-600 mb-8 max-w-2xl">Graduate with every certification HVAC employers require.</p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {credentials.map((cred) => (
-              <div key={cred.name} className={`rounded-xl p-5 border ${cred.required ? 'border-brand-blue-200 bg-brand-blue-50/40' : 'border-gray-200 bg-white'}`}>
-                <div className="flex items-start gap-3">
-                  <Award className={`w-5 h-5 mt-0.5 flex-shrink-0 ${cred.required ? 'text-brand-blue-600' : 'text-gray-400'}`} />
-                  <div>
-                    <p className="font-semibold text-gray-900 text-sm">{cred.name}</p>
-                    <p className="text-xs text-gray-500 mt-1">{cred.issuer}</p>
-                    {cred.required && <span className="inline-block mt-2 text-xs font-medium text-brand-blue-700 bg-brand-blue-100 px-2 py-0.5 rounded">Required by federal law</span>}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Program Structure */}
-      <section className="bg-gray-50 py-16">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">Program Structure</h2>
-          <p className="text-gray-600 mb-8">15 weeks of training split between classroom theory and employer-site OJT.</p>
-          <div className="grid md:grid-cols-3 gap-6 mb-10">
-            {[
-              { num: '110', label: 'Hours Classroom', sub: 'Theory, labs, exam prep' },
-              { num: '50', label: 'Hours OJT', sub: 'On-the-job training at employer sites' },
-              { num: '160', label: 'Total Clock Hours', sub: 'Theory + OJT combined' },
-            ].map((s) => (
-              <div key={s.label} className="bg-white rounded-xl p-6 border border-gray-200 text-center">
-                <p className="text-3xl font-bold text-gray-900">{s.num}</p>
-                <p className="text-sm text-gray-500 mt-1">{s.label}</p>
-                <p className="text-xs text-gray-400 mt-2">{s.sub}</p>
+              <div key={item.label} className="bg-gray-50 rounded-lg p-4 border border-gray-200 text-center">
+                <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">{item.label}</p>
+                <p className="text-xl font-bold text-gray-900">{item.value}</p>
               </div>
             ))}
           </div>
 
-          {modules.length > 0 && (
-            <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Curriculum Modules</h3>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {modules.map((mod, i) => (
-                  <div key={mod.id} className="bg-white rounded-lg p-4 border border-gray-200">
-                    <div className="flex items-start gap-3">
-                      <span className="flex-shrink-0 w-7 h-7 rounded-full bg-gray-100 text-gray-600 text-xs font-bold flex items-center justify-center">{i + 1}</span>
-                      <div>
-                        <p className="font-medium text-gray-900 text-sm">{mod.title}</p>
-                        {mod.description && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{mod.description}</p>}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* CTA Buttons — framed cards with button inside */}
+          <div className="grid sm:grid-cols-2 gap-6 mb-4">
+            <div className="rounded-xl border-2 border-brand-blue-600 bg-brand-blue-50 p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Ready to enroll?</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Create your account, select your program, and start onboarding.
+                Our admissions team will contact you about funding.
+              </p>
+              <Link
+                href="/apply/student?program=hvac-technician"
+                className="inline-block w-full text-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-3 px-6 rounded-lg transition"
+              >
+                Apply for Enrollment
+              </Link>
             </div>
-          )}
-        </div>
-      </section>
-
-      {/* Mid-page CTA */}
-      <section className="bg-brand-blue-600 py-12">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">Ready to Start?</h2>
-          <p className="text-brand-blue-100 mb-6">Tuition may be fully covered through workforce funding. Self-pay options start at $1,750 down.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=hvac-technician" className="inline-flex items-center justify-center px-6 py-3 bg-white text-brand-blue-600 font-semibold rounded-lg hover:bg-brand-blue-50 transition">
-              Apply with Workforce Funding
-            </Link>
-            <Link href="/programs/hvac-technician/apply" className="inline-flex items-center justify-center px-6 py-3 border-2 border-white/40 text-white font-semibold rounded-lg hover:bg-white/10 transition">
-              Enroll &amp; Pay Tuition
-            </Link>
+            <div className="rounded-xl border-2 border-gray-200 bg-white p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Have questions first?</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Submit an inquiry and our admissions team will contact you
+                within 1 business day about the program, schedule, and funding.
+              </p>
+              <Link
+                href="/apply/intake?program=hvac-technician"
+                className="inline-block w-full text-center border-2 border-gray-300 hover:border-gray-400 text-gray-900 font-bold py-3 px-6 rounded-lg transition"
+              >
+                Submit an Inquiry
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Career Outcomes */}
-      <section className="bg-white py-16">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">Career Outcomes</h2>
-          <p className="text-gray-600 mb-8 max-w-2xl">HVAC is a 4-star Indiana Top Job. Demand is year-round. Experienced technicians earn $60K–$80K+.</p>
-          <div className="grid md:grid-cols-3 gap-6">
+      {/* What You Will Learn */}
+      <section className="bg-gray-50 py-14">
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">What You Will Learn</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { title: 'HVAC Service Technician', salary: '$38K–$46K', image: '/images/trades/program-hvac-technician.jpg' },
-              { title: 'Installation Specialist', salary: '$40K–$55K', image: '/images/trades/program-hvac-overview.jpg' },
-              { title: 'Maintenance Technician', salary: '$42K–$60K', image: '/images/programs-hq/hvac-technician.jpg' },
-            ].map((job) => (
-              <div key={job.title} className="rounded-xl overflow-hidden border border-gray-200">
-                <div className="relative h-48">
-                  <Image src={job.image} alt={job.title} fill quality={85} className="object-cover" />
+              { title: 'HVAC Fundamentals', desc: 'System types, components, heating and cooling principles.', img: '/images/trades/program-hvac-overview.jpg', alt: 'HVAC system overview and components' },
+              { title: 'Electrical for HVAC', desc: 'Wiring diagrams, circuit testing, motor controls, and schematics.', img: '/images/trades/program-electrical-training.jpg', alt: 'Electrical wiring and circuit components for HVAC systems' },
+              { title: 'Refrigerant Handling', desc: 'EPA 608 prep — recovery, recycling, reclamation, and federal regs.', img: '/images/programs-hq/hvac-technician.jpg', alt: 'Technician handling refrigerant gauges on an HVAC unit' },
+              { title: 'Installation & Service', desc: 'Equipment sizing, ductwork, brazing, startup, and maintenance.', img: '/images/trades/program-hvac-technician.jpg', alt: 'HVAC technician installing ductwork and equipment' },
+              { title: 'Troubleshooting', desc: 'Diagnose failures using gauges, meters, and diagnostic tools.', img: '/images/trades/program-building-technology.jpg', alt: 'Technician using diagnostic tools on building systems' },
+              { title: 'Safety & Compliance', desc: 'OSHA 30, lockout/tagout, fall protection, confined spaces.', img: '/images/programs-hq/skilled-trades-hero.jpg', alt: 'Skilled trades workers following safety protocols on a job site' },
+            ].map((item) => (
+              <div key={item.title} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="relative h-40">
+                  <Image src={item.img} alt={item.alt} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
                 </div>
                 <div className="p-5">
-                  <h3 className="font-semibold text-gray-900">{job.title}</h3>
-                  <p className="text-sm text-gray-500 mt-1">Starting salary: {job.salary}</p>
+                  <h3 className="font-bold text-gray-900 mb-1">{item.title}</h3>
+                  <p className="text-sm text-gray-600">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -291,79 +119,185 @@ export default function HVACProgramContent() {
         </div>
       </section>
 
-      {/* How Funding Works */}
-      <section className="bg-gray-50 py-16">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
+      {/* Credentials — simple list, no images */}
+      <section className="bg-white py-14">
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-gray-900 mb-3">6 Credentials Included</h2>
+          <p className="text-gray-600 mb-6">Every certification Indiana HVAC employers require for hiring.</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {[
+              { name: 'EPA 608 Universal', issuer: 'EPA-approved organization' },
+              { name: 'Residential HVAC Cert 1', issuer: 'Elevate for Humanity' },
+              { name: 'Residential HVAC Cert 2', issuer: 'Elevate for Humanity' },
+              { name: 'OSHA 30 Safety', issuer: 'Dept. of Labor' },
+              { name: 'CPR / First Aid', issuer: 'American Heart Assoc.' },
+              { name: 'NRF Rise Up', issuer: 'National Retail Federation' },
+            ].map((c) => (
+              <div key={c.name} className="flex items-center gap-3 bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div className="w-2 h-2 rounded-full bg-brand-blue-600 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">{c.name}</p>
+                  <p className="text-xs text-gray-500">{c.issuer}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Career + Salary — compact */}
+      <section className="bg-gray-50 py-14">
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">Career Outcomes</h2>
+          <div className="grid sm:grid-cols-2 gap-8">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">How Funding Works</h2>
-              <p className="text-gray-600 mb-6">Many students have tuition fully covered through WIOA or the Workforce Ready Grant.</p>
-              <div className="space-y-4 mb-6">
-                {[
-                  { step: '1', title: 'Register at indianacareerconnect.com', desc: 'Create your account on the state workforce portal.' },
-                  { step: '2', title: 'Visit your local WorkOne office', desc: 'They determine eligibility and issue funding.' },
-                  { step: '3', title: 'Apply to our program', desc: 'We coordinate with WorkOne to confirm enrollment and funding.' },
-                ].map((s) => (
-                  <div key={s.step} className="flex gap-3">
-                    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-brand-blue-100 text-brand-blue-700 text-sm font-bold flex items-center justify-center">{s.step}</span>
-                    <div>
-                      <p className="font-medium text-gray-900">{s.title}</p>
-                      <p className="text-sm text-gray-500">{s.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <p className="text-sm text-gray-500 mb-6">Not using workforce funding? Self-pay: $5,000 with weekly plans, Affirm, and Sezzle.</p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/apply?program=hvac-technician" className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition">
-                  Apply with Workforce Funding
-                </Link>
-                <Link href="/programs/hvac-technician/apply" className="inline-flex items-center justify-center px-6 py-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-semibold rounded-lg transition">
-                  Enroll &amp; Pay Tuition
-                </Link>
-              </div>
+              <h3 className="font-bold text-gray-900 mb-3">Entry-Level Positions</h3>
+              <ul className="space-y-1 text-gray-700 text-sm">
+                <li>HVAC Service Technician</li>
+                <li>HVAC Installation Technician</li>
+                <li>Maintenance Technician</li>
+                <li>Refrigeration Technician</li>
+              </ul>
             </div>
-            <div className="relative h-80 rounded-2xl overflow-hidden">
-              <Image src="/images/hvac/hvac-advisor-meeting.jpg" alt="Student meeting with a funding advisor" fill quality={90} className="object-cover" />
+            <div>
+              <h3 className="font-bold text-gray-900 mb-3">Salary</h3>
+              <p className="text-sm text-gray-700 mb-3">
+                Entry: $18–$22/hr ($38K–$46K/yr).
+                Experienced: $60K–$80K+.
+              </p>
+              <h3 className="font-bold text-gray-900 mb-3">Demand</h3>
+              <p className="text-sm text-gray-700">
+                HVAC is a 4-Star Indiana Top Job. Employers hiring across Central Indiana.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Who This Is For */}
-      <section className="bg-white py-16">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Who This Program Is For</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { icon: Briefcase, text: 'Career changers looking for stable, high-demand work' },
-              { icon: GraduationCap, text: 'Recent graduates who want hands-on training, not more school' },
-              { icon: Shield, text: 'Veterans transitioning to civilian careers in the trades' },
-              { icon: Calendar, text: 'Working adults who need flexible scheduling' },
-            ].map((item) => (
-              <div key={item.text} className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                <item.icon className="w-6 h-6 text-brand-blue-600 mb-3" />
-                <p className="text-sm text-gray-700">{item.text}</p>
+      {/* Funding */}
+      <section className="bg-white py-14">
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-gray-900 mb-3">Funding</h2>
+          <p className="text-gray-600 mb-6">Most students pay nothing out of pocket. Here is exactly how to get started.</p>
+
+          <ol className="space-y-4 mb-10">
+            {/* Step 1 */}
+            <li className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <div className="flex gap-4 items-start">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-blue-600 text-white font-bold flex items-center justify-center text-sm">1</span>
+                <div>
+                  <p className="font-bold text-gray-900 mb-1">Register at Indiana Career Connect</p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Create a free account at the state workforce portal. This is required before you can
+                    be referred to any WIOA-funded training program. Takes about 10 minutes.
+                  </p>
+                  <Link
+                    href="https://indianacareerconnect.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-bold py-2 px-5 rounded-lg transition"
+                  >
+                    Go to Indiana Career Connect →
+                  </Link>
+                </div>
               </div>
-            ))}
+            </li>
+
+            {/* Step 2 */}
+            <li className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <div className="flex gap-4 items-start">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-blue-600 text-white font-bold flex items-center justify-center text-sm">2</span>
+                <div>
+                  <p className="font-bold text-gray-900 mb-1">Visit WorkOne Indy and Meet with a Career Coach</p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Walk in or call to schedule an appointment. Tell them you want to enroll in
+                    HVAC Technician Training at Elevate for Humanity. They will determine your
+                    eligibility for WIOA or the Indiana Workforce Ready Grant and complete the paperwork.
+                  </p>
+                  <div className="bg-white rounded-lg p-4 border border-gray-200 mb-3">
+                    <p className="font-bold text-gray-900 text-sm">WorkOne Indy — Southeast</p>
+                    <p className="text-sm text-gray-600">2511 E. 46th Street, Suite N, Indianapolis, IN 46205</p>
+                    <p className="text-sm text-gray-600">Phone: <Link href="tel:+13178908800" className="text-brand-blue-600 hover:underline">(317) 890-8800</Link></p>
+                    <p className="text-sm text-gray-600">Hours: Mon–Fri, 8:00 AM – 4:30 PM</p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <Link
+                      href="https://www.workoneindy.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-bold py-2 px-5 rounded-lg transition"
+                    >
+                      WorkOne Indy Website →
+                    </Link>
+                    <Link
+                      href="https://maps.google.com/?q=2511+E+46th+Street+Suite+N+Indianapolis+IN+46205"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block border-2 border-gray-300 hover:border-gray-400 text-gray-900 text-sm font-bold py-2 px-5 rounded-lg transition"
+                    >
+                      Get Directions →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            {/* Step 3 */}
+            <li className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <div className="flex gap-4 items-start">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-blue-600 text-white font-bold flex items-center justify-center text-sm">3</span>
+                <div>
+                  <p className="font-bold text-gray-900 mb-1">Apply to Our Program</p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Once WorkOne approves your funding, apply on our site. We coordinate directly
+                    with WorkOne to confirm your enrollment and funding. Once everything is approved,
+                    you start training with your cohort.
+                  </p>
+                  <Link
+                    href="/apply/student?program=hvac-technician"
+                    className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-bold py-2 px-5 rounded-lg transition"
+                  >
+                    Apply for Enrollment →
+                  </Link>
+                </div>
+              </div>
+            </li>
+          </ol>
+
+          {/* Self-pay note */}
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <p className="text-sm text-gray-600">
+              <span className="font-bold text-gray-900">Self-pay option:</span> If you don&apos;t qualify for workforce funding,
+              tuition is $5,000 with weekly payment plans available. Contact us at{' '}
+              <Link href="tel:+13173143757" className="text-brand-blue-600 hover:underline">(317) 314-3757</Link> to discuss options.
+            </p>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="bg-gray-50 py-16">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Frequently Asked Questions</h2>
-          <div className="space-y-3">
-            {faqs.map((faq, i) => (
-              <div key={i} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex items-center justify-between px-6 py-4 text-left">
-                  <span className="font-medium text-gray-900 pr-4">{faq.question}</span>
-                  {openFaq === i ? <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />}
+      <section className="bg-gray-50 py-14">
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">FAQ</h2>
+          <div className="space-y-2">
+            {[
+              { q: 'Do I need experience?', a: 'No. Built for complete beginners.' },
+              { q: 'How long is the program?', a: '15 weeks — 110 hours classroom, 50 hours on-the-job training.' },
+              { q: 'How much does it cost?', a: 'Free with WIOA or Workforce Ready Grant. Self-pay: $5,000 with payment plans.' },
+              { q: 'What certifications do I get?', a: 'EPA 608, Residential HVAC 1 & 2, OSHA 30, CPR/First Aid, Rise Up.' },
+              { q: 'Can I work while in the program?', a: 'Yes. Day and evening options. Most students keep their current job.' },
+            ].map((faq, i) => (
+              <div key={i} className="bg-white rounded-lg border border-gray-200">
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between p-4 text-left"
+                >
+                  <span className="font-semibold text-gray-900 text-sm">{faq.q}</span>
+                  {openFaq === i ? <ChevronUp className="w-4 h-4 text-gray-400 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />}
                 </button>
                 {openFaq === i && (
-                  <div className="px-6 pb-4">
-                    <p className="text-sm text-gray-600 leading-relaxed">{faq.answer}</p>
+                  <div className="px-4 pb-4">
+                    <p className="text-sm text-gray-600">{faq.a}</p>
                   </div>
                 )}
               </div>
@@ -372,23 +306,25 @@ export default function HVACProgramContent() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="bg-gray-900 py-16">
-        <div className="max-w-4xl mx-auto px-6 text-center">
+      {/* Bottom CTA */}
+      <section className="bg-slate-900 py-14">
+        <div className="max-w-5xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-white mb-3">Start Your HVAC Career</h2>
-          <p className="text-gray-400 mb-8 max-w-xl mx-auto">15 weeks. 6 credentials. 160 clock hours. Apply today — our team responds within 1 business day.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
-            <Link href="/apply?program=hvac-technician" className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold rounded-lg transition text-lg">
-              Apply with Workforce Funding
-              <ArrowRight className="w-5 h-5 ml-2" />
+          <p className="text-gray-400 mb-8">Apply now or ask us a question first.</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/apply/student?program=hvac-technician"
+              className="inline-block bg-white text-slate-900 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-center"
+            >
+              Apply for Enrollment
             </Link>
-            <Link href="/programs/hvac-technician/apply" className="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-600 hover:border-gray-500 text-white font-bold rounded-lg transition text-lg">
-              Enroll &amp; Pay Tuition
+            <Link
+              href="/apply/intake?program=hvac-technician"
+              className="inline-block border-2 border-white/30 text-white px-8 py-4 rounded-lg font-bold hover:bg-white/10 transition text-center"
+            >
+              Submit an Inquiry
             </Link>
           </div>
-          <p className="text-gray-500 text-sm">
-            Questions? Call <a href="tel:3173143757" className="text-white underline">317-314-3757</a> or email <a href="mailto:info@elevateforhumanity.org" className="text-white underline">info@elevateforhumanity.org</a>
-          </p>
         </div>
       </section>
     </>

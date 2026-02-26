@@ -46,6 +46,13 @@ export default function HvacApplicationSuccessPage() {
             </div>
           </div>
 
+          <Link
+            href="/onboarding/learner"
+            className="w-full inline-flex items-center justify-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-6 py-3 rounded-lg font-bold transition-colors mb-3"
+          >
+            Start Onboarding <ArrowRight className="w-4 h-4" />
+          </Link>
+
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/programs/hvac-technician"

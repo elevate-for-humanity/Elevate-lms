@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -106,16 +107,32 @@ export default async function WIOAVerifyPage({
   // Load documents for this participant
   const { data: documents } = await db
     .from('documents')
-    .select('id, title, file_url, document_type, status, created_at')
+    .select('id, title, file_url, file_path, document_type, status, created_at')
     .eq('user_id', participant.user_id)
     .order('created_at', { ascending: false });
 
-  const docs = documents || [];
+  // Generate signed URLs for private bucket documents
+  const docs = await Promise.all(
+    (documents || []).map(async (doc) => {
+      if (doc.file_path) {
+        const { data: signedData } = await db.storage
+          .from('documents')
+          .createSignedUrl(doc.file_path, 3600);
+        return { ...doc, file_url: signedData?.signedUrl || doc.file_url };
+      }
+      return doc;
+    })
+  );
   const address = participant.address as any;
   const missingDocs = docs.filter(d => d.status === 'missing' || !d.file_url);
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/funding-hero.jpg" alt="Funding administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <div className="max-w-5xl mx-auto">
         <Link href="/admin/wioa/verify" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4" />

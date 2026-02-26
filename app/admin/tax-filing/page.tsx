@@ -96,6 +96,11 @@ export default async function TaxFilingAdminPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/tax-refund-hero.jpg" alt="Tax administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-black mb-2">
           Tax Filing Management

@@ -38,10 +38,10 @@ function LoginForm() {
 
       if (!data?.user) throw new Error('Login succeeded but no user returned');
 
-      // Fetch profile — role + onboarding status drive routing
+      // Fetch profile — role + onboarding + enrollment status drive routing
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('role, onboarding_completed')
+        .select('role, onboarding_completed, enrollment_status')
         .eq('id', data.user.id)
         .single();
 
@@ -66,9 +66,11 @@ function LoginForm() {
 
       const role = profile.role;
       const onboardingDone = profile.onboarding_completed === true;
+      const isActiveStudent = profile.enrollment_status === 'active';
 
-      // Students must complete onboarding before accessing LMS
-      if (role === 'student' && !onboardingDone) {
+      // Students who haven't completed onboarding and aren't already active
+      // get sent to onboarding. Active students bypass this gate.
+      if (role === 'student' && !onboardingDone && !isActiveStudent) {
         router.push('/onboarding/learner');
         return;
       }

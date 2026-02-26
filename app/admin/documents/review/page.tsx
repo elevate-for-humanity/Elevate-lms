@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
@@ -61,9 +62,25 @@ export default async function AdminDocumentReviewPage() {
     )
     .order('created_at', { ascending: false });
 
-  const pendingDocs = documents?.filter((d) => d.status === 'pending') || [];
-  const approvedDocs = documents?.filter((d) => d.status === 'approved') || [];
-  const rejectedDocs = documents?.filter((d) => d.status === 'rejected') || [];
+  // Generate signed URLs for documents stored in private buckets.
+  // file_url may be null (new uploads) or a dead public URL (legacy).
+  // file_path is the authoritative storage reference.
+  const docsWithUrls = await Promise.all(
+    (documents || []).map(async (doc) => {
+      if (doc.file_path) {
+        const { data } = await db.storage
+          .from('documents')
+          .createSignedUrl(doc.file_path, 3600);
+        return { ...doc, view_url: data?.signedUrl || null };
+      }
+      // Fallback for legacy rows that only have file_url
+      return { ...doc, view_url: doc.file_url || null };
+    })
+  );
+
+  const pendingDocs = docsWithUrls.filter((d) => d.status === 'pending') || [];
+  const approvedDocs = docsWithUrls.filter((d) => d.status === 'approved') || [];
+  const rejectedDocs = docsWithUrls.filter((d) => d.status === 'rejected') || [];
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -92,6 +109,11 @@ export default async function AdminDocumentReviewPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       {/* Header */}
       <section className="bg-white border-b py-8">
         <div className="max-w-7xl mx-auto px-6">
@@ -259,14 +281,18 @@ export default async function AdminDocumentReviewPage() {
                     >
                       {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
                     </span>
-                    <a
-                      href={doc.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-brand-blue-600 hover:underline text-sm font-semibold"
-                    >
-                      View
-                    </a>
+                    {doc.view_url ? (
+                      <a
+                        href={doc.view_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-brand-blue-600 hover:underline text-sm font-semibold"
+                      >
+                        View
+                      </a>
+                    ) : (
+                      <span className="text-slate-400 text-sm">No file</span>
+                    )}
                     <Link
                       href={`/admin/documents/review/${doc.id}`}
                       className="px-4 py-2 bg-slate-200 text-black font-semibold rounded-lg hover:bg-slate-300 transition"

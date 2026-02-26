@@ -122,17 +122,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Get public URLs
-    const { data: idFrontUrl } = supabase.storage
-      .from('documents')
-      .getPublicUrl(idFrontPath);
-
-    const { data: selfieUrl } = supabase.storage
-      .from('documents')
-      .getPublicUrl(selfiePath);
-
-    const idBackUrl = idBackPath
-      ? supabase.storage.from('documents').getPublicUrl(idBackPath).data
-      : null;
+    // Bucket is private — store file paths, not public URLs.
+    // Admin review pages should generate signed URLs on-demand.
 
     // Save verification record to database
     const { data: verification, error: verificationError } = await db
@@ -141,9 +132,9 @@ export async function POST(request: NextRequest) {
         user_id: userId,
         provider: 'manual',
         status: 'pending',
-        id_front_url: idFrontUrl.publicUrl,
-        id_back_url: idBackUrl?.publicUrl,
-        selfie_url: selfieUrl.publicUrl,
+        id_front_url: idFrontPath,
+        id_back_url: idBackPath || null,
+        selfie_url: selfiePath,
         cost: 0, // FREE
       })
       .select()

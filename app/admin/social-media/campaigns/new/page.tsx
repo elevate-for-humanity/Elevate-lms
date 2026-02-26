@@ -585,7 +585,12 @@ function PlatformButton({
       <Icon
         className={`w-8 h-8 mb-2 ${selected ? 'text-brand-blue-600' : 'text-black'}`}
       />
-      <div className="font-medium text-black">{name}</div>
+      <div className="font-medium text-black">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/success-stories-hero.jpg" alt="Content administration" fill sizes="100vw" className="object-cover" priority />
+      </section>{name}</div>
     </button>
   );
 }

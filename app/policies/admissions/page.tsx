@@ -121,7 +121,7 @@ export default function AdmissionsPage() {
                     <ul className="list-disc pl-6 text-black space-y-1">
                       <li>Copy of high school diploma or GED</li>
                       <li>Government-issued photo ID</li>
-                      <li>Social Security card or work authorization</li>
+                      <li>Social Security number (entered securely online) or work authorization</li>
                       <li>Proof of funding eligibility (WIOA, WRG, employer sponsorship, or self-pay)</li>
                       <li>Program-specific documents (if applicable)</li>
                     </ul>

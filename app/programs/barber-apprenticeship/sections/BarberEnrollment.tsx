@@ -18,8 +18,8 @@ export function BarberEnrollment() {
               <DollarSign className="w-8 h-8 text-brand-green-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Pay in Full</h3>
               <p className="text-slate-600 text-sm mb-3">Visa, Mastercard, Amex, Discover via Stripe</p>
-              <Link href="/enroll/barber-apprenticeship" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
-                Enroll &amp; Pay &rarr;
+              <Link href="/apply/student?program=barber-apprenticeship" className="inline-block text-sm font-semibold text-brand-red-600 hover:text-brand-red-700">
+                Apply Now &rarr;
               </Link>
             </div>
             <div className="bg-white rounded-xl p-5 border border-slate-200 text-center">

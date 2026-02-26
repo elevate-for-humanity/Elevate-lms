@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { withErrorHandling, APIErrors } from '@/lib/api';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { NextRequest, NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 // OCR processing moved to Netlify function: /.netlify/functions/ocr-extract
@@ -10,6 +11,9 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
 
@@ -38,7 +42,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const docTypeMap: Record<string, string> = {
     government_id: 'photo_id',
     photo_id: 'photo_id',
-    ssn_proof: 'other',
+    income_proof: 'other',
     residency_proof: 'other',
     selective_service: 'other',
     resume: 'other',
@@ -90,10 +94,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     throw APIErrors.external('Supabase Storage', 'Failed to upload file');
   }
 
-    // Get public URL
-    const {
-      data: { publicUrl },
-    } = db.storage.from('documents').getPublicUrl(fileName);
+    // Bucket is private — do not use getPublicUrl().
+    // Store file_path only; generate signed URLs on-demand for viewing.
 
   // Parse and validate metadata
   let parsedMetadata = {};
@@ -120,7 +122,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       document_type: documentType,
       file_name: file.name,
       file_size: file.size,
-      file_url: publicUrl,
+      file_url: null,
       file_path: fileName,
       mime_type: file.type,
       status: 'pending_review',
@@ -161,6 +163,9 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 });
 
 export const GET = withErrorHandling(async (request: NextRequest) => {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
 

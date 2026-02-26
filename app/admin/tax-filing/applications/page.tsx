@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
@@ -60,6 +61,11 @@ export default async function TaxFilingApplicationsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/tax-refund-hero.jpg" alt="Tax administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <Link

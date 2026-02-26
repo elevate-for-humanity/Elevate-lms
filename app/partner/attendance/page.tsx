@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Calendar, Users, Plus, AlertTriangle, QrCode } from 'lucide-react';
@@ -84,6 +85,11 @@ export default async function PartnerAttendancePage() {
 
   return (
     <div>
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner attendance" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <div className="bg-slate-50 border-b -mx-4 -mt-6 px-4 py-3 mb-6">
         <Breadcrumbs items={[{ label: 'Partner', href: '/partner-portal' }, { label: 'Attendance' }]} />
       </div>

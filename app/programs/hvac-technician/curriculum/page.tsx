@@ -147,7 +147,7 @@ export default function HVACCurriculumPage() {
             <p className="text-slate-400 text-sm">{course.modules.length} modules · {totalLessons} lessons · {course.estimatedDurationWeeks} weeks</p>
           </div>
           <div className="flex gap-3">
-            <Link href="/programs/hvac-technician/apply" className="bg-white text-slate-900 px-6 py-3 rounded font-semibold text-sm hover:bg-slate-100 transition-colors">Apply Now</Link>
+            <Link href="/apply/student?program=hvac-technician" className="bg-white text-slate-900 px-6 py-3 rounded font-semibold text-sm hover:bg-slate-100 transition-colors">Apply Now</Link>
             <Link href="/programs/hvac-technician" className="border border-slate-500 text-white px-6 py-3 rounded font-semibold text-sm hover:border-white transition-colors">Program Details</Link>
           </div>
         </div>

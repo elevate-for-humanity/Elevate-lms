@@ -178,6 +178,11 @@ export default function EditorPage() {
   };
   return (
     <div className="h-screen flex flex-col">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       {/* Header */}
       <div className="h-12 bg-slate-800 text-white flex items-center justify-between px-4">
         <div className="flex items-center gap-4">

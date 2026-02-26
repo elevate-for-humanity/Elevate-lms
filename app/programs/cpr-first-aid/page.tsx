@@ -138,7 +138,7 @@ export default function CPRFirstAidPage() {
               href="/apply/student?program=cpr-first-aid"
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-red-600 px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition"
             >
-              Enroll Now — $75
+              Apply for Enrollment
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link

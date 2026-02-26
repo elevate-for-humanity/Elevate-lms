@@ -502,6 +502,11 @@ function StatCard({ title, value, icon: Icon, color, trend }: StatCardProps) {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Reports and analytics" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <div className="flex items-center justify-between mb-4">
         <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
           <Icon className="w-6 h-6" />

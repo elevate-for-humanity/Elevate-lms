@@ -1,5 +1,5 @@
 'use client';
-
+import Image from 'next/image';
 import { useState } from 'react';
 import Link from 'next/link';
 import { Building2, ArrowRight, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
@@ -87,6 +87,11 @@ export default function PartnerApplyPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner application" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Partner', href: '/partner-portal' }, { label: 'Apply' }]} />

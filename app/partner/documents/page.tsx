@@ -1,5 +1,5 @@
 'use client';
-
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
@@ -128,6 +128,11 @@ export default function PartnerDocumentsPage() {
 
   return (
     <div className="min-h-screen bg-slate-100">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Partner documents" fill sizes="100vw" className="object-cover" priority />
+      </section>
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -264,7 +269,7 @@ export default function PartnerDocumentsPage() {
         <div className="mt-8 flex justify-center gap-4">
           {allComplete ? (
             <Link
-              href="/partner/dashboard"
+              href="/partner-portal"
               className="flex items-center gap-2 px-8 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700 transition-colors"
             >
               Go to Dashboard

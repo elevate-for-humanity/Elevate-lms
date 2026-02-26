@@ -106,6 +106,11 @@ export default async function EmployeeDetailPage({ params }: Props) {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/career-services-hero.jpg" alt="HR administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       {/* Header */}
       <div className="mb-6">
         <Link

@@ -76,7 +76,14 @@ const PARTNER_ROUTES = ['/partner/dashboard', '/partner/programs'];
 const PARTNER_ONBOARDING_ROUTES = ['/partner/documents', '/partner/onboarding'];
 
 // Routes that require authentication (any role)
-const AUTH_REQUIRED_ROUTES = ['/student', '/learner', '/my-courses', '/my-progress', '/settings'];
+const AUTH_REQUIRED_ROUTES = [
+  '/student', '/learner', '/my-courses', '/my-progress', '/settings',
+  '/onboarding/learner', '/onboarding/employer', '/onboarding/partner',
+  '/onboarding/staff', '/onboarding/school',
+  '/employer-portal', '/franchise', '/program-holder',
+  '/tax-self-prep', '/supersonic-fast-cash/dashboard',
+  '/supersonic-fast-cash/diy-taxes',
+];
 
 // Routes that require onboarding completion
 const ONBOARDING_REQUIRED_ROUTES = ['/hub', '/lms', '/student-portal', '/my-courses', '/my-progress'];
@@ -152,8 +159,42 @@ export async function proxy(request: NextRequest) {
     // Protect /api/admin/*, /api/staff/*, /api/instructor/* at proxy level
     // Individual routes still have their own checks as defense-in-depth
     // ============================================
-    const PROTECTED_API_PREFIXES = ['/api/admin/', '/api/staff/', '/api/instructor/'];
-    const isProtectedApi = PROTECTED_API_PREFIXES.some(prefix => pathname.startsWith(prefix));
+    const PROTECTED_API_PREFIXES = [
+      '/api/admin/',
+      '/api/staff/',
+      '/api/instructor/',
+      // PII-sensitive routes — defense-in-depth alongside per-route guards
+      '/api/identity/',
+      '/api/documents/',
+      '/api/verification/',
+      '/api/tax/',
+      '/api/franchise/',
+      '/api/wotc/',
+      '/api/supersonic-fast-cash/save-tax-return',
+      '/api/supersonic-fast-cash/file-return',
+      '/api/supersonic-fast-cash/clients',
+      '/api/apprentice/documents',
+      '/api/onboarding/',
+      '/api/compliance/',
+      '/api/hr/',
+      '/api/reports/',
+    ];
+    // Public API routes that must not be blocked by auth
+    const PUBLIC_API_OVERRIDES = [
+      '/api/intake',
+      '/api/webhooks',
+      '/api/stripe/webhook',
+      '/api/supersonic-fast-cash/jotform-webhook',
+      '/api/supersonic-fast-cash/refund-tracking',
+      '/api/ai-tutor/public',
+      '/api/auth',
+      '/api/cron',
+    ];
+    const isPublicApiOverride = PUBLIC_API_OVERRIDES.some(prefix =>
+      pathname === prefix || pathname.startsWith(prefix + '/')
+    );
+    const isProtectedApi = !isPublicApiOverride &&
+      PROTECTED_API_PREFIXES.some(prefix => pathname.startsWith(prefix));
 
     if (isProtectedApi && !isWebhook) {
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

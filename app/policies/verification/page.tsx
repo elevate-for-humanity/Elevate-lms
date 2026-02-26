@@ -72,7 +72,7 @@ export default function VerificationPage() {
             </p>
             <ul className="list-disc pl-6 mb-6 text-black space-y-2">
               <li><strong>Government-Issued Photo ID:</strong> Driver's license, state ID, passport, or military ID</li>
-              <li><strong>Social Security Card or Work Authorization:</strong> For employment eligibility</li>
+              <li><strong>Social Security Number or Work Authorization:</strong> SSN entered securely online during onboarding</li>
               <li><strong>Proof of Address:</strong> Utility bill, lease agreement, or official mail</li>
               <li><strong>Educational Documents:</strong> High school diploma, GED, or transcripts</li>
             </ul>

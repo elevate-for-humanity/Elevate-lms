@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Clock, XCircle, AlertCircle, TrendingUp, Briefcase, CheckCircle } from 'lucide-react';
@@ -82,6 +83,11 @@ export default async function PartnerHoursPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/employer-hero.jpg" alt="Training hours" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[

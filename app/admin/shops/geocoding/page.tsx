@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
@@ -36,6 +37,11 @@ export default async function AdminGeocodingPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <h1 className="text-2xl font-bold mb-6">Shop Geocoding</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">

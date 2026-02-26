@@ -34,7 +34,7 @@ const PRIORITY_POPULATIONS = [
 
 const DOCUMENTS_NEEDED = [
   'Government-issued photo ID (driver\'s license, state ID, passport)',
-  'Social Security card',
+  'Social Security number (entered online)',
   'Proof of address (utility bill, lease agreement, bank statement)',
   'Proof of income (pay stubs, tax return, benefits letter)',
   'Selective Service registration (males 18-25)',

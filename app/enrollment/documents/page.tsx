@@ -93,30 +93,25 @@ export default function DocumentsPage() {
     setError(null);
 
     try {
-      const supabase = createClient();
-      
-      // Upload to Supabase Storage — path must start with userId for RLS
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}/${enrollmentId}/${docId}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('enrollment-documents')
-        .upload(fileName, file, { upsert: true });
+      // Upload via API route (bypasses storage RLS)
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('documentType', docId);
+      formData.append('metadata', JSON.stringify({ enrollmentId, category: 'enrollment' }));
 
-      if (uploadError) {
-        throw new Error('Failed to upload file');
-      }
+      const res = await fetch('/api/documents/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('enrollment-documents')
-        .getPublicUrl(fileName);
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Upload failed');
 
       // Update local state
       setDocuments(docs => 
         docs.map(doc => 
           doc.id === docId 
-            ? { ...doc, uploaded: true, file_url: publicUrl }
+            ? { ...doc, uploaded: true, file_url: result.document?.file_url || '' }
             : doc
         )
       );

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -73,6 +74,17 @@ export default async function ReviewDetailPage({
       .select('*')
       .eq('id', item.subject_id)
       .single();
+
+    // Generate signed URL for private bucket
+    if (doc?.file_path) {
+      const { data: signedData } = await db.storage
+        .from('documents')
+        .createSignedUrl(doc.file_path, 3600);
+      if (signedData?.signedUrl) {
+        doc.file_url = signedData.signedUrl;
+      }
+    }
+
     document = doc;
     subject = doc;
 
@@ -154,6 +166,11 @@ export default async function ReviewDetailPage({
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/about-hero.jpg" alt="Administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       {/* Header */}
       <div className="mb-6">
         <Link

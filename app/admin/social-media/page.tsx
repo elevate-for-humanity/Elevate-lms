@@ -509,6 +509,11 @@ function ScheduleSlot({ time, status, campaign }: ScheduleSlotProps) {
 
   return (
     <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
+        <Image src="/images/heroes-hq/success-stories-hero.jpg" alt="Content administration" fill sizes="100vw" className="object-cover" priority />
+      </section>
       <div className="flex items-center space-x-4">
         <Clock className="w-5 h-5 text-black" />
         <div>

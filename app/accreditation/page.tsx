@@ -28,20 +28,28 @@ export default function AccreditationPage() {
       name: 'Indiana ETPL — Eligible Training Provider',
       description:
         'Listed on the Indiana Eligible Training Provider List (ETPL) under the Workforce Innovation and Opportunity Act (WIOA). Eligible participants may receive funded training through their local WorkOne office.',
-      id_number: 'INTraining Location ID: 10004621',
+      id_number: 'INTraining Location ID: 10004621 · Program: Emergency Health & Safety Technician',
       icon: FileCheck,
     },
     {
       name: 'Indiana DWD Approved Training Provider',
       description:
-        'Recognized by the Indiana Department of Workforce Development as an approved training provider for workforce programs including WIOA, Workforce Ready Grant (WRG), and Next Level Jobs.',
+        'Recognized by the Indiana Department of Workforce Development as an approved training provider for WIOA, Workforce Ready Grant (WRG), and Next Level Jobs.',
       icon: Building2,
     },
     {
-      name: 'DOL Registered Apprenticeship Sponsor',
+      name: 'U.S. DOL Registered Apprenticeship Sponsor',
       description:
-        'Registered with the U.S. Department of Labor as an apprenticeship sponsor for structured earn-and-learn programs in skilled trades.',
+        'Registered with the U.S. Department of Labor as an apprenticeship sponsor for structured earn-and-learn programs.',
+      id_number: 'RAPIDS Program ID: 2025-IN-132301 · Program: Emergency Health & Safety Technician',
       icon: Award,
+    },
+    {
+      name: 'SAM.gov Active Federal Contractor',
+      description:
+        'Registered in the System for Award Management (SAM.gov) for federal contracting eligibility.',
+      id_number: 'UEI: VX2GK5S8SZH8 · CAGE: 0Q856 · Entity: Selfish Inc',
+      icon: Building2,
     },
     {
       name: 'EPA Section 608 Approved Testing Site',
@@ -50,17 +58,34 @@ export default function AccreditationPage() {
       icon: Shield,
     },
     {
-      name: '501(c)(3) Nonprofit Organization',
+      name: '501(c)(3) Nonprofit — Selfish Inc',
       description:
-        'Registered 501(c)(3) nonprofit organization focused on workforce development and career training access for underserved populations.',
-      id_number: 'EIN available upon request',
+        'IRS-recognized tax-exempt charitable organization. Candid/GuideStar registered nonprofit.',
       icon: CheckCircle,
     },
     {
-      name: 'OSHA Safety Training',
+      name: 'NCCER Accredited Training Sponsor',
       description:
-        'Programs include OSHA 10-Hour and OSHA 30-Hour safety certification preparation as part of the training curriculum.',
+        'Accredited by the National Center for Construction Education and Research for standardized craft training and assessment.',
+      icon: Award,
+    },
+    {
+      name: 'ITAP / INDOT Registration',
+      description:
+        '2Exclusive LLC-S registered with INDOT\'s Indiana Transportation Advancement Program for transportation and construction-aligned workforce services.',
+      icon: Building2,
+    },
+    {
+      name: 'CareerSafe / OSHA-Aligned Safety Training',
+      description:
+        'OSHA 10-Hour and OSHA 30-Hour safety certification preparation integrated into trades and safety pathways.',
       icon: Shield,
+    },
+    {
+      name: 'ByBlack Certified',
+      description:
+        'Verified Black-owned business certification through the U.S. Black Chambers, Inc.',
+      icon: CheckCircle,
     },
   ];
 
@@ -317,8 +342,20 @@ export default function AccreditationPage() {
               className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border"
             >
               <div>
-                <span className="font-medium block">DOL Apprenticeship Partner Finder</span>
-                <span className="text-xs text-gray-500">Search: &quot;Elevate for Humanity&quot; · Indianapolis, IN</span>
+                <span className="font-medium block">DOL RAPIDS Apprenticeship Lookup</span>
+                <span className="text-xs text-gray-500">RAPIDS ID: 2025-IN-132301 · Indianapolis, IN</span>
+              </div>
+              <ExternalLink className="w-5 h-5 text-gray-400 flex-shrink-0" />
+            </a>
+            <a
+              href="https://sam.gov/search/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border"
+            >
+              <div>
+                <span className="font-medium block">SAM.gov Entity Search</span>
+                <span className="text-xs text-gray-500">UEI: VX2GK5S8SZH8 · CAGE: 0Q856 · Entity: Selfish Inc</span>
               </div>
               <ExternalLink className="w-5 h-5 text-gray-400 flex-shrink-0" />
             </a>
@@ -342,7 +379,19 @@ export default function AccreditationPage() {
             >
               <div>
                 <span className="font-medium block">Indiana Department of Workforce Development</span>
-                <span className="text-xs text-gray-500">Approved training provider</span>
+                <span className="text-xs text-gray-500">WIOA + WRG approved training provider</span>
+              </div>
+              <ExternalLink className="w-5 h-5 text-gray-400 flex-shrink-0" />
+            </a>
+            <a
+              href="https://www.guidestar.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border"
+            >
+              <div>
+                <span className="font-medium block">Candid / GuideStar Nonprofit Profile</span>
+                <span className="text-xs text-gray-500">Search: &quot;Selfish Inc&quot; · 501(c)(3) verified</span>
               </div>
               <ExternalLink className="w-5 h-5 text-gray-400 flex-shrink-0" />
             </a>
@@ -350,8 +399,8 @@ export default function AccreditationPage() {
           <p className="text-center text-gray-500 text-xs mt-6">
             For documentation requests (EIN verification, insurance certificates,
             or compliance records), contact{' '}
-            <a href="mailto:admin@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">
-              admin@elevateforhumanity.org
+            <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">
+              elevate4humanityedu@gmail.com
             </a>
           </p>
         </div>

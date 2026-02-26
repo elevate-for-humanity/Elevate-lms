@@ -187,7 +187,7 @@ const supabase = await createClient();
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        to: 'admin@elevateforhumanity.org',
+        to: 'elevate4humanityedu@gmail.com',
         subject: `🔔 Student Checklist Updated: ${userEmail}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

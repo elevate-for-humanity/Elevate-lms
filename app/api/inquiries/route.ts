@@ -156,7 +156,7 @@ export async function POST(req: Request) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            to: 'admin@elevateforhumanity.org',
+            to: 'elevate4humanityedu@gmail.com',
             subject: `New Inquiry: ${body.name}${body.program ? ` - ${body.program}` : ''}`,
             html: `
             <h2>New Inquiry Received</h2>

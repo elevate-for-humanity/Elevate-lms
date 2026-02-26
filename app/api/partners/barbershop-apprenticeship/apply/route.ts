@@ -207,7 +207,7 @@ export async function POST(req: Request) {
     `;
 
     await sendEmail({
-      to: process.env.PARTNER_NOTIFICATION_EMAIL || 'admin@elevateforhumanity.org',
+      to: process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com',
       subject: `New Barbershop Partner Application: ${body.shopLegalName}`,
       html: internalEmailHtml,
     }).catch(err => logger.error('Failed to send internal notification', err));

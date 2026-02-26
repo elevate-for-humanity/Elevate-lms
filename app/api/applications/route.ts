@@ -343,7 +343,7 @@ export async function POST(req: Request) {
 
       // Send staff email in parallel (don't wait for it to finish before responding)
       const staffEmailPromise = sendEmail({
-        to: 'admin@elevateforhumanity.org',
+        to: 'elevate4humanityedu@gmail.com',
         subject: `New Application [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${body.program}`,
         html: `
           <h2>New Application Received</h2>

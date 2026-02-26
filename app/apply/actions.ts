@@ -9,7 +9,7 @@ import { logger } from '@/lib/logger';
 // but no mailbox exists there, so emails bounce and get re-suppressed in a loop.
 // Use only the Gmail address until MX records are updated or Resend forwarding is configured.
 const ADMIN_EMAILS = [
-  'admin@elevateforhumanity.org',
+  'elevate4humanityedu@gmail.com',
 ];
 
 async function sendEmailDirect(to: string, subject: string, html: string) {

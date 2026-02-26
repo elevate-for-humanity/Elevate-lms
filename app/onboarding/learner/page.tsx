@@ -307,7 +307,7 @@ export default async function LearnerOnboardingPage() {
 
       // Email 2: Admin — new student needs enrollment approval
       try {
-        const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'admin@elevateforhumanity.org';
+        const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com';
         await sendEmail({
           to: adminEmail,
           subject: `Action Required: ${studentName} completed onboarding for ${programName}`,

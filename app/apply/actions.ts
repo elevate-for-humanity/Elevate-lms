@@ -583,6 +583,47 @@ export async function submitProgramHolderApplication(data: ProgramHolderApplicat
   });
 
   if (result.success) {
+    // Set role to program_holder and create program_holders row.
+    // insertApplication creates the user with role='student' — fix that here.
+    const adminDb = createAdminClient();
+    if (adminDb) {
+      // Look up the user by email to get their auth ID
+      const normalizedEmail = data.email.toLowerCase().trim();
+      const { data: profile } = await adminDb
+        .from('profiles')
+        .select('id')
+        .eq('email', normalizedEmail)
+        .single();
+
+      if (profile?.id) {
+        // Create program_holders row (pending admin approval)
+        const { data: holderRow } = await adminDb
+          .from('program_holders')
+          .upsert({
+            user_id: profile.id,
+            organization_name: data.organizationName || `${data.firstName} ${data.lastName}`,
+            contact_name: `${data.firstName} ${data.lastName}`,
+            contact_email: normalizedEmail,
+            contact_phone: data.phone || null,
+            status: 'pending',
+            name: data.organizationName || `${data.firstName} ${data.lastName}`,
+          }, { onConflict: 'user_id', ignoreDuplicates: true })
+          .select('id')
+          .single();
+
+        // Set role and link profile to program_holders row
+        await adminDb
+          .from('profiles')
+          .update({
+            role: 'program_holder',
+            program_holder_id: holderRow?.id || null,
+          })
+          .eq('id', profile.id);
+
+        logger.info('[Apply] Program holder profile and row created', { userId: profile.id, holderId: holderRow?.id, org: data.organizationName });
+      }
+    }
+
     return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/apply/success?role=program-holder&ref=${result.referenceNumber}` };
   }
   return result;

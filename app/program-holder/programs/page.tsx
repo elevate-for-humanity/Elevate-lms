@@ -1,10 +1,8 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BookOpen, Plus, Edit, Eye, Trash2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
 export const metadata: Metadata = {
   title: 'Manage Programs | Program Holder Portal',
@@ -14,24 +12,15 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function ProgramHolderProgramsPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { db, programIds } = await requireProgramHolder();
 
-  if (!supabase) {
-    redirect('/login?redirect=/program-holder/programs');
-  }
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/program-holder/programs');
-  }
-
-  const { data: programsData } = await db
-    .from('programs')
-    .select('id, name, title, is_active, enrolled_count, completion_rate, created_at')
-    .eq('created_by', user.id)
-    .order('created_at', { ascending: false });
+  const { data: programsData } = programIds.length > 0
+    ? await db
+        .from('programs')
+        .select('id, name, title, is_active, enrolled_count, completion_rate, created_at')
+        .in('id', programIds)
+        .order('created_at', { ascending: false })
+    : { data: [] };
 
   const programs = (programsData || []).map(p => ({
     id: p.id,

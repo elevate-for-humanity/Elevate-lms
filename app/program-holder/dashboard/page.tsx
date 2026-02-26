@@ -1,10 +1,9 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { LayoutDashboard, Users, BookOpen, TrendingUp, Settings, BarChart3, Calendar } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
 export const metadata: Metadata = {
   title: 'Program Holder Portal | Elevate For Humanity',
@@ -14,27 +13,19 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function ProgramHolderDashboardPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { db, programIds } = await requireProgramHolder();
 
-  if (!supabase) {
-    redirect('/login?redirect=/program-holder/dashboard');
-  }
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/program-holder/dashboard');
-  }
-
-  // Fetch programs owned by this user
-  const { data: programsData } = await db
-    .from('programs')
-    .select('id, name, title, is_active, enrolled_count, completion_rate, created_at')
-    .eq('created_by', user.id)
-    .order('created_at', { ascending: false });
+  // Fetch programs this holder can access via program_holder_programs
+  const { data: programsData } = programIds.length > 0
+    ? await db
+        .from('programs')
+        .select('id, name, title, is_active, enrolled_count, completion_rate, created_at')
+        .in('id', programIds)
+        .order('created_at', { ascending: false })
+    : { data: [] };
 
   const programs = (programsData || []).map(p => ({
+    id: p.id,
     name: p.name || p.title || 'Untitled Program',
     students: p.enrolled_count || 0,
     completion: p.completion_rate || 0,
@@ -104,9 +95,13 @@ export default async function ProgramHolderDashboardPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {programs.slice(0, 6).map((program, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
-                        <td className="py-4 font-medium text-gray-900">{program.name}</td>
+                    {programs.slice(0, 6).map((program) => (
+                      <tr key={program.id} className="hover:bg-gray-50">
+                        <td className="py-4">
+                          <Link href={`/program-holder/programs/${program.id}`} className="font-medium text-brand-blue-600 hover:underline">
+                            {program.name}
+                          </Link>
+                        </td>
                         <td className="py-4 text-center text-gray-600">{program.students}</td>
                         <td className="py-4 text-center">
                           <span className="text-brand-green-600 font-medium">{program.completion}%</span>

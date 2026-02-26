@@ -143,7 +143,7 @@ export async function generateCertificatePDF(data: CertificateData): Promise<Blo
   });
 
   // Issuer
-  const issuer = 'Elevate For Humanity';
+  const issuer = 'Elevate for Humanity Career & Technical Institute';
   const issuerWidth = timesBold.widthOfTextAtSize(issuer, 16);
   page.drawText(issuer, {
     x: (width - issuerWidth) / 2,

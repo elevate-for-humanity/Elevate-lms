@@ -483,6 +483,7 @@ export default async function ProgramDetailPage({
     provider: {
       '@type': 'EducationalOrganization',
       name: 'Elevate for Humanity Career & Technical Institute',
+      legalName: '2Exclusive LLC-S',
       url: 'https://www.elevateforhumanity.org',
     },
     url: `https://www.elevateforhumanity.org/programs/${slug}`,

@@ -123,6 +123,7 @@ export function ProgramStructuredData({
     provider: {
       '@type': 'EducationalOrganization',
       name: ORG_NAME,
+      legalName: '2Exclusive LLC-S',
       sameAs: SITE_URL,
       address: {
         '@type': 'PostalAddress',
@@ -180,6 +181,7 @@ export function OrganizationStructuredData() {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
     name: ORG_NAME,
+    legalName: '2Exclusive LLC-S',
     alternateName: 'EFH',
     url: SITE_URL,
     logo: `${SITE_URL}/images/logo.png`,

@@ -92,6 +92,16 @@ export const NAV_ITEMS = [
     ]
   },
   { 
+    name: 'For Employers', 
+    href: '/employers',
+    subItems: [
+      { name: 'Hire Trained Talent', href: '/employers' },
+      { name: 'Partner With Us', href: '/partnerships' },
+      { name: 'Apprenticeship Sponsors', href: '/funding/dol' },
+      { name: 'Employer Portal', href: '/apply/employer' },
+    ]
+  },
+  { 
     name: 'Support', 
     href: '/support',
     subItems: [

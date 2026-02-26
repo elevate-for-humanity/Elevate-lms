@@ -75,7 +75,7 @@ export default async function ReviewDocumentPage({
   if (document.file_path) {
     const { data: signedData } = await db.storage
       .from('documents')
-      .createSignedUrl(document.file_path, 3600);
+      .createSignedUrl(document.file_path, 60);
     if (signedData?.signedUrl) {
       viewUrl = signedData.signedUrl;
     }

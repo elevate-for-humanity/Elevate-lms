@@ -20,7 +20,7 @@ const path = new URL(req.url).searchParams.get('path');
   const supabase = await createClient();
   const { data, error }: any = await supabase.storage
     .from('media')
-    .createSignedUrl(path, 3600);
+    .createSignedUrl(path, 300); // 5-minute expiry for media content
 
   if (error) {
     return Response.json({ error: toErrorMessage(error) }, { status: 500 });

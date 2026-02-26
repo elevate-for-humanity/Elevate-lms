@@ -152,7 +152,7 @@ export default function AdminHeader() {
         <EnvironmentBadge label={envBadge.label} color={envBadge.color} />
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-1" aria-label="Admin navigation">
           {NAV_SECTIONS.map((section) => (
             <div key={section.name} className="relative">
               {section.href ? (

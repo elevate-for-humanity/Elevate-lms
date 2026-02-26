@@ -158,10 +158,29 @@ export default function DocumentsPage() {
         </Link>
 
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Upload Required Documents</h1>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 mb-4">
           Upload the documents listed below. Required documents must be submitted before you can be enrolled.
-          All documents are stored securely and reviewed by our admissions team.
         </p>
+
+        {/* Compliance transparency statement */}
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
+          <div className="flex gap-3">
+            <AlertCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-brand-blue-900">
+              <p className="font-medium mb-1">Your information is protected</p>
+              <p>
+                Documents and personal information you provide are required for workforce funding
+                eligibility verification under WIOA guidelines. All data is encrypted, stored in
+                private secure storage, and only accessible to authorized compliance staff. Your
+                SSN is hashed immediately upon submission and is never stored or displayed in
+                plain text. For details, see our{' '}
+                <Link href="/privacy-policy" className="underline font-medium">Privacy Policy</Link>
+                {' '}and{' '}
+                <Link href="/compliance" className="underline font-medium">Data Security</Link> pages.
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Progress */}
         <div className="bg-white border rounded-lg p-4 mb-6">

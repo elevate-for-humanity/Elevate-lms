@@ -468,7 +468,7 @@ export default function HvacCourseViewer({
             </div>
             {course.secondChanceFriendly && (
               <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-green-400" />
+                <Shield className="w-4 h-4 text-brand-green-400" />
                 <span>Second-Chance Friendly</span>
               </div>
             )}

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { SecureDocumentLink } from '@/components/admin/SecureDocumentLink';
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
@@ -70,7 +71,7 @@ export default async function AdminDocumentReviewPage() {
       if (doc.file_path) {
         const { data } = await db.storage
           .from('documents')
-          .createSignedUrl(doc.file_path, 3600);
+          .createSignedUrl(doc.file_path, 60);
         return { ...doc, view_url: data?.signedUrl || null };
       }
       // Fallback for legacy rows that only have file_url
@@ -281,15 +282,8 @@ export default async function AdminDocumentReviewPage() {
                     >
                       {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
                     </span>
-                    {doc.view_url ? (
-                      <a
-                        href={doc.view_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-brand-blue-600 hover:underline text-sm font-semibold"
-                      >
-                        View
-                      </a>
+                    {doc.file_path ? (
+                      <SecureDocumentLink filePath={doc.file_path} />
                     ) : (
                       <span className="text-slate-400 text-sm">No file</span>
                     )}

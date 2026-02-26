@@ -33,7 +33,7 @@ export default async function StorePWAPage() {
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />
           <h1 className="text-2xl font-bold text-white">Elevate Store</h1>
-          <p className="text-red-200 text-sm mt-1">{products.length} products · Training materials, toolkits, and licenses</p>
+          <p className="text-brand-red-200 text-sm mt-1">{products.length} products · Training materials, toolkits, and licenses</p>
         </div>
       </div>
 

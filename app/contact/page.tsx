@@ -82,6 +82,11 @@ export default function ContactPage() {
           quality={90} className="object-cover"
           priority
         />
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center px-4">
+            Contact Us
+          </h1>
+        </div>
       </div>
 
       {/* Avatar Guide */}

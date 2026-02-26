@@ -81,7 +81,7 @@ export default function HVACCurriculumPage() {
         {/* Workforce Tags */}
         <div className="mt-4 flex flex-wrap gap-2">
           {course.workforceTags.map((tag) => (
-            <span key={tag} className="bg-green-50 border border-green-200 text-green-800 text-xs font-semibold px-2 py-1 rounded">{tag}</span>
+            <span key={tag} className="bg-brand-green-50 border border-brand-green-200 text-brand-green-800 text-xs font-semibold px-2 py-1 rounded">{tag}</span>
           ))}
         </div>
       </div>
@@ -160,8 +160,8 @@ function LessonTypeBadge({ type }: { type: string }) {
   const styles: Record<string, string> = {
     video: 'bg-brand-blue-100 text-brand-blue-700',
     reading: 'bg-amber-100 text-amber-700',
-    quiz: 'bg-red-100 text-red-700',
-    lab: 'bg-green-100 text-green-700',
+    quiz: 'bg-brand-red-100 text-brand-red-700',
+    lab: 'bg-brand-green-100 text-brand-green-700',
     assignment: 'bg-purple-100 text-purple-700',
   };
   return (

@@ -67,6 +67,11 @@ export default function TestimonialsPage() {
 
       {/* Hero */}
       <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden bg-slate-700">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center px-4">
+            Success Stories
+          </h1>
+        </div>
       </section>
 
       {/* Stats - only show if we have testimonials */}

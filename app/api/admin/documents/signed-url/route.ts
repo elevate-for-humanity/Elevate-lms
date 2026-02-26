@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await db.storage
       .from(bucket)
-      .createSignedUrl(filePath, 3600); // 1 hour expiry
+      .createSignedUrl(filePath, 60); // 60-second expiry for PII documents
 
     if (error || !data?.signedUrl) {
       return NextResponse.json({ error: 'Failed to generate URL' }, { status: 500 });

@@ -141,7 +141,7 @@ export default function ScheduleConsultationPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-4 text-sm">{error}</div>
+          <div className="bg-brand-red-50 border border-brand-red-200 text-brand-red-700 rounded-lg p-3 mb-4 text-sm">{error}</div>
         )}
 
         {/* Step 1: Meeting Type */}
@@ -153,7 +153,7 @@ export default function ScheduleConsultationPage() {
                 <button
                   key={type.value}
                   onClick={() => { setMeetingType(type.value); setStep(2); }}
-                  className={`w-full text-left p-4 rounded-xl border-2 transition-colors ${meetingType === type.value ? 'border-brand-red-600 bg-red-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                  className={`w-full text-left p-4 rounded-xl border-2 transition-colors ${meetingType === type.value ? 'border-brand-red-600 bg-brand-red-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}
                 >
                   <div className="flex items-center justify-between">
                     <div>

@@ -39,7 +39,7 @@ export async function GET(request: Request) {
       (documents || []).map(async (doc) => {
         const { data: urlData } = await supabase.storage
           .from('documents')
-          .createSignedUrl(doc.file_path, 3600); // 1 hour expiry
+          .createSignedUrl(doc.file_path, 60); // 60-second expiry for PII documents
 
         return {
           ...doc,

@@ -112,7 +112,7 @@ export default function PeerRecoverySpecialistPage() {
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Help Others Recover. Start Your Career.</h2>
           <p className="text-white/90 mb-6 text-sm">JRI-funded training available for eligible participants. Apply today.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=peer-recovery-specialist" className="bg-white text-brand-green-700 font-bold px-6 py-3 rounded-lg text-base hover:bg-green-50 transition-colors text-center">
+            <Link href="/apply?program=peer-recovery-specialist" className="bg-white text-brand-green-700 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-green-50 transition-colors text-center">
               Apply Now →
             </Link>
             <Link href="/funding/jri" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

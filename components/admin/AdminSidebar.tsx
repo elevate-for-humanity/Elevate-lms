@@ -210,7 +210,7 @@ export default function AdminSidebar() {
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
   const sidebarContent = (
-    <nav className="flex flex-col h-full">
+    <nav className="flex flex-col h-full" aria-label="Admin sidebar">
       {/* Logo */}
       <div className="px-4 py-5 border-b border-gray-800">
         <Link href="/admin" className="flex items-center gap-2">

@@ -299,6 +299,9 @@ export default function PayrollSetupForm({
           </div>
 
           {/* W-9 Upload */}
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-3 mb-4 text-sm text-brand-blue-900">
+            Your tax information is encrypted and stored securely. It is only used for payroll processing and is accessible to authorized payroll staff only.
+          </div>
           <div>
             <label className="block text-sm font-medium text-black mb-2">
               W-9 Tax Form

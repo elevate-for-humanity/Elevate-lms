@@ -117,7 +117,7 @@ export default async function WIOAVerifyPage({
       if (doc.file_path) {
         const { data: signedData } = await db.storage
           .from('documents')
-          .createSignedUrl(doc.file_path, 3600);
+          .createSignedUrl(doc.file_path, 60);
         return { ...doc, file_url: signedData?.signedUrl || doc.file_url };
       }
       return doc;

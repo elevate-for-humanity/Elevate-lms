@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
@@ -9,7 +9,9 @@ import {
   User,
   Calendar,
   AlertCircle,
-CheckCircle, } from 'lucide-react';
+  CheckCircle,
+  RefreshCw,
+} from 'lucide-react';
 
 interface Props {
   document: any;
@@ -18,6 +20,35 @@ interface Props {
 
 export function DocumentReviewForm({ document, adminId }: Props) {
   const router = useRouter();
+  const [docUrl, setDocUrl] = useState(document.file_url);
+  const [urlExpired, setUrlExpired] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Auto-refresh URL before it expires (refresh at 45s of 60s TTL)
+  useEffect(() => {
+    if (!document.file_path) return;
+    const timer = setTimeout(() => setUrlExpired(true), 45_000);
+    return () => clearTimeout(timer);
+  }, [document.file_path, docUrl]);
+
+  const refreshUrl = useCallback(async () => {
+    if (!document.file_path) return;
+    setRefreshing(true);
+    try {
+      const res = await fetch(
+        `/api/admin/documents/signed-url?path=${encodeURIComponent(document.file_path)}&bucket=documents`
+      );
+      if (res.ok) {
+        const { url } = await res.json();
+        if (url) {
+          setDocUrl(url);
+          setUrlExpired(false);
+        }
+      }
+    } finally {
+      setRefreshing(false);
+    }
+  }, [document.file_path]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [action, setAction] = useState<'approve' | 'reject' | null>(null);
@@ -128,35 +159,58 @@ export function DocumentReviewForm({ document, adminId }: Props) {
 
       {/* Document Preview */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h2 className="text-2xl font-bold mb-4">Document Preview</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold">Document Preview</h2>
+          {document.file_path && (
+            <button
+              onClick={refreshUrl}
+              disabled={refreshing}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-brand-blue-600 hover:bg-brand-blue-50 rounded-lg transition"
+              aria-label="Refresh document URL"
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              {refreshing ? 'Refreshing…' : 'Refresh'}
+            </button>
+          )}
+        </div>
+        {urlExpired && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4 flex items-center gap-2 text-sm text-yellow-800">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            Document link may have expired.
+            <button onClick={refreshUrl} className="underline font-medium">Click to refresh</button>
+          </div>
+        )}
         <div className="relative border rounded-lg overflow-hidden">
           {document.mime_type === 'application/pdf' ? (
             <iframe
-              src={document.file_url}
+              src={docUrl}
               className="w-full h-[600px]"
               title="Document Preview"
             />
           ) : (
             <div className="relative w-full min-h-[400px]">
-              <Image
-                src={document.file_url}
-                alt="Document"
-                fill
-                className="object-contain"
-                sizes="100vw"
-              />
+              {docUrl && (
+                <Image
+                  src={docUrl}
+                  alt="Document"
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                />
+              )}
             </div>
           )}
         </div>
         <div className="mt-4">
-          <a
-            href={document.file_url}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={async () => {
+              await refreshUrl();
+              if (docUrl) window.open(docUrl, '_blank', 'noopener,noreferrer');
+            }}
             className="text-brand-blue-600 hover:underline font-semibold"
           >
             Open in New Tab →
-          </a>
+          </button>
         </div>
       </div>
 

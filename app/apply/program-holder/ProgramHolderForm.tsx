@@ -11,6 +11,7 @@ export default function ProgramHolderForm() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (loading) return; // prevent double-submit
     setLoading(true);
     setError('');
 
@@ -47,7 +48,7 @@ export default function ProgramHolderForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" aria-busy={loading}>
       {error && (
         <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-800 text-sm" role="alert">
           {error}

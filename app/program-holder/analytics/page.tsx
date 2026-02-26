@@ -1,10 +1,8 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, TrendingUp, Users, DollarSign, GraduationCap, Download, ArrowUp, ArrowDown } from 'lucide-react';
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
 export const metadata: Metadata = {
   title: 'Analytics | Program Holder Portal | Elevate For Humanity',
@@ -15,33 +13,18 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function ProgramHolderAnalyticsPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: { user } } = await supabase.auth.getUser();
+  const { db, holderId } = await requireProgramHolder();
 
-  if (!user) {
-    redirect('/login?redirect=/program-holder/analytics');
-  }
-
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (!profile || !['program_holder', 'admin', 'super_admin'].includes(profile.role)) {
-    redirect('/');
-  }
-
-  // Get program holder record
+  // Get program holder record using the real linkage
   const { data: programHolder } = await db
     .from('program_holders')
     .select('id, name, payout_share')
-    .eq('owner_id', user.id)
+    .eq('id', holderId)
     .single();
 
   if (!programHolder) {
-    redirect('/program-holder');
+    // Should not happen since requireProgramHolder validates, but guard anyway
+    return <div className="p-8 text-center text-gray-500">Program holder record not found.</div>;
   }
 
   // Date ranges

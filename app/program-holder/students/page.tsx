@@ -1,10 +1,8 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Users, Search, Filter, Download, Mail, Eye } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
 export const metadata: Metadata = {
   title: 'Students | Program Holder Portal',
@@ -14,26 +12,16 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function ProgramHolderStudentsPage() {
-  const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const { db, programIds } = await requireProgramHolder();
 
-  if (!supabase) {
-    redirect('/login?redirect=/program-holder/students');
-  }
+  // Get programs this holder can access
+  const { data: myPrograms } = programIds.length > 0
+    ? await db
+        .from('programs')
+        .select('id, name, title')
+        .in('id', programIds)
+    : { data: [] };
 
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/program-holder/students');
-  }
-
-  // Get programs owned by this user
-  const { data: myPrograms } = await db
-    .from('programs')
-    .select('id, name, title')
-    .eq('created_by', user.id);
-
-  const programIds = (myPrograms || []).map(p => p.id);
   const programNames = (myPrograms || []).reduce<Record<string, string>>((acc, p) => {
     acc[p.id] = p.name || p.title || 'Unknown Program';
     return acc;

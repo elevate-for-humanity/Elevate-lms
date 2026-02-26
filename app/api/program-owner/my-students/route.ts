@@ -24,25 +24,30 @@ export async function GET(request: NextRequest) {
 
     const { data: profile } = await db
       .from('profiles')
-      .select('role')
+      .select('role, program_holder_id')
       .eq('id', user.id)
       .single();
 
-    if (!profile || profile.role !== 'program_owner') {
+    if (!profile || !['program_holder', 'program_owner', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Get programs owned by this user
-    const { data: ownedPrograms } = await db
-      .from('programs')
-      .select('id, name')
-      .eq('owner_id', user.id);
-
-    if (!ownedPrograms || ownedPrograms.length === 0) {
+    if (!profile.program_holder_id) {
       return NextResponse.json({ students: [] });
     }
 
-    const programIds = ownedPrograms.map((p) => p.id);
+    // Get programs via program_holder_programs association table
+    const { data: associations } = await db
+      .from('program_holder_programs')
+      .select('program_id')
+      .eq('program_holder_id', profile.program_holder_id)
+      .eq('status', 'active');
+
+    if (!associations || associations.length === 0) {
+      return NextResponse.json({ students: [] });
+    }
+
+    const programIds = associations.map((a: any) => a.program_id);
 
     // Get enrollments for owned programs
     const { data: enrollments } = await db

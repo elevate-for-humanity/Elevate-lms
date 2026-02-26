@@ -46,35 +46,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProgramHolderProgramPage({ params }: Props) {
   const { programId } = await params;
+  // Layout already validates access via requireProgramAccess
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="p-8 text-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Programs" }]} />
-        </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-      </div>
-    );
-  }
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-
-  // Verify program holder access
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'program_holder' && profile?.role !== 'admin') {
-    redirect('/unauthorized');
-  }
-
-  // Fetch program
+  // Fetch program (access validated by layout)
   const { data: program, error } = await db
     .from('programs')
     .select('*')

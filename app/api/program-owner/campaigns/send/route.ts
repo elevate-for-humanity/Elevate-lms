@@ -45,17 +45,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify program owner has access to these students through their programs
-    const { data: ownedPrograms } = await db
-      .from('programs')
-      .select('id')
-      .eq('owner_id', user.id);
+    // Verify program holder has access to these students through their programs
+    const { data: holderProfile } = await db
+      .from('profiles')
+      .select('program_holder_id')
+      .eq('id', user.id)
+      .single();
 
-    if (!ownedPrograms || ownedPrograms.length === 0) {
+    if (!holderProfile?.program_holder_id) {
+      return NextResponse.json({ error: 'No program holder record found' }, { status: 403 });
+    }
+
+    const { data: associations } = await db
+      .from('program_holder_programs')
+      .select('program_id')
+      .eq('program_holder_id', holderProfile.program_holder_id)
+      .eq('status', 'active');
+
+    if (!associations || associations.length === 0) {
       return NextResponse.json({ error: 'No programs found' }, { status: 403 });
     }
 
-    const programIds = ownedPrograms.map((p) => p.id);
+    const programIds = associations.map((a: any) => a.program_id);
 
     // Get enrollments for owned programs
     const { data: enrollments } = await db

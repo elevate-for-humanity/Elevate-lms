@@ -74,7 +74,7 @@ const cookieStore = await cookies();
         break;
       case 'program_holder':
       case 'instructor':
-        redirectTo = '/app/program-holder/dashboard';
+        redirectTo = '/program-holder/dashboard';
         break;
       case 'admin':
       case 'super_admin':

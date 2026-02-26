@@ -37,8 +37,8 @@ export const BARBER_HANDBOOK: ProgramHandbook = {
 Congratulations on taking the first step toward your career as a licensed barber! This handbook contains important information about your apprenticeship program, your responsibilities, and what you can expect during your training.
 
 ## Program Sponsor
-**Elevate For Humanity Career & Training Institute**
-In partnership with 2Exclusive LLC-S
+**2Exclusive LLC-S** (Sponsor of Record)
+DBA Elevate for Humanity Career & Technical Institute
 
 ## Program Registration
 - **DOL RAPIDS Program Number:** ${process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || '2025-IN-132301'}
@@ -454,8 +454,7 @@ If you experience financial difficulty:
 
 ## Parties to This Agreement
 - **Apprentice:** (Your name as signed below)
-- **Program Sponsor:** Elevate For Humanity Career & Training Institute
-- **Registered Sponsor:** 2Exclusive LLC-S
+- **Sponsor of Record:** 2Exclusive LLC-S (DBA Elevate for Humanity Career & Technical Institute)
 - **Employer/Shop:** (Your sponsoring barbershop)
 
 ## Purpose

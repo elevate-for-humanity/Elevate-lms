@@ -142,8 +142,8 @@ export default function ProgramHolderSetup() {
                   placeholder="e.g., Advanced Welding Certification"
                 />
                 <p className="text-sm text-black mt-1">
-                  This name will appear on certificates: "[Program Name] -
-                  Sponsored by Elevate for Humanity"
+                  This name will appear on certificates: &quot;[Program Name] -
+                  Sponsored by Elevate for Humanity Career &amp; Technical Institute&quot;
                 </p>
               </div>
               <button
@@ -512,7 +512,7 @@ export default function ProgramHolderSetup() {
                 <div>
                   <p className="text-sm text-black">Certificate Will Read</p>
                   <p className="font-semibold text-brand-green-600">
-                    {formData.programName} - Sponsored by Elevate for Humanity
+                    {formData.programName} - Sponsored by Elevate for Humanity Career &amp; Technical Institute
                   </p>
                 </div>
                 <div>

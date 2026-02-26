@@ -107,7 +107,7 @@ export default function ApprenticeshipAgreementPage() {
               <li>Related Technical Instruction (RTI) delivered by licensed credential partners and supervised curriculum modules through the institutional LMS</li>
               <li>On-the-Job Training (OJT) conducted at an approved licensed barbershop under the direct supervision of a licensed barber</li>
               <li>Competency tracking through the institutional LMS and standardized evaluation rubrics</li>
-              <li>Oversight by Program Holders (RTI Coordinators) and Sponsor (Elevate for Humanity)</li>
+              <li>Oversight by Program Holders (RTI Coordinators) and Sponsor (2Exclusive LLC-S, DBA Elevate for Humanity Career & Technical Institute)</li>
             </ul>
           </section>
 
@@ -234,7 +234,7 @@ export default function ApprenticeshipAgreementPage() {
             <h3 className="font-bold text-gray-900 text-base mb-2 print:text-[11px] print:mb-1">9. ROLES AND RESPONSIBILITIES</h3>
             <div className="space-y-3 print:space-y-2">
               {[
-                { role: 'Sponsor (Elevate for Humanity)', duties: 'Program oversight, RAPIDS registration and documentation, LMS tracking, completion verification, credential coordination, funding navigation, career services' },
+                { role: 'Sponsor (2Exclusive LLC-S, DBA Elevate for Humanity Career & Technical Institute)', duties: 'Program oversight, RAPIDS registration and documentation, LMS tracking, completion verification, credential coordination, funding navigation, career services' },
                 { role: 'Credential Partner (RTI Provider)', duties: 'Classroom and module-based instruction, academic evaluation, technical competency verification, state board exam preparation, RTI attendance documentation' },
                 { role: 'Employer (Licensed Barbershop)', duties: 'Hands-on workplace training, OJT supervision by licensed barber, monthly performance evaluations, safe training environment, OJT hour logging' },
                 { role: 'Program Holder (RTI Coordinator)', duties: 'RTI scheduling and coordination, progress monitoring, rubric completion enforcement, LMS documentation oversight, evaluation checkpoint management' },
@@ -307,7 +307,7 @@ export default function ApprenticeshipAgreementPage() {
                 { role: 'Licensed Supervisor Barber', fields: ['Print Name', 'Indiana Barber License #', 'Years Licensed', 'Signature', 'Date'] },
                 { role: 'Credential Partner Representative (RTI Provider)', fields: ['Print Name', 'Organization', 'License/Accreditation #', 'Signature', 'Date'] },
                 { role: 'Program Holder (RTI Coordinator)', fields: ['Print Name', 'Title', 'Signature', 'Date'] },
-                { role: 'Sponsor — Elevate for Humanity', fields: ['Authorized Representative', 'Title', 'Signature', 'Date'] },
+                { role: 'Sponsor — 2Exclusive LLC-S (DBA Elevate for Humanity Career & Technical Institute)', fields: ['Authorized Representative', 'Title', 'Signature', 'Date'] },
               ].map((signer, i) => (
                 <div key={i} className="border-2 rounded-lg p-4 print:p-3 print:border-gray-400 print:break-inside-avoid">
                   <p className="font-bold text-gray-900 mb-3 print:text-[11px] print:mb-2">{signer.role}</p>

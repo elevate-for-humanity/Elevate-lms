@@ -109,7 +109,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
           
           <p style="font-size: 12px; color: #6b7280; text-align: center;">
-            © ${new Date().getFullYear()} 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute. All rights reserved.
+            © ${new Date().getFullYear()} 2Exclusive LLC-S (DBA Elevate for Humanity Career & Technical Institute). All rights reserved.
           </p>
         </body>
         </html>
@@ -204,7 +204,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
           
           <p style="font-size: 12px; color: #6b7280; text-align: center;">
             This email was sent to ${student.email} because you enrolled in a program at Elevate for Humanity.<br>
-            © ${new Date().getFullYear()} 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute. All rights reserved.
+            © ${new Date().getFullYear()} 2Exclusive LLC-S (DBA Elevate for Humanity Career & Technical Institute). All rights reserved.
           </p>
         </body>
         </html>

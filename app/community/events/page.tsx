@@ -155,7 +155,7 @@ export default async function EventsPage() {
               </Link>
               {user && (
                 <Link
-                  href="/community/events/create"
+                  href="/community/events"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-500 transition border border-brand-blue-400"
                 >
                   <Plus className="w-5 h-5" />
@@ -182,7 +182,7 @@ export default async function EventsPage() {
               <p className="text-gray-600 mb-6">Check back soon for new events!</p>
               {user && (
                 <Link
-                  href="/community/events/create"
+                  href="/community/events"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700"
                 >
                   <Plus className="w-5 h-5" />

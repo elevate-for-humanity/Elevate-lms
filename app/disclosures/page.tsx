@@ -389,7 +389,7 @@ export default function DisclosuresPage() {
                 Our formal grievance process ensures your concerns are addressed promptly and fairly.
               </p>
               <Link
-                href="/policies/grievance"
+                href="/grievance"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-semibold rounded-lg transition-colors w-full justify-center"
               >
                 View Grievance Procedure

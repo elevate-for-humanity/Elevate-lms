@@ -192,7 +192,7 @@ export default function BillingPage() {
               You don't have an active subscription yet. Explore our plans to get started.
             </p>
             <Link
-              href="/pricing"
+              href="/license/pricing"
               className="inline-flex items-center gap-2 bg-brand-orange-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-orange-600"
             >
               View Plans

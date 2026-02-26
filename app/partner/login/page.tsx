@@ -173,7 +173,7 @@ export default function PartnerLoginPage() {
                 <input type="checkbox" className="w-4 h-4 text-brand-blue-600 border-gray-300 rounded focus:ring-brand-blue-500" />
                 <span className="ml-2 text-sm text-gray-600">Remember me</span>
               </label>
-              <Link href="/forgot-password" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
+              <Link href="/reset-password" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
                 Forgot password?
               </Link>
             </div>

@@ -103,7 +103,7 @@ export default async function CourseTemplatesPage() {
               <p className="text-sm text-gray-600">Build your own reusable course template</p>
             </div>
             <Link
-              href="/admin/course-builder/new"
+              href="/admin/course-builder"
               className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Start from Scratch

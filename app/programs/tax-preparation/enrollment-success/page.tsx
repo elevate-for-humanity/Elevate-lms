@@ -97,7 +97,7 @@ export default function EnrollmentSuccessPage() {
                   federal tax law fundamentals.
                 </p>
                 <Link
-                  href="/courses/tax-prep-financial-services"
+                  href="/programs/tax-preparation"
                   className="inline-flex items-center gap-1 text-brand-green-600 text-sm mt-2 hover:underline"
                 >
                   Go to Week 1

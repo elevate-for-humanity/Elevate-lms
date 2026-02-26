@@ -149,7 +149,7 @@ export default function PartnerPortalPage() {
             <Link href="/partners/join" className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-brand-blue-50 transition inline-flex items-center gap-2">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="/partners/login" className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition">
+            <Link href="/partner/login" className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition">
               Partner Sign In
             </Link>
           </div>

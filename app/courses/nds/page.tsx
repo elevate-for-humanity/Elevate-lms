@@ -248,7 +248,7 @@ export default async function NdsPage() {
           </h2>
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <Link
-              href="/programs/cdl"
+              href="/programs/cdl-training"
               className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">CDL Training</h3>
@@ -259,7 +259,7 @@ export default async function NdsPage() {
             </Link>
 
             <Link
-              href="/programs/drug-collector"
+              href="/training/certifications"
               className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">

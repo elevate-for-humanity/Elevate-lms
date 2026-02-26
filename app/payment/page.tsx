@@ -145,7 +145,7 @@ export default async function PaymentPage() {
                 </div>
                 <div className="flex flex-col gap-3">
                   <Link
-                    href="/enroll/barber-apprenticeship"
+                    href="/programs/barber-apprenticeship"
                     className="bg-white text-brand-orange-600 hover:bg-brand-orange-50 px-8 py-4 rounded-lg font-bold text-center transition-colors"
                   >
                     Enroll & Pay with Stripe

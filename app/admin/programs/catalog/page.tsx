@@ -162,7 +162,7 @@ export default async function ProgramCatalogPage() {
                     Download PDF
                   </Link>
                   <Link
-                    href="/admin/programs/catalog/preview"
+                    href="/admin/programs/catalog"
                     className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium"
                   >
                     <Eye className="w-4 h-4" />

@@ -208,7 +208,7 @@ export default async function EmployerDashboardOrchestrated() {
                 <SectionCard
                   title="Manage Job Postings"
                   description={`${postings?.length || 0} active posting${(postings?.length || 0) !== 1 ? 's' : ''}`}
-                  href="/employer/postings"
+                  href="/employer/dashboard"
                   icon={<Briefcase className="h-10 w-10" />}
                 />
               )}
@@ -239,7 +239,7 @@ export default async function EmployerDashboardOrchestrated() {
                       ? 'Track apprentices and compliance'
                       : 'Build your talent pipeline'
                   }
-                  href="/employer/apprenticeship"
+                  href="/employer/dashboard"
                   icon={<TrendingUp className="h-10 w-10" />}
                   badge={apprenticeshipProgram ? 'Active' : undefined}
                 />
@@ -332,7 +332,7 @@ export default async function EmployerDashboardOrchestrated() {
             <div className="space-y-3">
               {profile.verified && (
                 <a
-                  href="/employer/postings/new"
+                  href="/employer/dashboard"
                   className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
                 >
                   Post New Job
@@ -358,7 +358,7 @@ export default async function EmployerDashboardOrchestrated() {
                 for your needs.
               </p>
               <a
-                href="/employer/apprenticeship/new"
+                href="/employer/dashboard"
                 className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Learn More

@@ -108,7 +108,7 @@ export default async function AdminFerpaPage() {
           </div>
           <div className="flex gap-3">
             <Link
-              href="/admin/ferpa/audit-log"
+              href="/admin/ferpa"
               className="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
             >
               Audit Log
@@ -153,28 +153,28 @@ export default async function AdminFerpaPage() {
               <h2 className="font-semibold text-gray-900 mb-4">Quick Actions</h2>
               <div className="space-y-3">
                 <Link
-                  href="/admin/ferpa/consent-forms"
+                  href="/admin/ferpa"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <FileText className="w-5 h-5 text-brand-blue-600" />
                   <span className="text-gray-700">Manage Consent Forms</span>
                 </Link>
                 <Link
-                  href="/admin/ferpa/access-requests"
+                  href="/admin/ferpa"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <Eye className="w-5 h-5 text-brand-blue-600" />
                   <span className="text-gray-700">Review Access Requests</span>
                 </Link>
                 <Link
-                  href="/admin/ferpa/directory-info"
+                  href="/admin/ferpa"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <Users className="w-5 h-5 text-brand-green-600" />
                   <span className="text-gray-700">Directory Information</span>
                 </Link>
                 <Link
-                  href="/admin/ferpa/reports"
+                  href="/admin/ferpa"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <Download className="w-5 h-5 text-brand-orange-600" />
@@ -252,7 +252,7 @@ export default async function AdminFerpaPage() {
               </div>
               <div className="p-4 border-t">
                 <Link
-                  href="/admin/ferpa/activity"
+                  href="/admin/ferpa"
                   className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
                 >
                   View All Activity →

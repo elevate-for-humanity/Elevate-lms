@@ -344,7 +344,7 @@ export default function LicenseCheckoutPage() {
                         className="mt-1 w-4 h-4 text-brand-blue-600 border-slate-300 rounded focus:ring-brand-blue-500"
                       />
                       <span className="text-sm text-slate-700">
-                        I agree to the <Link href="/license-agreement" className="text-brand-blue-600 hover:underline" target="_blank">License Agreement</Link>
+                        I agree to the <Link href="/legal/license-agreement" className="text-brand-blue-600 hover:underline" target="_blank">License Agreement</Link>
                       </span>
                     </label>
                   </div>

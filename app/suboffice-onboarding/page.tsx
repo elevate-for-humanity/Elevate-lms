@@ -345,7 +345,7 @@ export default function SubofficeOnboardingPage() {
             Complete onboarding and start earning revenue share today.
           </p>
           <Link
-            href="/suboffice-onboarding/apply"
+            href="/suboffice-onboarding"
             className="bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-block"
           >
             Begin Application

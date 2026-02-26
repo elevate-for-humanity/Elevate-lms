@@ -143,7 +143,7 @@ export default function AIStudioPage() {
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
-                  href="/store/ai-studio/demo"
+                  href="/store/ai-studio"
                   className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm text-slate-900 px-8 py-4 rounded-lg font-bold text-lg border-2 border-white/30 hover:bg-white/20 transition-colors"
                 >
                   <Play className="w-5 h-5" />
@@ -245,7 +245,7 @@ export default function AIStudioPage() {
                 </div>
 
                 <Link
-                  href={`/store/ai-studio/checkout?plan=${plan.name.toLowerCase().replace(' ', '-')}`}
+                  href={`/store/ai-studio?plan=${plan.name.toLowerCase().replace(' ', '-')}`}
                   className={`block w-full text-center py-3 rounded-lg font-bold transition-colors mb-6 ${
                     plan.popular
                       ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
@@ -280,7 +280,7 @@ export default function AIStudioPage() {
             Start your free trial today. No credit card required.
           </p>
           <Link
-            href="/store/ai-studio/checkout?plan=professional"
+            href="/store/ai-studio?plan=professional"
             className="inline-flex items-center gap-2 bg-white text-brand-blue-900 px-10 py-5 rounded-lg font-bold text-lg hover:bg-brand-blue-50 transition-colors shadow-lg"
           >
             Start Free Trial

@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       forwardTo,
     });
 
-    // Use Resend SDK forward helper — handles content + attachments automatically
+
     const { data, error } = await getResend().emails.receiving.forward({
       emailId,
       to: forwardTo,

@@ -116,7 +116,7 @@ export default async function CourseDetailPage({
   } = await supabase.auth.getUser();
 
   let enrollment: any = null;
-  let completedLessonIds: Set<string> = new Set();
+  const completedLessonIds: Set<string> = new Set();
   let progressPercent = 0;
 
   if (user) {

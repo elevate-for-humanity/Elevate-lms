@@ -195,13 +195,13 @@ export default function SupersonicGovernancePage() {
           <h2 className="text-xl font-bold text-slate-900 mb-4">Related Resources</h2>
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/tax-preparation"
+              href="/supersonic-fast-cash/services/tax-preparation"
               className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:border-emerald-300 hover:text-emerald-600 transition-colors"
             >
               Tax Preparation
             </Link>
             <Link
-              href="/refund-advance"
+              href="/supersonic-fast-cash/services/refund-advance"
               className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:border-emerald-300 hover:text-emerald-600 transition-colors"
             >
               Refund Advance

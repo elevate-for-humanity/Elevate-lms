@@ -62,7 +62,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/apps/grants/settings" className="p-2 hover:bg-brand-green-700 rounded-lg">
+            <Link href="/apps/grants" className="p-2 hover:bg-brand-green-700 rounded-lg">
               <Settings className="w-5 h-5" />
             </Link>
           </div>

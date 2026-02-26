@@ -70,7 +70,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-red-500 rounded-full text-xs flex items-center justify-center">{alerts.length}</span>
               </div>
             )}
-            <Link href="/apps/sam-gov/settings" className="p-2 hover:bg-brand-blue-800 rounded-lg">
+            <Link href="/apps/sam-gov" className="p-2 hover:bg-brand-blue-800 rounded-lg">
               <Settings className="w-5 h-5" />
             </Link>
           </div>

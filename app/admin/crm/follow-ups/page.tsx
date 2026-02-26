@@ -102,7 +102,7 @@ export default async function CRMFollowUpsPage() {
             <p className="text-gray-600">Manage your follow-up tasks and reminders</p>
           </div>
           <Link
-            href="/admin/crm/follow-ups/new"
+            href="/admin/crm/follow-ups"
             className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />

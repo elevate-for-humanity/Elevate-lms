@@ -38,7 +38,7 @@ export default function MentorshipPage() {
           <Users className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Mentorship Program</h1>
           <p className="text-xl text-indigo-100 mb-8">Get personalized guidance from experienced professionals in your field</p>
-          <Link href="/mentorship/apply" className="inline-flex items-center gap-2 bg-white text-indigo-600 px-8 py-4 rounded-full font-bold hover:bg-indigo-50">
+          <Link href="/mentorship" className="inline-flex items-center gap-2 bg-white text-indigo-600 px-8 py-4 rounded-full font-bold hover:bg-indigo-50">
             Find a Mentor <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

@@ -107,7 +107,7 @@ export default async function MeetingsPage() {
             <div className="bg-white rounded-xl shadow-sm border">
               <div className="p-6 border-b flex items-center justify-between">
                 <h2 className="font-semibold text-gray-900">Upcoming Meetings</h2>
-                <Link href="/lms/collaborate/calendar" className="text-brand-green-600 hover:text-brand-green-700 text-sm font-medium">
+                <Link href="/lms/collaborate/meetings" className="text-brand-green-600 hover:text-brand-green-700 text-sm font-medium">
                   View Calendar
                 </Link>
               </div>

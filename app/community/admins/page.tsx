@@ -185,7 +185,7 @@ export default async function AdminsPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/help/admin" className="text-brand-blue-600 hover:underline">
+                  <Link href="/support/help" className="text-brand-blue-600 hover:underline">
                     Help Center
                   </Link>
                 </li>

@@ -440,7 +440,7 @@ export default function FranchiseAdminDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Link href="/franchise/admin/reports/revenue">
+                <Link href="/franchise/admin">
                   <Button variant="outline" className="w-full">View Report</Button>
                 </Link>
               </CardContent>
@@ -457,7 +457,7 @@ export default function FranchiseAdminDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Link href="/franchise/admin/reports/preparers">
+                <Link href="/franchise/admin">
                   <Button variant="outline" className="w-full">View Report</Button>
                 </Link>
               </CardContent>
@@ -474,7 +474,7 @@ export default function FranchiseAdminDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Link href="/franchise/admin/reports/returns">
+                <Link href="/franchise/admin">
                   <Button variant="outline" className="w-full">View Report</Button>
                 </Link>
               </CardContent>
@@ -491,7 +491,7 @@ export default function FranchiseAdminDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Link href="/franchise/admin/reports/comparison">
+                <Link href="/franchise/admin">
                   <Button variant="outline" className="w-full">View Report</Button>
                 </Link>
               </CardContent>
@@ -513,19 +513,19 @@ export default function FranchiseAdminDashboard() {
                 Add Office
               </Button>
             </Link>
-            <Link href="/franchise/admin/preparers">
+            <Link href="/franchise/admin">
               <Button variant="outline" className="w-full justify-start">
                 <Users className="mr-2 h-4 w-4" />
                 Manage Preparers
               </Button>
             </Link>
-            <Link href="/franchise/admin/returns">
+            <Link href="/franchise/admin">
               <Button variant="outline" className="w-full justify-start">
                 <FileText className="mr-2 h-4 w-4" />
                 View All Returns
               </Button>
             </Link>
-            <Link href="/franchise/admin/settings">
+            <Link href="/franchise/admin">
               <Button variant="outline" className="w-full justify-start">
                 <DollarSign className="mr-2 h-4 w-4" />
                 Fee Settings

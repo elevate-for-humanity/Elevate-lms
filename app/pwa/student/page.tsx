@@ -53,7 +53,7 @@ async function getStudentData(userId: string, email: string) {
   // Enrich program enrollments with program details from apprenticeship_programs
   const enrollments = progEnrollRes.data || [];
   const programIds = [...new Set(enrollments.map((pe: any) => pe.program_id).filter(Boolean))];
-  let programMap: Record<string, any> = {};
+  const programMap: Record<string, any> = {};
   if (programIds.length > 0) {
     const { data: programs } = await supabase
       .from('apprenticeship_programs')

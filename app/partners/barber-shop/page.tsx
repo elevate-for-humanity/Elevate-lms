@@ -61,7 +61,7 @@ export default function BarberShopPartnerPage() {
             <a href="/support" className="text-brand-orange-600 font-semibold">Get Help Online</a>
           </p>
           <Link
-            href="/programs/barber"
+            href="/programs/barber-apprenticeship"
             className="inline-block bg-brand-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-orange-600"
           >
             Back to Barber Program

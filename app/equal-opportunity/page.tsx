@@ -228,7 +228,7 @@ export default function EqualOpportunityPage() {
                 Phone: <a href="/support" className="text-brand-blue-600 hover:underline">Visit Support Center</a>
               </p>
               <p className="mt-4">
-                <Link href="/policies/grievance" className="text-brand-blue-600 hover:underline text-sm font-medium">
+                <Link href="/grievance" className="text-brand-blue-600 hover:underline text-sm font-medium">
                   View Grievance Procedure →
                 </Link>
               </p>

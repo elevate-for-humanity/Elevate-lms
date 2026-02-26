@@ -43,7 +43,7 @@ export default function PrivacyNoticePage() {
           <li><strong>Visitors:</strong> Users of our website and platforms</li>
         </ul>
         <p>
-          This notice supplements our comprehensive <Link href="/policies/privacy" className="text-brand-blue-600 hover:text-brand-blue-800">Privacy Policy</Link> and 
+          This notice supplements our comprehensive <Link href="/privacy-policy" className="text-brand-blue-600 hover:text-brand-blue-800">Privacy Policy</Link> and 
           provides specific information about data practices.
         </p>
       </section>
@@ -478,7 +478,7 @@ export default function PrivacyNoticePage() {
       <section className="mb-12">
         <h2>Related Policies</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Link href="/policies/privacy" className="block p-4 bg-brand-blue-50 rounded-lg hover:bg-brand-blue-100 transition-colors">
+          <Link href="/privacy-policy" className="block p-4 bg-brand-blue-50 rounded-lg hover:bg-brand-blue-100 transition-colors">
             <h3 className="text-lg font-semibold text-brand-blue-900 mt-0 mb-2">Privacy Policy</h3>
             <p className="text-brand-blue-800 text-sm mb-0">Comprehensive privacy policy and practices</p>
           </Link>

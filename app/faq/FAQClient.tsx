@@ -399,8 +399,7 @@ export default function FAQClient({ faqs, categories, popularIds }: FAQClientPro
                               >
                                 <Share2 className="w-4 h-4" />
                               </button>
-                              {showShareMenu === faq.id && (
-                              )}
+                              {showShareMenu === faq.id && null}
                             </div>
                           </div>
                         </div>

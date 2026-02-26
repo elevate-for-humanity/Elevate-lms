@@ -138,7 +138,7 @@ export default async function StartTrialPage() {
 
           <p className="text-center text-sm text-gray-500 mt-4">
             By starting a trial, you agree to our{' '}
-            <Link href="/terms" className="text-brand-blue-600 hover:underline">Terms of Service</Link>
+            <Link href="/terms-of-service" className="text-brand-blue-600 hover:underline">Terms of Service</Link>
           </p>
         </div>
 

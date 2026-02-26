@@ -128,6 +128,44 @@ fi
 echo ""
 
 # =============================================================================
+# CHECK 7: Unauthorized storage signing in admin paths
+# =============================================================================
+echo "Checking for unauthorized createSignedUrl in admin paths..."
+
+UNAUTHORIZED_SIGNING=$(grep -rn "createSignedUrl" --include="*.ts" --include="*.tsx" app/admin/ 2>/dev/null | grep -v "api/admin/documents/signed-url" || true)
+
+if [ -n "$UNAUTHORIZED_SIGNING" ]; then
+  echo -e "${RED}❌ FAIL:${NC} Direct createSignedUrl found in admin paths (must use getAdminDocumentUrl):"
+  echo "$UNAUTHORIZED_SIGNING" | while read line; do
+    echo "   $line"
+  done
+  echo "   Fix: Use getAdminDocumentUrl from lib/admin/document-access.ts"
+  ERRORS=$((ERRORS + 1))
+else
+  echo -e "${GREEN}✅ No unauthorized storage signing in admin paths${NC}"
+fi
+echo ""
+
+# =============================================================================
+# CHECK 8: SSN references in profiles table queries
+# =============================================================================
+echo "Checking for ssn_last4 references to profiles table..."
+
+SSN_IN_PROFILES=$(grep -rn "profiles.*ssn_last4\|from('profiles').*ssn" --include="*.ts" --include="*.tsx" app/ lib/ components/ 2>/dev/null | grep -v "migration\|\.sql\|supabase/" || true)
+
+if [ -n "$SSN_IN_PROFILES" ]; then
+  echo -e "${RED}❌ FAIL:${NC} SSN data referenced via profiles table (must use secure_identity):"
+  echo "$SSN_IN_PROFILES" | while read line; do
+    echo "   $line"
+  done
+  echo "   Fix: Use secure_identity table via lib/security/secure-identity.ts"
+  ERRORS=$((ERRORS + 1))
+else
+  echo -e "${GREEN}✅ No SSN references via profiles table${NC}"
+fi
+echo ""
+
+# =============================================================================
 # SUMMARY
 # =============================================================================
 echo "=========================================="

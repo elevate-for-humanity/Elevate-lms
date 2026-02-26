@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
+import { getAdminDocumentUrl } from '@/lib/admin/document-access';
 import Link from 'next/link';
 import {
   FileText,
@@ -75,28 +76,17 @@ export default async function ReviewDetailPage({
       .eq('id', item.subject_id)
       .single();
 
-    // Generate signed URL for private bucket
+    // Generate signed URL via centralized admin document access
     if (doc?.file_path) {
-      const { data: signedData } = await db.storage
-        .from('documents')
-        .createSignedUrl(doc.file_path, 60);
-      if (signedData?.signedUrl) {
-        doc.file_url = signedData.signedUrl;
-      }
-
-      // Audit: log document access
-      await db.from('admin_audit_events').insert({
-        actor_id: user.id,
-        action: 'DOCUMENT_VIEWED',
-        entity_type: 'document',
-        entity_id: doc.id,
-        metadata: {
-          document_type: doc.document_type,
-          document_owner_id: doc.user_id,
-          context: 'review_queue',
-        },
-        created_at: new Date().toISOString(),
-      }).catch(() => {});
+      const url = await getAdminDocumentUrl({
+        adminId: user.id,
+        documentId: doc.id,
+        filePath: doc.file_path,
+        documentOwnerId: doc.user_id,
+        documentType: doc.document_type,
+        context: 'review_queue',
+      });
+      if (url) doc.file_url = url;
     }
 
     document = doc;

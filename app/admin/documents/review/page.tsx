@@ -275,7 +275,7 @@ export default async function AdminDocumentReviewPage() {
                       {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
                     </span>
                     {doc.file_path ? (
-                      <SecureDocumentLink documentId={doc.id} filePath={doc.file_path} />
+                      <SecureDocumentLink documentId={doc.id} />
                     ) : (
                       <span className="text-slate-400 text-sm">No file</span>
                     )}

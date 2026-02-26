@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { DocumentReviewForm } from '@/components/admin/DocumentReviewForm';
+import { getAdminDocumentUrl } from '@/lib/admin/document-access';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -70,28 +71,18 @@ export default async function ReviewDocumentPage({
     redirect('/admin/documents/review');
   }
 
-  // Generate signed URL for private bucket document
+  // Generate signed URL via centralized admin document access
   let viewUrl = document.file_url;
   if (document.file_path) {
-    const { data: signedData } = await db.storage
-      .from('documents')
-      .createSignedUrl(document.file_path, 60);
-    if (signedData?.signedUrl) {
-      viewUrl = signedData.signedUrl;
-    }
-
-    // Log document access to audit trail
-    await db.from('admin_audit_events').insert({
-      actor_id: user.id,
-      action: 'DOCUMENT_REVIEWED',
-      entity_type: 'document',
-      entity_id: document.id,
-      metadata: {
-        document_type: document.document_type,
-        document_owner_id: document.user_id,
-      },
-      created_at: new Date().toISOString(),
-    }).catch(() => {});
+    const url = await getAdminDocumentUrl({
+      adminId: user.id,
+      documentId: document.id,
+      filePath: document.file_path,
+      documentOwnerId: document.user_id,
+      documentType: document.document_type,
+      context: 'document_review',
+    });
+    if (url) viewUrl = url;
   }
 
   // Pass signed URL to client component via the document object

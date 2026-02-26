@@ -76,6 +76,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid path' }, { status: 400 });
     }
 
+    // Legacy ?path= must match an existing document row.
+    // Prevents client-supplied path enumeration.
+    if (!documentId) {
+      const { data: matchingDoc } = await db
+        .from('documents')
+        .select('id, user_id, document_type')
+        .eq('file_path', filePath)
+        .single();
+
+      if (!matchingDoc) {
+        return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+      }
+      documentOwnerId = matchingDoc.user_id;
+      documentType = matchingDoc.document_type;
+    }
+
     // Allowlist of buckets admins can access
     const allowedBuckets = [
       'documents',
@@ -105,7 +121,7 @@ export async function GET(request: NextRequest) {
     // Log document access to immutable audit trail
     await db.from('admin_audit_events').insert({
       actor_id: user.id,
-      action: 'DOCUMENT_VIEWED',
+      action: 'DOCUMENT_URL_ISSUED',
       entity_type: 'document',
       entity_id: documentId || filePath,
       metadata: {

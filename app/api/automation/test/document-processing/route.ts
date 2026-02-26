@@ -150,7 +150,11 @@ export async function POST() {
         .eq('id', doc.id);
 
       // Record automated decision
+      const decisionValue = outcome === 'auto_approved' ? 'approved' : 'needs_review';
       await adminClient.from('automated_decisions').insert({
+        subject_type: 'document',
+        subject_id: doc.id,
+        decision: decisionValue,
         entity_type: 'document',
         entity_id: doc.id,
         decision_type: 'document_approval_test',
@@ -166,7 +170,6 @@ export async function POST() {
           extracted_data: testCase.testExtractedData,
         },
         processing_time_ms: Math.floor(Math.random() * 500) + 100,
-        created_at: new Date().toISOString(),
       });
 
       // Create review queue item if routed

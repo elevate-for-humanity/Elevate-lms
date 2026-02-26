@@ -166,6 +166,63 @@ fi
 echo ""
 
 # =============================================================================
+# CHECK: Schema contract — automated_decisions must have NOT NULL columns
+# =============================================================================
+echo "Checking automated_decisions inserts have required NOT NULL columns..."
+AD_ISSUES=0
+# Find all automated_decisions insert blocks and verify subject_type is present
+for file in $(grep -rl "from('automated_decisions').insert" --include="*.ts" --include="*.tsx" app/ lib/ 2>/dev/null); do
+  # For each insert, check that subject_type appears within 5 lines
+  grep -n "from('automated_decisions').insert" "$file" | while IFS=: read line_num rest; do
+    has_subject=$(sed -n "${line_num},$((line_num + 15))p" "$file" | grep -c "subject_type:")
+    if [ "$has_subject" -eq 0 ]; then
+      echo "   ❌ $file:$line_num — missing subject_type (NOT NULL in live DB)"
+      # Signal error via temp file since we're in a subshell
+      touch /tmp/ad_issue
+    fi
+  done
+done
+if [ -f /tmp/ad_issue ]; then
+  rm -f /tmp/ad_issue
+  echo "   Fix: All automated_decisions inserts must include subject_type, subject_id, decision"
+  ERRORS=$((ERRORS + 1))
+else
+  echo -e "${GREEN}✅ All automated_decisions inserts have required NOT NULL columns${NC}"
+fi
+echo ""
+
+# =============================================================================
+# CHECK: Schema contract — no inserts to non-functional security_logs table
+# =============================================================================
+echo "Checking for inserts to non-functional security_logs table..."
+SECLOG_HITS=$(grep -rn "from('security_logs').insert" --include="*.ts" --include="*.tsx" app/ lib/ 2>/dev/null || true)
+if [ -n "$SECLOG_HITS" ]; then
+  echo "$SECLOG_HITS" | while IFS= read -r line; do
+    echo "   ❌ $line"
+  done
+  echo "   Fix: Use audit_logs table instead (security_logs has no useful columns in live DB)"
+  ERRORS=$((ERRORS + 1))
+else
+  echo -e "${GREEN}✅ No inserts to non-functional security_logs table${NC}"
+fi
+echo ""
+
+# =============================================================================
+# CHECK: Schema contract — ai_audit_log must use user_id not student_id
+# =============================================================================
+echo "Checking ai_audit_log inserts use correct column names..."
+# Only flag student_id as a top-level insert column (not inside details JSONB)
+AI_AUDIT_ISSUES=$(grep -A 5 "from('ai_audit_log').insert" --include="*.ts" --include="*.tsx" -rn app/ lib/ 2>/dev/null | grep "student_id:" || true)
+if [ -n "$AI_AUDIT_ISSUES" ]; then
+  echo "$AI_AUDIT_ISSUES"
+  echo "   Fix: Use user_id instead of student_id (column does not exist in live DB)"
+  ERRORS=$((ERRORS + 1))
+else
+  echo -e "${GREEN}✅ ai_audit_log inserts use correct column names${NC}"
+fi
+echo ""
+
+# =============================================================================
 # SUMMARY
 # =============================================================================
 echo "=========================================="

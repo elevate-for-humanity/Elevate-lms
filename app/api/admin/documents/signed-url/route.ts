@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { getAdminDocumentUrl } from '@/lib/admin/document-access';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
@@ -12,7 +13,7 @@ export const dynamic = 'force-dynamic';
  * Admin-only — requires authenticated user with admin/super_admin role.
  *
  * Accepts either:
- *   ?id=<document_id>  — resolves path server-side (preferred)
+ *   ?id=<document_id>  — delegates to getAdminDocumentUrl (preferred)
  *   ?path=<file_path>&bucket=<bucket_name>  — direct path (legacy)
  *
  * Server-side resolution prevents client-supplied path enumeration.
@@ -44,52 +45,44 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const documentId = searchParams.get('id');
-    let filePath = searchParams.get('path');
-    let bucket = searchParams.get('bucket') || 'documents';
-    let documentOwnerId: string | null = null;
-    let documentType: string | null = null;
 
-    // Preferred: resolve path from document ID server-side
+    // Preferred path: delegate to centralized document access
     if (documentId) {
-      const { data: doc } = await db
-        .from('documents')
-        .select('file_path, user_id, document_type')
-        .eq('id', documentId)
-        .single();
+      const url = await getAdminDocumentUrl({
+        adminId: user.id,
+        documentId,
+        context: 'api_endpoint',
+      });
 
-      if (!doc?.file_path) {
+      if (!url) {
         return NextResponse.json({ error: 'Document not found' }, { status: 404 });
       }
 
-      filePath = doc.file_path;
-      documentOwnerId = doc.user_id;
-      documentType = doc.document_type;
-      bucket = 'documents';
+      return NextResponse.json({ url });
     }
+
+    // Legacy ?path= flow — kept for backward compatibility
+    const filePath = searchParams.get('path');
+    const bucket = searchParams.get('bucket') || 'documents';
 
     if (!filePath) {
       return NextResponse.json({ error: 'Missing id or path parameter' }, { status: 400 });
     }
 
-    // Path traversal protection (for legacy path parameter)
+    // Path traversal protection
     if (filePath.includes('..') || filePath.startsWith('/')) {
       return NextResponse.json({ error: 'Invalid path' }, { status: 400 });
     }
 
-    // Legacy ?path= must match an existing document row.
-    // Prevents client-supplied path enumeration.
-    if (!documentId) {
-      const { data: matchingDoc } = await db
-        .from('documents')
-        .select('id, user_id, document_type')
-        .eq('file_path', filePath)
-        .single();
+    // Legacy path must match an existing document row
+    const { data: matchingDoc } = await db
+      .from('documents')
+      .select('id, user_id, document_type')
+      .eq('file_path', filePath)
+      .single();
 
-      if (!matchingDoc) {
-        return NextResponse.json({ error: 'Document not found' }, { status: 404 });
-      }
-      documentOwnerId = matchingDoc.user_id;
-      documentType = matchingDoc.document_type;
+    if (!matchingDoc) {
+      return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
     // Allowlist of buckets admins can access
@@ -112,26 +105,20 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to generate URL' }, { status: 500 });
     }
 
-    // Extract owner from path if not already known (format: user_id/filename)
-    if (!documentOwnerId) {
-      const pathSegments = filePath.split('/');
-      documentOwnerId = pathSegments.length > 1 ? pathSegments[0] : null;
-    }
-
-    // Log document access to immutable audit trail
+    // Audit the legacy path access
     await db.from('admin_audit_events').insert({
-      actor_id: user.id,
+      actor_user_id: user.id,
       action: 'DOCUMENT_URL_ISSUED',
-      entity_type: 'document',
-      entity_id: documentId || filePath,
+      target_type: 'document',
+      target_id: matchingDoc.id,
       metadata: {
         bucket,
         admin_role: profile.role,
-        document_owner_id: documentOwnerId,
-        document_type: documentType,
-        resolution: documentId ? 'server_side' : 'client_path',
+        document_owner_id: matchingDoc.user_id,
+        document_type: matchingDoc.document_type,
+        file_path: filePath,
+        resolution: 'client_path',
       },
-      created_at: new Date().toISOString(),
     }).then(null, (err: Error) => {
       logger.warn('[SignedURL] Audit log insert failed', { error: err.message });
     });

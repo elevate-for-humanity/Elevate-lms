@@ -161,7 +161,11 @@ export async function POST() {
       }
 
       // Record automated decision
+      const decisionValue = outcome === 'auto_approved' ? 'approved' : 'needs_review';
       await adminClient.from('automated_decisions').insert({
+        subject_type: 'partner',
+        subject_id: partner.id,
+        decision: decisionValue,
         entity_type: 'partner',
         entity_id: partner.id,
         decision_type: 'partner_approval_test',
@@ -179,7 +183,6 @@ export async function POST() {
           license_expired: testCase.licenseExpired,
         },
         processing_time_ms: Math.floor(Math.random() * 300) + 50,
-        created_at: new Date().toISOString(),
       });
 
       // Create review queue item if needed

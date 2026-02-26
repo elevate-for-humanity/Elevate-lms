@@ -252,10 +252,10 @@ export async function testEnrollmentFlow(
 
         // Log to audit trail
         await supabase.from('ai_audit_log').insert({
-          student_id: userId,
-          program_slug: config.programSlug,
+          user_id: userId,
           action: 'ASSIGN_INSTRUCTOR',
           details: {
+            program_slug: config.programSlug,
             instructor_slug: instructor.slug,
             source: 'autopilot_test',
           },

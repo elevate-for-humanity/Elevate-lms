@@ -116,10 +116,10 @@ export async function POST(request: NextRequest) {
 
     // Log to audit trail
     await db.from('ai_audit_log').insert({
-      student_id: enrollment.user_id,
-      program_slug: programSlug,
+      user_id: enrollment.user_id,
       action: 'PAYMENT_SPLIT',
       details: {
+        program_slug: programSlug,
         total: total_amount,
         vendor: vendorAmount,
         elevate: elevateAmount,

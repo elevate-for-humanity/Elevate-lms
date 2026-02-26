@@ -53,14 +53,15 @@ export async function auditLicenseEvent(entry: LicenseAuditEntry): Promise<void>
     const supabase = createAdminClient();
     
     await supabase.from('license_audit_log').insert({
-      event,
-      license_id: licenseId,
-      tenant_id: tenantId,
       user_id: userId,
+      action: event,
       ip_address: ipAddress,
-      user_agent: userAgent,
-      metadata: metadata || {},
-      created_at: new Date().toISOString(),
+      details: {
+        license_id: licenseId,
+        tenant_id: tenantId,
+        user_agent: userAgent,
+        ...metadata,
+      },
     });
   } catch (error) {
     // Don't fail the operation if audit logging fails

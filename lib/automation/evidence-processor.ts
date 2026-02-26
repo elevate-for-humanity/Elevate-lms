@@ -374,6 +374,9 @@ async function autoApprove(
   const { data: decision } = await supabase
     .from('automated_decisions')
     .insert({
+      subject_type: 'document',
+      subject_id: documentId,
+      decision: 'approved',
       entity_type: 'document',
       entity_id: documentId,
       decision_type: 'document_approval',
@@ -388,7 +391,6 @@ async function autoApprove(
         context,
       },
       processing_time_ms: processingTimeMs,
-      created_at: new Date().toISOString(),
     })
     .select('id')
     .single();
@@ -478,6 +480,9 @@ async function routeToReview(
   const { data: decision } = await supabase
     .from('automated_decisions')
     .insert({
+      subject_type: 'document',
+      subject_id: documentId,
+      decision: 'needs_review',
       entity_type: 'document',
       entity_id: documentId,
       decision_type: 'document_review_routing',
@@ -492,7 +497,6 @@ async function routeToReview(
         context,
       },
       processing_time_ms: processingTimeMs,
-      created_at: new Date().toISOString(),
     })
     .select('id')
     .single();
@@ -616,6 +620,9 @@ export async function processTranscript(
     if (!error) {
       // Record the transfer hours decision
       await supabase.from('automated_decisions').insert({
+        subject_type: 'enrollment',
+        subject_id: enrollmentId,
+        decision: 'approved',
         entity_type: 'enrollment',
         entity_id: enrollmentId,
         decision_type: 'transfer_hours_applied',
@@ -629,7 +636,6 @@ export async function processTranscript(
           hours_applied: hours,
           source_school: result.extractedData.school_name,
         },
-        created_at: new Date().toISOString(),
       });
 
       await supabase.from('audit_logs').insert({

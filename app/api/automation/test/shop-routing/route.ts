@@ -219,7 +219,11 @@ export async function POST() {
       }
 
       // Record automated decision
+      const decisionValue = outcome === 'auto_assigned' ? 'assigned' : 'needs_review';
       await adminClient.from('automated_decisions').insert({
+        subject_type: 'application',
+        subject_id: application.id,
+        decision: decisionValue,
         entity_type: 'application',
         entity_id: application.id,
         decision_type: 'shop_routing_test',
@@ -236,7 +240,6 @@ export async function POST() {
           recommendations: scoredShops,
         },
         processing_time_ms: Math.floor(Math.random() * 200) + 50,
-        created_at: new Date().toISOString(),
       });
 
       // Create review queue item if not auto-assigned

@@ -39,10 +39,9 @@ export async function assignAIInstructorForProgram(opts: {
 
   // audit
   await supabase.from("ai_audit_log").insert({
-    student_id: opts.studentId,
-    program_slug: opts.programSlug,
+    user_id: opts.studentId,
     action: "ASSIGN_INSTRUCTOR",
-    details: { instructor_slug: instructor.slug },
+    details: { program_slug: opts.programSlug, instructor_slug: instructor.slug },
   });
 
   return { ok: true, instructorId: instructor.id, instructorSlug: instructor.slug };

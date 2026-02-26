@@ -98,12 +98,14 @@ export async function createEnrollmentCase(params: CreateCaseParams): Promise<En
   });
 
   await supabase.from('case_events').insert({
-    case_id: data.id,
-    event_type: 'case_created',
-    actor_id: params.studentId,
-    actor_role: 'student',
-    after_state: { status: 'draft', program_slug: params.programSlug },
-    metadata: { signatures_required: defaultSignatures },
+    user_id: params.studentId,
+    action: 'case_created',
+    details: {
+      case_id: data.id,
+      actor_role: 'student',
+      after_state: { status: 'draft', program_slug: params.programSlug },
+      signatures_required: defaultSignatures,
+    },
   });
 
   return data;

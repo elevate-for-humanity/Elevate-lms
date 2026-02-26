@@ -146,18 +146,17 @@ export async function enforceDocumentRetention(
 
       // Log each deletion to immutable audit trail
       await db.from('admin_audit_events').insert({
-        actor_id: actorId,
+        actor_user_id: actorId,
         action: 'DOCUMENT_PURGED',
-        entity_type: 'document',
-        entity_id: doc.id,
+        target_type: 'document',
+        target_id: doc.id,
         metadata: {
           document_type: doc.document_type,
           user_id: doc.user_id,
-          created_at: doc.created_at,
+          original_created_at: doc.created_at,
           retention_days: retentionDays,
           reason: 'retention_policy_enforcement',
         },
-        created_at: new Date().toISOString(),
       });
 
       deleted++;

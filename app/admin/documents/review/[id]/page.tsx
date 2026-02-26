@@ -79,6 +79,19 @@ export default async function ReviewDocumentPage({
     if (signedData?.signedUrl) {
       viewUrl = signedData.signedUrl;
     }
+
+    // Log document access to audit trail
+    await db.from('admin_audit_events').insert({
+      actor_id: user.id,
+      action: 'DOCUMENT_REVIEWED',
+      entity_type: 'document',
+      entity_id: document.id,
+      metadata: {
+        document_type: document.document_type,
+        document_owner_id: document.user_id,
+      },
+      created_at: new Date().toISOString(),
+    }).catch(() => {});
   }
 
   // Pass signed URL to client component via the document object

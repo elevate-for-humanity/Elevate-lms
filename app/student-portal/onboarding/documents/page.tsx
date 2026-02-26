@@ -123,14 +123,14 @@ export default function OnboardingDocumentsPage() {
         setUploadedFiles(uploaded);
       }
 
-      // Check if SSN last-4 already saved
-      const { data: profile } = await supabase
-        .from('profiles')
+      // Check if SSN last-4 already saved (from secure_identity table)
+      const { data: identity } = await supabase
+        .from('secure_identity')
         .select('ssn_last4')
-        .eq('id', data.user.id)
+        .eq('user_id', data.user.id)
         .single();
-      if (profile?.ssn_last4) {
-        setSsn(`***-**-${profile.ssn_last4}`);
+      if (identity?.ssn_last4) {
+        setSsn(`***-**-${identity.ssn_last4}`);
         setSsnSaved(true);
       }
 
@@ -276,9 +276,8 @@ export default function OnboardingDocumentsPage() {
     try {
       const supabase = createClient();
       const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ ssn_last4: digits.slice(-4) })
-        .eq('id', user.id);
+        .from('secure_identity')
+        .upsert({ user_id: user.id, ssn_last4: digits.slice(-4), updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
       if (updateError) throw updateError;
       setSsn(`***-**-${digits.slice(-4)}`);
       setSsnSaved(true);

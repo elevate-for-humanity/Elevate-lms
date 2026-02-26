@@ -235,7 +235,7 @@ export default function DocumentsPage() {
                   const supabase = createClient();
                   const { data: { user } } = await supabase.auth.getUser();
                   if (!user) { setError('Please log in.'); return; }
-                  const { error: err } = await supabase.from('profiles').update({ ssn_last4: ssnDigits.slice(-4) }).eq('id', user.id);
+                  const { error: err } = await supabase.from('secure_identity').upsert({ user_id: user.id, ssn_last4: ssnDigits.slice(-4), updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
                   if (err) {
                     setError('Failed to save: ' + err.message);
                     return;

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,7 +15,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: NextRequest) {
   try {
-    const rateLimited = await applyRateLimit(request, 'api');
+    const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
     const supabase = await createClient();
     const admin = createAdminClient();
@@ -45,6 +46,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Missing path parameter' }, { status: 400 });
     }
 
+    // Path traversal protection
+    if (filePath.includes('..') || filePath.startsWith('/')) {
+      return NextResponse.json({ error: 'Invalid path' }, { status: 400 });
+    }
+
     // Allowlist of buckets admins can access
     const allowedBuckets = [
       'documents',
@@ -64,6 +70,27 @@ export async function GET(request: NextRequest) {
     if (error || !data?.signedUrl) {
       return NextResponse.json({ error: 'Failed to generate URL' }, { status: 500 });
     }
+
+    // Log document access to immutable audit trail
+    // Extract document owner from file path (format: user_id/filename)
+    const pathSegments = filePath.split('/');
+    const documentOwnerId = pathSegments.length > 1 ? pathSegments[0] : null;
+
+    await db.from('admin_audit_events').insert({
+      actor_id: user.id,
+      action: 'DOCUMENT_VIEWED',
+      entity_type: 'document',
+      entity_id: filePath,
+      metadata: {
+        bucket,
+        admin_role: profile.role,
+        document_owner_id: documentOwnerId,
+      },
+      created_at: new Date().toISOString(),
+    }).then(null, (err: Error) => {
+      // Non-blocking — don't fail the request if audit logging fails
+      logger.warn('[SignedURL] Audit log insert failed', { error: err.message });
+    });
 
     return NextResponse.json({ url: data.signedUrl });
   } catch {

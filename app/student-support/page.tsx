@@ -93,7 +93,7 @@ export default function StudentSupportPage() {
               <div>
                 <p className="font-medium text-gray-900">Live Chat</p>
                 <p className="text-gray-600">Available 24/7</p>
-                <Link href="/chat" className="text-sm text-brand-green-600 hover:underline">Start Chat</Link>
+                <Link href="/support/chat" className="text-sm text-brand-green-600 hover:underline">Start Chat</Link>
               </div>
             </div>
             <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">

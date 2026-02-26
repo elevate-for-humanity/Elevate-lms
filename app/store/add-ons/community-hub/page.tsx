@@ -102,7 +102,7 @@ export default function CommunityHubPage() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
-                  href="/store/add-ons/community-hub/checkout"
+                  href="/store/add-ons/community-hub"
                   className="px-8 py-4 bg-white text-indigo-700 font-bold rounded-lg hover:bg-indigo-50 transition"
                 >
                   Get Community Hub - $2,499
@@ -261,7 +261,7 @@ export default function CommunityHubPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/store/add-ons/community-hub/checkout"
+              href="/store/add-ons/community-hub"
               className="px-8 py-4 bg-white text-indigo-700 font-bold rounded-lg hover:bg-indigo-50 transition"
             >
               Get Community Hub - $2,499

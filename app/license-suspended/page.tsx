@@ -34,7 +34,7 @@ export default function LicenseSuspendedPage() {
         <div className="space-y-4">
           {/* Update Billing Button */}
           <Link
-            href="/billing"
+            href="/account/billing"
             className="flex items-center justify-center gap-2 w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition"
           >
             <CreditCard className="w-5 h-5" />

@@ -42,7 +42,7 @@ export default async function FundingPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link href="/admin/grants/revenue" className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md"><h3 className="font-semibold mb-2">Grant Revenue</h3><p className="text-sm text-gray-500">Track grant income and disbursements</p></Link>
-          <Link href="/admin/funding/allocations" className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md"><h3 className="font-semibold mb-2">Allocations</h3><p className="text-sm text-gray-500">Manage funding allocations by program</p></Link>
+          <Link href="/admin/funding" className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md"><h3 className="font-semibold mb-2">Allocations</h3><p className="text-sm text-gray-500">Manage funding allocations by program</p></Link>
         </div>
       </div>
     </div>

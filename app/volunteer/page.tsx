@@ -171,7 +171,7 @@ export default async function VolunteerPage() {
             Whether you have a few hours or want to commit long-term, we have opportunities for you.
           </p>
           <Link
-            href="/volunteer/apply"
+            href="/volunteer"
             className="inline-flex items-center gap-2 px-6 py-3 bg-brand-orange-500 text-white rounded-lg hover:bg-brand-orange-600"
           >
             Apply to Volunteer <ArrowRight className="w-4 h-4" />

@@ -253,7 +253,7 @@ export default async function NrfPage() {
           </h2>
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <Link
-              href="/programs/business-financial"
+              href="/training/certifications"
               className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">
@@ -268,7 +268,7 @@ export default async function NrfPage() {
             </Link>
 
             <Link
-              href="/programs/business-financial"
+              href="/training/certifications"
               className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <h3 className="text-lg font-semibold mb-2">

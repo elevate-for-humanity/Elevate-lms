@@ -52,7 +52,7 @@ export default async function OpportunitiesPage() {
               <p className="text-gray-600 ml-10">Post positions and connect with trained, certified graduates.</p>
             </div>
             <Link
-              href="/employer/opportunities/new"
+              href="/employer/opportunities"
               className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition inline-flex items-center gap-2 self-start"
             >
               <Plus className="w-5 h-5" />
@@ -102,7 +102,7 @@ export default async function OpportunitiesPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No Opportunities Posted</h3>
               <p className="text-gray-600 mb-6">Post your first job opportunity to connect with trained graduates.</p>
               <Link
-                href="/employer/opportunities/new"
+                href="/employer/opportunities"
                 className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition inline-flex items-center gap-2"
               >
                 <Plus className="w-5 h-5" />

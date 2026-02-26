@@ -173,13 +173,13 @@ export function SupersonicFooter() {
             </div>
             <div className="flex flex-wrap justify-center gap-6 text-sm">
               <Link
-                href="/privacy"
+                href="/privacy-policy"
                 className="text-gray-300 hover:text-brand-red-400 transition-colors"
               >
                 Privacy Policy
               </Link>
               <Link
-                href="/terms"
+                href="/terms-of-service"
                 className="text-gray-300 hover:text-brand-red-400 transition-colors"
               >
                 Terms of Service

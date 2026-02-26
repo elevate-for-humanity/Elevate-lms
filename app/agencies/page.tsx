@@ -255,7 +255,7 @@ export default async function AgenciesPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/license/demo"
+              href="/store/demos"
               className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Schedule Demo <ArrowRight className="w-5 h-5" />

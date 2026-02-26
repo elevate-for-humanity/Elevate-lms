@@ -123,7 +123,7 @@ export default async function ProgramHolderDashboardPage() {
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="font-bold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <Link href="/program-holder/programs/new" className="flex items-center gap-3 p-3 bg-brand-blue-50 rounded-lg text-brand-blue-700 hover:bg-brand-blue-100">
+                <Link href="/program-holder/programs" className="flex items-center gap-3 p-3 bg-brand-blue-50 rounded-lg text-brand-blue-700 hover:bg-brand-blue-100">
                   <BookOpen className="w-5 h-5" /> Add New Program
                 </Link>
                 <Link href="/program-holder/students" className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg text-gray-700 hover:bg-gray-100">

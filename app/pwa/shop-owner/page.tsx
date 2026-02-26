@@ -174,7 +174,7 @@ function Dashboard({
                 <p className="text-amber-200 font-medium">Pending Entries</p>
                 <p className="text-amber-300 text-sm">{pendingEntries} hours need verification</p>
               </div>
-              <Link href="/pwa/shop-owner/verify" className="bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
+              <Link href="/pwa/shop-owner" className="bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
                 Review
               </Link>
             </div>

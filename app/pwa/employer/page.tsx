@@ -58,7 +58,7 @@ export default async function EmployerPWAPage() {
           <Link href="/employer-portal" className="bg-brand-green-600 text-white rounded-xl p-4 text-center font-semibold text-sm hover:bg-brand-green-700">
             Full Portal →
           </Link>
-          <Link href="/employer-portal/post-position" className="bg-brand-blue-600 text-white rounded-xl p-4 text-center font-semibold text-sm hover:bg-brand-blue-700">
+          <Link href="/employer/opportunities" className="bg-brand-blue-600 text-white rounded-xl p-4 text-center font-semibold text-sm hover:bg-brand-blue-700">
             Post Position →
           </Link>
           <Link href="/employer-portal/candidates" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-slate-50">

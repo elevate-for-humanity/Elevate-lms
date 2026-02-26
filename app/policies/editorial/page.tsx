@@ -245,7 +245,7 @@ export default function EditorialPage() {
               <ul className="list-disc pl-6 text-black space-y-1">
                 <li><a href="/policies/content" className="text-brand-blue-600 hover:underline">Content Policy</a></li>
                 <li><a href="/policies/copyright" className="text-brand-blue-600 hover:underline">Copyright Policy</a></li>
-                <li><a href="/policies/privacy" className="text-brand-blue-600 hover:underline">Privacy Policy</a></li>
+                <li><a href="/privacy-policy" className="text-brand-blue-600 hover:underline">Privacy Policy</a></li>
               </ul>
             </div>
           </div>

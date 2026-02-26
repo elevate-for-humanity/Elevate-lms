@@ -175,7 +175,7 @@ export default function FERPACompliancePage() {
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">Protect Student Data Today</h2>
           <p className="text-brand-blue-100 mb-8">Schedule a demo to see our FERPA compliance tools in action.</p>
-          <Link href="/store/demo" className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-50 transition">
+          <Link href="/store/demos" className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-50 transition">
             Schedule Demo
           </Link>
         </div>

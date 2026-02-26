@@ -62,7 +62,7 @@ export default function EducatorHubPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Become an Instructor</h2>
           <p className="text-gray-600 mb-8">Share your expertise and help others achieve their career goals.</p>
-          <Link href="/apply/instructor" className="inline-flex items-center gap-2 bg-teal-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-teal-700">
+          <Link href="/apply" className="inline-flex items-center gap-2 bg-teal-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-teal-700">
             Apply to Teach
           </Link>
         </div>

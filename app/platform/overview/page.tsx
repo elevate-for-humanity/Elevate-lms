@@ -334,7 +334,7 @@ export default async function PlatformLicensingPage() {
               </div>
 
               <Link
-                href="/pricing/program-holder"
+                href="/license/pricing"
                 className="block w-full bg-white text-brand-blue-600 hover:bg-slate-100 text-center px-6 py-4 rounded-lg font-bold transition text-lg"
               >
                 Learn More & Apply →
@@ -405,7 +405,7 @@ export default async function PlatformLicensingPage() {
               </div>
 
               <Link
-                href="/pricing/independent"
+                href="/license/pricing"
                 className="block w-full bg-slate-900 hover:bg-slate-800 text-white text-center px-6 py-4 rounded-lg font-bold transition text-lg"
               >
                 Get Started →
@@ -474,7 +474,7 @@ export default async function PlatformLicensingPage() {
               </div>
 
               <Link
-                href="/pricing/sponsor-licensing"
+                href="/license/pricing"
                 className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-6 py-4 rounded-lg font-bold transition text-lg"
               >
                 View Details →
@@ -544,7 +544,7 @@ export default async function PlatformLicensingPage() {
               </div>
 
               <Link
-                href="/pricing/build"
+                href="/license/pricing"
                 className="block w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white text-center px-6 py-4 rounded-lg font-bold transition text-lg"
               >
                 Build Package →

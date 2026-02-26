@@ -178,7 +178,7 @@ export default async function TeachersPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/help/instructors" className="text-brand-green-600 hover:underline">
+                  <Link href="/support/help" className="text-brand-green-600 hover:underline">
                     Help Center
                   </Link>
                 </li>

@@ -640,7 +640,7 @@ export default function HvacApplyPage() {
 
                 <p className="text-xs text-gray-500 text-center">
                   By submitting, you agree to our{' '}
-                  <Link href="/terms" className="underline">Terms of Service</Link> and{' '}
+                  <Link href="/terms-of-service" className="underline">Terms of Service</Link> and{' '}
                   <Link href="/privacy-policy" className="underline">Privacy Policy</Link>.
                 </p>
               </div>

@@ -211,7 +211,7 @@ export default function MarketplaceTermsPage() {
             <p>
               Your purchase information is handled according to our{' '}
               <a
-                href="/legal/privacy"
+                href="/privacy-policy"
                 className="text-brand-blue-600 hover:underline"
               >
                 Privacy Policy

@@ -194,16 +194,16 @@ echo ""
 # =============================================================================
 # CHECK: Schema contract — no inserts to non-functional security_logs table
 # =============================================================================
-echo "Checking for inserts to non-functional security_logs table..."
-SECLOG_HITS=$(grep -rn "from('security_logs').insert" --include="*.ts" --include="*.tsx" app/ lib/ 2>/dev/null || true)
+echo "Checking for references to deprecated security_logs table..."
+SECLOG_HITS=$(grep -rn "security_logs" --include="*.ts" --include="*.tsx" app/ lib/ 2>/dev/null | grep -v "node_modules\|\.next\|schema-contract-report\|quality-gates" || true)
 if [ -n "$SECLOG_HITS" ]; then
   echo "$SECLOG_HITS" | while IFS= read -r line; do
     echo "   ❌ $line"
   done
-  echo "   Fix: Use audit_logs table instead (security_logs has no useful columns in live DB)"
+  echo "   Fix: security_logs is deprecated (0 rows, no useful columns). Use audit_logs instead."
   ERRORS=$((ERRORS + 1))
 else
-  echo -e "${GREEN}✅ No inserts to non-functional security_logs table${NC}"
+  echo -e "${GREEN}✅ No references to deprecated security_logs table${NC}"
 fi
 echo ""
 
@@ -219,6 +219,25 @@ if [ -n "$AI_AUDIT_ISSUES" ]; then
   ERRORS=$((ERRORS + 1))
 else
   echo -e "${GREEN}✅ ai_audit_log inserts use correct column names${NC}"
+fi
+echo ""
+
+# =============================================================================
+# CHECK: Schema contract — governed table column validation
+# =============================================================================
+echo "Checking governed table column references against live schema..."
+if [ -f "scripts/governed-schema.json" ]; then
+  SCHEMA_ERRORS=$(python3 scripts/check-schema-columns.py 2>/dev/null || true)
+  if [ -n "$SCHEMA_ERRORS" ]; then
+    echo -e "${YELLOW}⚠️  WARNING:${NC} Column mismatches found in governed tables (non-blocking):"
+    echo "$SCHEMA_ERRORS"
+    # Non-blocking for now — these are pre-existing issues being tracked
+    # Change to ERRORS=$((ERRORS + 1)) to make blocking
+  else
+    echo -e "${GREEN}✅ All governed table column references match live schema${NC}"
+  fi
+else
+  echo "   ⚠️  scripts/governed-schema.json not found, skipping column validation"
 fi
 echo ""
 

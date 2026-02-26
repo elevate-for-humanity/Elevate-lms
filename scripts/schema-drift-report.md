@@ -690,3 +690,25 @@ These are the highest-priority tables to bring under migration control.
 - `user_files` (1 refs, 8 cols)
 - `partner_lms_sync_logs` (1 refs, 21 cols)
 - `tax_interview_questions` (1 refs, 6 cols)
+
+---
+
+## APPENDIX: Migration-Only Table Reconciliation
+
+### secure_identity
+- **Migration**: `20260226_isolate_ssn_from_profiles.sql` (created this session)
+- **Status**: NOT in live DB — migration not yet applied
+- **Action**: Apply when ready to isolate SSN from profiles table
+- **Risk**: Code in `lib/security/secure-identity.ts` references this table but gracefully handles absence
+
+### franchise_preparer_payouts
+- **Migration**: `20250124000001_franchise_system.sql`
+- **Status**: EXISTS in live DB ✅
+- **Note**: False positive in drift report — regex matched `preparer_payouts` substring
+
+### tax_fee_schedules
+- **Migration**: `20260125000000_franchise_management.sql`
+- **Status**: NOT in live DB — migration never applied
+- **Code references**: ZERO — not referenced anywhere in app/ or lib/
+- **Action**: Dead migration. Can be removed or left as documentation.
+- **Risk**: None — no code depends on this table

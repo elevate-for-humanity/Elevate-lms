@@ -1,93 +1,70 @@
-
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 import { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight } from 'lucide-react';
-
+import ProgramPageLayout from '@/components/programs/ProgramPageLayout';
+import type { ProgramPageConfig } from '@/components/programs/ProgramPageLayout';
+import { InView } from '@/components/ui/InView';
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
-  title: 'Federally Funded Programs | WIOA & JRI Training | Elevate',
-  description: 'Federally funded career training programs. WIOA and JRI funding covers tuition for qualifying students. Register at indianacareerconnect.com.',
+  title: 'Federal-Funded Training Programs | WIOA & JRI | Indianapolis',
+  description: 'Free career training through WIOA, WRG, and JRI federal funding. Healthcare, Skilled Trades, Technology, and CDL programs.',
   alternates: { canonical: `${SITE_URL}/programs/federal-funded` },
 };
 
-export default function FederalFundedPage() {
+const config: ProgramPageConfig = {
+  videoSrc: '/videos/program-hero.mp4',
+  title: 'Federal-Funded Programs', subtitle: 'Free career training through WIOA, WRG, and JRI. Tuition, books, supplies, and certifications covered.',
+  badge: 'Free Training', badgeColor: 'green',
+  duration: '3–16 weeks', cost: '$0 for eligible participants', format: 'In-person, Indianapolis', credential: 'Industry Certifications',
+  overview: 'Federal workforce programs cover the full cost of training for eligible participants. WIOA (Workforce Innovation and Opportunity Act), WRG (Workforce Ready Grant), and JRI (Justice Reinvestment Initiative) fund tuition, textbooks, supplies, certification exams, and supportive services like transportation and childcare. You pay nothing out of pocket.',
+  highlights: ['$0 tuition for eligible participants', 'Books, supplies, and uniforms included', 'Certification exam fees covered', 'Supportive services (transportation, childcare)', 'Career counseling and job placement', 'Available for unemployed, underemployed, and justice-involved individuals'],
+  overviewImage: '/images/programs-fresh/healthcare.jpg', overviewImageAlt: 'Students in a funded training program',
+  salaryNumber: 0, salaryLabel: 'Free training — you pay nothing if eligible', salaryPrefix: '',
+  steps: [
+    { title: 'Check Eligibility', desc: 'Take our 2-minute eligibility check or visit WorkOne.' },
+    { title: 'Choose a Program', desc: 'Pick from Healthcare, Skilled Trades, Technology, or CDL.' },
+    { title: 'Apply', desc: 'Complete our application and meet with an advisor.' },
+    { title: 'Start Training', desc: 'Begin your program — everything is covered.' },
+  ],
+  faqs: [
+    { question: 'Who qualifies for free training?', answer: 'You likely qualify if you are unemployed, underemployed, receiving public assistance (SNAP, TANF, Medicaid), a veteran, justice-involved, or have household income below 200% of poverty level.' },
+    { question: 'What does WIOA cover?', answer: 'WIOA covers tuition, textbooks, supplies, uniforms, certification exam fees, and supportive services (transportation, childcare, work tools). You pay nothing out of pocket.' },
+    { question: 'What is JRI funding?', answer: 'JRI (Justice Reinvestment Initiative) is Indiana state funding specifically for justice-involved individuals. It covers the same costs as WIOA and is available for participants with criminal records.' },
+    { question: 'How do I check my eligibility?', answer: 'Take our 2-minute online eligibility check, or visit your local WorkOne office. You can also call us at (317) 314-3757 and we will help you determine your eligibility.' },
+  ],
+  applyHref: '/wioa-eligibility',
+  breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Federal-Funded Programs' }],
+};
 
+export default function Page() {
   return (
-    <div className="min-h-screen bg-white">
-      <ProgramHeroBanner videoSrc="/videos/program-hero.mp4" voiceoverSrc="/audio/heroes/programs.mp3" />
-      <div className="bg-slate-50 border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Federally Funded Programs' }]} />
-        </div>
-      </div>
-
-      <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/homepage/funded-programs.jpg" alt="Federally Funded Programs" fill sizes="100vw" className="object-cover" priority />
-      </section>
-
-      <section className="py-8 sm:py-14 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6 text-center">Eligible Programs</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {[
-              { name: 'Healthcare', href: '/programs/healthcare', img: '/images/hero/hero-healthcare.jpg' },
-              { name: 'Skilled Trades', href: '/programs/skilled-trades', img: '/images/homepage/funded-programs.jpg' },
-              { name: 'CDL Training', href: '/programs/cdl-training', img: '/images/homepage/funded-programs-optimized.jpg' },
-              { name: 'Technology', href: '/programs/technology', img: '/images/hero/hero-tech-careers.jpg' },
-              { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', img: '/images/barber-hero-new.jpg' },
-              { name: 'Culinary', href: '/programs/culinary-apprenticeship', img: '/images/culinary/hero-program-culinary.jpg' },
-            ].map((p) => (
-              <Link key={p.name} href={p.href} className="group">
-                <div className="relative aspect-[3/2] rounded-xl overflow-hidden mb-2">
-                  <Image src={p.img} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 50vw, 33vw" />
-                </div>
-                <h3 className="font-bold text-slate-900 text-sm">{p.name}</h3>
-              </Link>
-            ))}
+    <ProgramPageLayout config={config}>
+      <InView animation="fade-up">
+        <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="text-center mb-10">
+              <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Funded Programs</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Programs Available with Federal Funding</h2>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { label: 'Healthcare', href: '/programs/healthcare', desc: 'CNA, Medical Assistant, Phlebotomy' },
+                { label: 'Skilled Trades', href: '/programs/skilled-trades', desc: 'HVAC, Electrical, Welding, Plumbing' },
+                { label: 'Technology', href: '/programs/technology', desc: 'IT Support, Cybersecurity, Web Dev' },
+                { label: 'CDL Training', href: '/programs/cdl-training', desc: 'Class A License in 3-6 weeks' },
+              ].map((cat) => (
+                <Link key={cat.label} href={cat.href} className="bg-slate-50 rounded-xl p-5 border border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all text-center group">
+                  <h3 className="font-bold text-slate-900 group-hover:text-brand-red-600 transition-colors">{cat.label}</h3>
+                  <p className="text-xs text-slate-500 mt-1">{cat.desc}</p>
+                  <span className="text-brand-red-600 font-semibold text-sm mt-3 block group-hover:underline">View Programs →</span>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
-
-      <section className="py-8 sm:py-14 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">How to Check Eligibility</h2>
-          <div className="space-y-3">
-            {[
-              { step: '1', title: 'Register Online', desc: 'Create an account at indianacareerconnect.com.' },
-              { step: '2', title: 'Schedule WorkOne Appointment', desc: 'Meet with a WorkOne counselor to determine funding eligibility.' },
-              { step: '3', title: 'Choose Your Program', desc: 'Select from WIOA/JRI-eligible training programs.' },
-              { step: '4', title: 'Start Training', desc: 'Begin your funded career training program.' },
-            ].map((s) => (
-              <div key={s.step} className="flex items-start gap-4 bg-white rounded-lg p-4">
-                <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{s.title}</h3>
-                  <p className="text-slate-600 text-sm">{s.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-8 sm:py-14 bg-brand-blue-600">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Check Your Funding Eligibility</h2>
-          <p className="text-white mb-6 text-sm">WIOA and JRI funding available for qualifying students.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=federal-funded" className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">
-              Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
-            </Link>
-            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
-              Register at Indiana Career Connect
-            </a>
-          </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </InView>
+    </ProgramPageLayout>
   );
 }

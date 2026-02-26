@@ -41,11 +41,11 @@ export const mainNavigation: NavItem[] = [
         description: 'Federally funded training',
         subItems: [
           { label: 'CNA', href: '/programs/cna' },
-          { label: 'Phlebotomy Technician', href: '/programs/phlebotomy-technician' },
+          { label: 'Phlebotomy Technician', href: '/programs/healthcare' },
           { label: 'Home Health Aide', href: '/programs/home-health-aide' },
           { label: 'Direct Support Professional', href: '/programs/direct-support-professional' },
           { label: 'CDL', href: '/programs/cdl' },
-          { label: 'CPR & First Aid', href: '/programs/cpr-first-aid-hsi' },
+          { label: 'CPR & First Aid', href: '/programs/cpr-first-aid' },
           { label: 'Peer Recovery Coach', href: '/programs/peer-recovery-coach' },
         ]
       },
@@ -55,7 +55,7 @@ export const mainNavigation: NavItem[] = [
         description: 'Justice-involved reentry programs',
         subItems: [
           { label: 'CNA', href: '/programs/cna' },
-          { label: 'Phlebotomy Technician', href: '/programs/phlebotomy-technician' },
+          { label: 'Phlebotomy Technician', href: '/programs/healthcare' },
           { label: 'CDL', href: '/programs/cdl' },
           { label: 'Workforce Readiness', href: '/programs/workforce-readiness' },
           { label: 'Peer Recovery Coach', href: '/programs/peer-recovery-coach' },

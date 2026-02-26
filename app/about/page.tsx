@@ -413,7 +413,7 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Programs at a Glance</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/programs-hq/cna-training.jpg', href: '/programs/cna-certification' },
+              { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/programs-hq/cna-training.jpg', href: '/programs/cna' },
               { name: 'CDL Training', duration: '4–6 weeks', image: '/images/programs-hq/cdl-trucking.jpg', href: '/programs/cdl' },
               { name: 'Building Technician with HVAC Fundamentals', duration: '12–16 weeks', image: '/images/programs-hq/hvac-technician.jpg', href: '/programs/hvac-technician' },
               { name: 'Electrical', duration: '12–16 weeks', image: '/images/programs-hq/electrical.jpg', href: '/programs/electrical' },

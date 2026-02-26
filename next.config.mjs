@@ -278,8 +278,7 @@ const nextConfig = {
       { source: '/programs/building-maintenance-tech', destination: '/programs/hvac-technician', permanent: true },
       { source: '/programs/building-services-technician', destination: '/programs/hvac-technician', permanent: true },
       { source: '/programs/business-financial', destination: '/programs/tax-preparation', permanent: true },
-      { source: '/programs/cpr-first-aid', destination: '/programs/cna', permanent: true },
-      { source: '/programs/cpr-first-aid-hsi', destination: '/programs/cna', permanent: true },
+      { source: '/programs/cpr-first-aid-hsi', destination: '/programs/cpr-first-aid', permanent: true },
       { source: '/programs/direct-support-professional', destination: '/programs/peer-recovery-specialist', permanent: true },
       { source: '/programs/drug-collector', destination: '/drug-testing/training', permanent: true },
       { source: '/programs/esthetician-apprenticeship', destination: '/programs/cosmetology-apprenticeship', permanent: true },
@@ -288,10 +287,15 @@ const nextConfig = {
       { source: '/programs/it-support', destination: '/programs/it-help-desk', permanent: true },
       { source: '/programs/jri', destination: '/programs/peer-recovery-specialist', permanent: true },
       { source: '/programs/phlebotomy', destination: '/programs/healthcare', permanent: true },
+      { source: '/programs/phlebotomy-technician', destination: '/programs/healthcare', permanent: true },
       { source: '/programs/business-startup-marketing', destination: '/programs/entrepreneurship', permanent: true },
       { source: '/programs/emergency-health-safety-tech', destination: '/programs/healthcare', permanent: true },
       { source: '/programs/home-health-aide', destination: '/programs/cna', permanent: true },
       { source: '/programs/public-safety-reentry-specialist', destination: '/programs/peer-recovery-specialist', permanent: true },
+      { source: '/programs/cdl-class-a', destination: '/programs/cdl-training', permanent: true },
+      { source: '/programs/certified-nursing-assistant', destination: '/programs/cna', permanent: true },
+      { source: '/programs/medical-coding-billing', destination: '/programs/healthcare', permanent: true },
+      { source: '/programs/cosmetology', destination: '/programs/cosmetology-apprenticeship', permanent: true },
 
       // ============================================
       // APP ALIAS REDIRECTS (Rule B: auth/app path renames)

@@ -5,23 +5,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 
 export default function HVACProgramContent() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative h-[300px] sm:h-[400px] md:h-[480px]">
-        <Image
-          src="/images/trades/hero-program-hvac.jpg"
-          alt="HVAC technician servicing a commercial air conditioning unit"
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority
-        />
-      </section>
+      {/* Video Hero Banner */}
+      <ProgramHeroBanner videoSrc="/videos/hvac-technician.mp4" voiceoverSrc="/audio/heroes/skilled-trades.mp3" />
 
       {/* Breadcrumbs */}
       <div className="bg-white border-b">

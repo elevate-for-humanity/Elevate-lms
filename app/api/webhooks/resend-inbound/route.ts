@@ -6,10 +6,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 
+// Lazy-init to avoid build-time crash when env var is missing
+let _resend: Resend | null = null;
 function getResend() {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) throw new Error('RESEND_API_KEY not configured');
-  return new Resend(key);
+  if (!_resend) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY environment variable is not set');
+    }
+    _resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return _resend;
 }
 
 // Where to forward inbound emails. Map recipient prefixes to Gmail.
@@ -65,7 +71,7 @@ export async function POST(request: NextRequest) {
       forwardTo,
     });
 
-
+    // Use Resend SDK forward helper — handles content + attachments automatically
     const { data, error } = await getResend().emails.receiving.forward({
       emailId,
       to: forwardTo,

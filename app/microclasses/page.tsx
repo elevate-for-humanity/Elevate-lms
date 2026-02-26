@@ -17,7 +17,7 @@ const microclasses = [
     duration: '4-6 hours',
     price: 'Free with WIOA',
     certification: 'HSI CPR/AED/First Aid',
-    href: '/programs/cpr-first-aid-hsi',
+    href: '/programs/cpr-first-aid',
     image: '/images/programs/cpr-certification-group-hd.jpg',
   },
   {

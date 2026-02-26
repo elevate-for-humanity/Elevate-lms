@@ -78,7 +78,7 @@ const PROGRAMS = [
   {
     name: 'CNA Certification',
     image: '/images/programs-hq/cna-training.jpg',
-    href: '/programs/cna-certification',
+    href: '/programs/cna',
     duration: '4–6 weeks',
     credential: 'Certified Nursing Assistant (CNA)',
     issuer: 'Indiana State Dept. of Health',

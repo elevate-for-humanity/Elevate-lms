@@ -5,8 +5,10 @@ import { revalidatePath } from 'next/cache';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 
+// info@elevateforhumanity.org removed — domain MX points to Resend/SES inbound
+// but no mailbox exists there, so emails bounce and get re-suppressed in a loop.
+// Use only the Gmail address until MX records are updated or Resend forwarding is configured.
 const ADMIN_EMAILS = [
-  'info@elevateforhumanity.org',
   'elevate4humanityedu@gmail.com',
 ];
 
@@ -321,7 +323,40 @@ async function insertApplication(payload: {
       `<p style="margin:0 0 20px;font-size:13px;color:#888;font-family:Arial,sans-serif">Forgot your password? Reset it anytime at <a href="${siteUrl}/reset-password" style="color:#888">${siteUrl}/reset-password</a></p>`,
     ].join('');
 
-    // Send student confirmation email — must await so it actually sends
+    // Admin notification FIRST — send before student email so serverless
+    // timeout doesn't prevent admin from being notified about new applications.
+    const adminSubject = `[NEW APPLICATION] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`;
+    const adminHtml = [
+        emailHeader,
+        `<h3>New ${payload.source.replace(/-/g, ' ')}</h3>`,
+        `<p style="color:#b45309"><strong>Status: PENDING — student completing onboarding, documents need verification</strong></p>`,
+        `<table style="border-collapse:collapse;width:100%;max-width:500px">`,
+        `<tr><td style="padding:6px;font-weight:bold">Name</td><td style="padding:6px">${payload.firstName} ${payload.lastName}</td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">Email</td><td style="padding:6px"><a href="mailto:${payload.email}">${payload.email}</a></td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">Phone</td><td style="padding:6px"><a href="tel:${payload.phone}">${payload.phone}</a></td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">Program</td><td style="padding:6px">${programLabel}</td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">City / ZIP</td><td style="padding:6px">${payload.city} ${payload.zip}</td></tr>`,
+        `<tr><td style="padding:6px;font-weight:bold">Reference</td><td style="padding:6px">${referenceNumber}</td></tr>`,
+        payload.supportNotes ? `<tr><td style="padding:6px;font-weight:bold">Details</td><td style="padding:6px">${payload.supportNotes}</td></tr>` : '',
+        `</table>`,
+        supabase ? `<p><a href="${siteUrl}/admin/applications/review/${referenceNumber}" style="display:inline-block;padding:10px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;margin:8px 0">Review & Approve</a></p>` : '',
+        supabase ? `<p><a href="${siteUrl}/admin/applications">View All Applications</a></p>` : '',
+        emailFooter,
+      ].filter(Boolean).join('');
+
+    await Promise.allSettled(
+      ADMIN_EMAILS.map((addr) =>
+        sendEmailDirect(addr, adminSubject, adminHtml)
+      ),
+    ).then((results) => {
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          logger.error(`[Apply] Admin notification to ${ADMIN_EMAILS[i]} failed:`, r.reason);
+        }
+      });
+    });
+
+    // Send student confirmation email
     await sendEmailDirect(
       payload.email,
       `Welcome to Elevate for Humanity — ${programLabel} [${referenceNumber}]`,
@@ -418,39 +453,6 @@ async function insertApplication(payload: {
         emailFooter,
       ].join(''),
     ).catch((err) => { logger.error('[Apply] Student confirmation email failed:', err instanceof Error ? err.message : err); });
-
-    // Admin notification — send to each admin address individually so a
-    // Resend suppression on one does not block the others.
-    const adminSubject = `[NEW APPLICATION] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`;
-    const adminHtml = [
-        emailHeader,
-        `<h3>New ${payload.source.replace(/-/g, ' ')}</h3>`,
-        `<p style="color:#b45309"><strong>Status: PENDING — student completing onboarding, documents need verification</strong></p>`,
-        `<table style="border-collapse:collapse;width:100%;max-width:500px">`,
-        `<tr><td style="padding:6px;font-weight:bold">Name</td><td style="padding:6px">${payload.firstName} ${payload.lastName}</td></tr>`,
-        `<tr><td style="padding:6px;font-weight:bold">Email</td><td style="padding:6px"><a href="mailto:${payload.email}">${payload.email}</a></td></tr>`,
-        `<tr><td style="padding:6px;font-weight:bold">Phone</td><td style="padding:6px"><a href="tel:${payload.phone}">${payload.phone}</a></td></tr>`,
-        `<tr><td style="padding:6px;font-weight:bold">Program</td><td style="padding:6px">${programLabel}</td></tr>`,
-        `<tr><td style="padding:6px;font-weight:bold">City / ZIP</td><td style="padding:6px">${payload.city} ${payload.zip}</td></tr>`,
-        `<tr><td style="padding:6px;font-weight:bold">Reference</td><td style="padding:6px">${referenceNumber}</td></tr>`,
-        payload.supportNotes ? `<tr><td style="padding:6px;font-weight:bold">Details</td><td style="padding:6px">${payload.supportNotes}</td></tr>` : '',
-        `</table>`,
-        supabase ? `<p><a href="${siteUrl}/admin/applications/review/${referenceNumber}" style="display:inline-block;padding:10px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;margin:8px 0">Review & Approve</a></p>` : '',
-        supabase ? `<p><a href="${siteUrl}/admin/applications">View All Applications</a></p>` : '',
-        emailFooter,
-      ].filter(Boolean).join('');
-
-    await Promise.allSettled(
-      ADMIN_EMAILS.map((addr) =>
-        sendEmailDirect(addr, adminSubject, adminHtml)
-      ),
-    ).then((results) => {
-      results.forEach((r, i) => {
-        if (r.status === 'rejected') {
-          logger.error(`[Apply] Admin notification to ${ADMIN_EMAILS[i]} failed:`, r.reason);
-        }
-      });
-    });
   }
 
   // Path A: DB available — insert application, admin enrolls later

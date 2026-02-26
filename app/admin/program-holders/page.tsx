@@ -5,41 +5,28 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
+import { Building2, Clock, CheckCircle, XCircle, Eye } from 'lucide-react';
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/program-holders',
-  },
-  title: 'Program Holders | Elevate For Humanity',
-  description:
-    'Manage program holder accounts.',
+  title: 'Program Holders | Admin | Elevate For Humanity',
+  description: 'Manage program holder organizations and approvals.',
+  robots: { index: false, follow: false },
 };
 
-export default async function ProgramHoldersPage() {
+const STATUS_STYLES: Record<string, string> = {
+  active: 'bg-brand-green-100 text-brand-green-800',
+  pending: 'bg-amber-100 text-amber-800',
+  rejected: 'bg-brand-red-100 text-brand-red-800',
+  suspended: 'bg-gray-100 text-gray-600',
+};
+
+export default async function AdminProgramHoldersPage() {
   const supabase = await createClient();
-  const _admin = createAdminClient(); const db = _admin || supabase;
+  const _admin = createAdminClient();
+  const db = _admin || supabase;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Program Holders" }]} />
-        </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
 
   const { data: profile } = await db
     .from('profiles')
@@ -47,135 +34,145 @@ export default async function ProgramHoldersPage() {
     .eq('id', user.id)
     .single();
 
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
     redirect('/unauthorized');
   }
 
-  const { data: items, count: totalItems } = await db
-    .from('profiles')
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .limit(50);
+  // Fetch all program holders
+  const { data: holders } = await db
+    .from('program_holders')
+    .select('id, organization_name, name, contact_name, contact_email, contact_phone, status, mou_signed, created_at, user_id')
+    .order('created_at', { ascending: false });
 
-  const { count: activeItems } = await db
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'active');
+  // Fetch program counts per holder
+  const holderIds = (holders || []).map((h: any) => h.id);
+  const { data: programCounts } = holderIds.length > 0
+    ? await db
+        .from('program_holder_programs')
+        .select('program_holder_id')
+        .in('program_holder_id', holderIds)
+    : { data: [] };
 
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
-    redirect('/unauthorized');
-  }
+  const countMap: Record<string, number> = {};
+  (programCounts || []).forEach((pc: any) => {
+    countMap[pc.program_holder_id] = (countMap[pc.program_holder_id] || 0) + 1;
+  });
+
+  const items = holders || [];
+  const pending = items.filter((h: any) => h.status === 'pending').length;
+  const active = items.filter((h: any) => h.status === 'active').length;
 
   return (
     <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Program Holders" }]} />
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-4">
+          <Breadcrumbs items={[
+            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Program Holders' },
+          ]} />
         </div>
-      {/* Hero Section */}
-      <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
-          src="/images/artlist/hero-training-2.jpg"
-          alt="Program Holders"
-          fill
-          className="object-cover"
-          quality={100}
-          priority
-          sizes="100vw"
-        />
 
-      </section>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Program Holders</h1>
+            <p className="text-gray-600 mt-1">Manage program holder organizations and approvals</p>
+          </div>
+        </div>
 
-      {/* Content Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-sm font-medium text-black mb-2">
-                  Total Items
-                </h3>
-                <p className="text-3xl font-bold text-brand-blue-600">
-                  {totalItems || 0}
-                </p>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-sm font-medium text-black mb-2">
-                  Active
-                </h3>
-                <p className="text-3xl font-bold text-brand-green-600">
-                  {activeItems || 0}
-                </p>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-sm font-medium text-black mb-2">
-                  Recent
-                </h3>
-                <p className="text-3xl font-bold text-brand-blue-600">
-                  {items?.filter((i) => {
-                    const created = new Date(i.created_at);
-                    const weekAgo = new Date();
-                    weekAgo.setDate(weekAgo.getDate() - 7);
-                    return created > weekAgo;
-                  }).length || 0}
-                </p>
-              </div>
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <Building2 className="w-5 h-5 text-gray-400" />
+              <h3 className="text-sm font-medium text-gray-500">Total</h3>
             </div>
+            <p className="text-3xl font-bold text-gray-900">{items.length}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="w-5 h-5 text-amber-500" />
+              <h3 className="text-sm font-medium text-gray-500">Pending Approval</h3>
+            </div>
+            <p className="text-3xl font-bold text-amber-600">{pending}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="w-5 h-5 text-brand-green-500" />
+              <h3 className="text-sm font-medium text-gray-500">Active</h3>
+            </div>
+            <p className="text-3xl font-bold text-brand-green-600">{active}</p>
+          </div>
+        </div>
 
-            {/* Data Display */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h2 className="text-2xl font-bold mb-4">Items</h2>
-              {items && items.length > 0 ? (
-                <div className="space-y-4">
-                  {items.map((item: any) => (
-                    <div
-                      key={item.id}
-                      className="p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <p className="font-semibold">
-                        {item.title || item.name || item.id}
-                      </p>
-                      <p className="text-sm text-black">
-                        {new Date(item.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
+        {/* Table */}
+        <div className="bg-white rounded-lg shadow-sm border">
+          {items.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-gray-500 border-b bg-gray-50">
+                    <th className="px-4 py-3 font-medium">Organization</th>
+                    <th className="px-4 py-3 font-medium">Contact</th>
+                    <th className="px-4 py-3 font-medium text-center">Programs</th>
+                    <th className="px-4 py-3 font-medium text-center">MOU</th>
+                    <th className="px-4 py-3 font-medium text-center">Status</th>
+                    <th className="px-4 py-3 font-medium">Applied</th>
+                    <th className="px-4 py-3 font-medium text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {items.map((h: any) => (
+                    <tr key={h.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3">
+                        <p className="font-medium text-gray-900">{h.organization_name || h.name || 'Unnamed'}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-gray-900">{h.contact_name || '—'}</p>
+                        <p className="text-xs text-gray-500">{h.contact_email || ''}</p>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`font-medium ${(countMap[h.id] || 0) === 0 ? 'text-amber-600' : 'text-gray-900'}`}>
+                          {countMap[h.id] || 0}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        {h.mou_signed ? (
+                          <CheckCircle className="w-4 h-4 text-brand-green-600 mx-auto" />
+                        ) : (
+                          <XCircle className="w-4 h-4 text-gray-300 mx-auto" />
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`text-xs font-medium px-2 py-1 rounded ${STATUS_STYLES[h.status] || 'bg-gray-100 text-gray-600'}`}>
+                          {h.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-500 text-xs">
+                        {new Date(h.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <Link
+                          href={`/admin/program-holders/${h.id}`}
+                          className="inline-flex items-center gap-1 text-brand-blue-600 hover:underline text-sm font-medium"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          Review
+                        </Link>
+                      </td>
+                    </tr>
                   ))}
-                </div>
-              ) : (
-                <p className="text-black text-center py-8">No items found</p>
-              )}
+                </tbody>
+              </table>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-700">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Program Holder Management
-                        </h2>
-            <p className="text-base md:text-lg text-brand-blue-100 mb-8">
-              Manage organizations that deliver programs under Elevate.
-                        </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link
-                href="/admin/program-holders"
-                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
-              >
-                View Holders
-              </Link>
-              <Link
-                href="/admin/program-holder-acknowledgements"
-                className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
-              >
-                View Acknowledgements
-              </Link>
+          ) : (
+            <div className="text-center py-16">
+              <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-500 font-medium">No program holders yet</p>
+              <p className="text-sm text-gray-400 mt-1">Program holder applications will appear here when submitted.</p>
             </div>
-          </div>
+          )}
         </div>
-      </section>
+      </div>
     </div>
   );
 }

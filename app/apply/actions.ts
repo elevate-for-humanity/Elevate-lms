@@ -565,6 +565,21 @@ export async function submitStudentApplication(data: StudentApplicationData) {
 }
 
 export async function submitProgramHolderApplication(data: ProgramHolderApplicationData) {
+  // Server-side validation — browser required attrs are not enforcement
+  const firstName = data.firstName?.trim();
+  const lastName = data.lastName?.trim();
+  const email = data.email?.trim().toLowerCase();
+  const phone = data.phone?.trim();
+  const organizationName = data.organizationName?.trim();
+
+  if (!firstName || !lastName || !email || !phone || !organizationName) {
+    return { success: false, error: 'Required fields missing: first name, last name, email, phone, and organization name are all required.' };
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { success: false, error: 'Please provide a valid email address.' };
+  }
+
   const result = await insertApplication({
     firstName: data.firstName,
     lastName: data.lastName,
@@ -585,8 +600,8 @@ export async function submitProgramHolderApplication(data: ProgramHolderApplicat
   });
 
   if (result.success) {
-    // Set role to program_holder and create program_holders row.
-    // insertApplication creates the user with role='student' — fix that here.
+    // Create program_holders row (pending) and link profile.
+    // Role stays as-is until admin approval via approve_and_provision RPC.
     const adminDb = createAdminClient();
     if (adminDb) {
       // Look up the user by email to get their auth ID
@@ -613,11 +628,11 @@ export async function submitProgramHolderApplication(data: ProgramHolderApplicat
           .select('id')
           .single();
 
-        // Set role and link profile to program_holders row
+        // Link profile to program_holders row but do NOT set role yet.
+        // Role is set to 'program_holder' during admin approval (via RPC).
         await adminDb
           .from('profiles')
           .update({
-            role: 'program_holder',
             program_holder_id: holderRow?.id || null,
           })
           .eq('id', profile.id);

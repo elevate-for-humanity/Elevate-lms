@@ -47,7 +47,7 @@ export default function MOUPage() {
 
           <p><strong>Between:</strong></p>
           <ul>
-            <li><strong>Sponsor:</strong> Elevate for Humanity, Inc. (&quot;Sponsor&quot;)</li>
+            <li><strong>Sponsor:</strong> 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Technical Institute (&quot;Sponsor&quot;)</li>
             <li><strong>Worksite Partner:</strong> _________________________________ (&quot;Shop&quot;)</li>
           </ul>
           <p><strong>Effective Date:</strong> _________________</p>
@@ -172,7 +172,7 @@ export default function MOUPage() {
           <h2>SIGNATURES</h2>
 
           <div className="mt-8">
-            <p><strong>SPONSOR: Elevate for Humanity, Inc.</strong></p>
+            <p><strong>SPONSOR: 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Technical Institute</strong></p>
             <p className="mt-4">Signature: _________________________________</p>
             <p>Printed Name: _________________________________</p>
             <p>Title: _________________________________</p>
@@ -206,7 +206,7 @@ export default function MOUPage() {
           <p className="text-sm"><strong>Questions?</strong> Contact: our contact form | (317) 314-3757</p>
 
           <div className="mt-8 text-center text-sm text-gray-500">
-            <p>Elevate for Humanity, Inc.</p>
+            <p>2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Technical Institute</p>
             <p>Indianapolis, Indiana</p>
             <p>www.elevateforhumanity.org</p>
           </div>

@@ -4,7 +4,7 @@
 
 **This Mutual Non-Disclosure Agreement ("Agreement")** is entered into as of _________________ ("Effective Date") by and between:
 
-**Party A:** Elevate for Humanity, Inc.  
+**Party A:** 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute  
 Address: [Company Address]  
 ("Elevate")
 

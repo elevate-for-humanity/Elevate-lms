@@ -151,7 +151,7 @@ export default function ServerFooter() {
                 className="w-7 h-7"
               />
               <p className="text-slate-400 text-sm">
-                © {new Date().getFullYear()} Elevate for Humanity, Inc. All rights reserved.
+                © {new Date().getFullYear()} 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Technical Institute. All rights reserved.
               </p>
             </div>
             

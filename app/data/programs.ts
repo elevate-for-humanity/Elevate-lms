@@ -1393,7 +1393,7 @@ export const programs: Program[] = [
     schedule: '480 hours',
     delivery: 'Hybrid (Classroom + Practice)',
     credential: 'Certified Administrative Professional',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Pell Grant',
@@ -1444,7 +1444,7 @@ export const programs: Program[] = [
     schedule: '1280 hours',
     delivery: 'Hybrid (Classroom + Shop)',
     credential: 'ASE Certified Technician',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Pell Grant',
@@ -1495,7 +1495,7 @@ export const programs: Program[] = [
     schedule: '640 hours',
     delivery: 'Hybrid (Classroom + Practice)',
     credential: 'QuickBooks Certified User',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Pell Grant',
@@ -1546,7 +1546,7 @@ export const programs: Program[] = [
     schedule: '160 hours',
     delivery: 'In-Person',
     credential: 'Certificate of Completion',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'WRG'
@@ -1586,7 +1586,7 @@ export const programs: Program[] = [
     schedule: '1500 hours',
     delivery: 'hybrid',
     credential: 'Indiana Cosmetology License',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Payment Plans'
@@ -1636,7 +1636,7 @@ export const programs: Program[] = [
     schedule: '1000 hours',
     delivery: 'apprenticeship',
     credential: 'Culinary Arts Certificate',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Payment Plans'
@@ -1683,7 +1683,7 @@ export const programs: Program[] = [
     schedule: '320 hours',
     delivery: 'Hybrid (Classroom + Practice)',
     credential: 'Customer Service Professional',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Workforce Ready Grant',
@@ -1734,7 +1734,7 @@ export const programs: Program[] = [
     schedule: '960 hours',
     delivery: 'Hybrid (Classroom + Lab)',
     credential: 'Certiport IT Specialist — Cybersecurity',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Pell Grant',
@@ -1785,7 +1785,7 @@ export const programs: Program[] = [
     schedule: '800 hours',
     delivery: 'Hybrid (Classroom + Online)',
     credential: 'Data Analyst',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Pell Grant',
@@ -1836,7 +1836,7 @@ export const programs: Program[] = [
     schedule: '480 hours',
     delivery: 'Hybrid (Classroom + Clinical)',
     credential: 'Certified Dental Assistant (CDA)',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Pell Grant',
@@ -1887,7 +1887,7 @@ export const programs: Program[] = [
     schedule: '1280 hours',
     delivery: 'Hybrid (Classroom + Shop)',
     credential: 'ASE Diesel Certification',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Pell Grant',
@@ -1938,7 +1938,7 @@ export const programs: Program[] = [
     schedule: '120 hours',
     delivery: 'In-Person',
     credential: 'Certificate of Completion',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'WRG'
@@ -1978,7 +1978,7 @@ export const programs: Program[] = [
     schedule: 'Contact for schedule',
     delivery: 'In-Person',
     credential: 'Certificate of Completion',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Payment Plans'
@@ -2017,7 +2017,7 @@ export const programs: Program[] = [
     schedule: '180 hours',
     delivery: 'hybrid',
     credential: 'Indiana EMT Certification',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Payment Plans'
@@ -2063,7 +2063,7 @@ export const programs: Program[] = [
     schedule: '640 hours',
     delivery: 'Hybrid (Classroom + Mentorship)',
     credential: 'Small Business Owner',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Small business grants',
@@ -2113,7 +2113,7 @@ export const programs: Program[] = [
     schedule: '40 hours',
     delivery: 'Hybrid (Classroom + Practice)',
     credential: 'OSHA Forklift Operator',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Workforce Ready Grant',
@@ -2164,7 +2164,7 @@ export const programs: Program[] = [
     schedule: '320 hours',
     delivery: 'Hybrid (Classroom + Online)',
     credential: 'Licensed Insurance Agent',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Payment Plans',
@@ -2215,7 +2215,7 @@ export const programs: Program[] = [
     schedule: '320 hours',
     delivery: 'Hybrid (Classroom + Lab)',
     credential: 'Certiport IT Specialist — Device Configuration',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Pell Grant',
@@ -2266,7 +2266,7 @@ export const programs: Program[] = [
     schedule: '60 hours',
     delivery: 'online',
     credential: 'Certified Life Coach',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Payment Plans'
@@ -2313,7 +2313,7 @@ export const programs: Program[] = [
     schedule: '480 hours',
     delivery: 'Hybrid (Classroom + Shop)',
     credential: 'Manufacturing Technician Level 1',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Pell Grant',
@@ -2364,7 +2364,7 @@ export const programs: Program[] = [
     schedule: '450 hours',
     delivery: 'in-person',
     credential: 'Indiana Nail Technician License',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Payment Plans'
@@ -2412,7 +2412,7 @@ export const programs: Program[] = [
     schedule: '40 hours',
     delivery: 'In-Person',
     credential: 'Certificate of Completion',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'WRG'
@@ -2452,7 +2452,7 @@ export const programs: Program[] = [
     schedule: '80 hours',
     delivery: 'In-Person',
     credential: 'Certificate of Completion',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'WRG'
@@ -2492,7 +2492,7 @@ export const programs: Program[] = [
     schedule: '640 hours',
     delivery: 'Hybrid (Classroom + Clinical)',
     credential: 'Certified Pharmacy Technician (CPhT)',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Pell Grant',
@@ -2543,7 +2543,7 @@ export const programs: Program[] = [
     schedule: 'Contact for schedule',
     delivery: 'In-Person',
     credential: 'Certificate of Completion',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Payment Plans'
@@ -2582,7 +2582,7 @@ export const programs: Program[] = [
     schedule: '480 hours',
     delivery: 'Hybrid (Classroom + Online)',
     credential: 'Licensed Real Estate Agent',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Payment Plans',
@@ -2633,7 +2633,7 @@ export const programs: Program[] = [
     schedule: '80 hours',
     delivery: 'In-Person',
     credential: 'Certificate of Completion',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'WRG'
@@ -2673,7 +2673,7 @@ export const programs: Program[] = [
     schedule: 'Contact for schedule',
     delivery: 'In-Person',
     credential: 'Certificate of Completion',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Payment Plans'
@@ -2712,7 +2712,7 @@ export const programs: Program[] = [
     schedule: '480 hours',
     delivery: 'Hybrid (Classroom + Field)',
     credential: 'NABCEP PV Installation Professional',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Workforce Ready Grant',
@@ -2763,7 +2763,7 @@ export const programs: Program[] = [
     schedule: '960 hours',
     delivery: 'Hybrid (Classroom + Online)',
     credential: 'Full-Stack Web Developer',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Pell Grant',
@@ -2814,7 +2814,7 @@ export const programs: Program[] = [
     schedule: 'Contact for schedule',
     delivery: 'In-Person',
     credential: 'Certificate of Completion',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Payment Plans'
@@ -2853,7 +2853,7 @@ export const programs: Program[] = [
     schedule: '200 hours',
     delivery: 'in-person',
     credential: 'ServSafe Food Handler',
-    approvals: ['Elevate for Humanity'],
+    approvals: ['Elevate for Humanity Career & Technical Institute'],
     fundingOptions: [
       'WIOA',
       'Payment Plans'

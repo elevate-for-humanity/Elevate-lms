@@ -247,7 +247,7 @@ export default function EnrollmentAgreementPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Credential Awarded</h2>
           <p className="text-gray-700 mb-4">
             Upon successful completion of all program requirements, students will receive a 
-            <strong> Certificate of Completion</strong> from Elevate for Humanity.
+            <strong> Certificate of Completion</strong> from Elevate for Humanity Career &amp; Technical Institute.
           </p>
           <p className="text-gray-700">
             This certificate documents that the student has completed the training program. 

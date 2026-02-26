@@ -72,7 +72,8 @@ export async function GET(request: NextRequest) {
       generatedAt: new Date().toISOString(),
       generatedBy: user.id,
       institution: {
-        name: 'Elevate for Humanity',
+        name: 'Elevate for Humanity Career & Technical Institute',
+        legalEntity: '2Exclusive LLC-S',
         type: 'Workforce Training Provider',
         etplStatus: 'Approved',
         doeStatus: 'Registered',

@@ -119,8 +119,8 @@ export default function HVACProgramContent() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {[
               { name: 'EPA 608 Universal', issuer: 'EPA-approved organization' },
-              { name: 'Residential HVAC Cert 1', issuer: 'Elevate for Humanity' },
-              { name: 'Residential HVAC Cert 2', issuer: 'Elevate for Humanity' },
+              { name: 'Residential HVAC Cert 1', issuer: 'Elevate for Humanity Career & Technical Institute' },
+              { name: 'Residential HVAC Cert 2', issuer: 'Elevate for Humanity Career & Technical Institute' },
               { name: 'OSHA 30 Safety', issuer: 'Dept. of Labor' },
               { name: 'CPR / First Aid', issuer: 'American Heart Assoc.' },
               { name: 'NRF Rise Up', issuer: 'National Retail Federation' },

@@ -2,7 +2,7 @@ export const APPRENTICESHIP = {
   IN: {
     enabled: true,
     state: "Indiana",
-    sponsorName: "Elevate for Humanity",
+    sponsorName: "2Exclusive LLC-S (DBA Elevate for Humanity Career & Technical Institute)",
     system: "U.S. Department of Labor Registered Apprenticeship (RAPIDS)",
     programName: "Barber Apprenticeship",
     earnAndLearn: true,

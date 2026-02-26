@@ -23,11 +23,11 @@ interface Props {
 
 export function SponsorshipInfoPanel({ programId, partnerId, variant = 'full' }: Props) {
   const [info, setInfo] = useState<SponsorshipInfo>({
-    sponsor_name: 'Elevate for Humanity',
+    sponsor_name: '2Exclusive LLC-S (DBA Elevate for Humanity Career & Technical Institute)',
     curriculum_type: 'Partner-provided + required online components',
     enrollment_manager: 'Managed by EFH',
     funding_source: 'Coordinated through WorkOne',
-    compliance_notes: 'All programs operate under Elevate for Humanity sponsorship.',
+    compliance_notes: 'All programs operate under 2Exclusive LLC-S sponsorship.',
   });
   const [loading, setLoading] = useState(!!programId || !!partnerId);
 
@@ -164,7 +164,7 @@ export function SponsorshipInfoPanel({ programId, partnerId, variant = 'full' }:
 }
 
 export function SponsorshipTooltip({ info }: { info?: SponsorshipInfo }) {
-  const sponsorName = info?.sponsor_name || 'Elevate for Humanity';
+  const sponsorName = info?.sponsor_name || '2Exclusive LLC-S (DBA Elevate for Humanity Career & Technical Institute)';
   
   return (
     <div className="max-w-sm">

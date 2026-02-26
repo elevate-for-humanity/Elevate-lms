@@ -69,7 +69,7 @@ export function CertificateTemplate({
           <div className="text-center">
             <div className="border-t-2 border-slate-900 pt-2 px-8">
               <p className="font-bold text-black">{instructorName}</p>
-              <p className="text-sm text-black">Elevate for Humanity</p>
+              <p className="text-sm text-black">Elevate for Humanity Career &amp; Technical Institute</p>
             </div>
           </div>
         </div>

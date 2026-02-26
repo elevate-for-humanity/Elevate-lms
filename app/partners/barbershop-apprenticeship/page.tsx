@@ -103,7 +103,7 @@ const faqs = [
   },
   {
     q: 'What is the difference between a Sponsor and a Worksite?',
-    a: 'Elevate for Humanity is the Sponsor of Record—we handle registration, compliance, and related instruction. Your shop is the Worksite where the apprentice gains hands-on experience under your supervision.',
+    a: '2Exclusive LLC-S (DBA Elevate for Humanity Career & Technical Institute) is the Sponsor of Record—we handle registration, compliance, and related instruction. Your shop is the Worksite where the apprentice gains hands-on experience under your supervision.',
   },
   {
     q: 'How long is the apprenticeship?',
@@ -203,7 +203,7 @@ export default function BarbershopPartnerPage() {
                   <Shield className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">Sponsor (Elevate for Humanity)</h3>
+                  <h3 className="text-xl font-bold text-gray-900">Sponsor (2Exclusive LLC-S)</h3>
                   <p className="text-sm text-gray-500">Compliance & Administration</p>
                 </div>
               </div>

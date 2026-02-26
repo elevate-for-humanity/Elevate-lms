@@ -354,7 +354,7 @@ export default async function ProgramsPage() {
                 credentials: [
                   { name: 'Business of Retail Certified Specialist', partner: 'National Retail Federation (NRF)' },
                   { name: 'Retail Industry Fundamentals Specialist', partner: 'National Retail Federation (NRF)' },
-                  { name: 'Certificate of Completion', partner: 'Elevate for Humanity' },
+                  { name: 'Certificate of Completion', partner: 'Elevate for Humanity Career & Technical Institute' },
                 ],
                 funding: 'WIOA',
                 category: 'Business',
@@ -371,7 +371,7 @@ export default async function ProgramsPage() {
                   { name: 'Microsoft 365 Fundamentals', partner: 'Microsoft' },
                   { name: 'QuickBooks Pro Advisor', partner: 'Intuit' },
                   { name: 'Rise Up', partner: 'National Retail Federation (NRF)' },
-                  { name: 'Certificate of Completion', partner: 'Elevate for Humanity' },
+                  { name: 'Certificate of Completion', partner: 'Elevate for Humanity Career & Technical Institute' },
                 ],
                 funding: 'WIOA',
                 category: 'Business',

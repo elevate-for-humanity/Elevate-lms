@@ -56,7 +56,7 @@ export default function CertificateGenerator({
           </div>
           <div className="border-t-2 border-gray-300 pt-8">
             <div className="text-sm text-black">
-              Elevate for Humanity
+              Elevate for Humanity Career &amp; Technical Institute
             </div>
             <div className="text-xs text-gray-500 mt-2">
               Workforce Development & Training

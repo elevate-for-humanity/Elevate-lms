@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
           course_id: enrollment.course_id,
           enrollment_id: enrollmentId,
           issue_date: issueDate || new Date().toISOString().split('T')[0],
-          signed_by: signedBy || 'Elevate for Humanity',
+          signed_by: signedBy || 'Elevate for Humanity Career & Technical Institute',
           status: 'issued',
           issued_by: user.id,
         });
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
           template_id: templateId,
           course_id: enrollment.course_id,
           issued_date: issueDate || new Date().toISOString().split('T')[0],
-          signed_by: signedBy || 'Elevate for Humanity',
+          signed_by: signedBy || 'Elevate for Humanity Career & Technical Institute',
           status: 'active',
           issued_by: user.id,
         });

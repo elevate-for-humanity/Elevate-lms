@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
   try {
     const { isAIAvailable } = await import('@/lib/ai/ai-service');
     aiAvailable = isAIAvailable();
-  } catch {}
+  } catch { /* AI service not available */ }
 
   if (!aiAvailable) {
     const fallback = `The ${program.name} program is available at Elevate for Humanity. Apply at elevateforhumanity.org${program.applyUrl} or contact us for details.`;

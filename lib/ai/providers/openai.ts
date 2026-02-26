@@ -9,6 +9,7 @@ export class OpenAIProvider implements AIProvider, AIImageProvider {
 
   private getClient() {
     if (this.client) return this.client;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const OpenAI = require('openai').default;
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey || apiKey === 'placeholder-build-key') {

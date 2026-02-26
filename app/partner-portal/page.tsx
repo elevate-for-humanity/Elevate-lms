@@ -28,7 +28,7 @@ export default async function PartnerPortalPage() {
 
   let org: any = null;
   let mouStatus = 'not_sent';
-  let stats = {
+  const stats = {
     activeApprentices: 0,
     pendingHours: 0,
     pendingDocuments: 0,

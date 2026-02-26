@@ -156,7 +156,7 @@ export default function DocumentUploadPage() {
                 setContactInfo({ ...contactInfo, email: e.target.value })
               }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-              placeholder="your.email@gmail.com"
+              placeholder="you@example.com"
             />
           </div>
           <div>

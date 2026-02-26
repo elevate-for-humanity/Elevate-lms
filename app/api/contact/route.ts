@@ -179,7 +179,7 @@ async function sendEmailNotification(data: z.infer<typeof ContactSchema>) {
 
     await resend.emails.send({
       from: 'Elevate for Humanity <noreply@elevateforhumanity.org>',
-      to: 'elevate4humanityedu@gmail.com',
+      to: 'admin@elevateforhumanity.org',
       subject: `New Inquiry from ${data.name}`,
       html: `
         <h2>New Contact Form Submission</h2>

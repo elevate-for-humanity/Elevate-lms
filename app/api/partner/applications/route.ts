@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
 
     // Send notification to admin
     try {
-      const adminEmail = process.env.ADMIN_EMAIL || 'elevate4humanityedu@gmail.com';
+      const adminEmail = process.env.ADMIN_EMAIL || 'admin@elevateforhumanity.org';
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
       await fetch(`${siteUrl}/api/email/send`, {
         method: 'POST',

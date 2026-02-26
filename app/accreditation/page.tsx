@@ -15,45 +15,52 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/accreditation',
   },
-  title: 'Approvals & Credentials | Elevate for Humanity',
+  title: 'Accreditation & Compliance | Elevate for Humanity',
   description:
-    'Elevate for Humanity is a workforce training provider offering industry-aligned certification programs. Learn about our approvals, credentials, and authorized testing site status.',
+    'Elevate for Humanity is a workforce training provider offering industry-aligned certification programs. View our ETPL listing, DWD provider status, apprenticeship registration, and compliance documentation.',
   keywords:
-    'workforce training provider, EPA 608 testing site, WIOA eligible, Indiana workforce development, industry certification training',
+    'workforce training provider, ETPL, EPA 608 testing site, WIOA eligible, Indiana workforce development, industry certification training, DWD approved',
 };
 
 export default function AccreditationPage() {
   const credentials = [
     {
-      name: 'EPA Section 608 Approved Testing Site',
+      name: 'Indiana ETPL — Eligible Training Provider',
       description:
-        'Authorized to administer proctored EPA Section 608 refrigerant handling certification examinations.',
-      icon: Shield,
-    },
-    {
-      name: 'WIOA Eligible Training Provider',
-      description:
-        'Listed on the Eligible Training Provider List (ETPL) for Workforce Innovation and Opportunity Act funding.',
+        'Listed on the Indiana Eligible Training Provider List (ETPL) under the Workforce Innovation and Opportunity Act (WIOA). Eligible participants may receive funded training through their local WorkOne office.',
+      id_number: 'INTraining Location ID: 10004621',
       icon: FileCheck,
     },
     {
-      name: 'Indiana DWD Training Provider',
+      name: 'Indiana DWD Approved Training Provider',
       description:
-        'Recognized by the Indiana Department of Workforce Development as a training provider.',
-      id_number: 'INTraining Location ID: 10004621',
+        'Recognized by the Indiana Department of Workforce Development as an approved training provider for workforce programs including WIOA, Workforce Ready Grant (WRG), and Next Level Jobs.',
       icon: Building2,
+    },
+    {
+      name: 'DOL Registered Apprenticeship Sponsor',
+      description:
+        'Registered with the U.S. Department of Labor as an apprenticeship sponsor for structured earn-and-learn programs in skilled trades.',
+      icon: Award,
+    },
+    {
+      name: 'EPA Section 608 Approved Testing Site',
+      description:
+        'Authorized to administer proctored EPA Section 608 refrigerant handling certification examinations on-site.',
+      icon: Shield,
     },
     {
       name: '501(c)(3) Nonprofit Organization',
       description:
-        'Registered nonprofit focused on workforce development and career training access.',
-      icon: Award,
+        'Registered 501(c)(3) nonprofit organization focused on workforce development and career training access for underserved populations.',
+      id_number: 'EIN available upon request',
+      icon: CheckCircle,
     },
     {
       name: 'OSHA Safety Training',
       description:
-        'Programs include OSHA safety certification preparation as part of the training curriculum.',
-      icon: CheckCircle,
+        'Programs include OSHA 10-Hour and OSHA 30-Hour safety certification preparation as part of the training curriculum.',
+      icon: Shield,
     },
   ];
 
@@ -62,7 +69,7 @@ export default function AccreditationPage() {
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Approvals & Credentials' }]} />
+          <Breadcrumbs items={[{ label: 'Accreditation & Compliance' }]} />
         </div>
       </div>
 
@@ -81,10 +88,10 @@ export default function AccreditationPage() {
           <div className="absolute inset-0 flex items-center">
             <div className="max-w-5xl mx-auto px-4">
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg">
-                Approvals &amp; Credentials
+                Accreditation &amp; Compliance
               </h1>
               <p className="text-lg text-white/85 max-w-2xl drop-shadow">
-                Industry-aligned workforce training with authorized certification testing
+                ETPL-listed, DWD-approved workforce training with verifiable credentials and compliance documentation
               </p>
             </div>
           </div>
@@ -172,6 +179,84 @@ export default function AccreditationPage() {
         </div>
       </section>
 
+      {/* Organizational Structure */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            Organizational Structure
+          </h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-slate-50 rounded-xl p-6 border">
+              <h3 className="font-bold text-lg mb-3">Elevate for Humanity Career &amp; Technical Institute</h3>
+              <p className="text-gray-600 text-sm mb-3">
+                The workforce training division. Delivers ETPL-listed certification
+                programs, apprenticeship training, and career pathway services.
+                Operates as an Indiana DWD-approved training provider.
+              </p>
+              <p className="text-xs text-gray-500">
+                Programs: HVAC, CDL, CNA, Electrical, Welding, IT Support, Barber, Business
+              </p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-6 border">
+              <h3 className="font-bold text-lg mb-3">Elevate for Humanity Foundation</h3>
+              <p className="text-gray-600 text-sm mb-3">
+                The 501(c)(3) nonprofit parent organization. Provides governance,
+                fiscal oversight, and community support services including barrier
+                reduction for justice-involved individuals, veterans, and
+                low-income participants.
+              </p>
+              <p className="text-xs text-gray-500">
+                Services: Funding navigation, career counseling, employer partnerships
+              </p>
+            </div>
+          </div>
+          <p className="text-center text-gray-500 text-sm mt-6">
+            Both entities operate under unified leadership and share a mission of
+            workforce development and economic mobility for underserved communities
+            in Indiana.
+          </p>
+        </div>
+      </section>
+
+      {/* Compliance & Data Handling */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-center mb-8">
+            Compliance &amp; Data Handling
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-lg p-5 border">
+              <h3 className="font-bold mb-2">FERPA Compliance</h3>
+              <p className="text-gray-600 text-sm">
+                Student education records are protected under the Family
+                Educational Rights and Privacy Act. Access is restricted to
+                authorized personnel only.
+              </p>
+            </div>
+            <div className="bg-white rounded-lg p-5 border">
+              <h3 className="font-bold mb-2">WIOA Reporting</h3>
+              <p className="text-gray-600 text-sm">
+                Participant data is reported to Indiana DWD and federal workforce
+                agencies as required by WIOA performance accountability standards.
+              </p>
+            </div>
+            <div className="bg-white rounded-lg p-5 border">
+              <h3 className="font-bold mb-2">PII Protection</h3>
+              <p className="text-gray-600 text-sm">
+                Social Security numbers, identity documents, and income
+                verification data are encrypted at rest and in transit. Access is
+                logged and auditable.
+              </p>
+            </div>
+          </div>
+          <p className="text-center mt-6">
+            <Link href="/privacy-policy" className="text-brand-blue-600 hover:underline text-sm">
+              Read our full Privacy Policy →
+            </Link>
+          </p>
+        </div>
+      </section>
+
       {/* Important Disclosure */}
       <section className="py-12 bg-slate-50 border-y">
         <div className="max-w-4xl mx-auto px-4">
@@ -208,26 +293,67 @@ export default function AccreditationPage() {
           <h2 className="text-2xl font-bold text-center mb-8">
             Verify Our Credentials
           </h2>
+          <p className="text-center text-gray-600 mb-8 text-sm">
+            All credentials listed on this page can be independently verified
+            through the following public registries.
+          </p>
           <div className="grid md:grid-cols-2 gap-6">
             <a
               href="https://intraining.dwd.in.gov/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border"
             >
-              <span>Indiana INTraining Provider Search</span>
-              <ExternalLink className="w-5 h-5 text-gray-400" />
+              <div>
+                <span className="font-medium block">Indiana INTraining — ETPL Provider Search</span>
+                <span className="text-xs text-gray-500">Search: &quot;Elevate for Humanity&quot; · Location ID: 10004621</span>
+              </div>
+              <ExternalLink className="w-5 h-5 text-gray-400 flex-shrink-0" />
+            </a>
+            <a
+              href="https://www.apprenticeship.gov/partner-finder"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border"
+            >
+              <div>
+                <span className="font-medium block">DOL Apprenticeship Partner Finder</span>
+                <span className="text-xs text-gray-500">Search: &quot;Elevate for Humanity&quot; · Indianapolis, IN</span>
+              </div>
+              <ExternalLink className="w-5 h-5 text-gray-400 flex-shrink-0" />
             </a>
             <a
               href="https://www.epa.gov/section608"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border"
             >
-              <span>EPA Section 608 Information</span>
-              <ExternalLink className="w-5 h-5 text-gray-400" />
+              <div>
+                <span className="font-medium block">EPA Section 608 Certification Program</span>
+                <span className="text-xs text-gray-500">Authorized proctored testing site</span>
+              </div>
+              <ExternalLink className="w-5 h-5 text-gray-400 flex-shrink-0" />
+            </a>
+            <a
+              href="https://www.in.gov/dwd/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border"
+            >
+              <div>
+                <span className="font-medium block">Indiana Department of Workforce Development</span>
+                <span className="text-xs text-gray-500">Approved training provider</span>
+              </div>
+              <ExternalLink className="w-5 h-5 text-gray-400 flex-shrink-0" />
             </a>
           </div>
+          <p className="text-center text-gray-500 text-xs mt-6">
+            For documentation requests (EIN verification, insurance certificates,
+            or compliance records), contact{' '}
+            <a href="mailto:admin@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">
+              admin@elevateforhumanity.org
+            </a>
+          </p>
         </div>
       </section>
 

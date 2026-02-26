@@ -128,9 +128,9 @@ export default function HomePage() {
       <section aria-label="Funding options" className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Funding Available</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">100% Tuition-Free Programs</h2>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Tuition-Free Programs for Eligible Participants</h2>
           <p className="text-lg text-slate-700 mb-8">
-            Most programs are fully funded through WIOA, WRG, and JRI. No tuition, no fees, no debt.
+            Most programs are fully funded through WIOA, WRG, and JRI for qualifying participants. No tuition, no fees, no debt.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             {[

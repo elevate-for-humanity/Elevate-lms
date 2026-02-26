@@ -147,7 +147,7 @@ export default function EnrollmentForm({ courseId, courseName, price, userEmail,
       {/* Free Course Note */}
       {isFree && (
         <p className="text-center text-sm text-slate-500">
-          This course is completely free. No payment required.
+          This course is funded through workforce grants. No payment required for eligible participants.
         </p>
       )}
     </div>

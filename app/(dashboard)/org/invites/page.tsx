@@ -216,7 +216,7 @@ export default function OrgInvitesPage() {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500 sm:text-sm"
-                  placeholder="your.email@gmail.com"
+                  placeholder="you@example.com"
                 />
               </div>
 

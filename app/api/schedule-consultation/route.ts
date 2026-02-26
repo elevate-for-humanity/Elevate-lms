@@ -8,7 +8,7 @@ import { logger } from '@/lib/logger';
 
 const ZOOM_URL = 'https://us06web.zoom.us/j/87654321098';
 const ZOOM_ID = '876 5432 1098';
-const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
+const ADMIN_EMAIL = 'admin@elevateforhumanity.org';
 
 export async function POST(request: Request) {
   try {

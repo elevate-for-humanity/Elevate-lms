@@ -90,7 +90,7 @@ export function BlockchainCredentialVerification() {
           issuer: 'Elevate for Humanity',
           issueDate: cert.issued_at?.split('T')[0] || '',
           blockchainHash: '',
-          verificationUrl: `https://elevateforhumanity.institute/verify/${cert.certificate_number}`,
+          verificationUrl: `https://elevateforhumanity.org/verify/${cert.certificate_number}`,
           status: 'verified',
           metadata: cert.metadata || {},
         });

@@ -103,7 +103,7 @@ export default function RecapCreateForm() {
               className="h-10 rounded-xl border px-3 text-sm"
               value={attendeeEmail}
               onChange={(e) => setAttendeeEmail(e.target.value)}
-              placeholder="your.email@gmail.com"
+              placeholder="you@example.com"
             />
           </label>
         </div>

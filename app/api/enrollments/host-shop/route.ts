@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            to: 'elevate4humanityedu@gmail.com',
+            to: 'admin@elevateforhumanity.org',
             subject: `New Host Shop Application: ${intake.shopName}`,
             html: `
               <h2>New Host Barbershop Application</h2>

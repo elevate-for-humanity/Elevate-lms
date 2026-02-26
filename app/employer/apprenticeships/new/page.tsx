@@ -92,7 +92,7 @@ export default async function NewPlacementPage() {
                 name="student_email"
                 required
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-                placeholder="student.email@gmail.com"
+                placeholder="student@example.com"
               />
               <p className="text-sm text-slate-500 mt-1">
                 Enter the email of a registered student

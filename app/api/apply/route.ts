@@ -12,7 +12,7 @@ import { sendEmail } from '@/lib/email/resend';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { getRoutingRecommendations } from '@/lib/automation/shop-routing';
 
-const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
+const ADMIN_EMAIL = 'admin@elevateforhumanity.org';
 const ADMIN_SMS = process.env.ADMIN_SMS_GATEWAY || '';
 
 export const POST = withRateLimit(

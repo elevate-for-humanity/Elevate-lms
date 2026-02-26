@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Technology Training Programs | Elevate for Humanity',
-    description: 'Start your tech career with free training programs in Indianapolis.',
+    description: 'Start your tech career with funded training programs in Indianapolis.',
     url: 'https://www.elevateforhumanity.org/programs/technology',
   },
 };

@@ -55,7 +55,7 @@ export default async function InstructorAddStudentPage() {
             <input
               type="email"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
-              placeholder="student.email@gmail.com"
+              placeholder="student@example.com"
             />
           </div>
           <div>

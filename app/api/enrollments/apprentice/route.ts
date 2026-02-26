@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            to: 'elevate4humanityedu@gmail.com',
+            to: 'admin@elevateforhumanity.org',
             subject: `New Barber Apprentice Application: ${intake.fullName}`,
             html: `
               <h2>New Barber Apprenticeship Application</h2>

@@ -145,7 +145,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${program.name} | Free Training | Elevate for Humanity`,
+    title: `${program.name} | Career Training | Elevate for Humanity`,
     description: program.shortDescription || program.description,
     alternates: {
       canonical: `https://www.elevateforhumanity.org/programs/${slug}`,

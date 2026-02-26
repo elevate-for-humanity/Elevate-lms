@@ -77,9 +77,6 @@ export default async function ReviewDocumentPage({
     const url = await getAdminDocumentUrl({
       adminId: user.id,
       documentId: document.id,
-      filePath: document.file_path,
-      documentOwnerId: document.user_id,
-      documentType: document.document_type,
       context: 'document_review',
     });
     if (url) viewUrl = url;

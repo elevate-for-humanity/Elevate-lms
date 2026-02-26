@@ -119,9 +119,6 @@ export default async function WIOAVerifyPage({
         const url = await getAdminDocumentUrl({
           adminId: user.id,
           documentId: doc.id,
-          filePath: doc.file_path,
-          documentOwnerId: participant.user_id,
-          documentType: doc.document_type,
           context: 'wioa_verify',
         });
         return { ...doc, file_url: url || doc.file_url };

@@ -38,7 +38,7 @@ Congratulations on taking the first step toward your career as a licensed barber
 
 ## Program Sponsor
 **Elevate For Humanity Career & Training Institute**
-In partnership with 2Exclusive LLC
+In partnership with 2Exclusive LLC-S
 
 ## Program Registration
 - **DOL RAPIDS Program Number:** ${process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || '2025-IN-132301'}
@@ -455,7 +455,7 @@ If you experience financial difficulty:
 ## Parties to This Agreement
 - **Apprentice:** (Your name as signed below)
 - **Program Sponsor:** Elevate For Humanity Career & Training Institute
-- **Registered Sponsor:** 2Exclusive LLC
+- **Registered Sponsor:** 2Exclusive LLC-S
 - **Employer/Shop:** (Your sponsoring barbershop)
 
 ## Purpose

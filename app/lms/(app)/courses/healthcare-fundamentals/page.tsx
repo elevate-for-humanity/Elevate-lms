@@ -365,7 +365,7 @@ export default function HealthcareFundamentalsCoursePage() {
             Ready to Start Your Healthcare Career?
           </h2>
           <p className="text-xl md:text-2xl text-white/90 mb-8">
-            Enroll now and begin learning today - completely free
+            Enroll now and begin learning today — funded for eligible participants
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

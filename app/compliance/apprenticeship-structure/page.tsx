@@ -99,7 +99,7 @@ export default function ApprenticeshipStructurePage() {
           <div className="grid sm:grid-cols-2 gap-4 mb-10">
             <div className="bg-slate-50 rounded-lg p-5 print:border print:bg-white">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Registered Apprenticeship Sponsor</p>
-              <p className="font-bold text-gray-900">2Exclusive LLC (DBA Elevate for Humanity)</p>
+              <p className="font-bold text-gray-900">2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute)</p>
               <p className="text-sm text-gray-600 mt-1">RAPIDS ID: 2025-IN-132301</p>
             </div>
             <div className="bg-slate-50 rounded-lg p-5 print:border print:bg-white">

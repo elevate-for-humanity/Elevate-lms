@@ -97,8 +97,8 @@ export default async function LmsPublicPage() {
           </h2>
           <p className="mt-4 text-lg text-zinc-700 max-w-3xl">
             Students across Indiana are building better careers through
-            our free training programs. 100% funded - no tuition, no hidden
-            costs.
+            our training programs. Eligible participants receive fully funded
+            training — no tuition, no hidden costs.
           </p>
           <ol className="mt-6 space-y-3 list-decimal pl-5 text-zinc-700 max-w-3xl">
             <li>Apply for a program that matches your career goals</li>

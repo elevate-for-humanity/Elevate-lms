@@ -84,7 +84,7 @@ export default function SellerRegisterPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
                 <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="your.email@gmail.com" />
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="you@example.com" />
               </div>
             </div>
             <div>

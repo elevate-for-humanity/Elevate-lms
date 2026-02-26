@@ -17,20 +17,80 @@ export interface EmailOptions {
 }
 
 /**
- * Send email via Resend HTTP API (no SDK — direct fetch).
+ * Send email via SendGrid or Resend HTTP API (no SDK — direct fetch).
+ * Uses SENDGRID_API_KEY if set, otherwise falls back to RESEND_API_KEY.
  * All email in the app routes through this single function.
  */
 export async function sendEmail(options: EmailOptions) {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    logger.warn('[Email] RESEND_API_KEY not configured — email not sent');
-    return { success: false, error: 'Email service not configured (RESEND_API_KEY missing)' };
+  const sendgridKey = process.env.SENDGRID_API_KEY;
+  const resendKey = process.env.RESEND_API_KEY;
+
+  if (!sendgridKey && !resendKey) {
+    logger.warn('[Email] No email API key configured — email not sent');
+    return { success: false, error: 'Email service not configured' };
   }
 
   const from = options.from || FROM_EMAIL;
   const replyTo = options.replyTo ?? REPLY_TO_EMAIL;
   const toArr = Array.isArray(options.to) ? options.to : [options.to];
 
+  // SendGrid (primary)
+  if (sendgridKey) {
+    return sendViaSendGrid(sendgridKey, { ...options, from, replyTo, to: toArr });
+  }
+
+  // Resend (fallback)
+  return sendViaResend(resendKey!, { ...options, from, replyTo, to: toArr });
+}
+
+async function sendViaSendGrid(
+  apiKey: string,
+  opts: { to: string[]; from: string; subject: string; html: string; text?: string; replyTo: string },
+) {
+  try {
+    const resp = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        personalizations: [{ to: opts.to.map((email) => ({ email })) }],
+        from: parseSendGridFrom(opts.from),
+        reply_to: parseSendGridFrom(opts.replyTo),
+        subject: opts.subject,
+        content: [
+          ...(opts.text ? [{ type: 'text/plain', value: opts.text }] : []),
+          { type: 'text/html', value: opts.html },
+        ],
+      }),
+    });
+
+    if (!resp.ok) {
+      const data = await resp.json().catch(() => ({}));
+      logger.error(`[Email] SendGrid ${resp.status}:`, data);
+      return { success: false, error: `SendGrid error ${resp.status}: ${JSON.stringify(data)}`, from: opts.from };
+    }
+
+    // SendGrid returns 202 with empty body on success
+    return { success: true, data: { provider: 'sendgrid' } };
+  } catch (error) {
+    logger.error('[Email] SendGrid send error:', error);
+    return { success: false, error: 'Operation failed' };
+  }
+}
+
+/** Parse "Name <email>" format into SendGrid {email, name} object */
+function parseSendGridFrom(from: string): { email: string; name?: string } {
+  const match = from.match(/^(.+?)\s*<(.+?)>$/);
+  if (match) return { name: match[1].trim(), email: match[2].trim() };
+  return { email: from };
+}
+
+async function sendViaResend(
+  apiKey: string,
+  opts: { to: string[]; from: string; subject: string; html: string; text?: string; replyTo: string },
+) {
   try {
     const resp = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -39,12 +99,12 @@ export async function sendEmail(options: EmailOptions) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from,
-        to: toArr,
-        subject: options.subject,
-        html: options.html,
-        reply_to: replyTo,
-        ...(options.text ? { text: options.text } : {}),
+        from: opts.from,
+        to: opts.to,
+        subject: opts.subject,
+        html: opts.html,
+        reply_to: opts.replyTo,
+        ...(opts.text ? { text: opts.text } : {}),
       }),
     });
 
@@ -52,12 +112,12 @@ export async function sendEmail(options: EmailOptions) {
 
     if (!resp.ok) {
       logger.error(`[Email] Resend ${resp.status}:`, data);
-      return { success: false, error: `Resend error ${resp.status}: ${data?.message || data?.error || JSON.stringify(data)}`, from };
+      return { success: false, error: `Resend error ${resp.status}: ${data?.message || data?.error || JSON.stringify(data)}`, from: opts.from };
     }
 
     return { success: true, data };
   } catch (error) {
-    logger.error('[Email] Send error:', error);
+    logger.error('[Email] Resend send error:', error);
     return { success: false, error: 'Operation failed' };
   }
 }

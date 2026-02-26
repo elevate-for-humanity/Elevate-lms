@@ -538,7 +538,7 @@ export default function InstructionalFrameworkPage() {
             <div className="bg-slate-50 rounded-lg p-5">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Registered Apprenticeship Sponsor</p>
               <p className="font-semibold text-gray-900">RAPIDS ID: 2025-IN-132301</p>
-              <p className="text-sm text-gray-600 mt-1">Sponsor of Record: 2Exclusive LLC (DBA Elevate for Humanity)</p>
+              <p className="text-sm text-gray-600 mt-1">Sponsor of Record: 2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute)</p>
             </div>
             <div className="bg-slate-50 rounded-lg p-5">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">ETPL / INTraining</p>

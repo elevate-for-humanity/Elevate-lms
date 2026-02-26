@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 const stats = [
   { label: 'Programs Available', value: '10+' },
   { label: 'Placement Goal', value: '85%' },
-  { label: 'Free Training', value: '100%' },
+  { label: 'Funded Training', value: '100%' },
   { label: 'Support', value: '24/7' },
 ];
 

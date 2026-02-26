@@ -43,7 +43,7 @@ export function StudentPortfolio() {
     name: 'Jordan Martinez',
     title: 'Full-Stack Developer',
     bio: 'Passionate software developer with expertise in web technologies.',
-    email: 'jordan.martinez@gmail.com',
+    email: 'jordan.martinez@example.com',
     phone: '(317) 314-3757',
     location: 'San Francisco, CA',
     linkedin: '',

@@ -8,7 +8,7 @@
 export const RAPIDS_CONFIG = {
   // Sponsor Information
   // RAPIDS registered sponsor is the legal entity; brand is the program name
-  sponsorOfRecord: '2Exclusive LLC', // Legal entity on RAPIDS registration
+  sponsorOfRecord: '2Exclusive LLC-S', // Legal entity on RAPIDS registration
   programBrand: 'Elevate for Humanity', // Program/brand name (DBA)
   
   // Registration Details

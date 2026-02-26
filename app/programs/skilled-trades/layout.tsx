@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Skilled Trades Training Programs | Elevate for Humanity',
-    description: 'Start your trades career with free training programs in Indianapolis.',
+    description: 'Start your trades career with funded training programs in Indianapolis.',
     url: 'https://www.elevateforhumanity.org/programs/skilled-trades',
   },
 };

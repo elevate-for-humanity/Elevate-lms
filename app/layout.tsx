@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default: 'Elevate for Humanity | Free Training Programs Funded by WIOA',
+    default: 'Elevate for Humanity | Career Training Programs — WIOA Funded',
     template: '%s | Elevate for Humanity',
   },
 
@@ -78,7 +78,7 @@ export const metadata: Metadata = {
     type: 'website',
     url: SITE_URL,
     siteName: 'Elevate for Humanity',
-    title: 'Elevate for Humanity | Free Training Programs Funded by WIOA',
+    title: 'Elevate for Humanity | Career Training Programs — WIOA Funded',
     description:
       'Learn job-ready skills through free training programs in healthcare, skilled trades, CDL, and technology. WIOA funding covers tuition for eligible Indiana residents.',
     images: [
@@ -93,7 +93,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: 'summary_large_image',
-    title: 'Elevate for Humanity | Free Training Programs Funded by WIOA',
+    title: 'Elevate for Humanity | Career Training Programs — WIOA Funded',
     description:
       'Learn job-ready skills through free training programs in healthcare, skilled trades, CDL, and technology. WIOA funding covers tuition for eligible Indiana residents.',
     images: ['/images/og-image.jpg'],

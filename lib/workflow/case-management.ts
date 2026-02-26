@@ -230,7 +230,7 @@ export async function getCaseTimeline(caseId: string): Promise<any[]> {
   const { data } = await supabase
     .from('case_events')
     .select('*')
-    .eq('case_id', caseId)
+    .contains('details', { case_id: caseId })
     .order('created_at', { ascending: true });
 
   return data || [];

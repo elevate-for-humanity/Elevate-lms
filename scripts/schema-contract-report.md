@@ -133,3 +133,50 @@ No sensitive data in any audit metadata payloads.
 | security_logs | NON-FUNCTIONAL | 2 files, table has no useful cols | HIGH |
 
 Total: 6 tables with confirmed mismatches, 16 files need fixes, 8 tables verified correct.
+
+---
+
+## APPENDIX: READ + UPDATE CONTRACT AUDIT (Phase 2)
+
+**Verified**: 2026-02-26, against live Supabase schema
+
+### Read Surface for Changed Tables
+
+| Table | Read Locations | Column Names Used | Status |
+|-------|---------------|-------------------|--------|
+| admin_audit_events | program-holders/[id] | actor_user_id, target_type, target_id | CORRECT |
+| automated_decisions | review-queue/[id], automation-qa | subject_type, subject_id (NOT NULL) | CORRECT |
+| franchise_audit_log | franchise/admin | log.action, log.entity_type | CORRECT |
+| case_events | case-management.ts | .contains('details', {case_id}) | FIXED (was .eq('case_id')) |
+| ai_audit_log | test-enrollment-flow.ts | .eq('user_id', userId) | FIXED (was .eq('student_id')) |
+| security_logs | (none) | N/A | NO CONSUMERS — redirect to audit_logs is safe |
+
+### Dashboard-Created Tables
+
+- 1091 tables in live DB
+- 247 tables defined in migrations
+- 852 tables created via Supabase Dashboard (no migration)
+- 589 of those 852 are referenced in code
+- 8 migration-defined tables not in live DB: preparer_payouts, secure_identity, tax_fee_schedules (+ 5 regex noise)
+
+### Admin Page Wiring Summary
+
+- 275 total admin pages
+- 211 LIVE (wired to Supabase)
+- 34 STUB (mock/placeholder data)
+- 30 STATIC (hardcoded, no DB queries)
+
+Full inventory: scripts/admin-wiring-inventory.md
+
+### Identity Key Fragmentation (Red Flag 3)
+
+The codebase uses these identity keys interchangeably:
+- `user_id` (FK to auth.users.id) — canonical
+- `student_id` (legacy alias for user_id)
+- `actor_id` (audit actor, maps to user_id)
+- `actor_user_id` (admin_audit_events specific)
+- `profiles.id` (same as auth.users.id)
+
+All map to the same UUID. The naming inconsistency is a documentation/convention
+problem, not a data integrity problem. Recommend standardizing on `user_id` for
+new code and adding a lint rule to flag `student_id` in new inserts.

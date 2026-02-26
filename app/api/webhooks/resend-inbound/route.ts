@@ -6,7 +6,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) throw new Error('RESEND_API_KEY not configured');
+  return new Resend(key);
+}
 
 // Where to forward inbound emails. Map recipient prefixes to Gmail.
 const FORWARD_MAP: Record<string, string> = {
@@ -62,7 +66,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Use Resend SDK forward helper — handles content + attachments automatically
-    const { data, error } = await resend.emails.receiving.forward({
+    const { data, error } = await getResend().emails.receiving.forward({
       emailId,
       to: forwardTo,
       from: 'Elevate Forwarding <noreply@elevateforhumanity.org>',

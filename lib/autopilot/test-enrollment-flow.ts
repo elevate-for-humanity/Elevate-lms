@@ -357,7 +357,7 @@ export async function testEnrollmentFlow(
     const { data: auditLogs, error: auditError } = await supabase
       .from('ai_audit_log')
       .select('*')
-      .eq('student_id', userId)
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(5);
 

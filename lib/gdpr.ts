@@ -2,6 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server';
 
+import { logAuditEvent } from '@/lib/audit';
+
 export async function exportUserData(userId: string) {
   const supabase = await createClient();
 
@@ -79,6 +81,18 @@ export async function deleteUserData(userId: string, options: { keepProfile?: bo
       completed_at: new Date().toISOString(),
     });
 
+    // L1 audit: GDPR data deletion is a high-severity operation
+    await logAuditEvent({
+      action: 'GDPR_DATA_DELETED',
+      actor_id: userId,
+      target_type: 'profiles',
+      target_id: userId,
+      metadata: {
+        keep_profile: options.keepProfile ?? false,
+        deleted_tables: deletions.filter(d => !d.error).length,
+      },
+    });
+
     return {
       success: true,
       deletedRecords: deletions.filter(d => !d.error).length,
@@ -123,6 +137,14 @@ export async function anonymizeUserData(userId: string) {
       request_type: 'data_anonymization',
       status: 'completed',
       completed_at: new Date().toISOString(),
+    });
+
+    // L1 audit: GDPR anonymization
+    await logAuditEvent({
+      action: 'GDPR_DATA_ANONYMIZED',
+      actor_id: userId,
+      target_type: 'profiles',
+      target_id: userId,
     });
 
     return { success: true };

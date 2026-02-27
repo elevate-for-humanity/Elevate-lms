@@ -360,7 +360,7 @@ export default function FundingImpactPage() {
 
           <div className="text-center mt-8">
             <Link
-              href="/success-stories"
+              href="/testimonials"
               className="inline-flex items-center gap-2 text-indigo-600 font-semibold hover:underline"
             >
               Read More Success Stories

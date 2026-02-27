@@ -43,7 +43,7 @@ export function StudentPortfolio() {
     name: 'Jordan Martinez',
     title: 'Full-Stack Developer',
     bio: 'Passionate software developer with expertise in web technologies.',
-    email: 'jordan.martinez@gmail.com',
+    email: 'jordan.martinez@example.com',
     phone: '(317) 314-3757',
     location: 'San Francisco, CA',
     linkedin: '',
@@ -135,7 +135,7 @@ export function StudentPortfolio() {
           setCertificates(certData.map(c => ({
             id: c.id,
             title: (c.training_programs as any)?.name || c.program_name || 'Certificate',
-            issuer: 'Elevate for Humanity',
+            issuer: 'Elevate for Humanity Career & Technical Institute',
             date: c.issued_at?.split('T')[0] || '',
             credentialUrl: c.verification_url || `/verify/${c.id}`,
           })));
@@ -241,7 +241,7 @@ export function StudentPortfolio() {
     {
       id: '1',
       title: 'Full-Stack Web Development',
-      issuer: 'Elevate for Humanity',
+      issuer: 'Elevate for Humanity Career & Technical Institute',
       date: '2024-01',
       credentialUrl: '#',
     },

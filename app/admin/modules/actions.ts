@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export async function createModule(formData: FormData) {
   const supabase = await createClient();
@@ -47,6 +48,8 @@ export async function createModule(formData: FormData) {
   if (error) {
     throw new Error('Operation failed');
   }
+
+  await logAdminAudit({ action: AdminAction.MODULE_CREATED, actorId: user.id, entityType: 'training_modules', entityId: BULK_ENTITY_ID, metadata: { title } });
 
   revalidatePath('/admin/modules');
   redirect('/admin/modules');
@@ -97,6 +100,8 @@ export async function updateModule(id: string, formData: FormData) {
     throw new Error('Operation failed');
   }
 
+  await logAdminAudit({ action: AdminAction.MODULE_UPDATED, actorId: user.id, entityType: 'training_modules', entityId: id, metadata: {} });
+
   revalidatePath('/admin/modules');
   redirect('/admin/modules');
 }
@@ -128,6 +133,8 @@ export async function deleteModule(id: string) {
   if (error) {
     throw new Error('Operation failed');
   }
+
+  await logAdminAudit({ action: AdminAction.MODULE_DELETED, actorId: user.id, entityType: 'training_modules', entityId: id, metadata: {} });
 
   revalidatePath('/admin/modules');
 }

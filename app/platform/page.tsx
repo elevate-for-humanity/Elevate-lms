@@ -246,13 +246,13 @@ export default function PlatformPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/platform/licensing"
+              href="/licensing-partnerships"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-red-600 font-bold rounded-lg hover:bg-slate-100 transition-colors"
             >
               License the Platform <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              href="/store/demo"
+              href="/store/demos"
               className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition-colors"
             >
               See Platform Tour

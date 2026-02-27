@@ -293,7 +293,7 @@ export default function DataRetentionPage() {
                 <strong>Related Policies:</strong>
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
-                <li><a href="/policies/privacy" className="text-brand-blue-600 hover:underline">Privacy Policy</a></li>
+                <li><a href="/privacy-policy" className="text-brand-blue-600 hover:underline">Privacy Policy</a></li>
                 <li><a href="/policies/ferpa" className="text-brand-blue-600 hover:underline">FERPA Policy</a></li>
                 <li><a href="/policies/verification" className="text-brand-blue-600 hover:underline">Verification Policy</a></li>
               </ul>

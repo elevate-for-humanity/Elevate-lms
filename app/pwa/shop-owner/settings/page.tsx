@@ -204,7 +204,7 @@ export default function ShopOwnerSettingsPage() {
               </div>
               <ChevronRight className="w-5 h-5 text-slate-500" />
             </Link>
-            <Link href="/privacy" className="flex items-center justify-between p-4 active:bg-slate-700">
+            <Link href="/privacy-policy" className="flex items-center justify-between p-4 active:bg-slate-700">
               <div className="flex items-center gap-4">
                 <Shield className="w-5 h-5 text-slate-400" />
                 <p className="text-white font-medium">Privacy Policy</p>

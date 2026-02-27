@@ -208,7 +208,7 @@ export default function ApprovalsPage() {
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <h3 className="text-lg md:text-lg font-bold mb-3">
-                    SAM.gov Active Federal Contractor (Selfish Inc)
+                    SAM.gov Active Entity (Selfish Inc)
                   </h3>
                   <div className="space-y-2 text-lg text-black">
                     <p>

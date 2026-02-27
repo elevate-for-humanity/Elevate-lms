@@ -299,7 +299,7 @@ export const LOC_PROGRAM_SPECS: Record<string, LOCProgramSpec> = {
       { name: 'OSHA 10 — General Industry Safety', issuingBody: 'OSHA / CareerSafe', examFeeIncluded: true },
       { name: 'Indiana Electrical Apprentice Registration', issuingBody: 'Indiana Department of Homeland Security (IDHS)', examFeeIncluded: true },
       { name: 'CPR / First Aid', issuingBody: 'American Heart Association', examFeeIncluded: true },
-      { name: 'Program Completion Certificate', issuingBody: 'Elevate for Humanity', examFeeIncluded: true },
+      { name: 'Program Completion Certificate', issuingBody: 'Elevate for Humanity Career & Technical Institute', examFeeIncluded: true },
     ],
     admissionsRequirements: [
       '18 years or older',
@@ -341,7 +341,7 @@ export const LOC_PROGRAM_SPECS: Record<string, LOCProgramSpec> = {
     credentials: [
       { name: 'OSHA 10 — Construction Safety', issuingBody: 'OSHA / CareerSafe', examFeeIncluded: true },
       { name: 'CPR / First Aid', issuingBody: 'American Heart Association', examFeeIncluded: true },
-      { name: 'Program Completion Certificate', issuingBody: 'Elevate for Humanity', examFeeIncluded: true },
+      { name: 'Program Completion Certificate', issuingBody: 'Elevate for Humanity Career & Technical Institute', examFeeIncluded: true },
     ],
     admissionsRequirements: [
       '18 years or older',

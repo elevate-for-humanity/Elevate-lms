@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
+
+import { auditMutation } from '@/lib/api/withAudit';
 
 const VALID_ROLES = ['student', 'staff', 'instructor', 'admin', 'super_admin'];
 
@@ -68,6 +71,15 @@ export async function POST(request: NextRequest) {
     if (!data) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    await logAdminAudit({
+      action: AdminAction.ROLE_CHANGED,
+      actorId: user.id,
+      entityType: 'profiles',
+      entityId: data.id,
+      metadata: { new_role: role, target_email: email },
+      req: request,
+    });
 
     return NextResponse.json({ 
       success: true, 

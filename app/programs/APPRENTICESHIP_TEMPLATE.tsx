@@ -478,8 +478,8 @@ export default function ApprenticeshipPage() {
             Start Earning While You Learn
           </h2>
           <p className="text-2xl mb-12 text-white/90">
-            No experience required. No tuition. Just your commitment to
-            mastering the craft.
+            No experience required. No tuition for eligible participants.
+            Just your commitment to mastering the craft.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link

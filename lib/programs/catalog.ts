@@ -122,7 +122,7 @@ export const BARBER_PROGRAM: ProgramCatalogEntry = {
   career_outcome_range: '$35,000-$65,000+/year',
   
   // Administrator
-  administrator: 'Elevate for Humanity',
+  administrator: 'Elevate for Humanity Career & Technical Institute',
   administrator_statement: ADMINISTRATOR_STATEMENT,
 };
 

@@ -157,12 +157,12 @@ export default function SupersonicGovernanceContactPage() {
             If you have questions about your tax preparation or refund advance:
           </p>
           <ul className="space-y-2 text-slate-700 mb-4">
-            <li>• For general tax questions, visit our <Link href="/tax-faq" className="text-emerald-600 hover:text-emerald-700">Tax FAQ</Link></li>
+            <li>• For general tax questions, visit our <Link href="/supersonic-fast-cash/support" className="text-emerald-600 hover:text-emerald-700">Tax FAQ</Link></li>
             <li>• For account-specific issues, contact customer support</li>
             <li>• For governance or compliance questions, use the channels above</li>
           </ul>
           <Link
-            href="/tax-preparation"
+            href="/supersonic-fast-cash/services/tax-preparation"
             className="inline-flex items-center gap-2 text-emerald-600 font-medium hover:text-emerald-700"
           >
             <FileText className="w-4 h-4" />
@@ -211,7 +211,7 @@ export default function SupersonicGovernanceContactPage() {
               Compliance Framework
             </Link>
             <Link
-              href="/tax-preparation"
+              href="/supersonic-fast-cash/services/tax-preparation"
               className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
             >
               Tax Preparation

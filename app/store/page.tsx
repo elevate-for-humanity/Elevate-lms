@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Zap, Users, FileCheck, Building2, GraduationCap, BarChart3, Shield, Check } from 'lucide-react';
+import { BNPL_CHECKOUT_LABEL } from '@/lib/bnpl-config';
 import StoreDemoVideo from './StoreDemoVideo';
 import StoreFAQ from './StoreFAQ';
 
@@ -244,7 +245,7 @@ export default function StorePage() {
               <Link href="/store/licensing/managed" className="block text-center text-slate-600 text-sm font-medium mt-2 hover:underline">
                 View plans & purchase directly →
               </Link>
-              <p className="text-xs text-slate-400 mt-3 text-center">Stripe, Affirm & Sezzle accepted at checkout</p>
+              <p className="text-xs text-slate-400 mt-3 text-center">Stripe, {BNPL_CHECKOUT_LABEL} at checkout</p>
             </div>
             {/* Enterprise */}
             <div className="border border-slate-200 rounded-2xl p-8">
@@ -267,7 +268,7 @@ export default function StorePage() {
               <Link href="/store/licensing/enterprise" className="block text-center border border-slate-300 text-slate-700 font-bold py-3 rounded-lg hover:bg-slate-50 transition">
                 View Enterprise License
               </Link>
-              <p className="text-xs text-slate-400 mt-3 text-center">Stripe, Affirm & Sezzle BNPL accepted at checkout</p>
+              <p className="text-xs text-slate-400 mt-3 text-center">Stripe, {BNPL_CHECKOUT_LABEL} at checkout</p>
             </div>
           </div>
         </div>

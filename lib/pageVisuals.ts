@@ -104,7 +104,7 @@ export const cnaVisuals: PageVisualConfig = {
       subtitle:
         "Tuition-based CNA training with safety, soft skills, and employer connections wrapped into one pathway.",
       ctaLabel: "Enroll in CNA",
-      ctaHref: "/programs/certified-nursing-assistant",
+      ctaHref: "/programs/cna",
     },
     {
       id: "cna-hero-earn",

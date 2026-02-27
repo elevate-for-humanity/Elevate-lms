@@ -9,6 +9,9 @@ import { logger } from '@/lib/logger';
 import { generateLicenseKey } from '@/lib/store/license';
 import * as crypto from 'node:crypto';
 
+import { logAuditEvent } from '@/lib/audit';
+import { setAuditContext } from '@/lib/audit-context';
+
 const ENVIRONMENT = process.env.NODE_ENV === 'production' ? 'production' : 'development';
 
 type ProvisioningStep = 
@@ -86,6 +89,12 @@ function generateSlug(name: string): string {
 export async function provisionLicense(ctx: ProvisioningContext): Promise<ProvisioningResult> {
   const supabase = createAdminClient();
   const { correlationId, email, productId, paymentIntentId, sessionId, amountCents, currency, organizationName } = ctx;
+
+  // Set audit context so DB triggers attribute writes to this automation
+  await setAuditContext(supabase, {
+    systemActor: 'license_provisioning',
+    requestId: correlationId,
+  });
 
   let purchaseId: string | undefined;
   let tenantId: string | undefined;
@@ -229,12 +238,43 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
     await logProvisioningEvent(correlationId, 'completed', 'completed', tenantId, paymentIntentId, undefined, { license_id: licenseId, admin_user_id: adminUserId });
     logger.info('License provisioning completed', { correlationId, tenantId, licenseId, adminUserId });
 
+    // L1 audit: record successful provisioning
+    await logAuditEvent({
+      action: 'LICENSE_PROVISIONED',
+      actor_id: adminUserId || 'system:license_provisioning',
+      target_type: 'license',
+      target_id: licenseId,
+      metadata: {
+        correlation_id: correlationId,
+        tenant_id: tenantId,
+        product_id: productId,
+        payment_intent_id: paymentIntentId,
+        email,
+        amount_cents: amountCents,
+      },
+    });
+
     return { success: true, tenantId, licenseId, licenseKey, adminUserId };
 
   } catch (error) {
     const errorMessage = 'Operation failed';
     logger.error('License provisioning failed', error as Error);
     await logProvisioningEvent(correlationId, 'failed', 'failed', tenantId, paymentIntentId, errorMessage);
+
+    // L1 audit: record failed provisioning
+    await logAuditEvent({
+      action: 'LICENSE_PROVISIONING_FAILED',
+      actor_id: 'system:license_provisioning',
+      target_type: 'license',
+      target_id: correlationId,
+      metadata: {
+        correlation_id: correlationId,
+        tenant_id: tenantId,
+        payment_intent_id: paymentIntentId,
+        email,
+        error: errorMessage,
+      },
+    });
 
     try {
       if (licenseId) await supabase.from('licenses').delete().eq('id', licenseId);
@@ -254,9 +294,20 @@ export async function suspendLicense(tenantId: string, reason: string): Promise<
   const supabase = createAdminClient();
   const correlationId = crypto.randomUUID();
 
+  await setAuditContext(supabase, { systemActor: 'license_enforcement', requestId: correlationId });
+
   await supabase.from('tenants').update({ license_status: 'suspended' }).eq('id', tenantId);
   await supabase.from('licenses').update({ status: 'suspended' }).eq('tenant_id', tenantId);
   await logProvisioningEvent(correlationId, 'completed', 'completed', tenantId, undefined, undefined, { action: 'suspended', reason });
+
+  await logAuditEvent({
+    action: 'LICENSE_SUSPENDED',
+    actor_id: 'system:license_enforcement',
+    target_type: 'tenant',
+    target_id: tenantId,
+    metadata: { reason, correlation_id: correlationId },
+  });
+
   logger.info('License suspended', { tenantId, reason });
 }
 
@@ -269,8 +320,20 @@ export async function enforceSubscriptionStatus(subscriptionId: string): Promise
 export async function reactivateLicense(tenantId: string): Promise<void> {
   const supabase = createAdminClient();
   const correlationId = crypto.randomUUID();
+
+  await setAuditContext(supabase, { systemActor: 'license_enforcement', requestId: correlationId });
+
   await supabase.from('tenants').update({ license_status: 'active' }).eq('id', tenantId);
   await supabase.from('licenses').update({ status: 'active' }).eq('tenant_id', tenantId);
   await logProvisioningEvent(correlationId, 'completed', 'completed', tenantId, undefined, undefined, { action: 'reactivated' });
+
+  await logAuditEvent({
+    action: 'LICENSE_REACTIVATED',
+    actor_id: 'system:license_enforcement',
+    target_type: 'tenant',
+    target_id: tenantId,
+    metadata: { correlation_id: correlationId },
+  });
+
   logger.info('License reactivated', { tenantId });
 }

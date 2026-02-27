@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { getAdminDocumentUrl } from '@/lib/admin/document-access';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,11 +12,15 @@ export const dynamic = 'force-dynamic';
  * Generate a short-lived signed URL for a document in a private bucket.
  * Admin-only — requires authenticated user with admin/super_admin role.
  *
- * GET /api/admin/documents/signed-url?path=<file_path>&bucket=<bucket_name>
+ * Accepts either:
+ *   ?id=<document_id>  — delegates to getAdminDocumentUrl (preferred)
+ *   ?path=<file_path>&bucket=<bucket_name>  — direct path (legacy)
+ *
+ * Server-side resolution prevents client-supplied path enumeration.
  */
 export async function GET(request: NextRequest) {
   try {
-    const rateLimited = await applyRateLimit(request, 'api');
+    const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
     const supabase = await createClient();
     const admin = createAdminClient();
@@ -38,11 +44,45 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
+    const documentId = searchParams.get('id');
+
+    // Preferred path: delegate to centralized document access
+    if (documentId) {
+      const url = await getAdminDocumentUrl({
+        adminId: user.id,
+        documentId,
+        context: 'api_endpoint',
+      });
+
+      if (!url) {
+        return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+      }
+
+      return NextResponse.json({ url });
+    }
+
+    // Legacy ?path= flow — kept for backward compatibility
     const filePath = searchParams.get('path');
     const bucket = searchParams.get('bucket') || 'documents';
 
     if (!filePath) {
-      return NextResponse.json({ error: 'Missing path parameter' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing id or path parameter' }, { status: 400 });
+    }
+
+    // Path traversal protection
+    if (filePath.includes('..') || filePath.startsWith('/')) {
+      return NextResponse.json({ error: 'Invalid path' }, { status: 400 });
+    }
+
+    // Legacy path must match an existing document row
+    const { data: matchingDoc } = await db
+      .from('documents')
+      .select('id, user_id, document_type')
+      .eq('file_path', filePath)
+      .single();
+
+    if (!matchingDoc) {
+      return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
     // Allowlist of buckets admins can access
@@ -59,11 +99,29 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await db.storage
       .from(bucket)
-      .createSignedUrl(filePath, 3600); // 1 hour expiry
+      .createSignedUrl(filePath, 60);
 
     if (error || !data?.signedUrl) {
       return NextResponse.json({ error: 'Failed to generate URL' }, { status: 500 });
     }
+
+    // Audit the legacy path access
+    await db.from('admin_audit_events').insert({
+      actor_user_id: user.id,
+      action: 'DOCUMENT_URL_ISSUED',
+      target_type: 'document',
+      target_id: matchingDoc.id,
+      metadata: {
+        bucket,
+        admin_role: profile.role,
+        document_owner_id: matchingDoc.user_id,
+        document_type: matchingDoc.document_type,
+        file_path: filePath,
+        resolution: 'client_path',
+      },
+    }).then(null, (err: Error) => {
+      logger.warn('[SignedURL] Audit log insert failed', { error: err.message });
+    });
 
     return NextResponse.json({ url: data.signedUrl });
   } catch {

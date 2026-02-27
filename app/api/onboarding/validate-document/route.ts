@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
           // Look for common ID markers
           const hasName = text.length > 20; // Reasonable amount of text extracted
           const hasIdMarkers = /DRIVER|LICENSE|STATE|IDENTIFICATION|ID|DOB|EXP|ISS|CLASS/.test(text);
-          const hasDate = /\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/.test(text);
+          const hasDate = /\d{1,2}[/-]\d{1,2}[/-]\d{2,4}/.test(text);
 
           if (hasIdMarkers || hasDate) {
             checks.push({ name: 'ID document detected', passed: true, detail: 'Document appears to be a government-issued ID' });
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
           }
 
           // Check for expiration
-          const expMatch = text.match(/EXP[:\s]*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/);
+          const expMatch = text.match(/EXP[:\s]*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/);
           if (expMatch) {
             const expDate = parseLooseDate(expMatch[1]);
             if (expDate && expDate < new Date()) {
@@ -226,7 +226,7 @@ function getImageDimensions(buffer: Buffer): { width: number; height: number } |
  */
 function parseLooseDate(dateStr: string): Date | null {
   try {
-    const cleaned = dateStr.replace(/[\/\-]/g, '/');
+    const cleaned = dateStr.replace(/[/-]/g, '/');
     const parts = cleaned.split('/');
     if (parts.length !== 3) return null;
     const month = parseInt(parts[0], 10);

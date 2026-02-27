@@ -8,12 +8,13 @@ import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { checkMOUStatusServer } from '@/lib/mou-checks';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Example API endpoint that requires a fully executed MOU
  * This demonstrates how to gate functionality behind MOU completion
  */
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -83,3 +84,4 @@ export async function POST(req: NextRequest) {
     message: 'Participant enrolled successfully',
   });
 }
+export const POST = withApiAudit('/api/program-holder/enroll-participant', _POST);

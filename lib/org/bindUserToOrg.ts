@@ -1,5 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 
+import { logAuditEvent } from '@/lib/audit';
+
 /**
  * Bind a user's profile to an organization
  * Used when creating or joining an org

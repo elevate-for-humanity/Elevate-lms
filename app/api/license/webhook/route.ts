@@ -4,7 +4,10 @@ import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-export async function POST(request: NextRequest) {
+import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+
+async function _POST(request: NextRequest) {
   let body: string;
   let signature: string | null;
 
@@ -69,3 +72,4 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ received: true });
 }
+export const POST = withApiAudit('/api/license/webhook', _POST, { actor_type: 'webhook', skip_body: true });

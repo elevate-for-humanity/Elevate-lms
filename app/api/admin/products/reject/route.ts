@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 // Using Node.js runtime for email compatibility
 export const maxDuration = 60;
@@ -8,8 +9,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -30,8 +32,14 @@ export async function POST(req: Request) {
 
     if (error) throw error;
 
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await logAdminAudit({ action: AdminAction.PRODUCT_REJECTED, actorId: user.id, entityType: 'marketplace_products', entityId: productId, metadata: { reason }, req });
+    }
+
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ err: toErrorMessage(err) }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/admin/products/reject', _POST);

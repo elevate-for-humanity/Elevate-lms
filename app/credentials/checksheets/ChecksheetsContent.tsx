@@ -272,8 +272,8 @@ function PrintableChecksheet({ sheet }: { sheet: Checksheet }) {
       </div>
 
       {/* Safety */}
-      <div className="border-x-2 border-gray-900 p-4 border-t bg-red-50 print:bg-white">
-        <h3 className="text-xs font-semibold uppercase text-red-700 mb-2">
+      <div className="border-x-2 border-gray-900 p-4 border-t bg-brand-red-50 print:bg-white">
+        <h3 className="text-xs font-semibold uppercase text-brand-red-700 mb-2">
           Safety Requirements
         </h3>
         <div className="grid grid-cols-2 gap-1 text-xs text-gray-700">

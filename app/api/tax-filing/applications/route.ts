@@ -10,6 +10,8 @@ import { supabaseServer } from '@/lib/supabase-server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 export async function GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');

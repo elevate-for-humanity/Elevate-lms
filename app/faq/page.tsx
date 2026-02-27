@@ -7,7 +7,7 @@ import FAQSearch from './FAQSearch';
 
 export const metadata: Metadata = {
   title: 'FAQ | Elevate For Humanity',
-  description: 'Frequently asked questions about our free career training programs, eligibility, funding, and services.',
+  description: 'Frequently asked questions about our career training programs, eligibility, funding, and services. Training at no cost to eligible participants.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/faq',
   },
@@ -80,6 +80,11 @@ export default function FAQPage() {
           className="object-cover"
           priority
         />
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center px-4">
+            Frequently Asked Questions
+          </h1>
+        </div>
       </section>
 
       {/* Quick Links */}

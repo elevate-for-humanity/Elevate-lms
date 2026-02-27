@@ -29,7 +29,7 @@ export default async function UnauthorizedPage() {
   }
   
   // Log unauthorized access attempt
-  await db.from('security_logs').insert({ event: 'unauthorized_access' }).select();
+  await db.from('audit_logs').insert({ action: 'unauthorized_access', event_type: 'security' }).select();
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
       <div className="max-w-2xl w-full bg-white border border-slate-200 rounded-lg p-8 sm:p-12 text-center">

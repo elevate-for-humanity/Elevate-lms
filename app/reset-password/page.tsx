@@ -99,7 +99,7 @@ export default function ResetPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 text-black"
-                  placeholder="your.email@gmail.com"
+                  placeholder="you@example.com"
                 />
               </div>
             </div>

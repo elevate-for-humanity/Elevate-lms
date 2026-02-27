@@ -9,11 +9,12 @@ import { apiRequireAdmin } from '@/lib/authGuards';
 import { sezzle } from '@/lib/sezzle/client';
 import { affirm } from '@/lib/affirm/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -60,3 +61,4 @@ const guard = await apiRequireAdmin();
   response.headers.set('Vary', 'Authorization, Cookie');
   return response;
 }
+export const GET = withApiAudit('/api/admin/payment-config', _GET);

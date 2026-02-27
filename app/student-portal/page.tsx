@@ -155,8 +155,8 @@ export default function StudentPortalPage() {
     {
       icon: Phone,
       title: 'Call Student Services',
-      description: '(317) 653-2678',
-      href: 'tel:+13176532678',
+      description: '(317) 314-3757',
+      href: 'tel:+13173143757',
     },
     {
       icon: Mail,

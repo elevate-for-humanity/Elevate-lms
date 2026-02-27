@@ -10,6 +10,8 @@ import { logger } from '@/lib/logger';
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 // Lazy-load OpenAI client to prevent build-time errors
 function getOpenAI() {
   const apiKey = process.env.OPENAI_API_KEY;

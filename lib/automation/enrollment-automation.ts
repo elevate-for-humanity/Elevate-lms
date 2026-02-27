@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
  */
 
 import { createAdminClient } from '@/lib/supabase/admin';
+import { setAuditContext } from '@/lib/audit-context';
 
 export interface EnrollmentAutomation {
   id: string;
@@ -19,6 +20,7 @@ export interface EnrollmentAutomation {
  */
 export async function sendWelcomeSequence(enrollmentId: string) {
   const supabase = createAdminClient();
+  await setAuditContext(supabase, { systemActor: 'enrollment_automation' });
 
   const { data: enrollment } = await supabase
     .from('program_enrollments')
@@ -81,6 +83,7 @@ export async function sendWelcomeSequence(enrollmentId: string) {
  */
 export async function sendInactivityReminders() {
   const supabase = createAdminClient();
+  await setAuditContext(supabase, { systemActor: 'enrollment_automation' });
 
   // Find students who haven't been active in 7 days
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -138,6 +141,7 @@ export async function sendInactivityReminders() {
  */
 export async function sendCompletionNudges() {
   const supabase = createAdminClient();
+  await setAuditContext(supabase, { systemActor: 'enrollment_automation' });
 
   // Find students who are 80%+ complete but haven't finished
   const { data: nearCompletion } = await supabase
@@ -193,6 +197,7 @@ export async function sendCompletionNudges() {
  */
 export async function autoAssignCourses(enrollmentId: string) {
   const supabase = createAdminClient();
+  await setAuditContext(supabase, { systemActor: 'enrollment_automation' });
 
   const { data: enrollment } = await supabase
     .from('program_enrollments')

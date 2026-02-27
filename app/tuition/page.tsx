@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
+import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { 
   Building2, Circle, 
@@ -246,7 +247,7 @@ export default async function TuitionPage() {
           <div className="space-y-4">
             {[
               { q: 'Is training really free?', a: 'Yes, for eligible participants. WIOA, WRG, and JRI funding covers 100% of tuition for qualifying students. Self-pay options are available for those who don\'t qualify.' },
-              { q: 'What if I don\'t qualify for free training?', a: 'We offer payment plans and Buy Now, Pay Later options (Klarna, Afterpay, Sezzle, Affirm, Zip) for self-pay students. Some programs have employer-sponsored spots. Our team will discuss all options with you.' },
+              { q: 'What if I don\'t qualify for free training?', a: `We offer payment plans and Buy Now, Pay Later options (${BNPL_PROVIDER_NAMES}) for self-pay students. Some programs have employer-sponsored spots. Our team will discuss all options with you.` },
               { q: 'Are there any hidden fees?', a: 'No hidden fees. We clearly disclose all costs upfront. Funded students have no out-of-pocket costs. Self-pay students know exact costs before enrolling.' },
               { q: 'Do I need to pay anything upfront?', a: 'For funded programs, no. For self-pay programs like Barber Apprenticeship, a deposit is required with the balance paid over time.' },
               { q: 'What does tuition include?', a: 'Tuition covers instruction, materials, certification exam fees (for most programs), and career services. Specific inclusions vary by program.' },

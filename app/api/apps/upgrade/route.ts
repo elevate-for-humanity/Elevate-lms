@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { auditMutation } from '@/lib/api/withAudit';
+
 // App pricing (monthly in cents)
 const APP_PRICES: Record<string, Record<string, number>> = {
   'sam-gov': {

@@ -7,10 +7,11 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const body = await request.text();
     const signature = request.headers.get('stripe-signature');
@@ -196,3 +197,4 @@ export async function POST(request: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/donations/webhook', _POST, { actor_type: 'webhook', skip_body: true });

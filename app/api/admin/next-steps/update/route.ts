@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -6,13 +7,14 @@ export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 type Payload = {
   id: string;
   patch: Record<string, any>;
 };
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -99,5 +101,8 @@ export async function POST(req: Request) {
   if (error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
+  await logAdminAudit({ action: AdminAction.NEXT_STEPS_UPDATED, actorId: user.id, entityType: 'next_steps', entityId: body.id, metadata: {}, req: request });
+
   return NextResponse.json({ ok: true, row: data });
 }
+export const POST = withApiAudit('/api/admin/next-steps/update', _POST);

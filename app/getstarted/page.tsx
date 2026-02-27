@@ -50,7 +50,7 @@ export default function Page() {
                 href="/contact"
                 className="bg-brand-orange-600 text-white px-8 py-4 rounded-full font-bold hover:bg-brand-orange-700 text-lg shadow-2xl transition-all"
               >
-                Contact Us - It's Free
+                Contact Us
               </Link>
               <Link
                 href="/programs"

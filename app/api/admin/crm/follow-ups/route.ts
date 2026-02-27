@@ -6,6 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
@@ -38,6 +39,9 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) throw error;
+
+    if (user) await logAdminAudit({ action: AdminAction.CRM_FOLLOWUP_CREATED, actorId: user.id, entityType: 'crm_follow_ups', entityId: data.id, metadata: { contact_id: body.contact_id }, req: request });
+
     return NextResponse.json({ data }, { status: 201 });
   } catch (error) {
     logger.error('CRM follow-up creation failed', error as Error);
@@ -65,6 +69,9 @@ export async function PATCH(request: NextRequest) {
 
     const { error } = await db.from('crm_follow_ups').update(updates).eq('id', id);
     if (error) throw error;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) await logAdminAudit({ action: AdminAction.CRM_FOLLOWUP_UPDATED, actorId: user.id, entityType: 'crm_follow_ups', entityId: id, metadata: { new_status: status }, req: request });
 
     return NextResponse.json({ success: true });
   } catch (error) {

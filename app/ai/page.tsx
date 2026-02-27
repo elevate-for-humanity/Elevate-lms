@@ -103,7 +103,7 @@ export default function AIHubPage() {
 
             {/* AI Course Builder */}
             <Link
-              href="/ai/course-builder"
+              href="/ai"
               className="group bg-zinc-900   rounded-2xl p-8 border-2 border-brand-blue-200 hover:border-brand-blue-400 hover:shadow-xl transition-all"
             >
               <div className="w-16 h-16 bg-brand-blue-600 rounded-xl flex items-center justify-center mb-6">
@@ -151,7 +151,7 @@ export default function AIHubPage() {
 
             {/* AI Instructor */}
             <Link
-              href="/ai/instructor"
+              href="/ai"
               className="group bg-zinc-900   rounded-2xl p-8 border-2 border-pink-200 hover:border-pink-400 hover:shadow-xl transition-all"
             >
               <div className="w-16 h-16 bg-pink-600 rounded-xl flex items-center justify-center mb-6">
@@ -172,7 +172,7 @@ export default function AIHubPage() {
 
             {/* AI Asset Generator */}
             <Link
-              href="/ai/generate-asset"
+              href="/ai"
               className="group bg-zinc-900   rounded-2xl p-8 border-2 border-teal-200 hover:border-teal-400 hover:shadow-xl transition-all"
             >
               <div className="w-16 h-16 bg-teal-600 rounded-xl flex items-center justify-center mb-6">

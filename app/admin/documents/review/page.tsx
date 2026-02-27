@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { SecureDocumentLink } from '@/components/admin/SecureDocumentLink';
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
@@ -62,21 +63,13 @@ export default async function AdminDocumentReviewPage() {
     )
     .order('created_at', { ascending: false });
 
-  // Generate signed URLs for documents stored in private buckets.
-  // file_url may be null (new uploads) or a dead public URL (legacy).
-  // file_path is the authoritative storage reference.
-  const docsWithUrls = await Promise.all(
-    (documents || []).map(async (doc) => {
-      if (doc.file_path) {
-        const { data } = await db.storage
-          .from('documents')
-          .createSignedUrl(doc.file_path, 3600);
-        return { ...doc, view_url: data?.signedUrl || null };
-      }
-      // Fallback for legacy rows that only have file_url
-      return { ...doc, view_url: doc.file_url || null };
-    })
-  );
+  // Document viewing is handled on-demand via SecureDocumentLink,
+  // which routes through /api/admin/documents/signed-url with audit logging.
+  // No server-side signed URLs are generated here.
+  const docsWithUrls = (documents || []).map((doc) => ({
+    ...doc,
+    view_url: null, // URLs generated on-demand via SecureDocumentLink
+  }));
 
   const pendingDocs = docsWithUrls.filter((d) => d.status === 'pending') || [];
   const approvedDocs = docsWithUrls.filter((d) => d.status === 'approved') || [];
@@ -281,15 +274,8 @@ export default async function AdminDocumentReviewPage() {
                     >
                       {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
                     </span>
-                    {doc.view_url ? (
-                      <a
-                        href={doc.view_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-brand-blue-600 hover:underline text-sm font-semibold"
-                      >
-                        View
-                      </a>
+                    {doc.file_path ? (
+                      <SecureDocumentLink documentId={doc.id} />
                     ) : (
                       <span className="text-slate-400 text-sm">No file</span>
                     )}

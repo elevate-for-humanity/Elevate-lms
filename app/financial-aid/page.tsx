@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { DollarSign, FileText, Phone, ArrowRight, Shield, Clock, Users, Calculator } from 'lucide-react';
 import { FinancialAidCalculator } from '@/components/FinancialAidCalculator';
+import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -44,7 +45,7 @@ const fundingOptions = [
   },
   {
     title: 'Buy Now, Pay Later (BNPL)',
-    description: 'Split tuition into 4–6 installments with Klarna, Afterpay, Sezzle, Affirm, or Zip.',
+    description: `Split tuition into 4–6 installments with ${BNPL_PROVIDER_NAMES}.`,
     eligibility: ['No hard credit check for most providers', 'Instant approval available', 'Self-pay students', 'Set up at enrollment'],
     coverage: 'Pay over 4–6 installments',
     icon: DollarSign,
@@ -211,7 +212,7 @@ export default function FinancialAidPage() {
             href="/apply"
             className="inline-flex items-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-lg font-semibold hover:bg-brand-green-50 transition-colors"
           >
-            Apply Now - It's Free
+            Apply Now
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

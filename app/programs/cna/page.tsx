@@ -1,203 +1,127 @@
-'use client';
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 
-import Link from 'next/link';
-import Image from 'next/image';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import {
-  Clock,
-  DollarSign,
-  GraduationCap,
-  MapPin,
+import { Metadata } from 'next';
+import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
+import ProgramPageLayout from '@/components/programs/ProgramPageLayout';
+import type { ProgramPageConfig } from '@/components/programs/ProgramPageLayout';
 
-  ArrowRight,
+const SITE_URL = 'https://www.elevateforhumanity.org';
 
-  Shield,
-  Users,
-  Calendar,
-} from 'lucide-react';
+export const metadata: Metadata = {
+  title: 'CNA Certification Program | Free with WIOA | Indianapolis',
+  description: 'Become a Certified Nursing Assistant in 4-6 weeks. State exam prep, clinical hours, and job placement included. Free for eligible participants through WIOA.',
+  alternates: { canonical: `${SITE_URL}/programs/cna` },
+};
 
-export default function CNAProgramPage() {
-  const highlights = [
-    { icon: Clock, label: 'Duration', value: '4–8 weeks' },
-    { icon: DollarSign, label: 'Tuition', value: '$1,200' },
-    { icon: GraduationCap, label: 'Credential', value: 'Indiana CNA License' },
-    { icon: MapPin, label: 'Location', value: 'Indianapolis, IN' },
-  ];
+const config: ProgramPageConfig = {
+  videoSrc: '/videos/cna-hero.mp4',
 
-  const curriculum = [
-    'Patient care fundamentals and safety',
-    'Vital signs measurement and documentation',
-    'Infection control and hygiene procedures',
-    'Mobility assistance and body mechanics',
-    'Nutrition and feeding assistance',
-    'Communication with patients and healthcare teams',
-    'Clinical rotation at a licensed healthcare facility',
-    'Indiana State CNA competency exam preparation',
-  ];
+  title: 'CNA Certification',
+  subtitle: 'Become a Certified Nursing Assistant in 4–6 weeks. Clinical hours, state exam prep, and job placement included.',
+  badge: 'Free with WIOA',
+  badgeColor: 'green',
 
-  const outcomes = [
-    { employer: 'Hospitals', pay: '$16–$20/hr' },
-    { employer: 'Nursing homes / Long-term care', pay: '$15–$19/hr' },
-    { employer: 'Home health agencies', pay: '$14–$18/hr' },
-    { employer: 'Rehabilitation centers', pay: '$16–$20/hr' },
-  ];
+  duration: '4–6 weeks',
+  cost: '$0 with WIOA funding',
+  format: 'In-person, Indianapolis',
+  credential: 'Indiana CNA License',
 
+  overview: 'This state-approved program prepares you for the Indiana CNA certification exam. You will complete classroom instruction and supervised clinical hours at a healthcare facility. Training covers patient care, vital signs, infection control, safety, and communication. Graduates are eligible to sit for the Indiana State CNA Competency Exam.',
+  highlights: [
+    'State-approved curriculum meeting Indiana Health requirements',
+    'Supervised clinical hours at a healthcare facility',
+    'Indiana CNA Competency Exam prep and scheduling',
+    'CPR/First Aid and BLS certification included',
+    'Job placement assistance with 50+ healthcare employer partners',
+    'Scrubs, textbook, and supplies provided with funding',
+  ],
+  overviewImage: '/images/programs-fresh/cna-nursing.jpg',
+  overviewImageAlt: 'CNA student practicing patient care skills',
+
+  salaryNumber: 38000,
+  salaryLabel: 'Average starting salary for CNAs in Indiana',
+  salaryPrefix: '$',
+
+  curriculum: [
+    {
+      title: 'Patient Care Fundamentals',
+      topics: ['Activities of daily living (ADLs)', 'Bathing, grooming, dressing', 'Feeding and nutrition', 'Mobility and transfers', 'Bed making and positioning'],
+    },
+    {
+      title: 'Clinical Skills',
+      topics: ['Vital signs (BP, pulse, temp, respiration)', 'Intake and output measurement', 'Specimen collection', 'Catheter care', 'Blood glucose monitoring'],
+    },
+    {
+      title: 'Safety & Infection Control',
+      topics: ['Hand hygiene and PPE', 'Standard precautions', 'Fall prevention', 'Fire safety and emergency procedures', 'Body mechanics and ergonomics'],
+    },
+    {
+      title: 'Communication & Rights',
+      topics: ['Patient rights and dignity', 'HIPAA compliance', 'Documentation and reporting', 'Team communication', 'Cultural sensitivity'],
+    },
+    {
+      title: 'Clinical Rotation',
+      topics: ['Supervised patient care', 'Long-term care facility experience', 'Skills demonstration', 'Clinical evaluation', 'Professional conduct'],
+    },
+    {
+      title: 'Exam Preparation',
+      topics: ['Written exam review', 'Skills demonstration practice', 'State exam registration', 'Test-taking strategies', 'License application process'],
+    },
+  ],
+
+  credentials: [
+    'Indiana CNA License',
+    'CPR/First Aid Certification',
+    'BLS Certification',
+  ],
+
+  careers: [
+    { title: 'Certified Nursing Assistant', salary: '$32,000–$42,000' },
+    { title: 'Home Health Aide', salary: '$28,000–$36,000' },
+    { title: 'Patient Care Technician', salary: '$34,000–$44,000' },
+    { title: 'Medical Assistant (with additional training)', salary: '$36,000–$46,000' },
+  ],
+
+  steps: [
+    { title: 'Apply Online', desc: 'Complete our application in about 5 minutes.' },
+    { title: 'Check Funding', desc: 'Most students qualify for free training through WIOA.' },
+    { title: 'Background Check', desc: 'Healthcare programs require a background check and drug screen.' },
+    { title: 'Start Training', desc: 'Begin classroom instruction and clinical rotations.' },
+  ],
+
+  faqs: [
+    { question: 'Is the CNA program really free?', answer: 'Yes, for eligible participants. WIOA funding covers tuition, textbook, scrubs, supplies, and the state exam fee. You pay nothing out of pocket if you qualify.' },
+    { question: 'Do I need any prior healthcare experience?', answer: 'No. This program is designed for complete beginners. You need a high school diploma or GED, and you must pass a background check and drug screen.' },
+    { question: 'How soon can I start working after graduation?', answer: 'Most graduates begin working within 2-4 weeks of passing the state exam. Our career services team connects you directly with hiring employers.' },
+    { question: 'What is the state exam like?', answer: 'The Indiana CNA Competency Exam has two parts: a written test (60 multiple-choice questions) and a skills demonstration (you perform 5 randomly selected skills in front of an evaluator). We prepare you for both.' },
+    { question: 'Can I work while in the CNA program?', answer: 'The program is full-time during the day (Monday-Friday). Some students work evenings or weekends. Talk to your advisor about scheduling.' },
+  ],
+
+  applyHref: '/apply?program=cna',
+
+  breadcrumbs: [
+    { label: 'Programs', href: '/programs' },
+    { label: 'Healthcare', href: '/programs/healthcare' },
+    { label: 'CNA Certification' },
+  ],
+};
+
+export default function Page() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'CNA Certification' }]} />
-      </div>
-
-      {/* Video Hero */}
-      <ProgramHeroBanner videoSrc="/videos/cna-hero.mp4" />
-
-      {/* Hero Image — no text overlay */}
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image
-          src="/images/programs-hq/cna-training.jpg"
-          alt="CNA training classroom with students practicing patient care"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-      </section>
-
-      {/* Quick Stats */}
-      <section className="bg-slate-50 border-b">
-        <div className="max-w-5xl mx-auto px-4 py-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {highlights.map((h) => {
-              const Icon = h.icon;
-              return (
-                <div key={h.label} className="flex items-center gap-3">
-                  <Icon className="w-8 h-8 text-brand-blue-600 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wide">{h.label}</p>
-                    <p className="font-bold text-gray-900">{h.value}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Program Overview */}
-      <section className="py-14 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-10">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Program Overview</h2>
-              <p className="text-gray-700 leading-relaxed mb-4">
-                The CNA Certification program prepares you for employment as a Certified Nursing
-                Assistant in hospitals, nursing homes, home health agencies, and rehabilitation
-                centers across Indiana.
-              </p>
-              <p className="text-gray-700 leading-relaxed mb-4">
-                Training includes classroom instruction, skills lab practice, and supervised
-                clinical hours at a licensed healthcare facility. Upon completion, you are
-                eligible to sit for the Indiana State CNA competency examination administered
-                by the Indiana State Department of Health (ISDH).
-              </p>
-              <p className="text-gray-600 text-sm">
-                The CNA credential is issued by the Indiana State Department of Health upon
-                passing the state competency exam. Elevate provides training and exam preparation
-                but does not independently issue the CNA license.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">What You&apos;ll Learn</h3>
-              <ul className="space-y-3">
-                {curriculum.map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <span className="w-2 h-2 bg-brand-green-500 rounded-full mt-2 flex-shrink-0" />
-                    <span className="text-gray-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Payment Options */}
-      <section className="py-14 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">Tuition &amp; Payment Options</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl border p-6 text-center">
-              <DollarSign className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
-              <h3 className="font-bold text-lg mb-2">Pay in Full</h3>
-              <p className="text-3xl font-bold text-gray-900 mb-2">$1,200</p>
-              <p className="text-gray-600 text-sm">One-time payment at enrollment</p>
-            </div>
-            <div className="bg-white rounded-xl border-2 border-brand-blue-500 p-6 text-center relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                Most Popular
-              </div>
-              <Calendar className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
-              <h3 className="font-bold text-lg mb-2">Payment Plan</h3>
-              <p className="text-3xl font-bold text-gray-900 mb-2">$200 <span className="text-base font-normal text-gray-500">down</span></p>
-              <p className="text-gray-600 text-sm">Then $50/week for 20 weeks</p>
-            </div>
-            <div className="bg-white rounded-xl border p-6 text-center">
-              <Shield className="w-10 h-10 text-brand-green-600 mx-auto mb-3" />
-              <h3 className="font-bold text-lg mb-2">Workforce Funding</h3>
-              <p className="text-3xl font-bold text-brand-green-600 mb-2">$0</p>
-              <p className="text-gray-600 text-sm">WIOA, JRI, or employer-sponsored — if eligible</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Career Outcomes */}
-      <section className="py-14 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">Career Outcomes</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {outcomes.map((o) => (
-              <div key={o.employer} className="flex items-center justify-between bg-slate-50 rounded-lg p-4 border">
-                <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-brand-blue-600" />
-                  <span className="font-medium text-gray-900">{o.employer}</span>
-                </div>
-                <span className="font-bold text-brand-green-600">{o.pay}</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-center text-gray-500 text-sm mt-4">
-            Salary ranges are estimates based on Indiana labor market data. Actual pay varies by employer and experience.
-          </p>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-16 bg-brand-blue-600">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Start Your Healthcare Career?
-          </h2>
-          <p className="text-brand-blue-100 mb-8 max-w-2xl mx-auto">
-            Enroll today or check your eligibility for funded training. Classes start regularly with day, evening, and weekend options.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply/student?program=cna-certification"
-              className="bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
-            >
-              Apply for Enrollment
-            </Link>
-            <Link
-              href="/apply/intake?program=cna-certification"
-              className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition"
-            >
-              Request Information
-            </Link>
-          </div>
-        </div>
-      </section>
-    </div>
+    <>
+      <ProgramStructuredData program={{
+        id: 'cna',
+        name: 'CNA Certification Program',
+        slug: 'cna',
+        description: config.subtitle,
+        duration_weeks: 6,
+        price: 0,
+        image_url: `${SITE_URL}/images/programs-fresh/cna-nursing.jpg`,
+        category: 'Healthcare',
+        outcomes: ['Indiana CNA License', 'CPR/First Aid Certification', 'BLS Certification'],
+      }} />
+      <ProgramPageLayout config={config} />
+    </>
   );
 }

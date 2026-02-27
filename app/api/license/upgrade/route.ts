@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 /**
  * Subscription tiers available for upgrade
  * Prices should be configured in Stripe and env vars

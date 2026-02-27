@@ -201,7 +201,7 @@ export default function InstructionalFrameworkPage() {
 
           <div className="space-y-4">
             {[
-              { role: 'Sponsor (Oversight & Compliance)', entity: 'Elevate for Humanity', detail: 'Curriculum standards, enrollment, funding navigation, progress tracking, credential verification, RAPIDS registration, ETPL compliance, institutional accountability' },
+              { role: 'Sponsor (Oversight & Compliance)', entity: '2Exclusive LLC-S (DBA Elevate for Humanity Career & Technical Institute)', detail: 'Curriculum standards, enrollment, funding navigation, progress tracking, credential verification, RAPIDS registration, ETPL compliance, institutional accountability' },
               { role: 'Primary RTI Providers', entity: 'State-Approved / Licensed Credential Partners', detail: 'Occupation-specific classroom instruction, clinical rotations, lab sessions, certification exam preparation. Credentials must match the occupation taught.' },
               { role: 'Program Holders', entity: 'Authorized Curriculum Managers & RTI Coordinators', detail: 'Curriculum delivery coordination, module sequencing, RTI scheduling, progress documentation. Operate under licensed instructional supervision of Tier 1 Credential Partners.' },
               { role: 'Subject Matter Experts', entity: 'Credentialed SMEs (Supplemental Instruction)', detail: 'Mentoring, supplemental labs, module support, practice sessions. Not sole RTI authorities — state-approved providers are always involved.' },
@@ -504,7 +504,7 @@ export default function InstructionalFrameworkPage() {
               },
               {
                 type: 'Certificate of Completion',
-                issuer: 'Elevate for Humanity',
+                issuer: 'Elevate for Humanity Career & Technical Institute',
                 color: 'bg-brand-green-50 border-brand-green-200',
                 examples: 'Program completion certificates, module completion records, workforce readiness certificates, RTI hour documentation',
                 note: 'Documents that the student completed the Elevate training pathway. Does not replace industry credentials.',
@@ -538,7 +538,7 @@ export default function InstructionalFrameworkPage() {
             <div className="bg-slate-50 rounded-lg p-5">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Registered Apprenticeship Sponsor</p>
               <p className="font-semibold text-gray-900">RAPIDS ID: 2025-IN-132301</p>
-              <p className="text-sm text-gray-600 mt-1">Sponsor of Record: 2Exclusive LLC (DBA Elevate for Humanity)</p>
+              <p className="text-sm text-gray-600 mt-1">Sponsor of Record: 2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute)</p>
             </div>
             <div className="bg-slate-50 rounded-lg p-5">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">ETPL / INTraining</p>

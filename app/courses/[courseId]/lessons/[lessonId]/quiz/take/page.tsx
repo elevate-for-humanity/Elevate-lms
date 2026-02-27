@@ -195,7 +195,7 @@ export default function TakeQuizPage({
                     href="/contact"
                     className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
                   >
-                    Apply Now - It's Free
+                    Apply Now
                   </Link>
                   <Link
                     href="/programs"

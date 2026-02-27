@@ -180,7 +180,7 @@ export default function IPLAExamSignup() {
                   setStudentInfo({ ...studentInfo, email: e.target.value })
                 }
                 className="w-full px-4 py-3 border rounded-lg"
-                placeholder="your.email@gmail.com"
+                placeholder="you@example.com"
               />
             </div>
             <div>

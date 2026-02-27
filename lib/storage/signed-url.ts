@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 
-const DEFAULT_EXPIRY = 3600; // 1 hour
+const DEFAULT_EXPIRY = 60; // 60 seconds — short-lived for PII document access
 
 /**
  * Generate a signed URL for a file in a private Supabase storage bucket.

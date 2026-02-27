@@ -381,11 +381,11 @@ export class ReturnService {
     newValues: unknown
   ): Promise<void> {
     await this.supabase.from('franchise_audit_log').insert({
-      event_type: eventType,
+      action: eventType,
       entity_type: entityType,
       entity_id: entityId,
       old_values: oldValues,
-      new_values: newValues
+      new_values: newValues,
     });
   }
 }

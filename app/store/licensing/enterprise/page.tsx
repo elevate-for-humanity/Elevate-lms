@@ -386,7 +386,7 @@ export default function SourceUseLicensePage() {
 
           <div className="text-center text-slate-600 text-xs space-y-2">
             <p>
-              Elevate for Humanity™ and the Elevate logo are trademarks of 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute.
+              Elevate for Humanity™ and the Elevate logo are trademarks of 2Exclusive LLC-S.
             </p>
             <p>
               Source-Use License is subject to full license agreement. Unauthorized use, distribution, 

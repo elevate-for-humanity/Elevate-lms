@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { setAuditContext } from '@/lib/audit-context';
 
 interface TestResult {
   step: string;
@@ -53,6 +54,7 @@ export async function testEnrollmentFlow(
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey);
+  await setAuditContext(supabase, { systemActor: 'autopilot_test' });
 
   // STEP 1: Create or get test student
   try {
@@ -252,10 +254,10 @@ export async function testEnrollmentFlow(
 
         // Log to audit trail
         await supabase.from('ai_audit_log').insert({
-          student_id: userId,
-          program_slug: config.programSlug,
+          user_id: userId,
           action: 'ASSIGN_INSTRUCTOR',
           details: {
+            program_slug: config.programSlug,
             instructor_slug: instructor.slug,
             source: 'autopilot_test',
           },
@@ -357,7 +359,7 @@ export async function testEnrollmentFlow(
     const { data: auditLogs, error: auditError } = await supabase
       .from('ai_audit_log')
       .select('*')
-      .eq('student_id', userId)
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(5);
 

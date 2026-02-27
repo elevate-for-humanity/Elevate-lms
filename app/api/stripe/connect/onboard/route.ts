@@ -6,8 +6,9 @@ import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
@@ -47,3 +48,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/stripe/connect/onboard', _POST);

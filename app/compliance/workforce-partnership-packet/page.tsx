@@ -95,11 +95,11 @@ export default function WorkforcePartnershipPacketPage() {
               <dl className="space-y-3 text-sm">
                 <div>
                   <dt className="font-semibold text-gray-500 text-xs uppercase tracking-wider">Organization</dt>
-                  <dd className="text-gray-900 font-medium">Elevate for Humanity</dd>
+                  <dd className="text-gray-900 font-medium">Elevate for Humanity Career &amp; Technical Institute</dd>
                 </div>
                 <div>
                   <dt className="font-semibold text-gray-500 text-xs uppercase tracking-wider">Legal Entity</dt>
-                  <dd className="text-gray-900">2Exclusive LLC (DBA Elevate for Humanity)</dd>
+                  <dd className="text-gray-900">2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute)</dd>
                 </div>
                 <div>
                   <dt className="font-semibold text-gray-500 text-xs uppercase tracking-wider">Classification</dt>

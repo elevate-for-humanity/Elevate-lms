@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { BNPL_DESCRIPTION } from '@/lib/bnpl-config';
 import { ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -38,6 +39,11 @@ export default function FundingPage() {
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
         <Image src="/images/trades/program-building-technology.jpg" alt="Workforce funding options" fill sizes="100vw" className="object-cover" priority />
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white text-center px-4">
+            Workforce Funding
+          </h1>
+        </div>
       </section>
 
       {/* Funding Options */}
@@ -159,7 +165,7 @@ export default function FundingPage() {
             {[
               { title: 'Pay in Full', desc: 'One-time payment at enrollment. Some programs offer a discount for full payment.', tag: 'Best Value', href: '/apply', linkText: 'Apply Now →' },
               { title: 'Payment Plan', desc: 'Split your tuition into monthly installments. No interest. Set up at enrollment.', tag: 'Flexible', href: '/apply', linkText: 'Apply Now →' },
-              { title: 'Buy Now, Pay Later', desc: 'Split payments into 4–6 installments with Klarna, Afterpay, Sezzle, Affirm, or Zip. No hard credit check for most providers.', tag: 'BNPL', href: '/apply', linkText: 'Apply Now →' },
+              { title: 'Buy Now, Pay Later', desc: BNPL_DESCRIPTION, tag: 'BNPL', href: '/apply', linkText: 'Apply Now →' },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col">
                 <span className="text-xs font-bold text-brand-blue-600 bg-brand-blue-50 px-2 py-1 rounded-full self-start">{item.tag}</span>

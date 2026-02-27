@@ -14,7 +14,7 @@ const PROGRAMS = [
   {
     name: 'CNA Certification',
     image: '/images/programs-hq/cna-training.jpg',
-    href: '/programs/cna-certification',
+    href: '/programs/cna',
     credential: 'Certified Nursing Assistant (CNA)',
     issuedBy: 'Indiana State Department of Health (ISDH)',
     whatItMeans: 'A CNA credential means you are legally authorized to provide direct patient care in Indiana. Hospitals, nursing homes, home health agencies, and assisted living facilities require this certification to hire you. It is a state-regulated credential — not a certificate of completion from a school.',

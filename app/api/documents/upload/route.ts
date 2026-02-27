@@ -147,7 +147,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     entityId: document.id,
     metadata: {
       document_type: documentType,
-      file_name: file.name,
+      file_extension: file.name.split('.').pop() || 'unknown',
       file_size: file.size,
       mime_type: file.type,
     },

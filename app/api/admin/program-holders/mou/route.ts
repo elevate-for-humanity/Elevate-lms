@@ -1,5 +1,6 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -7,6 +8,8 @@ import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { generateMOUText } from '@/lib/mou-template';
 import { withAuth } from '@/lib/with-auth';
+
+import { auditMutation } from '@/lib/api/withAudit';
 
 export const GET = withAuth(
   async (req, context) => {
@@ -60,6 +63,15 @@ export const GET = withAuth(
         .from('program_holders')
         .update({ mou_status: 'sent' })
         .eq('id', id);
+
+      await logAdminAudit({
+        action: AdminAction.MOU_STATUS_CHANGED,
+        actorId: user.id,
+        entityType: 'program_holders',
+        entityId: id,
+        metadata: { new_status: 'sent' },
+        req,
+      });
     }
 
     // Return as downloadable text file

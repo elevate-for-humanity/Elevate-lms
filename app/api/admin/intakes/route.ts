@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export const dynamic = 'force-dynamic';
 
@@ -77,6 +78,9 @@ export async function POST(request: NextRequest) {
       logger.error('Create intake error:', error);
       return NextResponse.json({ error: 'Failed to create intake' }, { status: 500 });
     }
+
+    const { data: { user: actor } } = await supabase.auth.getUser();
+    if (actor) await logAdminAudit({ action: AdminAction.INTAKE_CREATED, actorId: actor.id, entityType: 'intakes', entityId: intake.id, metadata: { name: intake.name }, req: request });
 
     return NextResponse.json({ success: true, intake });
   } catch (error) {

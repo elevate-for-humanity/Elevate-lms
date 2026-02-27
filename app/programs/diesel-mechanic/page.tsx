@@ -1,133 +1,50 @@
-
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 import { Metadata } from 'next';
-import Link from 'next/link';
-import Image from 'next/image';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight } from 'lucide-react';
-
+import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
+import ProgramPageLayout from '@/components/programs/ProgramPageLayout';
+import type { ProgramPageConfig } from '@/components/programs/ProgramPageLayout';
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
-  title: 'Diesel Mechanic Training | Heavy Equipment Repair | Elevate',
-  description: 'Diesel mechanic training in Indianapolis. Learn diesel engine repair, diagnostics, and maintenance. Funding available for qualifying students.',
+  title: 'Diesel Mechanic Training | ASE Prep | Indianapolis',
+  description: 'Diesel engine repair and maintenance training. 12-week program. OSHA 10 certified. Free for eligible participants.',
   alternates: { canonical: `${SITE_URL}/programs/diesel-mechanic` },
-  openGraph: {
-    title: 'Diesel Mechanic Training | Indianapolis',
-    description: 'Diesel engine repair, diagnostics, and maintenance training.',
-    url: `${SITE_URL}/programs/diesel-mechanic`,
-    images: [{ url: `${SITE_URL}/images/transportation/hero-program-automotive.jpg`, width: 1200, height: 630 }],
-  },
 };
 
-export default function DieselMechanicPage() {
+const config: ProgramPageConfig = {
+  videoSrc: '/videos/program-hero.mp4',
+  title: 'Diesel Mechanic', subtitle: 'Diagnose and repair diesel engines, transmissions, and hydraulic systems. OSHA 10 and ASE prep in 12 weeks.',
+  badge: 'Funding Available', badgeColor: 'orange',
+  duration: '12 weeks', cost: '$0 with WIOA funding', format: 'In-person, Indianapolis', credential: 'OSHA 10 + ASE Prep',
+  overview: 'This 12-week program covers diesel engine theory, fuel systems, electrical systems, brakes, transmissions, and hydraulics. You will work on real diesel engines and heavy equipment in a hands-on shop. Graduates earn OSHA 10 certification and are prepared for ASE Medium/Heavy Truck certification exams.',
+  highlights: ['Diesel engine theory and operation', 'Fuel system diagnosis and repair', 'Electrical and electronic systems', 'Brake and transmission service', 'Hydraulic system fundamentals', 'OSHA 10-Hour Construction Safety'],
+  overviewImage: '/images/programs-fresh/diesel-mechanic.jpg', overviewImageAlt: 'Diesel mechanic student working on an engine',
+  salaryNumber: 55000, salaryLabel: 'Average annual salary for diesel mechanics in Indiana (BLS)', salaryPrefix: '$',
+  curriculum: [
+    { title: 'Diesel Engines', topics: ['Engine theory and operation', 'Cylinder head and valve train', 'Piston and crankshaft assembly', 'Cooling and lubrication systems', 'Engine performance testing'] },
+    { title: 'Fuel Systems', topics: ['Diesel fuel properties', 'Injection systems', 'Common rail systems', 'Fuel filters and water separators', 'Emissions controls'] },
+    { title: 'Electrical Systems', topics: ['Starting and charging systems', 'Wiring diagrams', 'Sensor and actuator testing', 'Diagnostic scan tools', 'Multiplexing basics'] },
+    { title: 'Drivetrain & Brakes', topics: ['Manual transmissions', 'Automatic transmissions', 'Drive axles and differentials', 'Air brake systems', 'ABS diagnostics'] },
+    { title: 'Safety & Certification', topics: ['OSHA 10-Hour certification', 'Shop safety procedures', 'Hazardous materials handling', 'ASE exam preparation', 'Career placement support'] },
+  ],
+  credentials: ['OSHA 10-Hour Construction Safety', 'ASE Medium/Heavy Truck Prep', 'CPR/First Aid'],
+  careers: [
+    { title: 'Diesel Mechanic', salary: '$45,000–$65,000' },
+    { title: 'Heavy Equipment Mechanic', salary: '$48,000–$68,000' },
+    { title: 'Fleet Maintenance Technician', salary: '$42,000–$60,000' },
+    { title: 'Mobile Diesel Technician', salary: '$50,000–$70,000' },
+  ],
+  steps: [
+    { title: 'Apply Online', desc: 'Complete our application in about 5 minutes.' },
+    { title: 'Check Funding', desc: 'Register at Indiana Career Connect for WIOA eligibility.' },
+    { title: 'Attend Orientation', desc: 'Tour the diesel shop and meet your instructor.' },
+    { title: 'Start Training', desc: 'Begin 12 weeks of hands-on diesel training.' },
+  ],
+  applyHref: '/apply?program=diesel-mechanic',
+  breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Skilled Trades', href: '/programs/skilled-trades' }, { label: 'Diesel Mechanic' }],
+};
 
-  return (
-    <div className="min-h-screen bg-white">
-      <ProgramHeroBanner videoSrc="/videos/program-hero.mp4" voiceoverSrc="/audio/heroes/programs.mp3" />
-      <div className="bg-slate-50 border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Skilled Trades', href: '/programs/skilled-trades' }, { label: 'Diesel Mechanic' }]} />
-        </div>
-      </div>
-
-      <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/transportation/hero-program-automotive.jpg" alt="Diesel Mechanic Training" fill sizes="100vw" className="object-cover" priority />
-      </section>
-
-      <section className="bg-slate-900 py-5">
-        <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-          {[
-            { val: '12-16 Weeks', label: 'Program Length' },
-            { val: 'ASE Prep', label: 'Certification' },
-            { val: '$42K-$65K', label: 'Salary Range' },
-            { val: 'High Demand', label: 'Job Market' },
-          ].map((s) => (
-            <div key={s.label}>
-              <div className="text-lg sm:text-xl font-bold text-white">{s.val}</div>
-              <div className="text-slate-400 text-xs">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="py-8 sm:py-14 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex flex-col sm:flex-row gap-5 items-start">
-            <div className="relative w-full h-[200px] sm:w-72 sm:h-[280px] rounded-xl overflow-hidden flex-shrink-0">
-              <Image src="/images/artlist/hero-training-2.jpg" alt="Diesel mechanic training" fill sizes="100vw" className="object-cover" />
-            </div>
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What You&apos;ll Learn</h2>
-              <p className="text-slate-600 text-sm leading-relaxed mb-3">Hands-on training in diesel engine systems and heavy equipment repair.</p>
-              <div className="space-y-2">
-                {['Diesel engine fundamentals and operation', 'Fuel injection systems and turbochargers', 'Electrical and electronic diagnostics', 'Brake systems and suspension', 'Preventive maintenance and inspections', 'DOT compliance and safety standards'].map((item) => (
-                  <div key={item} className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-brand-orange-500 rounded-full flex-shrink-0" />
-                    <span className="text-slate-700 text-sm">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-8 sm:py-14 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">Career Paths</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[
-              { title: 'Fleet Mechanic', salary: '$40K-$55K' },
-              { title: 'Diesel Technician', salary: '$45K-$65K' },
-              { title: 'Heavy Equipment Tech', salary: '$48K-$70K' },
-              { title: 'Shop Foreman', salary: '$55K-$80K' },
-            ].map((c) => (
-              <div key={c.title} className="bg-white rounded-xl border border-slate-200 p-4">
-                <h3 className="font-bold text-slate-900 text-sm">{c.title}</h3>
-                <div className="text-brand-orange-500 font-bold text-sm">{c.salary}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-8 sm:py-14 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">How to Enroll</h2>
-          <div className="space-y-3">
-            {[
-              { step: '1', title: 'Apply Online', desc: 'Submit your student application.' },
-              { step: '2', title: 'Check Funding', desc: 'Register at indianacareerconnect.com for WIOA/JRI eligibility.' },
-              { step: '3', title: 'Start Training', desc: 'Hands-on shop instruction with certified technicians.' },
-              { step: '4', title: 'Get Certified & Hired', desc: 'Prepare for ASE certification and connect with employers.' },
-            ].map((s) => (
-              <div key={s.step} className="flex items-start gap-4 bg-slate-50 rounded-lg p-4">
-                <div className="w-8 h-8 bg-brand-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{s.title}</h3>
-                  <p className="text-slate-600 text-sm">{s.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-8 sm:py-14 bg-brand-orange-500">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Diesel Mechanic Career</h2>
-          <p className="text-white mb-6 text-sm">Trucks and heavy equipment need mechanics. Apply today.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=diesel-mechanic" className="bg-white text-brand-orange-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-orange-50 transition-colors text-center">
-              Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
-            </Link>
-            <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
-              Explore Funding Options
-            </Link>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
+export default function Page() {
+  return (<><ProgramStructuredData program={{ id: 'diesel-mechanic', name: config.title, slug: 'diesel-mechanic', description: config.subtitle, duration_weeks: 12, price: 0, image_url: `${SITE_URL}/images/programs-fresh/diesel-mechanic.jpg`, category: 'Skilled Trades', outcomes: config.credentials || [] }} /><ProgramPageLayout config={config} /></>);
 }

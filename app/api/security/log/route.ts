@@ -55,14 +55,17 @@ export async function POST(request: NextRequest) {
       try {
         const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-        await db.from('security_logs').insert({
-          event_type: body.type,
-          timestamp: body.timestamp,
-          url: body.url,
-          user_agent: body.userAgent,
+        await db.from('audit_logs').insert({
+          action: body.type,
+          event_type: 'security',
           ip_address: ip,
-          data: body.data,
-          severity: getSeverity(body.type as string),
+          user_agent: body.userAgent,
+          details: {
+            url: body.url,
+            timestamp: body.timestamp,
+            data: body.data,
+            severity: getSeverity(body.type as string),
+          },
         });
 
         // Send alerts for critical events (non-blocking)

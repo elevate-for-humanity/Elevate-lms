@@ -9,10 +9,14 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireApiAuth } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { createAdminClient, createAuditedAdminClient } from '@/lib/supabase/admin';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
-export async function POST(
+import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+
+async function _POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -41,7 +45,10 @@ export async function POST(
   }
 
   const { id } = await params;
-  const adminDb = createAdminClient();
+  const adminDb = await createAuditedAdminClient({
+    actorUserId: adminUser?.id,
+    systemActor: 'admin_application_approval',
+  });
   if (!adminDb) {
     return NextResponse.json(
       { error: "Database not configured" },
@@ -240,6 +247,15 @@ export async function POST(
       logger.warn('Failed to send approval email (non-critical)', emailErr);
     }
 
+    await logAdminAudit({
+      action: AdminAction.APPLICATION_APPROVED,
+      actorId: user.id,
+      entityType: 'applications',
+      entityId: applicationId,
+      metadata: { created_user_id: userId, program_id: program_id || null, funding_type: funding_type || null },
+      req,
+    });
+
     return NextResponse.json({
       message: program_id
         ? "Application approved, user created, and enrolled"
@@ -346,3 +362,4 @@ async function approveProgramHolder(
     next_step: `/admin/program-holders/${holderRow?.id}`,
   });
 }
+export const POST = withApiAudit('/api/admin/applications/[id]/approve', _POST);

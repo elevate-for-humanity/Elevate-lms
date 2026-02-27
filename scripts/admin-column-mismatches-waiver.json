@@ -1,0 +1,167 @@
+{
+  "_description": "Known column mismatches between admin page queries and live DB schema. Each entry has an expiry date \u2014 after expiry, CI should block. Re-run admin-route-inventory.py to verify fixes.",
+  "_generated": "2026-02-27",
+  "_schema_snapshot": "scripts/live-schema-snapshot.json",
+  "waivers": [
+    {
+      "id": "W003",
+      "table": "program_holder_documents",
+      "column": "program_holder_id",
+      "issue": "FILTER_COLUMN_MISSING \u2014 table uses user_id/organization_id, not program_holder_id",
+      "affected_routes": [
+        "/admin/program-holders/verification",
+        "/admin/program-holders/verification/[id]/review"
+      ],
+      "fix": "Rewrite filter to use organization_id or user_id",
+      "severity": "HIGH",
+      "expires": "2026-03-15"
+    },
+    {
+      "id": "W004",
+      "table": "program_holder_banking",
+      "column": "program_holder_id",
+      "issue": "FILTER_COLUMN_MISSING \u2014 table has different schema (no FK to program_holders)",
+      "affected_routes": [
+        "/admin/program-holders/verification",
+        "/admin/program-holders/verification/[id]/review"
+      ],
+      "fix": "Rewrite query to match actual banking table schema",
+      "severity": "HIGH",
+      "expires": "2026-03-15"
+    },
+    {
+      "id": "W005",
+      "table": "transfer_hours",
+      "column": "status",
+      "issue": "FILTER_COLUMN_MISSING \u2014 table has no status column",
+      "affected_routes": [
+        "/admin/transfer-hours"
+      ],
+      "fix": "ADD COLUMN status text DEFAULT 'pending' to transfer_hours",
+      "severity": "MEDIUM",
+      "expires": "2026-04-01"
+    },
+    {
+      "id": "W006",
+      "table": "signatures",
+      "column": "status",
+      "issue": "FILTER_COLUMN_MISSING \u2014 table has no status column",
+      "affected_routes": [
+        "/admin/signatures"
+      ],
+      "fix": "ADD COLUMN status text DEFAULT 'pending' to signatures",
+      "severity": "MEDIUM",
+      "expires": "2026-04-01"
+    },
+    {
+      "id": "W007",
+      "table": "external_modules",
+      "column": "status",
+      "issue": "FILTER_COLUMN_MISSING \u2014 table has no status/approval_status columns",
+      "affected_routes": [
+        "/admin/external-modules",
+        "/admin/external-modules/approvals"
+      ],
+      "fix": "ADD COLUMN status text DEFAULT 'active' and approval_status text to external_modules",
+      "severity": "MEDIUM",
+      "expires": "2026-04-01"
+    },
+    {
+      "id": "W008",
+      "table": "modules",
+      "column": "module_type",
+      "issue": "FILTER_COLUMN_MISSING \u2014 table has no module_type column",
+      "affected_routes": [
+        "/admin/modules"
+      ],
+      "fix": "ADD COLUMN module_type text to modules, OR remove filter from UI",
+      "severity": "LOW",
+      "expires": "2026-04-15"
+    },
+    {
+      "id": "W009",
+      "table": "media",
+      "column": "published",
+      "issue": "FILTER_COLUMN_MISSING \u2014 table only has id, path, uploaded_by, created_at",
+      "affected_routes": [
+        "/admin/videos"
+      ],
+      "fix": "ADD COLUMN published boolean DEFAULT false to media",
+      "severity": "LOW",
+      "expires": "2026-04-15"
+    },
+    {
+      "id": "W010",
+      "table": "jri_participants",
+      "column": "status",
+      "issue": "FILTER_COLUMN_MISSING \u2014 table has mystery 'elevateforhumanity' column, no status",
+      "affected_routes": [
+        "/admin/jri"
+      ],
+      "fix": "ADD COLUMN status text DEFAULT 'active' to jri_participants",
+      "severity": "MEDIUM",
+      "expires": "2026-04-01"
+    },
+    {
+      "id": "W011",
+      "table": "assignment_submissions",
+      "column": "course_id",
+      "issue": "FILTER_COLUMN_MISSING \u2014 table uses assignment_id, not course_id",
+      "affected_routes": [
+        "/admin/gradebook/[courseId]"
+      ],
+      "fix": "Join via assignment_id \u2192 assignments.course_id",
+      "severity": "MEDIUM",
+      "expires": "2026-04-01"
+    },
+    {
+      "id": "W012",
+      "table": "quiz_attempts",
+      "column": "course_id",
+      "issue": "FILTER_COLUMN_MISSING \u2014 table uses quiz_id, not course_id",
+      "affected_routes": [
+        "/admin/gradebook/[courseId]"
+      ],
+      "fix": "Join via quiz_id \u2192 quizzes.course_id",
+      "severity": "MEDIUM",
+      "expires": "2026-04-01"
+    },
+    {
+      "id": "W014",
+      "table": "grades",
+      "column": "enrollment_id",
+      "issue": "FILTER_COLUMN_MISSING \u2014 table uses student_id, not enrollment_id",
+      "affected_routes": [
+        "/admin/sap"
+      ],
+      "fix": "Change .eq('enrollment_id', id) to .eq('student_id', studentId)",
+      "severity": "MEDIUM",
+      "expires": "2026-04-01"
+    },
+    {
+      "id": "W015",
+      "table": "attendance_records",
+      "column": "enrollment_id",
+      "issue": "FILTER_COLUMN_MISSING \u2014 table uses student_record_id, not enrollment_id",
+      "affected_routes": [
+        "/admin/sap"
+      ],
+      "fix": "Change .eq('enrollment_id', id) to .eq('student_record_id', recordId)",
+      "severity": "MEDIUM",
+      "expires": "2026-04-01"
+    },
+    {
+      "id": "W016",
+      "table": "partner_lms_sync_logs",
+      "column": "provider_id",
+      "issue": "FILTER_COLUMN_MISSING \u2014 flat table, no provider_id FK",
+      "affected_routes": [
+        "/admin/partners/lms-integrations/[id]"
+      ],
+      "fix": "Rewrite query to filter by provider name or restructure table",
+      "severity": "LOW",
+      "expires": "2026-04-15"
+    }
+  ],
+  "_last_updated": "2026-02-27"
+}

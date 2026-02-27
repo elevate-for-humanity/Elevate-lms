@@ -77,11 +77,11 @@ export default async function EmployeeDetailPage({ params }: Props) {
     notFound();
   }
 
-  // Fetch time off requests
+  // Fetch time off requests (time_off_requests uses user_id, not employee PK)
   const { data: timeOffRequests } = await db
     .from('time_off_requests')
     .select('*')
-    .eq('employee_id', id)
+    .eq('user_id', employee.user_id)
     .order('created_at', { ascending: false })
     .limit(5);
 

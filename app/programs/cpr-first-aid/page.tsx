@@ -1,155 +1,47 @@
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 import { Metadata } from 'next';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight } from 'lucide-react';
+import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
+import ProgramPageLayout from '@/components/programs/ProgramPageLayout';
+import type { ProgramPageConfig } from '@/components/programs/ProgramPageLayout';
+const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
-  title: 'CPR & First Aid Certification | Elevate for Humanity',
-  description: 'CPR, First Aid, and AED certification through CareerSafe. Required for healthcare, trades, and workforce programs. Same-day certification available.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/programs/cpr-first-aid' },
+  title: 'CPR & First Aid Certification | Same-Day | Indianapolis',
+  description: 'American Heart Association CPR, First Aid, and AED certification. Same-day certification available. Required for healthcare and trades programs.',
+  alternates: { canonical: `${SITE_URL}/programs/cpr-first-aid` },
 };
 
-const curriculum = [
-  'Adult, child, and infant CPR techniques',
-  'AED (Automated External Defibrillator) operation',
-  'Choking response for conscious and unconscious victims',
-  'First aid for bleeding, burns, and fractures',
-  'Allergic reaction and anaphylaxis response',
-  'Heat and cold emergency treatment',
-  'Poison and substance exposure protocols',
-  'Scene assessment and emergency action steps',
-];
+const config: ProgramPageConfig = {
+  videoSrc: '/videos/healthcare-cna.mp4', voiceoverSrc: '/audio/heroes/cpr.mp3',
+  title: 'CPR & First Aid Certification', subtitle: 'Earn American Heart Association CPR, First Aid, and AED certification in one day.',
+  badge: 'Same-Day Certification', badgeColor: 'red',
+  duration: '1 day (8 hours)', cost: 'Included with funded programs', format: 'In-person, Indianapolis', credential: 'AHA CPR/First Aid/AED',
+  overview: 'This one-day course covers adult, child, and infant CPR, AED use, choking relief, and basic first aid. Training follows American Heart Association guidelines and includes hands-on practice with manikins and AED trainers. You receive your certification card the same day. This certification is required for all healthcare programs and many trades programs.',
+  highlights: ['Adult, child, and infant CPR techniques', 'AED (Automated External Defibrillator) operation', 'Choking relief for all ages', 'Basic first aid and wound care', 'Same-day certification card', 'American Heart Association guidelines'],
+  overviewImage: '/images/programs-fresh/cpr-first-aid.jpg', overviewImageAlt: 'Students practicing CPR on training manikins',
+  salaryNumber: 0, salaryLabel: 'Required certification for healthcare and trades careers', salaryPrefix: '',
+  curriculum: [
+    { title: 'CPR Skills', topics: ['Adult CPR technique', 'Child CPR technique', 'Infant CPR technique', 'Compression depth and rate', 'Rescue breathing'] },
+    { title: 'AED & Choking', topics: ['AED pad placement', 'AED operation steps', 'Adult choking relief', 'Child and infant choking', 'Recovery position'] },
+    { title: 'First Aid', topics: ['Wound care and bandaging', 'Burns and heat emergencies', 'Allergic reactions', 'Seizure response', 'When to call 911'] },
+  ],
+  credentials: ['AHA CPR/First Aid/AED Certification (2-year validity)'],
+  steps: [
+    { title: 'Register', desc: 'Sign up for the next available CPR class.' },
+    { title: 'Attend Class', desc: 'Complete 8 hours of instruction and hands-on practice.' },
+    { title: 'Pass Skills Check', desc: 'Demonstrate CPR and AED skills for your instructor.' },
+    { title: 'Get Certified', desc: 'Receive your AHA certification card the same day.' },
+  ],
+  faqs: [
+    { question: 'How long is the certification valid?', answer: 'AHA CPR/First Aid/AED certification is valid for 2 years from the date of issue.' },
+    { question: 'Is this included with other programs?', answer: 'Yes. CPR/First Aid certification is included at no extra cost with all healthcare programs (CNA, Medical Assistant, Phlebotomy) and most trades programs.' },
+    { question: 'Can I take this as a standalone course?', answer: 'Yes. You can register for CPR/First Aid certification without enrolling in any other program. Contact us for the next available class date and pricing.' },
+  ],
+  applyHref: '/apply?program=cpr-first-aid',
+  breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Healthcare', href: '/programs/healthcare' }, { label: 'CPR & First Aid' }],
+};
 
-const whoNeeds = [
-  'Healthcare workers (CNA, medical assistant, phlebotomy)',
-  'Construction and trades workers (OSHA requirement)',
-  'Childcare and education professionals',
-  'Fitness trainers and coaches',
-  'Workplace safety officers',
-  'Anyone who wants life-saving skills',
-];
-
-export default function CPRFirstAidPage() {
-  return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[
-            { label: 'Programs', href: '/programs' },
-            { label: 'CPR & First Aid Certification' },
-          ]} />
-        </div>
-      </div>
-
-      {/* Hero Image — no text overlay */}
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image
-          src="/images/programs-hq/healthcare-hero.jpg"
-          alt="CPR and First Aid training session"
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority
-        />
-      </section>
-
-      {/* Stats */}
-      <section className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-3xl font-bold text-gray-900">1 Day</div>
-              <div className="text-sm text-gray-500">Training Duration</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-gray-900">2 Years</div>
-              <div className="text-sm text-gray-500">Certification Valid</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-gray-900">$75</div>
-              <div className="text-sm text-gray-500">Tuition</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-gray-900">Same Day</div>
-              <div className="text-sm text-gray-500">Certification Issued</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Overview */}
-      <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-10">
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                CPR & First Aid Certification
-              </h1>
-              <p className="text-gray-700 leading-relaxed mb-4">
-                This certification course covers adult, child, and infant CPR, AED use, and basic first aid skills. Training is delivered through CareerSafe and meets OSHA, healthcare employer, and state licensing requirements.
-              </p>
-              <p className="text-gray-700 leading-relaxed mb-4">
-                Certification is valid for 2 years and is recognized by employers across healthcare, construction, education, and fitness industries.
-              </p>
-              <p className="text-gray-600 text-sm">
-                This certification is included at no additional cost in our HVAC, Electrical, CNA, and Barber programs.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">What You&apos;ll Learn</h3>
-              <ul className="space-y-3">
-                {curriculum.map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <span className="w-2 h-2 bg-brand-red-500 rounded-full mt-2 flex-shrink-0" />
-                    <span className="text-gray-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Who Needs This */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Who Needs This Certification</h2>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {whoNeeds.map((item) => (
-              <div key={item} className="flex items-start gap-3 p-4 bg-white rounded-xl">
-                <span className="w-2 h-2 bg-brand-blue-500 rounded-full mt-2 flex-shrink-0" />
-                <span className="text-gray-700">{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-16 bg-brand-red-600">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Get Certified Today</h2>
-          <p className="text-brand-red-100 mb-8 max-w-2xl mx-auto">
-            Same-day certification. No prerequisites. Walk in ready to save lives.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply/student?program=cpr-first-aid"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-red-600 px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition"
-            >
-              Apply for Enrollment
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-brand-red-700 transition"
-            >
-              Group Training Inquiry
-            </Link>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
+export default function Page() {
+  return (<><ProgramStructuredData program={{ id: 'cpr-first-aid', name: config.title, slug: 'cpr-first-aid', description: config.subtitle, duration_weeks: 1, price: 0, image_url: `${SITE_URL}/images/programs-fresh/cpr-first-aid.jpg`, category: 'Healthcare', outcomes: config.credentials || [] }} /><ProgramPageLayout config={config} /></>);
 }

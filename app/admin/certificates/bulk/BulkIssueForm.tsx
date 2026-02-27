@@ -60,7 +60,7 @@ export default function BulkIssueForm({
           enrollmentIds: Array.from(selected),
           templateId,
           issueDate,
-          signedBy: signedBy || 'Elevate for Humanity',
+          signedBy: signedBy || 'Elevate for Humanity Career & Technical Institute',
         }),
       });
 

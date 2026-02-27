@@ -349,7 +349,7 @@ export default function TimeclockPage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-md mx-auto px-4">
           <Link 
-            href="/apprentice/dashboard" 
+            href="/apprentice" 
             className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -378,7 +378,7 @@ export default function TimeclockPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-md mx-auto px-4">
         <Link 
-          href="/apprentice/dashboard" 
+          href="/apprentice" 
           className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export const dynamic = 'force-dynamic';
 
@@ -72,6 +73,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
+    await logAdminAudit({ action: AdminAction.PROMO_CODE_CREATED, actorId: auth.user.id, entityType: 'promo_codes', entityId: data.id, metadata: { code: data.code }, req });
+
     return NextResponse.json({ promoCode: data });
   } catch {
     return NextResponse.json({ error: 'Failed to create promo code' }, { status: 500 });
@@ -116,6 +119,8 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
+    await logAdminAudit({ action: AdminAction.PROMO_CODE_UPDATED, actorId: auth.user.id, entityType: 'promo_codes', entityId: body.id, metadata: { fields_updated: Object.keys(updateData) }, req });
+
     return NextResponse.json({ promoCode: data });
   } catch {
     return NextResponse.json({ error: 'Failed to update promo code' }, { status: 500 });
@@ -150,6 +155,8 @@ export async function DELETE(req: Request) {
     if (error) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
+
+    await logAdminAudit({ action: AdminAction.PROMO_CODE_DELETED, actorId: auth.user.id, entityType: 'promo_codes', entityId: id, metadata: {}, req });
 
     return NextResponse.json({ success: true });
   } catch {

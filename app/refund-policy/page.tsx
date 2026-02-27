@@ -232,13 +232,13 @@ export default async function RefundPolicyPage() {
               </p>
               <div className="space-y-2">
                 <Link
-                  href="/privacy"
+                  href="/privacy-policy"
                   className="block text-brand-blue-600 hover:underline font-semibold"
                 >
                   Privacy Policy →
                 </Link>
                 <Link
-                  href="/terms"
+                  href="/terms-of-service"
                   className="block text-brand-blue-600 hover:underline font-semibold"
                 >
                   Terms of Service →

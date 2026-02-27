@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export const dynamic = 'force-dynamic';
 
@@ -181,6 +182,8 @@ export async function PATCH(request: NextRequest) {
       throw error;
     }
 
+    await logAdminAudit({ action: AdminAction.COPILOT_UPDATED, actorId: user.id, entityType: 'copilot_deployments', entityId: deployment_id, metadata: { copilot_action: action, new_status: newStatus }, req: request });
+
     return NextResponse.json({
       deployment: updated,
       message: `Copilot ${action === 'start' ? 'started' : 'stopped'} successfully`,
@@ -226,6 +229,8 @@ export async function DELETE(request: NextRequest) {
     if (error) {
       throw error;
     }
+
+    await logAdminAudit({ action: AdminAction.COPILOT_DELETED, actorId: user.id, entityType: 'copilot_deployments', entityId: deploymentId, metadata: {}, req: request });
 
     return NextResponse.json({
       message: 'Deployment removed successfully',

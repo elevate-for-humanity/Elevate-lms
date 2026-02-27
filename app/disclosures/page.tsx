@@ -91,7 +91,7 @@ export default function DisclosuresPage() {
               </div>
               <div className="p-6">
                 <div className="space-y-3 text-gray-700">
-                  <p><span className="font-semibold text-gray-900">Legal Name:</span> 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute</p>
+                  <p><span className="font-semibold text-gray-900">Legal Name:</span> 2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute)</p>
                   <p><span className="font-semibold text-gray-900">Location:</span> Indianapolis, Indiana</p>
                   <p><span className="font-semibold text-gray-900">Phone:</span> Get Help Online</p>
                   <p><span className="font-semibold text-gray-900">Email:</span> our contact form</p>
@@ -389,7 +389,7 @@ export default function DisclosuresPage() {
                 Our formal grievance process ensures your concerns are addressed promptly and fairly.
               </p>
               <Link
-                href="/policies/grievance"
+                href="/grievance"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-semibold rounded-lg transition-colors w-full justify-center"
               >
                 View Grievance Procedure

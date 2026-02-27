@@ -8,6 +8,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+
+import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -315,7 +319,7 @@ async function importEmployers(
   return result;
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -386,6 +390,21 @@ export async function POST(request: NextRequest) {
         );
     }
 
+    await logAdminAudit({
+      action: AdminAction.BULK_IMPORT_EXECUTED,
+      actorId: user.id,
+      entityType: type,
+      entityId: BULK_ENTITY_ID,
+      metadata: {
+        import_type: type,
+        total_records: records.length,
+        imported: result.imported,
+        failed: result.failed,
+        file_name: file.name,
+      },
+      req: request,
+    });
+
     return NextResponse.json(result);
   } catch (error) {
     logger.error('Import error:', error);
@@ -400,3 +419,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/admin/import', _POST);

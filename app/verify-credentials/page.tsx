@@ -231,7 +231,7 @@ export default function VerifyCredentialsPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-slate-400 flex-shrink-0">•</span>
-                    <span><strong>Legal Name:</strong> 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute</span>
+                    <span><strong>Legal Name:</strong> 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Technical Institute</span>
                   </li>
                 </ul>
               </div>

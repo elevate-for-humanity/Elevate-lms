@@ -103,7 +103,7 @@ const faqs = [
   },
   {
     q: 'What is the difference between a Sponsor and a Worksite?',
-    a: 'Elevate for Humanity is the Sponsor of Record—we handle registration, compliance, and related instruction. Your shop is the Worksite where the apprentice gains hands-on experience under your supervision.',
+    a: '2Exclusive LLC-S (DBA Elevate for Humanity Career & Technical Institute) is the Sponsor of Record—we handle registration, compliance, and related instruction. Your shop is the Worksite where the apprentice gains hands-on experience under your supervision.',
   },
   {
     q: 'How long is the apprenticeship?',
@@ -158,11 +158,11 @@ export default function BarbershopPartnerPage() {
               <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link
-              href="/docs/Indiana-Barbershop-Apprenticeship-MOU"
+              href="/partner-portal"
               className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 text-white border border-white/30 rounded-lg text-lg font-bold transition-colors"
             >
-              <Download className="mr-2 w-5 h-5" />
-              View MOU Template
+              Partner Dashboard
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </div>
         </div>
@@ -212,7 +212,7 @@ export default function BarbershopPartnerPage() {
                   <Shield className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">Sponsor (Elevate for Humanity)</h3>
+                  <h3 className="text-xl font-bold text-gray-900">Sponsor (2Exclusive LLC-S)</h3>
                   <p className="text-sm text-gray-500">Compliance & Administration</p>
                 </div>
               </div>
@@ -436,14 +436,14 @@ export default function BarbershopPartnerPage() {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="/docs/Indiana-Barbershop-Apprenticeship-MOU"
+                href="/partner-portal"
                 className="inline-flex items-center justify-center px-6 py-3 bg-gray-900 text-white rounded-lg font-bold hover:bg-gray-800 transition-colors"
               >
-                <Download className="w-5 h-5 mr-2" />
-                View MOU Template
+                Access MOU in Partner Dashboard
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
               <p className="text-sm text-gray-500 self-center">
-                Review before applying. Signing is required to participate.
+                MOU is available after applying. Signing is required to participate.
               </p>
             </div>
           </div>

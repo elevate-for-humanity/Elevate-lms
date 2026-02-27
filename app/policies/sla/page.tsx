@@ -214,7 +214,7 @@ export default function SLAPage() {
               </Link>
             </li>
             <li>
-              <Link href="/policies/terms" className="text-brand-blue-600 hover:underline">
+              <Link href="/terms-of-service" className="text-brand-blue-600 hover:underline">
                 Terms of Service
               </Link>
             </li>

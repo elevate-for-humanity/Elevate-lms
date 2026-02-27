@@ -5,23 +5,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 
 export default function HVACProgramContent() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative h-[300px] sm:h-[400px] md:h-[480px]">
-        <Image
-          src="/images/trades/hero-program-hvac.jpg"
-          alt="HVAC technician servicing a commercial air conditioning unit"
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority
-        />
-      </section>
+      {/* Video Hero Banner */}
+      <ProgramHeroBanner videoSrc="/videos/hvac-technician.mp4" voiceoverSrc="/audio/heroes/skilled-trades.mp3" />
 
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
@@ -127,8 +119,8 @@ export default function HVACProgramContent() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {[
               { name: 'EPA 608 Universal', issuer: 'EPA-approved organization' },
-              { name: 'Residential HVAC Cert 1', issuer: 'Elevate for Humanity' },
-              { name: 'Residential HVAC Cert 2', issuer: 'Elevate for Humanity' },
+              { name: 'Residential HVAC Cert 1', issuer: 'Elevate for Humanity Career & Technical Institute' },
+              { name: 'Residential HVAC Cert 2', issuer: 'Elevate for Humanity Career & Technical Institute' },
               { name: 'OSHA 30 Safety', issuer: 'Dept. of Labor' },
               { name: 'CPR / First Aid', issuer: 'American Heart Assoc.' },
               { name: 'NRF Rise Up', issuer: 'National Retail Federation' },

@@ -38,10 +38,10 @@ const footerLinks = {
     { name: 'Add-Ons', href: '/store/add-ons' },
   ],
   compliance: [
-    { name: 'Governance', href: '/governance' },
+    { name: 'Compliance & Security', href: '/compliance' },
     { name: 'Data Privacy', href: '/governance/data' },
     { name: 'Accessibility', href: '/accessibility' },
-    { name: 'Security', href: '/governance/security' },
+    { name: 'Governance', href: '/governance' },
     { name: 'Transparency', href: '/transparency' },
     { name: 'Verify Credentials', href: '/verify' },
   ],

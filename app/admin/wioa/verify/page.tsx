@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
+import { getAdminDocumentUrl } from '@/lib/admin/document-access';
 import Link from 'next/link';
 import { ArrowLeft, FileText, XCircle, AlertTriangle, Download, Upload, CheckCircle, Users, Loader2 } from 'lucide-react';
 
@@ -111,14 +112,16 @@ export default async function WIOAVerifyPage({
     .eq('user_id', participant.user_id)
     .order('created_at', { ascending: false });
 
-  // Generate signed URLs for private bucket documents
+  // Generate signed URLs via centralized admin document access
   const docs = await Promise.all(
     (documents || []).map(async (doc) => {
       if (doc.file_path) {
-        const { data: signedData } = await db.storage
-          .from('documents')
-          .createSignedUrl(doc.file_path, 3600);
-        return { ...doc, file_url: signedData?.signedUrl || doc.file_url };
+        const url = await getAdminDocumentUrl({
+          adminId: user.id,
+          documentId: doc.id,
+          context: 'wioa_verify',
+        });
+        return { ...doc, file_url: url || doc.file_url };
       }
       return doc;
     })

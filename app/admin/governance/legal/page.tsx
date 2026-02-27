@@ -192,7 +192,7 @@ export default function LegalGovernancePage() {
           </h2>
           <div className="bg-slate-50 rounded-xl p-6">
             <ul className="space-y-2 text-slate-700 text-sm">
-              <li>&ldquo;Elevate for Humanity&rdquo; is a trade name of 2Exclusive LLC-S.</li>
+              <li>&ldquo;Elevate for Humanity Career &amp; Technical Institute&rdquo; is a trade name (DBA) of 2Exclusive LLC-S.</li>
               <li>&ldquo;Rise Forward Foundation&rdquo; is a trade name of Selfish Inc.</li>
               <li>&ldquo;CurvatureBody Sculpting&rdquo; is a program of Rise Forward Foundation (not a separate entity).</li>
               <li>&ldquo;SupersonicFastCash&rdquo; is a trade name of 2Exclusive LLC-S, used exclusively for tax preparation services.</li>

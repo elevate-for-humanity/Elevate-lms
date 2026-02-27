@@ -278,8 +278,7 @@ const nextConfig = {
       { source: '/programs/building-maintenance-tech', destination: '/programs/hvac-technician', permanent: true },
       { source: '/programs/building-services-technician', destination: '/programs/hvac-technician', permanent: true },
       { source: '/programs/business-financial', destination: '/programs/tax-preparation', permanent: true },
-      { source: '/programs/cpr-first-aid', destination: '/programs/cna', permanent: true },
-      { source: '/programs/cpr-first-aid-hsi', destination: '/programs/cna', permanent: true },
+      { source: '/programs/cpr-first-aid-hsi', destination: '/programs/cpr-first-aid', permanent: true },
       { source: '/programs/direct-support-professional', destination: '/programs/peer-recovery-specialist', permanent: true },
       { source: '/programs/drug-collector', destination: '/drug-testing/training', permanent: true },
       { source: '/programs/esthetician-apprenticeship', destination: '/programs/cosmetology-apprenticeship', permanent: true },
@@ -288,10 +287,15 @@ const nextConfig = {
       { source: '/programs/it-support', destination: '/programs/it-help-desk', permanent: true },
       { source: '/programs/jri', destination: '/programs/peer-recovery-specialist', permanent: true },
       { source: '/programs/phlebotomy', destination: '/programs/healthcare', permanent: true },
+      { source: '/programs/phlebotomy-technician', destination: '/programs/healthcare', permanent: true },
       { source: '/programs/business-startup-marketing', destination: '/programs/entrepreneurship', permanent: true },
       { source: '/programs/emergency-health-safety-tech', destination: '/programs/healthcare', permanent: true },
       { source: '/programs/home-health-aide', destination: '/programs/cna', permanent: true },
       { source: '/programs/public-safety-reentry-specialist', destination: '/programs/peer-recovery-specialist', permanent: true },
+      { source: '/programs/cdl-class-a', destination: '/programs/cdl-training', permanent: true },
+      { source: '/programs/certified-nursing-assistant', destination: '/programs/cna', permanent: true },
+      { source: '/programs/medical-coding-billing', destination: '/programs/healthcare', permanent: true },
+      { source: '/programs/cosmetology', destination: '/programs/cosmetology-apprenticeship', permanent: true },
 
       // ============================================
       // APP ALIAS REDIRECTS (Rule B: auth/app path renames)
@@ -448,6 +452,35 @@ const nextConfig = {
       // Legal consolidation
       { source: '/privacy', destination: '/privacy-policy', permanent: true },
       { source: '/terms', destination: '/terms-of-service', permanent: true },
+      { source: '/legal/privacy', destination: '/privacy-policy', permanent: true },
+      { source: '/legal/terms-of-service', destination: '/terms-of-service', permanent: true },
+      { source: '/legal/governance/lms', destination: '/legal/governance/platform-overview', permanent: true },
+      { source: '/legal/governance/store', destination: '/legal/governance/platform-overview', permanent: true },
+      { source: '/policies/privacy', destination: '/privacy-policy', permanent: true },
+      { source: '/policies/terms', destination: '/terms-of-service', permanent: true },
+      { source: '/policies/grievance', destination: '/grievance', permanent: true },
+      { source: '/license-agreement', destination: '/legal/license-agreement', permanent: true },
+
+      // Pricing / billing consolidation
+      { source: '/pricing', destination: '/license/pricing', permanent: true },
+      { source: '/billing', destination: '/account/billing', permanent: true },
+
+      // Auth aliases
+      { source: '/forgot-password', destination: '/reset-password', permanent: true },
+      { source: '/partners/login', destination: '/partner/login', permanent: true },
+
+      // Tax aliases
+      { source: '/tax-preparation', destination: '/supersonic-fast-cash/services/tax-preparation', permanent: true },
+      { source: '/tax-faq', destination: '/supersonic-fast-cash/support', permanent: true },
+      { source: '/refund-advance', destination: '/supersonic-fast-cash/services/refund-advance', permanent: true },
+      { source: '/tax/upload', destination: '/documents/upload', permanent: true },
+
+      // Store / platform aliases
+      { source: '/store/demo', destination: '/store/demos', permanent: true },
+      { source: '/store/orders', destination: '/shop/orders', permanent: true },
+      { source: '/platform/licensing', destination: '/licensing-partnerships', permanent: true },
+      { source: '/chat', destination: '/support/chat', permanent: true },
+      { source: '/certificates/verify', destination: '/cert/verify', permanent: true },
 
       // Verify consolidation
       { source: '/verifycertificate/:path*', destination: '/verify/:path*', permanent: true },

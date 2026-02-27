@@ -112,7 +112,7 @@ export default async function HSILearnPage({
     }
 
     // No enrollment found - redirect to enroll
-    redirect('/programs/cpr-first-aid-hsi');
+    redirect('/programs/cpr-first-aid');
   }
 
   return (

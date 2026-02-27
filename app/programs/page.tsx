@@ -7,14 +7,14 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Training Programs | Free Career Training',
-  description: 'Explore free career training programs in healthcare, skilled trades, technology, CDL, barbering, and business. WIOA-funded programs available. Start your new career today.',
+  title: 'Training Programs | No-Cost Career Training for Eligible Participants',
+  description: 'Career training programs in healthcare, skilled trades, technology, CDL, barbering, and business. Training at no cost to eligible Indiana residents through WIOA and state funding. Self-pay options also available.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/programs',
   },
   openGraph: {
-    title: 'Free Career Training Programs | Elevate for Humanity',
-    description: 'Explore free career training in healthcare, skilled trades, technology, CDL, barbering, and business. WIOA-funded programs available.',
+    title: 'Career Training Programs | Elevate for Humanity',
+    description: 'Career training in healthcare, skilled trades, technology, CDL, barbering, and business. No cost to eligible participants through WIOA and state funding.',
     url: 'https://www.elevateforhumanity.org/programs',
     siteName: 'Elevate for Humanity',
     images: [{ url: '/images/heroes-hq/programs-hero.jpg', width: 1200, height: 630, alt: 'Career training programs' }],
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free Career Training Programs | Elevate for Humanity',
-    description: 'Explore free career training in healthcare, skilled trades, technology, CDL, barbering, and business.',
+    title: 'Career Training Programs | Elevate for Humanity',
+    description: 'Career training in healthcare, skilled trades, technology, CDL, barbering, and business. No cost to eligible participants.',
     images: ['/images/heroes-hq/programs-hero.jpg'],
   },
 };
@@ -240,7 +240,7 @@ export default async function ProgramsPage() {
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Training Programs</h2>
             <p className="text-lg text-slate-600 max-w-3xl mx-auto">Each program is registered on Indiana&apos;s INTraining system under provider 2Exclusive LLC-S at the Elevate for Humanity Training Center. Credentials are paired with their issuing partner below.</p>
           </div>
-          <p className="text-center text-xs text-slate-400 mb-10">Provider: 2Exclusive LLC-S &nbsp;|&nbsp; Location: Elevate for Humanity Training Center, Indianapolis, IN (Marion County) &nbsp;|&nbsp; <span className="font-medium">W</span> = WIOA Eligible &nbsp; <span className="font-medium">WRG</span> = Workforce Ready Grant</p>
+          <p className="text-center text-xs text-slate-500 mb-10">Provider: 2Exclusive LLC-S &nbsp;|&nbsp; Location: Elevate for Humanity Training Center, Indianapolis, IN (Marion County) &nbsp;|&nbsp; <span className="font-medium">W</span> = WIOA Eligible &nbsp; <span className="font-medium">WRG</span> = Workforce Ready Grant</p>
           
           <div className="grid md:grid-cols-2 gap-6">
             {[
@@ -465,7 +465,7 @@ export default async function ProgramsPage() {
                     <div>
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="text-xs font-bold uppercase tracking-wider text-brand-blue-600">{program.category}</span>
-                        <span className="text-[10px] font-mono text-slate-400">{program.programId}</span>
+                        <span className="text-[10px] font-mono text-slate-500">{program.programId}</span>
                       </div>
                       <h3 className="text-lg font-bold text-slate-900 group-hover:text-brand-blue-600 transition-colors leading-tight">{program.name}</h3>
                     </div>
@@ -505,7 +505,7 @@ export default async function ProgramsPage() {
                           </svg>
                           <div>
                             <span className="font-medium text-slate-800">{cred.name}</span>
-                            <span className="text-slate-400 ml-1 text-xs">— {cred.partner}</span>
+                            <span className="text-slate-500 ml-1 text-xs">— {cred.partner}</span>
                           </div>
                         </div>
                       ))}
@@ -565,7 +565,7 @@ export default async function ProgramsPage() {
                     <summary className="flex items-center gap-3 p-4 cursor-pointer list-none">
                       <span className="text-xl font-bold text-brand-blue-600">{item.step}</span>
                       <span className="font-semibold text-slate-900 flex-1 text-sm">{item.title}</span>
-                      <svg className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-slate-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </summary>
@@ -720,7 +720,7 @@ export default async function ProgramsPage() {
               <details key={i} className="group bg-slate-50 rounded-2xl overflow-hidden">
                 <summary className="flex items-center justify-between p-5 cursor-pointer list-none font-semibold text-slate-900">
                   {faq.q}
-                  <svg className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-slate-500 group-open:rotate-180 transition-transform flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>

@@ -23,6 +23,7 @@ export function CourseStructuredData({ course }: CourseStructuredDataProps) {
     provider: {
       '@type': 'Organization',
       name: siteConfig.name,
+      legalName: '2Exclusive LLC-S',
       url: siteConfig.url,
     },
     ...(course.duration && { timeRequired: course.duration }),
@@ -86,6 +87,7 @@ export function ProgramStructuredData({ program }: ProgramStructuredDataProps) {
     provider: {
       '@type': 'EducationalOrganization',
       name: siteConfig.name,
+      legalName: '2Exclusive LLC-S',
       url: siteConfig.url,
       address: {
         '@type': 'PostalAddress',

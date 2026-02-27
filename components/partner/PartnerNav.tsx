@@ -30,7 +30,7 @@ export default function PartnerNav({ isAdmin }: { isAdmin: boolean }) {
     <aside className="space-y-2">
       <div className="rounded-xl border bg-white p-3">
         <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 px-3">Partner</div>
-        <nav className="flex flex-col gap-0.5">
+        <nav className="flex flex-col gap-0.5" aria-label="Partner navigation">
           {items.map((i) => {
             const active = pathname === i.href || (i.href !== '/partner-portal' && pathname.startsWith(i.href));
             return (
@@ -49,7 +49,7 @@ export default function PartnerNav({ isAdmin }: { isAdmin: boolean }) {
       {isAdmin && (
         <div className="rounded-xl border bg-white p-3">
           <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 px-3">Admin</div>
-          <nav className="flex flex-col gap-0.5">
+          <nav className="flex flex-col gap-0.5" aria-label="Partner admin navigation">
             {adminItems.map((i) => {
               const active = pathname.startsWith(i.href);
               return (

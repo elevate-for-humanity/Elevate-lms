@@ -326,7 +326,7 @@ export default function JRIPage() {
               href="/apply?funding=jri"
               className="inline-flex items-center justify-center bg-white text-brand-green-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
             >
-              Apply Now — It&apos;s Free
+              Apply Now
             </Link>
             <a
               href="/support"

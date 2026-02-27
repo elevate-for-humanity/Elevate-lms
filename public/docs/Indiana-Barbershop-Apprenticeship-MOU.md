@@ -5,7 +5,7 @@
 ---
 
 **Between:**
-- **Sponsor:** Elevate for Humanity, Inc. ("Sponsor")
+- **Sponsor:** 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute ("Sponsor")
 - **Worksite Partner:** _________________________________ ("Shop")
 
 **Effective Date:** _________________
@@ -137,7 +137,7 @@ This MOU constitutes the entire agreement between the parties regarding the subj
 
 ## SIGNATURES
 
-**SPONSOR: Elevate for Humanity, Inc.**
+**SPONSOR: 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute**
 
 Signature: _________________________________
 
@@ -181,6 +181,6 @@ Date: _________________________________
 
 ---
 
-Elevate for Humanity, Inc.
+2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute
 Indianapolis, Indiana
 www.elevateforhumanity.org

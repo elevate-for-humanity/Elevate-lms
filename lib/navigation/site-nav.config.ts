@@ -551,7 +551,7 @@ export const footerNavigation = {
       { label: 'Course Detail', href: '/courses/coursedetail' },
       { label: 'NDS', href: '/courses/nds' },
       { label: 'NRF', href: '/courses/nrf' },
-      { label: 'CNA Certification', href: '/programs/cna-certification' },
+      { label: 'CNA Certification', href: '/programs/cna' },
       { label: 'Micro Programs', href: '/programs/micro-programs' },
       { label: 'Web Development', href: '/programs/technology/web-development' },
     ],
@@ -649,8 +649,8 @@ export const footerNavigation = {
   programApply: {
     title: 'Program Applications',
     links: [
-      { label: 'CNA Enroll', href: '/programs/cna-certification/enroll' },
-      { label: 'CPR/First Aid Apply', href: '/programs/cpr-first-aid-hsi/apply' },
+      { label: 'CNA Enroll', href: '/programs/cna/enroll' },
+      { label: 'CPR/First Aid Apply', href: '/programs/cpr-first-aid/apply' },
       { label: 'Culinary Apply', href: '/programs/culinary-apprenticeship/apply' },
       { label: 'Electrical Apply', href: '/programs/electrical/apply' },
       { label: 'Medical Assistant Apply', href: '/programs/medical-assistant/apply' },

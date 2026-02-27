@@ -83,7 +83,7 @@ interface ProgramResult {
 
 const programResults: Record<string, ProgramResult[]> = {
   healthcare: [
-    { title: 'CNA Certification', description: 'Become a Certified Nursing Assistant in 4-6 weeks. High demand across Indiana hospitals and care facilities.', href: '/programs/cna-certification', duration: '4-6 weeks', salary: '$32K-$42K', funding: 'WIOA / WRG' },
+    { title: 'CNA Certification', description: 'Become a Certified Nursing Assistant in 4-6 weeks. High demand across Indiana hospitals and care facilities.', href: '/programs/cna', duration: '4-6 weeks', salary: '$32K-$42K', funding: 'WIOA / WRG' },
     { title: 'Medical Assistant', description: 'Clinical and administrative skills for doctor\'s offices, clinics, and hospitals.', href: '/programs/medical-assistant', duration: '12-16 weeks', salary: '$35K-$45K', funding: 'WIOA / WRG' },
     { title: 'Phlebotomy', description: 'Learn venipuncture and specimen collection. Quick certification, immediate job placement.', href: '/programs/healthcare', duration: '4-8 weeks', salary: '$33K-$40K', funding: 'WIOA / WRG' },
   ],
@@ -103,7 +103,7 @@ const programResults: Record<string, ProgramResult[]> = {
     { title: 'Barber Apprenticeship', description: 'Earn while you learn in a licensed barbershop. 1,500 hours toward your Indiana barber license.', href: '/programs/barber-apprenticeship', duration: '12-18 months', salary: '$30K-$60K+', funding: 'JRI / WIOA' },
   ],
   safety: [
-    { title: 'CPR & First Aid (HSI)', description: 'Same-day certification. American Heart Association equivalent through HSI.', href: '/programs/cpr-first-aid-hsi', duration: '1 day', salary: 'Required for many jobs', funding: 'Self-pay ($65)' },
+    { title: 'CPR & First Aid (HSI)', description: 'Same-day certification. American Heart Association equivalent through HSI.', href: '/programs/cpr-first-aid', duration: '1 day', salary: 'Required for many jobs', funding: 'Self-pay ($65)' },
   ],
 };
 

@@ -64,7 +64,7 @@ export default async function InstructorPWAPage() {
           <Link href="/instructor/students" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-slate-50">
             Student Roster
           </Link>
-          <Link href="/instructor/grading" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-slate-50">
+          <Link href="/pwa/instructor" className="bg-white border border-slate-200 text-slate-900 rounded-xl p-4 text-center font-semibold text-sm hover:bg-slate-50">
             Grading
           </Link>
         </div>

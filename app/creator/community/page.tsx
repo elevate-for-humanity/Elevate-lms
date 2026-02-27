@@ -52,7 +52,7 @@ export default async function CreatorCommunityPage() {
               <div className="text-sm">• Increasing student engagement</div>
               <div className="text-sm">• Course pricing strategies</div>
             </div>
-            <a href="/creator/community/forums" className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium">
+            <a href="/creator/community" className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium">
               View Forums →
             </a>
           </div>
@@ -67,7 +67,7 @@ export default async function CreatorCommunityPage() {
               <div className="text-sm">• Video production guides</div>
               <div className="text-sm">• Marketing materials</div>
             </div>
-            <a href="/creator/community/resources" className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium">
+            <a href="/creator/community" className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium">
               Browse Resources →
             </a>
           </div>
@@ -82,7 +82,7 @@ export default async function CreatorCommunityPage() {
               <div className="text-sm">• Course Design Workshop</div>
               <div className="text-sm">• Marketing Masterclass</div>
             </div>
-            <a href="/creator/community/events" className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium">
+            <a href="/creator/community" className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium">
               View Events →
             </a>
           </div>
@@ -97,7 +97,7 @@ export default async function CreatorCommunityPage() {
               <div className="text-sm">• Guest instructor spots</div>
               <div className="text-sm">• Content partnerships</div>
             </div>
-            <a href="/creator/community/collaborate" className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium">
+            <a href="/creator/community" className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium">
               Find Partners →
             </a>
           </div>

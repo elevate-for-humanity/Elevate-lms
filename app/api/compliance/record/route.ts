@@ -3,6 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();

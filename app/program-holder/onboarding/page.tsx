@@ -85,7 +85,7 @@ export default async function ProgramHolderOnboarding() {
               Go to Dashboard
             </Link>
             <Link
-              href="/program-holder/apply"
+              href="/program-holder/onboarding"
               className="bg-white text-black px-8 py-4 rounded-lg font-semibold hover:bg-slate-50 border-2 border-slate-300 text-lg transition-all"
             >
               Apply as Program Holder
@@ -164,7 +164,7 @@ export default async function ProgramHolderOnboarding() {
                 and program interests.
               </p>
               <Link
-                href="/program-holder/apply"
+                href="/program-holder/onboarding"
                 className="text-brand-blue-700 font-semibold hover:underline"
               >
                 Apply Now →
@@ -502,7 +502,7 @@ export default async function ProgramHolderOnboarding() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/program-holder/apply"
+              href="/program-holder/onboarding"
               className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg transition-all"
             >
               Apply Now

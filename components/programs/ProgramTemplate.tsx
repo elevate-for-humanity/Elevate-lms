@@ -4,7 +4,7 @@ import type { Program } from '@/app/data/programs';
 import { ProgramPaymentButton } from './ProgramPaymentButton';
 import { PricingTiers } from './PricingTiers';
 import { CareerServicesHook } from './CareerServicesHook';
-import VideoHeroBanner from '@/components/home/VideoHeroBanner';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { EligibilityNotice } from '@/components/EligibilityNotice';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { WhatYouWillLearn } from '@/components/WhatYouWillLearn';
@@ -32,10 +32,9 @@ export function ProgramTemplate({ program }: { program: Program }) {
 
       {/* HERO SECTION - Video or Text */}
       {program.heroVideo ? (
-        <VideoHeroBanner
+        <ProgramHeroBanner
           videoSrc={program.heroVideo}
           voiceoverSrc={program.voiceoverSrc}
-          withAudio={!!program.voiceoverSrc}
         />
       ) : (
         <section className="bg-zinc-900 text-white py-16">

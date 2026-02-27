@@ -8,6 +8,10 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { suspendLicense } from './provisioning';
 
+import { logAuditEvent } from '@/lib/audit';
+import { setAuditContext } from '@/lib/audit-context';
+import * as crypto from 'node:crypto';
+
 interface LicenseValidation {
   valid: boolean;
   status: 'active' | 'suspended' | 'expired' | 'revoked' | 'not_found';
@@ -151,6 +155,9 @@ export async function checkFeatureAccess(
  */
 export async function handleRefund(paymentIntentId: string): Promise<void> {
   const supabase = createAdminClient();
+  const requestId = crypto.randomUUID();
+
+  await setAuditContext(supabase, { systemActor: 'stripe_refund_handler', requestId });
 
   // Find the purchase
   const { data: purchase } = await supabase
@@ -170,8 +177,16 @@ export async function handleRefund(paymentIntentId: string): Promise<void> {
     .update({ status: 'refunded' })
     .eq('stripe_payment_intent_id', paymentIntentId);
 
-  // Suspend the license
+  // Suspend the license (already has its own audit context + L1 event)
   await suspendLicense(purchase.tenant_id, 'refund_processed');
+
+  await logAuditEvent({
+    action: 'LICENSE_REFUND_PROCESSED',
+    actor_id: 'system:stripe_refund_handler',
+    target_type: 'license_purchase',
+    target_id: purchase.license_id || paymentIntentId,
+    metadata: { payment_intent_id: paymentIntentId, tenant_id: purchase.tenant_id },
+  });
 
   logger.info('License suspended due to refund', { 
     paymentIntentId, 
@@ -184,6 +199,9 @@ export async function handleRefund(paymentIntentId: string): Promise<void> {
  */
 export async function handleDispute(paymentIntentId: string): Promise<void> {
   const supabase = createAdminClient();
+  const requestId = crypto.randomUUID();
+
+  await setAuditContext(supabase, { systemActor: 'stripe_dispute_handler', requestId });
 
   // Find the purchase
   const { data: purchase } = await supabase
@@ -203,8 +221,16 @@ export async function handleDispute(paymentIntentId: string): Promise<void> {
     .update({ status: 'disputed' })
     .eq('stripe_payment_intent_id', paymentIntentId);
 
-  // Suspend the license immediately
+  // Suspend the license immediately (already has its own audit context + L1 event)
   await suspendLicense(purchase.tenant_id, 'dispute_opened');
+
+  await logAuditEvent({
+    action: 'LICENSE_DISPUTE_OPENED',
+    actor_id: 'system:stripe_dispute_handler',
+    target_type: 'license_purchase',
+    target_id: purchase.license_id || paymentIntentId,
+    metadata: { payment_intent_id: paymentIntentId, tenant_id: purchase.tenant_id },
+  });
 
   logger.info('License suspended due to dispute', { 
     paymentIntentId, 
@@ -217,6 +243,9 @@ export async function handleDispute(paymentIntentId: string): Promise<void> {
  */
 export async function revokeLicense(tenantId: string, reason: string): Promise<void> {
   const supabase = createAdminClient();
+  const requestId = crypto.randomUUID();
+
+  await setAuditContext(supabase, { systemActor: 'license_enforcement', requestId });
 
   await supabase
     .from('tenants')
@@ -227,6 +256,14 @@ export async function revokeLicense(tenantId: string, reason: string): Promise<v
     .from('licenses')
     .update({ status: 'revoked' })
     .eq('tenant_id', tenantId);
+
+  await logAuditEvent({
+    action: 'LICENSE_REVOKED',
+    actor_id: 'system:license_enforcement',
+    target_type: 'tenant',
+    target_id: tenantId,
+    metadata: { reason, correlation_id: requestId },
+  });
 
   logger.info('License revoked', { tenantId, reason });
 }
@@ -239,6 +276,9 @@ export async function extendLicense(
   newExpirationDate: Date
 ): Promise<void> {
   const supabase = createAdminClient();
+  const requestId = crypto.randomUUID();
+
+  await setAuditContext(supabase, { systemActor: 'license_enforcement', requestId });
 
   await supabase
     .from('tenants')
@@ -249,6 +289,14 @@ export async function extendLicense(
     .from('licenses')
     .update({ expires_at: newExpirationDate.toISOString() })
     .eq('tenant_id', tenantId);
+
+  await logAuditEvent({
+    action: 'LICENSE_EXTENDED',
+    actor_id: 'system:license_enforcement',
+    target_type: 'tenant',
+    target_id: tenantId,
+    metadata: { new_expiration: newExpirationDate.toISOString(), correlation_id: requestId },
+  });
 
   logger.info('License extended', { tenantId, expiresAt: newExpirationDate });
 }

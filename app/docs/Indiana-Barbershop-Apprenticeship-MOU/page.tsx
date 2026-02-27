@@ -47,7 +47,7 @@ export default function MOUPage() {
 
           <p><strong>Between:</strong></p>
           <ul>
-            <li><strong>Sponsor:</strong> 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute (&quot;Sponsor&quot;)</li>
+            <li><strong>Sponsor:</strong> 2Exclusive LLC-S, DBA Elevate for Humanity Career &amp; Technical Institute (&quot;Sponsor&quot;)</li>
             <li><strong>Worksite Partner:</strong> _________________________________ (&quot;Shop&quot;)</li>
           </ul>
           <p><strong>Effective Date:</strong> _________________</p>
@@ -55,7 +55,7 @@ export default function MOUPage() {
           <hr className="my-6" />
 
           <h2>1. PURPOSE</h2>
-          <p>This Memorandum of Understanding (&quot;MOU&quot;) establishes the terms and conditions under which the Shop will serve as a worksite partner for the Indiana Barbershop Apprenticeship Program, a USDOL Registered Apprenticeship sponsored by Elevate for Humanity.</p>
+          <p>This Memorandum of Understanding (&quot;MOU&quot;) establishes the terms and conditions under which the Shop will serve as a worksite partner for the Indiana Barbershop Apprenticeship Program, a USDOL Registered Apprenticeship sponsored by 2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute).</p>
 
           <h2>2. PROGRAM OVERVIEW</h2>
           <p>The Indiana Barbershop Apprenticeship Program is a structured training program that combines:</p>
@@ -66,7 +66,7 @@ export default function MOUPage() {
           </ul>
 
           <h2>3. SPONSOR RESPONSIBILITIES</h2>
-          <p>Elevate for Humanity, as the Sponsor of Record, agrees to:</p>
+          <p>2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute), as the Sponsor of Record, agrees to:</p>
           <h3>Registration &amp; Compliance</h3>
           <ul>
             <li>Maintain USDOL/RAPIDS registration for the apprenticeship program</li>
@@ -172,7 +172,7 @@ export default function MOUPage() {
           <h2>SIGNATURES</h2>
 
           <div className="mt-8">
-            <p><strong>SPONSOR: 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute</strong></p>
+            <p><strong>SPONSOR: 2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute)</strong></p>
             <p className="mt-4">Signature: _________________________________</p>
             <p>Printed Name: _________________________________</p>
             <p>Title: _________________________________</p>
@@ -206,7 +206,7 @@ export default function MOUPage() {
           <p className="text-sm"><strong>Questions?</strong> Contact: our contact form | (317) 314-3757</p>
 
           <div className="mt-8 text-center text-sm text-gray-500">
-            <p>2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute</p>
+            <p>2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute)</p>
             <p>Indianapolis, Indiana</p>
             <p>www.elevateforhumanity.org</p>
           </div>

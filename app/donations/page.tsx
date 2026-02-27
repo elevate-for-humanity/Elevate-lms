@@ -15,7 +15,7 @@ export default function DonationsPage() {
 
   const impactStats = [
     { number: '20+', label: 'Training Programs' },
-    { number: '100%', label: 'Free with WIOA' },
+    { number: '100%', label: 'Funded via WIOA' },
     { number: 'ETPL', label: 'Listed Provider' },
     { number: 'DOL', label: 'Registered' },
   ];

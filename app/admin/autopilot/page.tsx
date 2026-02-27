@@ -79,7 +79,7 @@ export default async function AutopilotPage() {
         {/* Quick Links */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <Link
-            href="/admin/autopilots"
+            href="/admin/autopilot"
             className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition"
           >
             <h3 className="text-lg font-semibold text-black mb-2">

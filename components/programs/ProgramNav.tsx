@@ -11,7 +11,7 @@ interface ProgramNavProps {
 
 export function ProgramNav({ sections }: ProgramNavProps) {
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-[72px] z-40 shadow-sm">
+    <nav className="bg-white border-b border-gray-200 sticky top-[72px] z-40 shadow-sm" aria-label="Program sections">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex overflow-x-auto gap-1 py-3 scrollbar-hide">
           {sections.map((section) => (

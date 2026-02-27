@@ -171,7 +171,7 @@ export function ProductPage({ product }: ProductPageProps) {
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <nav className="flex items-center gap-2 text-sm">
+          <nav className="flex items-center gap-2 text-sm" aria-label="Breadcrumb">
             <Link href="/store" className="text-gray-500 hover:text-gray-700">Store</Link>
             <ChevronRight className="w-4 h-4 text-gray-400" />
             <Link href="/store/apps" className="text-gray-500 hover:text-gray-700">Apps</Link>

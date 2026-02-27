@@ -2,6 +2,8 @@
 import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
 
+import { logAuditEvent } from '@/lib/audit';
+
 // =====================================================
 // PAYMENT TYPES
 // =====================================================

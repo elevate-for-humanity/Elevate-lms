@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export const POST = withAuth(
   async (req: NextRequest, user) => {
@@ -245,6 +246,9 @@ export const POST = withAuth(
       const { count } = await db
         .from('marketing_contacts')
         .select('*', { count: 'exact', head: true });
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) await logAdminAudit({ action: AdminAction.CONTACTS_SETUP, actorId: user.id, entityType: 'marketing_contacts', entityId: BULK_ENTITY_ID, metadata: { inserted, skipped, total: count || 0 }, req: request });
 
       return NextResponse.json({
         success: true,

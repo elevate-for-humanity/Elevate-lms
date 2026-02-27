@@ -128,7 +128,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${program.name} | Free Training | Elevate for Humanity`,
+    title: `${program.name} | Career Training | Elevate for Humanity`,
     description: program.shortDescription || program.description,
     alternates: {
       canonical: `https://www.elevateforhumanity.org/programs/${slug}`,
@@ -440,7 +440,7 @@ export default async function ProgramDetailPage({
     ...(program.duration && { timeRequired: program.duration }),
     ...(program.tuition && { offers: { '@type': 'Offer', price: program.tuition, priceCurrency: 'USD' } }),
     educationalCredentialAwarded: program.credential || program.name,
-    isAccessibleForFree: program.fundingEligible !== false,
+    isAccessibleForFree: !program.price && program.fundingEligible !== false,
   };
 
   return (

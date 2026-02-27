@@ -300,7 +300,7 @@ export default function CopyrightPage() {
                 <li><a href="/policies/content" className="text-brand-blue-600 hover:underline">Content Policy</a></li>
                 <li><a href="/policies/academic-integrity" className="text-brand-blue-600 hover:underline">Academic Integrity Policy</a></li>
                 <li><a href="/policies/acceptable-use" className="text-brand-blue-600 hover:underline">Acceptable Use Policy</a></li>
-                <li><a href="/policies/terms" className="text-brand-blue-600 hover:underline">Terms of Service</a></li>
+                <li><a href="/terms-of-service" className="text-brand-blue-600 hover:underline">Terms of Service</a></li>
               </ul>
             </div>
           </div>

@@ -53,7 +53,7 @@ export default function LicensingGuidePage() {
                   <li>• We handle hosting, security, updates</li>
                   <li>• Self-service checkout available</li>
                 </ul>
-                <Link href="/store/licenses/managed" className="inline-block mt-4 text-brand-blue-600 font-medium hover:underline">
+                <Link href="/store/licensing/managed" className="inline-block mt-4 text-brand-blue-600 font-medium hover:underline">
                   View Managed License →
                 </Link>
               </div>
@@ -65,7 +65,7 @@ export default function LicensingGuidePage() {
                   <li>• Internal use only, no resale</li>
                   <li>• You assume operational responsibility</li>
                 </ul>
-                <Link href="/store/licenses/source-use" className="inline-block mt-4 text-slate-600 font-medium hover:underline">
+                <Link href="/store/licensing" className="inline-block mt-4 text-slate-600 font-medium hover:underline">
                   View Source-Use License →
                 </Link>
               </div>
@@ -255,10 +255,10 @@ export default function LicensingGuidePage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-black mb-4">Ready to Get Started?</h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/store/demo" className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-50">
+            <Link href="/store/demos" className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-50">
               Try Demo First
             </Link>
-            <Link href="/store/licenses/managed" className="inline-flex items-center justify-center gap-2 bg-brand-blue-800 text-slate-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-900">
+            <Link href="/store/licensing/managed" className="inline-flex items-center justify-center gap-2 bg-brand-blue-800 text-slate-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-900">
               Start License Setup <ArrowRight className="w-5 h-5" />
             </Link>
           </div>

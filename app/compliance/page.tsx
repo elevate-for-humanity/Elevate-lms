@@ -137,13 +137,55 @@ export default async function CompliancePage() {
         </section>
 
         <section>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Data Security & Privacy</h2>
+          <div className="bg-white rounded-xl shadow-sm p-6 space-y-4 text-gray-700">
+            <p>
+              Elevate for Humanity collects personal information — including government-issued IDs,
+              Social Security Numbers, and eligibility documents — as required for workforce funding
+              verification under WIOA, WRG, and JRI guidelines. We treat this data with the highest
+              level of care.
+            </p>
+            <div className="grid sm:grid-cols-2 gap-4 mt-4">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Encryption</h3>
+                <p className="text-sm">All data is encrypted in transit (TLS 1.2+) and at rest. SSNs are
+                  hashed immediately upon submission — plain-text SSNs are never stored or displayed.</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Access Controls</h3>
+                <p className="text-sm">Documents are stored in private storage buckets with row-level security.
+                  Access is restricted to authorized compliance staff through role-based permissions.</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Audit Trail</h3>
+                <p className="text-sm">All document access and administrative actions are logged in an immutable
+                  audit trail. Access events include timestamp, user identity, and action performed.</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Short-Lived Access</h3>
+                <p className="text-sm">When staff review documents, temporary access URLs are generated on demand
+                  and expire within 60 seconds. No permanent document links are stored in the system.</p>
+              </div>
+            </div>
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mt-4">
+              <p className="text-sm text-brand-blue-900">
+                <strong>Workforce Compliance Alignment:</strong> Our data handling practices align with
+                WIOA participant data requirements, FERPA student record protections, and Indiana DWD
+                data security standards. For questions about our security practices, contact us at{' '}
+                <Link href="/contact" className="underline">elevateforhumanity.org/contact</Link>.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Policies</h2>
           <div className="grid sm:grid-cols-2 gap-4">
-            <Link href="/privacy" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">
+            <Link href="/privacy-policy" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">
               <h3 className="font-semibold text-gray-900">Privacy Policy</h3>
               <p className="text-sm text-gray-500 mt-1">How we collect, use, and protect your data</p>
             </Link>
-            <Link href="/terms" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">
+            <Link href="/terms-of-service" className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block">
               <h3 className="font-semibold text-gray-900">Terms of Service</h3>
               <p className="text-sm text-gray-500 mt-1">Terms governing platform use</p>
             </Link>

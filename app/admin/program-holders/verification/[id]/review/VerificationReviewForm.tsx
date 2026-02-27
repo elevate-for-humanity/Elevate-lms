@@ -69,62 +69,10 @@ export default function VerificationReviewForm({
     setError(null);
 
     try {
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-
-      // Update program holder status
-      const { error: updateError } = await supabase
-        .from('program_holders')
-        .update({
-          verification_status: decision === 'approve' ? 'verified' : 'rejected',
-          status: decision === 'approve' ? 'verified_no_students' : 'rejected',
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', holder.id);
-
-      if (updateError) throw updateError;
-
-      // Create verification record
-      const { error: verificationError } = await supabase
-        .from('program_holder_verification')
-        .insert({
-          program_holder_id: holder.user_id,
-          verification_type: 'manual',
-          status: decision === 'approve' ? 'verified' : 'failed',
-          verified_at: new Date().toISOString(),
-          verified_by: adminUserId,
-          notes,
-        });
-
-      if (verificationError) throw verificationError;
-
-      // Mark all documents as verified/rejected
-      const { error: docsError } = await supabase
-        .from('program_holder_documents')
-        .update({
-          status: decision === 'approve' ? 'approved' : 'rejected',
-          verified_at: new Date().toISOString(),
-          verified_by: adminUserId,
-          notes,
-        })
-        .eq('program_holder_id', holder.user_id);
-
-      if (docsError) throw docsError;
-
-      // Mark banking as verified if approved
-      if (decision === 'approve' && banking) {
-        await supabase
-          .from('program_holder_banking')
-          .update({
-            verified: true,
-            verified_at: new Date().toISOString(),
-          })
-          .eq('program_holder_id', holder.user_id);
-      }
-
-      // Email notification handled by trigger to program holder
+      const { submitVerificationDecision } = await import('./actions');
+      const mappedDecision = decision === 'approve' ? 'approved' : 'rejected';
+      const result = await submitVerificationDecision(holder.id, holder.user_id, mappedDecision, notes);
+      if (result.error) throw new Error(result.error);
 
       router.push('/admin/program-holders/verification');
       router.refresh();

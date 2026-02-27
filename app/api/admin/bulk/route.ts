@@ -2,6 +2,7 @@ export const runtime = 'edge';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import {
   bulkEnrollStudents,
   bulkUnenrollStudents,
@@ -87,6 +88,8 @@ export const POST = withAuth(
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
+
+    await logAdminAudit({ action: AdminAction.BULK_GRADES_UPDATED, actorId: user.id, entityType: operation, entityId: '00000000-0000-0000-0000-000000000000', metadata: { operation, record_count: params.userIds?.length || params.updates?.length || 0 }, req: request });
 
     return NextResponse.json(result);
   } catch (error) { 

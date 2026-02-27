@@ -83,7 +83,7 @@ export const ELECTRICAL_DATA: TradesProgramData = {
     { name: 'OSHA 10 — General Industry Safety', issuingBody: 'OSHA / CareerSafe' },
     { name: 'Indiana Electrical Apprentice Registration', issuingBody: 'Indiana IDHS' },
     { name: 'CPR / First Aid', issuingBody: 'American Heart Association' },
-    { name: 'Program Completion Certificate', issuingBody: 'Elevate for Humanity' },
+    { name: 'Program Completion Certificate', issuingBody: 'Elevate for Humanity Career & Technical Institute' },
   ],
   curriculum: [
     { week: 'Weeks 1–2', title: 'Electrical Fundamentals', topics: ['Voltage, current, resistance', 'Ohm\'s Law and power calculations', 'AC vs DC electricity', 'Electrical safety and OSHA'], image: '/images/trades/hero-program-electrical.jpg', project: 'Build and test basic circuits' },
@@ -128,7 +128,7 @@ export const PLUMBING_DATA: TradesProgramData = {
   credentials: [
     { name: 'OSHA 10 — Construction Safety', issuingBody: 'OSHA / CareerSafe' },
     { name: 'CPR / First Aid', issuingBody: 'American Heart Association' },
-    { name: 'Program Completion Certificate', issuingBody: 'Elevate for Humanity' },
+    { name: 'Program Completion Certificate', issuingBody: 'Elevate for Humanity Career & Technical Institute' },
   ],
   curriculum: [
     { week: 'Weeks 1–2', title: 'Plumbing Fundamentals', topics: ['Plumbing codes and regulations', 'Water supply and drainage principles', 'Pipe materials (copper, PVC, PEX, cast iron)', 'Safety and tool identification'], image: '/images/trades/hero-program-plumbing.jpg', project: 'Identify and assemble various pipe types' },

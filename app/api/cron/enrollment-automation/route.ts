@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 import { runAutomationTasks } from '@/lib/automation/enrollment-automation';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +11,7 @@ export const dynamic = 'force-dynamic';
  * Cron job endpoint for enrollment automation
  * Called by scheduled cron or external scheduler
  */
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   try {
     // Verify cron secret to prevent unauthorized access
     const authHeader = req.headers.get('authorization');
@@ -39,3 +40,4 @@ export async function GET(req: Request) {
     );
   }
 }
+export const GET = withApiAudit('/api/cron/enrollment-automation', _GET, { actor_type: 'cron' });

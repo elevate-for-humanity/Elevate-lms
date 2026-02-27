@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export async function POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
@@ -58,6 +59,15 @@ export async function POST(request: NextRequest) {
     logger.error('Failed to update submission:', error);
     return NextResponse.json({ error: 'Failed to update submission' }, { status: 500 });
   }
+
+  await logAdminAudit({
+    action: AdminAction.CERTIFICATION_REVIEWED,
+    actorId: user.id,
+    entityType: 'certification_submissions',
+    entityId: submissionId,
+    metadata: { decision: action, notes: notes || null },
+    req: request,
+  });
 
   return NextResponse.json({ 
     success: true, 

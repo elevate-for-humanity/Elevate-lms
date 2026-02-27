@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export async function approveTransferHours(
   requestId: string,
@@ -43,6 +44,14 @@ export async function approveTransferHours(
     throw new Error('Operation failed');
   }
 
+  await logAdminAudit({
+    action: AdminAction.HOURS_TRANSFER_PROCESSED,
+    actorId: user.id,
+    entityType: 'transfer_hours',
+    entityId: requestId,
+    metadata: { decision: 'approved', hours_approved: hoursApproved },
+  });
+
   revalidatePath('/admin/transfer-hours');
 }
 
@@ -79,6 +88,14 @@ export async function denyTransferHours(requestId: string, notes?: string) {
   if (error) {
     throw new Error('Operation failed');
   }
+
+  await logAdminAudit({
+    action: AdminAction.HOURS_TRANSFER_PROCESSED,
+    actorId: user.id,
+    entityType: 'transfer_hours',
+    entityId: requestId,
+    metadata: { decision: 'denied' },
+  });
 
   revalidatePath('/admin/transfer-hours');
 }

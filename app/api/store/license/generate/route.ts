@@ -10,6 +10,8 @@ import { toErrorMessage } from '@/lib/safe';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 // Verify admin API key for internal/webhook calls
 function verifyAdminApiKey(request: Request): boolean {
   const apiKey = request.headers.get('x-admin-api-key');

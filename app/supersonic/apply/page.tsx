@@ -88,7 +88,7 @@ export default async function SupersonicApplyPage() {
                 ${existingApplication.estimated_amount.toLocaleString()}
               </p>
             )}
-            <Link href="/supersonic/status" className="text-brand-orange-600 hover:text-brand-orange-700">
+            <Link href="/supersonic" className="text-brand-orange-600 hover:text-brand-orange-700">
               View Application Status →
             </Link>
           </div>

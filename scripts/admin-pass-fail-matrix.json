@@ -1,0 +1,3857 @@
+[
+  {
+    "route": "/admin",
+    "status": "LIVE",
+    "purpose": "",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/accreditation",
+    "status": "LIVE",
+    "purpose": "Accreditation Readiness | Admin",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [
+      {
+        "table": "program_enrollments",
+        "column": "program",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [
+      "COLUMN_MISMATCH: program_enrollments.program"
+    ],
+    "writes": []
+  },
+  {
+    "route": "/admin/accreditation/report",
+    "status": "LIVE",
+    "purpose": "Accreditation Report | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/activity",
+    "status": "LIVE",
+    "purpose": "Activity Log | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/advanced-tools",
+    "status": "LIVE",
+    "purpose": "Automation & Workflows",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/affiliates",
+    "status": "LIVE",
+    "purpose": "Affiliate Management | Admin | Elevate for Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "affiliates",
+        "op": "insert"
+      },
+      {
+        "table": "profiles",
+        "op": "insert"
+      }
+    ]
+  },
+  {
+    "route": "/admin/affiliates/new",
+    "status": "FORM",
+    "purpose": "New Affiliate | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/ai-console",
+    "status": "LIVE",
+    "purpose": "AI Console | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/ai-tutor-logs",
+    "status": "LIVE",
+    "purpose": "AI Tutor Logs | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/analytics",
+    "status": "LIVE",
+    "purpose": "Analytics Dashboard | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/analytics/engagement",
+    "status": "LIVE",
+    "purpose": "Engagement Analytics | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/analytics/learning",
+    "status": "LIVE",
+    "purpose": "Learning Analytics | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/analytics/programs",
+    "status": "LIVE",
+    "purpose": "Program Analytics | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/api-keys",
+    "status": "LIVE",
+    "purpose": "API Keys | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/applicants",
+    "status": "LIVE",
+    "purpose": "Applicants | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/applicants-live",
+    "status": "LIVE",
+    "purpose": "Applicants Live | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/applications",
+    "status": "LIVE",
+    "purpose": "Applications | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/applications/[type]/[id]",
+    "status": "LIVE",
+    "purpose": "Application Details | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/applications/review/[id]",
+    "status": "LIVE",
+    "purpose": "Review Application | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/apprenticeships",
+    "status": "LIVE",
+    "purpose": "Apprenticeship Management",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": true,
+    "audit_gap_tables": [
+      "ojt_hours_log"
+    ],
+    "issues": [
+      "AUDIT_GAP: ojt_hours_log"
+    ],
+    "writes": [
+      {
+        "table": "ojt_hours_log",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/at-risk",
+    "status": "LIVE",
+    "purpose": "At-Risk Students | Admin Dashboard",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/audit-logs",
+    "status": "LIVE",
+    "purpose": "Audit Logs",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/automation",
+    "status": "LIVE",
+    "purpose": "Automation Log | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/automation-qa",
+    "status": "LIVE",
+    "purpose": "",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/autopilot",
+    "status": "LIVE",
+    "purpose": "Autopilot Management | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/barriers",
+    "status": "LIVE",
+    "purpose": "Barriers Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/blog",
+    "status": "LIVE",
+    "purpose": "Blog Management | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/campaigns",
+    "status": "LIVE",
+    "purpose": "Campaigns | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/campaigns/new",
+    "status": "FORM",
+    "purpose": "New Campaign | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/career-courses/create",
+    "status": "LIVE",
+    "purpose": "Course Content Creator",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/cash-advances",
+    "status": "LIVE",
+    "purpose": "Cash Advances Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/cash-advances/pending",
+    "status": "LIVE",
+    "purpose": "Pending Cash Advances | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/cash-advances/reports",
+    "status": "LIVE",
+    "purpose": "Cash Advance Reports | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/cash-advances/settings",
+    "status": "LIVE",
+    "purpose": "Cash Advance Settings | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/certificates",
+    "status": "LIVE",
+    "purpose": "Certificates | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "issued_certificates",
+        "op": "insert"
+      },
+      {
+        "table": "certificates",
+        "op": "insert"
+      },
+      {
+        "table": "audit_logs",
+        "op": "insert"
+      },
+      {
+        "table": "issued_certificates",
+        "op": "update"
+      },
+      {
+        "table": "certificates",
+        "op": "update"
+      },
+      {
+        "table": "audit_logs",
+        "op": "insert"
+      }
+    ]
+  },
+  {
+    "route": "/admin/certificates/bulk",
+    "status": "LIVE",
+    "purpose": "Bulk Certificate Issuance | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/certificates/issue",
+    "status": "LIVE",
+    "purpose": "Issue Certificate | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/certifications",
+    "status": "LIVE",
+    "purpose": "Certifications Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/certifications/bulk",
+    "status": "LIVE",
+    "purpose": "Bulk Certification Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/cohorts",
+    "status": "LIVE",
+    "purpose": "Cohort Tracker | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/completions",
+    "status": "LIVE",
+    "purpose": "Course Completions | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/compliance",
+    "status": "LIVE",
+    "purpose": "Compliance Dashboard | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/compliance-audit",
+    "status": "LIVE",
+    "purpose": "Monthly Compliance Audit",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/compliance/agreements",
+    "status": "LIVE",
+    "purpose": "Access Denied",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/compliance/deletions",
+    "status": "LIVE",
+    "purpose": "Data Deletion Requests | Admin Compliance | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/compliance/exports",
+    "status": "LIVE",
+    "purpose": "Data Export Requests | Admin Compliance | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/compliance/financial-assurance",
+    "status": "LIVE",
+    "purpose": "Financial Assurance | Admin | Elevate",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/contacts",
+    "status": "LIVE",
+    "purpose": "Contact Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/copilot",
+    "status": "LIVE",
+    "purpose": "AI Copilot Dashboard | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/copilot/deploy",
+    "status": "LIVE",
+    "purpose": "Deploy AI Copilot | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/course-builder",
+    "status": "LIVE",
+    "purpose": "Course Builder | Elevate For Humanity",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": true,
+    "audit_gap_tables": [
+      "training_courses",
+      "training_courses"
+    ],
+    "issues": [
+      "AUDIT_GAP: training_courses"
+    ],
+    "writes": [
+      {
+        "table": "training_courses",
+        "op": "delete"
+      },
+      {
+        "table": "training_courses",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/course-builder/assessments",
+    "status": "STATIC",
+    "purpose": "Assessment Bank | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/course-builder/media",
+    "status": "STATIC",
+    "purpose": "Media Library | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/course-builder/templates",
+    "status": "STATIC",
+    "purpose": "Course Templates | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/course-generator",
+    "status": "FORM",
+    "purpose": "AI Course Generator",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/course-import",
+    "status": "LIVE",
+    "purpose": "Course Import | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/course-templates",
+    "status": "LIVE",
+    "purpose": "Course Templates | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/courses",
+    "status": "LIVE",
+    "purpose": "Admin Courses | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/courses/[courseId]/content",
+    "status": "LIVE",
+    "purpose": "Course Content | Elevate For Humanity",
+    "verdict": "PARTIAL",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": true,
+    "audit_gap_tables": [
+      "training_lessons",
+      "training_lessons",
+      "training_lessons",
+      "training_lessons",
+      "training_lessons"
+    ],
+    "issues": [
+      "AUDIT_GAP: training_lessons"
+    ],
+    "writes": [
+      {
+        "table": "training_lessons",
+        "op": "update"
+      },
+      {
+        "table": "training_lessons",
+        "op": "insert"
+      },
+      {
+        "table": "training_lessons",
+        "op": "delete"
+      },
+      {
+        "table": "training_lessons",
+        "op": "update"
+      },
+      {
+        "table": "training_lessons",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/courses/[courseId]/edit",
+    "status": "LIVE",
+    "purpose": "Edit Course | Admin | Elevate LMS",
+    "verdict": "PASS",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/courses/[courseId]/quizzes",
+    "status": "LIVE",
+    "purpose": "Course Quizzes | Elevate For Humanity",
+    "verdict": "PARTIAL",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": true,
+    "audit_gap_tables": [
+      "quizzes",
+      "quizzes",
+      "quizzes"
+    ],
+    "issues": [
+      "AUDIT_GAP: quizzes"
+    ],
+    "writes": [
+      {
+        "table": "quizzes",
+        "op": "update"
+      },
+      {
+        "table": "quizzes",
+        "op": "insert"
+      },
+      {
+        "table": "quizzes",
+        "op": "delete"
+      }
+    ]
+  },
+  {
+    "route": "/admin/courses/[courseId]/quizzes/[quizId]/questions",
+    "status": "LIVE",
+    "purpose": "Quiz Questions | Elevate For Humanity",
+    "verdict": "PARTIAL",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": true,
+    "audit_gap_tables": [
+      "quiz_questions",
+      "quiz_questions",
+      "quiz_questions"
+    ],
+    "issues": [
+      "AUDIT_GAP: quiz_questions"
+    ],
+    "writes": [
+      {
+        "table": "quiz_questions",
+        "op": "update"
+      },
+      {
+        "table": "quiz_questions",
+        "op": "insert"
+      },
+      {
+        "table": "quiz_questions",
+        "op": "delete"
+      }
+    ]
+  },
+  {
+    "route": "/admin/courses/builder",
+    "status": "LIVE",
+    "purpose": "Course Builder | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/courses/bulk-operations",
+    "status": "LIVE",
+    "purpose": "Bulk Operations | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/courses/create",
+    "status": "LIVE",
+    "purpose": "Create Course | Admin | Elevate LMS",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/courses/manage",
+    "status": "LIVE",
+    "purpose": "Manage Courses | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/courses/partners",
+    "status": "STATIC",
+    "purpose": "Course Partners | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/crm",
+    "status": "LIVE",
+    "purpose": "CRM Hub | Admin Dashboard",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/crm/appointments",
+    "status": "LIVE",
+    "purpose": "Appointments",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/crm/appointments/new",
+    "status": "FORM",
+    "purpose": "New Appointment",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/crm/campaigns",
+    "status": "LIVE",
+    "purpose": "Email Campaigns | CRM",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/crm/campaigns/new",
+    "status": "LIVE",
+    "purpose": "Create Email Campaign",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/crm/contacts",
+    "status": "LIVE",
+    "purpose": "Contacts | CRM | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/crm/contacts/new",
+    "status": "FORM",
+    "purpose": "New Contact | CRM | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/crm/deals",
+    "status": "STATIC",
+    "purpose": "Deals | CRM | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/crm/deals/new",
+    "status": "FORM",
+    "purpose": "New Deal",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/crm/follow-ups",
+    "status": "LIVE",
+    "purpose": "Follow-ups | CRM Admin",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [
+      {
+        "table": "crm_follow_ups",
+        "column": "contact",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [
+      "COLUMN_MISMATCH: crm_follow_ups.contact"
+    ],
+    "writes": []
+  },
+  {
+    "route": "/admin/crm/leads",
+    "status": "LIVE",
+    "purpose": "Leads | CRM | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/crm/leads/new",
+    "status": "FORM",
+    "purpose": "New Lead | CRM | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/curriculum",
+    "status": "LIVE",
+    "purpose": "Curriculum Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/curriculum/upload",
+    "status": "LIVE",
+    "purpose": "Upload Curriculum | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/dashboard",
+    "status": "LIVE",
+    "purpose": "Admin Dashboard | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/dashboard/etpl",
+    "status": "STATIC",
+    "purpose": "ETPL Performance Dashboard | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/data-processor",
+    "status": "LIVE",
+    "purpose": "Data Processor | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/delegates",
+    "status": "LIVE",
+    "purpose": "Delegates Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/dev-studio",
+    "status": "LIVE",
+    "purpose": "",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/docs",
+    "status": "LIVE",
+    "purpose": "Documentation Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/docs/mou",
+    "status": "LIVE",
+    "purpose": "MOU Documentation | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/document-center",
+    "status": "LIVE",
+    "purpose": "Document Center | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/document-center/[category]",
+    "status": "LIVE",
+    "purpose": "Service Unavailable",
+    "verdict": "PASS",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/documents",
+    "status": "LIVE",
+    "purpose": "Document Center | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/documents/review",
+    "status": "LIVE",
+    "purpose": "Review Documents | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/documents/review/[id]",
+    "status": "LIVE",
+    "purpose": "Review Document | Admin",
+    "verdict": "PASS",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/documents/upload",
+    "status": "LIVE",
+    "purpose": "Upload Documents | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/editor",
+    "status": "LIVE",
+    "purpose": "Welcome to EFH",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/email-marketing",
+    "status": "LIVE",
+    "purpose": "Email Marketing",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/email-marketing/analytics",
+    "status": "LIVE",
+    "purpose": "Email Analytics",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/email-marketing/automation",
+    "status": "LIVE",
+    "purpose": "Marketing Automation",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/email-marketing/automation/new",
+    "status": "LIVE",
+    "purpose": "Create Drip Campaign",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/email-marketing/campaigns/new",
+    "status": "LIVE",
+    "purpose": "Create Campaign",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/employers",
+    "status": "LIVE",
+    "purpose": "Employer Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/employers-playbook",
+    "status": "LIVE",
+    "purpose": "Employers Playbook | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/employers/[id]/proposal",
+    "status": "LIVE",
+    "purpose": "Employer Proposal | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/employers/onboarding",
+    "status": "LIVE",
+    "purpose": "Employer Onboarding Review | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/enrollment-jobs",
+    "status": "LIVE",
+    "purpose": "Enrollment Jobs | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/enrollments",
+    "status": "LIVE",
+    "purpose": "Enrollment Management | Admin Dashboard",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [
+      {
+        "table": "training_enrollments",
+        "column": "course",
+        "issue": "COLUMN_MISSING"
+      },
+      {
+        "table": "training_enrollments",
+        "column": "student",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [
+      "COLUMN_MISMATCH: training_enrollments.course, training_enrollments.student"
+    ],
+    "writes": [
+      {
+        "table": "training_enrollments",
+        "op": "update"
+      },
+      {
+        "table": "training_enrollments",
+        "op": "insert"
+      },
+      {
+        "table": "lesson_progress",
+        "op": "delete"
+      },
+      {
+        "table": "training_enrollments",
+        "op": "delete"
+      },
+      {
+        "table": "training_enrollments",
+        "op": "update"
+      },
+      {
+        "table": "training_enrollments",
+        "op": "update"
+      },
+      {
+        "table": "training_enrollments",
+        "op": "update"
+      },
+      {
+        "table": "program_enrollments",
+        "op": "update"
+      },
+      {
+        "table": "profiles",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/etpl-alignment",
+    "status": "LIVE",
+    "purpose": "Etpl Alignment | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/external-modules",
+    "status": "LIVE",
+    "purpose": "",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": true,
+    "audit_gap_tables": [
+      "external_modules",
+      "external_modules"
+    ],
+    "issues": [
+      "AUDIT_GAP: external_modules"
+    ],
+    "writes": [
+      {
+        "table": "external_modules",
+        "op": "update"
+      },
+      {
+        "table": "external_modules",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/external-modules/approvals",
+    "status": "LIVE",
+    "purpose": "Module Approvals | Elevate For Humanity",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [
+      {
+        "table": "external_modules",
+        "column": "status",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "audit_gap": true,
+    "audit_gap_tables": [
+      "external_partner_progress",
+      "external_partner_progress"
+    ],
+    "issues": [
+      "COLUMN_MISMATCH: external_modules.status",
+      "AUDIT_GAP: external_partner_progress"
+    ],
+    "writes": [
+      {
+        "table": "external_partner_progress",
+        "op": "update"
+      },
+      {
+        "table": "external_partner_progress",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/external-progress",
+    "status": "LIVE",
+    "purpose": "External Progress | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/ferpa",
+    "status": "LIVE",
+    "purpose": "FERPA Compliance | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/ferpa/training",
+    "status": "LIVE",
+    "purpose": "FERPA Training Management | Elevate For Humanity",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [
+      {
+        "table": "ferpa_training_records",
+        "column": "profiles",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [
+      "COLUMN_MISMATCH: ferpa_training_records.profiles"
+    ],
+    "writes": []
+  },
+  {
+    "route": "/admin/files",
+    "status": "LIVE",
+    "purpose": "File Manager | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/funding",
+    "status": "LIVE",
+    "purpose": "Funding Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/funding-playbook",
+    "status": "LIVE",
+    "purpose": "Funding Playbook | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/governance",
+    "status": "STATIC",
+    "purpose": "Governance | Elevate for Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/governance/authoritative-docs",
+    "status": "LIVE",
+    "purpose": "Authoritative Documents | Governance | Elevate for Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/governance/compliance",
+    "status": "STATIC",
+    "purpose": "Compliance & Disclosure Framework | Governance | Elevate for Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/governance/contact",
+    "status": "STATIC",
+    "purpose": "Governance Contact | Elevate for Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/governance/data",
+    "status": "STATIC",
+    "purpose": "Data Governance | Elevate for Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/governance/legal",
+    "status": "STATIC",
+    "purpose": "Legal & Entity Information | Elevate for Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/governance/operational-controls",
+    "status": "STATIC",
+    "purpose": "Operational Controls | Governance | Elevate for Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/governance/security",
+    "status": "STATIC",
+    "purpose": "Security & Data Protection Statement | Elevate for Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/governance/seo-indexing",
+    "status": "STATIC",
+    "purpose": "SEO & Indexing Governance | Elevate for Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/gradebook",
+    "status": "LIVE",
+    "purpose": "Gradebook | Admin | Elevate LMS",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/gradebook/[courseId]",
+    "status": "LIVE",
+    "purpose": "Gradebook | Admin | Elevate LMS",
+    "verdict": "PARTIAL",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [
+      {
+        "table": "assignment_submissions",
+        "column": "course_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      },
+      {
+        "table": "quiz_attempts",
+        "column": "course_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "audit_gap": true,
+    "audit_gap_tables": [
+      "assignment_submissions"
+    ],
+    "issues": [
+      "COLUMN_MISMATCH: assignment_submissions.course_id, quiz_attempts.course_id",
+      "AUDIT_GAP: assignment_submissions"
+    ],
+    "writes": [
+      {
+        "table": "assignment_submissions",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/grants",
+    "status": "LIVE",
+    "purpose": "Grant Management | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "grant_opportunities",
+        "op": "insert"
+      },
+      {
+        "table": "grant_opportunities",
+        "op": "update"
+      },
+      {
+        "table": "grant_opportunities",
+        "op": "delete"
+      },
+      {
+        "table": "grant_applications",
+        "op": "insert"
+      },
+      {
+        "table": "grant_applications",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/grants/intake",
+    "status": "LIVE",
+    "purpose": "Grant Intake | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/grants/new",
+    "status": "FORM",
+    "purpose": "Add Grant Opportunity | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/grants/revenue",
+    "status": "LIVE",
+    "purpose": "Grant Revenue | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/grants/submissions",
+    "status": "LIVE",
+    "purpose": "Submissions | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/grants/workflow",
+    "status": "LIVE",
+    "purpose": "Grants Workflow | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/hours-export",
+    "status": "LIVE",
+    "purpose": "Weekly Hours Export",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/hr",
+    "status": "LIVE",
+    "purpose": "HR Dashboard | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/hr/employees",
+    "status": "LIVE",
+    "purpose": "Employee Directory | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/hr/employees/[id]",
+    "status": "LIVE",
+    "purpose": "Employee Details | HR | Admin",
+    "verdict": "PARTIAL",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [
+      {
+        "table": "employees",
+        "column": "managers",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [
+      "COLUMN_MISMATCH: employees.managers"
+    ],
+    "writes": []
+  },
+  {
+    "route": "/admin/hr/employees/new",
+    "status": "LIVE",
+    "purpose": "Add Employee | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/hr/leave",
+    "status": "LIVE",
+    "purpose": "Leave Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/hr/payroll",
+    "status": "LIVE",
+    "purpose": "Payroll Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/hr/time",
+    "status": "LIVE",
+    "purpose": "Time Tracking | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/hsi-enrollments",
+    "status": "LIVE",
+    "purpose": "HSI Enrollments | Admin Dashboard",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/hvac-activation",
+    "status": "LIVE",
+    "purpose": "HVAC Course Activation",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/impact",
+    "status": "LIVE",
+    "purpose": "Impact Dashboard | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/import",
+    "status": "LIVE",
+    "purpose": "Data Import",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/inbox",
+    "status": "LIVE",
+    "purpose": "Admin Inbox | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "partner_inquiries",
+        "op": "update"
+      },
+      {
+        "table": "license_requests",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/incentives",
+    "status": "LIVE",
+    "purpose": "Employer Incentives",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": true,
+    "audit_gap_tables": [
+      "incentives"
+    ],
+    "issues": [
+      "AUDIT_GAP: incentives"
+    ],
+    "writes": [
+      {
+        "table": "incentives",
+        "op": "insert"
+      }
+    ]
+  },
+  {
+    "route": "/admin/incentives/create",
+    "status": "FORM",
+    "purpose": "Create Incentive | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/instructors",
+    "status": "STATIC",
+    "purpose": "",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/instructors/performance",
+    "status": "LIVE",
+    "purpose": "Instructor Performance | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/intake",
+    "status": "LIVE",
+    "purpose": "Admissions Intake Management",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/integrations",
+    "status": "LIVE",
+    "purpose": "",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": true,
+    "audit_gap_tables": [
+      "integrations"
+    ],
+    "issues": [
+      "AUDIT_GAP: integrations"
+    ],
+    "writes": [
+      {
+        "table": "integrations",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/integrations/google-classroom",
+    "status": "LIVE",
+    "purpose": "Google Classroom | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/integrations/salesforce",
+    "status": "LIVE",
+    "purpose": "Salesforce Integration",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/internal-docs",
+    "status": "LIVE",
+    "purpose": "Internal Docs | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/jobs",
+    "status": "LIVE",
+    "purpose": "Job Postings | Admin | Elevate for Humanity",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": true,
+    "audit_gap_tables": [
+      "jobs"
+    ],
+    "issues": [
+      "AUDIT_GAP: jobs"
+    ],
+    "writes": [
+      {
+        "table": "jobs",
+        "op": "insert"
+      }
+    ]
+  },
+  {
+    "route": "/admin/jobs/new",
+    "status": "FORM",
+    "purpose": "Post New Job | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/jri",
+    "status": "LIVE",
+    "purpose": "JRI Management | Elevate For Humanity",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [
+      {
+        "table": "jri_participants",
+        "column": "status",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [
+      "COLUMN_MISMATCH: jri_participants.status"
+    ],
+    "writes": []
+  },
+  {
+    "route": "/admin/leads",
+    "status": "LIVE",
+    "purpose": "Leads | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/leads/new",
+    "status": "FORM",
+    "purpose": "Add Lead | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/learner",
+    "status": "LIVE",
+    "purpose": "Learner Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/learner/[id]",
+    "status": "LIVE",
+    "purpose": "Learner Details | Admin | Elevate for Humanity",
+    "verdict": "PASS",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/lessons",
+    "status": "LIVE",
+    "purpose": "Lessons Management | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/license",
+    "status": "LIVE",
+    "purpose": "License Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/license-requests",
+    "status": "LIVE",
+    "purpose": "Admin License Requests | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "license_requests",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/licenses",
+    "status": "LIVE",
+    "purpose": "Admin Licenses | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "licenses",
+        "op": "insert"
+      }
+    ]
+  },
+  {
+    "route": "/admin/licenses/create",
+    "status": "LIVE",
+    "purpose": "Create License | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/licensing",
+    "status": "LIVE",
+    "purpose": "License Management",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "licenses",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/live-chat",
+    "status": "LIVE",
+    "purpose": "Live Chat",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/marketing",
+    "status": "LIVE",
+    "purpose": "Marketing | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/marketplace",
+    "status": "STATIC",
+    "purpose": "Marketplace | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "REDIRECT",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/marketplace/creators",
+    "status": "LIVE",
+    "purpose": "Admin Marketplace Creators | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/marketplace/payouts",
+    "status": "LIVE",
+    "purpose": "Admin Marketplace Payouts | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/marketplace/products",
+    "status": "LIVE",
+    "purpose": "Admin Marketplace Products | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/media-studio",
+    "status": "LIVE",
+    "purpose": "Media Studio",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/migrations",
+    "status": "LIVE",
+    "purpose": "Data Migrations | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/mobile-sync",
+    "status": "LIVE",
+    "purpose": "Mobile Sync | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/moderation",
+    "status": "LIVE",
+    "purpose": "Moderation Queue | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/modules",
+    "status": "LIVE",
+    "purpose": "Modules Management | Admin",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [
+      {
+        "table": "modules",
+        "column": "module_type",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "audit_gap": true,
+    "audit_gap_tables": [
+      "modules",
+      "modules",
+      "modules"
+    ],
+    "issues": [
+      "COLUMN_MISMATCH: modules.module_type",
+      "AUDIT_GAP: modules"
+    ],
+    "writes": [
+      {
+        "table": "modules",
+        "op": "insert"
+      },
+      {
+        "table": "modules",
+        "op": "update"
+      },
+      {
+        "table": "modules",
+        "op": "delete"
+      }
+    ]
+  },
+  {
+    "route": "/admin/modules/new",
+    "status": "LIVE",
+    "purpose": "Create Module | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/monitoring",
+    "status": "LIVE",
+    "purpose": "",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/monitoring/setup",
+    "status": "LIVE",
+    "purpose": "",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/mou",
+    "status": "LIVE",
+    "purpose": "MOU Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/next-steps",
+    "status": "LIVE",
+    "purpose": "WorkOne / ICC Progress Dashboard",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/notifications",
+    "status": "LIVE",
+    "purpose": "Class Reminder",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/operations",
+    "status": "LIVE",
+    "purpose": "Operations Dashboard | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/outcomes",
+    "status": "LIVE",
+    "purpose": "Outcomes Tracking | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/partner-enrollments",
+    "status": "LIVE",
+    "purpose": "Partner Enrollments | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/partner-inquiries",
+    "status": "LIVE",
+    "purpose": "Admin Partner Inquiries | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "partner_inquiries",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/partners",
+    "status": "LIVE",
+    "purpose": "Admin Partners | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/partners/lms-integrations",
+    "status": "LIVE",
+    "purpose": "Lms Integrations | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/partners/lms-integrations/[id]",
+    "status": "LIVE",
+    "purpose": "LMS Integration Details | Partners | Admin",
+    "verdict": "PARTIAL",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [
+      {
+        "table": "partner_lms_sync_logs",
+        "column": "provider_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [
+      "COLUMN_MISMATCH: partner_lms_sync_logs.provider_id"
+    ],
+    "writes": []
+  },
+  {
+    "route": "/admin/payroll",
+    "status": "LIVE",
+    "purpose": "Payroll Management",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "apprentice_payroll",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/payroll-cards",
+    "status": "LIVE",
+    "purpose": "Payroll Cards | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/performance-dashboard",
+    "status": "LIVE",
+    "purpose": "Performance Dashboard | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/portal-map",
+    "status": "LIVE",
+    "purpose": "Admin Portal Map",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/program-generator",
+    "status": "LIVE",
+    "purpose": "Program Generator | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/program-holder-acknowledgements",
+    "status": "LIVE",
+    "purpose": "Program Holder Acknowledgements | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/program-holder-documents",
+    "status": "LIVE",
+    "purpose": "Program Holder Documents",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "program_holder_documents",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/program-holders",
+    "status": "LIVE",
+    "purpose": "Program Holders | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/program-holders/[id]",
+    "status": "LIVE",
+    "purpose": "Review Program Holder | Admin",
+    "verdict": "PASS",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "program_holders",
+        "op": "update"
+      },
+      {
+        "table": "admin_audit_events",
+        "op": "insert"
+      },
+      {
+        "table": "program_holders",
+        "op": "update"
+      },
+      {
+        "table": "admin_audit_events",
+        "op": "insert"
+      }
+    ]
+  },
+  {
+    "route": "/admin/program-holders/[id]/countersign-mou",
+    "status": "LIVE",
+    "purpose": "Countersign Mou | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/program-holders/verification",
+    "status": "LIVE",
+    "purpose": "Program Holder Verification | Admin",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [
+      {
+        "table": "program_holder_documents",
+        "column": "program_holder_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      },
+      {
+        "table": "program_holder_banking",
+        "column": "program_holder_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [
+      "COLUMN_MISMATCH: program_holder_documents.program_holder_id, program_holder_banking.program_holder_id"
+    ],
+    "writes": []
+  },
+  {
+    "route": "/admin/program-holders/verification/[id]/review",
+    "status": "LIVE",
+    "purpose": "Review Program Holder | Admin",
+    "verdict": "PARTIAL",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [
+      {
+        "table": "program_holder_documents",
+        "column": "program_holder_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      },
+      {
+        "table": "program_holder_banking",
+        "column": "program_holder_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [
+      "COLUMN_MISMATCH: program_holder_documents.program_holder_id, program_holder_banking.program_holder_id"
+    ],
+    "writes": [
+      {
+        "table": "program_holders",
+        "op": "update"
+      },
+      {
+        "table": "program_holder_verification",
+        "op": "insert"
+      },
+      {
+        "table": "profiles",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/programs",
+    "status": "LIVE",
+    "purpose": "Programs Management | Admin",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": true,
+    "audit_gap_tables": [
+      "programs",
+      "programs",
+      "programs"
+    ],
+    "issues": [
+      "AUDIT_GAP: programs"
+    ],
+    "writes": [
+      {
+        "table": "programs",
+        "op": "insert"
+      },
+      {
+        "table": "programs",
+        "op": "update"
+      },
+      {
+        "table": "programs",
+        "op": "delete"
+      }
+    ]
+  },
+  {
+    "route": "/admin/programs/[code]/dashboard",
+    "status": "LIVE",
+    "purpose": "Program Dashboard | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/programs/builder",
+    "status": "LIVE",
+    "purpose": "Program Builder | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/programs/catalog",
+    "status": "LIVE",
+    "purpose": "Program Catalog Generator | Admin | Elevate",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/programs/new",
+    "status": "LIVE",
+    "purpose": "Create Program | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/progress",
+    "status": "LIVE",
+    "purpose": "Progress Tracking | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/promo-codes",
+    "status": "LIVE",
+    "purpose": "Promo Codes",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/quiz-builder",
+    "status": "LIVE",
+    "purpose": "Quiz Builder | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/quizzes",
+    "status": "LIVE",
+    "purpose": "Quizzes Management | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/rapids",
+    "status": "LIVE",
+    "purpose": "RAPIDS / USDOL Registration Status",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/rapids/apprentices",
+    "status": "LIVE",
+    "purpose": "RAPIDS Apprentice Management",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/reporting",
+    "status": "LIVE",
+    "purpose": "Reporting Center | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/reports",
+    "status": "LIVE",
+    "purpose": "Reports | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/reports/caseload",
+    "status": "LIVE",
+    "purpose": "Caseload Reports | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/reports/charts",
+    "status": "LIVE",
+    "purpose": "Charts & Visualizations | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/reports/enrollment",
+    "status": "LIVE",
+    "purpose": "Enrollment Report | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/reports/financial",
+    "status": "LIVE",
+    "purpose": "Financial Report | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/reports/leads",
+    "status": "LIVE",
+    "purpose": "Lead Generation Report | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/reports/partners",
+    "status": "LIVE",
+    "purpose": "Partner Reports | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/reports/samples",
+    "status": "LIVE",
+    "purpose": "Sample Reports | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/reports/users",
+    "status": "LIVE",
+    "purpose": "User Activity Report | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/retention",
+    "status": "LIVE",
+    "purpose": "Retention Analytics | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/review-queue",
+    "status": "LIVE",
+    "purpose": "Review Queue | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/review-queue/[id]",
+    "status": "LIVE",
+    "purpose": "Review Item | Admin",
+    "verdict": "PASS",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/sap",
+    "status": "LIVE",
+    "purpose": "SAP Monitoring | Admin Dashboard",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [
+      {
+        "table": "grades",
+        "column": "enrollment_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      },
+      {
+        "table": "attendance_records",
+        "column": "enrollment_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [
+      "COLUMN_MISMATCH: grades.enrollment_id, attendance_records.enrollment_id"
+    ],
+    "writes": []
+  },
+  {
+    "route": "/admin/security",
+    "status": "LIVE",
+    "purpose": "Security Settings | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/settings",
+    "status": "LIVE",
+    "purpose": "Admin Settings | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/shops",
+    "status": "LIVE",
+    "purpose": "Admin Shops | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/shops/geocoding",
+    "status": "LIVE",
+    "purpose": "Shop Geocoding",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/signatures",
+    "status": "LIVE",
+    "purpose": "Signatures Management | Elevate For Humanity",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [
+      {
+        "table": "signatures",
+        "column": "status",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [
+      "COLUMN_MISMATCH: signatures.status"
+    ],
+    "writes": []
+  },
+  {
+    "route": "/admin/signatures/new",
+    "status": "LIVE",
+    "purpose": "Request Signature | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/site-health",
+    "status": "LIVE",
+    "purpose": "Site Health | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/social-media",
+    "status": "LIVE",
+    "purpose": "Social Media Automation",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/social-media/campaigns/new",
+    "status": "LIVE",
+    "purpose": "Create Social Media Campaign",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/store",
+    "status": "LIVE",
+    "purpose": "Store Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/store/catalog",
+    "status": "LIVE",
+    "purpose": "Catalog Sanity Check | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/store/clones",
+    "status": "LIVE",
+    "purpose": "Elevate LMS + Workforce Suite - Complete Codebase",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/students",
+    "status": "LIVE",
+    "purpose": "Students Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/students/export",
+    "status": "LIVE",
+    "purpose": "Export Student Data",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/success",
+    "status": "LIVE",
+    "purpose": "Success Stories | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/support",
+    "status": "LIVE",
+    "purpose": "Support Dashboard",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/syllabus-generator",
+    "status": "LIVE",
+    "purpose": "Syllabus Generator | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/system-health",
+    "status": "LIVE",
+    "purpose": "System Health | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/system-monitor",
+    "status": "LIVE",
+    "purpose": "",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/system-status",
+    "status": "LIVE",
+    "purpose": "System Status | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/tax-filing",
+    "status": "LIVE",
+    "purpose": "Tax Filing Management | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/tax-filing/applications",
+    "status": "LIVE",
+    "purpose": "Tax Filing Applications | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "tax_applications",
+        "op": "insert"
+      }
+    ]
+  },
+  {
+    "route": "/admin/tax-filing/applications/new",
+    "status": "FORM",
+    "purpose": "New Tax Filing Application | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/tax-filing/preparers",
+    "status": "LIVE",
+    "purpose": "Tax Preparers | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/tax-filing/reports",
+    "status": "LIVE",
+    "purpose": "Tax Filing Reports | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/tax-filing/training",
+    "status": "LIVE",
+    "purpose": "Tax Preparer Training | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/tenants",
+    "status": "LIVE",
+    "purpose": "Tenant Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/test-emails",
+    "status": "LIVE",
+    "purpose": "Test Email System",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/test-payments",
+    "status": "LIVE",
+    "purpose": "Payment System Status",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/transfer-hours",
+    "status": "LIVE",
+    "purpose": "Transfer Hours Management | Admin",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [
+      {
+        "table": "transfer_hours",
+        "column": "status",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [
+      "COLUMN_MISMATCH: transfer_hours.status"
+    ],
+    "writes": [
+      {
+        "table": "transfer_hours",
+        "op": "update"
+      },
+      {
+        "table": "transfer_hours",
+        "op": "update"
+      }
+    ]
+  },
+  {
+    "route": "/admin/users",
+    "status": "LIVE",
+    "purpose": "User Management | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "profiles",
+        "op": "update"
+      },
+      {
+        "table": "profiles",
+        "op": "update"
+      },
+      {
+        "table": "profiles",
+        "op": "update"
+      },
+      {
+        "table": "profiles",
+        "op": "delete"
+      }
+    ]
+  },
+  {
+    "route": "/admin/users/new",
+    "status": "LIVE",
+    "purpose": "Create New User | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/verifications/review",
+    "status": "LIVE",
+    "purpose": "Review ID Verifications | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/verifications/review/[id]",
+    "status": "LIVE",
+    "purpose": "Review Verification | Admin",
+    "verdict": "PASS",
+    "smoke": "DYNAMIC_ROUTE",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/video-generator",
+    "status": "LIVE",
+    "purpose": "Lesson Video Generator",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/video-manager",
+    "status": "LIVE",
+    "purpose": "Video Manager",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/videos",
+    "status": "LIVE",
+    "purpose": "Videos Management | Elevate For Humanity",
+    "verdict": "PARTIAL",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [
+      {
+        "table": "media",
+        "column": "published",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [
+      "COLUMN_MISMATCH: media.published"
+    ],
+    "writes": []
+  },
+  {
+    "route": "/admin/videos/upload",
+    "status": "LIVE",
+    "purpose": "Upload Videos | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/waitlist",
+    "status": "LIVE",
+    "purpose": "Waitlist | Admin | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/wioa",
+    "status": "STATIC",
+    "purpose": "WIOA Compliance | Admin | Elevate for Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/wioa/documents",
+    "status": "LIVE",
+    "purpose": "WIOA Documents | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/wioa/eligibility",
+    "status": "LIVE",
+    "purpose": "WIOA Eligibility | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/wioa/reports",
+    "status": "LIVE",
+    "purpose": "WIOA Reports | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/wioa/verify",
+    "status": "LIVE",
+    "purpose": "Verify Eligibility | WIOA Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/workflows",
+    "status": "LIVE",
+    "purpose": "Workflow Automation | Elevate For Humanity",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  },
+  {
+    "route": "/admin/wotc",
+    "status": "LIVE",
+    "purpose": "WOTC Management | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": [
+      {
+        "table": "wotc_applications",
+        "op": "insert"
+      },
+      {
+        "table": "wotc_applications",
+        "op": "update"
+      },
+      {
+        "table": "wotc_applications",
+        "op": "update"
+      },
+      {
+        "table": "wotc_applications",
+        "op": "update"
+      },
+      {
+        "table": "wotc_applications",
+        "op": "delete"
+      }
+    ]
+  },
+  {
+    "route": "/admin/wotc/new",
+    "status": "FORM",
+    "purpose": "New WOTC Application | Admin",
+    "verdict": "PASS",
+    "smoke": "COMPILES_OK",
+    "column_mismatches": [],
+    "audit_gap": false,
+    "audit_gap_tables": [],
+    "issues": [],
+    "writes": []
+  }
+]

@@ -14,7 +14,7 @@ import {
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
-  title: 'Scholarships & Financial Aid | Free Training Funding | Elevate',
+  title: 'Scholarships & Financial Aid | Training Funding | Elevate',
   description: 'Explore scholarships, grants, and funding options for career training. WIOA funding, employer sponsorships, and need-based scholarships available.',
   alternates: { canonical: `${SITE_URL}/scholarships` },
   keywords: [
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     'career change scholarships',
   ],
   openGraph: {
-    title: 'Scholarships & Financial Aid | Free Training Funding',
+    title: 'Scholarships & Financial Aid | Training Funding',
     description: 'Explore scholarships, grants, and funding options for career training.',
     url: `${SITE_URL}/scholarships`,
     siteName: 'Elevate for Humanity',
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Scholarships & Financial Aid | Free Training Funding',
+    title: 'Scholarships & Financial Aid | Training Funding',
     description: 'Explore scholarships, grants, and funding options for career training.',
     images: [`${SITE_URL}/images/heroes-hq/funding-hero.jpg`],
   },

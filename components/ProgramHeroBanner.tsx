@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, Mic, MicOff } from 'lucide-react';
 
 interface ProgramHeroBannerProps {
   videoSrc: string;
@@ -12,6 +12,7 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
   const videoRef = useRef<HTMLVideoElement>(null);
   const voiceoverRef = useRef<HTMLAudioElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
   const [voiceActive, setVoiceActive] = useState(false);
 
   // Play/pause video based on scroll visibility
@@ -27,6 +28,12 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
           video.play().catch(() => {});
         } else {
           video.pause();
+          // Pause voiceover when scrolled away
+          const vo = voiceoverRef.current;
+          if (vo && !vo.paused) {
+            vo.pause();
+            setVoiceActive(false);
+          }
         }
       },
       { threshold: 0.3 }
@@ -35,6 +42,13 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
     observer.observe(container);
     return () => observer.disconnect();
   }, []);
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !video.muted;
+    setIsMuted(video.muted);
+  };
 
   const toggleVoiceover = () => {
     const voiceover = voiceoverRef.current;
@@ -50,11 +64,11 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
   };
 
   return (
-    <div ref={containerRef} className="relative w-full overflow-hidden bg-black" style={{ maxHeight: '400px' }}>
+    <div ref={containerRef} className="relative w-full overflow-hidden bg-black" style={{ maxHeight: '480px' }}>
       <video
         ref={videoRef}
         className="w-full h-full object-cover"
-        style={{ aspectRatio: '16/9', maxHeight: '400px' }}
+        style={{ aspectRatio: '16/9', maxHeight: '480px' }}
         src={videoSrc}
         muted
         loop
@@ -67,23 +81,44 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
         <audio ref={voiceoverRef} src={voiceoverSrc} preload="none" onEnded={() => setVoiceActive(false)} />
       )}
 
-      {voiceoverSrc && (
+      {/* Controls row — bottom right */}
+      <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2">
+        {/* Voiceover toggle */}
+        {voiceoverSrc && (
+          <button
+            onClick={toggleVoiceover}
+            aria-label={voiceActive ? 'Stop narration' : 'Play narration'}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-full backdrop-blur-sm text-white transition-all ${
+              voiceActive
+                ? 'bg-brand-red-600 hover:bg-brand-red-700'
+                : 'bg-black/50 hover:bg-black/70'
+            }`}
+          >
+            {voiceActive ? (
+              <><Mic className="w-4 h-4" /><span className="text-sm font-semibold hidden sm:inline">Narration On</span></>
+            ) : (
+              <><MicOff className="w-4 h-4" /><span className="text-sm font-semibold hidden sm:inline">Narration</span></>
+            )}
+          </button>
+        )}
+
+        {/* Video sound toggle — always visible */}
         <button
-          onClick={toggleVoiceover}
-          aria-label={voiceActive ? 'Stop narration' : 'Play narration'}
-          className={`absolute z-10 flex items-center gap-2 backdrop-blur-sm text-white rounded-full shadow-lg transition-all ${
-            voiceActive
-              ? 'bottom-4 right-4 px-4 py-2.5 bg-black/60 hover:bg-black/80'
-              : 'bottom-6 right-6 px-5 py-3 bg-brand-red-600 hover:bg-brand-red-700 animate-pulse'
+          onClick={toggleMute}
+          aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-full backdrop-blur-sm text-white transition-all ${
+            isMuted
+              ? 'bg-black/50 hover:bg-black/70'
+              : 'bg-brand-blue-600 hover:bg-brand-blue-700'
           }`}
         >
-          {voiceActive ? (
-            <><Volume2 className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Narration On</span></>
+          {isMuted ? (
+            <><VolumeX className="w-5 h-5" /><span className="text-sm font-bold hidden sm:inline">Tap for Sound</span></>
           ) : (
-            <><VolumeX className="w-5 h-5" /><span className="text-sm font-bold">Tap for Narration</span></>
+            <><Volume2 className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Sound On</span></>
           )}
         </button>
-      )}
+      </div>
     </div>
   );
 }

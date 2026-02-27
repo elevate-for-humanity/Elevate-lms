@@ -211,7 +211,7 @@ export default async function CookiesPage() {
 
             <div className="mt-12 pt-8 border-t border-slate-200">
               <Link
-                href="/privacy"
+                href="/privacy-policy"
                 className="text-brand-blue-600 hover:underline font-semibold"
               >
                 View our Privacy Policy →

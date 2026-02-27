@@ -62,10 +62,10 @@ export async function processMiladyPayment(params: MiladyPaymentParams) {
 
     // STEP 3: Log to audit trail
     await supabase.from('ai_audit_log').insert({
-      student_id: params.studentId,
-      program_slug: 'barber-apprenticeship',
+      user_id: params.studentId,
       action: 'MILADY_PAYMENT_PROCESSED',
       details: {
+        program_slug: 'barber-apprenticeship',
         enrollment_id: params.enrollmentId,
         amount: amount,
         status: 'pending',
@@ -84,10 +84,10 @@ export async function processMiladyPayment(params: MiladyPaymentParams) {
 
     // Log error but don't fail enrollment
     await supabase.from('ai_audit_log').insert({
-      student_id: params.studentId,
-      program_slug: 'barber-apprenticeship',
+      user_id: params.studentId,
       action: 'MILADY_PAYMENT_ERROR',
       details: {
+        program_slug: 'barber-apprenticeship',
         enrollment_id: params.enrollmentId,
         error: 'Operation failed',
       },

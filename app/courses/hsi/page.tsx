@@ -143,7 +143,7 @@ export default async function HsiPage() {
               {courseCategories.map((category) => (
                 <Link
                   key={category.name}
-                  href="/programs/cpr-first-aid-hsi"
+                  href="/training/certifications"
                   className="bg-white rounded-lg shadow-sm border hover:shadow-lg transition-shadow p-6 group"
                 >
                   <div className="text-4xl mb-4 text-2xl md:text-3xl lg:text-4xl">
@@ -262,7 +262,7 @@ export default async function HsiPage() {
               href="/contact"
               className="inline-block bg-white text-brand-orange-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-50 transition-colors"
             >
-              Apply Now - It's Free
+              Apply Now
             </Link>
           </div>
         </div>

@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export const dynamic = 'force-dynamic';
 
@@ -72,6 +73,9 @@ export default async function LicenseRequestsAdminPage() {
       .from('license_requests')
       .update({ status, internal_notes: notes })
       .eq('id', id);
+
+    const { data: { user: actor } } = await supabase2.auth.getUser();
+    if (actor) await logAdminAudit({ action: AdminAction.LICENSE_REQUEST_REVIEWED, actorId: actor.id, entityType: 'license_requests', entityId: id, metadata: { new_status: status } });
 
     redirect('/admin/license-requests');
   }

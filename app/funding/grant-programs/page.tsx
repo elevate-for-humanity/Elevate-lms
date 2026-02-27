@@ -263,7 +263,7 @@ export default function GrantProgramsPage() {
               href="/apply"
               className="inline-block bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
-              Apply Now - It's Free
+              Apply Now
             </Link>
             <p className="text-sm text-black mt-4">
               Questions?{' '}

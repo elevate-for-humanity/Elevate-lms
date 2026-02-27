@@ -13,11 +13,11 @@ export const NAV_ITEMS = [
     href: '/programs',
     subItems: [
       { name: '— Healthcare —', href: '/programs', isHeader: true },
-      { name: 'CNA Training', href: '/programs/cna-certification' },
+      { name: 'CNA Training', href: '/programs/cna' },
       { name: 'Medical Assistant', href: '/programs/medical-assistant' },
       { name: 'Pharmacy Technician', href: '/programs/pharmacy-technician' },
       { name: 'Phlebotomy', href: '/programs/healthcare' },
-      { name: 'CPR & First Aid', href: '/programs/cpr-first-aid-hsi' },
+      { name: 'CPR & First Aid', href: '/programs/cpr-first-aid' },
       { name: '— Skilled Trades —', href: '/programs', isHeader: true },
       { name: 'HVAC Technician', href: '/programs/hvac-technician' },
       { name: 'CDL Training', href: '/programs/cdl-training' },
@@ -89,6 +89,16 @@ export const NAV_ITEMS = [
       { name: 'Events', href: '/rise-foundation/events' },
       { name: 'Donate', href: '/rise-foundation/donate' },
       { name: 'Get Involved', href: '/rise-foundation/get-involved' },
+    ]
+  },
+  { 
+    name: 'For Employers', 
+    href: '/employers',
+    subItems: [
+      { name: 'Hire Trained Talent', href: '/employers' },
+      { name: 'Partner With Us', href: '/partnerships' },
+      { name: 'Apprenticeship Sponsors', href: '/funding/dol' },
+      { name: 'Employer Portal', href: '/apply/employer' },
     ]
   },
   { 

@@ -2,192 +2,414 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState, useRef } from 'react';
-import AutoPlayTTS from '@/components/AutoPlayTTS';
+import { ArrowRight, Award, Briefcase, CheckCircle2 } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { InView } from '@/components/ui/InView';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
+import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 
-interface Program {
+/* ------------------------------------------------------------------ */
+/*  Config types — every section is data-driven                        */
+/* ------------------------------------------------------------------ */
+
+interface CareerPath {
   title: string;
-  duration: string;
-  description: string;
-  href: string;
-  image: string;
+  salary: string;
+  growth?: string;
 }
 
-interface Stat {
-  icon: string;
+interface CurriculumModule {
+  title: string;
+  topics: string[];
+}
+
+interface FAQ {
+  question: string;
+  answer: string;
+}
+
+interface Step {
+  title: string;
+  desc: string;
+}
+
+export interface ProgramPageConfig {
+  // Hero — video only, no text overlay
+  videoSrc: string;
+  voiceoverSrc?: string;
+
+  // Identity
   title: string;
   subtitle: string;
+  badge?: string;
+  badgeColor?: 'red' | 'green' | 'blue' | 'orange' | 'purple';
+
+  // Quick facts shown inline with title
+  duration: string;
+  cost: string;
+  format: string;
+  credential: string;
+
+  // Overview with image
+  overview: string;
+  highlights: string[];
+  overviewImage: string;
+  overviewImageAlt: string;
+
+  // Salary callout
+  salaryNumber: number;
+  salaryLabel: string;
+  salaryPrefix?: string;
+  salarySuffix?: string;
+
+  // Curriculum
+  curriculum?: CurriculumModule[];
+
+  // Credentials
+  credentials?: string[];
+
+  // Career paths
+  careers?: CareerPath[];
+
+  // How to enroll steps
+  steps?: Step[];
+
+  // FAQ
+  faqs?: FAQ[];
+
+  // CTA
+  applyHref?: string;
+  inquiryHref?: string;
+
+  // Breadcrumbs
+  breadcrumbs: { label: string; href?: string }[];
 }
 
-interface ProgramPageLayoutProps {
-  voiceoverMessage: string;
-  videoSrc: string;
-  programs: Program[];
-  stats: Stat[];
-  accentColor: 'blue' | 'orange' | 'purple' | 'green' | 'red';
-  ctaText: string;
-  applyLink: string;
-}
+/* ------------------------------------------------------------------ */
+/*  Badge color map                                                    */
+/* ------------------------------------------------------------------ */
 
-const colorClasses = {
-  blue: {
-    badge: 'bg-brand-blue-600',
-    cta: 'bg-brand-blue-600',
-    ctaHover: 'hover:bg-brand-blue-700',
-    ctaText: 'text-brand-blue-600',
-  },
-  orange: {
-    badge: 'bg-brand-orange-500',
-    cta: 'bg-brand-orange-500',
-    ctaHover: 'hover:bg-brand-orange-600',
-    ctaText: 'text-brand-orange-600',
-  },
-  purple: {
-    badge: 'bg-purple-600',
-    cta: 'bg-purple-600',
-    ctaHover: 'hover:bg-purple-700',
-    ctaText: 'text-purple-600',
-  },
-  green: {
-    badge: 'bg-brand-green-600',
-    cta: 'bg-brand-green-600',
-    ctaHover: 'hover:bg-brand-green-700',
-    ctaText: 'text-brand-green-600',
-  },
-  red: {
-    badge: 'bg-brand-red-600',
-    cta: 'bg-brand-red-600',
-    ctaHover: 'hover:bg-brand-red-700',
-    ctaText: 'text-brand-red-600',
-  },
+const badgeMap: Record<string, string> = {
+  red: 'bg-brand-red-600',
+  green: 'bg-brand-green-600',
+  blue: 'bg-brand-blue-600',
+  orange: 'bg-brand-orange-500',
+  purple: 'bg-purple-600',
 };
 
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
+
 export default function ProgramPageLayout({
-  voiceoverMessage,
-  videoSrc,
-  programs,
-  stats,
-  accentColor,
-  ctaText,
-  applyLink,
-}: ProgramPageLayoutProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [showContent, setShowContent] = useState(false);
-  const colors = colorClasses[accentColor];
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowContent(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = true;
-    video.play().catch(() => {});
-  }, []);
+  config,
+  children,
+}: {
+  config: ProgramPageConfig;
+  children?: React.ReactNode;
+}) {
+  const c = config;
+  const applyHref = c.applyHref || '/apply';
+  const inquiryHref = c.inquiryHref || `/inquiry?program=${encodeURIComponent(c.title)}`;
 
   return (
-    <>
-      <AutoPlayTTS text={voiceoverMessage} delay={1000} />
+    <div className="min-h-screen bg-white">
 
-      {/* Hero - Clean video with just CTAs */}
-      <section className="relative w-full h-[50vh] sm:h-[60vh] flex items-end overflow-hidden bg-slate-900">
-        <video
-          ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover brightness-110"
-          loop
-          muted
-          playsInline
-          autoPlay
-          preload="metadata"
-        >
-          <source src={videoSrc} type="video/mp4" />
-        </video>
-        
-        <div className="absolute inset-0 bg-black/40 pointer-events-none" />
-        
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12">
-          <div className={`flex flex-wrap gap-4 transition-all duration-700 ease-out ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <Link 
-              href={applyLink}
-              className={`inline-flex items-center justify-center ${colors.cta} text-white px-8 py-4 rounded-full font-semibold ${colors.ctaHover} transition-colors text-lg`}
-            >
-              Apply Now
-            </Link>
-            <Link 
-              href="/wioa-eligibility"
-              className="inline-flex items-center text-white text-lg border-b-2 border-white pb-1 hover:border-brand-blue-400 hover:text-brand-blue-400 transition-all duration-300"
-            >
-              Check Eligibility
-            </Link>
-          </div>
+      {/* ===== VIDEO HERO — clean, no text ===== */}
+      <ProgramHeroBanner videoSrc={c.videoSrc} voiceoverSrc={c.voiceoverSrc} />
+
+      {/* ===== BREADCRUMBS ===== */}
+      <div className="bg-white border-b border-slate-100">
+        <div className="max-w-5xl mx-auto px-6 py-3">
+          <Breadcrumbs items={c.breadcrumbs} />
         </div>
-      </section>
+      </div>
 
-      {/* Programs Grid */}
-      <section className="py-12 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className={`grid gap-6 ${programs.length === 1 ? 'max-w-md mx-auto' : programs.length === 2 ? 'md:grid-cols-2 max-w-3xl mx-auto' : 'md:grid-cols-3'}`}>
-            {programs.map((program) => (
-              <Link
-                key={program.title}
-                href={program.href}
-                className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow border border-slate-100"
-              >
-                <div className="relative h-48">
-                  <Image
-                    src={program.image}
-                    alt={program.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    quality={85}
-                  />
-                  <div className={`absolute top-3 right-3 ${colors.badge} text-white px-3 py-1 rounded-full text-xs font-semibold`}>
-                    {program.duration}
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">
-                    {program.title}
-                  </h2>
-                  <p className="text-gray-600 mb-4">{program.description}</p>
-                  <span className="text-brand-blue-600 font-semibold group-hover:underline">
-                    Learn More →
+      {/* ===== TITLE + QUICK FACTS ===== */}
+      <InView animation="fade-up">
+        <section className="bg-white py-10 sm:py-14">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+              <div className="flex-1 min-w-0">
+                {c.badge && (
+                  <span className={`inline-block text-xs font-bold text-white px-3 py-1 rounded-full mb-4 ${badgeMap[c.badgeColor || 'red']}`}>
+                    {c.badge}
                   </span>
+                )}
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-[1.1]">
+                  {c.title}
+                </h1>
+                <p className="text-slate-500 text-lg mt-3 max-w-xl leading-relaxed">
+                  {c.subtitle}
+                </p>
+
+                {/* Quick facts — inline, not a strip */}
+                <div className="flex flex-wrap gap-x-8 gap-y-3 mt-6 text-sm">
+                  {[
+                    { label: 'Duration', value: c.duration },
+                    { label: 'Cost', value: c.cost },
+                    { label: 'Format', value: c.format },
+                    { label: 'Credential', value: c.credential },
+                  ].map((f) => (
+                    <div key={f.label}>
+                      <span className="text-slate-400">{f.label}</span>
+                      <span className="ml-1.5 font-semibold text-slate-900">{f.value}</span>
+                    </div>
+                  ))}
                 </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="py-10 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8">
-          <div className={`grid gap-6 text-center ${stats.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
-            {stats.map((stat, i) => (
-              <div key={i}>
-                <div className="text-3xl mb-2">{stat.icon}</div>
-                <h3 className="font-bold text-gray-900">{stat.title}</h3>
-                <p className="text-sm text-gray-600">{stat.subtitle}</p>
               </div>
+
+              {/* CTA */}
+              <div className="flex flex-col gap-2 lg:pt-4 shrink-0">
+                <Link
+                  href={applyHref}
+                  className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-all shadow-lg shadow-brand-red-600/30 text-base"
+                >
+                  Apply Now
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  href="/wioa-eligibility"
+                  className="text-center text-sm text-slate-500 hover:text-brand-red-600 transition-colors"
+                >
+                  Check funding eligibility →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </InView>
+
+      {/* ===== OVERVIEW + IMAGE ===== */}
+      <InView animation="fade-up">
+        <section className="py-14 lg:py-20 bg-slate-50 border-t border-slate-100">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="grid lg:grid-cols-5 gap-10 items-start">
+              <div className="lg:col-span-3">
+                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Program Overview</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4">What You&apos;ll Get</h2>
+                <p className="text-slate-600 leading-relaxed">{c.overview}</p>
+                <ul className="mt-6 space-y-3">
+                  {c.highlights.map((h) => (
+                    <li key={h} className="flex items-start gap-3">
+                      <span className="flex-shrink-0 w-5 h-5 bg-brand-green-100 rounded-full flex items-center justify-center mt-0.5">
+                        <span className="text-brand-green-600 text-xs font-bold">✓</span>
+                      </span>
+                      <span className="text-slate-700 text-sm">{h}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="lg:col-span-2">
+                <div className="relative h-[280px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl">
+                  <Image
+                    src={c.overviewImage}
+                    alt={c.overviewImageAlt}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="object-cover"
+                  />
+                </div>
+                {/* Salary callout */}
+                <div className="mt-4 bg-white rounded-xl p-5 border border-slate-200 text-center">
+                  <div className="text-3xl font-extrabold text-brand-green-600">
+                    <AnimatedCounter
+                      end={c.salaryNumber}
+                      prefix={c.salaryPrefix || '$'}
+                      suffix={c.salarySuffix || ''}
+                      duration={2000}
+                    />
+                  </div>
+                  <p className="text-slate-500 text-sm mt-1">{c.salaryLabel}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </InView>
+
+      {/* ===== CURRICULUM ===== */}
+      {c.curriculum && c.curriculum.length > 0 && (
+        <InView animation="fade-up">
+          <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+            <div className="max-w-5xl mx-auto px-6">
+              <div className="text-center mb-10">
+                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Curriculum</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">What You&apos;ll Learn</h2>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {c.curriculum.map((mod, i) => (
+                  <ScrollReveal key={mod.title} delay={i * 80} direction="up">
+                    <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 h-full hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+                      <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wide mb-3">{mod.title}</h3>
+                      <ul className="space-y-2">
+                        {mod.topics.map((t) => (
+                          <li key={t} className="flex items-start gap-2 text-sm text-slate-600">
+                            <span className="w-1 h-1 rounded-full bg-brand-red-500 mt-2 flex-shrink-0" />
+                            {t}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </ScrollReveal>
+                ))}
+              </div>
+            </div>
+          </section>
+        </InView>
+      )}
+
+      {/* ===== CREDENTIALS ===== */}
+      {c.credentials && c.credentials.length > 0 && (
+        <InView animation="fade-up">
+          <section className="py-14 lg:py-20 bg-slate-50 border-t border-slate-100">
+            <div className="max-w-5xl mx-auto px-6">
+              <div className="text-center mb-8">
+                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Credentials</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">What You&apos;ll Earn</h2>
+              </div>
+              <div className="flex flex-wrap justify-center gap-3">
+                {c.credentials.map((cr, i) => (
+                  <ScrollReveal key={cr} delay={i * 60} direction="up">
+                    <div className="flex items-center gap-2 bg-white border border-brand-green-200 rounded-full px-5 py-2.5 shadow-sm">
+                      <Award className="w-4 h-4 text-brand-green-600 flex-shrink-0" />
+                      <span className="text-sm font-semibold text-brand-green-800">{cr}</span>
+                    </div>
+                  </ScrollReveal>
+                ))}
+              </div>
+            </div>
+          </section>
+        </InView>
+      )}
+
+      {/* ===== EXTRA SECTIONS ===== */}
+      {children}
+
+      {/* ===== CAREER PATHS ===== */}
+      {c.careers && c.careers.length > 0 && (
+        <InView animation="fade-up">
+          <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+            <div className="max-w-5xl mx-auto px-6">
+              <div className="text-center mb-10">
+                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">After Graduation</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Career Paths</h2>
+                <p className="text-slate-500 mt-2 max-w-md mx-auto">Where our graduates work after completing this program.</p>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {c.careers.map((career, i) => (
+                  <ScrollReveal key={career.title} delay={i * 80} direction="up">
+                    <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 text-center hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+                      <Briefcase className="w-7 h-7 text-brand-blue-600 mx-auto mb-3" />
+                      <h3 className="font-bold text-slate-900">{career.title}</h3>
+                      <div className="text-brand-green-600 font-bold text-lg mt-1">{career.salary}</div>
+                      {career.growth && <p className="text-xs text-slate-500 mt-1">{career.growth}</p>}
+                    </div>
+                  </ScrollReveal>
+                ))}
+              </div>
+            </div>
+          </section>
+        </InView>
+      )}
+
+      {/* ===== HOW TO ENROLL ===== */}
+      {c.steps && c.steps.length > 0 && (
+        <InView animation="fade-up">
+          <section className="py-14 lg:py-20 bg-slate-50 border-t border-slate-100">
+            <div className="max-w-5xl mx-auto px-6">
+              <div className="text-center mb-10">
+                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Get Started</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">How to Enroll</h2>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {c.steps.map((step, i) => (
+                  <ScrollReveal key={step.title} delay={i * 100} direction="up">
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                        {i + 1}
+                      </div>
+                      <h3 className="font-bold text-slate-900 mb-2">{step.title}</h3>
+                      <p className="text-slate-600 text-sm">{step.desc}</p>
+                    </div>
+                  </ScrollReveal>
+                ))}
+              </div>
+            </div>
+          </section>
+        </InView>
+      )}
+
+      {/* ===== FAQ ===== */}
+      {c.faqs && c.faqs.length > 0 && (
+        <InView animation="fade-up">
+          <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+            <div className="max-w-3xl mx-auto px-6">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8 text-center">Frequently Asked Questions</h2>
+              <div className="space-y-3">
+                {c.faqs.map((faq) => (
+                  <details key={faq.question} className="group bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                    <summary className="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-slate-900 hover:text-brand-red-600 transition-colors text-sm">
+                      {faq.question}
+                      <span className="ml-4 text-slate-400 group-open:rotate-45 transition-transform text-lg leading-none">+</span>
+                    </summary>
+                    <div className="px-6 pb-4 text-slate-600 text-sm leading-relaxed">
+                      {faq.answer}
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </section>
+        </InView>
+      )}
+
+      {/* ===== FINAL CTA ===== */}
+      <InView animation="fade-up">
+        <section className="py-14 sm:py-20 bg-brand-red-600 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
+          <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
+              Ready to Change Your Life?
+            </h2>
+            <p className="text-xl text-white/90 mb-8 max-w-lg mx-auto">
+              Apply in minutes. Most students begin training within 2–4 weeks.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link
+                href={applyHref}
+                className="bg-white text-brand-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors"
+              >
+                Get Started Today
+              </Link>
+              <Link
+                href="/programs"
+                className="bg-brand-red-700 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-800 transition-colors"
+              >
+                Browse All Programs
+              </Link>
+            </div>
+          </div>
+        </section>
+      </InView>
+
+      {/* ===== TRUST BAR ===== */}
+      <section className="py-8 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-6">
+          <p className="text-center text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Recognized By</p>
+          <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 mb-4">
+            {[
+              { src: '/images/partners/usdol.webp', alt: 'U.S. Department of Labor' },
+              { src: '/images/partners/dwd.webp', alt: 'Indiana DWD' },
+              { src: '/images/partners/workone.webp', alt: 'WorkOne Indiana' },
+              { src: '/images/partners/nextleveljobs.webp', alt: 'Next Level Jobs' },
+            ].map((logo) => (
+              <Image key={logo.alt} src={logo.src} alt={logo.alt} width={100} height={40} className="object-contain h-8 w-auto opacity-70 hover:opacity-100 transition-opacity" />
             ))}
           </div>
         </div>
       </section>
-
-      {/* CTA */}
-      <section className={`py-10 ${colors.cta}`}>
-        <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
-          <Link
-            href={applyLink}
-            className={`inline-block bg-white ${colors.ctaText} px-8 py-3 font-semibold rounded-full hover:bg-opacity-90 transition-colors`}
-          >
-            {ctaText}
-          </Link>
-        </div>
-      </section>
-    </>
+    </div>
   );
 }

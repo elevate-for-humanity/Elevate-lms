@@ -99,9 +99,9 @@ export default function EnrollmentForm({ courseId, courseName, price, userEmail,
         />
         <span className="text-sm text-slate-600">
           I agree to the{' '}
-          <a href="/terms" className="text-brand-blue-600 hover:underline">Terms of Service</a>
+          <a href="/terms-of-service" className="text-brand-blue-600 hover:underline">Terms of Service</a>
           {' '}and{' '}
-          <a href="/privacy" className="text-brand-blue-600 hover:underline">Privacy Policy</a>.
+          <a href="/privacy-policy" className="text-brand-blue-600 hover:underline">Privacy Policy</a>.
           I understand that I will have access to this course upon enrollment.
         </span>
       </label>
@@ -147,7 +147,7 @@ export default function EnrollmentForm({ courseId, courseName, price, userEmail,
       {/* Free Course Note */}
       {isFree && (
         <p className="text-center text-sm text-slate-500">
-          This course is completely free. No payment required.
+          This course is funded through workforce grants. No payment required for eligible participants.
         </p>
       )}
     </div>

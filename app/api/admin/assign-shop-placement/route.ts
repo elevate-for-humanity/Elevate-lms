@@ -8,6 +8,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { canMatchApprentice, hasVerifiedDocuments } from '@/lib/documents';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * MANDATORY VERIFICATION ENFORCEMENT:
@@ -15,7 +17,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  * - Apprentice: photo_id verified
  * - Host Shop: shop_license AND barber_license verified
  */
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -130,6 +132,8 @@ export async function POST(req: Request) {
       // Continue - placement was successful
     }
 
+    await logAdminAudit({ action: AdminAction.SHOP_PLACEMENT_ASSIGNED, actorId: user.id, entityType: 'shop_placements', entityId: studentId, metadata: { shop_name: shopName }, req });
+
     return NextResponse.json({ success: true });
   } catch (err: any) {
     // Error: $1
@@ -139,3 +143,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/admin/assign-shop-placement', _POST);

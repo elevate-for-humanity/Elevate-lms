@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,6 +42,8 @@ export async function POST(request: NextRequest) {
         message: 'Script deviation logged' 
       });
     }
+
+    await logAdminAudit({ action: AdminAction.SCRIPT_DEVIATION_LOGGED, actorId: user.id, entityType: 'script_deviations', entityId: intakeId || BULK_ENTITY_ID, metadata: { script_id: scriptId, reason }, req: request });
 
     return NextResponse.json({ 
       success: true, 

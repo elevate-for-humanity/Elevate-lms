@@ -209,7 +209,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
               href="/apply"
               className="px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-gray-100 transition"
             >
-              Apply Now - It's Free
+              Apply Now
             </Link>
             <Link
               href="/programs"

@@ -88,7 +88,7 @@ export function MobileMenu() {
           </div>
 
           {/* Navigation */}
-          <nav className="p-4 overflow-y-auto max-h-[calc(100vh-80px)]">
+          <nav className="p-4 overflow-y-auto max-h-[calc(100vh-80px)]" aria-label="Mobile navigation">
             <ul className="space-y-2">
               {navItems.map((item) => (
                 <li key={item.href}>

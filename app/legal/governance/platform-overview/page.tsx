@@ -369,11 +369,11 @@ export default function PlatformOverviewPage() {
               <p className="font-medium">Compliance and Disclosure Framework</p>
               <p className="text-sm text-gray-500">EFH-CMP-001</p>
             </Link>
-            <Link href="/legal/governance/lms" className="block p-4 border rounded-lg hover:bg-gray-50">
+            <Link href="/legal/governance/platform-overview" className="block p-4 border rounded-lg hover:bg-gray-50">
               <p className="font-medium">LMS Governance and Course Standards</p>
               <p className="text-sm text-gray-500">EFH-LMS-001</p>
             </Link>
-            <Link href="/legal/governance/store" className="block p-4 border rounded-lg hover:bg-gray-50">
+            <Link href="/legal/governance/platform-overview" className="block p-4 border rounded-lg hover:bg-gray-50">
               <p className="font-medium">Store, Payments, and Licensing Framework</p>
               <p className="text-sm text-gray-500">EFH-PAY-001</p>
             </Link>

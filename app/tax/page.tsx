@@ -346,7 +346,7 @@ export default function TaxServicesPage() {
             </Link>
 
             <Link
-              href="/tax/upload"
+              href="/documents/upload"
               className="bg-white p-6 rounded-xl border-2 border-gray-200 hover:border-brand-blue-500 hover:shadow-lg transition-all group"
             >
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-brand-blue-600 transition-colors">

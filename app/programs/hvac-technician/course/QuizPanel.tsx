@@ -65,11 +65,11 @@ export function QuizPanel({
     const passed = score >= passingScore;
     return (
       <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-        <div className={`px-8 py-10 text-center ${passed ? 'bg-brand-green-50' : 'bg-red-50'}`}>
+        <div className={`px-8 py-10 text-center ${passed ? 'bg-brand-green-50' : 'bg-brand-red-50'}`}>
           {passed ? (
             <Trophy className="w-16 h-16 text-brand-green-500 mx-auto mb-4" />
           ) : (
-            <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+            <XCircle className="w-16 h-16 text-brand-red-400 mx-auto mb-4" />
           )}
           <h3 className="text-2xl font-bold text-gray-900 mb-2">
             {passed ? 'Quiz Passed!' : 'Not Quite — Try Again'}
@@ -127,7 +127,7 @@ export function QuizPanel({
             let style = 'border-slate-200 hover:border-slate-300 hover:bg-slate-50';
             if (selected === idx && !showResult) style = 'border-brand-blue-400 bg-brand-blue-50 ring-2 ring-brand-blue-200';
             if (showResult && idx === q.correctAnswer) style = 'border-brand-green-400 bg-brand-green-50';
-            if (showResult && selected === idx && idx !== q.correctAnswer) style = 'border-red-400 bg-red-50';
+            if (showResult && selected === idx && idx !== q.correctAnswer) style = 'border-brand-red-400 bg-brand-red-50';
 
             return (
               <button
@@ -139,7 +139,7 @@ export function QuizPanel({
                 <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
                   selected === idx && !showResult ? 'bg-brand-blue-600 text-white' :
                   showResult && idx === q.correctAnswer ? 'bg-brand-green-500 text-white' :
-                  showResult && selected === idx ? 'bg-red-500 text-white' :
+                  showResult && selected === idx ? 'bg-brand-red-500 text-white' :
                   'bg-slate-100 text-slate-600'
                 }`}>
                   {String.fromCharCode(65 + idx)}
@@ -149,7 +149,7 @@ export function QuizPanel({
                   <CheckCircle className="w-5 h-5 text-brand-green-500 shrink-0 ml-auto mt-0.5" />
                 )}
                 {showResult && selected === idx && idx !== q.correctAnswer && (
-                  <XCircle className="w-5 h-5 text-red-500 shrink-0 ml-auto mt-0.5" />
+                  <XCircle className="w-5 h-5 text-brand-red-500 shrink-0 ml-auto mt-0.5" />
                 )}
               </button>
             );

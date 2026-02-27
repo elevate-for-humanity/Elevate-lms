@@ -13,6 +13,7 @@ import { getStripe } from '@/lib/stripe/client';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { setAuditContext } from '@/lib/audit-context';
 import { 
   createInstallmentSubscription, 
   checkAndCancelCompletedSubscription,
@@ -109,7 +110,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
           
           <p style="font-size: 12px; color: #6b7280; text-align: center;">
-            © ${new Date().getFullYear()} Elevate for Humanity, Inc. All rights reserved.
+            © ${new Date().getFullYear()} 2Exclusive LLC-S (DBA Elevate for Humanity Career & Technical Institute). All rights reserved.
           </p>
         </body>
         </html>
@@ -204,7 +205,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
           
           <p style="font-size: 12px; color: #6b7280; text-align: center;">
             This email was sent to ${student.email} because you enrolled in a program at Elevate for Humanity.<br>
-            © ${new Date().getFullYear()} Elevate for Humanity, Inc. All rights reserved.
+            © ${new Date().getFullYear()} 2Exclusive LLC-S (DBA Elevate for Humanity Career & Technical Institute). All rights reserved.
           </p>
         </body>
         </html>
@@ -418,6 +419,7 @@ function getSupabaseAdmin() {
 export async function handleTuitionWebhook(event: Stripe.Event): Promise<void> {
   const stripe = getStripe();
   const supabase = getSupabaseAdmin();
+  await setAuditContext(supabase, { systemActor: 'tuition_webhook', requestId: event.id });
   switch (event.type) {
     case 'checkout.session.completed':
       await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);

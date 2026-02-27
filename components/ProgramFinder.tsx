@@ -96,7 +96,7 @@ const programs: Program[] = [
     demand: 'Very High',
     icon: Stethoscope,
     matchScore: 0,
-    path: '/programs/certified-nursing-assistant'
+    path: '/programs/cna'
   },
   {
     id: 'medical-coding',
@@ -107,7 +107,7 @@ const programs: Program[] = [
     demand: 'High',
     icon: Code,
     matchScore: 0,
-    path: '/programs/medical-coding-billing'
+    path: '/programs/healthcare'
   },
   {
     id: 'hvac',
@@ -129,7 +129,7 @@ const programs: Program[] = [
     demand: 'High',
     icon: Scissors,
     matchScore: 0,
-    path: '/programs/cosmetology'
+    path: '/programs/cosmetology-apprenticeship'
   },
   {
     id: 'cdl',
@@ -140,7 +140,7 @@ const programs: Program[] = [
     demand: 'Very High',
     icon: Truck,
     matchScore: 0,
-    path: '/programs/cdl-class-a'
+    path: '/programs/cdl-training'
   },
   {
     id: 'phlebotomy',
@@ -151,7 +151,7 @@ const programs: Program[] = [
     demand: 'High',
     icon: Stethoscope,
     matchScore: 0,
-    path: '/programs/phlebotomy-technician'
+    path: '/programs/healthcare'
   }
 ];
 

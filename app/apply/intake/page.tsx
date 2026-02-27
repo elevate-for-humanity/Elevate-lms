@@ -254,7 +254,7 @@ function IntakeForm() {
 
             {/* Disclaimer */}
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm text-slate-600">
-              By submitting this form, you authorize 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute to review your
+              By submitting this form, you authorize 2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute) to review your
               eligibility for workforce-funded training programs. Funding eligibility is determined
               by our workforce partners and is not guaranteed. Your information will be kept
               confidential in accordance with our <Link href="/privacy-policy" className="text-brand-red-600 underline">privacy policy</Link>.

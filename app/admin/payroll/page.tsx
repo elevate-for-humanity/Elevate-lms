@@ -89,14 +89,8 @@ export default function AdminPayroll() {
   }
 
   async function markPaid(payrollId: string) {
-    await supabase
-      .from('apprentice_payroll')
-      .update({
-        status: 'paid',
-        paid_at: new Date().toISOString(),
-      })
-      .eq('id', payrollId);
-
+    const { markPayrollPaid } = await import('./actions');
+    await markPayrollPaid(payrollId);
     await loadData();
   }
 

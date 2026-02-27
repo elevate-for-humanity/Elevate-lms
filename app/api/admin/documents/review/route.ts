@@ -7,6 +7,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export async function POST(request: NextRequest) {
   try {
@@ -80,6 +81,15 @@ export async function POST(request: NextRequest) {
     const userProfile = document.profiles as any;
     const studentUserId = document.user_id;
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+
+    await logAdminAudit({
+      action: AdminAction.DOCUMENT_REVIEWED,
+      actorId: user.id,
+      entityType: 'documents',
+      entityId: documentId,
+      metadata: { decision: action, file_name: document.file_name, student_user_id: studentUserId },
+      req: request,
+    });
 
     if (userProfile?.email) {
       await sendEmail({

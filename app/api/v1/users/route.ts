@@ -16,6 +16,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 // GET /api/v1/users - List users
 export async function GET(request: NextRequest) {
   

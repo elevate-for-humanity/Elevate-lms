@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
       ],
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_URL || `https://${process.env.URL}` || 'http://localhost:3000'}/courses/hsi/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_URL || `https://${process.env.URL}` || 'http://localhost:3000'}/programs/cpr-first-aid-hsi`,
+      cancel_url: `${process.env.NEXT_PUBLIC_URL || `https://${process.env.URL}` || 'http://localhost:3000'}/programs/cpr-first-aid`,
       customer_email: studentEmail,
       client_reference_id: studentId,
       // Enable Buy Now Pay Later options

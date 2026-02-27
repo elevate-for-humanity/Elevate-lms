@@ -253,8 +253,8 @@ export default function LessonPage() {
       return (
         <div className="flex items-center justify-center h-[100dvh] bg-slate-50">
           <div className="text-center max-w-md px-4">
-            <div className="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="w-7 h-7 text-red-600" />
+            <div className="w-14 h-14 bg-brand-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="w-7 h-7 text-brand-red-600" />
             </div>
             <h2 className="text-xl font-bold text-slate-900 mb-2">Lesson Not Found</h2>
             <p className="text-slate-600 mb-6">

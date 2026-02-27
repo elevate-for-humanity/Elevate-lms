@@ -318,7 +318,7 @@ export default function CommunityGuidelinesPage() {
                 <li><a href="/policies/student-code" className="text-brand-blue-600 hover:underline">Student Code of Conduct</a></li>
                 <li><a href="/policies/acceptable-use" className="text-brand-blue-600 hover:underline">Acceptable Use Policy</a></li>
                 <li><a href="/policies/moderation" className="text-brand-blue-600 hover:underline">Content Moderation Policy</a></li>
-                <li><a href="/policies/privacy" className="text-brand-blue-600 hover:underline">Privacy Policy</a></li>
+                <li><a href="/privacy-policy" className="text-brand-blue-600 hover:underline">Privacy Policy</a></li>
               </ul>
             </div>
           </div>

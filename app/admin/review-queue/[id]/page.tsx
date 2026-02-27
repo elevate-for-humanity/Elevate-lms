@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
+import { getAdminDocumentUrl } from '@/lib/admin/document-access';
 import Link from 'next/link';
 import {
   FileText,
@@ -75,14 +76,14 @@ export default async function ReviewDetailPage({
       .eq('id', item.subject_id)
       .single();
 
-    // Generate signed URL for private bucket
+    // Generate signed URL via centralized admin document access
     if (doc?.file_path) {
-      const { data: signedData } = await db.storage
-        .from('documents')
-        .createSignedUrl(doc.file_path, 3600);
-      if (signedData?.signedUrl) {
-        doc.file_url = signedData.signedUrl;
-      }
+      const url = await getAdminDocumentUrl({
+        adminId: user.id,
+        documentId: doc.id,
+        context: 'review_queue',
+      });
+      if (url) doc.file_url = url;
     }
 
     document = doc;

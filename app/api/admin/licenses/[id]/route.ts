@@ -4,6 +4,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getTenantContext, logAdminAccess } from '@/lib/tenant';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
+
+import { auditMutation } from '@/lib/api/withAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -120,10 +123,20 @@ export async function PATCH(
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
-    logger.info('Admin license action completed', { 
-      action, 
-      licenseId, 
-      adminUserId: tenantContext.userId 
+    const auditActionMap: Record<string, string> = {
+      suspend: AdminAction.LICENSE_SUSPENDED,
+      reactivate: AdminAction.LICENSE_REACTIVATED,
+      update_features: AdminAction.LICENSE_FEATURES_UPDATED,
+      update_limits: AdminAction.LICENSE_FEATURES_UPDATED,
+    };
+
+    await logAdminAudit({
+      action: (auditActionMap[action] || action) as any,
+      actorId: tenantContext.userId,
+      entityType: 'licenses',
+      entityId: licenseId,
+      metadata: { license_action: action, tenant_id: license.tenant_id, reason },
+      req: request,
     });
 
     return NextResponse.json({ success: true, action });
@@ -178,10 +191,13 @@ export async function DELETE(
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
-    logger.info('License revoked', { 
-      licenseId, 
-      reason, 
-      adminUserId: tenantContext.userId 
+    await logAdminAudit({
+      action: AdminAction.LICENSE_REVOKED,
+      actorId: tenantContext.userId,
+      entityType: 'licenses',
+      entityId: licenseId,
+      metadata: { reason },
+      req: request,
     });
 
     return NextResponse.json({ success: true, revoked: data });

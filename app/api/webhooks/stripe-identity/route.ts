@@ -8,6 +8,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { stripe } from '@/lib/stripe/client';
 
+import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+
 const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
   ? createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -15,7 +18,7 @@ const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SE
     )
   : null;
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   if (!stripe || !supabase) { /* Condition handled */ }
 
   const body = await request.text();
@@ -131,3 +134,4 @@ export async function POST(request: NextRequest) {
   }
 
 }
+export const POST = withApiAudit('/api/webhooks/stripe-identity', _POST, { actor_type: 'webhook', skip_body: true });

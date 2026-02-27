@@ -295,6 +295,22 @@ export async function importUsers(
     }
   }
 
+  // L1 audit: record bulk import operation
+  try {
+    const { logAuditEvent } = await import('@/lib/audit');
+    await logAuditEvent({
+      action: 'BULK_USER_IMPORT',
+      actor_id: 'session_user', // server client — auth.uid() available to L2 triggers
+      target_type: 'profiles',
+      metadata: {
+        total_rows: users.length,
+        success_count: successCount,
+        error_count: errors.length,
+        created_emails: createdUsers,
+      },
+    });
+  } catch { /* audit best-effort */ }
+
   return {
     success: errors.length === 0,
     totalRows: users.length,

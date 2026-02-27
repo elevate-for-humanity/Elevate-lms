@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
 export async function createLicense(formData: FormData) {
   const supabase = await createClient();
@@ -12,6 +13,8 @@ export async function createLicense(formData: FormData) {
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
+  const { data: _profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (!_profile || !['admin', 'super_admin'].includes(_profile.role)) throw new Error('Forbidden');
 
   const { error } = await db.from('licenses').insert({
     tenant_id: formData.get('tenant_id') as string || null,
@@ -21,6 +24,8 @@ export async function createLicense(formData: FormData) {
   });
 
   if (error) throw new Error('Failed to process license action.');
+
+  await logAdminAudit({ action: AdminAction.LICENSE_CREATED, actorId: user.id, entityType: 'licenses', entityId: BULK_ENTITY_ID, metadata: { tier: formData.get('tier') as string } });
 
   revalidatePath('/admin/licenses');
   redirect('/admin/licenses');

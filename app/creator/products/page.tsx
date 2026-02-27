@@ -63,7 +63,7 @@ export default async function CreatorProductsPage() {
             </p>
           </div>
           <Link
-            href="/creator/products/new"
+            href="/creator/products"
             className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
           >
             Add New Product
@@ -92,7 +92,7 @@ export default async function CreatorProductsPage() {
               Create your first product to start selling on the marketplace.
             </p>
             <Link
-              href="/creator/products/new"
+              href="/creator/products"
               className="inline-block bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               Create First Product

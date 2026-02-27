@@ -1,0 +1,6676 @@
+[
+  {
+    "route": "/admin",
+    "file": "app/admin/page.tsx",
+    "lines": 6,
+    "status": "LIVE",
+    "purpose": "",
+    "reads": {
+      "profiles": [
+        "role",
+        "tenant_id"
+      ],
+      "licenses": [
+        "canceled_at",
+        "current_period_end",
+        "expires_at",
+        "id",
+        "status",
+        "stripe_customer_id",
+        "stripe_subscription_id",
+        "suspended_at",
+        "tier"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/accreditation",
+    "file": "app/admin/accreditation/page.tsx",
+    "lines": 486,
+    "status": "LIVE",
+    "purpose": "Accreditation Readiness | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "programs": [
+        "*"
+      ],
+      "program_enrollments": [
+        "*",
+        "program"
+      ],
+      "job_placements": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "program_enrollments",
+        "column": "program",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/accreditation/report",
+    "file": "app/admin/accreditation/report/page.tsx",
+    "lines": 144,
+    "status": "LIVE",
+    "purpose": "Accreditation Report | Admin",
+    "reads": {
+      "programs": [
+        "created_at",
+        "id",
+        "name",
+        "status"
+      ],
+      "training_courses": [
+        "course_name",
+        "id",
+        "is_active"
+      ],
+      "certificates": [
+        "created_at",
+        "id",
+        "status"
+      ],
+      "program_enrollments": [
+        "created_at",
+        "id",
+        "status"
+      ],
+      "completions": [
+        "created_at",
+        "id"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/activity",
+    "file": "app/admin/activity/page.tsx",
+    "lines": 223,
+    "status": "LIVE",
+    "purpose": "Activity Log | Admin | Elevate For Humanity",
+    "reads": {
+      "audit_logs": [
+        "action",
+        "created_at",
+        "id",
+        "metadata",
+        "profiles!",
+        "target_id",
+        "target_type",
+        "user_id"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "audit_logs",
+        "column": "profiles!",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/advanced-tools",
+    "file": "app/admin/advanced-tools/page.tsx",
+    "lines": 314,
+    "status": "LIVE",
+    "purpose": "Automation & Workflows",
+    "reads": {
+      "settings": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/affiliates",
+    "file": "app/admin/affiliates/page.tsx",
+    "lines": 167,
+    "status": "LIVE",
+    "purpose": "Affiliate Management | Admin | Elevate for Humanity",
+    "reads": {
+      "affiliate_payouts": [
+        "amount"
+      ],
+      "affiliate_applications": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "affiliates",
+        "op": "insert"
+      },
+      {
+        "table": "profiles",
+        "op": "insert"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/affiliates/new",
+    "file": "app/admin/affiliates/new/page.tsx",
+    "lines": 93,
+    "status": "FORM",
+    "purpose": "New Affiliate | Admin",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "createAffiliate"
+    ],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/ai-console",
+    "file": "app/admin/ai-console/page.tsx",
+    "lines": 103,
+    "status": "LIVE",
+    "purpose": "AI Console | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "conversations": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/ai-tutor-logs",
+    "file": "app/admin/ai-tutor-logs/page.tsx",
+    "lines": 186,
+    "status": "LIVE",
+    "purpose": "AI Tutor Logs | Admin",
+    "reads": {
+      "public_ai_tutor_logs": [
+        "*",
+        "ip_hash"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/analytics",
+    "file": "app/admin/analytics/page.tsx",
+    "lines": 173,
+    "status": "LIVE",
+    "purpose": "Analytics Dashboard | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ],
+      "training_courses": [
+        "*"
+      ],
+      "program_enrollments": [
+        "*"
+      ],
+      "programs": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/analytics/engagement",
+    "file": "app/admin/analytics/engagement/page.tsx",
+    "lines": 190,
+    "status": "LIVE",
+    "purpose": "Engagement Analytics | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "email",
+        "full_name",
+        "id",
+        "last_sign_in_at"
+      ],
+      "program_enrollments": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/analytics/learning",
+    "file": "app/admin/analytics/learning/page.tsx",
+    "lines": 190,
+    "status": "LIVE",
+    "purpose": "Learning Analytics | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "training_courses": [
+        "*",
+        "enrollment_count",
+        "id",
+        "title"
+      ],
+      "program_enrollments": [
+        "*"
+      ],
+      "certificates": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/analytics/programs",
+    "file": "app/admin/analytics/programs/page.tsx",
+    "lines": 192,
+    "status": "LIVE",
+    "purpose": "Program Analytics | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "programs": [
+        "*",
+        "created_at",
+        "id",
+        "status",
+        "title"
+      ],
+      "program_enrollments": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/api-keys",
+    "file": "app/admin/api-keys/page.tsx",
+    "lines": 205,
+    "status": "LIVE",
+    "purpose": "API Keys | Admin | Elevate For Humanity",
+    "reads": {
+      "api_keys": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/applicants",
+    "file": "app/admin/applicants/page.tsx",
+    "lines": 217,
+    "status": "LIVE",
+    "purpose": "Applicants | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ],
+      "applications": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/applicants-live",
+    "file": "app/admin/applicants-live/page.tsx",
+    "lines": 188,
+    "status": "LIVE",
+    "purpose": "Applicants Live | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/applications",
+    "file": "app/admin/applications/page.tsx",
+    "lines": 356,
+    "status": "LIVE",
+    "purpose": "Applications | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "applications": [
+        "*",
+        "status"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/applications/[type]/[id]",
+    "file": "app/admin/applications/[type]/[id]/page.tsx",
+    "lines": 293,
+    "status": "LIVE",
+    "purpose": "Application Details | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "admin_applications_queue": [
+        "*"
+      ],
+      "application_state_events": [
+        "actor_id",
+        "actor_role",
+        "created_at",
+        "from_state",
+        "id",
+        "reason",
+        "to_state"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/applications/transition"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/applications/review/[id]",
+    "file": "app/admin/applications/review/[id]/page.tsx",
+    "lines": 259,
+    "status": "LIVE",
+    "purpose": "Review Application | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "applications": [
+        "*"
+      ],
+      "training_courses": [
+        "course_name",
+        "id"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/applications/${applicationId}",
+      "/api/admin/applications/${applicationId}/approve"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/apprenticeships",
+    "file": "app/admin/apprenticeships/page.tsx",
+    "lines": 400,
+    "status": "LIVE",
+    "purpose": "Apprenticeship Management",
+    "reads": {},
+    "writes": [
+      {
+        "table": "ojt_hours_log",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": false,
+    "audit_gap": true
+  },
+  {
+    "route": "/admin/at-risk",
+    "file": "app/admin/at-risk/page.tsx",
+    "lines": 442,
+    "status": "LIVE",
+    "purpose": "At-Risk Students | Admin Dashboard",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "program_enrollments": [
+        "program_id",
+        "status"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/audit-logs",
+    "file": "app/admin/audit-logs/page.tsx",
+    "lines": 326,
+    "status": "LIVE",
+    "purpose": "Audit Logs",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/audit-logs?${params}"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/automation",
+    "file": "app/admin/automation/page.tsx",
+    "lines": 269,
+    "status": "LIVE",
+    "purpose": "Automation Log | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "delivery_logs": [
+        "*"
+      ],
+      "notifications": [
+        "*"
+      ],
+      "program_enrollments": [
+        "created_at",
+        "id",
+        "profiles!"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "program_enrollments",
+        "column": "profiles!",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/automation-qa",
+    "file": "app/admin/automation-qa/page.tsx",
+    "lines": 489,
+    "status": "LIVE",
+    "purpose": "",
+    "reads": {
+      "automated_decisions": [
+        "*"
+      ],
+      "review_queue": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/automation/test/document-processing",
+      "/api/automation/test/partner-approval",
+      "/api/automation/test/shop-routing"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/autopilot",
+    "file": "app/admin/autopilot/page.tsx",
+    "lines": 131,
+    "status": "LIVE",
+    "purpose": "Autopilot Management | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/barriers",
+    "file": "app/admin/barriers/page.tsx",
+    "lines": 200,
+    "status": "LIVE",
+    "purpose": "Barriers Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "participant_barriers": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/blog",
+    "file": "app/admin/blog/page.tsx",
+    "lines": 88,
+    "status": "LIVE",
+    "purpose": "Blog Management | Admin",
+    "reads": {
+      "blog_posts": [
+        "created_at",
+        "id",
+        "status",
+        "title"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/campaigns",
+    "file": "app/admin/campaigns/page.tsx",
+    "lines": 265,
+    "status": "LIVE",
+    "purpose": "Campaigns | Admin | Elevate For Humanity",
+    "reads": {
+      "marketing_campaigns": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/campaigns/new",
+    "file": "app/admin/campaigns/new/page.tsx",
+    "lines": 132,
+    "status": "FORM",
+    "purpose": "New Campaign | Admin | Elevate For Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/career-courses/create",
+    "file": "app/admin/career-courses/create/page.tsx",
+    "lines": 435,
+    "status": "LIVE",
+    "purpose": "Course Content Creator",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/career-courses",
+      "/api/admin/career-courses/modules/${selectedModule.id}",
+      "/api/ai-studio/generate-avatar",
+      "/api/ai/generate-script"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/cash-advances",
+    "file": "app/admin/cash-advances/page.tsx",
+    "lines": 455,
+    "status": "LIVE",
+    "purpose": "Cash Advances Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ],
+      "cash_advance_applications": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/cash-advances/pending",
+    "file": "app/admin/cash-advances/pending/page.tsx",
+    "lines": 134,
+    "status": "LIVE",
+    "purpose": "Pending Cash Advances | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "cash_advances": []
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/cash-advances/reports",
+    "file": "app/admin/cash-advances/reports/page.tsx",
+    "lines": 173,
+    "status": "LIVE",
+    "purpose": "Cash Advance Reports | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "cash_advances": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/cash-advances/settings",
+    "file": "app/admin/cash-advances/settings/page.tsx",
+    "lines": 232,
+    "status": "LIVE",
+    "purpose": "Cash Advance Settings | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/certificates",
+    "file": "app/admin/certificates/page.tsx",
+    "lines": 218,
+    "status": "LIVE",
+    "purpose": "Certificates | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "full_name",
+        "id",
+        "role"
+      ],
+      "issued_certificates": [
+        "certificate_number",
+        "created_at",
+        "id",
+        "issue_date",
+        "recipient_email",
+        "recipient_name",
+        "signed_by",
+        "status"
+      ],
+      "certificates": [
+        "certificate_number",
+        "created_at",
+        "id",
+        "issued_date",
+        "signed_by",
+        "status",
+        "student_email",
+        "student_name"
+      ]
+    },
+    "writes": [
+      {
+        "table": "issued_certificates",
+        "op": "insert"
+      },
+      {
+        "table": "certificates",
+        "op": "insert"
+      },
+      {
+        "table": "audit_logs",
+        "op": "insert"
+      },
+      {
+        "table": "issued_certificates",
+        "op": "update"
+      },
+      {
+        "table": "certificates",
+        "op": "update"
+      },
+      {
+        "table": "audit_logs",
+        "op": "insert"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "revokeCertificate"
+    ],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/certificates/bulk",
+    "file": "app/admin/certificates/bulk/page.tsx",
+    "lines": 105,
+    "status": "LIVE",
+    "purpose": "Bulk Certificate Issuance | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "certificate_templates": [
+        "description",
+        "id",
+        "name"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/certificates/bulk"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/certificates/issue",
+    "file": "app/admin/certificates/issue/page.tsx",
+    "lines": 247,
+    "status": "LIVE",
+    "purpose": "Issue Certificate | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "certificate_templates": [
+        "description",
+        "id",
+        "name"
+      ],
+      "training_courses": [
+        "id",
+        "title"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "issueCertificate"
+    ],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/certifications",
+    "file": "app/admin/certifications/page.tsx",
+    "lines": 187,
+    "status": "LIVE",
+    "purpose": "Certifications Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/certifications/bulk",
+    "file": "app/admin/certifications/bulk/page.tsx",
+    "lines": 216,
+    "status": "LIVE",
+    "purpose": "Bulk Certification Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "certification_types": [
+        "id",
+        "name",
+        "provider",
+        "validity_months"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/cohorts",
+    "file": "app/admin/cohorts/page.tsx",
+    "lines": 285,
+    "status": "LIVE",
+    "purpose": "Cohort Tracker | Admin",
+    "reads": {
+      "profiles": [
+        "created_at",
+        "email",
+        "enrollment_status",
+        "full_name",
+        "id",
+        "phone"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/completions",
+    "file": "app/admin/completions/page.tsx",
+    "lines": 210,
+    "status": "LIVE",
+    "purpose": "Course Completions | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "program_enrollments": [
+        "*",
+        "completed_at",
+        "courses!",
+        "id",
+        "profiles!",
+        "progress"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "program_enrollments",
+        "column": "courses!",
+        "issue": "COLUMN_MISSING"
+      },
+      {
+        "table": "program_enrollments",
+        "column": "profiles!",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/compliance",
+    "file": "app/admin/compliance/page.tsx",
+    "lines": 274,
+    "status": "LIVE",
+    "purpose": "Compliance Dashboard | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/compliance-audit",
+    "file": "app/admin/compliance-audit/page.tsx",
+    "lines": 401,
+    "status": "LIVE",
+    "purpose": "Monthly Compliance Audit",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/compliance-audit",
+      "/api/compliance-audit?id=${auditId}"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/compliance/agreements",
+    "file": "app/admin/compliance/agreements/page.tsx",
+    "lines": 345,
+    "status": "LIVE",
+    "purpose": "Access Denied",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "license_agreement_acceptances": [
+        "*",
+        "accepted_at",
+        "agreement_type",
+        "document_version",
+        "id",
+        "ip_address",
+        "signature_method",
+        "signer_email",
+        "signer_name",
+        "user_id"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/compliance/deletions",
+    "file": "app/admin/compliance/deletions/page.tsx",
+    "lines": 178,
+    "status": "LIVE",
+    "purpose": "Data Deletion Requests | Admin Compliance | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/compliance/exports",
+    "file": "app/admin/compliance/exports/page.tsx",
+    "lines": 178,
+    "status": "LIVE",
+    "purpose": "Data Export Requests | Admin Compliance | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/compliance/financial-assurance",
+    "file": "app/admin/compliance/financial-assurance/page.tsx",
+    "lines": 400,
+    "status": "LIVE",
+    "purpose": "Financial Assurance | Admin | Elevate",
+    "reads": {
+      "financial_assurances": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/contacts",
+    "file": "app/admin/contacts/page.tsx",
+    "lines": 211,
+    "status": "LIVE",
+    "purpose": "Contact Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "contact_submissions": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/copilot",
+    "file": "app/admin/copilot/page.tsx",
+    "lines": 217,
+    "status": "LIVE",
+    "purpose": "AI Copilot Dashboard | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "copilot_deployments": [
+        "copilot_type",
+        "status"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/copilot/deploy",
+    "file": "app/admin/copilot/deploy/page.tsx",
+    "lines": 79,
+    "status": "LIVE",
+    "purpose": "Deploy AI Copilot | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/copilot/deploy",
+      "/api/admin/copilot/deploy?id=${deploymentId}"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/course-builder",
+    "file": "app/admin/course-builder/page.tsx",
+    "lines": 57,
+    "status": "LIVE",
+    "purpose": "Course Builder | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "training_courses": [],
+      "programs": [
+        "id",
+        "title"
+      ]
+    },
+    "writes": [
+      {
+        "table": "training_courses",
+        "op": "delete"
+      },
+      {
+        "table": "training_courses",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": false,
+    "audit_gap": true
+  },
+  {
+    "route": "/admin/course-builder/assessments",
+    "file": "app/admin/course-builder/assessments/page.tsx",
+    "lines": 160,
+    "status": "STATIC",
+    "purpose": "Assessment Bank | Admin | Elevate For Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/course-builder/media",
+    "file": "app/admin/course-builder/media/page.tsx",
+    "lines": 145,
+    "status": "STATIC",
+    "purpose": "Media Library | Admin | Elevate For Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/course-builder/templates",
+    "file": "app/admin/course-builder/templates/page.tsx",
+    "lines": 117,
+    "status": "STATIC",
+    "purpose": "Course Templates | Admin | Elevate For Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/course-generator",
+    "file": "app/admin/course-generator/page.tsx",
+    "lines": 260,
+    "status": "FORM",
+    "purpose": "AI Course Generator",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/ai/generate-course"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/course-import",
+    "file": "app/admin/course-import/page.tsx",
+    "lines": 187,
+    "status": "LIVE",
+    "purpose": "Course Import | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/course-templates",
+    "file": "app/admin/course-templates/page.tsx",
+    "lines": 187,
+    "status": "LIVE",
+    "purpose": "Course Templates | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/courses",
+    "file": "app/admin/courses/page.tsx",
+    "lines": 365,
+    "status": "LIVE",
+    "purpose": "Admin Courses | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "training_enrollments": [
+        "course_id"
+      ],
+      "training_courses": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/courses/[courseId]/content",
+    "file": "app/admin/courses/[courseId]/content/page.tsx",
+    "lines": 55,
+    "status": "LIVE",
+    "purpose": "Course Content | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "training_courses": [
+        "*"
+      ],
+      "training_lessons": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "training_lessons",
+        "op": "update"
+      },
+      {
+        "table": "training_lessons",
+        "op": "insert"
+      },
+      {
+        "table": "training_lessons",
+        "op": "delete"
+      },
+      {
+        "table": "training_lessons",
+        "op": "update"
+      },
+      {
+        "table": "training_lessons",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": false,
+    "audit_gap": true
+  },
+  {
+    "route": "/admin/courses/[courseId]/edit",
+    "file": "app/admin/courses/[courseId]/edit/page.tsx",
+    "lines": 91,
+    "status": "LIVE",
+    "purpose": "Edit Course | Admin | Elevate LMS",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "training_courses": [
+        "*"
+      ],
+      "programs": [
+        "id",
+        "title"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/courses/[courseId]/quizzes",
+    "file": "app/admin/courses/[courseId]/quizzes/page.tsx",
+    "lines": 54,
+    "status": "LIVE",
+    "purpose": "Course Quizzes | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "training_courses": [
+        "*"
+      ],
+      "quizzes": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "quizzes",
+        "op": "update"
+      },
+      {
+        "table": "quizzes",
+        "op": "insert"
+      },
+      {
+        "table": "quizzes",
+        "op": "delete"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": false,
+    "audit_gap": true
+  },
+  {
+    "route": "/admin/courses/[courseId]/quizzes/[quizId]/questions",
+    "file": "app/admin/courses/[courseId]/quizzes/[quizId]/questions/page.tsx",
+    "lines": 56,
+    "status": "LIVE",
+    "purpose": "Quiz Questions | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "quizzes": [
+        "*"
+      ],
+      "quiz_questions": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "quiz_questions",
+        "op": "update"
+      },
+      {
+        "table": "quiz_questions",
+        "op": "insert"
+      },
+      {
+        "table": "quiz_questions",
+        "op": "delete"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": false,
+    "audit_gap": true
+  },
+  {
+    "route": "/admin/courses/builder",
+    "file": "app/admin/courses/builder/page.tsx",
+    "lines": 89,
+    "status": "LIVE",
+    "purpose": "Course Builder | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/courses/bulk-operations",
+    "file": "app/admin/courses/bulk-operations/page.tsx",
+    "lines": 179,
+    "status": "LIVE",
+    "purpose": "Bulk Operations | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "training_courses": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/courses/create",
+    "file": "app/admin/courses/create/page.tsx",
+    "lines": 89,
+    "status": "LIVE",
+    "purpose": "Create Course | Admin | Elevate LMS",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "course_categories": [
+        "id",
+        "name"
+      ],
+      "programs": [
+        "id",
+        "title"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/courses/manage",
+    "file": "app/admin/courses/manage/page.tsx",
+    "lines": 109,
+    "status": "LIVE",
+    "purpose": "Manage Courses | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "training_courses": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/courses/partners",
+    "file": "app/admin/courses/partners/page.tsx",
+    "lines": 106,
+    "status": "STATIC",
+    "purpose": "Course Partners | Admin",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/crm",
+    "file": "app/admin/crm/page.tsx",
+    "lines": 354,
+    "status": "LIVE",
+    "purpose": "CRM Hub | Admin Dashboard",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ],
+      "campaigns": [
+        "*"
+      ],
+      "leads": [
+        "*"
+      ],
+      "follow_ups": [
+        "*"
+      ],
+      "appointments": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/crm/appointments",
+    "file": "app/admin/crm/appointments/page.tsx",
+    "lines": 142,
+    "status": "LIVE",
+    "purpose": "Appointments",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/crm/appointments"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/crm/appointments/new",
+    "file": "app/admin/crm/appointments/new/page.tsx",
+    "lines": 198,
+    "status": "FORM",
+    "purpose": "New Appointment",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/crm/appointments"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/crm/campaigns",
+    "file": "app/admin/crm/campaigns/page.tsx",
+    "lines": 228,
+    "status": "LIVE",
+    "purpose": "Email Campaigns | CRM",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "campaigns": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/crm/campaigns/new",
+    "file": "app/admin/crm/campaigns/new/page.tsx",
+    "lines": 278,
+    "status": "LIVE",
+    "purpose": "Create Email Campaign",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/crm/campaigns/send",
+      "/api/crm/templates"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/crm/contacts",
+    "file": "app/admin/crm/contacts/page.tsx",
+    "lines": 207,
+    "status": "LIVE",
+    "purpose": "Contacts | CRM | Admin | Elevate For Humanity",
+    "reads": {
+      "crm_contacts": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/crm/contacts/new",
+    "file": "app/admin/crm/contacts/new/page.tsx",
+    "lines": 252,
+    "status": "FORM",
+    "purpose": "New Contact | CRM | Admin | Elevate For Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/crm/deals",
+    "file": "app/admin/crm/deals/page.tsx",
+    "lines": 204,
+    "status": "STATIC",
+    "purpose": "Deals | CRM | Admin | Elevate For Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/crm/deals/new",
+    "file": "app/admin/crm/deals/new/page.tsx",
+    "lines": 190,
+    "status": "FORM",
+    "purpose": "New Deal",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/crm/deals"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/crm/follow-ups",
+    "file": "app/admin/crm/follow-ups/page.tsx",
+    "lines": 177,
+    "status": "LIVE",
+    "purpose": "Follow-ups | CRM Admin",
+    "reads": {
+      "crm_follow_ups": [
+        "contact"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "crm_follow_ups",
+        "column": "contact",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/crm/leads",
+    "file": "app/admin/crm/leads/page.tsx",
+    "lines": 226,
+    "status": "LIVE",
+    "purpose": "Leads | CRM | Admin | Elevate For Humanity",
+    "reads": {
+      "leads": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/crm/leads/new",
+    "file": "app/admin/crm/leads/new/page.tsx",
+    "lines": 273,
+    "status": "FORM",
+    "purpose": "New Lead | CRM | Admin | Elevate For Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/curriculum",
+    "file": "app/admin/curriculum/page.tsx",
+    "lines": 188,
+    "status": "LIVE",
+    "purpose": "Curriculum Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/curriculum/upload",
+    "file": "app/admin/curriculum/upload/page.tsx",
+    "lines": 74,
+    "status": "LIVE",
+    "purpose": "Upload Curriculum | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/dashboard",
+    "file": "app/admin/dashboard/page.tsx",
+    "lines": 158,
+    "status": "LIVE",
+    "purpose": "Admin Dashboard | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "created_at",
+        "email",
+        "enrollment_status",
+        "full_name",
+        "id",
+        "role"
+      ],
+      "program_enrollments": [
+        "course_id",
+        "enrolled_at",
+        "progress",
+        "status"
+      ],
+      "programs": [
+        "id",
+        "name",
+        "status"
+      ],
+      "training_courses": [
+        "course_name",
+        "id",
+        "is_active"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/dashboard/etpl",
+    "file": "app/admin/dashboard/etpl/page.tsx",
+    "lines": 315,
+    "status": "STATIC",
+    "purpose": "ETPL Performance Dashboard | Admin",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/data-processor",
+    "file": "app/admin/data-processor/page.tsx",
+    "lines": 188,
+    "status": "LIVE",
+    "purpose": "Data Processor | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/delegates",
+    "file": "app/admin/delegates/page.tsx",
+    "lines": 85,
+    "status": "LIVE",
+    "purpose": "Delegates Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "delegates": [
+        "profiles!"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "delegates",
+        "column": "profiles!",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/dev-studio",
+    "file": "app/admin/dev-studio/page.tsx",
+    "lines": 438,
+    "status": "LIVE",
+    "purpose": "",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/auth/check-admin",
+      "/api/github/file",
+      "/api/github/repos"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/docs",
+    "file": "app/admin/docs/page.tsx",
+    "lines": 186,
+    "status": "LIVE",
+    "purpose": "Documentation Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/docs/mou",
+    "file": "app/admin/docs/mou/page.tsx",
+    "lines": 62,
+    "status": "LIVE",
+    "purpose": "MOU Documentation | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/document-center",
+    "file": "app/admin/document-center/page.tsx",
+    "lines": 188,
+    "status": "LIVE",
+    "purpose": "Document Center | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/document-center/[category]",
+    "file": "app/admin/document-center/[category]/page.tsx",
+    "lines": 250,
+    "status": "LIVE",
+    "purpose": "Service Unavailable",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "documents": []
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/documents",
+    "file": "app/admin/documents/page.tsx",
+    "lines": 58,
+    "status": "LIVE",
+    "purpose": "Document Center | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "documents": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/documents/review",
+    "file": "app/admin/documents/review/page.tsx",
+    "lines": 303,
+    "status": "LIVE",
+    "purpose": "Review Documents | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/documents/review/[id]",
+    "file": "app/admin/documents/review/[id]/page.tsx",
+    "lines": 112,
+    "status": "LIVE",
+    "purpose": "Review Document | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/documents/upload",
+    "file": "app/admin/documents/upload/page.tsx",
+    "lines": 49,
+    "status": "LIVE",
+    "purpose": "Upload Documents | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/editor",
+    "file": "app/admin/editor/page.tsx",
+    "lines": 281,
+    "status": "LIVE",
+    "purpose": "Welcome to EFH",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/auth/check-admin"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/email-marketing",
+    "file": "app/admin/email-marketing/page.tsx",
+    "lines": 440,
+    "status": "LIVE",
+    "purpose": "Email Marketing",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/auth/check-admin"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/email-marketing/analytics",
+    "file": "app/admin/email-marketing/analytics/page.tsx",
+    "lines": 531,
+    "status": "LIVE",
+    "purpose": "Email Analytics",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/auth/check-admin",
+      "/api/email/analytics?range=${timeRange}"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/email-marketing/automation",
+    "file": "app/admin/email-marketing/automation/page.tsx",
+    "lines": 454,
+    "status": "LIVE",
+    "purpose": "Marketing Automation",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/auth/check-admin"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/email-marketing/automation/new",
+    "file": "app/admin/email-marketing/automation/new/page.tsx",
+    "lines": 609,
+    "status": "LIVE",
+    "purpose": "Create Drip Campaign",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/auth/check-admin",
+      "/api/email/workflows"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/email-marketing/campaigns/new",
+    "file": "app/admin/email-marketing/campaigns/new/page.tsx",
+    "lines": 748,
+    "status": "LIVE",
+    "purpose": "Create Campaign",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/auth/check-admin",
+      "/api/email-marketing/campaigns/schedule",
+      "/api/email-marketing/campaigns/send",
+      "/api/email/campaigns"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/employers",
+    "file": "app/admin/employers/page.tsx",
+    "lines": 47,
+    "status": "LIVE",
+    "purpose": "Employer Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "employers": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/employers-playbook",
+    "file": "app/admin/employers-playbook/page.tsx",
+    "lines": 188,
+    "status": "LIVE",
+    "purpose": "Employers Playbook | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/employers/[id]/proposal",
+    "file": "app/admin/employers/[id]/proposal/page.tsx",
+    "lines": 54,
+    "status": "LIVE",
+    "purpose": "Employer Proposal | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "employers": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/employers/onboarding",
+    "file": "app/admin/employers/onboarding/page.tsx",
+    "lines": 145,
+    "status": "LIVE",
+    "purpose": "Employer Onboarding Review | Admin",
+    "reads": {
+      "employer_onboarding": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/enrollment-jobs",
+    "file": "app/admin/enrollment-jobs/page.tsx",
+    "lines": 239,
+    "status": "LIVE",
+    "purpose": "Enrollment Jobs | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/enrollments",
+    "file": "app/admin/enrollments/page.tsx",
+    "lines": 98,
+    "status": "LIVE",
+    "purpose": "Enrollment Management | Admin Dashboard",
+    "reads": {
+      "profiles": [
+        "email",
+        "full_name",
+        "id",
+        "role"
+      ],
+      "training_enrollments": [
+        "course",
+        "id",
+        "student"
+      ],
+      "training_courses": [
+        "course_name",
+        "id"
+      ],
+      "cohorts": [
+        "code",
+        "id",
+        "name",
+        "status"
+      ]
+    },
+    "writes": [
+      {
+        "table": "training_enrollments",
+        "op": "update"
+      },
+      {
+        "table": "training_enrollments",
+        "op": "insert"
+      },
+      {
+        "table": "lesson_progress",
+        "op": "delete"
+      },
+      {
+        "table": "training_enrollments",
+        "op": "delete"
+      },
+      {
+        "table": "training_enrollments",
+        "op": "update"
+      },
+      {
+        "table": "training_enrollments",
+        "op": "update"
+      },
+      {
+        "table": "training_enrollments",
+        "op": "update"
+      },
+      {
+        "table": "program_enrollments",
+        "op": "update"
+      },
+      {
+        "table": "profiles",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [
+      "/api/email/send"
+    ],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "training_enrollments",
+        "column": "course",
+        "issue": "COLUMN_MISSING"
+      },
+      {
+        "table": "training_enrollments",
+        "column": "student",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/etpl-alignment",
+    "file": "app/admin/etpl-alignment/page.tsx",
+    "lines": 187,
+    "status": "LIVE",
+    "purpose": "Etpl Alignment | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/external-modules",
+    "file": "app/admin/external-modules/page.tsx",
+    "lines": 320,
+    "status": "LIVE",
+    "purpose": "",
+    "reads": {},
+    "writes": [
+      {
+        "table": "external_modules",
+        "op": "update"
+      },
+      {
+        "table": "external_modules",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": false,
+    "audit_gap": true
+  },
+  {
+    "route": "/admin/external-modules/approvals",
+    "file": "app/admin/external-modules/approvals/page.tsx",
+    "lines": 56,
+    "status": "LIVE",
+    "purpose": "Module Approvals | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "external_modules": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "external_partner_progress",
+        "op": "update"
+      },
+      {
+        "table": "external_partner_progress",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "external_modules",
+        "column": "status",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "has_mutations": true,
+    "has_audit_trail": false,
+    "audit_gap": true
+  },
+  {
+    "route": "/admin/external-progress",
+    "file": "app/admin/external-progress/page.tsx",
+    "lines": 187,
+    "status": "LIVE",
+    "purpose": "External Progress | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/external-progress/update"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/ferpa",
+    "file": "app/admin/ferpa/page.tsx",
+    "lines": 268,
+    "status": "LIVE",
+    "purpose": "FERPA Compliance | Admin | Elevate For Humanity",
+    "reads": {
+      "audit_logs": [
+        "action",
+        "actor_id",
+        "created_at",
+        "target_type"
+      ],
+      "profiles": [
+        "*",
+        "role"
+      ],
+      "documents": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/ferpa/training",
+    "file": "app/admin/ferpa/training/page.tsx",
+    "lines": 81,
+    "status": "LIVE",
+    "purpose": "FERPA Training Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "created_at",
+        "email",
+        "full_name",
+        "id",
+        "role"
+      ],
+      "ferpa_training_records": [
+        "profiles"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "ferpa_training_records",
+        "column": "profiles",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/files",
+    "file": "app/admin/files/page.tsx",
+    "lines": 50,
+    "status": "LIVE",
+    "purpose": "File Manager | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/funding",
+    "file": "app/admin/funding/page.tsx",
+    "lines": 51,
+    "status": "LIVE",
+    "purpose": "Funding Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/funding-playbook",
+    "file": "app/admin/funding-playbook/page.tsx",
+    "lines": 187,
+    "status": "LIVE",
+    "purpose": "Funding Playbook | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/governance",
+    "file": "app/admin/governance/page.tsx",
+    "lines": 246,
+    "status": "STATIC",
+    "purpose": "Governance | Elevate for Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/governance/authoritative-docs",
+    "file": "app/admin/governance/authoritative-docs/page.tsx",
+    "lines": 159,
+    "status": "LIVE",
+    "purpose": "Authoritative Documents | Governance | Elevate for Humanity",
+    "reads": {
+      "compliance_documents": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/governance/compliance",
+    "file": "app/admin/governance/compliance/page.tsx",
+    "lines": 267,
+    "status": "STATIC",
+    "purpose": "Compliance & Disclosure Framework | Governance | Elevate for Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/governance/contact",
+    "file": "app/admin/governance/contact/page.tsx",
+    "lines": 204,
+    "status": "STATIC",
+    "purpose": "Governance Contact | Elevate for Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/governance/data",
+    "file": "app/admin/governance/data/page.tsx",
+    "lines": 283,
+    "status": "STATIC",
+    "purpose": "Data Governance | Elevate for Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/governance/legal",
+    "file": "app/admin/governance/legal/page.tsx",
+    "lines": 312,
+    "status": "STATIC",
+    "purpose": "Legal & Entity Information | Elevate for Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/governance/operational-controls",
+    "file": "app/admin/governance/operational-controls/page.tsx",
+    "lines": 234,
+    "status": "STATIC",
+    "purpose": "Operational Controls | Governance | Elevate for Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/governance/security",
+    "file": "app/admin/governance/security/page.tsx",
+    "lines": 283,
+    "status": "STATIC",
+    "purpose": "Security & Data Protection Statement | Elevate for Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/governance/seo-indexing",
+    "file": "app/admin/governance/seo-indexing/page.tsx",
+    "lines": 216,
+    "status": "STATIC",
+    "purpose": "SEO & Indexing Governance | Elevate for Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/gradebook",
+    "file": "app/admin/gradebook/page.tsx",
+    "lines": 101,
+    "status": "LIVE",
+    "purpose": "Gradebook | Admin | Elevate LMS",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "training_courses": [
+        "enrollment_count",
+        "id",
+        "status",
+        "title"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/gradebook/[courseId]",
+    "file": "app/admin/gradebook/[courseId]/page.tsx",
+    "lines": 110,
+    "status": "LIVE",
+    "purpose": "Gradebook | Admin | Elevate LMS",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "training_courses": [
+        "id",
+        "title"
+      ],
+      "program_enrollments": [
+        "id",
+        "profiles!",
+        "progress",
+        "status",
+        "user_id"
+      ],
+      "assignment_submissions": [
+        "*"
+      ],
+      "quiz_attempts": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "assignment_submissions",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "program_enrollments",
+        "column": "profiles!",
+        "issue": "COLUMN_MISSING"
+      },
+      {
+        "table": "assignment_submissions",
+        "column": "course_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      },
+      {
+        "table": "quiz_attempts",
+        "column": "course_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "has_mutations": true,
+    "has_audit_trail": false,
+    "audit_gap": true
+  },
+  {
+    "route": "/admin/grants",
+    "file": "app/admin/grants/page.tsx",
+    "lines": 206,
+    "status": "LIVE",
+    "purpose": "Grant Management | Admin",
+    "reads": {
+      "grant_opportunities": [
+        "*"
+      ],
+      "grant_applications": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "grant_opportunities",
+        "op": "insert"
+      },
+      {
+        "table": "grant_opportunities",
+        "op": "update"
+      },
+      {
+        "table": "grant_opportunities",
+        "op": "delete"
+      },
+      {
+        "table": "grant_applications",
+        "op": "insert"
+      },
+      {
+        "table": "grant_applications",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/grants/intake",
+    "file": "app/admin/grants/intake/page.tsx",
+    "lines": 263,
+    "status": "LIVE",
+    "purpose": "Grant Intake | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/grants/new",
+    "file": "app/admin/grants/new/page.tsx",
+    "lines": 223,
+    "status": "FORM",
+    "purpose": "Add Grant Opportunity | Admin",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "createGrantOpportunity"
+    ],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/grants/revenue",
+    "file": "app/admin/grants/revenue/page.tsx",
+    "lines": 48,
+    "status": "LIVE",
+    "purpose": "Grant Revenue | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/grants/submissions",
+    "file": "app/admin/grants/submissions/page.tsx",
+    "lines": 349,
+    "status": "LIVE",
+    "purpose": "Submissions | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/grants/workflow",
+    "file": "app/admin/grants/workflow/page.tsx",
+    "lines": 213,
+    "status": "LIVE",
+    "purpose": "Grants Workflow | Elevate For Humanity",
+    "reads": {
+      "grants": [
+        "*"
+      ],
+      "grant_entities": [
+        "*"
+      ],
+      "grant_applications": [
+        "*"
+      ],
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/hours-export",
+    "file": "app/admin/hours-export/page.tsx",
+    "lines": 254,
+    "status": "LIVE",
+    "purpose": "Weekly Hours Export",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/export/weekly-hours?${params}"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/hr",
+    "file": "app/admin/hr/page.tsx",
+    "lines": 59,
+    "status": "LIVE",
+    "purpose": "HR Dashboard | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/hr/employees",
+    "file": "app/admin/hr/employees/page.tsx",
+    "lines": 59,
+    "status": "LIVE",
+    "purpose": "Employee Directory | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "employees": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/hr/employees/[id]",
+    "file": "app/admin/hr/employees/[id]/page.tsx",
+    "lines": 372,
+    "status": "LIVE",
+    "purpose": "Employee Details | HR | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "employees": [
+        "managers"
+      ],
+      "time_off_requests": [
+        "*"
+      ],
+      "performance_reviews": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "employees",
+        "column": "managers",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/hr/employees/new",
+    "file": "app/admin/hr/employees/new/page.tsx",
+    "lines": 59,
+    "status": "LIVE",
+    "purpose": "Add Employee | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/hr/leave",
+    "file": "app/admin/hr/leave/page.tsx",
+    "lines": 62,
+    "status": "LIVE",
+    "purpose": "Leave Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "leave_requests": [
+        "profiles!"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "leave_requests",
+        "column": "profiles!",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/hr/payroll",
+    "file": "app/admin/hr/payroll/page.tsx",
+    "lines": 52,
+    "status": "LIVE",
+    "purpose": "Payroll Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/hr/time",
+    "file": "app/admin/hr/time/page.tsx",
+    "lines": 48,
+    "status": "LIVE",
+    "purpose": "Time Tracking | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/hsi-enrollments",
+    "file": "app/admin/hsi-enrollments/page.tsx",
+    "lines": 180,
+    "status": "LIVE",
+    "purpose": "HSI Enrollments | Admin Dashboard",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/hvac-activation",
+    "file": "app/admin/hvac-activation/page.tsx",
+    "lines": 364,
+    "status": "LIVE",
+    "purpose": "HVAC Course Activation",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/generate-lesson-videos",
+      "/api/admin/sync-course-definitions",
+      "/api/courses/${COURSE_ID}"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/impact",
+    "file": "app/admin/impact/page.tsx",
+    "lines": 48,
+    "status": "LIVE",
+    "purpose": "Impact Dashboard | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/import",
+    "file": "app/admin/import/page.tsx",
+    "lines": 551,
+    "status": "LIVE",
+    "purpose": "Data Import",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/import"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/inbox",
+    "file": "app/admin/inbox/page.tsx",
+    "lines": 303,
+    "status": "LIVE",
+    "purpose": "Admin Inbox | Elevate For Humanity",
+    "reads": {
+      "user_profiles": [
+        "role"
+      ],
+      "partner_inquiries": [
+        "*"
+      ],
+      "license_requests": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "partner_inquiries",
+        "op": "update"
+      },
+      {
+        "table": "license_requests",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "updateLicense",
+      "updatePartner"
+    ],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/incentives",
+    "file": "app/admin/incentives/page.tsx",
+    "lines": 342,
+    "status": "LIVE",
+    "purpose": "Employer Incentives",
+    "reads": {},
+    "writes": [
+      {
+        "table": "incentives",
+        "op": "insert"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/incentives"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": false,
+    "audit_gap": true
+  },
+  {
+    "route": "/admin/incentives/create",
+    "file": "app/admin/incentives/create/page.tsx",
+    "lines": 104,
+    "status": "FORM",
+    "purpose": "Create Incentive | Admin",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "createIncentive"
+    ],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/instructors",
+    "file": "app/admin/instructors/page.tsx",
+    "lines": 301,
+    "status": "STATIC",
+    "purpose": "",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/instructors/performance",
+    "file": "app/admin/instructors/performance/page.tsx",
+    "lines": 61,
+    "status": "LIVE",
+    "purpose": "Instructor Performance | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/intake",
+    "file": "app/admin/intake/page.tsx",
+    "lines": 563,
+    "status": "LIVE",
+    "purpose": "Admissions Intake Management",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/intakes",
+      "/api/admin/script-acknowledgment",
+      "/api/admin/script-deviation",
+      "/api/intake/workflow"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/integrations",
+    "file": "app/admin/integrations/page.tsx",
+    "lines": 189,
+    "status": "LIVE",
+    "purpose": "",
+    "reads": {
+      "integrations": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "integrations",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": false,
+    "audit_gap": true
+  },
+  {
+    "route": "/admin/integrations/google-classroom",
+    "file": "app/admin/integrations/google-classroom/page.tsx",
+    "lines": 178,
+    "status": "LIVE",
+    "purpose": "Google Classroom | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/integrations/salesforce",
+    "file": "app/admin/integrations/salesforce/page.tsx",
+    "lines": 195,
+    "status": "LIVE",
+    "purpose": "Salesforce Integration",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/integrations?provider=salesforce"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/internal-docs",
+    "file": "app/admin/internal-docs/page.tsx",
+    "lines": 188,
+    "status": "LIVE",
+    "purpose": "Internal Docs | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/jobs",
+    "file": "app/admin/jobs/page.tsx",
+    "lines": 196,
+    "status": "LIVE",
+    "purpose": "Job Postings | Admin | Elevate for Humanity",
+    "reads": {
+      "job_postings": [
+        "*"
+      ],
+      "employers": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "jobs",
+        "op": "insert"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": false,
+    "audit_gap": true
+  },
+  {
+    "route": "/admin/jobs/new",
+    "file": "app/admin/jobs/new/page.tsx",
+    "lines": 108,
+    "status": "FORM",
+    "purpose": "Post New Job | Admin",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "createJob"
+    ],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/jri",
+    "file": "app/admin/jri/page.tsx",
+    "lines": 50,
+    "status": "LIVE",
+    "purpose": "JRI Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "jri_participants": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "jri_participants",
+        "column": "status",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/leads",
+    "file": "app/admin/leads/page.tsx",
+    "lines": 283,
+    "status": "LIVE",
+    "purpose": "Leads | Admin | Elevate For Humanity",
+    "reads": {
+      "leads": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/leads/new",
+    "file": "app/admin/leads/new/page.tsx",
+    "lines": 141,
+    "status": "FORM",
+    "purpose": "Add Lead | Admin | Elevate For Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/learner",
+    "file": "app/admin/learner/page.tsx",
+    "lines": 131,
+    "status": "LIVE",
+    "purpose": "Learner Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/learner/[id]",
+    "file": "app/admin/learner/[id]/page.tsx",
+    "lines": 370,
+    "status": "LIVE",
+    "purpose": "Learner Details | Admin | Elevate for Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ],
+      "program_enrollments": [],
+      "certificates": [
+        "*"
+      ],
+      "lesson_progress": []
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/lessons",
+    "file": "app/admin/lessons/page.tsx",
+    "lines": 174,
+    "status": "LIVE",
+    "purpose": "Lessons Management | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "training_courses": [
+        "course_name",
+        "id"
+      ],
+      "training_lessons": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/license",
+    "file": "app/admin/license/page.tsx",
+    "lines": 60,
+    "status": "LIVE",
+    "purpose": "License Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/license-requests",
+    "file": "app/admin/license-requests/page.tsx",
+    "lines": 185,
+    "status": "LIVE",
+    "purpose": "Admin License Requests | Elevate For Humanity",
+    "reads": {
+      "user_profiles": [
+        "role"
+      ],
+      "license_requests": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "license_requests",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "updateStatus"
+    ],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/licenses",
+    "file": "app/admin/licenses/page.tsx",
+    "lines": 113,
+    "status": "LIVE",
+    "purpose": "Admin Licenses | Elevate For Humanity",
+    "reads": {},
+    "writes": [
+      {
+        "table": "licenses",
+        "op": "insert"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/licenses/create",
+    "file": "app/admin/licenses/create/page.tsx",
+    "lines": 95,
+    "status": "LIVE",
+    "purpose": "Create License | Admin",
+    "reads": {
+      "tenants": [
+        "id",
+        "name"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "createLicense"
+    ],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/licensing",
+    "file": "app/admin/licensing/page.tsx",
+    "lines": 165,
+    "status": "LIVE",
+    "purpose": "License Management",
+    "reads": {
+      "licenses": [
+        "*"
+      ],
+      "tenants": [
+        "active",
+        "id",
+        "name",
+        "slug"
+      ]
+    },
+    "writes": [
+      {
+        "table": "licenses",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/live-chat",
+    "file": "app/admin/live-chat/page.tsx",
+    "lines": 354,
+    "status": "LIVE",
+    "purpose": "Live Chat",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/auth/check-admin"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/marketing",
+    "file": "app/admin/marketing/page.tsx",
+    "lines": 274,
+    "status": "LIVE",
+    "purpose": "Marketing | Admin | Elevate For Humanity",
+    "reads": {
+      "marketing_campaigns": [
+        "*"
+      ],
+      "leads": [
+        "*",
+        "source"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/marketplace",
+    "file": "app/admin/marketplace/page.tsx",
+    "lines": 60,
+    "status": "STATIC",
+    "purpose": "Marketplace | Admin | Elevate For Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/marketplace/creators",
+    "file": "app/admin/marketplace/creators/page.tsx",
+    "lines": 203,
+    "status": "LIVE",
+    "purpose": "Admin Marketplace Creators | Elevate For Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/creators/approve",
+      "/api/admin/creators/reject"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/marketplace/payouts",
+    "file": "app/admin/marketplace/payouts/page.tsx",
+    "lines": 222,
+    "status": "LIVE",
+    "purpose": "Admin Marketplace Payouts | Elevate For Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/payouts/mark-paid"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/marketplace/products",
+    "file": "app/admin/marketplace/products/page.tsx",
+    "lines": 193,
+    "status": "LIVE",
+    "purpose": "Admin Marketplace Products | Elevate For Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/products/approve",
+      "/api/admin/products/reject"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/media-studio",
+    "file": "app/admin/media-studio/page.tsx",
+    "lines": 422,
+    "status": "LIVE",
+    "purpose": "Media Studio",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/auth/check-admin",
+      "/api/media/buckets",
+      "/api/media/files?bucket=${bucket}",
+      "/api/media/optimize?bucket=${selectedBucket}",
+      "/api/media/upload"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/migrations",
+    "file": "app/admin/migrations/page.tsx",
+    "lines": 55,
+    "status": "LIVE",
+    "purpose": "Data Migrations | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/mobile-sync",
+    "file": "app/admin/mobile-sync/page.tsx",
+    "lines": 59,
+    "status": "LIVE",
+    "purpose": "Mobile Sync | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/moderation",
+    "file": "app/admin/moderation/page.tsx",
+    "lines": 97,
+    "status": "LIVE",
+    "purpose": "Moderation Queue | Admin",
+    "reads": {
+      "forum_posts": [
+        "content",
+        "created_at",
+        "id",
+        "status",
+        "title",
+        "user_id"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/modules",
+    "file": "app/admin/modules/page.tsx",
+    "lines": 160,
+    "status": "LIVE",
+    "purpose": "Modules Management | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "programs": [
+        "id",
+        "name",
+        "slug"
+      ],
+      "modules": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "modules",
+        "op": "insert"
+      },
+      {
+        "table": "modules",
+        "op": "update"
+      },
+      {
+        "table": "modules",
+        "op": "delete"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "createModule",
+      "updateModule"
+    ],
+    "column_mismatches": [
+      {
+        "table": "modules",
+        "column": "module_type",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "has_mutations": true,
+    "has_audit_trail": false,
+    "audit_gap": true
+  },
+  {
+    "route": "/admin/modules/new",
+    "file": "app/admin/modules/new/page.tsx",
+    "lines": 69,
+    "status": "LIVE",
+    "purpose": "Create Module | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "programs": [
+        "id",
+        "name",
+        "slug"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/monitoring",
+    "file": "app/admin/monitoring/page.tsx",
+    "lines": 403,
+    "status": "LIVE",
+    "purpose": "",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/monitoring/errors?limit=10",
+      "/api/admin/monitoring/status"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/monitoring/setup",
+    "file": "app/admin/monitoring/setup/page.tsx",
+    "lines": 301,
+    "status": "LIVE",
+    "purpose": "",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/monitoring/verify-schema"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/mou",
+    "file": "app/admin/mou/page.tsx",
+    "lines": 60,
+    "status": "LIVE",
+    "purpose": "MOU Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/next-steps",
+    "file": "app/admin/next-steps/page.tsx",
+    "lines": 544,
+    "status": "LIVE",
+    "purpose": "WorkOne / ICC Progress Dashboard",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/next-steps/update",
+      "/api/admin/next-steps?${queryString}"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/notifications",
+    "file": "app/admin/notifications/page.tsx",
+    "lines": 438,
+    "status": "LIVE",
+    "purpose": "Class Reminder",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/notifications/broadcast"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/operations",
+    "file": "app/admin/operations/page.tsx",
+    "lines": 48,
+    "status": "LIVE",
+    "purpose": "Operations Dashboard | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/outcomes",
+    "file": "app/admin/outcomes/page.tsx",
+    "lines": 48,
+    "status": "LIVE",
+    "purpose": "Outcomes Tracking | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/partner-enrollments",
+    "file": "app/admin/partner-enrollments/page.tsx",
+    "lines": 104,
+    "status": "LIVE",
+    "purpose": "Partner Enrollments | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/partner-inquiries",
+    "file": "app/admin/partner-inquiries/page.tsx",
+    "lines": 184,
+    "status": "LIVE",
+    "purpose": "Admin Partner Inquiries | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "partner_inquiries": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "partner_inquiries",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "updateStatus"
+    ],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/partners",
+    "file": "app/admin/partners/page.tsx",
+    "lines": 182,
+    "status": "LIVE",
+    "purpose": "Admin Partners | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "partners": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/partners/lms-integrations",
+    "file": "app/admin/partners/lms-integrations/page.tsx",
+    "lines": 178,
+    "status": "LIVE",
+    "purpose": "Lms Integrations | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/partners/lms-integrations/[id]",
+    "file": "app/admin/partners/lms-integrations/[id]/page.tsx",
+    "lines": 393,
+    "status": "LIVE",
+    "purpose": "LMS Integration Details | Partners | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "partner_lms_providers": [
+        "*"
+      ],
+      "partner_lms_sync_logs": [
+        "*"
+      ],
+      "partner_lms_courses": [
+        "*"
+      ],
+      "partner_lms_enrollments": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "partner_lms_sync_logs",
+        "column": "provider_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/payroll",
+    "file": "app/admin/payroll/page.tsx",
+    "lines": 295,
+    "status": "LIVE",
+    "purpose": "Payroll Management",
+    "reads": {},
+    "writes": [
+      {
+        "table": "apprentice_payroll",
+        "op": "update"
+      }
+    ],
+    "rpcs": [
+      "calculate_payroll"
+    ],
+    "api_routes": [
+      "/api/apprentice/email-alerts"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/payroll-cards",
+    "file": "app/admin/payroll-cards/page.tsx",
+    "lines": 188,
+    "status": "LIVE",
+    "purpose": "Payroll Cards | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/performance-dashboard",
+    "file": "app/admin/performance-dashboard/page.tsx",
+    "lines": 335,
+    "status": "LIVE",
+    "purpose": "Performance Dashboard | Admin | Elevate For Humanity",
+    "reads": {
+      "training_courses": [
+        "*",
+        "category",
+        "status"
+      ],
+      "leads": [
+        "*"
+      ],
+      "crm_contacts": [
+        "*"
+      ],
+      "wotc_applications": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/portal-map",
+    "file": "app/admin/portal-map/page.tsx",
+    "lines": 946,
+    "status": "LIVE",
+    "purpose": "Admin Portal Map",
+    "reads": {
+      "pages": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/program-generator",
+    "file": "app/admin/program-generator/page.tsx",
+    "lines": 187,
+    "status": "LIVE",
+    "purpose": "Program Generator | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/program-holder-acknowledgements",
+    "file": "app/admin/program-holder-acknowledgements/page.tsx",
+    "lines": 189,
+    "status": "LIVE",
+    "purpose": "Program Holder Acknowledgements | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/program-holder-documents",
+    "file": "app/admin/program-holder-documents/page.tsx",
+    "lines": 333,
+    "status": "LIVE",
+    "purpose": "Program Holder Documents",
+    "reads": {},
+    "writes": [
+      {
+        "table": "program_holder_documents",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/program-holders",
+    "file": "app/admin/program-holders/page.tsx",
+    "lines": 179,
+    "status": "LIVE",
+    "purpose": "Program Holders | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "program_holders": [
+        "contact_email",
+        "contact_name",
+        "contact_phone",
+        "created_at",
+        "id",
+        "mou_signed",
+        "name",
+        "organization_name",
+        "status",
+        "user_id"
+      ],
+      "program_holder_programs": [
+        "program_holder_id"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/program-holders/[id]",
+    "file": "app/admin/program-holders/[id]/page.tsx",
+    "lines": 601,
+    "status": "LIVE",
+    "purpose": "Review Program Holder | Admin",
+    "reads": {
+      "profiles": [
+        "email",
+        "full_name",
+        "id",
+        "role"
+      ],
+      "program_holders": [
+        "*",
+        "contact_email",
+        "contact_name",
+        "organization_name"
+      ],
+      "program_holder_programs": [
+        "created_at",
+        "id",
+        "is_primary",
+        "program_id",
+        "role_in_program",
+        "status"
+      ],
+      "programs": [
+        "id",
+        "is_active",
+        "name",
+        "slug",
+        "title"
+      ],
+      "admin_audit_events": [
+        "action",
+        "actor_user_id",
+        "created_at",
+        "metadata"
+      ]
+    },
+    "writes": [
+      {
+        "table": "program_holders",
+        "op": "update"
+      },
+      {
+        "table": "admin_audit_events",
+        "op": "insert"
+      },
+      {
+        "table": "program_holders",
+        "op": "update"
+      },
+      {
+        "table": "admin_audit_events",
+        "op": "insert"
+      }
+    ],
+    "rpcs": [
+      "approve_and_provision_program_holder",
+      "deprovision_program",
+      "provision_additional_program"
+    ],
+    "api_routes": [],
+    "server_actions": [
+      "approveAndProvision",
+      "provisionProgram",
+      "rejectHolder",
+      "removeProgram",
+      "suspendHolder"
+    ],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/program-holders/[id]/countersign-mou",
+    "file": "app/admin/program-holders/[id]/countersign-mou/page.tsx",
+    "lines": 178,
+    "status": "LIVE",
+    "purpose": "Countersign Mou | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "programs": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/program-holders/verification",
+    "file": "app/admin/program-holders/verification/page.tsx",
+    "lines": 365,
+    "status": "LIVE",
+    "purpose": "Program Holder Verification | Admin",
+    "reads": {
+      "program_holder_documents": [
+        "*"
+      ],
+      "program_holder_banking": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "program_holder_documents",
+        "column": "program_holder_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      },
+      {
+        "table": "program_holder_banking",
+        "column": "program_holder_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/program-holders/verification/[id]/review",
+    "file": "app/admin/program-holders/verification/[id]/review/page.tsx",
+    "lines": 102,
+    "status": "LIVE",
+    "purpose": "Review Program Holder | Admin",
+    "reads": {
+      "program_holder_documents": [
+        "*"
+      ],
+      "program_holder_banking": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "program_holders",
+        "op": "update"
+      },
+      {
+        "table": "program_holder_verification",
+        "op": "insert"
+      },
+      {
+        "table": "profiles",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "program_holder_documents",
+        "column": "program_holder_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      },
+      {
+        "table": "program_holder_banking",
+        "column": "program_holder_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/programs",
+    "file": "app/admin/programs/page.tsx",
+    "lines": 148,
+    "status": "LIVE",
+    "purpose": "Programs Management | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "programs": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "programs",
+        "op": "insert"
+      },
+      {
+        "table": "programs",
+        "op": "update"
+      },
+      {
+        "table": "programs",
+        "op": "delete"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "createProgram",
+      "updateProgram"
+    ],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": false,
+    "audit_gap": true
+  },
+  {
+    "route": "/admin/programs/[code]/dashboard",
+    "file": "app/admin/programs/[code]/dashboard/page.tsx",
+    "lines": 52,
+    "status": "LIVE",
+    "purpose": "Program Dashboard | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "programs": [
+        "*"
+      ],
+      "program_enrollments": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/programs/builder",
+    "file": "app/admin/programs/builder/page.tsx",
+    "lines": 59,
+    "status": "LIVE",
+    "purpose": "Program Builder | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "training_courses": [
+        "id",
+        "title"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/programs/catalog",
+    "file": "app/admin/programs/catalog/page.tsx",
+    "lines": 322,
+    "status": "LIVE",
+    "purpose": "Program Catalog Generator | Admin | Elevate",
+    "reads": {
+      "programs": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/programs/new",
+    "file": "app/admin/programs/new/page.tsx",
+    "lines": 69,
+    "status": "LIVE",
+    "purpose": "Create Program | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/progress",
+    "file": "app/admin/progress/page.tsx",
+    "lines": 52,
+    "status": "LIVE",
+    "purpose": "Progress Tracking | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "program_enrollments": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/promo-codes",
+    "file": "app/admin/promo-codes/page.tsx",
+    "lines": 474,
+    "status": "LIVE",
+    "purpose": "Promo Codes",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/promo-codes",
+      "/api/admin/promo-codes?id=${id}"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/quiz-builder",
+    "file": "app/admin/quiz-builder/page.tsx",
+    "lines": 187,
+    "status": "LIVE",
+    "purpose": "Quiz Builder | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/quizzes",
+    "file": "app/admin/quizzes/page.tsx",
+    "lines": 188,
+    "status": "LIVE",
+    "purpose": "Quizzes Management | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "training_courses": [
+        "course_name",
+        "id"
+      ],
+      "quiz_questions": [
+        "quiz_id"
+      ],
+      "quiz_attempts": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/rapids",
+    "file": "app/admin/rapids/page.tsx",
+    "lines": 309,
+    "status": "LIVE",
+    "purpose": "RAPIDS / USDOL Registration Status",
+    "reads": {
+      "apprenticeships": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/rapids/apprentices",
+    "file": "app/admin/rapids/apprentices/page.tsx",
+    "lines": 462,
+    "status": "LIVE",
+    "purpose": "RAPIDS Apprentice Management",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/reports/rapids/export?format=json",
+      "/api/reports/rapids/export?type=${type}&format=${format}"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/reporting",
+    "file": "app/admin/reporting/page.tsx",
+    "lines": 63,
+    "status": "LIVE",
+    "purpose": "Reporting Center | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/reports",
+    "file": "app/admin/reports/page.tsx",
+    "lines": 183,
+    "status": "LIVE",
+    "purpose": "Reports | Admin",
+    "reads": {
+      "leads": [
+        "*",
+        "created_at"
+      ],
+      "program_enrollments": [
+        "*",
+        "created_at"
+      ],
+      "training_courses": [
+        "*",
+        "id",
+        "title"
+      ],
+      "wotc_applications": [
+        "*"
+      ],
+      "grant_applications": [
+        "*"
+      ],
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/reports/caseload",
+    "file": "app/admin/reports/caseload/page.tsx",
+    "lines": 49,
+    "status": "LIVE",
+    "purpose": "Caseload Reports | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/reports/charts",
+    "file": "app/admin/reports/charts/page.tsx",
+    "lines": 198,
+    "status": "LIVE",
+    "purpose": "Charts & Visualizations | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "enrollments": [
+        "program_id",
+        "status"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/reports/enrollment",
+    "file": "app/admin/reports/enrollment/page.tsx",
+    "lines": 198,
+    "status": "LIVE",
+    "purpose": "Enrollment Report | Admin",
+    "reads": {
+      "program_enrollments": [
+        "*"
+      ],
+      "training_courses": [
+        "course_name",
+        "id"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/reports/financial",
+    "file": "app/admin/reports/financial/page.tsx",
+    "lines": 239,
+    "status": "LIVE",
+    "purpose": "Financial Report | Admin",
+    "reads": {
+      "wotc_applications": [
+        "*"
+      ],
+      "grant_applications": [],
+      "grant_opportunities": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/reports/leads",
+    "file": "app/admin/reports/leads/page.tsx",
+    "lines": 238,
+    "status": "LIVE",
+    "purpose": "Lead Generation Report | Admin",
+    "reads": {
+      "leads": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/reports/partners",
+    "file": "app/admin/reports/partners/page.tsx",
+    "lines": 161,
+    "status": "LIVE",
+    "purpose": "Partner Reports | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "partners": [
+        "*",
+        "city",
+        "created_at",
+        "id",
+        "name",
+        "state",
+        "status"
+      ],
+      "partner_inquiries": [
+        "created_at",
+        "id",
+        "name",
+        "organization",
+        "status"
+      ],
+      "partner_enrollments": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/reports/samples",
+    "file": "app/admin/reports/samples/page.tsx",
+    "lines": 145,
+    "status": "LIVE",
+    "purpose": "Sample Reports | Admin",
+    "reads": {
+      "profiles": [
+        "created_at",
+        "email",
+        "enrollment_status",
+        "full_name",
+        "id",
+        "role"
+      ],
+      "program_enrollments": [
+        "created_at",
+        "id",
+        "program_id",
+        "status"
+      ],
+      "certificates": [
+        "created_at",
+        "id",
+        "status"
+      ],
+      "completions": [
+        "created_at",
+        "id"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/reports/users",
+    "file": "app/admin/reports/users/page.tsx",
+    "lines": 212,
+    "status": "LIVE",
+    "purpose": "User Activity Report | Admin",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/retention",
+    "file": "app/admin/retention/page.tsx",
+    "lines": 48,
+    "status": "LIVE",
+    "purpose": "Retention Analytics | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/review-queue",
+    "file": "app/admin/review-queue/page.tsx",
+    "lines": 221,
+    "status": "LIVE",
+    "purpose": "Review Queue | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "review_queue": [
+        "*",
+        "queue_type"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/review-queue/[id]",
+    "file": "app/admin/review-queue/[id]/page.tsx",
+    "lines": 407,
+    "status": "LIVE",
+    "purpose": "Review Item | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "review_queue": [
+        "*"
+      ],
+      "documents": [
+        "*"
+      ],
+      "documents_extractions": [
+        "*"
+      ],
+      "transfer_hours": [],
+      "applications": [
+        "profiles!"
+      ],
+      "shop_routing_scores": [],
+      "partners": [
+        "*"
+      ],
+      "automated_decisions": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/review-queue/resolve"
+    ],
+    "server_actions": [
+      "extraction"
+    ],
+    "column_mismatches": [
+      {
+        "table": "applications",
+        "column": "profiles!",
+        "issue": "COLUMN_MISSING"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/sap",
+    "file": "app/admin/sap/page.tsx",
+    "lines": 537,
+    "status": "LIVE",
+    "purpose": "SAP Monitoring | Admin Dashboard",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "grades": [
+        "percentage"
+      ],
+      "attendance_records": [
+        "status"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "grades",
+        "column": "enrollment_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      },
+      {
+        "table": "attendance_records",
+        "column": "enrollment_id",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/security",
+    "file": "app/admin/security/page.tsx",
+    "lines": 58,
+    "status": "LIVE",
+    "purpose": "Security Settings | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/settings",
+    "file": "app/admin/settings/page.tsx",
+    "lines": 64,
+    "status": "LIVE",
+    "purpose": "Admin Settings | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/shops",
+    "file": "app/admin/shops/page.tsx",
+    "lines": 336,
+    "status": "LIVE",
+    "purpose": "Admin Shops | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "shop_applications": [
+        "*"
+      ],
+      "shop_required_docs_status": [
+        "approved",
+        "required"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/shops/geocoding",
+    "file": "app/admin/shops/geocoding/page.tsx",
+    "lines": 70,
+    "status": "LIVE",
+    "purpose": "Shop Geocoding",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "shops": [
+        "active",
+        "address1",
+        "address2",
+        "city",
+        "geocode_error",
+        "geocode_failed_at",
+        "geocode_source",
+        "geocoded_at",
+        "id",
+        "latitude",
+        "longitude",
+        "name",
+        "state",
+        "zip"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/shops/geocode"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/signatures",
+    "file": "app/admin/signatures/page.tsx",
+    "lines": 233,
+    "status": "LIVE",
+    "purpose": "Signatures Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "signatures": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "signatures",
+        "column": "status",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/signatures/new",
+    "file": "app/admin/signatures/new/page.tsx",
+    "lines": 55,
+    "status": "LIVE",
+    "purpose": "Request Signature | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/site-health",
+    "file": "app/admin/site-health/page.tsx",
+    "lines": 69,
+    "status": "LIVE",
+    "purpose": "Site Health | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/social-media",
+    "file": "app/admin/social-media/page.tsx",
+    "lines": 536,
+    "status": "LIVE",
+    "purpose": "Social Media Automation",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/auth/check-admin"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/social-media/campaigns/new",
+    "file": "app/admin/social-media/campaigns/new/page.tsx",
+    "lines": 597,
+    "status": "LIVE",
+    "purpose": "Create Social Media Campaign",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/auth/check-admin",
+      "/api/social-media/campaigns",
+      "/api/social-media/generate"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/store",
+    "file": "app/admin/store/page.tsx",
+    "lines": 49,
+    "status": "LIVE",
+    "purpose": "Store Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/store/clone-codebase",
+      "/api/store/create-product",
+      "/api/store/products"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/store/catalog",
+    "file": "app/admin/store/catalog/page.tsx",
+    "lines": 167,
+    "status": "LIVE",
+    "purpose": "Catalog Sanity Check | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/store/clones",
+    "file": "app/admin/store/clones/page.tsx",
+    "lines": 534,
+    "status": "LIVE",
+    "purpose": "Elevate LMS + Workforce Suite - Complete Codebase",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/store/publish"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/students",
+    "file": "app/admin/students/page.tsx",
+    "lines": 308,
+    "status": "LIVE",
+    "purpose": "Students Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ],
+      "program_enrollments": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/students/export",
+    "file": "app/admin/students/export/page.tsx",
+    "lines": 353,
+    "status": "LIVE",
+    "purpose": "Export Student Data",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/export/students?${params}"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/success",
+    "file": "app/admin/success/page.tsx",
+    "lines": 57,
+    "status": "LIVE",
+    "purpose": "Success Stories | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "success_stories": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/support",
+    "file": "app/admin/support/page.tsx",
+    "lines": 291,
+    "status": "LIVE",
+    "purpose": "Support Dashboard",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/support/tickets?${params}"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/syllabus-generator",
+    "file": "app/admin/syllabus-generator/page.tsx",
+    "lines": 187,
+    "status": "LIVE",
+    "purpose": "Syllabus Generator | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/system-health",
+    "file": "app/admin/system-health/page.tsx",
+    "lines": 187,
+    "status": "LIVE",
+    "purpose": "System Health | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/system-monitor",
+    "file": "app/admin/system-monitor/page.tsx",
+    "lines": 154,
+    "status": "LIVE",
+    "purpose": "",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/health"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/system-status",
+    "file": "app/admin/system-status/page.tsx",
+    "lines": 639,
+    "status": "LIVE",
+    "purpose": "System Status | Admin",
+    "reads": {
+      "creator_courses": [
+        "*"
+      ],
+      "program_enrollments": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/tax-filing",
+    "file": "app/admin/tax-filing/page.tsx",
+    "lines": 418,
+    "status": "LIVE",
+    "purpose": "Tax Filing Management | Admin",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ],
+      "tax_filing_applications": [
+        "*"
+      ],
+      "tax_preparers": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/tax-filing/applications",
+    "file": "app/admin/tax-filing/applications/page.tsx",
+    "lines": 234,
+    "status": "LIVE",
+    "purpose": "Tax Filing Applications | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "tax_applications": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "tax_applications",
+        "op": "insert"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/tax-filing/applications/new",
+    "file": "app/admin/tax-filing/applications/new/page.tsx",
+    "lines": 104,
+    "status": "FORM",
+    "purpose": "New Tax Filing Application | Admin",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "createTaxApplication"
+    ],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/tax-filing/preparers",
+    "file": "app/admin/tax-filing/preparers/page.tsx",
+    "lines": 141,
+    "status": "LIVE",
+    "purpose": "Tax Preparers | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/tax-filing/reports",
+    "file": "app/admin/tax-filing/reports/page.tsx",
+    "lines": 141,
+    "status": "LIVE",
+    "purpose": "Tax Filing Reports | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/tax-filing/training",
+    "file": "app/admin/tax-filing/training/page.tsx",
+    "lines": 161,
+    "status": "LIVE",
+    "purpose": "Tax Preparer Training | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/tenants",
+    "file": "app/admin/tenants/page.tsx",
+    "lines": 58,
+    "status": "LIVE",
+    "purpose": "Tenant Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ],
+      "tenants": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/test-emails",
+    "file": "app/admin/test-emails/page.tsx",
+    "lines": 248,
+    "status": "LIVE",
+    "purpose": "Test Email System",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/test-email"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/test-payments",
+    "file": "app/admin/test-payments/page.tsx",
+    "lines": 273,
+    "status": "LIVE",
+    "purpose": "Payment System Status",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/stripe/checkout"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/transfer-hours",
+    "file": "app/admin/transfer-hours/page.tsx",
+    "lines": 154,
+    "status": "LIVE",
+    "purpose": "Transfer Hours Management | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "transfer_hours": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "transfer_hours",
+        "op": "update"
+      },
+      {
+        "table": "transfer_hours",
+        "op": "update"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "approveTransferHours",
+      "denyTransferHours"
+    ],
+    "column_mismatches": [
+      {
+        "table": "transfer_hours",
+        "column": "status",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/users",
+    "file": "app/admin/users/page.tsx",
+    "lines": 59,
+    "status": "LIVE",
+    "purpose": "User Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*",
+        "role"
+      ]
+    },
+    "writes": [
+      {
+        "table": "profiles",
+        "op": "update"
+      },
+      {
+        "table": "profiles",
+        "op": "update"
+      },
+      {
+        "table": "profiles",
+        "op": "update"
+      },
+      {
+        "table": "profiles",
+        "op": "delete"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/users/new",
+    "file": "app/admin/users/new/page.tsx",
+    "lines": 272,
+    "status": "LIVE",
+    "purpose": "Create New User | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/verifications/review",
+    "file": "app/admin/verifications/review/page.tsx",
+    "lines": 278,
+    "status": "LIVE",
+    "purpose": "Review ID Verifications | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/verifications/review/[id]",
+    "file": "app/admin/verifications/review/[id]/page.tsx",
+    "lines": 97,
+    "status": "LIVE",
+    "purpose": "Review Verification | Admin",
+    "reads": {
+      "profiles": [
+        "role"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/video-generator",
+    "file": "app/admin/video-generator/page.tsx",
+    "lines": 276,
+    "status": "LIVE",
+    "purpose": "Lesson Video Generator",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/generate-lesson-videos"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/video-manager",
+    "file": "app/admin/video-manager/page.tsx",
+    "lines": 163,
+    "status": "LIVE",
+    "purpose": "Video Manager",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [
+      "/api/admin/videos/upload"
+    ],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/videos",
+    "file": "app/admin/videos/page.tsx",
+    "lines": 247,
+    "status": "LIVE",
+    "purpose": "Videos Management | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "media": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [
+      {
+        "table": "media",
+        "column": "published",
+        "issue": "FILTER_COLUMN_MISSING (via .eq)"
+      }
+    ],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/videos/upload",
+    "file": "app/admin/videos/upload/page.tsx",
+    "lines": 49,
+    "status": "LIVE",
+    "purpose": "Upload Videos | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/waitlist",
+    "file": "app/admin/waitlist/page.tsx",
+    "lines": 157,
+    "status": "LIVE",
+    "purpose": "Waitlist | Admin | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "role"
+      ],
+      "waitlist": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/wioa",
+    "file": "app/admin/wioa/page.tsx",
+    "lines": 208,
+    "status": "STATIC",
+    "purpose": "WIOA Compliance | Admin | Elevate for Humanity",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/wioa/documents",
+    "file": "app/admin/wioa/documents/page.tsx",
+    "lines": 158,
+    "status": "LIVE",
+    "purpose": "WIOA Documents | Admin",
+    "reads": {
+      "wioa_documents": []
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/wioa/eligibility",
+    "file": "app/admin/wioa/eligibility/page.tsx",
+    "lines": 183,
+    "status": "LIVE",
+    "purpose": "WIOA Eligibility | Admin",
+    "reads": {
+      "wioa_applications": []
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/wioa/reports",
+    "file": "app/admin/wioa/reports/page.tsx",
+    "lines": 127,
+    "status": "LIVE",
+    "purpose": "WIOA Reports | Admin",
+    "reads": {
+      "program_enrollments": [
+        "*"
+      ],
+      "certificates": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/wioa/verify",
+    "file": "app/admin/wioa/verify/page.tsx",
+    "lines": 327,
+    "status": "LIVE",
+    "purpose": "Verify Eligibility | WIOA Admin",
+    "reads": {
+      "wioa_participants": [
+        "*",
+        "created_at",
+        "eligibility_status",
+        "email",
+        "first_name",
+        "id",
+        "last_name"
+      ],
+      "documents": [
+        "created_at",
+        "document_type",
+        "file_path",
+        "file_url",
+        "id",
+        "status",
+        "title"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/workflows",
+    "file": "app/admin/workflows/page.tsx",
+    "lines": 63,
+    "status": "LIVE",
+    "purpose": "Workflow Automation | Elevate For Humanity",
+    "reads": {
+      "profiles": [
+        "*"
+      ]
+    },
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/wotc",
+    "file": "app/admin/wotc/page.tsx",
+    "lines": 198,
+    "status": "LIVE",
+    "purpose": "WOTC Management | Admin",
+    "reads": {
+      "wotc_applications": [
+        "*"
+      ]
+    },
+    "writes": [
+      {
+        "table": "wotc_applications",
+        "op": "insert"
+      },
+      {
+        "table": "wotc_applications",
+        "op": "update"
+      },
+      {
+        "table": "wotc_applications",
+        "op": "update"
+      },
+      {
+        "table": "wotc_applications",
+        "op": "update"
+      },
+      {
+        "table": "wotc_applications",
+        "op": "delete"
+      }
+    ],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [],
+    "column_mismatches": [],
+    "has_mutations": true,
+    "has_audit_trail": true,
+    "audit_gap": false
+  },
+  {
+    "route": "/admin/wotc/new",
+    "file": "app/admin/wotc/new/page.tsx",
+    "lines": 295,
+    "status": "FORM",
+    "purpose": "New WOTC Application | Admin",
+    "reads": {},
+    "writes": [],
+    "rpcs": [],
+    "api_routes": [],
+    "server_actions": [
+      "createWOTCApplication"
+    ],
+    "column_mismatches": [],
+    "has_mutations": false,
+    "has_audit_trail": false,
+    "audit_gap": false
+  }
+]

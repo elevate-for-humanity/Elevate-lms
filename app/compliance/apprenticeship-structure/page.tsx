@@ -99,7 +99,7 @@ export default function ApprenticeshipStructurePage() {
           <div className="grid sm:grid-cols-2 gap-4 mb-10">
             <div className="bg-slate-50 rounded-lg p-5 print:border print:bg-white">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Registered Apprenticeship Sponsor</p>
-              <p className="font-bold text-gray-900">2Exclusive LLC (DBA Elevate for Humanity)</p>
+              <p className="font-bold text-gray-900">2Exclusive LLC-S (DBA Elevate for Humanity Career &amp; Technical Institute)</p>
               <p className="text-sm text-gray-600 mt-1">RAPIDS ID: 2025-IN-132301</p>
             </div>
             <div className="bg-slate-50 rounded-lg p-5 print:border print:bg-white">
@@ -121,7 +121,7 @@ export default function ApprenticeshipStructurePage() {
 
           <div className="space-y-3">
             {[
-              { level: 1, role: 'Sponsor (Oversight & Compliance)', entity: '2Exclusive LLC-S', icon: Shield, scope: 'RAPIDS registration, ETPL compliance, curriculum standards, enrollment management, funding navigation, progress tracking, credential verification, institutional accountability. Final authority on all program decisions.' },
+              { level: 1, role: 'Sponsor (Oversight & Compliance)', entity: '2Exclusive LLC-S (DBA Elevate for Humanity Career & Technical Institute)', icon: Shield, scope: 'RAPIDS registration, ETPL compliance, curriculum standards, enrollment management, funding navigation, progress tracking, credential verification, institutional accountability. Final authority on all program decisions.' },
               { level: 2, role: 'Primary RTI Providers (Credential Partners)', entity: 'State-Approved / Licensed Training Institutions', icon: GraduationCap, scope: 'Occupation-specific classroom instruction, clinical rotations, lab sessions, certification exam preparation. Credentials must match the occupation taught. Operate under signed MOU with Elevate.' },
               { level: 3, role: 'Program Holders (RTI Coordinators)', entity: 'Authorized Curriculum Managers', icon: FileCheck, scope: 'Curriculum delivery coordination, module sequencing, RTI scheduling, progress documentation. Operate under the instructional authority of Tier 2 Credential Partners. Not independent instructors.' },
               { level: 4, role: 'Subject Matter Experts (SMEs)', entity: 'Credentialed Industry Professionals', icon: Award, scope: 'Supplemental instruction, mentoring, lab supervision, module support. Never sole RTI authority — state-approved providers are always involved in RTI delivery for every program.' },

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -6,6 +7,7 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Admin API for Enrollment Jobs
@@ -14,7 +16,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  * POST - Manually trigger orchestrator or retry failed job
  */
 
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -69,7 +71,7 @@ const supabase = await createClient();
   return NextResponse.json({ jobs });
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -114,6 +116,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
+    await logAdminAudit({ action: AdminAction.ENROLLMENT_JOB_UPDATED, actorId: user.id, entityType: 'enrollment_jobs', entityId: job_id, metadata: { retry: true }, req });
+
     return NextResponse.json({ success: true, message: 'Job reset for retry' });
   }
 
@@ -132,3 +136,5 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
 }
+export const GET = withApiAudit('/api/admin/enrollment-jobs', _GET);
+export const POST = withApiAudit('/api/admin/enrollment-jobs', _POST);

@@ -9,6 +9,8 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { isDemoEnabled, getDemoTenantSlug } from '@/lib/demo/context';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 export const dynamic = 'force-dynamic';
 
 const DEMO_TENANT_ID = '00000000-0000-0000-0000-000000000001';

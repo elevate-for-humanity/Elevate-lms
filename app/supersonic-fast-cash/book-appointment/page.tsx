@@ -140,7 +140,7 @@ export default function BookAppointment() {
     },
     {
       id: '56th',
-      name: '7009 E 56th St, Suite EE1, Indianapolis, IN 46226',
+      name: '8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240',
       available: appointmentData.appointmentType === 'in-person',
     },
   ];

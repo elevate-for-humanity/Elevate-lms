@@ -64,7 +64,7 @@ const programs = [
   },
   {
     name: 'CPR & First Aid',
-    href: '/programs/cpr-first-aid-hsi',
+    href: '/programs/cpr-first-aid',
     image: '/images/programs-hq/cna-training.jpg',
     certs: ['HSI CPR/AED', 'First Aid'],
     funding: 'Same-day certification',

@@ -16,7 +16,7 @@ export async function getSignedMOUUrl(
 
   const { data, error }: any = await supabase.storage
     .from('mous')
-    .createSignedUrl(filename, 3600); // 1 hour expiry
+    .createSignedUrl(filename, 60); // 60-second expiry for compliance documents
 
   if (error) {
     logger.error('Error creating signed URL', error as Error, { filename });

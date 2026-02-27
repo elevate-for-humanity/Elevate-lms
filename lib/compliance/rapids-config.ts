@@ -9,7 +9,7 @@ export const RAPIDS_CONFIG = {
   // Sponsor Information
   // RAPIDS registered sponsor is the legal entity; brand is the program name
   sponsorOfRecord: '2Exclusive LLC-S', // Legal entity on RAPIDS registration
-  programBrand: 'Elevate for Humanity', // Program/brand name (DBA)
+  programBrand: 'Elevate for Humanity Career & Technical Institute', // DBA of 2Exclusive LLC-S
   
   // Registration Details
   registrationId: process.env.RAPIDS_REGISTRATION_ID || '2025-IN-132301',
@@ -99,7 +99,7 @@ export function getPublicRegistrationDetails() {
   return {
     sponsorLegalEntity: RAPIDS_CONFIG.sponsorOfRecord,
     programBrand: RAPIDS_CONFIG.programBrand,
-    publicStatement: `${RAPIDS_CONFIG.programBrand} is the program brand operated by ${RAPIDS_CONFIG.sponsorOfRecord}, the registered Sponsor of Record.`,
+    publicStatement: `${RAPIDS_CONFIG.programBrand} is a DBA of ${RAPIDS_CONFIG.sponsorOfRecord}, the registered Sponsor of Record.`,
     state: RAPIDS_CONFIG.state,
     isStateFunded: RAPIDS_CONFIG.isStateFunded,
     licensingAgency: RAPIDS_CONFIG.licensingAgency,

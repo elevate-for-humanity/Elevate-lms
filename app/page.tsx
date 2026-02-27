@@ -38,7 +38,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3 mt-6">
             <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg text-base sm:text-lg transition-all shadow-lg shadow-brand-red-600/30">
-              Apply Now — It&apos;s Free
+              Apply Now
             </Link>
             <Link href="/programs" className="bg-white/15 border border-white/30 text-white font-bold px-8 py-3.5 rounded-lg text-base sm:text-lg hover:bg-white/25 transition-all">
               Browse Programs
@@ -69,7 +69,7 @@ export default function HomePage() {
                 href={item.href}
                 className="flex flex-col bg-white rounded-xl border-2 border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all group overflow-hidden"
               >
-                <Image src={item.image} alt={item.alt} width={600} height={400} className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300" />
+                <Image src={item.image} alt={item.alt} width={600} height={400} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="w-full aspect-[3/2] object-cover group-hover:scale-105 transition-transform duration-300" />
                 <div className="p-5 flex flex-col flex-1">
                   <span className="font-bold text-lg text-slate-900 mb-1">{item.label}</span>
                   <span className="text-sm text-slate-600 mb-4 flex-1">{item.desc}</span>
@@ -89,7 +89,7 @@ export default function HomePage() {
       {/* ===== HOW IT WORKS ===== */}
       <InView animation="fade-up">
       <section aria-label="How it works" className="py-10 sm:py-14">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">How It Works</h2>
             <p className="text-lg text-slate-700">Four steps to your new career</p>
@@ -109,7 +109,7 @@ export default function HomePage() {
                   width={800}
                   height={533}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="w-full h-48 object-cover rounded-lg mb-4"
+                  className="w-full aspect-[3/2] object-cover rounded-lg mb-4"
                 />
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{step.title}</h3>
                 <p className="text-slate-700 text-base mb-4">{step.desc}</p>
@@ -167,7 +167,7 @@ export default function HomePage() {
           <p className="text-lg text-slate-700 mb-8">
             Many programs are available at no cost to eligible participants through WIOA, WRG, and JRI. Platform access fees may apply depending on funding source and enrollment type.
           </p>
-          <div className="grid sm:grid-cols-2 gap-6 mb-10">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             {[
               { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/hp/wioa.jpg' },
               { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost for eligible participants.', href: '/funding/state-programs', image: '/images/hp/grants.jpg' },
@@ -176,7 +176,7 @@ export default function HomePage() {
               { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/hp/government.jpg', external: true },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
-                <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-48 object-cover" />
+                <Image src={item.image} alt={item.label} width={600} height={400} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="w-full aspect-[3/2] object-cover" />
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-lg mb-1">{item.label}</h3>
                   <p className="text-slate-600 text-sm mb-4">{item.desc}</p>
@@ -214,7 +214,7 @@ export default function HomePage() {
           <p className="text-lg text-slate-700 mb-8">
             Our candidates come out of our programs credentialed and ready to work. Access tax credits and funding.
           </p>
-          <div className="grid sm:grid-cols-2 gap-6 mb-10">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-10">
             {[
               { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. Background checks and drug screening are completed where required by employer or program.', href: '/career-services', image: '/images/hp/candidates.jpg' },
               { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives employers $2,400 per qualifying hire (up to $9,600 for qualified veterans). Targeted groups include formerly incarcerated, TANF/SNAP recipients, and long-term unemployed. We help file Form 8850 within the 28-day deadline.', href: '/employer', image: '/images/hp/wotc.jpg' },
@@ -222,7 +222,7 @@ export default function HomePage() {
               { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/hp/post-jobs.jpg' },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
-                <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-48 object-cover" />
+                <Image src={item.image} alt={item.label} width={600} height={400} sizes="(max-width: 640px) 100vw, 50vw" className="w-full aspect-[3/2] object-cover" />
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-lg mb-1">{item.label}</h3>
                   <p className="text-slate-600 text-sm mb-4">{item.desc}</p>
@@ -251,7 +251,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div className="rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/hp/why-elevate.jpg" alt="Students in a training session at Elevate for Humanity" width={800} height={600} className="w-full h-72 sm:h-80 lg:h-96 object-cover" />
+              <Image src="/images/hp/why-elevate.jpg" alt="Students in a training session at Elevate for Humanity" width={800} height={600} sizes="(max-width: 1024px) 100vw, 50vw" className="w-full aspect-[4/3] object-cover" />
             </div>
             <div>
               <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Why Elevate</p>
@@ -277,7 +277,7 @@ export default function HomePage() {
               </div>
               <div className="mt-8">
                 <Link href="/apply/student" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors shadow-lg shadow-brand-red-600/20">
-                  Apply Now — It&apos;s Free
+                  Apply Now
                 </Link>
               </div>
             </div>
@@ -289,7 +289,7 @@ export default function HomePage() {
       {/* ===== TESTIMONIALS ===== */}
       <InView animation="fade-up">
       <section aria-label="Student testimonials" className="py-10 sm:py-14 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">Real Students. Real Results.</h2>
             <p className="text-slate-500 text-lg">Hear from graduates who changed their careers through Elevate.</p>

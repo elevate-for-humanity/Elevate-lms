@@ -3,10 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
@@ -64,3 +65,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Failed to submit enrollment' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/enrollment/submit', _POST);

@@ -36,7 +36,7 @@ export const PATHWAYS: Pathway[] = [
     outcomes: ['Certified Nursing Assistant', 'Patient Care Technician'],
     credential: 'CNA Certification',
     credentialIssuer: 'Indiana State Dept. of Health (ISDH)',
-    ctaHref: '/programs/cna-certification',
+    ctaHref: '/programs/cna',
     stages: [
       { stage: 1, title: 'Eligibility Screening', description: 'Indiana Career Connect registration, WorkOne appointment, WIOA/JRI eligibility determination.', duration: '1–2 weeks' },
       { stage: 2, title: 'Classroom & Clinical Training', description: 'Patient care fundamentals, vital signs, infection control, mobility techniques, medical terminology. Clinical rotation at a healthcare facility.', duration: '4–6 weeks' },

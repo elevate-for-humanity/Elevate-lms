@@ -94,7 +94,7 @@ export default async function InstructorMessagesPage() {
             <h2 className="text-xl font-semibold text-gray-900 mb-2">No messages yet</h2>
             <p className="text-gray-600 mb-6">Start a conversation with your instructor.</p>
             <Link 
-              href="/lms/messages/new?type=instructor"
+              href="/lms/messages?type=instructor"
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Send className="w-4 h-4" />

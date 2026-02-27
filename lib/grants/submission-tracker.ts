@@ -6,6 +6,8 @@
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { notifyGrantSubmitted } from './notification-system';
 
+import { logAuditEvent } from '@/lib/audit';
+
 export type SubmissionMethod = 'email' | 'portal' | 'mail' | 'other';
 export type SubmissionStatus =
   | 'pending'

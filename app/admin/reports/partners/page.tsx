@@ -36,7 +36,7 @@ export default async function PartnerReportsPage() {
     db.from('partner_enrollments').select('*', { count: 'exact', head: true }),
     db.from('partner_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
     db.from('partners').select('id, name, city, state, status, created_at').order('created_at', { ascending: false }).limit(20),
-    db.from('partner_inquiries').select('id, full_name, organization, status, submitted_at').order('submitted_at', { ascending: false }).limit(10),
+    db.from('partner_inquiries').select('id, name, organization, status, created_at').order('created_at', { ascending: false }).limit(10),
   ]);
 
   const total = totalEnrollments || 0;
@@ -128,7 +128,7 @@ export default async function PartnerReportsPage() {
                 {inquiries.map((inq: any) => (
                   <div key={inq.id} className="flex items-center justify-between py-2 border-b last:border-0">
                     <div>
-                      <p className="font-medium text-gray-900 text-sm">{inq.full_name}</p>
+                      <p className="font-medium text-gray-900 text-sm">{inq.name}</p>
                       <p className="text-xs text-gray-500">{inq.organization || '—'}</p>
                     </div>
                     <div className="text-right">
@@ -140,9 +140,9 @@ export default async function PartnerReportsPage() {
                       }`}>
                         {inq.status}
                       </span>
-                      {inq.submitted_at && (
+                      {inq.created_at && (
                         <p className="text-xs text-gray-400 mt-1">
-                          {new Date(inq.submitted_at).toLocaleDateString()}
+                          {new Date(inq.created_at).toLocaleDateString()}
                         </p>
                       )}
                     </div>

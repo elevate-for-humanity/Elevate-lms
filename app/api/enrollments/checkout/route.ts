@@ -17,6 +17,7 @@ import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 function getSupabase() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -25,7 +26,7 @@ function getSupabase() {
   return createClient(supabaseUrl, supabaseKey);
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
 
@@ -210,3 +211,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/enrollments/checkout', _POST);

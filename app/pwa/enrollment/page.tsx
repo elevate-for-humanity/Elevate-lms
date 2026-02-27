@@ -35,7 +35,7 @@ export default async function EnrollmentPWAPage() {
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Image src="/logo.png" alt="Elevate" width={40} height={40} className="mb-3" />
           <h1 className="text-2xl font-bold text-white">Enrollment Center</h1>
-          <p className="text-orange-200 text-sm mt-1">Apply, track status, and complete enrollment</p>
+          <p className="text-brand-orange-200 text-sm mt-1">Apply, track status, and complete enrollment</p>
         </div>
       </div>
 
@@ -59,7 +59,7 @@ export default async function EnrollmentPWAPage() {
       <div className="px-4 mt-6">
         <Link href="/apply" className="block bg-brand-orange-500 text-white rounded-xl p-5 text-center hover:bg-brand-orange-600 transition-colors">
           <div className="text-lg font-bold">Start Your Application →</div>
-          <div className="text-orange-100 text-sm mt-1">{freePrograms.length} programs with funding available</div>
+          <div className="text-brand-orange-100 text-sm mt-1">{freePrograms.length} programs with funding available</div>
         </Link>
       </div>
 
@@ -98,7 +98,7 @@ export default async function EnrollmentPWAPage() {
                 <div className="text-xs text-slate-500">{app.email} · {new Date(app.created_at).toLocaleDateString()}</div>
               </div>
               <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                app.status === 'approved' ? 'bg-green-100 text-green-700' :
+                app.status === 'approved' ? 'bg-brand-green-100 text-brand-green-700' :
                 app.status === 'enrolled' ? 'bg-brand-blue-100 text-brand-blue-700' :
                 app.status === 'pending' || !app.status ? 'bg-amber-100 text-amber-700' :
                 'bg-slate-100 text-slate-600'
@@ -137,7 +137,7 @@ export default async function EnrollmentPWAPage() {
         <div className="space-y-2">
           {programs.slice(0, 10).map((prog: any) => (
             <Link key={prog.id} href={`/programs/${prog.slug}`} className="flex items-center gap-3 bg-white rounded-xl border border-slate-200 p-3 hover:border-brand-orange-300">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center text-brand-orange-600 font-bold text-xs flex-shrink-0">
+              <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center text-brand-orange-600 font-bold text-xs flex-shrink-0">
                 {prog.category?.slice(0, 3).toUpperCase() || 'PRG'}
               </div>
               <div className="flex-1 min-w-0">

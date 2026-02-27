@@ -24,7 +24,7 @@ export default function RapidsAdminPage() {
     ...program,
   }));
 
-  const procurementStatement = `Elevate for Humanity is the program brand operated by 2Exclusive LLC-S, the USDOL Registered Apprenticeship Sponsor of Record for the Barber program in Indiana. Registration documentation is available upon request for procurement, compliance, or partner onboarding purposes. This program is fee-based and not state-funded. Employment and wages, if applicable, are governed by host sites and applicable labor laws and are not administered through Elevate.`;
+  const procurementStatement = `Elevate for Humanity Career & Technical Institute is a DBA of 2Exclusive LLC-S, the USDOL Registered Apprenticeship Sponsor of Record for the Barber program in Indiana. Registration documentation is available upon request for procurement, compliance, or partner onboarding purposes. This program is fee-based and not state-funded. Employment and wages, if applicable, are governed by host sites and applicable labor laws and are not administered through Elevate.`;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -159,7 +159,7 @@ export default function RapidsAdminPage() {
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
             <p className="text-sm text-amber-800">
               <strong>Legal Entity vs Brand:</strong> The RAPIDS-registered Sponsor of Record is the legal entity. 
-              The program brand is used in marketing and student-facing materials.
+              The DBA (trade name) is used in marketing and student-facing materials.
             </p>
           </div>
           
@@ -169,7 +169,7 @@ export default function RapidsAdminPage() {
               <p className="font-semibold text-gray-900">{RAPIDS_CONFIG.sponsorOfRecord}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Program Brand</p>
+              <p className="text-sm text-gray-500">DBA (Trade Name)</p>
               <p className="font-semibold text-gray-900">{RAPIDS_CONFIG.programBrand}</p>
             </div>
             <div>

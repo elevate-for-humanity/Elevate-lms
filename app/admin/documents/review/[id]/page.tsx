@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { DocumentReviewForm } from '@/components/admin/DocumentReviewForm';
+import { getAdminDocumentUrl } from '@/lib/admin/document-access';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -70,15 +71,15 @@ export default async function ReviewDocumentPage({
     redirect('/admin/documents/review');
   }
 
-  // Generate signed URL for private bucket document
+  // Generate signed URL via centralized admin document access
   let viewUrl = document.file_url;
   if (document.file_path) {
-    const { data: signedData } = await db.storage
-      .from('documents')
-      .createSignedUrl(document.file_path, 3600);
-    if (signedData?.signedUrl) {
-      viewUrl = signedData.signedUrl;
-    }
+    const url = await getAdminDocumentUrl({
+      adminId: user.id,
+      documentId: document.id,
+      context: 'document_review',
+    });
+    if (url) viewUrl = url;
   }
 
   // Pass signed URL to client component via the document object

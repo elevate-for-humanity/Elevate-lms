@@ -226,14 +226,14 @@ export default async function SecurityPage() {
           <h2 className="text-2xl font-bold mb-6">Related Policies</h2>
           <div className="grid md:grid-cols-3 gap-4">
             <Link
-              href="/privacy"
+              href="/privacy-policy"
               className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition"
             >
               <h3 className="font-semibold">Privacy Policy</h3>
               <p className="text-sm text-gray-600">How we collect and use data</p>
             </Link>
             <Link
-              href="/terms"
+              href="/terms-of-service"
               className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition"
             >
               <h3 className="font-semibold">Terms of Service</h3>

@@ -11,6 +11,8 @@ import {
 } from '@/lib/programs/pricing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 /**
  * POST /api/barber/checkout
  * 

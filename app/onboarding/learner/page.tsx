@@ -98,6 +98,7 @@ export default async function LearnerOnboardingPage() {
     agreementsResult,
     handbookResult,
     idDocResult,
+    orientationResult,
   ] = await Promise.all([
     db.from('profiles')
       .select('*, onboarding_completed, funding_confirmed, funding_source, orientation_completed, schedule_selected, enrollment_status, full_name, first_name, last_name, phone, address')
@@ -126,6 +127,10 @@ export default async function LearnerOnboardingPage() {
       .eq('document_type', 'photo_id')
       .limit(1)
       .maybeSingle(),
+    db.from('orientation_completions')
+      .select('id')
+      .eq('user_id', user.id)
+      .limit(1),
   ]);
 
   const profile = profileResult.data;
@@ -137,8 +142,7 @@ export default async function LearnerOnboardingPage() {
   const handbookAcknowledged = (handbookResult.data?.length || 0) > 0;
   // Identity verified if user has uploaded a photo_id document
   const identityVerified = !!idDocResult.data;
-  // Orientation: check profile flag (orientation_completions.user_id may not exist yet)
-  const orientationDone = !!profile?.orientation_completed;
+  const orientationDone = !!profile?.orientation_completed || (orientationResult.data?.length || 0) > 0;
 
   // Look up program name from apprenticeship_programs (FK target for program_enrollments)
   let enrollmentProgramName: string | null = null;

@@ -260,7 +260,7 @@ export default function BarbershopPartnerApplyPage() {
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input type="checkbox" checked={formData.consentAcknowledged} onChange={e => updateField('consentAcknowledged', e.target.checked)} className="mt-1" />
                     <span className="text-sm text-gray-700">
-                      I consent to be contacted regarding this application and acknowledge that my information will be handled according to the <Link href="/privacy" className="text-brand-blue-600 underline">Privacy Policy</Link>. *
+                      I consent to be contacted regarding this application and acknowledge that my information will be handled according to the <Link href="/privacy-policy" className="text-brand-blue-600 underline">Privacy Policy</Link>. *
                     </span>
                   </label>
                 </div>

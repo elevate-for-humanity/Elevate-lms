@@ -1,404 +1,128 @@
-'use client';
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import ProgramHeroBanner from '@/components/ProgramHeroBanner';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { FundingBadge } from '@/components/programs/FundingBadge';
-import { createBrowserClient } from '@supabase/ssr';
-import { 
-  Clock, DollarSign, TrendingUp, ArrowRight, 
-  Flame, Award, Users, Calendar, ChevronDown, ChevronUp, 
-  Play, Phone, GraduationCap, Briefcase, Shield, Factory,
-  Wrench, HardHat, Zap, Target
-} from 'lucide-react';
+import { Metadata } from 'next';
+import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
+import ProgramPageLayout from '@/components/programs/ProgramPageLayout';
+import type { ProgramPageConfig } from '@/components/programs/ProgramPageLayout';
 
-export default function WeldingProgramPage() {
-  const [dbRows, setDbRows] = useState<any[]>([]);
-  useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-    supabase.from('programs').select('*').limit(50)
-      .then(({ data }) => { if (data) setDbRows(data); });
-  }, []);
+const SITE_URL = 'https://www.elevateforhumanity.org';
 
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+export const metadata: Metadata = {
+  title: 'Welding Technician Training | AWS Certified | Indianapolis',
+  description: '10-week welding program. MIG, TIG, Stick, and Flux-Core. OSHA 10, AWS certifications. Free for eligible participants through WIOA.',
+  alternates: { canonical: `${SITE_URL}/programs/welding` },
+};
 
-  const faqs = [
-    {
-      question: "Do I need any experience to start welding training?",
-      answer: "No prior experience is required. Our program starts with the fundamentals - safety, equipment operation, and basic techniques. We'll teach you everything from striking your first arc to passing AWS certification tests."
-    },
-    {
-      question: "What welding processes will I learn?",
-      answer: "You'll master four primary welding processes: SMAW (Stick), GMAW (MIG), GTAW (TIG), and FCAW (Flux-Core). These cover 95% of welding jobs in manufacturing, construction, and fabrication. You'll also learn oxy-fuel cutting and plasma cutting."
-    },
-    {
-      question: "What certifications will I earn?",
-      answer: "You'll earn AWS (American Welding Society) certifications in multiple processes and positions. Specific certs include AWS D1.1 Structural Steel, and you'll be prepared for 3G and 4G plate certifications. These are industry-standard credentials recognized by employers nationwide."
-    },
-    {
-      question: "How long is the welding program?",
-      answer: "The full program is 12-16 weeks depending on your schedule. We offer day and evening classes. You'll complete approximately 400 hours of hands-on training plus classroom instruction on blueprint reading, welding symbols, and metallurgy."
-    },
-    {
-      question: "Is welding a good career choice?",
-      answer: "Absolutely. The Bureau of Labor Statistics projects steady demand for welders through 2032. Skilled welders are needed in manufacturing, construction, shipbuilding, aerospace, and energy. Many welders earn $50,000-$80,000+ annually, with underwater and pipeline welders earning over $100,000."
-    },
-    {
-      question: "What safety equipment is provided?",
-      answer: "We provide all safety equipment during training including welding helmets with auto-darkening lenses, leather gloves, welding jackets, safety glasses, and respirators. You'll learn proper PPE usage as part of the curriculum."
-    },
-    {
-      question: "Can I specialize in a specific type of welding?",
-      answer: "Yes! After mastering fundamentals, many students focus on TIG welding for precision work, pipe welding for higher pay, or structural welding for construction. We help you identify which specialization matches your career goals."
-    },
-    {
-      question: "What jobs can I get after completing the program?",
-      answer: "Graduates work as production welders, fabricators, pipe welders, structural welders, welding inspectors, and maintenance welders. Industries include automotive, aerospace, construction, shipbuilding, manufacturing, and energy. Many employers offer apprenticeships that lead to journeyman status."
-    }
-  ];
+const config: ProgramPageConfig = {
+  videoSrc: '/videos/welding-trades.mp4',
+  voiceoverSrc: '/audio/heroes/welding.mp3',
 
-  const curriculum = [
-    {
-      week: "Weeks 1-2",
-      title: "Welding Fundamentals & Safety",
-      topics: ["Shop safety and PPE requirements", "Welding equipment and setup", "Metal identification and properties", "Oxy-fuel cutting and heating"],
-      project: "Complete safety certification and basic cuts"
-    },
-    {
-      week: "Weeks 3-4",
-      title: "SMAW (Stick Welding)",
-      topics: ["Electrode selection (6010, 6011, 7018)", "Flat and horizontal positions", "Vertical up and overhead positions", "Joint preparation and fit-up"],
-      project: "Pass visual inspection on all position welds"
-    },
-    {
-      week: "Weeks 5-6",
-      title: "GMAW (MIG Welding)",
-      topics: ["Wire feed setup and adjustment", "Shielding gas selection (CO2, Argon mix)", "Short circuit and spray transfer", "Welding thin and thick materials"],
-      project: "Complete production-quality MIG welds"
-    },
-    {
-      week: "Weeks 7-8",
-      title: "FCAW (Flux-Core Welding)",
-      topics: ["Self-shielded vs gas-shielded FCAW", "High-deposition welding techniques", "Out-of-position welding", "Structural welding applications"],
-      project: "Pass AWS D1.1 visual inspection"
-    },
-    {
-      week: "Weeks 9-10",
-      title: "GTAW (TIG Welding)",
-      topics: ["Tungsten selection and preparation", "Filler rod techniques", "Welding steel, stainless, and aluminum", "Precision and aesthetic welds"],
-      project: "Complete TIG welds on multiple materials"
-    },
-    {
-      week: "Weeks 11-12",
-      title: "Blueprint Reading & Welding Symbols",
-      topics: ["Interpreting welding blueprints", "AWS welding symbol standards", "Weld joint design and specifications", "Quality control and inspection"],
-      project: "Fabricate project from blueprint"
-    },
-    {
-      week: "Weeks 13-14",
-      title: "Certification Preparation",
-      topics: ["AWS certification test procedures", "Bend test and visual inspection criteria", "Common defects and how to avoid them", "Test plate preparation"],
-      project: "Pass practice certification tests"
-    },
-    {
-      week: "Weeks 15-16",
-      title: "Advanced Skills & Career Launch",
-      topics: ["Pipe welding introduction", "Plasma and CNC cutting", "Resume and portfolio building", "Employer interviews and job placement"],
-      project: "Earn AWS certifications and secure employment"
-    }
-  ];
+  title: 'Welding Technician',
+  subtitle: 'Master MIG, TIG, Stick, and Flux-Core welding. Graduate with OSHA 10 and AWS certifications in 10 weeks.',
+  badge: 'Funding Available',
+  badgeColor: 'orange',
 
-  const stats = [
-    { value: "92%", label: "Certification Pass Rate", icon: Award },
-    { value: "$54K", label: "Average Starting Salary", icon: DollarSign },
-    { value: "16", label: "Weeks to Certified", icon: Calendar },
-    { value: "400+", label: "Hours Hands-On Training", icon: Flame }
-  ];
+  duration: '10 weeks',
+  cost: '$0 with WIOA funding',
+  format: 'In-person, Indianapolis',
+  credential: 'AWS D1.1 + OSHA 10',
 
+  overview: 'This 10-week hands-on program teaches four welding processes: MIG (GMAW), TIG (GTAW), Stick (SMAW), and Flux-Core (FCAW). You will weld on carbon steel in all positions — flat, horizontal, vertical, and overhead. Training includes blueprint reading, weld symbols, and metallurgy basics. Graduates are prepared for the AWS D1.1 Structural Welding certification test.',
+  highlights: [
+    'Four welding processes: MIG, TIG, Stick, Flux-Core',
+    'All-position welding on carbon steel',
+    'Blueprint reading and weld symbol interpretation',
+    'AWS D1.1 Structural Welding certification prep',
+    'OSHA 10-Hour Construction Safety certification',
+    '80%+ shop time — hands-on from day one',
+  ],
+  overviewImage: '/images/programs-fresh/welding.jpg',
+  overviewImageAlt: 'Welding student working with MIG welder in shop',
+
+  salaryNumber: 47540,
+  salaryLabel: 'Average annual salary for welders in Indiana (BLS)',
+  salaryPrefix: '$',
+
+  curriculum: [
+    {
+      title: 'MIG Welding (GMAW)',
+      topics: ['Machine setup and wire feed', 'Flat and horizontal positions', 'Vertical and overhead positions', 'Short-circuit and spray transfer', 'Multi-pass welds'],
+    },
+    {
+      title: 'TIG Welding (GTAW)',
+      topics: ['Tungsten selection and sharpening', 'Gas flow and cup size', 'Filler rod techniques', 'Carbon steel TIG', 'Thin gauge welding'],
+    },
+    {
+      title: 'Stick Welding (SMAW)',
+      topics: ['Electrode selection (6010, 6013, 7018)', 'Arc striking and control', 'All-position stick welding', 'Open root joints', 'Pipe welding basics'],
+    },
+    {
+      title: 'Flux-Core (FCAW)',
+      topics: ['Self-shielded vs gas-shielded', 'Machine setup', 'Flat and horizontal', 'Vertical up technique', 'Multi-pass structural welds'],
+    },
+    {
+      title: 'Blueprint & Theory',
+      topics: ['Weld symbols (AWS A2.4)', 'Joint types and preparation', 'Metallurgy basics', 'Weld defects and inspection', 'Destructive and visual testing'],
+    },
+    {
+      title: 'Safety & Certification',
+      topics: ['OSHA 10-Hour certification', 'Fire prevention and ventilation', 'PPE for welding', 'AWS D1.1 test prep', 'Career placement support'],
+    },
+  ],
+
+  credentials: [
+    'AWS D1.1 Structural Welding (test prep)',
+    'OSHA 10-Hour Construction Safety',
+    'CPR/First Aid',
+  ],
+
+  careers: [
+    { title: 'Structural Welder', salary: '$42,000–$60,000' },
+    { title: 'MIG Welder', salary: '$38,000–$52,000' },
+    { title: 'TIG Welder', salary: '$45,000–$65,000' },
+    { title: 'Pipe Welder', salary: '$55,000–$80,000' },
+    { title: 'Welding Inspector (with experience)', salary: '$60,000–$85,000' },
+  ],
+
+  steps: [
+    { title: 'Apply Online', desc: 'Complete our application in about 5 minutes.' },
+    { title: 'Check Funding', desc: 'Register at Indiana Career Connect for WIOA eligibility.' },
+    { title: 'Attend Orientation', desc: 'Tour the welding shop and meet your instructor.' },
+    { title: 'Start Welding', desc: 'Begin 10 weeks of hands-on welding training.' },
+  ],
+
+  faqs: [
+    { question: 'Do I need welding experience?', answer: 'No. This program is designed for beginners. You will start with basic safety and machine setup, then progress through all four welding processes. By week 10, you will be welding in all positions.' },
+    { question: 'What gear do I need?', answer: 'Welding helmets, gloves, and safety glasses are provided during training. You will need steel-toe boots and long pants. WIOA funding may cover additional gear for eligible participants.' },
+    { question: 'Is this program free?', answer: 'Yes, for eligible participants. WIOA funding covers tuition, materials, and certification fees. If you do not qualify for WIOA, payment plans are available.' },
+    { question: 'What is the AWS D1.1 certification?', answer: 'AWS D1.1 is the American Welding Society standard for structural steel welding. It is the most widely recognized welding certification in construction and manufacturing. This program prepares you for the test — the actual certification test is administered separately.' },
+  ],
+
+  applyHref: '/apply?program=welding',
+
+  breadcrumbs: [
+    { label: 'Programs', href: '/programs' },
+    { label: 'Skilled Trades', href: '/programs/skilled-trades' },
+    { label: 'Welding Technician' },
+  ],
+};
+
+export default function Page() {
   return (
     <>
-      <ProgramHeroBanner videoSrc="/videos/welding-trades.mp4" voiceoverSrc="/audio/heroes/welding.mp3" />
-      <div className="bg-slate-50 border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[
-            { label: 'Programs', href: '/programs' },
-            { label: 'Skilled Trades', href: '/programs/skilled-trades' },
-            { label: 'Welding Technology' }
-          ]} />
-        </div>
-      </div>
-
-      {/* Hero Image — no text overlay */}
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/trades/welding-hero.jpg" alt="Welding training program" fill sizes="100vw" className="object-cover" priority />
-      </section>
-
-      {/* Stats */}
-      <section className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="text-center"
-              >
-                <stat.icon className="w-8 h-8 text-brand-red-600 mx-auto mb-2" />
-                <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
-                <div className="text-sm text-gray-500">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Why Welding */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="inline-block bg-brand-red-100 text-brand-red-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              Why Welding?
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              A Skill That's Always in Demand
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              From skyscrapers to spacecraft, welders build the world. It's a career that combines craftsmanship with technology.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Factory,
-                title: "Diverse Industries",
-                description: "Work in manufacturing, construction, aerospace, automotive, shipbuilding, energy, or art. Welders are needed everywhere metal is joined."
-              },
-              {
-                icon: DollarSign,
-                title: "High Earning Potential",
-                description: "Entry-level welders start at $40-55K. Specialized welders (pipe, underwater, aerospace) earn $80-150K+. Overtime is often available."
-              },
-              {
-                icon: Target,
-                title: "Career Advancement",
-                description: "Progress from welder to lead welder, welding inspector, welding engineer, or shop supervisor. Many welders start their own fabrication businesses."
-              },
-              {
-                icon: Wrench,
-                title: "Hands-On Work",
-                description: "If you like working with your hands and seeing tangible results, welding delivers. Every project is a visible accomplishment."
-              },
-              {
-                icon: HardHat,
-                title: "Job Security",
-                description: "Automation can't replace skilled welders for complex work. The aging workforce means opportunities for new welders are growing."
-              },
-              {
-                icon: Zap,
-                title: "Portable Skills",
-                description: "Your certifications are recognized nationwide. Work anywhere - from local shops to traveling pipeline jobs to international projects."
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center mb-4">
-                  <item.icon className="w-6 h-6 text-brand-red-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Curriculum */}
-      <section id="curriculum" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="inline-block bg-brand-green-100 text-brand-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              Training Program
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              16-Week Welding Curriculum
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              400+ hours of hands-on training across all major welding processes. Graduate with AWS certifications.
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            {curriculum.map((module, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-slate-50 rounded-2xl p-6 lg:p-8"
-              >
-                <div className="flex flex-col lg:flex-row lg:items-start gap-6">
-                  <div className="flex-shrink-0">
-                    <div className="w-20 h-20 bg-brand-red-600 rounded-2xl flex items-center justify-center text-white">
-                      <span className="text-sm font-bold">{module.week}</span>
-                    </div>
-                  </div>
-                  <div className="flex-grow">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">{module.title}</h3>
-                    <div className="grid md:grid-cols-2 gap-4 mb-4">
-                      {module.topics.map((topic, i) => (
-                        <div key={i} className="flex items-center gap-2">
-                          <span className="w-2 h-2 bg-slate-400 rounded-full flex-shrink-0 mt-2" />
-                          <span className="text-gray-700">{topic}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="bg-white rounded-lg p-4 mt-4">
-                      <span className="text-sm font-semibold text-brand-red-700">Milestone:</span>
-                      <span className="text-sm text-brand-red-600 ml-2">{module.project}</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Certifications */}
-      <section className="py-20 bg-slate-800 text-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="inline-block bg-white/10 text-brand-red-300 text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              Industry Credentials
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              AWS Certifications Included
-            </h2>
-            <p className="text-lg text-slate-300 max-w-2xl mx-auto">
-              Graduate with American Welding Society certifications recognized by employers worldwide.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "AWS D1.1 Structural",
-                description: "Certification for structural steel welding used in buildings, bridges, and heavy equipment.",
-                icon: Award
-              },
-              {
-                title: "Multi-Process Certified",
-                description: "Demonstrate proficiency in SMAW, GMAW, GTAW, and FCAW welding processes.",
-                icon: Flame
-              },
-              {
-                title: "Multi-Position Qualified",
-                description: "Certified to weld in flat, horizontal, vertical, and overhead positions (1G-4G).",
-                icon: GraduationCap
-              }
-            ].map((cert, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white/10 backdrop-blur rounded-2xl p-8 text-center"
-              >
-                <div className="w-16 h-16 bg-white0 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <cert.icon className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">{cert.title}</h3>
-                <p className="text-slate-300">{cert.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="inline-block bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              Common Questions
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Frequently Asked Questions
-            </h2>
-          </div>
-
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-xl shadow-sm overflow-hidden"
-              >
-                <button
-                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
-                >
-                  <span className="font-semibold text-gray-900 pr-4">{faq.question}</span>
-                  {openFaq === index ? (
-                    <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  )}
-                </button>
-                {openFaq === index && (
-                  <div className="px-6 pb-5">
-                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 bg-brand-red-600 text-white">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-            Ready to Strike Your First Arc?
-          </h2>
-          <p className="text-xl text-brand-red-100 mb-8 max-w-2xl mx-auto">
-            Join a trade that builds the world. Check your eligibility for free WIOA-funded welding training.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply?program=welding"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-red-600 font-semibold rounded-full hover:bg-white transition-all transform hover:scale-105 shadow-lg"
-            >
-              Register at Indiana Career Connect
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Link>
-            <Link
-              href="/inquiry?program=welding"
-              className="inline-flex items-center justify-center px-8 py-4 bg-brand-red-700 hover:bg-brand-red-600 text-white font-semibold rounded-full transition-all"
-            >
-              <ArrowRight className="w-5 h-5 mr-2" />
-              Get Free Info
-            </Link>
-          </div>
-        </div>
-      </section>
+      <ProgramStructuredData program={{
+        id: 'welding',
+        name: 'Welding Technician Training',
+        slug: 'welding',
+        description: config.subtitle,
+        duration_weeks: 10,
+        price: 0,
+        image_url: `${SITE_URL}/images/programs-fresh/welding.jpg`,
+        category: 'Skilled Trades',
+        outcomes: ['AWS D1.1 Structural Welding (test prep)', 'OSHA 10-Hour Construction Safety', 'CPR/First Aid'],
+      }} />
+      <ProgramPageLayout config={config} />
     </>
   );
 }

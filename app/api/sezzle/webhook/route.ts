@@ -19,6 +19,7 @@ import { logger } from '@/lib/logger';
 import { createEnrollmentFromPayment } from '@/lib/enrollment/create-enrollment';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 import crypto from 'crypto';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 interface SezzleWebhookEvent {
   event_id: string;
@@ -93,7 +94,7 @@ function verifyWebhookSignature(
   return crypto.timingSafeEqual(sigBuf, expectedBuf);
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   let payload: string;
   try {
     payload = await request.text();
@@ -488,3 +489,4 @@ async function handleCheckoutCompleted(event: SezzleWebhookEvent, supabase: any)
       .eq('sezzle_reference_id', reference_id);
   }
 }
+export const POST = withApiAudit('/api/sezzle/webhook', _POST, { actor_type: 'webhook', skip_body: true });

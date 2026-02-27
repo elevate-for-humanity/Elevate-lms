@@ -265,7 +265,7 @@ export default function HostShopsPage() {
               General Inquiry
             </Link>
             <Link
-              href="/portal/partner/enroll/host-shop"
+              href="/programs/barber-apprenticeship/host-shops"
               className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold transition"
             >
               Enroll as a Host Shop

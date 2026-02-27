@@ -143,9 +143,9 @@ function CertiportExamContent() {
                 <MapPin className="w-4 h-4" /> Testing Center
               </h3>
               <p className="text-brand-blue-800 text-sm">
-                Elevate for Humanity Career & Technical Institute<br />
-                7009 E 56th St, Suite F<br />
-                Indianapolis, IN 46226
+                Elevate for Humanity Career &amp; Technical Institute<br />
+                8888 Keystone Crossing, Suite 1300<br />
+                Indianapolis, IN 46240
               </p>
             </div>
 

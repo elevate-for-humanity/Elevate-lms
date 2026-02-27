@@ -100,7 +100,7 @@ export async function POST(req: Request) {
         student_id: studentId,
         program_id: programId,
         program_slug: programSlug,
-        sponsor: 'Elevate for Humanity',
+        sponsor: '2Exclusive LLC-S',
         student_email: profile.email,
         student_name:
           profile.full_name || `${profile.first_name} ${profile.last_name}`,

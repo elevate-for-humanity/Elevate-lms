@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 // AUTH: Intentionally public — no authentication required
 
 export const runtime = 'nodejs';
@@ -233,7 +234,7 @@ Timestamp: ${new Date().toISOString()}
   }
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -287,7 +288,7 @@ export async function POST(request: NextRequest) {
 }
 
 // GET endpoint for webhook verification
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -298,3 +299,5 @@ return NextResponse.json({
     events: ['invitee.created', 'invitee.canceled'],
   });
 }
+export const GET = withApiAudit('/api/chatbot/calendly-webhook', _GET, { actor_type: 'webhook', skip_body: true });
+export const POST = withApiAudit('/api/chatbot/calendly-webhook', _POST, { actor_type: 'webhook', skip_body: true });

@@ -200,7 +200,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
               href="/apply"
               className="inline-flex items-center justify-center rounded-full bg-brand-orange-600 px-5 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-brand-orange-700"
             >
-              Apply Now – It&apos;s Free
+              Apply Now
             </Link>
             <Link
               href="/funding/wioa"

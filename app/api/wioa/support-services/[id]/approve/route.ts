@@ -54,4 +54,4 @@ async function _POST(
     );
   }
 }
-export const POST = withApiAudit('/api/wioa/support-services/[id]/approve', _POST);
+export const POST = withApiAudit('/api/wioa/support-services/[id]/approve', _POST, { critical: true });

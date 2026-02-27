@@ -30,6 +30,7 @@
 import { logAuditEvent, getRequestMetadata } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
+import * as Sentry from '@sentry/nextjs';
 
 // Unique request ID for correlation across audit entries and logs.
 let requestCounter = 0;
@@ -128,6 +129,12 @@ export async function writeApiAuditEvent(event: ApiAuditEvent): Promise<void> {
       endpoint: event.endpoint,
       result: event.result,
     });
+    Sentry.captureException(e, {
+      tags: { subsystem: 'audit', endpoint: event.endpoint },
+      extra: { result: event.result, actor_id: event.actor_id },
+    });
+    // Re-throw so withApiAudit's critical mode can catch it
+    throw e;
   }
 }
 

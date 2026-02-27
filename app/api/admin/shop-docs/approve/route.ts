@@ -140,4 +140,4 @@ async function _POST(req: Request) {
     );
   }
 }
-export const POST = withApiAudit('/api/admin/shop-docs/approve', _POST);
+export const POST = withApiAudit('/api/admin/shop-docs/approve', _POST, { critical: true });

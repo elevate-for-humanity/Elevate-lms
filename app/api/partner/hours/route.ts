@@ -97,5 +97,5 @@ async function _POST(request: NextRequest) {
 
   return NextResponse.json(data);
 }
-export const GET = withApiAudit('/api/partner/hours', _GET);
-export const POST = withApiAudit('/api/partner/hours', _POST);
+export const GET = withApiAudit('/api/partner/hours', _GET, { critical: true });
+export const POST = withApiAudit('/api/partner/hours', _POST, { critical: true });

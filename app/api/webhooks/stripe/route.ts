@@ -49,6 +49,7 @@ import {
   assertSubscriptionData,
 } from '@/lib/licensing/billing-authority';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import * as Sentry from '@sentry/nextjs';
 
 
 
@@ -95,9 +96,10 @@ async function _POST(request: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
-    const errMsg = 'Internal server error';
-    logger.error('[webhook] Signature verification failed:', errMsg);
-    logger.error('Webhook signature verification failed:', err);
+    logger.error('[webhook] Signature verification failed:', err);
+    Sentry.captureException(err, {
+      tags: { subsystem: 'stripe_webhook', failure: 'signature_verification' },
+    });
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -230,6 +232,7 @@ async function _POST(request: NextRequest) {
 
           logger.info(`✅ Program enrollment provisioned: ${programSlug} for student ${studentId}`);
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error('[webhook] Error processing program_enrollment:', err);
           logger.error('Error processing program_enrollment:', err instanceof Error ? err : new Error(String(err)));
         }
@@ -252,6 +255,7 @@ async function _POST(request: NextRequest) {
 
           logger.info(`✅ Donation recorded: $${amount} from ${donorEmail || 'anonymous'}`);
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error('[webhook] Error processing donation:', err);
         }
         break;
@@ -350,6 +354,7 @@ async function _POST(request: NextRequest) {
 
           logger.info(`✅ Apprenticeship enrollment created (pending approval): ${program} for student ${studentId}`);
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error('[webhook] Error processing apprenticeship_enrollment:', err);
           logger.error('Error processing apprenticeship_enrollment:', err instanceof Error ? err : new Error(String(err)));
         }
@@ -455,6 +460,7 @@ async function _POST(request: NextRequest) {
           });
 
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error('[webhook] Error processing trial upgrade:', err);
           logger.error('Error processing trial upgrade:', err instanceof Error ? err : new Error(String(err)));
         }
@@ -560,6 +566,7 @@ async function _POST(request: NextRequest) {
           }
 
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error('[webhook] Error processing program enrollment:', err);
           logger.error('Error processing program enrollment:', err instanceof Error ? err : new Error(String(err)));
         }
@@ -587,6 +594,7 @@ async function _POST(request: NextRequest) {
             logger.error(`❌ License provisioning failed: ${result.error}`);
           }
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error('Error provisioning license:', err instanceof Error ? err : new Error(String(err)));
         }
         break;
@@ -611,6 +619,7 @@ async function _POST(request: NextRequest) {
             `✅ Store subscription checkout completed: ${session.id}`
           );
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error(
             'Error processing store subscription checkout:',
             err instanceof Error ? err : new Error(String(err))
@@ -652,6 +661,7 @@ async function _POST(request: NextRequest) {
             logger.info(`✅ Enrollment payment completed: ${enrollmentId}`);
           }
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error(
             'Error processing enrollment payment:',
             err instanceof Error ? err : new Error(String(err))
@@ -755,6 +765,7 @@ async function _POST(request: NextRequest) {
 
           logger.info(`✅ Career course purchase completed: ${courseIds.join(', ')}`);
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error('Error processing career course purchase:', err);
         }
         break;
@@ -816,6 +827,7 @@ async function _POST(request: NextRequest) {
 
           // Send notification to admin
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error(
             'Error processing drug testing purchase:',
             err instanceof Error ? err : new Error(String(err))
@@ -998,6 +1010,7 @@ async function _POST(request: NextRequest) {
 
           logger.info('✅ Barber apprenticeship enrollment completed:', applicationId);
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error(
             'Error processing barber apprenticeship enrollment:',
             err instanceof Error ? err : new Error(String(err))
@@ -1056,6 +1069,7 @@ async function _POST(request: NextRequest) {
 
           logger.info('✅ Partner course payment logged');
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error(
             'Error processing partner course enrollment:',
             err instanceof Error ? err : new Error(String(err))
@@ -1143,6 +1157,7 @@ async function _POST(request: NextRequest) {
 
           logger.info('✅ HSI payment logged successfully');
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error(
             'Error processing HSI enrollment:',
             err instanceof Error ? err : new Error(String(err))
@@ -1176,6 +1191,7 @@ async function _POST(request: NextRequest) {
             logger.info(`✅ Enrollment payment completed: ${enrollmentId}`);
           }
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error(
             'Error processing enrollment payment:',
             err instanceof Error ? err : new Error(String(err))
@@ -1488,6 +1504,7 @@ async function _POST(request: NextRequest) {
             );
           }
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error(
             'Error processing payment failure:',
             err instanceof Error ? err : new Error(String(err))
@@ -1555,6 +1572,7 @@ async function _POST(request: NextRequest) {
             );
           }
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error(
             'Error processing subscription event:',
             err instanceof Error ? err : new Error(String(err))
@@ -1610,6 +1628,7 @@ async function _POST(request: NextRequest) {
             logger.info(`✅ Store subscription canceled: ${subscription.id}`);
           }
         } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook' } });
           logger.error(
             'Error processing subscription deletion:',
             err instanceof Error ? err : new Error(String(err))
@@ -1878,4 +1897,4 @@ async function _POST(request: NextRequest) {
   logger.info('[webhook] Returning 200 for event:', event.id);
   return NextResponse.json({ received: true });
 }
-export const POST = withApiAudit('/api/webhooks/stripe', _POST, { actor_type: 'webhook' });
+export const POST = withApiAudit('/api/webhooks/stripe', _POST, { actor_type: 'webhook' , critical: true });

@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import * as Sentry from '@sentry/nextjs';
 
 export const dynamic = 'force-dynamic';
 function getWebhookSecret() {
@@ -27,6 +28,7 @@ async function _POST(req: Request) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err: any) {
+          Sentry.captureException(err, { tags: { subsystem: 'webhook' } });
     logger.error('Webhook signature verification failed:', err.message);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
@@ -134,4 +136,4 @@ async function _POST(req: Request) {
 
   return NextResponse.json({ received: true });
 }
-export const POST = withApiAudit('/api/webhooks/stripe/career-courses', _POST, { actor_type: 'webhook', skip_body: true });
+export const POST = withApiAudit('/api/webhooks/stripe/career-courses', _POST, { actor_type: 'webhook', skip_body: true , critical: true });

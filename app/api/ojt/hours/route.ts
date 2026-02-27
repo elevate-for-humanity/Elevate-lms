@@ -154,5 +154,5 @@ async function _GET(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-export const GET = withApiAudit('/api/ojt/hours', _GET);
-export const POST = withApiAudit('/api/ojt/hours', _POST);
+export const GET = withApiAudit('/api/ojt/hours', _GET, { critical: true });
+export const POST = withApiAudit('/api/ojt/hours', _POST, { critical: true });

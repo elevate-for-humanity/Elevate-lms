@@ -97,4 +97,4 @@ async function _POST(req: Request) {
     );
   }
 }
-export const POST = withApiAudit('/api/rapids/safe-update', _POST);
+export const POST = withApiAudit('/api/rapids/safe-update', _POST, { critical: true });

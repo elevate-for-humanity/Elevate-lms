@@ -20,6 +20,7 @@ import { createEnrollmentFromPayment } from '@/lib/enrollment/create-enrollment'
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 import crypto from 'crypto';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import * as Sentry from '@sentry/nextjs';
 
 interface SezzleWebhookEvent {
   event_id: string;

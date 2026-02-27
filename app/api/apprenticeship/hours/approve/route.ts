@@ -141,5 +141,5 @@ async function _PUT(req: Request) {
     );
   }
 }
-export const POST = withApiAudit('/api/apprenticeship/hours/approve', _POST);
-export const PUT = withApiAudit('/api/apprenticeship/hours/approve', _PUT);
+export const POST = withApiAudit('/api/apprenticeship/hours/approve', _POST, { critical: true });
+export const PUT = withApiAudit('/api/apprenticeship/hours/approve', _PUT, { critical: true });

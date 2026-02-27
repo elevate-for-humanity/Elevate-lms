@@ -76,6 +76,6 @@ const { id } = await params;
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-export const GET = withApiAudit('/api/admin/enrollments/[id]', _GET);
-export const PATCH = withApiAudit('/api/admin/enrollments/[id]', _PATCH);
-export const DELETE = withApiAudit('/api/admin/enrollments/[id]', _DELETE);
+export const GET = withApiAudit('/api/admin/enrollments/[id]', _GET, { critical: true });
+export const PATCH = withApiAudit('/api/admin/enrollments/[id]', _PATCH, { critical: true });
+export const DELETE = withApiAudit('/api/admin/enrollments/[id]', _DELETE, { critical: true });

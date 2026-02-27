@@ -151,5 +151,5 @@ async function _POST(req: Request) {
     message: 'Transfer hour request submitted. You will be notified once reviewed.',
   });
 }
-export const GET = withApiAudit('/api/apprentice/transfer-hours', _GET);
-export const POST = withApiAudit('/api/apprentice/transfer-hours', _POST);
+export const GET = withApiAudit('/api/apprentice/transfer-hours', _GET, { critical: true });
+export const POST = withApiAudit('/api/apprentice/transfer-hours', _POST, { critical: true });

@@ -121,6 +121,6 @@ async function _POST(
     );
   }
 }
-export const GET = withApiAudit('/api/wioa/iep/[id]', _GET);
-export const POST = withApiAudit('/api/wioa/iep/[id]', _POST);
-export const PUT = withApiAudit('/api/wioa/iep/[id]', _PUT);
+export const GET = withApiAudit('/api/wioa/iep/[id]', _GET, { critical: true });
+export const POST = withApiAudit('/api/wioa/iep/[id]', _POST, { critical: true });
+export const PUT = withApiAudit('/api/wioa/iep/[id]', _PUT, { critical: true });

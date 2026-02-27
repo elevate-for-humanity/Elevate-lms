@@ -91,4 +91,4 @@ async function _POST(request: Request) {
 
   return NextResponse.json({ evidence });
 }
-export const POST = withApiAudit('/api/compliance/evidence', _POST);
+export const POST = withApiAudit('/api/compliance/evidence', _POST, { critical: true });

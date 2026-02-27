@@ -144,4 +144,4 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-export const POST = withApiAudit('/api/pwa/barber/log-hours', _POST);
+export const POST = withApiAudit('/api/pwa/barber/log-hours', _POST, { critical: true });

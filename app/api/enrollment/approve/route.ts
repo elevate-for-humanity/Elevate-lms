@@ -116,4 +116,4 @@ async function _POST() {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
-export const POST = withApiAudit('/api/enrollment/approve', _POST);
+export const POST = withApiAudit('/api/enrollment/approve', _POST, { critical: true });

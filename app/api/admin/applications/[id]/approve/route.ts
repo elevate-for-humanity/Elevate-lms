@@ -362,4 +362,4 @@ async function approveProgramHolder(
     next_step: `/admin/program-holders/${holderRow?.id}`,
   });
 }
-export const POST = withApiAudit('/api/admin/applications/[id]/approve', _POST);
+export const POST = withApiAudit('/api/admin/applications/[id]/approve', _POST, { critical: true });

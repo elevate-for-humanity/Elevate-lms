@@ -92,4 +92,4 @@ async function _POST(req: Request) {
     );
   }
 }
-export const POST = withApiAudit('/api/apprenticeship/hours/reject', _POST);
+export const POST = withApiAudit('/api/apprenticeship/hours/reject', _POST, { critical: true });

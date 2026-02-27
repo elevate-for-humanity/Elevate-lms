@@ -10,6 +10,7 @@ import { stripe } from '@/lib/stripe/client';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import * as Sentry from '@sentry/nextjs';
 
 const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
   ? createClient(
@@ -134,4 +135,4 @@ async function _POST(request: NextRequest) {
   }
 
 }
-export const POST = withApiAudit('/api/webhooks/stripe-identity', _POST, { actor_type: 'webhook', skip_body: true });
+export const POST = withApiAudit('/api/webhooks/stripe-identity', _POST, { actor_type: 'webhook', skip_body: true , critical: true });

@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import * as Sentry from '@sentry/nextjs';
 
 interface AffirmWebhookEvent {
   type: string;

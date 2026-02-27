@@ -109,5 +109,5 @@ const supabase = await createClient();
 
   return NextResponse.json({ ok: true });
 }
-export const GET = withApiAudit('/api/compliance/items', _GET);
-export const PATCH = withApiAudit('/api/compliance/items', _PATCH);
+export const GET = withApiAudit('/api/compliance/items', _GET, { critical: true });
+export const PATCH = withApiAudit('/api/compliance/items', _PATCH, { critical: true });

@@ -15,12 +15,18 @@
 //   export const POST = withApiAudit('/api/cron/enrollment-automation', handler, { actor_type: 'cron' });
 
 import { writeApiAuditEvent, type ActorType } from '@/lib/audit/api-audit';
+import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import * as Sentry from '@sentry/nextjs';
 
 interface WithApiAuditOptions {
   actor_type?: ActorType;
   actor_id?: string;
   skip_body?: boolean;
+  // When true, audit write failure returns 500 instead of silently continuing.
+  // Use for compliance-critical routes: enrollment approvals, hour certifications,
+  // RAPIDS mutations, payment state changes.
+  critical?: boolean;
 }
 
 // Keys to strip from params before logging
@@ -140,7 +146,7 @@ export function withApiAudit(
       errorSummary = e instanceof Error ? e.message.slice(0, 200) : 'Unknown error';
       throw e;
     } finally {
-      writeApiAuditEvent({
+      const auditPayload = {
         endpoint,
         method: req.method,
         actor_type: actorType,
@@ -151,7 +157,36 @@ export function withApiAudit(
         status_code: statusCode,
         error_summary: errorSummary,
         duration_ms: Date.now() - start,
-      }).catch(() => {});
+      };
+
+      if (options?.critical) {
+        // Compliance-critical: audit failure = request failure.
+        // The action happened but we can't prove it — that's worse than a 500.
+        try {
+          await writeApiAuditEvent(auditPayload);
+        } catch (auditErr) {
+          const msg = `Audit write failed on critical route ${endpoint}`;
+          logger.error(msg, auditErr instanceof Error ? auditErr : new Error(String(auditErr)));
+          Sentry.captureException(auditErr, {
+            tags: { audit_critical: 'true', endpoint },
+            extra: { request_id: rid, actor_id: actorId, result },
+          });
+          // Override the response — the action may have succeeded but
+          // we cannot prove it, so we fail the request.
+          response = NextResponse.json(
+            { error: 'Audit system unavailable. Action not recorded. Contact support.' },
+            { status: 503 },
+          );
+        }
+      } else {
+        // Non-critical: fire-and-forget, but still report failures to Sentry
+        writeApiAuditEvent(auditPayload).catch((auditErr) => {
+          Sentry.captureException(auditErr, {
+            tags: { audit_critical: 'false', endpoint },
+            level: 'warning',
+          });
+        });
+      }
     }
 
     return response!;

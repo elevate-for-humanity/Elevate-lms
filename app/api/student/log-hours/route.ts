@@ -75,4 +75,4 @@ async function _POST(request: Request) {
     );
   }
 }
-export const POST = withApiAudit('/api/student/log-hours', _POST);
+export const POST = withApiAudit('/api/student/log-hours', _POST, { critical: true });

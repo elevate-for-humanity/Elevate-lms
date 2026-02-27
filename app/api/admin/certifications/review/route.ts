@@ -127,5 +127,5 @@ const supabase = await createClient();
 
   return NextResponse.json({ submissions: data });
 }
-export const GET = withApiAudit('/api/admin/certifications/review', _GET);
-export const POST = withApiAudit('/api/admin/certifications/review', _POST);
+export const GET = withApiAudit('/api/admin/certifications/review', _GET, { critical: true });
+export const POST = withApiAudit('/api/admin/certifications/review', _POST, { critical: true });

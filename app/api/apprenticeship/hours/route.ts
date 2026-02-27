@@ -125,5 +125,5 @@ async function _GET(req: Request) {
     );
   }
 }
-export const GET = withApiAudit('/api/apprenticeship/hours', _GET);
-export const POST = withApiAudit('/api/apprenticeship/hours', _POST);
+export const GET = withApiAudit('/api/apprenticeship/hours', _GET, { critical: true });
+export const POST = withApiAudit('/api/apprenticeship/hours', _POST, { critical: true });

@@ -7,7 +7,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Become a Host Barbershop | Barber Apprenticeship | Elevate for Humanity',
-  description: 'Become an approved partner training site for the USDOL Registered Barber Apprenticeship program sponsored by Elevate for Humanity Career & Technical Institute.',
+  description: 'Partner with Elevate for Humanity as a host barbershop for our USDOL Registered Barber Apprenticeship program. Train the next generation of barbers.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/programs/barber-apprenticeship/host-shops',
   },
@@ -255,7 +255,7 @@ export default function HostShopsPage() {
           <Building2 className="w-16 h-16 mx-auto mb-6 text-white" />
           <h2 className="text-3xl font-bold mb-4">Ready to Train the Next Generation?</h2>
           <p className="text-slate-300 mb-8">
-            Join our network of approved partner training sites and help shape future barbers. Partner locations operate under formal training agreements with the apprenticeship sponsor.
+            Join our network of approved host barbershops and help shape future barbers.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

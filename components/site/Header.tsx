@@ -64,6 +64,7 @@ export const NAV_ITEMS = [
       { name: 'Success Stories', href: '/testimonials' },
       { name: 'Indiana Outcomes', href: '/outcomes/indiana' },
       { name: 'Partnerships', href: '/partnerships' },
+      { name: 'Barbershop Partners', href: '/partners/barbershop-apprenticeship' },
       { name: 'FAQ', href: '/faq' },
     ]
   },

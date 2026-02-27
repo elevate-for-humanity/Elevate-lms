@@ -2,6 +2,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   XCircle,
   ArrowRight,
@@ -135,55 +136,72 @@ export default function BarbershopPartnerPage() {
         <Breadcrumbs items={[{ label: "Partners", href: "/partners" }, { label: "Barbershop Apprenticeship" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-slate-800 text-white py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center gap-2 text-slate-300 mb-4">
+      <section className="relative py-20 overflow-hidden">
+        <Image
+          src="/images/programs-hq/barber-hero.jpg"
+          alt="Barber training apprenticeship"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-white/40" />
+        <div className="relative max-w-6xl mx-auto px-4">
+          <div className="flex items-center gap-2 text-brand-blue-700 mb-4">
             <Building2 className="w-5 h-5" />
-            <span className="text-sm font-medium uppercase tracking-wider">Indiana Barbershop Partners</span>
+            <span className="text-sm font-semibold uppercase tracking-wider">Indiana Barbershop Partners</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black mb-6">
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">
             Become a Barbershop Partner
           </h1>
-          <p className="text-xl text-slate-300 mb-8 max-w-3xl">
+          <p className="text-xl text-gray-700 mb-8 max-w-3xl">
             Host apprentices at your Indiana barbershop and help develop the next generation of
             licensed barbers. We handle the paperwork and compliance—you provide the hands-on
             training and mentorship.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-wrap gap-3">
             <Link
               href="/partners/barbershop-apprenticeship/apply"
-              className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white rounded-lg text-lg font-bold transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white rounded-lg text-lg font-bold transition-colors shadow-md"
             >
               Apply to Become a Partner
               <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link
-              href="/partner-portal"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 text-white border border-white/30 rounded-lg text-lg font-bold transition-colors"
+              href="/partners/barbershop-apprenticeship/handbook"
+              className="inline-flex items-center justify-center px-6 py-4 bg-white/90 hover:bg-white text-gray-900 border border-gray-300 rounded-lg font-bold transition-colors shadow-md"
             >
-              Partner Dashboard
-              <ArrowRight className="ml-2 w-5 h-5" />
+              Partner Handbook
+            </Link>
+            <Link
+              href="/partners/barbershop-apprenticeship/forms"
+              className="inline-flex items-center justify-center px-6 py-4 bg-white/90 hover:bg-white text-gray-900 border border-gray-300 rounded-lg font-bold transition-colors shadow-md"
+            >
+              Required Forms
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Sponsor Clarification */}
-      <section className="py-6 bg-amber-50 border-b border-amber-200">
-        <div className="max-w-6xl mx-auto px-4">
-          <p className="text-sm text-amber-900 leading-relaxed">
-            <strong>Sponsor &amp; Partner Structure:</strong> Apprentices complete supervised on-the-job training at sponsor-approved licensed partner locations while receiving structured related technical instruction through Elevate for Humanity Career &amp; Technical Institute. Partner barbershops and employer training sites are licensed facilities that provide supervised practical training under sponsor-approved standards. Partner locations do not function as the apprenticeship sponsor or instructional institution but operate as approved training sites within the registered program structure.
-          </p>
+      {/* Quick Nav */}
+      <nav className="bg-white border-b sticky top-0 z-10">
+        <div className="max-w-6xl mx-auto px-4 flex gap-6 overflow-x-auto">
+          <Link href="#overview" className="py-3 text-sm font-medium text-slate-600 hover:text-brand-blue-600 whitespace-nowrap border-b-2 border-transparent hover:border-brand-blue-600">Overview</Link>
+          <Link href="#how-it-works" className="py-3 text-sm font-medium text-slate-600 hover:text-brand-blue-600 whitespace-nowrap border-b-2 border-transparent hover:border-brand-blue-600">How It Works</Link>
+          <Link href="/partners/barbershop-apprenticeship/handbook" className="py-3 text-sm font-medium text-slate-600 hover:text-brand-blue-600 whitespace-nowrap border-b-2 border-transparent hover:border-brand-blue-600">Partner Handbook</Link>
+          <Link href="/partners/barbershop-apprenticeship/sign-mou" className="py-3 text-sm font-medium text-slate-600 hover:text-brand-blue-600 whitespace-nowrap border-b-2 border-transparent hover:border-brand-blue-600">Sign MOU</Link>
+          <Link href="/partners/barbershop-apprenticeship/forms" className="py-3 text-sm font-medium text-slate-600 hover:text-brand-blue-600 whitespace-nowrap border-b-2 border-transparent hover:border-brand-blue-600">Required Forms</Link>
+          <Link href="/partners/barbershop-apprenticeship/apply" className="py-3 text-sm font-medium text-brand-blue-600 hover:text-brand-blue-700 whitespace-nowrap border-b-2 border-brand-blue-600">Apply Now</Link>
         </div>
-      </section>
+      </nav>
 
       {/* Who This Is For */}
-      <section className="py-16 bg-white">
+      <section id="overview" className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">Who This Is For</h2>
           <p className="text-gray-600 mb-8 max-w-3xl">
-            This program is designed for established Indiana barbershops that want to host and
-            develop apprentice barbers as an approved training site under a structured, USDOL-registered apprenticeship.
+            This program is designed for established Indiana barbershops that want to train and
+            develop apprentice barbers through a structured, USDOL-registered apprenticeship.
           </p>
           <div className="grid md:grid-cols-2 gap-4">
             {eligibilityItems.map((item, i) => (
@@ -197,7 +215,7 @@ export default function BarbershopPartnerPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-gray-100">
+      <section id="how-it-works" className="py-16 bg-gray-100">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
           <p className="text-gray-600 mb-12 max-w-3xl">
@@ -208,8 +226,8 @@ export default function BarbershopPartnerPage() {
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             <div className="bg-white p-8 rounded-xl shadow-sm">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-brand-blue-600" />
+                <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                  <Image src="/images/barber/barber-tools.jpg" alt="Sponsor compliance and administration" fill className="object-cover" sizes="48px" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gray-900">Sponsor (2Exclusive LLC-S)</h3>
@@ -228,8 +246,8 @@ export default function BarbershopPartnerPage() {
 
             <div className="bg-white p-8 rounded-xl shadow-sm">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-6 h-6 text-brand-green-600" />
+                <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                  <Image src="/images/barber/barber-shop-interior.jpg" alt="Barbershop worksite for training" fill className="object-cover" sizes="48px" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gray-900">Worksite (Your Shop)</h3>
@@ -274,8 +292,8 @@ export default function BarbershopPartnerPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div className="bg-gray-50 p-6 rounded-xl border-2 border-gray-200">
-              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
-                <DollarSign className="w-5 h-5 text-brand-green-600" />
+              <div className="relative w-10 h-10 rounded-lg overflow-hidden mb-4">
+                <Image src="/images/barber/barber-cutting.jpg" alt="Barber cutting hair" fill className="object-cover" sizes="40px" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Hourly Wage</h3>
               <p className="text-sm text-gray-600 mb-3">
@@ -285,8 +303,8 @@ export default function BarbershopPartnerPage() {
             </div>
 
             <div className="bg-gray-50 p-6 rounded-xl border-2 border-gray-200">
-              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Briefcase className="w-5 h-5 text-brand-blue-600" />
+              <div className="relative w-10 h-10 rounded-lg overflow-hidden mb-4">
+                <Image src="/images/barber/barber-fade.jpg" alt="Barber performing fade cut" fill className="object-cover" sizes="40px" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Commission</h3>
               <p className="text-sm text-gray-600 mb-3">
@@ -296,8 +314,8 @@ export default function BarbershopPartnerPage() {
             </div>
 
             <div className="bg-gray-50 p-6 rounded-xl border-2 border-brand-blue-300 bg-brand-blue-50">
-              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Award className="w-5 h-5 text-brand-blue-600" />
+              <div className="relative w-10 h-10 rounded-lg overflow-hidden mb-4">
+                <Image src="/images/barber/training.jpg" alt="Barber training session" fill className="object-cover" sizes="40px" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Hybrid</h3>
               <p className="text-sm text-gray-600 mb-3">
@@ -307,8 +325,8 @@ export default function BarbershopPartnerPage() {
             </div>
 
             <div className="bg-gray-50 p-6 rounded-xl border-2 border-gray-200">
-              <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <FileText className="w-5 h-5 text-brand-orange-600" />
+              <div className="relative w-10 h-10 rounded-lg overflow-hidden mb-4">
+                <Image src="/images/barber/gallery-1.jpg" alt="Barbershop team" fill className="object-cover" sizes="40px" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Funding Support</h3>
               <p className="text-sm text-gray-600 mb-3">
@@ -341,10 +359,10 @@ export default function BarbershopPartnerPage() {
       </section>
 
       {/* What We Do NOT Do */}
-      <section className="py-12 bg-gray-900 text-white">
+      <section className="py-12 bg-red-50 border-y border-red-100">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
-            <XCircle className="w-7 h-7 text-brand-red-400" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+            <XCircle className="w-7 h-7 text-brand-red-500" />
             What This Program Does NOT Provide
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -357,8 +375,8 @@ export default function BarbershopPartnerPage() {
               'Legal or tax advice',
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3">
-                <XCircle className="w-5 h-5 text-brand-red-400 flex-shrink-0" />
-                <span className="text-gray-300">{item}</span>
+                <XCircle className="w-5 h-5 text-brand-red-500 flex-shrink-0" />
+                <span className="text-gray-700">{item}</span>
               </div>
             ))}
           </div>
@@ -388,12 +406,12 @@ export default function BarbershopPartnerPage() {
       </section>
 
       {/* MOU Section */}
-      <section className="py-16 bg-gray-100">
+      <section id="mou" className="py-16 bg-gray-100">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white p-8 rounded-xl shadow-sm">
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <FileText className="w-6 h-6 text-brand-blue-600" />
+              <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                <Image src="/images/barber/barber-tools.jpg" alt="Partnership agreement documents" fill className="object-cover" sizes="48px" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Memorandum of Understanding (MOU)</h2>
@@ -436,15 +454,18 @@ export default function BarbershopPartnerPage() {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="/partner-portal"
-                className="inline-flex items-center justify-center px-6 py-3 bg-gray-900 text-white rounded-lg font-bold hover:bg-gray-800 transition-colors"
+                href="/partners/barbershop-apprenticeship/sign-mou"
+                className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-bold hover:bg-brand-blue-700 transition-colors"
               >
-                Access MOU in Partner Dashboard
-                <ArrowRight className="w-5 h-5 ml-2" />
+                Sign MOU Digitally
               </Link>
-              <p className="text-sm text-gray-500 self-center">
-                MOU is available after applying. Signing is required to participate.
-              </p>
+              <Link
+                href="/docs/Indiana-Barbershop-Apprenticeship-MOU"
+                className="inline-flex items-center justify-center px-6 py-3 bg-white text-gray-900 border border-gray-300 rounded-lg font-bold hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                View MOU Document
+              </Link>
             </div>
           </div>
         </div>

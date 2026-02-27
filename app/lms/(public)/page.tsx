@@ -113,7 +113,7 @@ export default async function LmsPublicPage() {
               href="/apply"
               className="rounded-xl bg-brand-blue-600 text-white px-5 py-3 font-bold hover:bg-brand-blue-700 text-center"
             >
-              Apply Now - It's Free
+              Apply Now
             </Link>
             <Link
               href="/login?next=/lms/dashboard"

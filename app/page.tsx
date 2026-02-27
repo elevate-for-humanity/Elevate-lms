@@ -38,7 +38,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3 mt-6">
             <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg text-base sm:text-lg transition-all shadow-lg shadow-brand-red-600/30">
-              Apply Now — It&apos;s Free
+              Apply Now
             </Link>
             <Link href="/programs" className="bg-white/15 border border-white/30 text-white font-bold px-8 py-3.5 rounded-lg text-base sm:text-lg hover:bg-white/25 transition-all">
               Browse Programs
@@ -242,7 +242,7 @@ export default function HomePage() {
               </div>
               <div className="mt-8">
                 <Link href="/apply/student" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors shadow-lg shadow-brand-red-600/20">
-                  Apply Now — It&apos;s Free
+                  Apply Now
                 </Link>
               </div>
             </div>

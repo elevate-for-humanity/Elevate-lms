@@ -262,7 +262,7 @@ export default async function HsiPage() {
               href="/contact"
               className="inline-block bg-white text-brand-orange-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-red-50 transition-colors"
             >
-              Apply Now - It's Free
+              Apply Now
             </Link>
           </div>
         </div>

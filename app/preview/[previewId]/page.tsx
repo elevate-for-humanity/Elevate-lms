@@ -644,7 +644,7 @@ export default function PreviewPage() {
               className={`px-8 py-4 font-bold text-lg transition-transform hover:scale-105 ${buttonRadius}`}
               style={{ backgroundColor: colors.accent, color: '#ffffff' }}
             >
-              Apply Now - It&apos;s Free
+              Apply Now
             </button>
           </div>
         </section>

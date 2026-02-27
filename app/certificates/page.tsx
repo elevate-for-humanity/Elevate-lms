@@ -410,7 +410,7 @@ export default function CertificatesPage() {
             href="/apply"
             className="inline-flex items-center gap-2 bg-brand-orange-500 hover:bg-brand-orange-600 text-white px-8 py-4 rounded-xl text-lg font-bold transition-colors"
           >
-            Apply Now - It's Free
+            Apply Now
           </Link>
         </div>
       </section>

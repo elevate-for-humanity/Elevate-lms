@@ -164,7 +164,7 @@ export default function ProgramPageLayout({
                   href={applyHref}
                   className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg transition-all shadow-lg shadow-brand-red-600/30 text-base"
                 >
-                  Apply Now — It&apos;s Free
+                  Apply Now
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link

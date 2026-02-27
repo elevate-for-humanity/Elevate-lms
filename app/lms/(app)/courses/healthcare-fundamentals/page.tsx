@@ -136,7 +136,7 @@ export default function HealthcareFundamentalsCoursePage() {
                   href="/apply"
                   className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors shadow-2xl"
                 >
-                  Enroll Now - It's Free
+                  Enroll Now
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
@@ -372,7 +372,7 @@ export default function HealthcareFundamentalsCoursePage() {
               href="/apply"
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-10 py-5 rounded-xl text-lg font-black shadow-2xl hover:bg-gray-100 transition-all"
             >
-              Enroll Now - It's Free
+              Enroll Now
               <ArrowRight className="w-6 h-6" />
             </Link>
             <Link

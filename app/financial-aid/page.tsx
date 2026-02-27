@@ -212,7 +212,7 @@ export default function FinancialAidPage() {
             href="/apply"
             className="inline-flex items-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-lg font-semibold hover:bg-brand-green-50 transition-colors"
           >
-            Apply Now - It's Free
+            Apply Now
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

@@ -153,3 +153,4 @@ lighthouse-*.json
 deno.lock
 eng.traineddata
 scripts/live-schema-snapshot.json
+audit_artifacts/

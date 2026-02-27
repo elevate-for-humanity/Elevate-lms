@@ -54,12 +54,14 @@ function onAuditFailure(context: string, error: unknown, event: Record<string, u
   // On serverless, stderr (channel 1) is the real last resort.
   if (typeof globalThis.process !== 'undefined') {
     try {
+      // Dynamic require: fs is unavailable in edge runtime, so this is
+      // guarded by the process check and wrapped in try/catch.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const fs = require('fs');
+      const { appendFileSync } = require('node:fs');
       const line = JSON.stringify({ ...failureRecord, event }) + '\n';
-      fs.appendFileSync('/tmp/audit-fallback.jsonl', line);
+      appendFileSync('/tmp/audit-fallback.jsonl', line);
     } catch {
-      // stderr already has it
+      // stderr already has it — edge runtime or fs unavailable
     }
   }
 }

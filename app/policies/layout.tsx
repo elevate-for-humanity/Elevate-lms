@@ -1,6 +1,12 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FileText, Home } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Policies & Compliance',
+  description: 'Institutional policies, compliance documentation, and regulatory disclosures for Elevate for Humanity.',
+};
 
 export default function PoliciesLayout({
   children,

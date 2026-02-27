@@ -1,7 +1,13 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { createServerSupabaseClient } from '@/lib/auth';
+
+export const metadata: Metadata = {
+  title: 'Onboarding',
+  description: 'Complete your onboarding process for Elevate for Humanity.',
+};
 
 // Force dynamic rendering for all onboarding pages
 export const dynamic = 'force-dynamic';

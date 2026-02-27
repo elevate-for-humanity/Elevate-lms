@@ -46,9 +46,9 @@ export default function LicensingPage() {
     setLoading(false);
   }
 
-  async function updateLicenseStatus(licenseId: string, status: string) {
-    const supabase = createClient();
-    await supabase.from('licenses').update({ status }).eq('id', licenseId);
+  async function handleUpdateLicenseStatus(licenseId: string, status: string) {
+    const { updateLicenseStatus: serverUpdate } = await import('./actions');
+    await serverUpdate(licenseId, status);
     loadData();
   }
 
@@ -126,7 +126,7 @@ export default function LicensingPage() {
               <div className="flex gap-2">
                 {license.status === 'active' && (
                   <button
-                    onClick={() => updateLicenseStatus(license.id, 'suspended')}
+                    onClick={() => handleUpdateLicenseStatus(license.id, 'suspended')}
                     className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
                   >
                     Suspend
@@ -134,7 +134,7 @@ export default function LicensingPage() {
                 )}
                 {license.status === 'suspended' && (
                   <button
-                    onClick={() => updateLicenseStatus(license.id, 'active')}
+                    onClick={() => handleUpdateLicenseStatus(license.id, 'active')}
                     className="px-4 py-2 bg-brand-green-600 text-white rounded hover:bg-brand-green-700"
                   >
                     Activate
@@ -142,7 +142,7 @@ export default function LicensingPage() {
                 )}
                 {license.status !== 'cancelled' && (
                   <button
-                    onClick={() => updateLicenseStatus(license.id, 'cancelled')}
+                    onClick={() => handleUpdateLicenseStatus(license.id, 'cancelled')}
                     className="px-4 py-2 bg-brand-red-600 text-white rounded hover:bg-brand-red-700"
                   >
                     Cancel

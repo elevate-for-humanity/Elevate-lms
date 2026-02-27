@@ -7,13 +7,14 @@ export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 type Payload = {
   id: string;
   patch: Record<string, any>;
 };
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -104,3 +105,4 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ ok: true, row: data });
 }
+export const POST = withApiAudit('/api/admin/next-steps/update', _POST);

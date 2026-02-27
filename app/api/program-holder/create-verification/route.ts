@@ -8,6 +8,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { stripe } from '@/lib/stripe/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 export async function POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');

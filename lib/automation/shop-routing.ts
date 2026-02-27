@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { setAuditContext } from '@/lib/audit-context';
 
 // Types
 export interface ShopProfile {
@@ -143,6 +144,7 @@ export async function getRoutingRecommendations(
   applicationId: string
 ): Promise<RoutingResult> {
   const supabase = getSupabaseAdmin();
+  await setAuditContext(supabase, { systemActor: 'shop_routing' });
   
   try {
     // 1. Get application details
@@ -369,6 +371,7 @@ export async function assignToShop(
   assignedBy?: string
 ): Promise<{ success: boolean; error?: string }> {
   const supabase = getSupabaseAdmin();
+  await setAuditContext(supabase, { actorUserId: assignedBy, systemActor: 'shop_routing' });
   
   try {
     // 1. Update routing score status

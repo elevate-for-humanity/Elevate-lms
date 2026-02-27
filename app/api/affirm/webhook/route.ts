@@ -10,6 +10,7 @@ export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 interface AffirmWebhookEvent {
   type: string;
@@ -24,7 +25,7 @@ interface AffirmWebhookEvent {
   };
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     // Verify webhook authenticity via shared secret header
     const webhookSecret = process.env.AFFIRM_WEBHOOK_SECRET;
@@ -199,3 +200,4 @@ async function handleChargeRefunded(event: AffirmWebhookEvent, supabase: any) {
       .eq('affirm_order_id', order_id);
   }
 }
+export const POST = withApiAudit('/api/affirm/webhook', _POST, { actor_type: 'webhook', skip_body: true });

@@ -8,12 +8,13 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
   logger.warn('Deprecated webhook endpoint called', { 
@@ -38,3 +39,4 @@ export async function POST(request: NextRequest) {
     headers: { 'Content-Type': 'application/json' }
   });
 }
+export const POST = withApiAudit('/api/store/licenses/webhook', _POST, { actor_type: 'webhook', skip_body: true });

@@ -48,6 +48,11 @@ interface Props {
   };
 }
 
+async function auditEnrollment(action: string, targetId: string, meta?: Record<string, unknown>) {
+  const { auditEnrollmentAction } = await import('./actions');
+  await auditEnrollmentAction(action, targetId, meta);
+}
+
 export default function EnrollmentManagementClient({ initialEnrollments, users, courses, cohorts, stats }: Props) {
   const [enrollments, setEnrollments] = useState<Enrollment[]>(initialEnrollments);
   const [showModal, setShowModal] = useState(false);
@@ -113,6 +118,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
           .single();
 
         if (updateError) throw updateError;
+        auditEnrollment('enrollment_updated', editingEnrollment.id, { status: formData.status });
         setEnrollments(enrollments.map(e => e.id === editingEnrollment.id ? data : e));
       } else {
         // CREATE new enrollment
@@ -144,6 +150,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
           .single();
 
         if (insertError) throw insertError;
+        auditEnrollment('enrollment_created', data.id, { user_id: formData.user_id, course_id: formData.course_id });
         setEnrollments([data, ...enrollments]);
       }
 
@@ -177,6 +184,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
         .eq('id', enrollmentId);
 
       if (deleteError) throw deleteError;
+      auditEnrollment('enrollment_deleted', enrollmentId);
       setEnrollments(enrollments.filter(e => e.id !== enrollmentId));
     } catch (err: any) {
       setError('An error occurred');

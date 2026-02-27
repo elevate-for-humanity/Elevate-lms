@@ -16,6 +16,7 @@ import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -29,7 +30,7 @@ function getSupabaseAdmin() {
   return createClient(url, key);
 }
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   // Verify cron secret
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -221,3 +222,4 @@ async function sendPastDueAlert(
     `,
   });
 }
+export const GET = withApiAudit('/api/cron/payment-monitoring', _GET, { actor_type: 'cron' });

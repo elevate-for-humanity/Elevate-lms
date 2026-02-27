@@ -4,6 +4,7 @@ import { logger } from '@/lib/logger';
 
 import { createClient } from '@supabase/supabase-js';
 import { getPartnerClient, PartnerType } from './index';
+import { setAuditContext } from '@/lib/audit-context';
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -37,6 +38,7 @@ export async function enrollInExternalModule(
   request: HybridEnrollmentRequest
 ): Promise<HybridEnrollmentResult> {
   const supabase = getSupabaseAdmin();
+  await setAuditContext(supabase, { actorUserId: request.studentId, systemActor: 'hybrid_enrollment' });
   try {
     // Fetch module details
     const { data: module, error: moduleError } = await supabase

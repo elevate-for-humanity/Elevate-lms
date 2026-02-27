@@ -7,8 +7,9 @@ import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
@@ -101,7 +102,7 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -127,3 +128,5 @@ export async function GET(request: Request) {
     );
   }
 }
+export const GET = withApiAudit('/api/stripe/invoice/create', _GET);
+export const POST = withApiAudit('/api/stripe/invoice/create', _POST);

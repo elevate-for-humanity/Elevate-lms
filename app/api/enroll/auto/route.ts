@@ -17,6 +17,9 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+
 interface AutoEnrollRequest {
   firstName: string;
   lastName: string;
@@ -26,7 +29,7 @@ interface AutoEnrollRequest {
   notes?: string;
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
@@ -339,3 +342,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/enroll/auto', _POST);

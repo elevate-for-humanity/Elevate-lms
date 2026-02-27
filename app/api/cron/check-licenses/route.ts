@@ -12,6 +12,8 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 export const runtime = 'nodejs';
 export const maxDuration = 300;
 

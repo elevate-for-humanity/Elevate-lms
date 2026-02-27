@@ -8,6 +8,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 /**
  * Mark course as completed
  * POST /api/lms/progress/complete

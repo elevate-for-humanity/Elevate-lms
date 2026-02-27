@@ -1,5 +1,6 @@
 // lib/multiTenant/compliance.ts
 import { createClient } from '@supabase/supabase-js';
+import { setAuditContext } from '@/lib/audit-context';
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -18,6 +19,7 @@ export type TenantCompliance = {
 
 export async function getTenantCompliance(tenantId: string): Promise<TenantCompliance> {
   const supabase = getSupabaseAdmin();
+  await setAuditContext(supabase, { systemActor: 'tenant_compliance' });
   const { data: tenant } = await supabase
     .from('tenants')
     .select('compliance_wioa, compliance_ferpa, compliance_hipaa')
@@ -39,6 +41,9 @@ export async function updateTenantCompliance(
   tenantId: string,
   compliance: Partial<TenantCompliance>
 ): Promise<void> {
+  const supabase = getSupabaseAdmin();
+  await setAuditContext(supabase, { systemActor: 'tenant_compliance' });
+
   const updates: Record<string, boolean> = {};
 
   if (compliance.wioa !== undefined) updates.compliance_wioa = compliance.wioa;

@@ -1,10 +1,11 @@
 import { getStripe } from '@/lib/stripe/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 
@@ -26,3 +27,4 @@ export async function POST(req: Request) {
     headers: { 'Content-Type': 'application/json' },
   });
 }
+export const POST = withApiAudit('/api/stripe', _POST);

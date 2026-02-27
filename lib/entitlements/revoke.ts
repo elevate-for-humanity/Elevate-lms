@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { createClient } from "@supabase/supabase-js";
+import { setAuditContext } from '@/lib/audit-context';
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -12,6 +13,7 @@ function getSupabaseAdmin() {
 
 export async function revokeEntitlement(userId: string, entitlementCode: string) {
   const supabase = getSupabaseAdmin();
+  await setAuditContext(supabase, { systemActor: 'entitlement_revocation' });
   const { error } = await supabase
     .from("store_entitlements")
     .update({ 
@@ -31,6 +33,7 @@ export async function revokeEntitlement(userId: string, entitlementCode: string)
 
 export async function revokeLmsAccess(userId: string, courseId: string) {
   const supabase = getSupabaseAdmin();
+  await setAuditContext(supabase, { systemActor: 'entitlement_revocation' });
   const { error } = await supabase
     .from("course_enrollments")
     .update({ 
@@ -51,6 +54,7 @@ export async function revokeLmsAccess(userId: string, courseId: string) {
 
 export async function revokeAllAccessForPayment(userId: string, paymentIntentId: string) {
   const supabase = getSupabaseAdmin();
+  await setAuditContext(supabase, { systemActor: 'entitlement_revocation' });
   // Revoke all entitlements tied to this payment
   const { error: entitlementError } = await supabase
     .from("store_entitlements")

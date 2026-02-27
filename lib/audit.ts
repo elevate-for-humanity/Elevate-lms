@@ -1,7 +1,71 @@
 // lib/audit.ts
 // Audit logging helper for enterprise compliance
+//
+// Failure policy: audit writes NEVER throw, but failures are:
+// 1. Logged to logger.error (application logs)
+// 2. Written to stderr as structured JSON (container-level visibility)
+// 3. Counted in auditFailureCount (scrapable by monitoring)
+// 4. Written to fallback file if DB is unreachable (disaster recovery)
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { logger } from '@/lib/logger';
+
+// Telemetry: in-process failure counter. Expose via /api/health or metrics endpoint.
+let auditFailureCount = 0;
+let auditSuccessCount = 0;
+
+export function getAuditTelemetry() {
+  return { auditSuccessCount, auditFailureCount };
+}
+
+function onAuditFailure(context: string, error: unknown, event: Record<string, unknown>) {
+  auditFailureCount++;
+  const errorMessage = error instanceof Error ? error.message : String(error);
+
+  // Channel 1: Structured stderr — always visible in container logs
+  const failureRecord = {
+    level: 'AUDIT_WRITE_FAILURE',
+    timestamp: new Date().toISOString(),
+    context,
+    error: errorMessage,
+    event,
+  };
+  process.stderr.write(JSON.stringify(failureRecord) + '\n');
+
+  // Channel 2: Application logger
+  logger.error(context, error as Error, { event });
+
+  // Channel 3: Durable DB fallback — separate table with minimal constraints.
+  // Uses a fresh client to avoid reusing the one that just failed.
+  try {
+    const fallbackClient = createSupabaseClient();
+    // Fire-and-forget: don't await, don't let this throw
+    fallbackClient.from('audit_failures').insert({
+      context,
+      error_message: errorMessage,
+      original_event: event,
+    }).then(() => {}).catch(() => {});
+  } catch {
+    // If even creating the client fails, fall through to file
+  }
+
+  // Channel 4: Local file — last resort if DB is completely unreachable.
+  // NOTE: On Netlify Functions, /tmp is ephemeral (wiped between invocations).
+  // This channel is only durable in long-lived runtimes (dev, Docker, VMs).
+  // On serverless, stderr (channel 1) is the real last resort.
+  if (typeof globalThis.process !== 'undefined') {
+    try {
+      const fs = require('fs');
+      const line = JSON.stringify({ ...failureRecord, event }) + '\n';
+      fs.appendFileSync('/tmp/audit-fallback.jsonl', line);
+    } catch {
+      // stderr already has it
+    }
+  }
+}
+
+function onAuditSuccess() {
+  auditSuccessCount++;
+}
 
 export type AuditEvent = {
   tenantId?: string | null;
@@ -18,26 +82,59 @@ export type AuditEvent = {
  * Log an audit event to the database
  * This function is designed to never throw errors to prevent disrupting normal operations
  */
+// PII field names to redact from metadata payloads.
+// Values are replaced with '[REDACTED]' before insert.
+const PII_METADATA_KEYS = new Set([
+  'email', 'user_email', 'created_emails', 'anonymized_email',
+  'phone', 'phone_number', 'mobile',
+  'ssn', 'ssn_hash', 'ssn_last4', 'ssn_last_4',
+  'date_of_birth', 'dob',
+  'address', 'address_line1', 'address_line2', 'street_address',
+  'full_name', 'first_name', 'last_name', 'name',
+  'tax_id', 'itin', 'ein',
+  'bank_account', 'routing_number', 'account_number',
+  'driver_license', 'state_id', 'government_id',
+  'file_path', 'file_url', 'document_url', 'signed_url',
+  'password', 'temp_password', 'temporary_password',
+]);
+
+function sanitizeMetadata(metadata: Record<string, any>): Record<string, any> {
+  const sanitized: Record<string, any> = {};
+  for (const [key, value] of Object.entries(metadata)) {
+    if (PII_METADATA_KEYS.has(key.toLowerCase())) {
+      sanitized[key] = '[REDACTED]';
+    } else if (value && typeof value === 'object' && !Array.isArray(value)) {
+      sanitized[key] = sanitizeMetadata(value);
+    } else {
+      sanitized[key] = value;
+    }
+  }
+  return sanitized;
+}
+
 export async function logAuditEvent(event: AuditEvent): Promise<void> {
+  const payload = {
+    tenant_id: event.tenantId,
+    user_id: event.userId,
+    action: event.action,
+    resource_type: event.resourceType,
+    resource_id: event.resourceId,
+    metadata: sanitizeMetadata(event.metadata || {}),
+    ip_address: event.ipAddress,
+    user_agent: event.userAgent,
+  };
+
   try {
     const supabase = createSupabaseClient();
-    const { error } = await supabase.from('audit_logs').insert({
-      tenant_id: event.tenantId,
-      user_id: event.userId,
-      action: event.action,
-      resource_type: event.resourceType,
-      resource_id: event.resourceId,
-      metadata: event.metadata || {},
-      ip_address: event.ipAddress,
-      user_agent: event.userAgent,
-    });
+    const { error } = await supabase.from('audit_logs').insert(payload);
 
     if (error) {
-      logger.error('Failed to write audit log', error as Error, { event });
+      onAuditFailure('logAuditEvent: DB insert rejected', error, payload);
+    } else {
+      onAuditSuccess();
     }
   } catch (e) {
-    // Do not crash app for logging failures
-    logger.error('Audit logging exception', e as Error, { event });
+    onAuditFailure('logAuditEvent: exception', e, payload);
   }
 }
 
@@ -45,27 +142,74 @@ export async function logAuditEvent(event: AuditEvent): Promise<void> {
  * Common audit actions for consistency
  */
 export const AuditActions = {
-  // User actions
+  // User / profile actions
   USER_CREATED: 'user_created',
   USER_UPDATED: 'user_updated',
   USER_DELETED: 'user_deleted',
+  USER_ROLE_CHANGED: 'user_role_changed',
   USER_LOGIN: 'user_login',
   USER_LOGOUT: 'user_logout',
   USER_PASSWORD_CHANGED: 'user_password_changed',
   USER_2FA_ENABLED: 'user_2fa_enabled',
   USER_2FA_DISABLED: 'user_2fa_disabled',
 
-  // Course actions
+  // Course / content actions
   COURSE_CREATED: 'course_created',
   COURSE_UPDATED: 'course_updated',
   COURSE_DELETED: 'course_deleted',
   COURSE_PUBLISHED: 'course_published',
   COURSE_UNPUBLISHED: 'course_unpublished',
+  LESSON_CREATED: 'lesson_created',
+  LESSON_UPDATED: 'lesson_updated',
+  LESSON_DELETED: 'lesson_deleted',
+  QUIZ_CREATED: 'quiz_created',
+  QUIZ_UPDATED: 'quiz_updated',
+  QUIZ_DELETED: 'quiz_deleted',
+  MODULE_CREATED: 'module_created',
+  MODULE_UPDATED: 'module_updated',
+  MODULE_DELETED: 'module_deleted',
+  PROGRAM_CREATED: 'program_created',
+  PROGRAM_UPDATED: 'program_updated',
+  PROGRAM_DELETED: 'program_deleted',
 
   // Enrollment actions
   ENROLLMENT_CREATED: 'enrollment_created',
+  ENROLLMENT_UPDATED: 'enrollment_updated',
   ENROLLMENT_COMPLETED: 'enrollment_completed',
   ENROLLMENT_CANCELLED: 'enrollment_cancelled',
+  ENROLLMENT_DELETED: 'enrollment_deleted',
+
+  // License / access actions
+  LICENSE_CREATED: 'license_created',
+  LICENSE_UPDATED: 'license_updated',
+  LICENSE_REQUEST_UPDATED: 'license_request_updated',
+
+  // Grant / funding actions
+  GRANT_OPPORTUNITY_CREATED: 'grant_opportunity_created',
+  GRANT_OPPORTUNITY_UPDATED: 'grant_opportunity_updated',
+  GRANT_OPPORTUNITY_DELETED: 'grant_opportunity_deleted',
+  GRANT_APPLICATION_CREATED: 'grant_application_created',
+  GRANT_APPLICATION_UPDATED: 'grant_application_updated',
+
+  // Tax / WOTC actions
+  TAX_APPLICATION_CREATED: 'tax_application_created',
+  WOTC_APPLICATION_CREATED: 'wotc_application_created',
+  WOTC_APPLICATION_UPDATED: 'wotc_application_updated',
+  WOTC_APPLICATION_DELETED: 'wotc_application_deleted',
+
+  // Payroll / financial actions
+  PAYROLL_RECORD_UPDATED: 'payroll_record_updated',
+  TRANSFER_HOURS_UPDATED: 'transfer_hours_updated',
+
+  // Program holder / verification actions
+  PROGRAM_HOLDER_UPDATED: 'program_holder_updated',
+  PROGRAM_HOLDER_VERIFIED: 'program_holder_verified',
+  PROGRAM_HOLDER_DOC_REVIEWED: 'program_holder_doc_reviewed',
+  PROGRAM_HOLDER_BANKING_UPDATED: 'program_holder_banking_updated',
+
+  // Partner / affiliate actions
+  PARTNER_INQUIRY_UPDATED: 'partner_inquiry_updated',
+  AFFILIATE_CREATED: 'affiliate_created',
 
   // HR actions
   EMPLOYEE_CREATED: 'employee_created',
@@ -118,6 +262,19 @@ export const AuditActions = {
   MARKETPLACE_SALE_COMPLETED: 'marketplace_sale_completed',
   MARKETPLACE_PAYOUT_PROCESSED: 'marketplace_payout_processed',
   MARKETPLACE_WEBHOOK_FAILED: 'marketplace_webhook_failed',
+
+  // External module actions
+  EXTERNAL_MODULE_UPDATED: 'external_module_updated',
+
+  // Grading actions
+  GRADE_UPDATED: 'grade_updated',
+
+  // Integration actions
+  INTEGRATION_UPDATED: 'integration_updated',
+
+  // Incentive / job actions
+  INCENTIVE_CREATED: 'incentive_created',
+  JOB_CREATED: 'job_created',
 } as const;
 
 /**
@@ -190,5 +347,52 @@ export async function auditedAction<T>(
     });
 
     throw error;
+  }
+}
+
+// ─── Admin page audit helper ────────────────────────────────────────────────
+// For use in server components and server actions inside /admin pages.
+// Resolves actor from the Supabase session automatically.
+// Never throws — audit failures must not break admin operations.
+
+export type AdminAuditParams = {
+  action: string;
+  target_type: string;
+  target_id: string;
+  metadata?: Record<string, unknown>;
+};
+
+/**
+ * Write an audit event from an admin page context.
+ * Reads the current user from the Supabase session.
+ * Safe to call fire-and-forget (never throws).
+ *
+ * Usage:
+ *   await writeAdminAuditEvent(supabase, {
+ *     action: AuditActions.LICENSE_CREATED,
+ *     target_type: 'license',
+ *     target_id: newLicense.id,
+ *     metadata: { plan: 'enterprise' },
+ *   });
+ */
+export async function writeAdminAuditEvent(
+  supabase: { auth: { getUser: () => Promise<{ data: { user: { id: string } | null } }> } },
+  params: AdminAuditParams
+): Promise<void> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    await logAuditEvent({
+      userId: user?.id ?? null,
+      action: params.action,
+      resourceType: params.target_type,
+      resourceId: params.target_id,
+      metadata: params.metadata ?? {},
+    });
+  } catch (e) {
+    onAuditFailure('writeAdminAuditEvent', e, {
+      action: params.action,
+      target_type: params.target_type,
+      target_id: params.target_id,
+    });
   }
 }

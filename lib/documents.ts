@@ -22,6 +22,7 @@ import { logger } from '@/lib/logger';
  */
 
 import { createAdminClient } from '@/lib/supabase/admin';
+import { setAuditContext } from '@/lib/audit-context';
 
 export type OwnerType = 'apprentice' | 'host_shop';
 
@@ -441,6 +442,8 @@ export async function verifyDocument(
   const supabase = createAdminClient();
   if (!supabase) return false;
 
+  await setAuditContext(supabase, { actorUserId: verifiedBy, systemActor: 'document_verification' });
+
   const { error } = await supabase
     .from('documents')
     .update({
@@ -467,6 +470,8 @@ export async function rejectDocument(
 ): Promise<boolean> {
   const supabase = createAdminClient();
   if (!supabase) return false;
+
+  await setAuditContext(supabase, { actorUserId: rejectedBy, systemActor: 'document_verification' });
 
   const { error } = await supabase
     .from('documents')
@@ -498,6 +503,8 @@ export async function createDocumentRecord(params: {
 }): Promise<Document | null> {
   const supabase = createAdminClient();
   if (!supabase) return null;
+
+  await setAuditContext(supabase, { actorUserId: params.uploadedBy, systemActor: 'document_upload' });
 
   const { data, error } = await supabase
     .from('documents')

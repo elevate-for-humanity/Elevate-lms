@@ -1,6 +1,7 @@
 
 import type { ProgramEnrollment } from "@/types/enrollment";
 import { createClient } from "@supabase/supabase-js";
+import { setAuditContext } from "@/lib/audit-context";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -15,6 +16,7 @@ export async function createProgramEnrollment(
   if (!supabase) {
     throw new Error("Supabase not configured");
   }
+  await setAuditContext(supabase, { systemActor: "enrollment_db" });
 
   const { data, error }: any = await supabase
     .from("program_enrollments")
@@ -53,6 +55,7 @@ export async function updateEnrollmentStatus(
   if (!supabase) {
     throw new Error("Supabase not configured");
   }
+  await setAuditContext(supabase, { systemActor: "enrollment_db" });
 
   const { error } = await supabase
     .from("program_enrollments")

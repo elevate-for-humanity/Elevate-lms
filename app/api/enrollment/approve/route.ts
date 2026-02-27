@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
@@ -14,7 +15,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhuma
  * Sends approval emails to both student and admin.
  * Idempotent — checks application status before sending.
  */
-export async function POST() {
+async function _POST() {
   try {
     const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
@@ -115,3 +116,4 @@ export async function POST() {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/enrollment/approve', _POST);

@@ -12,6 +12,8 @@ import { logger } from '@/lib/logger';
 'use server';
 import { supabaseAdmin } from '../supabaseAdmin';
 import { revalidatePath } from 'next/cache';
+import { logAuditEvent } from '@/lib/audit';
+
 // ============================================================================
 // TYPES
 // ============================================================================

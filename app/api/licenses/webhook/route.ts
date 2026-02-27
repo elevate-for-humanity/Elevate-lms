@@ -10,6 +10,7 @@ import {
   handleSubscriptionDeleted,
   handlePaymentFailed,
 } from '@/lib/license/linkStripeToLicense';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 function getWebhookSecret() {
   return process.env.STRIPE_WEBHOOK_SECRET_LICENSES || process.env.STRIPE_WEBHOOK_SECRET || '';
 }
@@ -20,7 +21,7 @@ function getWebhookSecret() {
  * Handles Stripe webhook events for license purchases.
  * Uses shared linking logic from lib/license/linkStripeToLicense.ts
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
 
@@ -83,3 +84,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/licenses/webhook', _POST, { actor_type: 'webhook', skip_body: true });

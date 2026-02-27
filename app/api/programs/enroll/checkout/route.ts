@@ -24,6 +24,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 type FundingSource = 'self_pay' | 'workone' | 'wioa' | 'grant' | 'employer';
 
@@ -32,7 +33,7 @@ interface CheckoutRequest {
   funding_source?: FundingSource;
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
@@ -223,7 +224,7 @@ export async function POST(request: NextRequest) {
 /**
  * GET - Return API documentation
  */
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -244,3 +245,5 @@ return NextResponse.json({
     webhook_provisioning: 'On checkout.session.completed, student_enrollments is created with status=active',
   });
 }
+export const GET = withApiAudit('/api/programs/enroll/checkout', _GET);
+export const POST = withApiAudit('/api/programs/enroll/checkout', _POST);

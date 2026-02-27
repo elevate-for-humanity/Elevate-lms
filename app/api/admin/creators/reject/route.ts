@@ -9,6 +9,7 @@ import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { sendCreatorRejectionEmail } from '@/lib/email/resend';
 import { z } from 'zod';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Input validation schema
 const rejectCreatorSchema = z.object({
@@ -18,7 +19,7 @@ const rejectCreatorSchema = z.object({
     .max(500, 'Rejection reason must be less than 500 characters'),
 });
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -183,3 +184,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/admin/creators/reject', _POST);

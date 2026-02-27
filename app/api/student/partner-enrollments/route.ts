@@ -10,6 +10,7 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function getSupabaseServerClient() {
   const cookieStore = await cookies();
@@ -26,7 +27,7 @@ async function getSupabaseServerClient() {
   );
 }
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -74,3 +75,4 @@ export async function GET(request: Request) {
 
   return NextResponse.json({ enrollments });
 }
+export const GET = withApiAudit('/api/student/partner-enrollments', _GET);

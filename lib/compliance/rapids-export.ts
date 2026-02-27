@@ -11,6 +11,7 @@
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { RAPIDS_CONFIG } from './rapids-config';
+import { setAuditContext } from '@/lib/audit-context';
 
 // Lazy initialization to avoid build-time errors
 function getSupabaseAdmin(): SupabaseClient {
@@ -131,6 +132,7 @@ export async function exportNewRegistrations(
   
   // Query enrollments that need RAPIDS registration
   const supabase = getSupabaseAdmin();
+  await setAuditContext(supabase, { systemActor: 'rapids_export' });
   let query = supabase
     .from('program_enrollments')
     .select(`

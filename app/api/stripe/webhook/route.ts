@@ -13,6 +13,10 @@ import { NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
 
+import { auditMutation } from '@/lib/api/withAudit';
+import { setAuditContext } from '@/lib/audit-context';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+
 function tierFromPrice(priceId?: string | null): 'free' | 'student' | 'career' {
   if (!priceId) return 'free';
   if (priceId === process.env.STRIPE_PRICE_STUDENT) return 'student';
@@ -59,7 +63,7 @@ async function upsertAccess(payload: {
   }
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
     return NextResponse.json(
       { error: 'Stripe not configured' },
@@ -147,6 +151,9 @@ export async function POST(req: Request) {
         // Import Supabase admin client for user creation
         const { createAdminClient } = await import('@/lib/supabase/admin');
         const supabaseAdmin = createAdminClient();
+        if (supabaseAdmin) {
+          await setAuditContext(supabaseAdmin, { systemActor: 'stripe_webhook', requestId: event.id });
+        }
 
         // If no studentId, create a new user account
         let finalStudentId = studentId;
@@ -546,6 +553,13 @@ export async function POST(req: Request) {
       );
     }
 
+    await auditMutation(request, {
+      action: 'stripe_webhook_processed',
+      target_type: 'stripe_event',
+      target_id: event.id,
+      metadata: { event_type: event.type },
+    });
+
     return NextResponse.json({ received: true });
   } catch (err: unknown) {
     logger.error('Stripe webhook error:', err);
@@ -555,3 +569,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/stripe/webhook', _POST, { actor_type: 'webhook', skip_body: true });

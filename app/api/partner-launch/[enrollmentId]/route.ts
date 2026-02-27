@@ -10,6 +10,7 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { getPartnerClient, PartnerType } from '@/lib/partners';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function getSupabaseServerClient() {
   const cookieStore = await cookies();
@@ -30,7 +31,7 @@ interface Params {
   params: Promise<{ enrollmentId: string }>;
 }
 
-export async function GET(_req: Request, { params }: Params) {
+async function _GET(_req: Request, { params }: Params) {
   const rateLimited = await applyRateLimit(_req, 'api');
   if (rateLimited) return rateLimited;
 
@@ -64,3 +65,4 @@ export async function GET(_req: Request, { params }: Params) {
 
   return NextResponse.redirect(launchUrl);
 }
+export const GET = withApiAudit('/api/partner-launch/[enrollmentId]', _GET);

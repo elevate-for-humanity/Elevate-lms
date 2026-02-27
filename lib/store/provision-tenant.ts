@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { auditLog } from '@/lib/auditLog';
+import { setAuditContext } from '@/lib/audit-context';
 import * as crypto from 'node:crypto';
 
 interface TenantProvisioningResult {
@@ -50,6 +51,8 @@ function generateSlug(name: string): string {
 export async function provisionTenant(params: ProvisionTenantParams): Promise<TenantProvisioningResult> {
   const { email, organizationName, productId, licenseId, stripeEventId } = params;
   const supabase = createAdminClient();
+
+  await setAuditContext(supabase, { systemActor: 'tenant_provisioning', requestId: stripeEventId });
 
   try {
     // Check if tenant already exists for this email

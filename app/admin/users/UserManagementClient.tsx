@@ -76,25 +76,15 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
 
     try {
       if (editingUser) {
-        // UPDATE existing user
-        const { data, error: updateError } = await supabase
-          .from('profiles')
-          .update({
-            full_name: formData.full_name || null,
-            role: formData.role,
-            phone: formData.phone || null,
-            is_active: formData.is_active,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingUser.id)
-          .select()
-          .single();
-
-        if (updateError) throw updateError;
-        setUsers(users.map(u => u.id === editingUser.id ? { ...u, ...data } : u));
+        const { updateUserProfile } = await import('./actions');
+        const result = await updateUserProfile(editingUser.id, {
+          full_name: formData.full_name || undefined,
+          role: formData.role,
+          is_active: formData.is_active,
+        });
+        if (result.error) throw new Error(result.error);
+        setUsers(users.map(u => u.id === editingUser.id ? { ...u, ...result.data } : u));
       } else {
-        // CREATE - Note: Creating users requires auth.admin or invite flow
-        // For now, we create a profile entry (user must sign up separately)
         setError('To add new users, use the invite system or have them sign up directly.');
         setLoading(false);
         return;
@@ -114,12 +104,9 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
 
     setLoading(true);
     try {
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ is_active: false, updated_at: new Date().toISOString() })
-        .eq('id', userId);
-
-      if (updateError) throw updateError;
+      const { deactivateUser } = await import('./actions');
+      const result = await deactivateUser(userId);
+      if (result.error) throw new Error(result.error);
       setUsers(users.map(u => u.id === userId ? { ...u, is_active: false } : u));
     } catch (err: any) {
       setError('An error occurred');
@@ -131,12 +118,9 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
   const handleActivate = async (userId: string) => {
     setLoading(true);
     try {
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ is_active: true, updated_at: new Date().toISOString() })
-        .eq('id', userId);
-
-      if (updateError) throw updateError;
+      const { activateUser } = await import('./actions');
+      const result = await activateUser(userId);
+      if (result.error) throw new Error(result.error);
       setUsers(users.map(u => u.id === userId ? { ...u, is_active: true } : u));
     } catch (err: any) {
       setError('An error occurred');
@@ -150,12 +134,9 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
 
     setLoading(true);
     try {
-      const { error: deleteError } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', userId);
-
-      if (deleteError) throw deleteError;
+      const { deleteUser } = await import('./actions');
+      const result = await deleteUser(userId);
+      if (result.error) throw new Error(result.error);
       setUsers(users.filter(u => u.id !== userId));
     } catch (err: any) {
       setError('An error occurred');

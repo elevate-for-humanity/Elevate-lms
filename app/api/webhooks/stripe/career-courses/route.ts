@@ -4,13 +4,14 @@ import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 function getWebhookSecret() {
   return process.env.STRIPE_WEBHOOK_SECRET_CAREER_COURSES || process.env.STRIPE_WEBHOOK_SECRET || '';
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   const body = await req.text();
   const headersList = await headers();
   const signature = headersList.get('stripe-signature');
@@ -133,3 +134,4 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ received: true });
 }
+export const POST = withApiAudit('/api/webhooks/stripe/career-courses', _POST, { actor_type: 'webhook', skip_body: true });

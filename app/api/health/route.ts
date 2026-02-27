@@ -4,6 +4,7 @@ import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
 import { getAppVersion } from '@/lib/version/getAppVersion';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { getAuditTelemetry } from '@/lib/audit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -122,6 +123,30 @@ const checks: Record<string, any> = {
     }
   } else {
     checks.checks.resend = { skipped: true, status: 'pass' };
+  }
+
+  // Check 6: Audit telemetry
+  const auditTelemetry = getAuditTelemetry();
+  checks.checks.audit = {
+    success_count: auditTelemetry.auditSuccessCount,
+    failure_count: auditTelemetry.auditFailureCount,
+    status: auditTelemetry.auditFailureCount === 0 ? 'pass' : 'warn',
+  };
+
+  // Check 7: Audit infrastructure integrity (trigger health)
+  try {
+    const adminClient = createAdminClient();
+    if (adminClient) {
+      const { data: integrity } = await adminClient.rpc('verify_audit_integrity');
+      checks.checks.audit_integrity = {
+        status: integrity?.status === 'HEALTHY' ? 'pass' : 'fail',
+        disabled_triggers: integrity?.disabled_triggers ?? 'unknown',
+        missing_immutability: integrity?.missing_immutability_tables ?? [],
+        checked_at: integrity?.checked_at,
+      };
+    }
+  } catch {
+    checks.checks.audit_integrity = { status: 'unknown', error: 'RPC unavailable' };
   }
 
   // Overall Status

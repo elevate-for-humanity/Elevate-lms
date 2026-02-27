@@ -14,6 +14,9 @@ import { logger } from '@/lib/logger';
 
 
 
+import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+
 interface CheckoutRequest {
   programId: string;
   paymentType?: 'full' | 'plan';
@@ -21,7 +24,7 @@ interface CheckoutRequest {
   couponCode?: string;
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -367,7 +370,7 @@ export async function POST(request: NextRequest) {
 }
 
 // GET endpoint to retrieve session status
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -405,3 +408,5 @@ if (!stripe) {
     );
   }
 }
+export const GET = withApiAudit('/api/payments/create-session', _GET);
+export const POST = withApiAudit('/api/payments/create-session', _POST);

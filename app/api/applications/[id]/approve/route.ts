@@ -10,6 +10,8 @@ import { getCurrentUser } from '@/lib/auth';
 import { sendEmail } from '@/lib/email/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

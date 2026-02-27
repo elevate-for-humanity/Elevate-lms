@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { setAuditContext } from '@/lib/audit-context';
 
 /**
  * Document retention policy configuration.
@@ -64,6 +65,8 @@ export async function enforceDocumentRetention(
     logger.error('[Retention] Admin client not available');
     return { scanned: 0, deleted: 0, skipped: 0, errors: 0, dryRun, documents: [] };
   }
+
+  await setAuditContext(db, { systemActor: 'document_retention' });
 
   const retentionDays = DEFAULT_RETENTION_DAYS;
   const cutoffDate = new Date();

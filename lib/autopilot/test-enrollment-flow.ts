@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { setAuditContext } from '@/lib/audit-context';
 
 interface TestResult {
   step: string;
@@ -53,6 +54,7 @@ export async function testEnrollmentFlow(
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey);
+  await setAuditContext(supabase, { systemActor: 'autopilot_test' });
 
   // STEP 1: Create or get test student
   try {

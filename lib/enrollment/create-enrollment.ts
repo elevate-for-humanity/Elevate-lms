@@ -5,6 +5,8 @@
 
 import { logger } from '@/lib/logger';
 
+import { logAuditEvent } from '@/lib/audit';
+
 interface EnrollmentParams {
   studentId?: string;
   programId: string;
@@ -49,12 +51,15 @@ export async function createEnrollmentFromPayment(
 
   try {
     const { createAdminClient } = await import('@/lib/supabase/admin');
+    const { setAuditContext } = await import('@/lib/audit-context');
     const supabaseAdmin = createAdminClient();
 
     if (!supabaseAdmin) {
       logger.error('[Enrollment] createAdminClient returned null — SUPABASE_SERVICE_ROLE_KEY missing');
       return { success: false, error: 'Database configuration error' };
     }
+
+    await setAuditContext(supabaseAdmin, { systemActor: 'enrollment_creation' });
 
     let finalStudentId = initialStudentId;
     let isNewUser = false;
@@ -217,6 +222,25 @@ export async function createEnrollmentFromPayment(
         supabaseAdmin,
       });
     }
+
+    // L1 audit: record enrollment creation
+    try {
+      const { logAuditEvent } = await import('@/lib/audit');
+      await logAuditEvent({
+        action: 'ENROLLMENT_CREATED_FROM_PAYMENT',
+        actor_id: 'system:enrollment_creation',
+        target_type: 'program_enrollment',
+        target_id: enrollmentId || undefined,
+        metadata: {
+          student_id: finalStudentId,
+          program_id: programId,
+          payment_provider: paymentProvider,
+          payment_reference: paymentReference,
+          is_new_user: isNewUser,
+          is_new_enrollment: isNewEnrollment,
+        },
+      });
+    } catch { /* audit best-effort */ }
 
     return {
       success: true,

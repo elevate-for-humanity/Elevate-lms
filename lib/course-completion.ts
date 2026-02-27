@@ -2,6 +2,7 @@
 // Course completion logic including external partner modules
 
 import { createClient } from '@supabase/supabase-js';
+import { setAuditContext } from '@/lib/audit-context';
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -171,6 +172,8 @@ export async function completeCourse(
   }
 
   const supabase = getSupabaseAdmin();
+  await setAuditContext(supabase, { actorUserId: userId, systemActor: 'course_completion' });
+
   // Update enrollment status
   const { error } = await supabase
     .from('program_enrollments')

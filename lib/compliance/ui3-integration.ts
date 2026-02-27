@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger';
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { setAuditContext } from '@/lib/audit-context';
 
 export interface UI3WageRecord {
   ssn: string;
@@ -82,6 +83,8 @@ export async function processUI3Results(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
+
+  await setAuditContext(supabase, { systemActor: 'ui3_wage_matching' });
 
   const matchResults: UI3MatchResult[] = [];
 

@@ -2,6 +2,9 @@ import { createSupabaseClient } from '@/lib/supabase-api';
 import { logger } from '@/lib/logger';
 import { ProvisioningJob } from '../queue';
 
+import { logAuditEvent } from '@/lib/audit';
+import { setAuditContext } from '@/lib/audit-context';
+
 /**
  * STEP 6A: License provision job handler
  * 
@@ -9,6 +12,7 @@ import { ProvisioningJob } from '../queue';
  */
 export async function processLicenseProvision(job: ProvisioningJob): Promise<void> {
   const supabase = createSupabaseClient();
+  await setAuditContext(supabase, { systemActor: 'license_provision_job', requestId: job.correlation_id });
   const { tenantId, plan, stripeCustomerId, stripeSubscriptionId } = job.payload as {
     tenantId: string;
     plan: string;

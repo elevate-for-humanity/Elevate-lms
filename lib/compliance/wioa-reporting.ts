@@ -6,6 +6,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { setAuditContext } from '@/lib/audit-context';
 
 export interface StudentOutcomeData {
   student_id: string;
@@ -125,6 +126,7 @@ export async function generateQuarterlyReport(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
   );
+  await setAuditContext(supabase, { systemActor: 'wioa_reporting' });
 
   // Get all students who enrolled or completed during quarter
   const { data: enrollments, error } = await supabase
@@ -272,6 +274,7 @@ export async function calculateWIOAPerformance(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
   );
+  await setAuditContext(supabase, { systemActor: 'wioa_reporting' });
 
   // Get all completers in the period
   const { data: completers } = await supabase

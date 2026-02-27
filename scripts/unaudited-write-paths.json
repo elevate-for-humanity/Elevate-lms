@@ -1,0 +1,996 @@
+[
+  {
+    "file": "app/api/admin/applications/[id]/approve/route.ts",
+    "line": 198,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/intakes/route.ts",
+    "line": 67,
+    "table": "applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/affirm/webhook/route.ts",
+    "line": 114,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/applications/[id]/approve/route.ts",
+    "line": 61,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/applications/[id]/reject/route.ts",
+    "line": 57,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/applications/route.ts",
+    "line": 117,
+    "table": "applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/applications/route.ts",
+    "line": 233,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/applications/wioa/route.ts",
+    "line": 89,
+    "table": "applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/apply/employer/route.ts",
+    "line": 66,
+    "table": "applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/apply/simple/route.ts",
+    "line": 28,
+    "table": "applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/apply/staff/route.ts",
+    "line": 70,
+    "table": "applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/automation/test/shop-routing/route.ts",
+    "line": 131,
+    "table": "applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/automation/test/shop-routing/route.ts",
+    "line": 213,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/enroll/auto/route.ts",
+    "line": 216,
+    "table": "applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/enroll/checkout/route.ts",
+    "line": 104,
+    "table": "applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/enroll/checkout/route.ts",
+    "line": 207,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/enroll/complete/route.ts",
+    "line": 205,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/inquiries/route.ts",
+    "line": 98,
+    "table": "applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/program-holder/apply/route.ts",
+    "line": 85,
+    "table": "applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/sezzle/checkout/route.ts",
+    "line": 234,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/sezzle/virtual-card/process/route.ts",
+    "line": 160,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/sezzle/webhook/route.ts",
+    "line": 214,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/stripe/webhook/route.ts",
+    "line": 222,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/supersonic-fast-cash/careers/apply/route.ts",
+    "line": 31,
+    "table": "applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/db/courses.ts",
+    "line": 422,
+    "table": "applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/db/courses.ts",
+    "line": 475,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "lib/db/courses.ts",
+    "line": 487,
+    "table": "applications",
+    "op": "delete",
+    "has_audit": false
+  },
+  {
+    "file": "lib/enrollment/create-enrollment.ts",
+    "line": 126,
+    "table": "applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/monitoring/verify-schema/route.ts",
+    "line": 93,
+    "table": "audit_logs",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/monitoring/verify-schema/route.ts",
+    "line": 105,
+    "table": "audit_logs",
+    "op": "delete",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/demo/reset/route.ts",
+    "line": 52,
+    "table": "audit_logs",
+    "op": "delete",
+    "has_audit": false
+  },
+  {
+    "file": "lib/enrollment/complete-enrollment.ts",
+    "line": 119,
+    "table": "audit_logs",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/automation/test/document-processing/route.ts",
+    "line": 154,
+    "table": "automated_decisions",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/automation/test/partner-approval/route.ts",
+    "line": 165,
+    "table": "automated_decisions",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/automation/test/shop-routing/route.ts",
+    "line": 223,
+    "table": "automated_decisions",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/cert/bulk-issue/route.ts",
+    "line": 141,
+    "table": "certificates",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/cert/issue/route.ts",
+    "line": 119,
+    "table": "certificates",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/cert/replace/route.ts",
+    "line": 58,
+    "table": "certificates",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/cert/replace/route.ts",
+    "line": 67,
+    "table": "certificates",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/certificates/download/route.ts",
+    "line": 108,
+    "table": "certificates",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/certificates/generate/route.ts",
+    "line": 163,
+    "table": "certificates",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/certificates/issue-program/route.ts",
+    "line": 64,
+    "table": "certificates",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/certificates/issue/route.ts",
+    "line": 80,
+    "table": "certificates",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/certificates/route.ts",
+    "line": 73,
+    "table": "certificates",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/certifications/careersafe/route.ts",
+    "line": 99,
+    "table": "certificates",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/certifications/rise-up/route.ts",
+    "line": 93,
+    "table": "certificates",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/certificates/issue-certificate.ts",
+    "line": 112,
+    "table": "certificates",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/certificates/verification.ts",
+    "line": 92,
+    "table": "certificates",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/course-completion.ts",
+    "line": 226,
+    "table": "certificates",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/gdpr.ts",
+    "line": 60,
+    "table": "certificates",
+    "op": "delete",
+    "has_audit": false
+  },
+  {
+    "file": "lib/new-ecosystem-services/certificates.ts",
+    "line": 63,
+    "table": "certificates",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/documents/review/route.ts",
+    "line": 53,
+    "table": "documents",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/automation/process-document/route.ts",
+    "line": 51,
+    "table": "documents",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/automation/test/document-processing/route.ts",
+    "line": 108,
+    "table": "documents",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/automation/test/document-processing/route.ts",
+    "line": 141,
+    "table": "documents",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/cron/check-expiring-documents/route.ts",
+    "line": 68,
+    "table": "documents",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/enrollment/upload-document/route.ts",
+    "line": 58,
+    "table": "documents",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/onboarding/validate-document/route.ts",
+    "line": 148,
+    "table": "documents",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/staff/enroll-student/route.ts",
+    "line": 200,
+    "table": "documents",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "lib/documents.ts",
+    "line": 445,
+    "table": "documents",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "lib/documents.ts",
+    "line": 503,
+    "table": "documents",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/grants/draft/route.ts",
+    "line": 121,
+    "table": "grant_applications",
+    "op": "upsert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/grants/submission-tracker.ts",
+    "line": 89,
+    "table": "grant_applications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/grants/sync/route.ts",
+    "line": 80,
+    "table": "grant_opportunities",
+    "op": "upsert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/verifications/review/route.ts",
+    "line": 53,
+    "table": "id_verifications",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/license-request/route.ts",
+    "line": 53,
+    "table": "license_requests",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/licenses/request/route.ts",
+    "line": 41,
+    "table": "license_requests",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/licenses/[id]/route.ts",
+    "line": 82,
+    "table": "licenses",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/cron/check-licenses/route.ts",
+    "line": 48,
+    "table": "licenses",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/cron/trial-lifecycle/route.ts",
+    "line": 144,
+    "table": "licenses",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/license/upgrade/route.ts",
+    "line": 143,
+    "table": "licenses",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/license/webhook/route.ts",
+    "line": 56,
+    "table": "licenses",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/onboarding/provision-tenant/route.ts",
+    "line": 63,
+    "table": "licenses",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/provisioning/tenant/route.ts",
+    "line": 174,
+    "table": "licenses",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/store/license/generate/route.ts",
+    "line": 183,
+    "table": "licenses",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/store/webhook/route.ts",
+    "line": 102,
+    "table": "licenses",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/jobs/handlers/license-provision.ts",
+    "line": 33,
+    "table": "licenses",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "lib/jobs/handlers/license-provision.ts",
+    "line": 52,
+    "table": "licenses",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/license/linkStripeToLicense.ts",
+    "line": 67,
+    "table": "licenses",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "lib/licensing/enforcement.ts",
+    "line": 227,
+    "table": "licenses",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "lib/licensing/provisioning.ts",
+    "line": 156,
+    "table": "licenses",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/licensing/provisioning.ts",
+    "line": 240,
+    "table": "licenses",
+    "op": "delete",
+    "has_audit": false
+  },
+  {
+    "file": "lib/licensing/provisioning.ts",
+    "line": 258,
+    "table": "licenses",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/enroll/apply/route.ts",
+    "line": 97,
+    "table": "partner_inquiries",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/partner-inquiry/route.ts",
+    "line": 30,
+    "table": "partner_inquiries",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/applications/[id]/approve/route.ts",
+    "line": 137,
+    "table": "profiles",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/applications/[id]/approve/route.ts",
+    "line": 211,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/applications/[id]/approve/route.ts",
+    "line": 320,
+    "table": "profiles",
+    "op": "upsert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/import/route.ts",
+    "line": 91,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/import/route.ts",
+    "line": 102,
+    "table": "profiles",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/users/role/route.ts",
+    "line": 57,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/applications/[id]/approve/route.ts",
+    "line": 96,
+    "table": "profiles",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/applications/route.ts",
+    "line": 186,
+    "table": "profiles",
+    "op": "upsert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/apps/upgrade/route.ts",
+    "line": 76,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/barber/checkout/route.ts",
+    "line": 116,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/compliance/record/route.ts",
+    "line": 57,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/demo/reset/route.ts",
+    "line": 85,
+    "table": "profiles",
+    "op": "delete",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/enroll/auto/route.ts",
+    "line": 108,
+    "table": "profiles",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/enroll/complete/route.ts",
+    "line": 96,
+    "table": "profiles",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/enrollment/barber/route.ts",
+    "line": 82,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/licenses/checkout/route.ts",
+    "line": 97,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/lms/progress/complete/route.ts",
+    "line": 99,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/milady/auto-enroll/route.ts",
+    "line": 93,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/onboarding/complete/route.ts",
+    "line": 28,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/onboarding/learner/route.ts",
+    "line": 55,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/onboarding/provision-tenant/route.ts",
+    "line": 95,
+    "table": "profiles",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/payments/create-session/route.ts",
+    "line": 137,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/profile/update/route.ts",
+    "line": 24,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/program-holder/sign-mou/route.ts",
+    "line": 59,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/staff/enroll-student/route.ts",
+    "line": 87,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/staff/enroll-student/route.ts",
+    "line": 100,
+    "table": "profiles",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/stripe/webhook/route.ts",
+    "line": 187,
+    "table": "profiles",
+    "op": "upsert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/v1/import/route.ts",
+    "line": 160,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/v1/import/route.ts",
+    "line": 180,
+    "table": "profiles",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/v1/users/route.ts",
+    "line": 151,
+    "table": "profiles",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/admin/bulk-import.ts",
+    "line": 252,
+    "table": "profiles",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/auth/syncUserProfile.ts",
+    "line": 63,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "lib/auth/syncUserProfile.ts",
+    "line": 68,
+    "table": "profiles",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/enrollment/create-enrollment.ts",
+    "line": 103,
+    "table": "profiles",
+    "op": "upsert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/gdpr.ts",
+    "line": 71,
+    "table": "profiles",
+    "op": "delete",
+    "has_audit": false
+  },
+  {
+    "file": "lib/gdpr.ts",
+    "line": 103,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "lib/licensing/provisioning.ts",
+    "line": 182,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "lib/licensing/provisioning.ts",
+    "line": 193,
+    "table": "profiles",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/org/bindUserToOrg.ts",
+    "line": 13,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "lib/org/switchOrg.ts",
+    "line": 25,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "lib/payments.ts",
+    "line": 70,
+    "table": "profiles",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/program-holder/documents/upload/route.ts",
+    "line": 103,
+    "table": "program_holder_documents",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/identity/upload-manual/route.ts",
+    "line": 151,
+    "table": "program_holder_verification",
+    "op": "upsert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/program-holder/create-verification/route.ts",
+    "line": 69,
+    "table": "program_holder_verification",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/webhooks/stripe-identity/route.ts",
+    "line": 69,
+    "table": "program_holder_verification",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/applications/[id]/approve/route.ts",
+    "line": 305,
+    "table": "program_holders",
+    "op": "upsert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/program-holders/mou/countersign/route.ts",
+    "line": 51,
+    "table": "program_holders",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/program-holders/mou/route.ts",
+    "line": 60,
+    "table": "program_holders",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/program-holders/update/route.ts",
+    "line": 35,
+    "table": "program_holders",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/program-holder/create-verification/route.ts",
+    "line": 79,
+    "table": "program_holders",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/program-holder/mou/sign/route.ts",
+    "line": 76,
+    "table": "program_holders",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/webhooks/stripe-identity/route.ts",
+    "line": 78,
+    "table": "program_holders",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/supersonic/apply/route.ts",
+    "line": 63,
+    "table": "tax_applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/tax-filing/applications/route.ts",
+    "line": 76,
+    "table": "tax_filing_applications",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/actions/enrollments.ts",
+    "line": 224,
+    "table": "transfer_hours",
+    "op": "insert",
+    "has_audit": false
+  },
+  {
+    "file": "lib/actions/enrollments.ts",
+    "line": 306,
+    "table": "transfer_hours",
+    "op": "update",
+    "has_audit": false
+  },
+  {
+    "file": "app/api/admin/wioa/verify/route.ts",
+    "line": 33,
+    "table": "wioa_participants",
+    "op": "update",
+    "has_audit": false
+  }
+]

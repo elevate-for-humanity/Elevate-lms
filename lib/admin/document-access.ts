@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { setAuditContext } from '@/lib/audit-context';
 
 /** Only bucket admin document access is allowed to sign from */
 const DOCUMENT_BUCKET = 'documents';
@@ -25,6 +26,7 @@ export async function getAdminDocumentUrl(params: {
 
   const db = createAdminClient();
   if (!db) return null;
+  await setAuditContext(db, { actorUserId: adminId, systemActor: 'admin_document_access' });
 
   if (!documentId) return null;
 

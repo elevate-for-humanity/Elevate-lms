@@ -89,22 +89,9 @@ export default function AdminProgramHolderDocuments() {
   const handleApprove = async (docId: string, approve: boolean) => {
     setProcessing(true);
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from('program_holder_documents')
-        .update({
-          approved: approve,
-          approved_by: user.id,
-          approved_at: new Date().toISOString(),
-          approval_notes: approvalNotes || null,
-        })
-        .eq('id', docId);
-
-      if (error) {
+      const { reviewDocument } = await import('./actions');
+      const result = await reviewDocument(docId, approve, approvalNotes || undefined);
+      if (result.error) {
         alert('Failed to update document');
       } else {
         setSelectedDoc(null);

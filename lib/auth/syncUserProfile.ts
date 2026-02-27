@@ -8,6 +8,9 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+import { logAuditEvent } from '@/lib/audit';
+import { setAuditContext } from '@/lib/audit-context';
+
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -41,6 +44,9 @@ export async function syncUserProfile(input: SyncUserInput) {
   if (!email) return;
 
   const supabase = getSupabaseAdmin();
+
+  // Set audit context so DB triggers attribute this service-role write
+  await setAuditContext(supabase, { systemActor: 'sso_profile_sync' });
 
   // Check if user exists
   const { data: existing } = await supabase

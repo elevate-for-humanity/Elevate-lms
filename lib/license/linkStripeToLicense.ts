@@ -8,6 +8,9 @@ import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { createAdminClient } from '@/lib/supabase/admin';
 
+import { logAuditEvent } from '@/lib/audit';
+import { setAuditContext } from '@/lib/audit-context';
+
 export interface LinkingMetadata {
   license_id?: string;
   tenant_id?: string;
@@ -39,6 +42,8 @@ export async function linkStripeToLicense(
     logger.error('[linkStripeToLicense] Supabase admin client not available');
     return { success: false, error: 'Database connection failed' };
   }
+
+  await setAuditContext(supabase, { systemActor: 'stripe_license_linker', requestId: eventId });
   
   logger.info('[linkStripeToLicense] Starting with:', { eventId, customerId, subscriptionId, metadata });
   const { license_id, tenant_id } = metadata;
@@ -215,6 +220,8 @@ export async function handleSubscriptionUpdated(
   const currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
 
   const supabase = createAdminClient();
+  await setAuditContext(supabase, { systemActor: 'stripe_subscription_handler', requestId: event.id });
+
   const status = mapSubscriptionStatus(subscription.status);
 
   const updateData = {

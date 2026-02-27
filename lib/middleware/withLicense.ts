@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { TenantContext } from './withTenant';
 import { checkLicenseAccess } from '@/lib/licensing/billing-authority';
+import { setAuditContext } from '@/lib/audit-context';
 
 export interface LicenseContext extends TenantContext {
   licenseId: string;
@@ -43,6 +44,7 @@ export async function withLicense(
 ): Promise<{ valid: boolean; license?: LicenseContext; error?: string }> {
   try {
     const adminSupabase = createAdminClient();
+    await setAuditContext(adminSupabase, { systemActor: 'license_middleware' });
 
     // Get license for tenant - include all fields needed for billing authority check
     const { data: license, error } = await adminSupabase

@@ -22,7 +22,7 @@ export default async function ProgramDashboardPage({ params }: { params: { code:
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
   const { data: program } = await db.from('programs').select('*').eq('code', params.code).single();
-  const { count: participants } = await db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('program_code', params.code);
+  const { count: participants } = await db.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('program_slug', params.code);
 
   return (
     <div className="min-h-screen bg-gray-50">

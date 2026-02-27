@@ -362,6 +362,9 @@ export async function handleFailedPayment(
     const { createClient } = await import('@supabase/supabase-js');
     supabase = createClient(supabaseUrl, supabaseKey);
   }
+
+  const { setAuditContext } = await import('@/lib/audit-context');
+  await setAuditContext(supabase, { systemActor: 'tuition_payment_failure' });
   
   logger.info(`Payment failed for subscription ${subscriptionId}, student ${studentId}`);
   

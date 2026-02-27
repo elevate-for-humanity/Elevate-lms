@@ -1,5 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 
+import { logAuditEvent } from '@/lib/audit';
+
 /**
  * Switch user's active organization
  * Only for super_admin or users with multiple org memberships

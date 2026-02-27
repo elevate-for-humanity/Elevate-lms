@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { setAuditContext } from '@/lib/audit-context';
 
 // MeF types
 export interface MeFAcknowledgment {
@@ -95,6 +96,8 @@ export class AcknowledgmentHandler {
       logger.info('Supabase not configured, skipping database updates');
       return;
     }
+
+    await setAuditContext(this.supabase, { systemActor: 'mef_acknowledgment', requestId: acknowledgment.submissionId });
 
     // Update submission status
     await this.supabase

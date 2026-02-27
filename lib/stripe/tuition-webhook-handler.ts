@@ -13,6 +13,7 @@ import { getStripe } from '@/lib/stripe/client';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { setAuditContext } from '@/lib/audit-context';
 import { 
   createInstallmentSubscription, 
   checkAndCancelCompletedSubscription,
@@ -418,6 +419,7 @@ function getSupabaseAdmin() {
 export async function handleTuitionWebhook(event: Stripe.Event): Promise<void> {
   const stripe = getStripe();
   const supabase = getSupabaseAdmin();
+  await setAuditContext(supabase, { systemActor: 'tuition_webhook', requestId: event.id });
   switch (event.type) {
     case 'checkout.session.completed':
       await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);

@@ -4,10 +4,7 @@ import type { Program } from "@/lib/programs/programs.data";
 
 export default function ProgramCard({ program }: { program: Program }) {
   return (
-    <Link
-      href={`/programs/${program.slug}`}
-      className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm hover:shadow-md transition"
-    >
+    <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm hover:shadow-md transition">
       <div className="relative w-full h-[220px] rounded-xl overflow-hidden border border-zinc-100 bg-zinc-50">
         <Image
           src={program.cardImage || program.heroImage || "/images/programs/default.jpg"}
@@ -27,7 +24,12 @@ export default function ProgramCard({ program }: { program: Program }) {
         {program.level ? <span className="rounded-full border px-3 py-2">{program.level}</span> : null}
       </div>
 
-      <div className="mt-4 font-extrabold text-zinc-900">View program →</div>
-    </Link>
+      <Link
+        href={`/programs/${program.slug}`}
+        className="mt-4 inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors"
+      >
+        View Program
+      </Link>
+    </div>
   );
 }

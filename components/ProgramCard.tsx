@@ -22,17 +22,14 @@ export function ProgramCard({
   badge = "FREE",
 }: ProgramCardProps) {
   return (
-    <Link
-      href={link}
-      className="group bg-white rounded-xl overflow-hidden shadow-md border border-slate-200 hover:border-brand-orange-500 hover:shadow-xl transition-all hover:-translate-y-1"
-    >
+    <div className="bg-white rounded-xl overflow-hidden shadow-md border border-slate-200 hover:shadow-xl transition-all">
       {/* Image */}
       <div className="relative aspect-video overflow-hidden">
         <Image
           src={image}
           alt={title}
           fill
-          className="object-cover group-hover:scale-110 transition-transform duration-500"
+          className="object-cover"
           quality={100}
         />
         {badge && (
@@ -44,7 +41,7 @@ export function ProgramCard({
 
       {/* Content */}
       <div className="p-6">
-        <h3 className="text-xl font-bold text-black mb-3 group-hover:text-brand-orange-500 transition-colors">
+        <h3 className="text-xl font-bold text-black mb-3">
           {title}
         </h3>
         <p className="text-black mb-4 line-clamp-2">{description}</p>
@@ -61,12 +58,14 @@ export function ProgramCard({
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="flex items-center gap-2 text-brand-orange-500 font-semibold group-hover:gap-3 transition-all">
-          <span>View Program</span>
-          <ArrowRight size={18} />
-        </div>
+        {/* CTA Button */}
+        <Link
+          href={link}
+          className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors"
+        >
+          View Program <ArrowRight size={16} />
+        </Link>
       </div>
-    </Link>
+    </div>
   );
 }

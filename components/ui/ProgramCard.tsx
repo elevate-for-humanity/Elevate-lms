@@ -10,28 +10,25 @@ interface ProgramCardProps {
 
 export function ProgramCard({ title, description, image, href }: ProgramCardProps) {
   return (
-    <Link
-      href={href}
-      className="group block bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-    >
+    <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       <div className="aspect-video relative overflow-hidden">
         <Image
           src={image}
           alt={title}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          className="object-cover"
         />
       </div>
       <div className="p-6">
         <h3 className="text-xl font-semibold mb-2 text-black">{title}</h3>
         <p className="text-black text-sm mb-4">{description}</p>
-        <span className="text-brand-orange-600 text-sm font-medium inline-flex items-center gap-1">
+        <Link
+          href={href}
+          className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors"
+        >
           Learn More
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </span>
+        </Link>
       </div>
-    </Link>
+    </div>
   );
 }

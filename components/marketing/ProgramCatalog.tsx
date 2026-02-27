@@ -68,10 +68,9 @@ export function ProgramCatalog() {
         {/* Program cards */}
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {programs.map((program) => (
-            <Link
+            <div
               key={program.name}
-              href={program.href}
-              className="group flex flex-col rounded-3xl bg-slate-900/80 p-5 ring-1 ring-slate-800 transition hover:-translate-y-1 hover:ring-emerald-400/60"
+              className="flex flex-col rounded-3xl bg-slate-900/80 p-5 ring-1 ring-slate-800"
             >
               <h3 className="text-base font-semibold text-slate-50">
                 {program.name}
@@ -79,13 +78,16 @@ export function ProgramCatalog() {
               <p className="mt-2 text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
                 {program.meta}
               </p>
-              <p className="mt-3 text-sm text-slate-300">
+              <p className="mt-3 text-sm text-slate-300 flex-1">
                 {program.summary}
               </p>
-              <span className="mt-4 inline-flex text-sm font-semibold text-brand-orange-300 group-hover:text-emerald-200">
-                Learn more →
-              </span>
-            </Link>
+              <Link
+                href={program.href}
+                className="mt-4 inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors"
+              >
+                Learn More
+              </Link>
+            </div>
           ))}
         </div>
       </div>

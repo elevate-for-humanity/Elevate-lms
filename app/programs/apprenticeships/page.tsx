@@ -7,6 +7,7 @@ import ProgramPageLayout from '@/components/programs/ProgramPageLayout';
 import type { ProgramPageConfig } from '@/components/programs/ProgramPageLayout';
 import { InView } from '@/components/ui/InView';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
+import SponsorDisclosure from '@/components/compliance/SponsorDisclosure';
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
@@ -49,6 +50,9 @@ const config: ProgramPageConfig = {
 export default function Page() {
   return (
     <ProgramPageLayout config={config}>
+      <div className="max-w-5xl mx-auto px-6">
+        <SponsorDisclosure />
+      </div>
       <InView animation="fade-up">
         <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-6">
@@ -59,17 +63,19 @@ export default function Page() {
             <div className="grid sm:grid-cols-2 gap-6">
               {programs.map((p, i) => (
                 <ScrollReveal key={p.title} delay={i * 80} direction="up">
-                  <Link href={p.href} className="group flex flex-col bg-white rounded-xl border-2 border-slate-200 hover:border-brand-red-400 hover:shadow-md transition-all overflow-hidden">
-                    <Image src={p.image} alt={p.title} width={600} height={400} className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div className="flex flex-col bg-white rounded-xl border-2 border-slate-200 hover:shadow-md transition-all overflow-hidden">
+                    <Image src={p.image} alt={p.title} width={600} height={400} className="w-full h-44 object-cover" />
                     <div className="p-5 flex flex-col flex-1">
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-bold text-lg text-slate-900">{p.title}</span>
                         <span className="text-xs font-semibold text-brand-red-600 bg-brand-red-50 px-2 py-1 rounded-full">{p.duration}</span>
                       </div>
                       <span className="text-sm text-slate-600 mb-4 flex-1">{p.desc}</span>
-                      <span className="text-brand-red-600 font-semibold text-sm group-hover:underline">Learn More →</span>
+                      <Link href={p.href} className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors self-start">
+                        Learn More
+                      </Link>
                     </div>
-                  </Link>
+                  </div>
                 </ScrollReveal>
               ))}
             </div>

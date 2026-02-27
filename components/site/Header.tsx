@@ -145,12 +145,6 @@ export default function Header() {
             Sign In
           </Link>
           <Link
-            href="/programs"
-            className="border border-brand-blue-600 text-brand-blue-600 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-50 transition-colors"
-          >
-            View Programs
-          </Link>
-          <Link
             href="/apply/student"
             className="bg-brand-red-600 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-brand-red-700 transition-colors"
           >

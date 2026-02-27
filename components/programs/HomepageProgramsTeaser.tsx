@@ -47,32 +47,34 @@ export function HomepageProgramsTeaser() {
 
         <div className="mt-6 grid gap-6 md:grid-cols-3">
           {programs.map((program) => (
-            <Link
+            <div
               key={program.href}
-              href={program.href}
-              className="group flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200 transition-shadow hover:shadow-lg"
+              className="flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200 transition-shadow hover:shadow-lg"
             >
               <div className="relative h-48 overflow-hidden">
                 <Image
                   src={program.image}
                   alt={program.title}
                   fill
-          sizes="100vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  sizes="100vw"
+                  className="object-cover"
                 />
               </div>
               <div className="flex flex-1 flex-col p-4">
                 <h3 className="text-base font-semibold text-black">
                   {program.title}
                 </h3>
-                <p className="mt-1 text-xs text-black">{program.description}</p>
+                <p className="mt-1 text-xs text-black flex-1">{program.description}</p>
                 <div className="mt-3">
-                  <span className="text-xs font-semibold text-brand-orange-600 group-hover:underline">
-                    Learn more →
-                  </span>
+                  <Link
+                    href={program.href}
+                    className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-xs hover:bg-brand-blue-700 transition-colors"
+                  >
+                    Learn More
+                  </Link>
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </div>

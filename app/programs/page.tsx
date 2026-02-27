@@ -8,7 +8,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Training Programs | No-Cost Career Training for Eligible Participants',
-  description: 'Career training programs in healthcare, skilled trades, technology, CDL, barbering, and business. Training at no cost to eligible Indiana residents through WIOA and state funding. Self-pay options also available.',
+  description: 'Career training programs in healthcare, skilled trades, technology, CDL, barbering, and business. Training may be fully funded for eligible participants through WIOA and state workforce programs. Self-pay options also available.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/programs',
   },
@@ -33,6 +33,7 @@ import { createPublicClient } from '@/lib/supabase/public';
 import ProgramCTA from '@/components/ProgramCTA';
 import ProgramOutcomesTracker from '@/components/ProgramOutcomesTracker';
 import EnrollmentProcess from '@/components/EnrollmentProcess';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 
 // Cache for 10 minutes - program listings don't change frequently
 export const revalidate = 600;
@@ -165,20 +166,15 @@ export default async function ProgramsPage() {
         </div>
       </div>
 
-      {/* HERO - Full width, consistent height */}
-      <section className="relative w-full h-[45vh] sm:h-[50vh] lg:h-[55vh]">
-        <div className="absolute inset-0">
-          <Image src="/images/programs-hero-vibrant.jpg" alt="Career training programs" fill sizes="100vw" className="object-cover" priority />
-        </div>
-
-      </section>
+      {/* HERO - Video banner with auto-play */}
+      <ProgramHeroBanner videoSrc="/videos/training-providers-hero.mp4" voiceoverSrc="/audio/heroes/programs.mp3" />
 
       {/* TEXT SECTION - Below hero, consistent sizing */}
       <section className="py-10 sm:py-12 lg:py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight mb-4">
             Find Your <span className="text-brand-blue-600">Career Path.</span><br />
-            <span className="text-brand-red-600">Start Free.</span>
+            <span className="text-brand-red-600">Start Today.</span>
           </h1>
           <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-6">
             If you&apos;re here, you&apos;re in the right place. This program is designed to take you from interested to enrolled, then into class with a clear next step at every stage.
@@ -329,7 +325,7 @@ export default async function ProgramsPage() {
 
               {
                 name: 'Professional Esthetician & Client Services',
-                image: '/images/programs-hq/barber-hero.jpg',
+                image: '/images/programs-fresh/cosmetology.jpg',
                 slug: 'professional-esthetician',
                 href: '/programs/barber-apprenticeship',
                 programId: '#10004628',
@@ -456,22 +452,19 @@ export default async function ProgramsPage() {
             ].map((program) => (
               <div key={program.programId} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 overflow-hidden">
                 {program.image && (
-                  <Link href={program.href} className="block relative h-40 overflow-hidden">
-                    <Image src={program.image} alt={program.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
-                  </Link>
+                  <div className="relative h-40 overflow-hidden">
+                    <Image src={program.image} alt={program.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                  </div>
                 )}
-                <Link href={program.href} className="block p-6 pb-3 group">
+                <div className="p-6 pb-3">
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="text-xs font-bold uppercase tracking-wider text-brand-blue-600">{program.category}</span>
                         <span className="text-[10px] font-mono text-slate-500">{program.programId}</span>
                       </div>
-                      <h3 className="text-lg font-bold text-slate-900 group-hover:text-brand-blue-600 transition-colors leading-tight">{program.name}</h3>
+                      <h3 className="text-lg font-bold text-slate-900 leading-tight">{program.name}</h3>
                     </div>
-                    <span className="text-brand-blue-600 font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all flex-shrink-0 mt-1">
-                      Details →
-                    </span>
                   </div>
                   
                   <div className="grid grid-cols-3 gap-x-3 gap-y-1 text-sm mb-4">
@@ -500,9 +493,7 @@ export default async function ProgramsPage() {
                     <div className="space-y-1.5">
                       {program.credentials.map((cred, ci) => (
                         <div key={ci} className="flex items-start gap-2 text-sm">
-                          <svg className="w-3.5 h-3.5 text-brand-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
+                          <span className="text-slate-400 flex-shrink-0 mt-0.5 font-bold">–</span>
                           <div>
                             <span className="font-medium text-slate-800">{cred.name}</span>
                             <span className="text-slate-500 ml-1 text-xs">— {cred.partner}</span>
@@ -511,17 +502,17 @@ export default async function ProgramsPage() {
                       ))}
                     </div>
                   </div>
-                </Link>
-                {/* Action bar: Apply, Inquiry, LMS */}
+                </div>
+                {/* Action buttons */}
                 <div className="px-6 pb-4 pt-2 border-t border-slate-100 flex flex-wrap gap-2">
-                  <Link href={`/apply?program=${program.slug}`} className="inline-flex items-center gap-1 bg-brand-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-brand-blue-700 transition-colors">
+                  <Link href={program.href} className="inline-flex items-center gap-1 bg-brand-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-brand-blue-700 transition-colors">
+                    View Details
+                  </Link>
+                  <Link href={`/apply?program=${program.slug}`} className="inline-flex items-center gap-1 bg-brand-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-brand-red-700 transition-colors">
                     Apply Now
                   </Link>
                   <Link href={`/contact?subject=${encodeURIComponent(program.name)}`} className="inline-flex items-center gap-1 border border-slate-300 text-slate-600 text-xs font-semibold px-3 py-1.5 rounded-full hover:border-brand-blue-400 hover:text-brand-blue-600 transition-colors">
                     Inquiry
-                  </Link>
-                  <Link href="/courses" className="inline-flex items-center gap-1 border border-slate-300 text-slate-600 text-xs font-semibold px-3 py-1.5 rounded-full hover:border-brand-blue-400 hover:text-brand-blue-600 transition-colors">
-                    LMS Dashboard
                   </Link>
                 </div>
               </div>
@@ -609,16 +600,14 @@ export default async function ProgramsPage() {
               <p className="text-base text-slate-600 mb-5">From enrollment to employment, we support you every step of the way.</p>
               <div className="space-y-2">
                 {[
-                  'Free Tuition through WIOA Funding',
+                  'Funded Tuition through WIOA for Eligible Participants',
                   'Books & Supplies Included',
                   'Transportation Assistance Available',
                   'Job Placement Support',
                   'Industry-Recognized Certifications',
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-3 p-2.5 bg-white rounded-lg shadow-sm">
-                    <svg className="w-4 h-4 text-brand-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                    <span className="w-2 h-2 bg-brand-blue-600 rounded-full flex-shrink-0" />
                     <span className="font-medium text-slate-700 text-sm">{item}</span>
                   </div>
                 ))}
@@ -658,9 +647,7 @@ export default async function ProgramsPage() {
                   'Credential attainment documentation with issuer verification',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <svg className="w-4 h-4 text-brand-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                    <span className="w-2 h-2 bg-brand-blue-600 rounded-full flex-shrink-0 mt-1.5" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -709,7 +696,7 @@ export default async function ProgramsPage() {
           <div className="space-y-4">
             {[
               { q: 'Is the training really free?', a: 'Yes! WIOA, WRG, and JRI programs cover tuition, books, and supplies for eligible participants. Some programs like Barber Apprenticeship are self-pay with payment plans available.' },
-              { q: 'How do I know if I qualify for free training?', a: 'You likely qualify if you are unemployed, underemployed, receiving public assistance (SNAP, TANF, Medicaid), a veteran, or have household income below 200% of poverty level. Take our 2-minute eligibility check.' },
+              { q: 'How do I know if I qualify for funded training?', a: 'Eligibility varies by program and funding source. Common qualifiers include unemployment, underemployment, receiving public assistance (SNAP, TANF, Medicaid), veteran status, or household income below 200% of poverty level. Eligibility and funding determinations are subject to program and agency guidelines. Take our 2-minute eligibility check.' },
               { q: 'How long are the programs?', a: 'Most certification programs are 4-16 weeks. CDL training is 3-6 weeks. Apprenticeships like Barber are 12-18 months but you earn while you learn.' },
               { q: 'Do I need prior experience or education?', a: 'Most programs require only a high school diploma or GED. No prior experience needed. We start from the basics and build your skills.' },
               { q: 'What if I have a criminal record?', a: 'We specialize in serving justice-involved individuals. Many programs are specifically designed for people with records. JRI funding covers training for eligible participants.' },

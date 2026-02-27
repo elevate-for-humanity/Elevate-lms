@@ -137,13 +137,6 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
               Sign In
             </Link>
             <Link
-              href="/programs"
-              onClick={() => setIsOpen(false)}
-              className="block w-full text-center py-3 border border-brand-blue-600 text-brand-blue-600 rounded-lg font-semibold"
-            >
-              View Programs
-            </Link>
-            <Link
               href="/apply/student"
               onClick={() => setIsOpen(false)}
               className="block w-full text-center py-3 bg-brand-red-600 text-white rounded-lg font-semibold"

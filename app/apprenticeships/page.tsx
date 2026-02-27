@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import SponsorDisclosure from '@/components/compliance/SponsorDisclosure';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { 
@@ -45,6 +46,10 @@ const apprenticeships = (dbRows as any[]) || [];
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Apprenticeships' }]} />
         </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4">
+        <SponsorDisclosure />
       </div>
 
       {/* Hero */}
@@ -223,6 +228,34 @@ const apprenticeships = (dbRows as any[]) || [];
 
       {/* CTA */}
       <section className="py-20 bg-slate-900">
+        {/* Registered Apprenticeship Authority */}
+        <div className="max-w-5xl mx-auto px-4 mb-16">
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 sm:p-8">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">Registered Apprenticeship Authority</h2>
+            <p className="text-sm text-slate-700 leading-relaxed mb-4">
+              Elevate for Humanity Career &amp; Training Institute administers apprenticeship programs under a sponsor-led model. As the sponsor of record, 2Exclusive LLC-S oversees standards, curriculum alignment, apprentice registration, hour tracking, and compliance reporting. Apprentices complete supervised on-the-job training at approved licensed partner sites while receiving structured related technical instruction through the institute.
+            </p>
+            <div className="grid sm:grid-cols-2 gap-4 text-sm">
+              <div className="bg-white border border-slate-200 rounded-lg p-4">
+                <p className="text-slate-500 text-xs uppercase tracking-wider mb-1">RAPIDS Program</p>
+                <p className="font-bold text-slate-900">2025-IN-132301</p>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-lg p-4">
+                <p className="text-slate-500 text-xs uppercase tracking-wider mb-1">Federal Oversight</p>
+                <p className="font-bold text-slate-900">U.S. DOL Office of Apprenticeship</p>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-lg p-4">
+                <p className="text-slate-500 text-xs uppercase tracking-wider mb-1">Registered Occupations</p>
+                <p className="font-bold text-slate-900">Barber, Esthetician, Nail Tech, Hair Stylist, Building Services Technician, Youth Culinary</p>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-lg p-4">
+                <p className="text-slate-500 text-xs uppercase tracking-wider mb-1">RTI Delivery</p>
+                <p className="font-bold text-slate-900">Classroom + Web-Based Learning (LMS)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
             Start Your Apprenticeship

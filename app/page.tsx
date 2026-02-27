@@ -38,7 +38,7 @@ export default function HomePage() {
           </h1>
           <p className="text-base sm:text-lg text-slate-300 mt-4 leading-relaxed max-w-2xl mx-auto">
             Career training in healthcare, skilled trades, CDL, and technology.
-            Many programs available at no cost to eligible Indiana residents through WIOA and state funding.
+            Training may be fully funded for eligible participants through WIOA and state workforce programs.
           </p>
           <div className="flex flex-wrap justify-center gap-3 mt-6">
             <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg text-base sm:text-lg transition-all shadow-lg shadow-brand-red-600/30">
@@ -64,7 +64,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { href: '/programs', label: 'I want to train', desc: 'Browse funded programs in healthcare, trades, CDL, and tech.', cta: 'Browse Programs', image: '/images/hp/train.jpg', alt: 'Students in a training classroom' },
-              { href: '/funding', label: 'I need funding', desc: 'Most programs are tuition-free. Check your eligibility.', cta: 'Check Eligibility', image: '/images/hp/funding.jpg', alt: 'Funding and financial aid' },
+              { href: '/funding', label: 'I need funding', desc: 'Training may be fully funded for eligible participants. Check your eligibility.', cta: 'Check Eligibility', image: '/images/hp/funding.jpg', alt: 'Funding and financial aid' },
               { href: '/employer', label: "I'm an employer", desc: 'Hire credentialed graduates. Access WOTC tax credits.', cta: 'Hire Graduates', image: '/images/hp/employer.jpg', alt: 'Employer partnership meeting' },
               { href: '/store', label: 'I run a school', desc: 'License the Elevate platform for your organization.', cta: 'Get Licensed', image: '/images/hp/school.jpg', alt: 'Training program office' },
             ].map((item) => (
@@ -167,7 +167,7 @@ export default function HomePage() {
       <section aria-label="Funding options" className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Funding Available</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Funded Training Programs</h2>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Funded Training for Eligible Participants</h2>
           <p className="text-lg text-slate-700 mb-8">
             Many programs are available at no cost to eligible participants through WIOA, WRG, and JRI. Platform access fees may apply depending on funding source and enrollment type.
           </p>

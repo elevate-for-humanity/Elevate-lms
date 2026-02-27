@@ -51,6 +51,8 @@ const config: ProgramPageConfig = {
   breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Skilled Trades', href: '/programs/skilled-trades' }, { label: 'HVAC Technician' }],
 };
 
+import SponsorDisclosure from '@/components/compliance/SponsorDisclosure';
+
 export default function Page() {
-  return (<><ProgramStructuredData program={{ id: 'hvac-technician', name: config.title, slug: 'hvac-technician', description: config.subtitle, duration_weeks: 15, price: 0, image_url: `${SITE_URL}/images/programs-fresh/hvac.jpg`, category: 'Skilled Trades', outcomes: config.credentials || [] }} /><ProgramPageLayout config={config} /></>);
+  return (<><ProgramStructuredData program={{ id: 'hvac-technician', name: config.title, slug: 'hvac-technician', description: config.subtitle, duration_weeks: 15, price: 0, image_url: `${SITE_URL}/images/programs-fresh/hvac.jpg`, category: 'Skilled Trades', outcomes: config.credentials || [] }} /><ProgramPageLayout config={config}><SponsorDisclosure /></ProgramPageLayout></>);
 }

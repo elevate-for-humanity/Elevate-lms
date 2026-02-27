@@ -8,7 +8,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Financial Aid & Funding | Elevate For Humanity',
-  description: 'Learn about free training through WIOA, state grants, and other funding options. Most students pay $0 for their career training.',
+  description: 'Learn about funded training through WIOA, state grants, and other workforce funding options. Training may be fully funded for eligible participants.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/financial-aid',
   },
@@ -38,7 +38,7 @@ const fundingOptions = [
   },
   {
     title: 'Payment Plans',
-    description: 'For those who don\'t qualify for free training, we offer affordable payment options.',
+    description: 'For those who do not qualify for funded training, we offer affordable payment options.',
     eligibility: ['Anyone not eligible for grants', 'Valid ID required', 'No credit check', 'Flexible terms'],
     coverage: 'Split into monthly payments',
     icon: Clock,
@@ -206,7 +206,7 @@ export default function FinancialAidPage() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your New Career?</h2>
           <p className="text-xl text-white/90 mb-8">
-            Apply today and find out if you qualify for free training. No obligation, no credit check.
+            Apply today and find out if you qualify for funded training. No obligation, no credit check.
           </p>
           <Link
             href="/apply"

@@ -38,10 +38,11 @@ const footerLinks = {
     { name: 'Add-Ons', href: '/store/add-ons' },
   ],
   compliance: [
+    { name: 'Institutional Governance', href: '/institutional-governance' },
+    { name: 'Verification & Approvals', href: '/verification-approvals' },
     { name: 'Compliance & Security', href: '/compliance' },
     { name: 'Data Privacy', href: '/governance/data' },
     { name: 'Accessibility', href: '/accessibility' },
-    { name: 'Governance', href: '/governance' },
     { name: 'Transparency', href: '/transparency' },
     { name: 'Verify Credentials', href: '/verify' },
   ],
@@ -151,7 +152,10 @@ export default function ServerFooter() {
                 className="w-7 h-7"
               />
               <p className="text-slate-400 text-sm">
-                © {new Date().getFullYear()} 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Technical Institute. Registered Apprenticeship Sponsor and Workforce Training Provider.
+                © {new Date().getFullYear()} 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Training Institute.
+              </p>
+              <p className="text-slate-500 text-xs mt-1">
+                Registered Apprenticeship Sponsor | Workforce Training Provider | Career &amp; Technical Instructional Institution
               </p>
             </div>
             
@@ -193,7 +197,7 @@ export default function ServerFooter() {
             {/* Legal Disclaimer */}
             <div className="mt-6 pt-6 border-t border-slate-800">
               <p className="text-[10px] leading-relaxed text-slate-500 max-w-4xl mx-auto text-center">
-                2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Technical Institute is a workforce training provider and USDOL Registered Apprenticeship Sponsor. Programs are not institutionally accredited degree programs. Certification outcomes are issued by the respective certifying organizations upon successful completion of required examinations. Training preparation and authorized proctored testing access are provided; federal or state licenses are not independently issued. Financial aid through federal student aid (FAFSA, Pell Grants, and federal loans) is not currently offered. Training may be funded through WIOA, WRG, JRI, employer sponsorships, or other workforce programs for eligible participants. Platform access fees may apply depending on funding source and enrollment type.
+                Elevate for Humanity Career & Training Institute is a workforce training provider operating under 2Exclusive LLC-S. Programs are not institutionally accredited degree programs. Certification outcomes are issued by the respective certifying organizations upon successful completion of required examinations. Elevate for Humanity Career & Training Institute provides training, preparation, and authorized proctored testing access but does not independently issue federal or state licenses. Financial aid through federal student aid (FAFSA, Pell Grants, and federal loans) is not currently offered. Training may be fully funded for eligible participants through workforce programs such as WIOA, JRI, and approved funding partners. Eligibility and funding determinations are subject to program and agency guidelines.
               </p>
             </div>
           </div>

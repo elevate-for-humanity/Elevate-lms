@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { Volume2, VolumeX, Mic, MicOff } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 
 interface ProgramHeroBannerProps {
   videoSrc: string;
@@ -13,9 +13,9 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
   const voiceoverRef = useRef<HTMLAudioElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMuted, setIsMuted] = useState(true);
-  const [voiceActive, setVoiceActive] = useState(false);
+  const hasPlayedVoiceover = useRef(false);
 
-  // Play/pause video based on scroll visibility
+  // Play video + voiceover on scroll into view, pause when scrolled away. No looping.
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -23,16 +23,19 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
     const observer = new IntersectionObserver(
       ([entry]) => {
         const video = videoRef.current;
+        const vo = voiceoverRef.current;
         if (!video) return;
+
         if (entry.isIntersecting) {
           video.play().catch(() => {});
+          if (vo && !hasPlayedVoiceover.current) {
+            hasPlayedVoiceover.current = true;
+            vo.play().catch(() => {});
+          }
         } else {
           video.pause();
-          // Pause voiceover when scrolled away
-          const vo = voiceoverRef.current;
           if (vo && !vo.paused) {
             vo.pause();
-            setVoiceActive(false);
           }
         }
       },
@@ -50,19 +53,6 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
     setIsMuted(video.muted);
   };
 
-  const toggleVoiceover = () => {
-    const voiceover = voiceoverRef.current;
-    if (!voiceover) return;
-    if (!voiceActive) {
-      voiceover.currentTime = 0;
-      voiceover.play().catch(() => {});
-      setVoiceActive(true);
-    } else {
-      voiceover.pause();
-      setVoiceActive(false);
-    }
-  };
-
   return (
     <div ref={containerRef} className="relative w-full overflow-hidden bg-black" style={{ maxHeight: '480px' }}>
       <video
@@ -71,38 +61,16 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
         style={{ aspectRatio: '16/9', maxHeight: '480px' }}
         src={videoSrc}
         muted
-        loop
         playsInline
-        autoPlay
         preload="metadata"
       />
 
       {voiceoverSrc && (
-        <audio ref={voiceoverRef} src={voiceoverSrc} preload="none" onEnded={() => setVoiceActive(false)} />
+        <audio ref={voiceoverRef} src={voiceoverSrc} preload="none" />
       )}
 
-      {/* Controls row — bottom right */}
-      <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2">
-        {/* Voiceover toggle */}
-        {voiceoverSrc && (
-          <button
-            onClick={toggleVoiceover}
-            aria-label={voiceActive ? 'Stop narration' : 'Play narration'}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-full backdrop-blur-sm text-white transition-all ${
-              voiceActive
-                ? 'bg-brand-red-600 hover:bg-brand-red-700'
-                : 'bg-black/50 hover:bg-black/70'
-            }`}
-          >
-            {voiceActive ? (
-              <><Mic className="w-4 h-4" /><span className="text-sm font-semibold hidden sm:inline">Narration On</span></>
-            ) : (
-              <><MicOff className="w-4 h-4" /><span className="text-sm font-semibold hidden sm:inline">Narration</span></>
-            )}
-          </button>
-        )}
-
-        {/* Video sound toggle — always visible */}
+      {/* Video sound toggle */}
+      <div className="absolute bottom-4 right-4 z-10">
         <button
           onClick={toggleMute}
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}

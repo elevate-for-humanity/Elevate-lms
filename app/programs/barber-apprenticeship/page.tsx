@@ -50,6 +50,8 @@ const config: ProgramPageConfig = {
   breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Apprenticeships', href: '/programs/apprenticeships' }, { label: 'Barber Apprenticeship' }],
 };
 
+import SponsorDisclosure from '@/components/compliance/SponsorDisclosure';
+
 export default function Page() {
-  return (<><ProgramStructuredData program={{ id: 'barber-apprenticeship', name: config.title, slug: 'barber-apprenticeship', description: config.subtitle, duration_weeks: 65, price: 4890, image_url: `${SITE_URL}/images/programs-fresh/barber.jpg`, category: 'Beauty & Cosmetology', outcomes: config.credentials || [] }} /><ProgramPageLayout config={config} /></>);
+  return (<><ProgramStructuredData program={{ id: 'barber-apprenticeship', name: config.title, slug: 'barber-apprenticeship', description: config.subtitle, duration_weeks: 65, price: 4890, image_url: `${SITE_URL}/images/programs-fresh/barber.jpg`, category: 'Beauty & Cosmetology', outcomes: config.credentials || [] }} /><ProgramPageLayout config={config}><SponsorDisclosure /></ProgramPageLayout></>);
 }

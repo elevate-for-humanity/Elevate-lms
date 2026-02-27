@@ -44,6 +44,8 @@ const config: ProgramPageConfig = {
   breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Apprenticeships', href: '/programs/apprenticeships' }, { label: 'Culinary' }],
 };
 
+import SponsorDisclosure from '@/components/compliance/SponsorDisclosure';
+
 export default function Page() {
-  return (<><ProgramStructuredData program={{ id: 'culinary-apprenticeship', name: config.title, slug: 'culinary-apprenticeship', description: config.subtitle, duration_weeks: 52, price: 0, image_url: `${SITE_URL}/images/programs-fresh/culinary.jpg`, category: 'Culinary', outcomes: config.credentials || [] }} /><ProgramPageLayout config={config} /></>);
+  return (<><ProgramStructuredData program={{ id: 'culinary-apprenticeship', name: config.title, slug: 'culinary-apprenticeship', description: config.subtitle, duration_weeks: 52, price: 0, image_url: `${SITE_URL}/images/programs-fresh/culinary.jpg`, category: 'Culinary', outcomes: config.credentials || [] }} /><ProgramPageLayout config={config}><SponsorDisclosure /></ProgramPageLayout></>);
 }

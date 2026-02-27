@@ -43,6 +43,8 @@ const config: ProgramPageConfig = {
   breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Apprenticeships', href: '/programs/apprenticeships' }, { label: 'Nail Technician' }],
 };
 
+import SponsorDisclosure from '@/components/compliance/SponsorDisclosure';
+
 export default function Page() {
-  return (<><ProgramStructuredData program={{ id: 'nail-technician-apprenticeship', name: config.title, slug: 'nail-technician-apprenticeship', description: config.subtitle, duration_weeks: 36, price: 3500, image_url: `${SITE_URL}/images/programs-fresh/nail-tech.jpg`, category: 'Beauty & Cosmetology', outcomes: config.credentials || [] }} /><ProgramPageLayout config={config} /></>);
+  return (<><ProgramStructuredData program={{ id: 'nail-technician-apprenticeship', name: config.title, slug: 'nail-technician-apprenticeship', description: config.subtitle, duration_weeks: 36, price: 3500, image_url: `${SITE_URL}/images/programs-fresh/nail-tech.jpg`, category: 'Beauty & Cosmetology', outcomes: config.credentials || [] }} /><ProgramPageLayout config={config}><SponsorDisclosure /></ProgramPageLayout></>);
 }

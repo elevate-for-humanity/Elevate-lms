@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
+import SponsorDisclosure from '@/components/compliance/SponsorDisclosure';
 import {
   XCircle,
   ArrowRight,
@@ -134,6 +135,9 @@ export default function BarbershopPartnerPage() {
     <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Partners", href: "/partners" }, { label: "Barbershop Apprenticeship" }]} />
+      </div>
+      <div className="max-w-6xl mx-auto px-4">
+        <SponsorDisclosure />
       </div>
 {/* Hero */}
       <section className="relative py-20 overflow-hidden">

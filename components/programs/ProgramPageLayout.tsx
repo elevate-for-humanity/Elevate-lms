@@ -80,6 +80,7 @@ export interface ProgramPageConfig {
 
   // CTA
   applyHref?: string;
+  inquiryHref?: string;
 
   // Breadcrumbs
   breadcrumbs: { label: string; href?: string }[];
@@ -110,6 +111,7 @@ export default function ProgramPageLayout({
 }) {
   const c = config;
   const applyHref = c.applyHref || '/apply';
+  const inquiryHref = c.inquiryHref || `/inquiry?program=${encodeURIComponent(c.title)}`;
 
   return (
     <div className="min-h-screen bg-white">

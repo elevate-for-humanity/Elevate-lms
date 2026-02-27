@@ -181,12 +181,14 @@ export default async function PartnerPortalPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {[
           { title: 'Log Hours', href: '/partner/hours', icon: Clock, description: 'Submit apprentice training hours', color: 'border-l-brand-blue-500' },
           { title: 'Record Attendance', href: '/partner/attendance/record', icon: ClipboardList, description: 'Mark daily attendance', color: 'border-l-brand-green-500' },
           { title: 'Upload Documents', href: '/partner/documents', icon: Upload, description: 'Submit required documents', color: 'border-l-amber-500' },
           { title: 'View Apprentices', href: '/partner/programs/barber', icon: Scissors, description: 'Manage current apprentices', color: 'border-l-pink-500' },
+          { title: 'MOU Agreement', href: '/docs/Indiana-Barbershop-Apprenticeship-MOU', icon: FileText, description: 'View or download your Memorandum of Understanding', color: 'border-l-gray-500' },
+          { title: 'Settings', href: '/partner/settings', icon: Settings, description: 'Manage shop profile and contacts', color: 'border-l-slate-400' },
         ].map((action) => (
           <Link key={action.title} href={action.href}
             className={`bg-white rounded-xl border border-l-4 ${action.color} p-5 hover:shadow-md transition`}>

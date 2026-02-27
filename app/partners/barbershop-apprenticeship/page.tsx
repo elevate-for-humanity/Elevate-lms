@@ -158,11 +158,11 @@ export default function BarbershopPartnerPage() {
               <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link
-              href="/docs/Indiana-Barbershop-Apprenticeship-MOU"
+              href="/partner-portal"
               className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 text-white border border-white/30 rounded-lg text-lg font-bold transition-colors"
             >
-              <Download className="mr-2 w-5 h-5" />
-              View MOU Template
+              Partner Dashboard
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </div>
         </div>
@@ -427,14 +427,14 @@ export default function BarbershopPartnerPage() {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="/docs/Indiana-Barbershop-Apprenticeship-MOU"
+                href="/partner-portal"
                 className="inline-flex items-center justify-center px-6 py-3 bg-gray-900 text-white rounded-lg font-bold hover:bg-gray-800 transition-colors"
               >
-                <Download className="w-5 h-5 mr-2" />
-                View MOU Template
+                Access MOU in Partner Dashboard
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
               <p className="text-sm text-gray-500 self-center">
-                Review before applying. Signing is required to participate.
+                MOU is available after applying. Signing is required to participate.
               </p>
             </div>
           </div>

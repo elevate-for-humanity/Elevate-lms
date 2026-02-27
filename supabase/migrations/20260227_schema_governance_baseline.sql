@@ -629,7 +629,7 @@ CREATE TABLE IF NOT EXISTS public.messages (
 -- ============================================
 CREATE TABLE IF NOT EXISTS public.appointments (
   id UUID PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
-  all TEXT,
+  "all" TEXT,
   amount NUMERIC DEFAULT 0,
   appointment_date DATE,
   appointment_time TEXT,

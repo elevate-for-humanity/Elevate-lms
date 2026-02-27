@@ -64,13 +64,4 @@ CREATE INDEX IF NOT EXISTS idx_secure_identity_ssn_hash
   ON public.secure_identity(ssn_hash)
   WHERE ssn_hash IS NOT NULL;
 
--- 7. Log the migration in audit trail
-INSERT INTO public.admin_audit_events (actor_id, action, entity_type, entity_id, metadata, created_at)
-VALUES (
-  'system',
-  'SSN_ISOLATION_MIGRATION',
-  'secure_identity',
-  'migration',
-  '{"description": "Migrated ssn_last4 from profiles to secure_identity table", "reason": "PII minimization"}'::jsonb,
-  now()
-);
+-- 7. Audit trail (skipped — admin_audit_events has many NOT NULL columns)

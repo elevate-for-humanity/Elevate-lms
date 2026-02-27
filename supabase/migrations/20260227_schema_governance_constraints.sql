@@ -57,7 +57,7 @@ CREATE INDEX IF NOT EXISTS idx_applications_status ON public.applications USING 
 -- CERTIFICATES
 -- ============================================
 -- PK: certificates_pkey (id)
-ALTER TABLE public.certificates ADD CONSTRAINT IF NOT EXISTS certificates_certificate_number_key UNIQUE (certificate_number);
+DO $$ BEGIN ALTER TABLE public.certificates ADD CONSTRAINT certificates_certificate_number_key UNIQUE (certificate_number); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 -- FK: certificates_enrollment_fk: certificates.enrollment_id -> training_enrollments.id
 DO $$ BEGIN
   ALTER TABLE public.certificates ADD CONSTRAINT certificates_enrollment_fk
@@ -141,7 +141,7 @@ CREATE INDEX IF NOT EXISTS idx_messages_sender ON public.messages USING btree (s
 -- NOTIFICATIONS
 -- ============================================
 -- PK: notifications_pkey (id)
-ALTER TABLE public.notifications ADD CONSTRAINT IF NOT EXISTS notifications_idempotency_key_key UNIQUE (idempotency_key);
+DO $$ BEGIN ALTER TABLE public.notifications ADD CONSTRAINT notifications_idempotency_key_key UNIQUE (idempotency_key); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 -- FK: notifications_tenant_id_fkey: notifications.tenant_id -> tenants.id
 DO $$ BEGIN
   ALTER TABLE public.notifications ADD CONSTRAINT notifications_tenant_id_fkey
@@ -164,7 +164,7 @@ CREATE INDEX IF NOT EXISTS idx_notifications_user ON public.notifications USING 
 -- ORGANIZATIONS
 -- ============================================
 -- PK: organizations_pkey (id)
-ALTER TABLE public.organizations ADD CONSTRAINT IF NOT EXISTS organizations_slug_key UNIQUE (slug);
+DO $$ BEGIN ALTER TABLE public.organizations ADD CONSTRAINT organizations_slug_key UNIQUE (slug); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 CREATE INDEX IF NOT EXISTS idx_organizations_contact_email ON public.organizations USING btree (contact_email);
 CREATE INDEX IF NOT EXISTS idx_organizations_slug ON public.organizations USING btree (slug);
 CREATE INDEX IF NOT EXISTS idx_organizations_status ON public.organizations USING btree (status);
@@ -232,7 +232,7 @@ CREATE INDEX IF NOT EXISTS idx_profiles_tenant_id ON public.profiles USING btree
 -- PROGRAM_HOLDERS
 -- ============================================
 -- PK: program_holders_pkey (id)
-ALTER TABLE public.program_holders ADD CONSTRAINT IF NOT EXISTS unique_program_holders_user_id UNIQUE (user_id);
+DO $$ BEGIN ALTER TABLE public.program_holders ADD CONSTRAINT unique_program_holders_user_id UNIQUE (user_id); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 -- FK: program_holders_primary_program_fkey: program_holders.primary_program_id -> programs.id
 DO $$ BEGIN
   ALTER TABLE public.program_holders ADD CONSTRAINT program_holders_primary_program_fkey
@@ -252,8 +252,8 @@ CREATE INDEX IF NOT EXISTS idx_program_holders_user_id ON public.program_holders
 -- PROGRAMS
 -- ============================================
 -- PK: programs_pkey (id)
-ALTER TABLE public.programs ADD CONSTRAINT IF NOT EXISTS programs_code_key UNIQUE (code);
-ALTER TABLE public.programs ADD CONSTRAINT IF NOT EXISTS programs_slug_key UNIQUE (slug);
+DO $$ BEGIN ALTER TABLE public.programs ADD CONSTRAINT programs_code_key UNIQUE (code); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER TABLE public.programs ADD CONSTRAINT programs_slug_key UNIQUE (slug); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 -- FK: fk_programs_store: programs.store_id -> store_instances.id
 DO $$ BEGIN
   ALTER TABLE public.programs ADD CONSTRAINT fk_programs_store
@@ -332,13 +332,13 @@ END $$;
 -- TENANTS
 -- ============================================
 -- PK: tenants_pkey (id)
-ALTER TABLE public.tenants ADD CONSTRAINT IF NOT EXISTS tenants_slug_key UNIQUE (slug);
+DO $$ BEGIN ALTER TABLE public.tenants ADD CONSTRAINT tenants_slug_key UNIQUE (slug); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ============================================
 -- TRAINING_COURSES
 -- ============================================
 -- PK: training_courses_pkey (id)
-ALTER TABLE public.training_courses ADD CONSTRAINT IF NOT EXISTS training_courses_course_code_key UNIQUE (course_code);
+DO $$ BEGIN ALTER TABLE public.training_courses ADD CONSTRAINT training_courses_course_code_key UNIQUE (course_code); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 -- FK: training_courses_instructor_id_fkey: training_courses.instructor_id -> auth.users.id
 DO $$ BEGIN
   ALTER TABLE public.training_courses ADD CONSTRAINT training_courses_instructor_id_fkey
@@ -364,9 +364,9 @@ CREATE INDEX IF NOT EXISTS idx_training_courses_tenant_id ON public.training_cou
 -- TRAINING_ENROLLMENTS
 -- ============================================
 -- PK: training_enrollments_pkey (id)
-ALTER TABLE public.training_enrollments ADD CONSTRAINT IF NOT EXISTS training_enrollments_user_course_unique UNIQUE (user_id);
-ALTER TABLE public.training_enrollments ADD CONSTRAINT IF NOT EXISTS training_enrollments_user_id_course_id_key UNIQUE (user_id);
-ALTER TABLE public.training_enrollments ADD CONSTRAINT IF NOT EXISTS uq_training_enrollments_user_course UNIQUE (course_id);
+DO $$ BEGIN ALTER TABLE public.training_enrollments ADD CONSTRAINT training_enrollments_user_course_unique UNIQUE (user_id); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER TABLE public.training_enrollments ADD CONSTRAINT training_enrollments_user_id_course_id_key UNIQUE (user_id); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN ALTER TABLE public.training_enrollments ADD CONSTRAINT uq_training_enrollments_user_course UNIQUE (course_id); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 -- FK: training_enrollments_course_id_fkey: training_enrollments.course_id -> training_courses.id
 DO $$ BEGIN
   ALTER TABLE public.training_enrollments ADD CONSTRAINT training_enrollments_course_id_fkey
@@ -398,7 +398,7 @@ CREATE INDEX IF NOT EXISTS training_enrollments_tenant_id_idx ON public.training
 -- TRAINING_LESSONS
 -- ============================================
 -- PK: training_lessons_pkey (id)
-ALTER TABLE public.training_lessons ADD CONSTRAINT IF NOT EXISTS training_lessons_course_id_lesson_number_key UNIQUE (lesson_number);
+DO $$ BEGIN ALTER TABLE public.training_lessons ADD CONSTRAINT training_lessons_course_id_lesson_number_key UNIQUE (lesson_number); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 -- FK: training_lessons_course_id_fkey: training_lessons.course_id -> training_courses.id
 DO $$ BEGIN
   ALTER TABLE public.training_lessons ADD CONSTRAINT training_lessons_course_id_fkey
@@ -418,5 +418,5 @@ CREATE INDEX IF NOT EXISTS idx_training_lessons_tenant_id ON public.training_les
 -- USER_PROFILES
 -- ============================================
 -- PK: user_profiles_pkey (id)
-ALTER TABLE public.user_profiles ADD CONSTRAINT IF NOT EXISTS user_profiles_user_id_key UNIQUE (user_id);
+DO $$ BEGIN ALTER TABLE public.user_profiles ADD CONSTRAINT user_profiles_user_id_key UNIQUE (user_id); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 CREATE INDEX IF NOT EXISTS idx_user_profiles_user ON public.user_profiles USING btree (user_id);

@@ -449,7 +449,7 @@ CREATE TABLE IF NOT EXISTS public.email_logs (
   metadata JSONB,
   org_id UUID,
   recipient TEXT,
-  to TEXT,
+  "to" TEXT,
   type TEXT
 );
 

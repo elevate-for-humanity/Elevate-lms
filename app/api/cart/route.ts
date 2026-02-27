@@ -5,9 +5,10 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getCart, addToCart, updateCartItem, removeFromCart } from '@/lib/store/db';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Get or create cart
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -68,7 +69,7 @@ const cookieStore = await cookies();
 }
 
 // Add item to cart
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Update cart item
-export async function PATCH(request: NextRequest) {
+async function _PATCH(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -138,7 +139,7 @@ export async function PATCH(request: NextRequest) {
 }
 
 // Remove item from cart
-export async function DELETE(request: NextRequest) {
+async function _DELETE(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -166,3 +167,7 @@ const searchParams = request.nextUrl.searchParams;
     return NextResponse.json({ error: 'Failed to remove from cart' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/cart', _GET);
+export const POST = withApiAudit('/api/cart', _POST);
+export const PATCH = withApiAudit('/api/cart', _PATCH);
+export const DELETE = withApiAudit('/api/cart', _DELETE);

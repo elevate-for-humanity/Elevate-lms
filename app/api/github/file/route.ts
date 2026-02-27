@@ -13,8 +13,9 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -89,7 +90,7 @@ const userToken = req.headers.get('x-gh-token');
   }
 }
 
-export async function PUT(req: NextRequest) {
+async function _PUT(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -175,7 +176,7 @@ const userToken = req.headers.get('x-gh-token');
   }
 }
 
-export async function DELETE(req: NextRequest) {
+async function _DELETE(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -234,7 +235,7 @@ const userToken = req.headers.get('x-gh-token');
 }
 
 // Rename/move file (creates new file, deletes old)
-export async function PATCH(req: NextRequest) {
+async function _PATCH(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -320,3 +321,7 @@ const userToken = req.headers.get('x-gh-token');
     );
   }
 }
+export const GET = withApiAudit('/api/github/file', _GET);
+export const PUT = withApiAudit('/api/github/file', _PUT);
+export const PATCH = withApiAudit('/api/github/file', _PATCH);
+export const DELETE = withApiAudit('/api/github/file', _DELETE);

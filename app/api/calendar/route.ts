@@ -7,8 +7,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -46,7 +47,7 @@ const supabase = await createClient();
   return NextResponse.json(events);
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(data);
 }
 
-export async function PUT(request: NextRequest) {
+async function _PUT(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -123,7 +124,7 @@ const supabase = await createClient();
   return NextResponse.json(data);
 }
 
-export async function DELETE(request: NextRequest) {
+async function _DELETE(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -155,3 +156,7 @@ const supabase = await createClient();
 
   return NextResponse.json({ success: true });
 }
+export const GET = withApiAudit('/api/calendar', _GET);
+export const POST = withApiAudit('/api/calendar', _POST);
+export const PUT = withApiAudit('/api/calendar', _PUT);
+export const DELETE = withApiAudit('/api/calendar', _DELETE);

@@ -8,9 +8,10 @@ import { parseBody } from '@/lib/api-helpers';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/wioa/iep/[id] - Get IEP by ID
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -42,7 +43,7 @@ const supabase = createSupabaseClient();
 }
 
 // PUT /api/wioa/iep/[id] - Update IEP
-export async function PUT(
+async function _PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -81,7 +82,7 @@ const supabase = createSupabaseClient();
 }
 
 // POST /api/wioa/iep/[id]/approve - Approve IEP
-export async function POST(
+async function _POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -120,3 +121,6 @@ export async function POST(
     );
   }
 }
+export const GET = withApiAudit('/api/wioa/iep/[id]', _GET);
+export const POST = withApiAudit('/api/wioa/iep/[id]', _POST);
+export const PUT = withApiAudit('/api/wioa/iep/[id]', _PUT);

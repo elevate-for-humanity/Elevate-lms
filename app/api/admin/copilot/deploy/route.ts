@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,7 @@ interface CopilotDeployment {
 }
 
 // GET - List all copilot deployments
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -54,7 +55,7 @@ export async function GET(request: Request) {
 }
 
 // POST - Deploy a new copilot
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -143,7 +144,7 @@ export async function POST(request: NextRequest) {
 }
 
 // PATCH - Update deployment status (start/stop)
-export async function PATCH(request: NextRequest) {
+async function _PATCH(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -198,7 +199,7 @@ export async function PATCH(request: NextRequest) {
 }
 
 // DELETE - Remove a deployment
-export async function DELETE(request: NextRequest) {
+async function _DELETE(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -278,3 +279,7 @@ function getDefaultConfig(copilotType: string): Record<string, unknown> {
       return {};
   }
 }
+export const GET = withApiAudit('/api/admin/copilot/deploy', _GET);
+export const POST = withApiAudit('/api/admin/copilot/deploy', _POST);
+export const PATCH = withApiAudit('/api/admin/copilot/deploy', _PATCH);
+export const DELETE = withApiAudit('/api/admin/copilot/deploy', _DELETE);

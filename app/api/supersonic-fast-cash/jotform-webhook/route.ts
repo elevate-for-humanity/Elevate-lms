@@ -8,6 +8,7 @@ import { Resend } from 'resend';
 import { auditPiiAccess } from '@/lib/auditLog';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -42,7 +43,7 @@ function isAllowedIP(ip: string): boolean {
  * Receives form submissions and creates SupersonicFastCash tax returns.
  * Secured by IP allowlist and optional shared secret.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -308,9 +309,11 @@ export async function POST(request: NextRequest) {
 }
 
 /** Health check — returns 200 with no details */
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 return NextResponse.json({ ok: true });
 }
+export const GET = withApiAudit('/api/supersonic-fast-cash/jotform-webhook', _GET, { actor_type: 'webhook' });
+export const POST = withApiAudit('/api/supersonic-fast-cash/jotform-webhook', _POST, { actor_type: 'webhook' });

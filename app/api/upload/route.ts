@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/server';
 import { rateLimitNew as rateLimit } from '@/lib/rateLimit';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const UPLOAD_DIR = join(process.cwd(), 'public', 'uploads');
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -96,7 +97,7 @@ function getFileExtension(filename: string): string {
   return parts.pop()?.toLowerCase() || '';
 }
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -235,7 +236,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+async function _DELETE(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -312,3 +313,5 @@ export async function DELETE(request: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/upload', _POST);
+export const DELETE = withApiAudit('/api/upload', _DELETE);

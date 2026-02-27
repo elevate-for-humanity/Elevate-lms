@@ -48,6 +48,7 @@ import {
   isSubscriptionTier,
   assertSubscriptionData,
 } from '@/lib/licensing/billing-authority';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 
 
@@ -59,7 +60,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase =
   supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   // Stage 0: Log env var presence for debugging
   logger.info('[webhook] Env check:', {
     hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
@@ -1877,3 +1878,4 @@ export async function POST(request: NextRequest) {
   logger.info('[webhook] Returning 200 for event:', event.id);
   return NextResponse.json({ received: true });
 }
+export const POST = withApiAudit('/api/webhooks/stripe', _POST, { actor_type: 'webhook' });

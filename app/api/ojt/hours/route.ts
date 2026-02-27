@@ -3,9 +3,10 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // POST - Log OJT hours
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
 }
 
 // GET - Fetch user's OJT hours
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -153,3 +154,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/ojt/hours', _GET);
+export const POST = withApiAudit('/api/ojt/hours', _POST);

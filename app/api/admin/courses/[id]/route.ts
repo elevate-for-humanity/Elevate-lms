@@ -4,6 +4,7 @@ import { getCourse, updateCourse, deleteCourse } from '@/lib/db/courses';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -21,7 +22,7 @@ async function requireAdmin() {
   return { user, profile };
 }
 
-export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
+async function _GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -37,7 +38,7 @@ const { id } = await params;
   }
 }
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+async function _PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -61,7 +62,7 @@ const { id } = await params;
   }
 }
 
-export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
+async function _DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -75,3 +76,6 @@ const { id } = await params;
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/admin/courses/[id]', _GET);
+export const PATCH = withApiAudit('/api/admin/courses/[id]', _PATCH);
+export const DELETE = withApiAudit('/api/admin/courses/[id]', _DELETE);

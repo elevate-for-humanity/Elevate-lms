@@ -7,11 +7,12 @@ import { createClient } from '@/lib/supabase/server';
 import { getOrgContext } from '@/lib/org/getOrgContext';
 import { getOrgSubscription, getLicenseStatus } from '@/lib/billing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Get organization subscription and license status
  */
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -56,3 +57,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/billing/subscription', _GET);

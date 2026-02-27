@@ -8,8 +8,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(
+async function _POST(
   request: NextRequest,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
@@ -189,7 +190,7 @@ export async function POST(
   }
 }
 
-export async function DELETE(
+async function _DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
@@ -283,3 +284,5 @@ export async function DELETE(
     );
   }
 }
+export const POST = withApiAudit('/api/lessons/[lessonId]/complete', _POST);
+export const DELETE = withApiAudit('/api/lessons/[lessonId]/complete', _DELETE);

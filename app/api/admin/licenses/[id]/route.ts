@@ -7,6 +7,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -21,7 +22,7 @@ export const dynamic = 'force-dynamic';
  * All actions require super_admin role and are audited.
  */
 
-export async function PATCH(
+async function _PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -149,7 +150,7 @@ export async function PATCH(
 /**
  * DELETE: Revoke license (permanent)
  */
-export async function DELETE(
+async function _DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -206,3 +207,5 @@ export async function DELETE(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+export const PATCH = withApiAudit('/api/admin/licenses/[id]', _PATCH);
+export const DELETE = withApiAudit('/api/admin/licenses/[id]', _DELETE);

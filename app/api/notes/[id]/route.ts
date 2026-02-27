@@ -8,8 +8,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function DELETE(
+async function _DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -45,3 +46,4 @@ export async function DELETE(
     );
   }
 }
+export const DELETE = withApiAudit('/api/notes/[id]', _DELETE);

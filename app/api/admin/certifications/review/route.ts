@@ -4,8 +4,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
   });
 }
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -126,3 +127,5 @@ const supabase = await createClient();
 
   return NextResponse.json({ submissions: data });
 }
+export const GET = withApiAudit('/api/admin/certifications/review', _GET);
+export const POST = withApiAudit('/api/admin/certifications/review', _POST);

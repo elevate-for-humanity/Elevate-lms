@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 function generateShareCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
@@ -15,7 +16,7 @@ function generateShareCode(): string {
   return code;
 }
 
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -52,7 +53,7 @@ const code = req.nextUrl.searchParams.get('code');
   return NextResponse.json(data);
 }
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -94,7 +95,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(data);
 }
 
-export async function DELETE(req: NextRequest) {
+async function _DELETE(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -121,3 +122,6 @@ const userId = req.headers.get('x-user-id');
 
   return NextResponse.json({ ok: true });
 }
+export const GET = withApiAudit('/api/studio/share', _GET);
+export const POST = withApiAudit('/api/studio/share', _POST);
+export const DELETE = withApiAudit('/api/studio/share', _DELETE);

@@ -4,8 +4,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { preparerService } from '@/lib/franchise/preparer-service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ preparerId: string }> }
 ) {
@@ -63,7 +64,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
+async function _PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ preparerId: string }> }
 ) {
@@ -140,7 +141,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
+async function _DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ preparerId: string }> }
 ) {
@@ -198,3 +199,6 @@ export async function DELETE(
     );
   }
 }
+export const GET = withApiAudit('/api/franchise/preparers/[preparerId]', _GET);
+export const PATCH = withApiAudit('/api/franchise/preparers/[preparerId]', _PATCH);
+export const DELETE = withApiAudit('/api/franchise/preparers/[preparerId]', _DELETE);

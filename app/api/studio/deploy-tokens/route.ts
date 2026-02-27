@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import crypto from 'crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Simple encryption for tokens - in production use a proper KMS
 const ENCRYPTION_KEY = process.env.DEPLOY_TOKEN_KEY || 'default-key-change-in-production-32';
@@ -33,7 +34,7 @@ function decrypt(text: string): string {
 }
 
 // Get deploy tokens for user
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -70,7 +71,7 @@ const userId = req.headers.get('x-user-id');
 }
 
 // Save or update deploy token
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -126,7 +127,7 @@ export async function POST(req: NextRequest) {
 }
 
 // Get decrypted token for deployment (internal use)
-export async function PUT(req: NextRequest) {
+async function _PUT(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -172,7 +173,7 @@ const userId = req.headers.get('x-user-id');
 }
 
 // Delete deploy token
-export async function DELETE(req: NextRequest) {
+async function _DELETE(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -207,3 +208,7 @@ const userId = req.headers.get('x-user-id');
     );
   }
 }
+export const GET = withApiAudit('/api/studio/deploy-tokens', _GET);
+export const POST = withApiAudit('/api/studio/deploy-tokens', _POST);
+export const PUT = withApiAudit('/api/studio/deploy-tokens', _PUT);
+export const DELETE = withApiAudit('/api/studio/deploy-tokens', _DELETE);

@@ -7,10 +7,11 @@ import { logger } from '@/lib/logger';
 import { getRAPIDSMetadata, isRAPIDSProgram } from '@/lib/compliance/rapids-config';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
     const auth = await requireAuth(request);
@@ -147,3 +148,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/create-checkout-session', _POST);

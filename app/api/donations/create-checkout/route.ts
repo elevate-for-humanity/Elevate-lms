@@ -9,8 +9,9 @@ import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { stripe } from '@/lib/stripe/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -140,3 +141,4 @@ export async function POST(request: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/donations/create-checkout', _POST);

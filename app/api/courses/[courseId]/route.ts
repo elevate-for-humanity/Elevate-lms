@@ -8,8 +8,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
@@ -72,7 +73,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
+async function _PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
@@ -132,7 +133,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
+async function _DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
@@ -190,3 +191,6 @@ export async function DELETE(
     );
   }
 }
+export const GET = withApiAudit('/api/courses/[courseId]', _GET);
+export const PATCH = withApiAudit('/api/courses/[courseId]', _PATCH);
+export const DELETE = withApiAudit('/api/courses/[courseId]', _DELETE);

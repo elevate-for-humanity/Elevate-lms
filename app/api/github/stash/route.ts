@@ -7,12 +7,13 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Git stash operations via GitHub API
 // Note: GitHub API doesn't have native stash support, so we simulate it
 // by creating temporary branches or storing in database
 
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -58,7 +59,7 @@ const userToken = req.headers.get('x-gh-token');
 }
 
 // Create a stash (save current changes to a temporary branch)
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
     const auth = await requireAuth(req);
@@ -130,7 +131,7 @@ export async function POST(req: NextRequest) {
 }
 
 // Apply/pop a stash
-export async function PUT(req: NextRequest) {
+async function _PUT(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -205,7 +206,7 @@ const userToken = req.headers.get('x-gh-token');
 }
 
 // Delete a stash
-export async function DELETE(req: NextRequest) {
+async function _DELETE(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -242,3 +243,7 @@ const userToken = req.headers.get('x-gh-token');
     );
   }
 }
+export const GET = withApiAudit('/api/github/stash', _GET);
+export const POST = withApiAudit('/api/github/stash', _POST);
+export const PUT = withApiAudit('/api/github/stash', _PUT);
+export const DELETE = withApiAudit('/api/github/stash', _DELETE);

@@ -8,8 +8,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { uploadComplianceEvidenceFile } from "@/lib/storage/complianceEvidence";
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -90,3 +91,4 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ evidence });
 }
+export const POST = withApiAudit('/api/compliance/evidence', _POST);

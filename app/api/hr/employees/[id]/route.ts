@@ -9,9 +9,10 @@ import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/hr/employees/[id] - Get single employee
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -78,7 +79,7 @@ export async function GET(
 }
 
 // PATCH /api/hr/employees/[id] - Update employee
-export async function PATCH(
+async function _PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -130,7 +131,7 @@ export async function PATCH(
 }
 
 // DELETE /api/hr/employees/[id] - Soft delete (terminate) employee
-export async function DELETE(
+async function _DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -184,3 +185,6 @@ export async function DELETE(
     );
   }
 }
+export const GET = withApiAudit('/api/hr/employees/[id]', _GET);
+export const PATCH = withApiAudit('/api/hr/employees/[id]', _PATCH);
+export const DELETE = withApiAudit('/api/hr/employees/[id]', _DELETE);

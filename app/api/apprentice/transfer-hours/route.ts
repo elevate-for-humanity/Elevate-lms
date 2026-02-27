@@ -3,12 +3,13 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // GET: Fetch transfer hour requests for current user
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -44,7 +45,7 @@ const supabase = await createClient();
 }
 
 // POST: Submit a transfer hour request
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -150,3 +151,5 @@ export async function POST(req: Request) {
     message: 'Transfer hour request submitted. You will be notified once reviewed.',
   });
 }
+export const GET = withApiAudit('/api/apprentice/transfer-hours', _GET);
+export const POST = withApiAudit('/api/apprentice/transfer-hours', _POST);

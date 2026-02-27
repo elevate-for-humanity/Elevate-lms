@@ -8,9 +8,10 @@ import { parseBody } from '@/lib/api-helpers';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // POST /api/wioa/support-services/[id]/approve - Approve/deny support service
-export async function POST(
+async function _POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -53,3 +54,4 @@ export async function POST(
     );
   }
 }
+export const POST = withApiAudit('/api/wioa/support-services/[id]/approve', _POST);

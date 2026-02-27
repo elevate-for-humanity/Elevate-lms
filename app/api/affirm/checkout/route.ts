@@ -21,8 +21,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { resolvePaymentAmount } from '@/lib/payments/resolve-amount';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
@@ -167,3 +168,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/affirm/checkout', _POST);

@@ -7,9 +7,10 @@ import { NextResponse } from 'next/server';
 import { createServerSupabaseClient, getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // PATCH /api/messages/[id] - Mark message as read
-export async function PATCH(
+async function _PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -57,7 +58,7 @@ const { id } = await params;
 }
 
 // DELETE /api/messages/[id] - Delete message
-export async function DELETE(
+async function _DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -97,3 +98,5 @@ const { id } = await params;
     );
   }
 }
+export const PATCH = withApiAudit('/api/messages/[id]', _PATCH);
+export const DELETE = withApiAudit('/api/messages/[id]', _DELETE);

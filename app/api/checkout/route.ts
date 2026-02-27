@@ -9,6 +9,7 @@ import { billingConfigs } from '../../../lms-data/billingConfig';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const checkoutSchema = z.object({
   programId: z.string().min(1),
@@ -21,7 +22,7 @@ const checkoutSchema = z.object({
 
 const stripe = getStripe();
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
@@ -123,3 +124,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/checkout', _POST);

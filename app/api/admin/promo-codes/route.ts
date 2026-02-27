@@ -3,11 +3,12 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
 // GET - Fetch all promo codes
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -36,7 +37,7 @@ export async function GET(request: Request) {
 }
 
 // POST - Create new promo code
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
@@ -82,7 +83,7 @@ export async function POST(req: Request) {
 }
 
 // PUT - Update promo code
-export async function PUT(req: Request) {
+async function _PUT(req: Request) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
@@ -128,7 +129,7 @@ export async function PUT(req: Request) {
 }
 
 // DELETE - Delete promo code
-export async function DELETE(req: Request) {
+async function _DELETE(req: Request) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
@@ -163,3 +164,7 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: 'Failed to delete promo code' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/admin/promo-codes', _GET);
+export const POST = withApiAudit('/api/admin/promo-codes', _POST);
+export const PUT = withApiAudit('/api/admin/promo-codes', _PUT);
+export const DELETE = withApiAudit('/api/admin/promo-codes', _DELETE);

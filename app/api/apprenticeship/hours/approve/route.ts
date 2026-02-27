@@ -7,8 +7,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -75,7 +76,7 @@ export async function POST(req: Request) {
 }
 
 // Bulk approve
-export async function PUT(req: Request) {
+async function _PUT(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -140,3 +141,5 @@ export async function PUT(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/apprenticeship/hours/approve', _POST);
+export const PUT = withApiAudit('/api/apprenticeship/hours/approve', _PUT);

@@ -10,8 +10,9 @@ import { stripe } from '@/lib/billing/stripe';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
 
@@ -75,3 +76,4 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ reported: updates.length });
 }
+export const POST = withApiAudit('/api/billing/report-usage', _POST);

@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,7 +14,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/apprentice/documents
  * Get document types and uploaded documents for a program
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
  * POST /api/apprentice/documents
  * Upload a document
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -216,7 +217,7 @@ export async function POST(request: NextRequest) {
  * DELETE /api/apprentice/documents
  * Delete a document
  */
-export async function DELETE(request: NextRequest) {
+async function _DELETE(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -289,3 +290,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/apprentice/documents', _GET);
+export const POST = withApiAudit('/api/apprentice/documents', _POST);
+export const DELETE = withApiAudit('/api/apprentice/documents', _DELETE);

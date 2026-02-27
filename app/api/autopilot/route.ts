@@ -14,6 +14,7 @@ import fs from 'fs';
 import path from 'path';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,7 +94,7 @@ function seedContent() {
 }
 
 // GET - Retrieve autopilot state
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -112,7 +113,7 @@ export async function GET(request: NextRequest) {
 }
 
 // POST - Add new task or update state
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -170,7 +171,7 @@ export async function POST(request: NextRequest) {
 }
 
 // DELETE - Remove task
-export async function DELETE(request: NextRequest) {
+async function _DELETE(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -197,3 +198,6 @@ export async function DELETE(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/autopilot', _GET);
+export const POST = withApiAudit('/api/autopilot', _POST);
+export const DELETE = withApiAudit('/api/autopilot', _DELETE);

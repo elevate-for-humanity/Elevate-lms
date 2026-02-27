@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 
 const FAQS = [
   {
@@ -10,7 +11,7 @@ const FAQS = [
   },
   {
     q: 'What payment methods do you accept?',
-    a: 'Stripe (all major credit/debit cards), Affirm (pay over time), and Sezzle (buy now, pay later). All payment options are available at checkout — no invoices, no purchase orders, no waiting.',
+    a: `Stripe (all major credit/debit cards) and BNPL providers (${BNPL_PROVIDER_NAMES}). All payment options are available at checkout — no invoices, no purchase orders, no waiting.`,
   },
   {
     q: 'What does the setup fee cover?',
@@ -41,8 +42,8 @@ const FAQS = [
     a: 'Managed: we host and operate the platform for you. You get your own branded instance on our infrastructure. Enterprise Source-Use: you get the full source code and deploy on your own servers. Enterprise is for state agencies or large networks that require on-premise deployment for compliance reasons.',
   },
   {
-    q: 'Can I use Affirm or Sezzle to pay over time?',
-    a: 'Yes. At checkout, select Affirm or Sezzle as your payment method. Affirm offers 3-36 month financing. Sezzle splits payments into 4 interest-free installments. Both are available for all license tiers.',
+    q: 'Can I use BNPL to pay over time?',
+    a: `Yes. At checkout, select your preferred BNPL provider (${BNPL_PROVIDER_NAMES}). Options include 3–36 month financing and interest-free installment plans. Available for all license tiers.`,
   },
 ];
 

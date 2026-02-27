@@ -37,7 +37,7 @@ const config: ProgramPageConfig = {
   ],
   steps: [
     { title: 'Apply Online', desc: 'Complete our application in about 5 minutes.' },
-    { title: 'Enroll', desc: 'Payment plans available. BNPL through Affirm.' },
+    { title: 'Enroll', desc: 'Payment plans and BNPL options available.' },
     { title: 'Attend Orientation', desc: 'Meet your instructor and review the program.' },
     { title: 'Start Training', desc: 'Begin your 5-week business administration program.' },
   ],

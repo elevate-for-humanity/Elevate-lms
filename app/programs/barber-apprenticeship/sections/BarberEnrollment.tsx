@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Phone, Shield, CreditCard, DollarSign, Building2, Scissors } from 'lucide-react';
 import { ProgramTutorCTA } from '@/components/ProgramTutorCTA';
 import { ENROLLMENT_STEPS, ELIGIBILITY } from '../barber-program-data';
+import { ACTIVE_BNPL_PROVIDERS, BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 
 export function BarberEnrollment() {
   return (
@@ -34,11 +35,11 @@ export function BarberEnrollment() {
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">POPULAR</span>
               <CreditCard className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900 mb-1">Buy Now, Pay Later</h3>
-              <p className="text-slate-600 text-sm mb-2">Split into 4 interest-free payments</p>
+              <p className="text-slate-600 text-sm mb-2">Split into interest-free payments</p>
               <div className="flex flex-wrap justify-center gap-1 mb-3">
-                <span className="px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">Klarna</span>
-                <span className="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">Afterpay</span>
-                <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">Affirm</span>
+                {ACTIVE_BNPL_PROVIDERS.slice(0, 3).map((p) => (
+                  <span key={p.id} className={`px-2 py-0.5 ${p.badgeBg} ${p.badgeText} rounded-full text-xs font-medium`}>{p.name}</span>
+                ))}
               </div>
               <Link href="/pay" className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition-colors">
                 Apply for BNPL
@@ -136,7 +137,7 @@ export function BarberEnrollment() {
                 <strong>WIOA:</strong> Adults and dislocated workers who meet income guidelines or are receiving public assistance may qualify for WIOA funding, which covers tuition, books, supplies, and in some cases transportation and childcare.
               </p>
               <p className="text-sm text-slate-700">
-                <strong>Self-Pay:</strong> Payment plans and BNPL financing available. Contact us or submit the intake form to find out which options you qualify for.
+                <strong>Self-Pay:</strong> Payment plans and BNPL financing ({BNPL_PROVIDER_NAMES}) available. Contact us or submit the intake form to find out which options you qualify for.
               </p>
             </div>
           </div>
@@ -185,7 +186,7 @@ export function BarberEnrollment() {
             2,000-hour apprenticeship with licensed shop training. Apply today to check your eligibility.
           </p>
           <p className="text-slate-400 mb-8">
-            Pay in full, use a payment plan, or apply for Buy Now Pay Later with Klarna, Afterpay, or Affirm.
+            Pay in full, use a payment plan, or apply for Buy Now Pay Later with {BNPL_PROVIDER_NAMES}.
           </p>
           <div className="flex flex-wrap gap-4 justify-center mb-6">
             <Link href="/programs/barber-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">

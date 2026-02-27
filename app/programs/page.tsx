@@ -7,14 +7,14 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Training Programs | Free Career Training',
-  description: 'Explore free career training programs in healthcare, skilled trades, technology, CDL, barbering, and business. WIOA-funded programs available. Start your new career today.',
+  title: 'Training Programs | No-Cost Career Training for Eligible Participants',
+  description: 'Career training programs in healthcare, skilled trades, technology, CDL, barbering, and business. Training at no cost to eligible Indiana residents through WIOA and state funding. Self-pay options also available.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/programs',
   },
   openGraph: {
-    title: 'Free Career Training Programs | Elevate for Humanity',
-    description: 'Explore free career training in healthcare, skilled trades, technology, CDL, barbering, and business. WIOA-funded programs available.',
+    title: 'Career Training Programs | Elevate for Humanity',
+    description: 'Career training in healthcare, skilled trades, technology, CDL, barbering, and business. No cost to eligible participants through WIOA and state funding.',
     url: 'https://www.elevateforhumanity.org/programs',
     siteName: 'Elevate for Humanity',
     images: [{ url: '/images/heroes-hq/programs-hero.jpg', width: 1200, height: 630, alt: 'Career training programs' }],
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free Career Training Programs | Elevate for Humanity',
-    description: 'Explore free career training in healthcare, skilled trades, technology, CDL, barbering, and business.',
+    title: 'Career Training Programs | Elevate for Humanity',
+    description: 'Career training in healthcare, skilled trades, technology, CDL, barbering, and business. No cost to eligible participants.',
     images: ['/images/heroes-hq/programs-hero.jpg'],
   },
 };
@@ -82,7 +82,7 @@ async function getCategories() {
       { title: 'Healthcare', description: 'CNA, Medical Assistant, Phlebotomy training programs.', href: '/programs/healthcare', programs: ['CNA Training', 'Medical Assistant', 'Phlebotomy'] },
       { title: 'Skilled Trades', description: 'HVAC, Electrical, Welding, Plumbing training programs.', href: '/programs/skilled-trades', programs: ['Building Technician', 'Electrical', 'Welding'] },
       { title: 'Technology', description: 'IT Support, Cybersecurity, Web Development programs.', href: '/programs/technology', programs: ['IT Support', 'Cybersecurity', 'Web Dev'] },
-      { title: 'CDL & Transportation', description: 'Commercial driving license training programs.', href: '/programs/cdl-training', programs: ['CDL Class A', 'CDL Class B'] },
+      { title: 'CDL & Transportation', description: 'Commercial driving license training programs.', href: '/programs/cdl', programs: ['CDL Class A', 'CDL Class B'] },
       { title: 'Beauty & Barbering', description: 'Barber apprenticeship and cosmetology programs.', href: '/programs/barber-apprenticeship', programs: ['Barber Apprenticeship', 'Cosmetology'] },
       { title: 'Business & Finance', description: 'Financial literacy and business training programs.', href: '/programs/business', programs: ['Financial Literacy', 'Business Admin'] },
     ];
@@ -106,7 +106,7 @@ async function getCategories() {
       { title: 'Healthcare', description: 'CNA, Medical Assistant, Phlebotomy training programs.', href: '/programs/healthcare', programs: ['CNA Training', 'Medical Assistant', 'Phlebotomy'] },
       { title: 'Skilled Trades', description: 'HVAC, Electrical, Welding, Plumbing training programs.', href: '/programs/skilled-trades', programs: ['Building Technician', 'Electrical', 'Welding'] },
       { title: 'Technology', description: 'IT Support, Cybersecurity, Web Development programs.', href: '/programs/technology', programs: ['IT Support', 'Cybersecurity', 'Web Dev'] },
-      { title: 'CDL & Transportation', description: 'Commercial driving license training programs.', href: '/programs/cdl-training', programs: ['CDL Class A', 'CDL Class B'] },
+      { title: 'CDL & Transportation', description: 'Commercial driving license training programs.', href: '/programs/cdl', programs: ['CDL Class A', 'CDL Class B'] },
       { title: 'Beauty & Barbering', description: 'Barber apprenticeship and cosmetology programs.', href: '/programs/barber-apprenticeship', programs: ['Barber Apprenticeship', 'Cosmetology'] },
       { title: 'Business & Finance', description: 'Financial literacy and business training programs.', href: '/programs/business', programs: ['Financial Literacy', 'Business Admin'] },
     ];
@@ -354,7 +354,7 @@ export default async function ProgramsPage() {
                 credentials: [
                   { name: 'Business of Retail Certified Specialist', partner: 'National Retail Federation (NRF)' },
                   { name: 'Retail Industry Fundamentals Specialist', partner: 'National Retail Federation (NRF)' },
-                  { name: 'Certificate of Completion', partner: 'Elevate for Humanity Career & Technical Institute' },
+                  { name: 'Certificate of Completion', partner: 'Elevate for Humanity' },
                 ],
                 funding: 'WIOA',
                 category: 'Business',
@@ -363,7 +363,7 @@ export default async function ProgramsPage() {
                 name: 'Financial Literacy Program',
                 image: '/images/programs-hq/business-office.jpg',
                 slug: 'tax-prep-financial-services',
-                href: '/programs/bookkeeping',
+                href: '/programs/tax-entrepreneurship',
                 programId: '#10004627',
                 duration: '10 weeks',
                 cost: '$4,950',
@@ -371,7 +371,7 @@ export default async function ProgramsPage() {
                   { name: 'Microsoft 365 Fundamentals', partner: 'Microsoft' },
                   { name: 'QuickBooks Pro Advisor', partner: 'Intuit' },
                   { name: 'Rise Up', partner: 'National Retail Federation (NRF)' },
-                  { name: 'Certificate of Completion', partner: 'Elevate for Humanity Career & Technical Institute' },
+                  { name: 'Certificate of Completion', partner: 'Elevate for Humanity' },
                 ],
                 funding: 'WIOA',
                 category: 'Business',
@@ -443,7 +443,7 @@ export default async function ProgramsPage() {
                 name: 'Forklift Operator Certification',
                 image: '/images/trades/program-construction-training.jpg',
                 slug: 'forklift',
-                href: '/programs/skilled-trades',
+                href: '/programs/forklift',
                 programId: '#10004702',
                 duration: '1 day',
                 cost: '$2,700',

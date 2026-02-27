@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { DollarSign, FileText, Phone, ArrowRight, Shield, Clock, Users, Calculator } from 'lucide-react';
 import { FinancialAidCalculator } from '@/components/FinancialAidCalculator';
+import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -44,7 +45,7 @@ const fundingOptions = [
   },
   {
     title: 'Buy Now, Pay Later (BNPL)',
-    description: 'Split tuition into 4–6 installments with Klarna, Afterpay, Sezzle, Affirm, or Zip.',
+    description: `Split tuition into 4–6 installments with ${BNPL_PROVIDER_NAMES}.`,
     eligibility: ['No hard credit check for most providers', 'Instant approval available', 'Self-pay students', 'Set up at enrollment'],
     coverage: 'Pay over 4–6 installments',
     icon: DollarSign,
@@ -89,7 +90,7 @@ export default function FinancialAidPage() {
             <Link href="/funding" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               All Funding Options
             </Link>
-            <Link href="/funding/jri" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
+            <Link href="/programs/jri" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               JRI Programs
             </Link>
             <Link href="/how-it-works" className="px-4 py-2 bg-brand-orange-100 text-brand-orange-800 rounded-full text-sm font-medium hover:bg-brand-orange-200 transition-colors">

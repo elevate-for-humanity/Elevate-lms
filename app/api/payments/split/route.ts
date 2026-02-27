@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/authGuards';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const paymentSplitSchema = z.object({
   enrollment_id: z.string().uuid(),
@@ -30,7 +31,7 @@ const VENDOR_COSTS: Record<string, { vendor: string; cost: number }> = {
   // Add other programs as needed
 };
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -194,3 +195,4 @@ async function processVendorPayment(params: {
       logger.error("Unhandled error", error instanceof Error ? error : undefined);
   }
 }
+export const POST = withApiAudit('/api/payments/split', _POST);

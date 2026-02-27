@@ -24,6 +24,7 @@ import {
   handleStripeWebhook,
 } from '@/lib/payments';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Verify that the Stripe customer ID belongs to the authenticated user.
@@ -89,7 +90,7 @@ async function getUserStripeCustomerId(userId: string): Promise<string | null> {
   return profile?.stripe_customer_id || null;
 }
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -139,7 +140,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -354,3 +355,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/payments', _GET);
+export const POST = withApiAudit('/api/payments', _POST);

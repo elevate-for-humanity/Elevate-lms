@@ -3,6 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 

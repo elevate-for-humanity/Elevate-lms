@@ -5,6 +5,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { enqueueNotification, buildTokenUrl } from '@/lib/notifications';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +18,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhuma
  * Staff enrollment endpoint - enrolls student and sends Milady access email immediately.
  * Used when Elevate pays on behalf of student (workforce funding, etc.)
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -246,3 +249,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/staff/enroll-student', _POST);

@@ -3,6 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -30,6 +32,14 @@ export async function POST(request: NextRequest) {
       logger.error('[Profile] Update failed:', error.message);
       return NextResponse.json({ success: false, error: 'Profile update failed' }, { status: 500 });
     }
+
+    await auditMutation(request, {
+      action: 'user_updated',
+      target_type: 'profile',
+      target_id: user.id,
+      user_id: user.id,
+      metadata: { self_update: true, fields: Object.keys(fields) },
+    });
 
     return NextResponse.json({ success: true });
   } catch (err) {

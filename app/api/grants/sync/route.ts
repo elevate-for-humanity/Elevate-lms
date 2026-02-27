@@ -20,6 +20,8 @@ import {
 } from '@/lib/integrations/grants-gov';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 /**
  * POST /api/grants/sync
  * Sync grants from Grants.gov to local database

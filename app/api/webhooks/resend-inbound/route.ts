@@ -5,6 +5,7 @@ export const maxDuration = 30;
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Lazy-init to avoid build-time crash when env var is missing
 let _resend: Resend | null = null;
@@ -35,7 +36,7 @@ const DEFAULT_FORWARD = 'elevate4humanityedu@gmail.com';
  *   https://www.elevateforhumanity.org/api/webhooks/resend-inbound
  *   Event: email.received
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const event = await request.json();
 
@@ -90,3 +91,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Internal error' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/webhooks/resend-inbound', _POST, { actor_type: 'webhook', skip_body: true });

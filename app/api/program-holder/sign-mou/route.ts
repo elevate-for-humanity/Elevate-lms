@@ -5,6 +5,8 @@ import { createRouteHandlerClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 

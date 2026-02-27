@@ -32,6 +32,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const enrollCheckoutSchema = z.object({
   firstName: z.string().min(1).max(100).trim(),
@@ -41,7 +42,7 @@ const enrollCheckoutSchema = z.object({
   programSlug: z.string().min(1).max(100),
 });
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
@@ -229,3 +230,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/enroll/checkout', _POST);

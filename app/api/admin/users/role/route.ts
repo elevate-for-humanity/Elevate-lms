@@ -5,6 +5,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 const VALID_ROLES = ['student', 'staff', 'instructor', 'admin', 'super_admin'];
 
 /**

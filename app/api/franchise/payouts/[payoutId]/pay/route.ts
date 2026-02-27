@@ -4,8 +4,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { payoutService } from '@/lib/franchise/payout-service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(
+async function _POST(
   request: NextRequest,
   { params }: { params: Promise<{ payoutId: string }> }
 ) {
@@ -72,3 +73,4 @@ export async function POST(
     );
   }
 }
+export const POST = withApiAudit('/api/franchise/payouts/[payoutId]/pay', _POST);

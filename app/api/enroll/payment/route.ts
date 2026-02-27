@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { paymentRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const enrollPaymentSchema = z.object({
   amount: z.number().positive(),
@@ -28,7 +29,7 @@ const PROGRAM_DETAILS: Record<string, { name: string; totalPrice: number }> = {
   cdl: { name: 'CDL Training', totalPrice: 5000 },
 };
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
@@ -130,3 +131,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/enroll/payment', _POST);

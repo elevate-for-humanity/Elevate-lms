@@ -14,6 +14,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { sendEmail } from '@/lib/email/resend';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 // CORS preflight for cross-origin form submissions
 export async function OPTIONS() {
   return new NextResponse(null, {

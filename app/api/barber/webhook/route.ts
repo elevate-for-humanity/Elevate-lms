@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
 import { BARBER_PRICING, calculateWeeklyPayment } from '@/lib/programs/pricing';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const MILADY_LOGIN_URL = 'https://www.miladytraining.com/users/sign_in';
 
@@ -85,7 +86,7 @@ function getWebhookSecret() {
  * 4. Send welcome email (idempotent)
  * 5. Send Milady email (idempotent)
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
 
@@ -642,7 +643,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
  * Update subscription when transfer hours are verified
  * Called internally when admin verifies transfer hours
  */
-export async function PUT(request: NextRequest) {
+async function _PUT(request: NextRequest) {
   try {
     const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
@@ -735,3 +736,5 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to update subscription' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/barber/webhook', _POST, { actor_type: 'webhook', skip_body: true });
+export const PUT = withApiAudit('/api/barber/webhook', _PUT, { actor_type: 'webhook', skip_body: true });

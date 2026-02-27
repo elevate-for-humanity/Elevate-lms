@@ -9,6 +9,8 @@ import { createRouteHandlerClient } from '@/lib/auth';
 import { generateMOUText } from '@/lib/mou-template';
 import { withAuth } from '@/lib/with-auth';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 export const GET = withAuth(
   async (req, context) => {
     const { user } = context;

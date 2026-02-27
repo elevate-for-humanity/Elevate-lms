@@ -7,8 +7,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   request: Request,
   { params }: { params: Promise<{ enrollmentId: string }> }
 ) {
@@ -68,3 +69,4 @@ export async function GET(
     );
   }
 }
+export const GET = withApiAudit('/api/scorm/enrollment/[enrollmentId]', _GET);

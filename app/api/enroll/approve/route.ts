@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { canApproveApprentice } from '@/lib/documents';
 import { notifyApprenticeDecision } from '@/lib/notifications';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 interface ApproveEnrollmentRequest {
   enrollment_id: string;
@@ -32,7 +33,7 @@ interface ApproveEnrollmentRequest {
  * 5. Call generate_enrollment_steps RPC
  * 6. Return proof of orchestration
  */
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
@@ -436,3 +437,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/enroll/approve', _POST);

@@ -6,6 +6,8 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 

@@ -9,6 +9,8 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 export async function POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');

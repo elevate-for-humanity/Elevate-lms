@@ -22,13 +22,14 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 interface FinalizePaymentRequest {
   enrollmentId: string;
   paymentMode: 'sponsored' | 'self_pay' | 'employer' | 'scholarship';
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
@@ -334,3 +335,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/enroll/finalize-payment', _POST);

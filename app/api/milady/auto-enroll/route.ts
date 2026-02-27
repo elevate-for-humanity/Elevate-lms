@@ -16,7 +16,10 @@ import { createAccount, enrollInCourse } from '@/lib/partners/milady';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-export async function POST(request: Request) {
+import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+
+async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -171,3 +174,4 @@ export async function POST(request: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/milady/auto-enroll', _POST);

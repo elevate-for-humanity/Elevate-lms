@@ -4,6 +4,7 @@ import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -102,7 +103,7 @@ async function recordPurchase(
   }
 }
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   const stripe = getStripe();
   
   if (!stripe) {
@@ -253,3 +254,4 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ received: true });
 }
+export const POST = withApiAudit('/api/webhooks/store', _POST, { actor_type: 'webhook', skip_body: true });

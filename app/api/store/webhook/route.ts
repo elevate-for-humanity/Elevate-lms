@@ -20,6 +20,9 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { isEventProcessed, markEventProcessed } from '@/lib/store/idempotency';
 
+import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+
 interface ProductRecord {
   id: string;
   title: string;
@@ -27,7 +30,7 @@ interface ProductRecord {
   download_url?: string;
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const body = await req.text();
     const signature = req.headers.get('stripe-signature');
@@ -151,3 +154,4 @@ export async function POST(req: Request) {
     return Response.json({ error: toErrorMessage(error) }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/store/webhook', _POST, { actor_type: 'webhook', skip_body: true });

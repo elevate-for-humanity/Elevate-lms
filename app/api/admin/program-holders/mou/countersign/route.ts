@@ -11,6 +11,8 @@ import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 
+import { auditMutation } from '@/lib/api/withAudit';
+
 export const POST = withAuth(
   async (req, context) => {
     const { user } = context;

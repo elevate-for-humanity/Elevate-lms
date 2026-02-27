@@ -9,9 +9,10 @@ import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/hr/benefits/enrollments?employee_id=
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/hr/benefits/enrollments
 // Body: { employee_id, plan_id, coverage_level, effective_date, ... }
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -103,3 +104,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/hr/benefits/enrollments', _GET);
+export const POST = withApiAudit('/api/hr/benefits/enrollments', _POST);

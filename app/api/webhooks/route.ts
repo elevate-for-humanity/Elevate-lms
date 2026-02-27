@@ -18,8 +18,9 @@ import {
   retryWebhookDelivery,
   type WebhookEvent,
 } from '@/lib/webhooks';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const authResult = await apiRequireAdmin();
 
@@ -77,7 +78,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const authResult = await apiRequireAdmin();
 
@@ -175,3 +176,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/webhooks', _GET, { actor_type: 'webhook', skip_body: true });
+export const POST = withApiAudit('/api/webhooks', _POST, { actor_type: 'webhook', skip_body: true });

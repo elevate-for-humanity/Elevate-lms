@@ -12,6 +12,7 @@ import { createClient } from '@supabase/supabase-js';
 import { getPartnerClient, PartnerType, WebhookPayload } from '@/lib/partners';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +27,7 @@ function getSupabaseClient() {
   return createClient(supabaseUrl, supabaseKey);
 }
 
-export async function POST(
+async function _POST(
   request: NextRequest,
   { params }: { params: Promise<{ partner: string }> }
 ) {
@@ -282,3 +283,4 @@ async function handleCertificateIssued(
     logger.error('[Webhook] Failed to update certificate:', error);
   }
 }
+export const POST = withApiAudit('/api/webhooks/partners/[partner]', _POST, { actor_type: 'webhook', skip_body: true });

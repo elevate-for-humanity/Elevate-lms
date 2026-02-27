@@ -3,6 +3,7 @@ import { apiRequireAdmin } from '@/lib/authGuards';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,7 +13,7 @@ export const dynamic = 'force-dynamic';
  * Returns duplicate counts across enrollment tables.
  * All counts should be 0 in a healthy system.
  */
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -55,3 +56,4 @@ const guard = await apiRequireAdmin();
     note: 'Canonical authority: program_enrollments. Others are legacy.',
   });
 }
+export const GET = withApiAudit('/api/admin/enrollment-integrity', _GET);

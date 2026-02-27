@@ -54,6 +54,7 @@ function onAuditFailure(context: string, error: unknown, event: Record<string, u
   // On serverless, stderr (channel 1) is the real last resort.
   if (typeof globalThis.process !== 'undefined') {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const fs = require('fs');
       const line = JSON.stringify({ ...failureRecord, event }) + '\n';
       fs.appendFileSync('/tmp/audit-fallback.jsonl', line);

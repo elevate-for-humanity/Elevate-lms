@@ -1,10 +1,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
-
+import type { Metadata } from 'next';
 
 import HomeHeroVideo from './HomeHeroVideo';
 import { InView } from '@/components/ui/InView';
 
+export const metadata: Metadata = {
+  title: 'Elevate for Humanity | Funded Career Training in Healthcare, Trades, CDL & Technology',
+  description: 'Free career training for eligible Indiana residents through WIOA, WRG, and JRI funding. Programs in healthcare, skilled trades, CDL, technology, and barbering.',
+};
 
 export default function HomePage() {
   return (

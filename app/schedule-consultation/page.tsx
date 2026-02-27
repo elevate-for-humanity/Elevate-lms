@@ -92,13 +92,10 @@ export default function ScheduleConsultationPage() {
           </p>
           <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-4 text-left">
             <div className="font-semibold text-brand-blue-900 mb-1">Join via Zoom</div>
-            <a href="https://us06web.zoom.us/j/87654321098" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 font-medium text-sm hover:underline break-all">
-              https://us06web.zoom.us/j/87654321098
-            </a>
-            <div className="text-brand-blue-700 text-xs mt-1">Meeting ID: 876 5432 1098</div>
+            <p className="text-brand-blue-700 text-sm">Your unique Zoom meeting link has been sent to your email.</p>
           </div>
           <p className="text-slate-500 text-sm mb-6">
-            You&apos;ll receive a confirmation email at <strong>{email}</strong> with the Zoom link.
+            Check your inbox at <strong>{email}</strong> for the confirmation with your Zoom link.
             Our enrollment team will reach out before your appointment.
           </p>
           <div className="flex flex-col gap-3">

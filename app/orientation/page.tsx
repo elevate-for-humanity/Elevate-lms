@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import OrientationFormClient from './OrientationFormClient';
-import { ZOOM_MEETING_URL } from '@/lib/config/zoom';
+
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/orientation' },
@@ -75,20 +75,13 @@ export default async function OrientationPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-4">Join via Zoom</h2>
           <p className="text-slate-600 mb-6 max-w-2xl mx-auto">
-            If you already have a scheduled orientation, use the Zoom link from your calendar invite.
-            For open office hours or quick questions, you can join our general Zoom room below.
+            After you schedule your orientation above, you will receive a calendar invite
+            with a unique Zoom meeting link. Use that link to join at your scheduled time.
           </p>
-          <a
-            href={ZOOM_MEETING_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-brand-blue-700 transition-colors"
-          >
-            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3l4 3V6l-4 3V5a2 2 0 0 0-2-2H4zm0 2h10v10H4V5z" />
-            </svg>
-            Join Zoom Meeting
-          </a>
+          <p className="text-slate-500 text-sm">
+            Questions? Call <a href="tel:+13173143757" className="text-brand-blue-600 font-medium hover:underline">(317) 314-3757</a> or
+            visit our <Link href="/contact" className="text-brand-blue-600 font-medium hover:underline">contact page</Link>.
+          </p>
         </div>
       </section>
 

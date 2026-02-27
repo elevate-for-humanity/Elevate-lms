@@ -168,13 +168,22 @@ export default function BarbershopPartnerPage() {
         </div>
       </section>
 
+      {/* Sponsor Clarification */}
+      <section className="py-6 bg-amber-50 border-b border-amber-200">
+        <div className="max-w-6xl mx-auto px-4">
+          <p className="text-sm text-amber-900 leading-relaxed">
+            <strong>Sponsor &amp; Partner Structure:</strong> Apprentices complete supervised on-the-job training at sponsor-approved licensed partner locations while receiving structured related technical instruction through Elevate for Humanity Career &amp; Technical Institute. Partner barbershops and employer training sites are licensed facilities that provide supervised practical training under sponsor-approved standards. Partner locations do not function as the apprenticeship sponsor or instructional institution but operate as approved training sites within the registered program structure.
+          </p>
+        </div>
+      </section>
+
       {/* Who This Is For */}
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">Who This Is For</h2>
           <p className="text-gray-600 mb-8 max-w-3xl">
-            This program is designed for established Indiana barbershops that want to train and
-            develop apprentice barbers through a structured, USDOL-registered apprenticeship.
+            This program is designed for established Indiana barbershops that want to host and
+            develop apprentice barbers as an approved training site under a structured, USDOL-registered apprenticeship.
           </p>
           <div className="grid md:grid-cols-2 gap-4">
             {eligibilityItems.map((item, i) => (

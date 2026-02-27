@@ -8,8 +8,11 @@ export function BarberDeliveryModel() {
       <section className="py-16 bg-slate-50">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Training Delivery Model</h2>
+          <p className="text-slate-600 mb-4 max-w-3xl">
+            Elevate for Humanity Career &amp; Technical Institute serves as the Registered Apprenticeship sponsor and instructional provider. Apprentices complete supervised on-the-job training at sponsor-approved licensed partner locations while receiving structured related technical instruction through Elevate for Humanity Career &amp; Technical Institute.
+          </p>
           <p className="text-slate-600 mb-10 max-w-3xl">
-            Programs are delivered through a structured workforce training model that includes licensed credential partners for instruction, employer-based hands-on training where applicable, mapped competencies, and LMS-tracked progress under centralized program oversight.
+            All partner locations operate under formal training agreements, sponsor-approved training standards, and documented hour tracking and competency verification requirements.
           </p>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">

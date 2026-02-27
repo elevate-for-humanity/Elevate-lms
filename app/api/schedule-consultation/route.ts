@@ -5,9 +5,8 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { createZoomMeeting } from '@/lib/integrations/zoom';
 
-const ZOOM_URL = 'https://us06web.zoom.us/j/87654321098';
-const ZOOM_ID = '876 5432 1098';
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
 export async function POST(request: Request) {
@@ -17,25 +16,6 @@ export async function POST(request: Request) {
 
     if (!name || !email || !appointment_type || !appointment_date || !appointment_time) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
-
-    // Save to Supabase
-    const supabase = createAdminClient();
-    if (supabase) {
-      const { error: dbError } = await supabase.from('appointments').insert({
-        email,
-        subject: name,
-        appointment_type,
-        appointment_date,
-        appointment_time,
-        location: 'Zoom',
-        service_type: notes || '',
-        status: 'scheduled',
-        stage: phone || '',
-      });
-      if (dbError) {
-        logger.error('[Schedule] DB insert failed:', dbError.message);
-      }
     }
 
     const typeLabels: Record<string, string> = {
@@ -49,6 +29,49 @@ export async function POST(request: Request) {
     const dateFormatted = new Date(appointment_date + 'T12:00:00').toLocaleDateString('en-US', {
       weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
     });
+
+    // Create a real Zoom meeting for this appointment
+    let zoomUrl = '';
+    let zoomId = '';
+    try {
+      const meeting = await createZoomMeeting({
+        topic: `${typeLabel} — ${name}`,
+        startTime: `${appointment_date}T${appointment_time}:00`,
+        duration: 30,
+        agenda: `${typeLabel} with ${name} (${email})${notes ? `. Notes: ${notes}` : ''}`,
+        settings: {
+          waiting_room: true,
+          join_before_host: false,
+          mute_upon_entry: true,
+          auto_recording: 'cloud',
+        },
+      });
+      zoomUrl = meeting.join_url;
+      zoomId = meeting.id;
+      logger.info('[Schedule] Zoom meeting created', { meetingId: meeting.id });
+    } catch (zoomErr) {
+      logger.error('[Schedule] Zoom meeting creation failed:', zoomErr instanceof Error ? zoomErr.message : zoomErr);
+      return NextResponse.json({ error: 'Failed to create Zoom meeting. Please call (317) 314-3757 to schedule.' }, { status: 502 });
+    }
+
+    // Save to Supabase
+    const supabase = createAdminClient();
+    if (supabase) {
+      const { error: dbError } = await supabase.from('appointments').insert({
+        email,
+        subject: name,
+        appointment_type,
+        appointment_date,
+        appointment_time,
+        location: zoomUrl,
+        service_type: notes || '',
+        status: 'scheduled',
+        stage: phone || '',
+      });
+      if (dbError) {
+        logger.error('[Schedule] DB insert failed:', dbError.message);
+      }
+    }
 
     // Send confirmation to applicant
     await sendEmail({
@@ -66,8 +89,8 @@ export async function POST(request: Request) {
 </table>
 <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;margin:16px 0">
 <strong style="color:#1e40af">Join via Zoom</strong><br/>
-<a href="${ZOOM_URL}" style="color:#2563eb;font-size:14px">${ZOOM_URL}</a><br/>
-<span style="color:#3b82f6;font-size:12px">Meeting ID: ${ZOOM_ID}</span>
+<a href="${zoomUrl}" style="color:#2563eb;font-size:14px">${zoomUrl}</a><br/>
+<span style="color:#3b82f6;font-size:12px">Meeting ID: ${zoomId}</span>
 </div>
 <h3 style="color:#111827">Before Your Meeting</h3>
 <ol style="line-height:1.8">
@@ -97,13 +120,13 @@ export async function POST(request: Request) {
 <tr><td style="padding:6px 12px;border:1px solid #e5e7eb;font-weight:bold">Date</td><td style="padding:6px 12px;border:1px solid #e5e7eb">${dateFormatted} at ${appointment_time}</td></tr>
 <tr><td style="padding:6px 12px;border:1px solid #e5e7eb;font-weight:bold">Notes</td><td style="padding:6px 12px;border:1px solid #e5e7eb">${notes || 'None'}</td></tr>
 </table>
-<p><a href="${ZOOM_URL}">Join Zoom Meeting</a></p>
+<p><a href="${zoomUrl}">Join Zoom Meeting</a> (ID: ${zoomId})</p>
 </div>`,
     }).catch((err) => {
       logger.error('[Schedule] Admin notification email failed:', err instanceof Error ? err.message : err);
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, meetingUrl: zoomUrl });
   } catch (err) {
     logger.error('[Schedule] Error:', err instanceof Error ? err.message : err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });

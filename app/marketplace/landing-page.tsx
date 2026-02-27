@@ -18,7 +18,7 @@ export default function MarketplaceLanding() {
           <ShoppingBag className="w-20 h-20 mx-auto mb-6" />
           <h1 className="text-5xl font-bold mb-6">Marketplace</h1>
           <p className="text-xl max-w-3xl mx-auto mb-8">
-            Your one-stop shop for services, products, and business solutions.
+            Services, products, and business solutions in one place.
             Connect with trusted providers and grow your business.
           </p>
           <div className="flex gap-4 justify-center">

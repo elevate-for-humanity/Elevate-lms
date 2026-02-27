@@ -43,7 +43,7 @@ async function getStudentData(userId: string, email: string) {
     // Upcoming appointments
     supabase
       .from('appointments')
-      .select('id, appointment_type, appointment_date, appointment_time, status')
+      .select('id, appointment_type, appointment_date, appointment_time, status, location')
       .eq('email', email)
       .eq('status', 'scheduled')
       .order('appointment_date', { ascending: true })
@@ -278,9 +278,11 @@ export default async function StudentPWAPage() {
                 <div className="text-sm text-slate-600">
                   {new Date(appt.appointment_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at {appt.appointment_time}
                 </div>
-                <a href="https://us06web.zoom.us/j/87654321098" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 text-xs font-medium mt-1 inline-block hover:underline">
-                  Join Zoom →
-                </a>
+                {appt.location && appt.location.startsWith('https://') && (
+                  <a href={appt.location} target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 text-xs font-medium mt-1 inline-block hover:underline">
+                    Join Zoom →
+                  </a>
+                )}
               </div>
             ))}
           </div>

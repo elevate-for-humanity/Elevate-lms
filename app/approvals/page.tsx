@@ -39,6 +39,37 @@ export default function ApprovalsPage() {
 
       </section>
 
+      {/* Institutional Governance */}
+      <section className="py-12 bg-slate-50 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="bg-white rounded-2xl p-8 border border-slate-200">
+            <h2 className="text-xl font-bold text-slate-900 mb-3">Institutional Governance</h2>
+            <p className="text-base text-slate-700 leading-relaxed mb-4">
+              Elevate for Humanity Career &amp; Technical Institute operates under 2Exclusive LLC-S and coordinates apprenticeship sponsorship, instruction, and partner training sites under formal agreements and applicable regulatory standards.
+            </p>
+            <dl className="grid sm:grid-cols-3 gap-4 text-sm">
+              <div>
+                <dt className="font-semibold text-slate-500 uppercase tracking-wide text-xs">Legal Entity</dt>
+                <dd className="text-slate-900 font-medium mt-1">2Exclusive LLC-S</dd>
+              </div>
+              <div>
+                <dt className="font-semibold text-slate-500 uppercase tracking-wide text-xs">DBA</dt>
+                <dd className="text-slate-900 font-medium mt-1">Elevate for Humanity Career &amp; Technical Institute</dd>
+              </div>
+              <div>
+                <dt className="font-semibold text-slate-500 uppercase tracking-wide text-xs">Role</dt>
+                <dd className="text-slate-900 font-medium mt-1">Registered Apprenticeship Sponsor, Training Provider, Workforce Intermediary</dd>
+              </div>
+            </dl>
+            <div className="mt-4">
+              <Link href="/governance" className="text-brand-red-600 font-semibold text-sm hover:underline">
+                View full Governance &amp; Program Structure →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* State & Workforce Approvals */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">

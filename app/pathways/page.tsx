@@ -202,16 +202,14 @@ export default function PathwaysPage() {
           </h1>
           <div className="prose prose-lg max-w-none text-gray-700 space-y-4">
             <p>
-              Elevate for Humanity is a career pathway workforce institute based in Indianapolis, Indiana.
-              We do not just offer training programs — we operate a structured system that takes you from
-              where you are today to a credential, a job, and a career.
+              Elevate for Humanity Career &amp; Technical Institute is a centralized apprenticeship sponsor and workforce training provider based in Indianapolis, Indiana, operating under 2Exclusive LLC-S.
+              The institute coordinates related technical instruction, apprenticeship sponsorship, and licensed employer training sites under a unified governance structure.
             </p>
             <p>
-              That system has five stages: eligibility screening, cohort-based training, industry
-              credentialing, apprenticeship or job placement, and ongoing advancement support. Every
-              program we run follows this same structure. Whether you are training to become a CNA, a
+              Programs follow a five-stage pathway: eligibility screening, cohort-based training, industry
+              credentialing, apprenticeship or job placement, and ongoing advancement support. Whether you are training to become a CNA, a
               CDL driver, a licensed barber, an HVAC technician, or a cybersecurity analyst — the
-              pathway is the same.
+              pathway structure is the same.
             </p>
             <p>
               Many of our programs are available at no cost to eligible participants through

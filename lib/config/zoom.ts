@@ -1,7 +1,20 @@
 /**
  * Central Zoom configuration.
- * Update ZOOM_MEETING_URL with your real Zoom meeting link.
- * All pages that reference Zoom pull from here.
+ * Meetings are created dynamically via the Server-to-Server OAuth API
+ * (lib/integrations/zoom.ts). This file provides a helper and a
+ * configuration check for pages that need Zoom.
  */
-export const ZOOM_MEETING_URL = 'https://us06web.zoom.us/j/87654321098';
-export const ZOOM_MEETING_ID = '876 5432 1098';
+
+// Re-export the meeting creator so consumers can import from one place
+export { createZoomMeeting } from '@/lib/integrations/zoom';
+
+/**
+ * Whether the Zoom API is configured (all required env vars present).
+ */
+export function isZoomConfigured(): boolean {
+  return !!(
+    process.env.ZOOM_ACCOUNT_ID &&
+    process.env.ZOOM_CLIENT_ID &&
+    process.env.ZOOM_CLIENT_SECRET
+  );
+}

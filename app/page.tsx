@@ -30,11 +30,11 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto px-6 text-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-[1.08]">
             Your New Career Starts Here.
-            <span className="block text-brand-red-400 mt-1">No Tuition. No Debt.</span>
+            <span className="block text-brand-red-400 mt-1">Funded Training. Real Careers.</span>
           </h1>
           <p className="text-base sm:text-lg text-slate-300 mt-4 leading-relaxed max-w-2xl mx-auto">
-            Free career training in healthcare, skilled trades, CDL, and technology.
-            Funded by WIOA for eligible Indiana residents.
+            Career training in healthcare, skilled trades, CDL, and technology.
+            Many programs available at no cost to eligible Indiana residents through WIOA and state funding.
           </p>
           <div className="flex flex-wrap justify-center gap-3 mt-6">
             <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3.5 rounded-lg text-base sm:text-lg transition-all shadow-lg shadow-brand-red-600/30">
@@ -123,14 +123,49 @@ export default function HomePage() {
       </section>
       </InView>
 
+      {/* ===== INSTITUTIONAL GOVERNANCE ===== */}
+      <InView animation="fade-up">
+      <section aria-label="About the institute" className="py-10 sm:py-14 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-4xl mx-auto px-6">
+          <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">About the Institute</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">A Centralized Workforce Development &amp; Apprenticeship Sponsor</h2>
+          <p className="text-lg text-slate-700 leading-relaxed mb-6">
+            Elevate for Humanity Career &amp; Technical Institute, a program of 2Exclusive LLC-S, operates as a centralized workforce development and Registered Apprenticeship sponsor organization. The institute provides related technical instruction (RTI), apprenticeship sponsorship, workforce-funded career pathway enrollment, and coordination with licensed employer training sites under a unified governance and compliance structure.
+          </p>
+          <p className="text-base text-slate-600 leading-relaxed mb-6">
+            Apprentices receive structured instruction through the institute while completing supervised on-the-job training at sponsor-approved licensed partner locations in accordance with state and federal apprenticeship standards.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-6 mt-8">
+            <div className="bg-white rounded-lg p-5 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-2">Related Technical Instruction</h3>
+              <p className="text-sm text-slate-600">Delivered by the institute through structured curriculum and learning systems.</p>
+            </div>
+            <div className="bg-white rounded-lg p-5 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-2">On-the-Job Training</h3>
+              <p className="text-sm text-slate-600">Delivered at licensed employer partner locations operating under formal training agreements.</p>
+            </div>
+            <div className="bg-white rounded-lg p-5 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-2">Oversight &amp; Compliance</h3>
+              <p className="text-sm text-slate-600">Managed by the Sponsor including standards, hour tracking, apprentice registration, and regulatory reporting.</p>
+            </div>
+          </div>
+          <div className="mt-6">
+            <Link href="/governance" className="text-brand-red-600 font-semibold hover:underline text-sm">
+              View Governance &amp; Program Structure →
+            </Link>
+          </div>
+        </div>
+      </section>
+      </InView>
+
       {/* ===== FUNDING ===== */}
       <InView animation="fade-up">
       <section aria-label="Funding options" className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <p className="text-brand-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Funding Available</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">100% Tuition-Free Programs</h2>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Funded Training Programs</h2>
           <p className="text-lg text-slate-700 mb-8">
-            Most programs are fully funded through WIOA, WRG, and JRI. No tuition, no fees, no debt.
+            Many programs are available at no cost to eligible participants through WIOA, WRG, and JRI. Platform access fees may apply depending on funding source and enrollment type.
           </p>
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[

@@ -8,49 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-
-// Zoom integration helper
-async function createZoomMeeting(topic: string, start: string) {
-  const ZOOM_API_KEY = process.env.ZOOM_API_KEY;
-  const ZOOM_API_SECRET = process.env.ZOOM_API_SECRET;
-
-  if (!ZOOM_API_KEY || !ZOOM_API_SECRET) {
-    throw new Error('Zoom credentials not configured');
-  }
-
-  const token = Buffer.from(`${ZOOM_API_KEY}:${ZOOM_API_SECRET}`).toString(
-    'base64'
-  );
-
-  const res = await fetch('https://api.zoom.us/v2/users/me/meetings', {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      topic,
-      type: 2,
-      start_time: start,
-      timezone: 'America/New_York',
-      duration: 60,
-      settings: {
-        host_video: true,
-        participant_video: true,
-        join_before_host: false,
-        mute_upon_entry: true,
-        waiting_room: true,
-      },
-    }),
-  });
-
-  if (!res.ok) {
-    const error = await res.text();
-    throw new Error(`Zoom API error: ${error}`);
-  }
-
-  return res.json();
-}
+import { createZoomMeeting } from '@/lib/integrations/zoom';
 
 export async function POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
@@ -96,12 +54,23 @@ export async function POST(req: Request) {
     let joinUrl = '';
 
     if (provider === 'zoom') {
-      const zoom = await createZoomMeeting(topic, start);
+      const zoom = await createZoomMeeting({
+        topic,
+        startTime: start,
+        duration: durationMinutes,
+        settings: {
+          host_video: true,
+          participant_video: true,
+          join_before_host: false,
+          mute_upon_entry: true,
+          waiting_room: true,
+          auto_recording: 'cloud',
+        },
+      });
       joinUrl = zoom.join_url;
     } else if (provider === 'teams') {
-      // Teams integration would go here
-      // For now, use a Content
-      joinUrl = 'https://teams.microsoft.com/l/meetup-join/Content';
+      // Teams meeting creation requires Graph API — not yet configured
+      throw new Error('Teams meeting creation not yet configured');
     }
 
     const { data: meeting, error } = await db

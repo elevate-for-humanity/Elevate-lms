@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Mail, Phone, MapPin, Clock, Send, AlertCircle, Loader2 } from 'lucide-react';
 import Turnstile from '@/components/Turnstile';
-import { ZOOM_MEETING_URL } from '@/lib/config/zoom';
+
 
 import FeedbackWidget from '@/components/FeedbackWidget';
 
@@ -262,7 +262,7 @@ export default function ContactPage() {
               </p>
 
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
                   const fd = new FormData(e.currentTarget);
                   const date = fd.get('meetingDate') as string;
@@ -273,14 +273,29 @@ export default function ContactPage() {
 
                   if (!date || !time || !name || !email) return;
 
-                  // Build Google Calendar event URL
-                  const startDT = `${date.replace(/-/g, '')}T${time.replace(':', '')}00`;
-                  const endH = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
-                  const endDT = `${date.replace(/-/g, '')}T${endH}${time.split(':')[1]}00`;
-                  const details = `Meeting with ${name} (${email})%0A%0ATopic: ${encodeURIComponent(topic || 'General inquiry')}%0A%0AZoom Link: ${ZOOM_MEETING_URL}`;
-                  const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Elevate for Humanity — Meeting')}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)},${encodeURIComponent('info@elevateforhumanity.org')}&location=Zoom`;
+                  // Create real Zoom meeting via API
+                  try {
+                    const res = await fetch('/api/schedule-consultation', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        name, email, appointment_type: topic || 'General inquiry',
+                        appointment_date: date, appointment_time: time,
+                      }),
+                    });
+                    const data = await res.json();
+                    const zoomLink = data.meetingUrl || '';
 
-                  window.open(calUrl, '_blank');
+                    const startDT = `${date.replace(/-/g, '')}T${time.replace(':', '')}00`;
+                    const endH = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
+                    const endDT = `${date.replace(/-/g, '')}T${endH}${time.split(':')[1]}00`;
+                    const details = `Meeting with ${name} (${email})%0A%0ATopic: ${encodeURIComponent(topic || 'General inquiry')}%0A%0AZoom Link: ${zoomLink}`;
+                    const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Elevate for Humanity — Meeting')}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)},${encodeURIComponent('info@elevateforhumanity.org')}&location=Zoom`;
+
+                    window.open(calUrl, '_blank');
+                  } catch {
+                    alert('Failed to schedule meeting. Please call (317) 314-3757.');
+                  }
                 }}
                 className="space-y-4"
               >
@@ -347,17 +362,11 @@ export default function ContactPage() {
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
               <h3 className="font-semibold text-gray-900 mb-2">Virtual Meetings via Zoom</h3>
               <p className="text-gray-600 mb-4">
-                All scheduled meetings include a Zoom link. You can also join our open office hours for quick questions without an appointment.
+                All scheduled meetings include a unique Zoom link sent to your email. Use the form above to book a meeting and you will receive your personal Zoom link automatically.
               </p>
-              <a
-                href={ZOOM_MEETING_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3l4 3V6l-4 3V5a2 2 0 0 0-2-2H4zm0 2h10v10H4V5z"/></svg>
-                Join Zoom Meeting
-              </a>
+              <p className="text-gray-500 text-sm">
+                Questions? Call <a href="tel:+13173143757" className="text-brand-blue-600 font-medium hover:underline">(317) 314-3757</a>
+              </p>
             </div>
 
             {/* Campus Info */}

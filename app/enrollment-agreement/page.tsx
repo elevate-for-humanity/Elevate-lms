@@ -42,7 +42,7 @@ export default function EnrollmentAgreementPage() {
         <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-8">
           <p className="text-gray-700">
             This document outlines the terms of enrollment between you (the "Student") and 
-            Elevate for Humanity, Inc. (the "School"). 
+            2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute (the "School"). 
             By enrolling in a program, you agree to these terms.
           </p>
         </div>
@@ -52,7 +52,7 @@ export default function EnrollmentAgreementPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Parties to This Agreement</h2>
           <div className="bg-gray-50 rounded-lg p-6">
             <p className="text-gray-700 mb-4"><strong>School:</strong></p>
-            <p className="text-gray-700 mb-1">Elevate for Humanity, Inc.</p>
+            <p className="text-gray-700 mb-1">2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute</p>
             <p className="text-gray-700 mb-1">8888 Keystone Crossing, Suite 1300</p>
             <p className="text-gray-700 mb-1">Indianapolis, IN 46240</p>
             <p className="text-gray-700 mb-4">Get Help Online</p>

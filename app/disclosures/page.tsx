@@ -91,7 +91,7 @@ export default function DisclosuresPage() {
               </div>
               <div className="p-6">
                 <div className="space-y-3 text-gray-700">
-                  <p><span className="font-semibold text-gray-900">Legal Name:</span> Elevate for Humanity, Inc.</p>
+                  <p><span className="font-semibold text-gray-900">Legal Name:</span> 2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute</p>
                   <p><span className="font-semibold text-gray-900">Location:</span> Indianapolis, Indiana</p>
                   <p><span className="font-semibold text-gray-900">Phone:</span> Get Help Online</p>
                   <p><span className="font-semibold text-gray-900">Email:</span> our contact form</p>

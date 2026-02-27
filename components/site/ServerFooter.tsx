@@ -151,7 +151,7 @@ export default function ServerFooter() {
                 className="w-7 h-7"
               />
               <p className="text-slate-400 text-sm">
-                © {new Date().getFullYear()} Elevate for Humanity, Inc. All rights reserved.
+                © {new Date().getFullYear()} 2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Technical Institute. Registered Apprenticeship Sponsor and Workforce Training Provider.
               </p>
             </div>
             
@@ -193,7 +193,7 @@ export default function ServerFooter() {
             {/* Legal Disclaimer */}
             <div className="mt-6 pt-6 border-t border-slate-800">
               <p className="text-[10px] leading-relaxed text-slate-500 max-w-4xl mx-auto text-center">
-                Elevate for Humanity Career & Technical Institute is a workforce training provider. Programs are not institutionally accredited degree programs. Certification outcomes are issued by the respective certifying organizations upon successful completion of required examinations. Elevate for Humanity Career & Technical Institute provides training, preparation, and authorized proctored testing access but does not independently issue federal or state licenses. Financial aid through federal student aid (FAFSA, Pell Grants, and federal loans) is not currently offered. Students may utilize workforce funding programs, grants, employer sponsorships, or self-pay enrollment options where eligible.
+                2Exclusive LLC-S d/b/a Elevate for Humanity Career &amp; Technical Institute is a workforce training provider and USDOL Registered Apprenticeship Sponsor. Programs are not institutionally accredited degree programs. Certification outcomes are issued by the respective certifying organizations upon successful completion of required examinations. Training preparation and authorized proctored testing access are provided; federal or state licenses are not independently issued. Financial aid through federal student aid (FAFSA, Pell Grants, and federal loans) is not currently offered. Training may be funded through WIOA, WRG, JRI, employer sponsorships, or other workforce programs for eligible participants. Platform access fees may apply depending on funding source and enrollment type.
               </p>
             </div>
           </div>

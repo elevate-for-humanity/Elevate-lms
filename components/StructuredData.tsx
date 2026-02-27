@@ -5,7 +5,7 @@ export default function StructuredData() {
     '@type': ['EducationalOrganization', 'LocalBusiness'],
     '@id': 'https://www.elevateforhumanity.org/#organization',
     name: 'Elevate for Humanity',
-    legalName: 'Elevate for Humanity, Inc.',
+    legalName: '2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute',
     alternateName: 'Elevate 4 Humanity',
     url: 'https://www.elevateforhumanity.org',
     logo: {

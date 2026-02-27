@@ -100,6 +100,10 @@ export const NAV_ITEMS = [
       { name: 'Partner With Us', href: '/partnerships' },
       { name: 'Apprenticeship Sponsors', href: '/funding/dol' },
       { name: 'Employer Portal', href: '/apply/employer' },
+      { name: '— Portals —', href: '/partners', isHeader: true },
+      { name: 'Program Holder Portal', href: '/program-holder' },
+      { name: 'Partner Portal', href: '/partner-portal' },
+      { name: 'Partner Barbershop', href: '/partners/barber-shop' },
     ]
   },
   { 

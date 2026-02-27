@@ -48,11 +48,12 @@ const footerLinks = {
   ],
   access: [
     { name: 'Student Portal', href: '/login' },
-    { name: 'Partner Portal', href: '/partner/login' },
+    { name: 'Program Holder Portal', href: '/program-holder' },
+    { name: 'Partner Portal', href: '/partner-portal' },
+    { name: 'Partner Barbershop', href: '/partners/barber-shop' },
     { name: 'Partnerships', href: '/partnerships' },
     { name: 'Support', href: '/support' },
     { name: 'FAQ', href: '/faq' },
-    { name: 'Site Map', href: '/site-map' },
   ],
   legal: [
     { name: 'Terms of Service', href: '/terms-of-service' },

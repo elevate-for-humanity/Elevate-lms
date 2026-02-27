@@ -15,10 +15,9 @@
 
 ## What This Is
 
-Elevate for Humanity operates a vertically integrated **Workforce Operating System** designed to deliver funded training, manage compliance, and track employment outcomes across multiple stakeholders.
+Elevate for Humanity operates a vertically integrated **Workforce Operating System** with a full LMS built in. The platform handles the entire lifecycle — enrollment, course delivery, quizzes, grading, certificates, attendance, progress tracking, SCORM, and AI tutoring — while also managing government funding, compliance reporting, employer partnerships, and employment outcomes.
 
-**This platform is not a general-purpose LMS.**  
-It is a managed workforce infrastructure that unifies enrollment, learning delivery, funding workflows, and reporting into a single system.
+The LMS is not a bolt-on. It is integrated end-to-end with 80+ learner pages, 30+ course API routes, and dedicated portals for students, instructors, employers, partners, program holders, staff, apprentices, and workforce boards.
 
 ### Delivery Models
 
@@ -31,23 +30,35 @@ It is a managed workforce infrastructure that unifies enrollment, learning deliv
 
 ## Platform Capabilities
 
-| Capability | Generic LMS | Elevate Workforce OS |
-|------------|-------------|---------------------|
-| Course delivery | ✅ | ✅ |
-| Multi-stakeholder portals | ❌ | ✅ 7 portals |
-| Enrollment + approvals + waitlists | ❌ | ✅ Built-in |
-| Government funding integration | ❌ | ✅ WIOA, WRG, JRI |
-| Compliance reporting | Basic | ✅ Automated DOL/DWD |
-| Employer partnerships | ❌ | ✅ Built-in |
-| Employment outcome tracking | ❌ | ✅ End-to-end |
-| Apprenticeship management | ❌ | ✅ RAPIDS registered |
+### Integrated LMS
+| Feature | Details |
+|---------|---------|
+| Course delivery | Courses, lessons, modules, SCORM packages |
+| Quizzes + grading | Quiz builder, gradebook, auto-grading |
+| Assignments | Submission, review, peer review |
+| Progress tracking | Per-lesson, per-course, learning paths |
+| Certificates | Issue, verify, bulk generate |
+| Attendance | Clock-in, instructor record, export |
+| AI tutor | Adaptive learning, recommendations |
+| Forums + social | Discussion boards, study groups, messaging |
+
+### Workforce Management (beyond LMS)
+| Capability | Details |
+|------------|---------|
+| Multi-stakeholder portals | 8+ portals (student, instructor, employer, partner, program holder, staff, apprentice, workforce board) |
+| Enrollment + approvals + waitlists | End-to-end enrollment pipeline |
+| Government funding | WIOA, WRG, JRI integration |
+| Compliance reporting | Automated DOL/DWD reporting |
+| Employer partnerships | Hiring pipeline, WOTC, job posting |
+| Employment outcome tracking | Placement through retention |
+| Apprenticeship management | RAPIDS registered, hour logging, state board prep |
+| Marketplace | Course marketplace with creator payouts |
 
 ---
 
 ## Category Statement
 
-> Elevate for Humanity is a Workforce Operating System — a managed, AI-assisted platform that automates funded enrollment, training delivery, compliance, and employment outcomes.  
-> **It includes an LMS. It is not an LMS.**
+> Elevate for Humanity is a Workforce Operating System with a fully integrated LMS. The platform manages the complete pipeline — from funded enrollment and course delivery through compliance reporting and employment outcomes — in a single system.
 
 ---
 

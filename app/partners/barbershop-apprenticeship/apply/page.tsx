@@ -4,13 +4,44 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, AlertCircle, Download } from 'lucide-react';
+import Image from 'next/image';
+import {
+  ArrowLeft, Loader2, AlertCircle, Download,
+  BookOpen, FileText, ClipboardCheck, ShieldCheck, ArrowRight,
+} from 'lucide-react';
 
 const employmentModels = [
   { value: 'hourly', label: 'Hourly Wage' },
   { value: 'commission', label: 'Commission' },
   { value: 'hybrid', label: 'Hybrid (Wage + Commission)' },
   { value: 'not_sure', label: 'Not Sure Yet' },
+];
+
+const partnerSteps = [
+  {
+    label: 'Read the Partner Handbook',
+    description: 'Understand your responsibilities, policies, and guidelines.',
+    href: '/partners/barbershop-apprenticeship/handbook',
+    icon: BookOpen,
+  },
+  {
+    label: 'Review Required Forms',
+    description: 'See all documents needed before hosting apprentices.',
+    href: '/partners/barbershop-apprenticeship/forms',
+    icon: FileText,
+  },
+  {
+    label: 'Sign the MOU',
+    description: 'Digitally sign the Memorandum of Understanding.',
+    href: '/partners/barbershop-apprenticeship/sign-mou',
+    icon: ClipboardCheck,
+  },
+  {
+    label: 'Acknowledge Policies',
+    description: 'Review and acknowledge all program policies.',
+    href: '/partners/barbershop-apprenticeship/policy-acknowledgment',
+    icon: ShieldCheck,
+  },
 ];
 
 export default function BarbershopPartnerApplyPage() {
@@ -81,21 +112,58 @@ export default function BarbershopPartnerApplyPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Partners", href: "/partners" }, { label: "Apply" }]} />
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: 'Partners', href: '/partners' }, { label: 'Barbershop', href: '/partners/barbershop-apprenticeship' }, { label: 'Apply' }]} />
       </div>
-<section className="bg-slate-800 text-white py-12">
-        <div className="max-w-3xl mx-auto px-4">
-          <Link href="/partners/barbershop-apprenticeship" className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-6">
+
+      {/* Hero */}
+      <section className="relative py-12 overflow-hidden">
+        <Image
+          src="/images/programs-hq/barber-hero.jpg"
+          alt="Barbershop partner application"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-white/40" />
+        <div className="relative max-w-5xl mx-auto px-4">
+          <Link href="/partners/barbershop-apprenticeship" className="inline-flex items-center gap-1 text-gray-600 hover:text-brand-blue-700 text-sm mb-4">
             <ArrowLeft className="w-4 h-4" /> Back to Partner Information
           </Link>
-          <h1 className="text-3xl font-bold mb-3">Barbershop Partner Application</h1>
-          <p className="text-slate-300">Complete this form to apply as a worksite partner for the Indiana Barber Apprenticeship program.</p>
+          <h1 className="text-3xl font-black text-gray-900 mb-2">Barbershop Partner Application</h1>
+          <p className="text-gray-700">Complete this form to apply as a worksite partner for the Indiana Barber Apprenticeship program.</p>
         </div>
       </section>
 
-      <section className="py-12">
-        <div className="max-w-3xl mx-auto px-4">
+      <section className="py-10">
+        <div className="max-w-5xl mx-auto px-4">
+          {/* Before You Apply checklist */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
+            <h2 className="text-lg font-bold text-gray-900 mb-1">Before You Apply</h2>
+            <p className="text-sm text-gray-500 mb-5">Complete these steps first so you&apos;re ready to submit.</p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {partnerSteps.map((step) => (
+                <Link
+                  key={step.href}
+                  href={step.href}
+                  className="group flex flex-col gap-3 p-4 rounded-lg border border-gray-200 hover:border-brand-blue-300 hover:bg-brand-blue-50/50 transition-colors"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-brand-blue-50 text-brand-blue-600 flex items-center justify-center group-hover:bg-brand-blue-100 transition-colors">
+                    <step.icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-semibold text-gray-900 group-hover:text-brand-blue-700 transition-colors flex items-center gap-1">
+                      {step.label}
+                      <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </span>
+                    <p className="text-xs text-gray-500 mt-0.5">{step.description}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
           {error && (
             <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />

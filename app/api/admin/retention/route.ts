@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { enforceDocumentRetention } from '@/lib/retention/document-retention';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -21,7 +22,7 @@ export const maxDuration = 60;
  *   dryRun: boolean  — preview what would be deleted without deleting (default: false)
  *   batchSize: number — max documents to process per run (default: 50, max: 200)
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
  *
  * Returns the current retention policy configuration. Super_admin only.
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -110,3 +111,5 @@ export async function GET(request: NextRequest) {
     note: 'WIOA requires 3-year retention from program exit. Default is 1095 days.',
   });
 }
+export const GET = withApiAudit('/api/admin/retention', _GET);
+export const POST = withApiAudit('/api/admin/retention', _POST);

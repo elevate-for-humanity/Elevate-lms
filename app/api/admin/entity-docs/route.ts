@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,7 +12,7 @@ export const dynamic = 'force-dynamic';
  * Get all documents for a user/entity and their verification status.
  * Used by the admin verification drawer to show entity-level doc checklist.
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -174,3 +175,4 @@ async function getEntityStatus(
     return null;
   }
 }
+export const GET = withApiAudit('/api/admin/entity-docs', _GET);

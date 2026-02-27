@@ -7,9 +7,10 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Submit a review
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
 }
 
 // Add a comment to PR
-export async function PUT(req: NextRequest) {
+async function _PUT(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -124,3 +125,5 @@ const userToken = req.headers.get('x-gh-token');
     );
   }
 }
+export const POST = withApiAudit('/api/github/pulls/review', _POST);
+export const PUT = withApiAudit('/api/github/pulls/review', _PUT);

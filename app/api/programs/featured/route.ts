@@ -10,8 +10,9 @@ import { createSupabaseClient } from "@/lib/supabase-api";
 import { cacheGet, cacheSet } from '@/lib/cache';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(_req: NextRequest) {
+async function _GET(_req: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -41,3 +42,4 @@ const supabase = createSupabaseClient();
 
   return NextResponse.json({ programs: data, cached: false });
 }
+export const GET = withApiAudit('/api/programs/featured', _GET);

@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const getOpenAI = () => new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -14,7 +15,7 @@ const getOpenAI = () => new OpenAI({
 // Since we can't run actual language servers in the browser,
 // we use AI to provide similar functionality
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -224,3 +225,4 @@ Only include real issues, not style preferences.`;
     return NextResponse.json({ diagnostics: [] });
   }
 }
+export const POST = withApiAudit('/api/studio/lsp', _POST);

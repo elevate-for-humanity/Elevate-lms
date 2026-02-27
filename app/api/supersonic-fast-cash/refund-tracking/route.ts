@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -62,7 +63,7 @@ function jsonResponse(body: Record<string, unknown>, status: number) {
  * POST: Look up return status by public tracking code.
  * Reads ONLY from sfc_tax_return_public_status view — never from sfc_tax_returns.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -152,3 +153,4 @@ export async function POST(request: NextRequest) {
 }
 
 // GET handler removed — tracking codes must be submitted via POST body, never in URL params
+export const POST = withApiAudit('/api/supersonic-fast-cash/refund-tracking', _POST);

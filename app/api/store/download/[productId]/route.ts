@@ -9,6 +9,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { generateSignedDownloadUrl, isStorageConfigured, getProductFileInfo, getPublicFallbackUrl } from '@/lib/storage/file-storage';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Download digital product
@@ -95,7 +96,7 @@ async function logDownload(
 /**
  * Handle download request
  */
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ productId: string }> }
 ) {
@@ -180,3 +181,4 @@ export async function GET(
     );
   }
 }
+export const GET = withApiAudit('/api/store/download/[productId]', _GET);

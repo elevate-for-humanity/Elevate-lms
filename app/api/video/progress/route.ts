@@ -8,8 +8,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -43,7 +44,7 @@ const supabase = await createClient();
   return NextResponse.json({ progress: data || null });
 }
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -89,3 +90,5 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ success: true, progress: data });
 }
+export const GET = withApiAudit('/api/video/progress', _GET);
+export const POST = withApiAudit('/api/video/progress', _POST);

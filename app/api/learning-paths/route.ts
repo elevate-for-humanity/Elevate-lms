@@ -8,12 +8,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function parseBody<T>(request: NextRequest): Promise<T> {
   return request.json() as Promise<T>;
 }
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -32,7 +33,7 @@ const supabase = getSupabaseServerClient();
   return NextResponse.json(data);
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -64,3 +65,5 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json(data);
 }
+export const GET = withApiAudit('/api/learning-paths', _GET);
+export const POST = withApiAudit('/api/learning-paths', _POST);

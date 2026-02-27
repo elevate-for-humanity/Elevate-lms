@@ -7,6 +7,7 @@ import { toErrorMessage } from '@/lib/safe';
 import { cloudflareStream } from '@/server/cloudflare-stream';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * AI Video Generation API
@@ -18,7 +19,7 @@ import { requireAuth } from '@/lib/api/requireAuth';
  * 4. Optional: Synthesia integration (premium)
  */
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -203,3 +204,4 @@ function getBackgroundForStyle(style: string): string {
 //   const data = await response.json();
 //   return data.download;
 // }
+export const POST = withApiAudit('/api/ai-studio/generate-video', _POST);

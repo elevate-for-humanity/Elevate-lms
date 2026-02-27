@@ -9,8 +9,9 @@ import { getOpenAIClient, isOpenAIConfigured } from '@/lib/openai-client';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -98,3 +99,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/ai/tutor', _POST);

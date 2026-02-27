@@ -2,9 +2,10 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getFeaturedForAudience } from '@/lib/store/db';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 // AUTH: Intentionally public — no authentication required
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -20,3 +21,4 @@ const searchParams = request.nextUrl.searchParams;
     return NextResponse.json({ results: [], error: 'Failed to fetch featured items' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/search/featured', _GET);

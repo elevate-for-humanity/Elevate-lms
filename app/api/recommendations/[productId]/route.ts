@@ -2,9 +2,10 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getRecommendations, getAvatarSalesMessage } from '@/lib/store/db';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 // AUTH: Intentionally public — no authentication required
 
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ productId: string }> }
 ) {
@@ -32,3 +33,4 @@ const { productId } = await params;
     }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/recommendations/[productId]', _GET);

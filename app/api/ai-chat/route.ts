@@ -7,10 +7,11 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -204,3 +205,4 @@ You are the Elevate for Humanity AI Assistant - a warm, helpful guide for prospe
     });
   }
 }
+export const POST = withApiAudit('/api/ai-chat', _POST);

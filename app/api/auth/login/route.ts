@@ -3,8 +3,9 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { rateLimitNew as rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rateLimit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -65,3 +66,5 @@ return NextResponse.json(
     { status: 405 }
   );
 }
+export const GET = withApiAudit('/api/auth/login', _GET);
+export const POST = withApiAudit('/api/auth/login', _POST);

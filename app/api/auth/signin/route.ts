@@ -10,8 +10,9 @@ import { createClient } from '@/lib/supabase/server';
 import { withRateLimit } from '@/lib/api/with-rate-limit';
 import { authRateLimit } from '@/lib/rate-limit';
 import { signInSchema } from '@/lib/api/validation-schemas';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export const POST = withRateLimit(
+const _POST = withRateLimit(
   withErrorHandling(async (request: NextRequest) => {
     const supabase = await createClient();
     
@@ -60,3 +61,4 @@ export const POST = withRateLimit(
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
+export const POST = withApiAudit('/api/auth/signin', _POST);

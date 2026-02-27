@@ -6,6 +6,7 @@ import { getOpenAIClient } from '@/lib/openai-client';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // System prompt for the AI receptionist
 const RECEPTIONIST_PROMPT = `You are the AI receptionist for Elevate for Humanity, a workforce development organization in Indiana.
@@ -37,7 +38,7 @@ If asked about:
 - Hours/Location → Say we're online 24/7, training sites across Indiana
 - Specific questions → Answer briefly, offer to connect with specialist`;
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -165,3 +166,4 @@ function getFallbackResponse(message: string): string {
   // Default response
   return 'Thanks for reaching out! I can help you with information about our programs, applying, funding, or connecting you with our team. What would you like to know? Or, I can transfer you to a specialist - just let me know!';
 }
+export const POST = withApiAudit('/api/receptionist', _POST);

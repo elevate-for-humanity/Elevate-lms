@@ -15,6 +15,7 @@ import { logger } from '@/lib/logger';
 import { sendEmail } from '@/lib/email/resend';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // CORS preflight for cross-origin form submissions
 export async function OPTIONS() {
@@ -35,7 +36,7 @@ const corsHeaders = {
 };
 
 // Public endpoint — anonymous application submissions
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -399,3 +400,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/applications', _POST);

@@ -4,8 +4,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { preparerService } from '@/lib/franchise/preparer-service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ preparerId: string }> }
 ) {
@@ -69,3 +70,4 @@ export async function GET(
     );
   }
 }
+export const GET = withApiAudit('/api/franchise/preparers/[preparerId]/stats', _GET);

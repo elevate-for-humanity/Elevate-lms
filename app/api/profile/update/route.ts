@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     const db = createAdminClient() || supabase;
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const supabase = await createClient();
     const db = createAdminClient() || supabase;
@@ -72,3 +73,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/profile/update', _GET);
+export const POST = withApiAudit('/api/profile/update', _POST);

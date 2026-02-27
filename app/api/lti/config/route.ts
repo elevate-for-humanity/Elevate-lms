@@ -5,8 +5,9 @@ export const maxDuration = 60;
 // app/api/lti/config/route.ts
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -38,3 +39,4 @@ const toolUrl = process.env.LTI_TOOL_URL || 'https://www.elevateforhumanity.org'
 
   return NextResponse.json(config);
 }
+export const GET = withApiAudit('/api/lti/config', _GET);

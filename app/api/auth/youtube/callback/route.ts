@@ -6,12 +6,13 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * YouTube/Google OAuth Callback
  * Exchanges code for access token and stores in database
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -107,3 +108,4 @@ const searchParams = request.nextUrl.searchParams;
     );
   }
 }
+export const GET = withApiAudit('/api/auth/youtube/callback', _GET);

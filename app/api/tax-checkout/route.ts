@@ -6,6 +6,7 @@ import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const DIY_SERVICES = {
   review: {
@@ -26,7 +27,7 @@ const DIY_SERVICES = {
   },
 };
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -85,3 +86,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/tax-checkout', _POST);

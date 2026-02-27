@@ -6,8 +6,9 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   _: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -78,3 +79,4 @@ export async function GET(
     );
   }
 }
+export const GET = withApiAudit('/api/recaps/[id]', _GET);

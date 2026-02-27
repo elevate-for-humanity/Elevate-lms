@@ -10,6 +10,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -17,7 +18,7 @@ function getResend() {
   return new Resend(key);
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
@@ -97,3 +98,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/partner-inquiry', _POST);

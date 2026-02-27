@@ -6,8 +6,9 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createRouteHandlerClient } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -62,3 +63,4 @@ const { id } = await params;
 
   return Response.json(ph);
 }
+export const GET = withApiAudit('/api/admin/program-holders/[id]', _GET);

@@ -9,9 +9,10 @@ import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/hr/leave-requests?employee_id=&status=
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/hr/leave-requests
 // Body: { employee_id, policy_id, start_date, end_date, total_hours, reason }
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -121,3 +122,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/hr/leave-requests', _GET);
+export const POST = withApiAudit('/api/hr/leave-requests', _POST);

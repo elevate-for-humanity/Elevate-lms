@@ -10,6 +10,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 interface ProductInput {
   title: string;
@@ -19,7 +20,7 @@ interface ProductInput {
   demo: { enabled: boolean; url: string };
 }
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -106,3 +107,4 @@ async function createStripeProduct(product: ProductInput) {
 
   return stripeProduct;
 }
+export const POST = withApiAudit('/api/store/publish', _POST);

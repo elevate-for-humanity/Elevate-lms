@@ -11,6 +11,7 @@ import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Lazy-load OpenAI client to prevent build-time errors
 function getOpenAI() {
@@ -21,7 +22,7 @@ function getOpenAI() {
   return new OpenAI({ apiKey });
 }
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -155,3 +156,4 @@ Focus on workforce, community impact, and elevation if applicable.
     );
   }
 }
+export const POST = withApiAudit('/api/grants/draft', _POST);

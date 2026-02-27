@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getRoutingRecommendations, assignToShop } from '@/lib/automation/shop-routing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +12,7 @@ export const dynamic = 'force-dynamic';
  * POST /api/automation/routing
  * Get routing recommendations or assign to shop
  */
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -65,3 +66,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/automation/routing', _POST);

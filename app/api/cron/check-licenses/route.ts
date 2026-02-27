@@ -13,11 +13,12 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   // Verify cron secret (for security)
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
@@ -189,3 +190,4 @@ async function sendExpiryWarningEmail(email: string, companyName: string, expire
     logger.error('Failed to send expiry warning email:', error);
   }
 }
+export const GET = withApiAudit('/api/cron/check-licenses', _GET);

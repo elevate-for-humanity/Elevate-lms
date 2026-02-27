@@ -6,11 +6,12 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * POST /api/ferpa/reports — Generate a FERPA compliance report
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -110,3 +111,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Report generation failed' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/ferpa/reports', _POST);

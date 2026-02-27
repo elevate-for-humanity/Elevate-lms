@@ -7,8 +7,9 @@ import { requireAdmin } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -73,3 +74,5 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ data });
 }
+export const GET = withApiAudit('/api/admin/crm/appointments', _GET);
+export const POST = withApiAudit('/api/admin/crm/appointments', _POST);

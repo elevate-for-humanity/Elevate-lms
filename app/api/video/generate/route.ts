@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { generateCourseVideo, getAvailableServices } from '@/lib/video/generate';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 interface Scene {
   id: string;
@@ -37,7 +38,7 @@ interface VideoRequest {
  * 1. Course video with AI instructor voiceover (courseName, lessonTitle, etc.)
  * 2. Scene-based video generation (scenes array)
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
@@ -197,7 +198,7 @@ async function handleSceneVideoGeneration(body: VideoRequest) {
 /**
  * Get video generation status
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -218,3 +219,5 @@ const { searchParams } = new URL(request.url);
     { status: 404 }
   );
 }
+export const GET = withApiAudit('/api/video/generate', _GET);
+export const POST = withApiAudit('/api/video/generate', _POST);

@@ -7,8 +7,9 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { generateCertificatePDF } from '@/lib/certificates/generator';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   request: Request,
   { params }: { params: Promise<{ certificateId: string }> }
 ) {
@@ -63,3 +64,4 @@ export async function GET(
     );
   }
 }
+export const GET = withApiAudit('/api/certificates/[certificateId]/download', _GET);

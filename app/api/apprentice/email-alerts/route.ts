@@ -6,8 +6,9 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
 }
 
 // Cron endpoint to check for missed check-ins
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -138,3 +139,5 @@ const supabase = await createClient();
 
   return NextResponse.json({ alertsSent });
 }
+export const GET = withApiAudit('/api/apprentice/email-alerts', _GET);
+export const POST = withApiAudit('/api/apprentice/email-alerts', _POST);

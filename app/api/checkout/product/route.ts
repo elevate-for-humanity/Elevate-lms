@@ -6,8 +6,9 @@ import { stripe } from '@/lib/stripe/client';
 import { toError, toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
     const auth = await requireAuth(req);
@@ -50,3 +51,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/checkout/product', _POST);

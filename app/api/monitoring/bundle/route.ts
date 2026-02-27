@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -44,7 +45,7 @@ async function safeQuery(supabase: any, table: string, select = '*', options?: {
   }
 }
 
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -180,3 +181,4 @@ export async function GET(req: Request) {
     );
   }
 }
+export const GET = withApiAudit('/api/monitoring/bundle', _GET);

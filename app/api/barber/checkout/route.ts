@@ -12,6 +12,7 @@ import {
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * POST /api/barber/checkout
@@ -28,7 +29,7 @@ import { auditMutation } from '@/lib/api/withAudit';
  * - Mon-Thu enrollment: first charge upcoming Friday
  * - Friday enrollment: first charge next week's Friday (7 days later)
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
@@ -241,7 +242,7 @@ export async function POST(request: NextRequest) {
  * Calculate payment plan without creating a session (for preview)
  * Use this to show estimated payments before checkout
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -300,3 +301,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/barber/checkout', _GET);
+export const POST = withApiAudit('/api/barber/checkout', _POST);

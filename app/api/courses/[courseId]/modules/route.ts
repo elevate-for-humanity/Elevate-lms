@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
@@ -33,7 +34,7 @@ export async function GET(
   }
 }
 
-export async function POST(
+async function _POST(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
@@ -76,7 +77,7 @@ export async function POST(
   }
 }
 
-export async function PUT(
+async function _PUT(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
@@ -110,3 +111,6 @@ export async function PUT(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/courses/[courseId]/modules', _GET);
+export const POST = withApiAudit('/api/courses/[courseId]/modules', _POST);
+export const PUT = withApiAudit('/api/courses/[courseId]/modules', _PUT);

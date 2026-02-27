@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 type HourType = 'RTI' | 'OJT';
 type FundingPhase = 'PRE_WIOA' | 'WIOA' | 'POST_CERT';
@@ -22,7 +23,7 @@ function weekStartISO(d: Date) {
   return date.toISOString().slice(0, 10);
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -233,7 +234,7 @@ export async function POST(req: Request) {
 }
 
 // GET: Fetch time entries for current user
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -280,3 +281,5 @@ const supabase = await createClient();
     return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
   return NextResponse.json({ entries: data });
 }
+export const GET = withApiAudit('/api/time/entries', _GET);
+export const POST = withApiAudit('/api/time/entries', _POST);

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -13,7 +14,7 @@ function getOpenAIClient() {
   });
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -75,3 +76,4 @@ Write the complete script now:`;
     );
   }
 }
+export const POST = withApiAudit('/api/ai/generate-script', _POST);

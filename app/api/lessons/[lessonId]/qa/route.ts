@@ -8,8 +8,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   _req: NextRequest,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
@@ -48,7 +49,7 @@ const { lessonId } = await params;
 }
 
 // POST is multipurpose: kind = "question" | "answer"
-export async function POST(
+async function _POST(
   req: NextRequest,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
@@ -126,3 +127,5 @@ export async function POST(
 
   return NextResponse.json({ answer: data });
 }
+export const GET = withApiAudit('/api/lessons/[lessonId]/qa', _GET);
+export const POST = withApiAudit('/api/lessons/[lessonId]/qa', _POST);

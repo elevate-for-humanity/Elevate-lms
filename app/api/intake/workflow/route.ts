@@ -11,9 +11,10 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { validateIntakeCompletion } from '@/lib/enrollment/funding-enforcement';
 import { IntakeStatus, FundingPathway } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET: Retrieve intake record for user/program
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -51,7 +52,7 @@ const supabase = await createClient();
 }
 
 // POST: Create new intake record
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
 
@@ -110,7 +111,7 @@ export async function POST(request: NextRequest) {
 }
 
 // PATCH: Update intake step
-export async function PATCH(request: NextRequest) {
+async function _PATCH(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -311,3 +312,6 @@ const supabase = await createClient();
       : `Step completed. Next: ${newStatus}`
   });
 }
+export const GET = withApiAudit('/api/intake/workflow', _GET);
+export const POST = withApiAudit('/api/intake/workflow', _POST);
+export const PATCH = withApiAudit('/api/intake/workflow', _PATCH);

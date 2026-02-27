@@ -5,8 +5,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -134,3 +135,4 @@ async function logExportAudit(
       logger.error("Unhandled error", err instanceof Error ? err : undefined);
     }
 }
+export const GET = withApiAudit('/api/partner/exports/completions', _GET);

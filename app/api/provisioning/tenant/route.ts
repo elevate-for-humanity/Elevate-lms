@@ -7,6 +7,7 @@ import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -76,7 +77,7 @@ async function sendWelcomeEmail(email: string, orgName: string, subdomain: strin
  * 3. Sets up subdomain routing
  * 4. Sends welcome email
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -254,7 +255,7 @@ export async function POST(request: NextRequest) {
  * 
  * Check if subdomain is available
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -289,3 +290,5 @@ const subdomain = request.nextUrl.searchParams.get('subdomain');
     domain: `${normalized}.elevatelms.com`,
   });
 }
+export const GET = withApiAudit('/api/provisioning/tenant', _GET);
+export const POST = withApiAudit('/api/provisioning/tenant', _POST);

@@ -6,13 +6,14 @@ import {
   getReengagementEmail,
   CourseEmailData 
 } from '@/lib/email/career-course-sequences';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
 // This endpoint should be called by a cron job daily
 // scheduled cron or external service like cron-job.org
 
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   // Verify cron secret
   const authHeader = req.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -113,3 +114,4 @@ async function sendEmail(to: string, subject: string, html: string) {
     throw new Error(`Email send failed: ${response.statusText}`);
   }
 }
+export const GET = withApiAudit('/api/cron/career-course-emails', _GET);

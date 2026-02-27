@@ -8,9 +8,10 @@ import { parseBody } from '@/lib/api-helpers';
 import { getSupabaseServerClient } from '@/lib/supabaseServer';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/quizzes/[quizId] - Load quiz with questions
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ quizId: string }> }
 ) {
@@ -57,7 +58,7 @@ export async function GET(
 }
 
 // POST /api/quizzes/[quizId] - Submit quiz attempt
-export async function POST(
+async function _POST(
   request: NextRequest,
   { params }: { params: Promise<{ quizId: string }> }
 ) {
@@ -172,3 +173,5 @@ export async function POST(
     );
   }
 }
+export const GET = withApiAudit('/api/quizzes/[quizId]', _GET);
+export const POST = withApiAudit('/api/quizzes/[quizId]', _POST);

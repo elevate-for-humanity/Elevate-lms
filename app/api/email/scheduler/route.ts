@@ -8,13 +8,14 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Email Scheduler - Processes scheduled campaigns
  * Run this endpoint via cron job every 5 minutes
  * Example cron: every 5 minutes - curl https://yoursite.com/api/email/scheduler
  */
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -141,9 +142,11 @@ export async function GET(req: Request) {
 /**
  * Manual trigger for testing
  */
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
 
   return GET(req);
 }
+export const GET = withApiAudit('/api/email/scheduler', _GET);
+export const POST = withApiAudit('/api/email/scheduler', _POST);

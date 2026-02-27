@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -121,7 +122,7 @@ Timestamp: ${new Date().toISOString()}
 `.trim();
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
@@ -180,7 +181,7 @@ export async function POST(request: NextRequest) {
 }
 
 // GET endpoint to check API health
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -190,3 +191,5 @@ return NextResponse.json({
     description: 'Captures qualified leads from AI chatbot conversations',
   });
 }
+export const GET = withApiAudit('/api/chatbot/lead', _GET);
+export const POST = withApiAudit('/api/chatbot/lead', _POST);

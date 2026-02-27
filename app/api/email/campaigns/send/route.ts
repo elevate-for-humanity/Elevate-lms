@@ -10,12 +10,13 @@ import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
@@ -208,3 +209,4 @@ async function getRecipients(supabase: any, listType: string) {
 
   return data || [];
 }
+export const POST = withApiAudit('/api/email/campaigns/send', _POST);

@@ -10,8 +10,9 @@ import { getAuthUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logStaffRecordAccess } from '@/lib/audit/ferpa';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -177,3 +178,4 @@ if (!supabaseAdmin) {
     );
   }
 }
+export const GET = withApiAudit('/api/cm/learners/[id]', _GET);

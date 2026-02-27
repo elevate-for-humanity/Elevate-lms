@@ -6,6 +6,7 @@ import { Redis } from "@upstash/redis";
 import { headers } from "next/headers";
 import crypto from "crypto";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const ratelimit =
   process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
@@ -24,7 +25,7 @@ function hashIp(ip: string): string {
 }
 
 // POST /api/chat/session — create a new chat session (works for anon + auth)
-export async function POST(request: Request) {
+async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -62,3 +63,4 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ session_id: data.id });
 }
+export const POST = withApiAudit('/api/chat/session', _POST);

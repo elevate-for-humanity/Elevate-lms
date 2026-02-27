@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const supabase = await createClient();
     const _admin = createAdminClient(); const db = _admin || supabase;
@@ -33,3 +34,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Failed to send campaign' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/crm/send-campaign', _POST);

@@ -12,6 +12,7 @@ import {
 import { allPrograms } from '@/lms-data/programs';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const apiKey = process.env.OPENAI_API_KEY;
 
@@ -20,7 +21,7 @@ interface HistoryMessage {
   content: string;
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -139,3 +140,4 @@ Keep responses concise (2-4 paragraphs max), practical, and encouraging. Focus o
     );
   }
 }
+export const POST = withApiAudit('/api/ai/instructor', _POST);

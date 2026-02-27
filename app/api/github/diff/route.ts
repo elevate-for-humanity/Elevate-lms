@@ -7,9 +7,10 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Get diff between two refs or for a specific file
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -68,3 +69,4 @@ const userToken = req.headers.get('x-gh-token');
     );
   }
 }
+export const GET = withApiAudit('/api/github/diff', _GET);

@@ -5,8 +5,9 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -37,7 +38,7 @@ const userId = req.headers.get('x-user-id');
   return NextResponse.json(data || null);
 }
 
-export async function PUT(req: NextRequest) {
+async function _PUT(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -74,3 +75,5 @@ const userId = req.headers.get('x-user-id');
 
   return NextResponse.json(data);
 }
+export const GET = withApiAudit('/api/studio/session', _GET);
+export const PUT = withApiAudit('/api/studio/session', _PUT);

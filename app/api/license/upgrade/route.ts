@@ -7,6 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Subscription tiers available for upgrade
@@ -53,7 +54,7 @@ type SubscriptionTierId = keyof typeof SUBSCRIPTION_TIERS;
  * Creates a Stripe Checkout session for upgrading from trial to paid subscription.
  * Preserves tenant_id and previous_license_id for webhook processing.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -200,7 +201,7 @@ export async function POST(request: NextRequest) {
  * 
  * Returns available subscription tiers for upgrade
  */
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -215,3 +216,5 @@ const tiers = Object.entries(SUBSCRIPTION_TIERS).map(([id, config]) => ({
 
   return NextResponse.json({ tiers });
 }
+export const GET = withApiAudit('/api/license/upgrade', _GET);
+export const POST = withApiAudit('/api/license/upgrade', _POST);

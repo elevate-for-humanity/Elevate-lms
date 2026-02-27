@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({
@@ -21,7 +22,7 @@ const openai = process.env.OPENAI_API_KEY
     })
   : null;
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -168,3 +169,4 @@ Keep responses concise but helpful. Use bullet points for clarity when listing i
     });
   }
 }
+export const POST = withApiAudit('/api/chat/ai-response', _POST);

@@ -9,13 +9,14 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Mark course as completed
  * POST /api/lms/progress/complete
  * Accepts both JSON and FormData
  */
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 
@@ -157,3 +158,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/lms/progress/complete', _POST);

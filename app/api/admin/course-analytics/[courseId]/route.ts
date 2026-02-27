@@ -11,8 +11,9 @@ import {
   generateCourseReport,
 } from '@/lib/analytics/course-analytics';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   req: Request,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
@@ -67,3 +68,4 @@ export async function GET(
     );
   }
 }
+export const GET = withApiAudit('/api/admin/course-analytics/[courseId]', _GET);

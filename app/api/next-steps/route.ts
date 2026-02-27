@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 function computeProgress(row: any) {
   const checks = [
@@ -29,7 +30,7 @@ function computeProgress(row: any) {
   };
 }
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -89,7 +90,7 @@ const supabase = await createClient();
   return NextResponse.json({ ...data, progress: computeProgress(data) });
 }
 
-export async function PATCH(req: Request) {
+async function _PATCH(req: Request) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -238,3 +239,5 @@ const supabase = await createClient();
 
   return NextResponse.json({ ...data, progress: computeProgress(data) });
 }
+export const GET = withApiAudit('/api/next-steps', _GET);
+export const PATCH = withApiAudit('/api/next-steps', _PATCH);

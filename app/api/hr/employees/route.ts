@@ -11,9 +11,10 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/hr/employees - List all employees
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -83,7 +84,7 @@ export async function GET(request: NextRequest) {
 }
 
 // POST /api/hr/employees - Create new employee
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -196,3 +197,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/hr/employees', _GET);
+export const POST = withApiAudit('/api/hr/employees', _POST);

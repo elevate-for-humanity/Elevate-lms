@@ -9,6 +9,7 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Simple HTML escape for security
 function escapeHtml(text: string): string {
@@ -20,7 +21,7 @@ function escapeHtml(text: string): string {
     .replace(/'/g, '&#039;');
 }
 
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -330,3 +331,4 @@ const { searchParams } = new URL(req.url);
     });
   }
 }
+export const GET = withApiAudit('/api/preview/render', _GET);

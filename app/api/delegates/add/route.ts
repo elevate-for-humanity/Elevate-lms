@@ -9,8 +9,9 @@ import { createRouteHandlerClient } from '@/lib/auth';
 import { getUserByEmail } from '@/lib/supabase-admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -73,3 +74,4 @@ export async function POST(req: NextRequest) {
     return new Response('Failed to add delegate', { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/delegates/add', _POST);

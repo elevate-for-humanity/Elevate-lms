@@ -6,11 +6,12 @@ import { requireAdmin } from '@/lib/auth';
 import { importScormPackage, getScormRegistration } from '@/lib/scormCloud';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * POST /api/admin/scorm — Import a SCORM package via SCORM Cloud
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
 /**
  * GET /api/admin/scorm?registrationId=xxx — Get SCORM registration status
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -58,3 +59,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch registration' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/admin/scorm', _GET);
+export const POST = withApiAudit('/api/admin/scorm', _POST);

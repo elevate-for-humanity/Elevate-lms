@@ -6,6 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { APP_STORE_PRODUCTS } from '@/lib/stripe/app-store-products';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -38,7 +39,7 @@ interface CheckoutRequest {
   amount?: number; // in cents, for dynamic pricing
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
 
@@ -248,3 +249,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/checkout/learner', _POST);

@@ -8,8 +8,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   _req: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
@@ -75,7 +76,7 @@ const supabase = await createClient();
   });
 }
 
-export async function POST(
+async function _POST(
   req: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
@@ -122,3 +123,5 @@ export async function POST(
 
   return NextResponse.json({ success: true, review: data });
 }
+export const GET = withApiAudit('/api/courses/[courseId]/reviews', _GET);
+export const POST = withApiAudit('/api/courses/[courseId]/reviews', _POST);

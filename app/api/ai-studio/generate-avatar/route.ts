@@ -12,6 +12,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +29,7 @@ const execAsync = promisify(exec);
  * 4. Optional: Synthesia integration (premium)
  */
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -281,3 +282,4 @@ async function generateWithSynthesia(
 
   throw new Error('Synthesia generation timeout');
 }
+export const POST = withApiAudit('/api/ai-studio/generate-avatar', _POST);

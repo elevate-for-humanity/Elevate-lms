@@ -4,6 +4,7 @@ import OpenAI from 'openai';
 import * as cheerio from 'cheerio';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Lazy-load OpenAI client to prevent build-time errors
 function getOpenAI() {
@@ -25,7 +26,7 @@ function getOpenAI() {
  * 3. AI analyzes and maps to our templates
  * 4. Generate config that recreates their site
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -322,3 +323,4 @@ Return ONLY valid JSON.`;
     };
   }
 }
+export const POST = withApiAudit('/api/ai/import-site', _POST);

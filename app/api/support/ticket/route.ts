@@ -9,8 +9,9 @@ import { createZendeskTicket } from '@/lib/support/zendesk';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -65,3 +66,4 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ ok: true });
 }
+export const POST = withApiAudit('/api/support/ticket', _POST);

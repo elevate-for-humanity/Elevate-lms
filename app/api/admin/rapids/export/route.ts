@@ -16,10 +16,11 @@ import {
   markAsSubmitted,
 } from '@/lib/compliance/rapids-export';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -100,7 +101,7 @@ export async function GET(request: NextRequest) {
 /**
  * POST - Mark records as submitted to RAPIDS
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -145,3 +146,5 @@ export async function POST(request: NextRequest) {
     message: `${enrollment_ids.length} records marked as submitted`,
   });
 }
+export const GET = withApiAudit('/api/admin/rapids/export', _GET);
+export const POST = withApiAudit('/api/admin/rapids/export', _POST);

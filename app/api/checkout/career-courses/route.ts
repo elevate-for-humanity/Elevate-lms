@@ -4,9 +4,10 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
@@ -145,3 +146,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/checkout/career-courses', _POST);

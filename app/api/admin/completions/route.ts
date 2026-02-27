@@ -9,6 +9,7 @@ import { createServerClient } from "@supabase/ssr";
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function getSupabaseServerClient() {
   const cookieStore = await cookies();
@@ -34,7 +35,7 @@ const toDateString = (value: any) => {
   return "";
 };
 
-export const GET = withAuth(
+const _GET = withAuth(
   async (req: NextRequest, { user }) => {
     const url = new URL(req.url);
     const daysParam = url.searchParams.get("days");
@@ -140,3 +141,4 @@ export const GET = withAuth(
   },
   { roles: ['admin', 'super_admin'] }
 );
+export const GET = withApiAudit('/api/admin/completions', _GET);

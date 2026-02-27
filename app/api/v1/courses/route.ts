@@ -16,9 +16,10 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/v1/courses - List all courses
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -132,7 +133,7 @@ const startTime = Date.now();
 }
 
 // POST /api/v1/courses - Create a new course
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -205,3 +206,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(apiResponse(false, null, error), { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/v1/courses', _GET);
+export const POST = withApiAudit('/api/v1/courses', _POST);

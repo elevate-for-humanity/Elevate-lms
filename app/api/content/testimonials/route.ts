@@ -3,8 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -50,3 +51,4 @@ const searchParams = request.nextUrl.searchParams;
     return NextResponse.json({ testimonials: [] });
   }
 }
+export const GET = withApiAudit('/api/content/testimonials', _GET);

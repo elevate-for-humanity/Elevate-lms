@@ -8,11 +8,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
@@ -94,7 +95,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -106,3 +107,5 @@ return NextResponse.json({
     usage: 'POST with multipart/form-data: file, documentType, programContext',
   });
 }
+export const GET = withApiAudit('/api/ocr/extract', _GET);
+export const POST = withApiAudit('/api/ocr/extract', _POST);

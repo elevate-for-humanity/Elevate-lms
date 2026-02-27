@@ -11,12 +11,13 @@ import { parseBody } from '@/lib/api-helpers';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * POST /api/xapi/statement
  * Receive and store xAPI statements
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
  * GET /api/xapi/statement
  * Retrieve xAPI statements (LRS query)
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -115,3 +116,5 @@ const supabase = createSupabaseClient();
     );
   }
 }
+export const GET = withApiAudit('/api/xapi/statement', _GET);
+export const POST = withApiAudit('/api/xapi/statement', _POST);

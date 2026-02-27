@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Admin: Assign Certiport Voucher
@@ -16,7 +17,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  * This updates the exam request status to 'voucher_assigned'
  * and stores the voucher code so the student can see it.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -99,3 +100,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/certiport-exam/assign-voucher', _POST);

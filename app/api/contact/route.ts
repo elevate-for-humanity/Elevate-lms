@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { rateLimitNew as rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rateLimit';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Validation schema for contact form
 const ContactSchema = z.object({
@@ -30,7 +31,7 @@ const DemoScheduleSchema = z.object({
   timestamp: z.string().optional(),
 });
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -206,3 +207,4 @@ async function sendEmailNotification(data: z.infer<typeof ContactSchema>) {
     throw error;
   }
 }
+export const POST = withApiAudit('/api/contact', _POST);

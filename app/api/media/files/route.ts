@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET() {
+async function _GET() {
   try {
     const supabase = await createClient();
     const _admin = createAdminClient(); const db = _admin || supabase;
@@ -22,3 +23,4 @@ export async function GET() {
     return NextResponse.json({ files: [] });
   }
 }
+export const GET = withApiAudit('/api/media/files', _GET);

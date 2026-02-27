@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -23,7 +24,7 @@ function getSupabaseAdmin() {
  * Body: { subdomain, correlationId? }
  * Also accepts x-correlation-id header.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -93,3 +94,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error', correlationId }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/trial/begin-onboarding', _POST);

@@ -14,8 +14,9 @@ import {
   batchCheckEligibility,
 } from '@/lib/grants/eligibility-engine';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -62,3 +63,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/grants/eligibility', _POST);

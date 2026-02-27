@@ -7,8 +7,9 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -88,3 +89,4 @@ export async function POST(request: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/staff/customer-service/tickets', _POST);

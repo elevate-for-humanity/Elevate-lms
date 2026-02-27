@@ -8,8 +8,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { notifySendgrid } from '@/lib/notify';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export const POST = withAuth(
+const _POST = withAuth(
   async (req: Request, user) => {
 
   const auth = req.headers.get('authorization') || '';
@@ -62,3 +63,4 @@ export const POST = withAuth(
   },
   { roles: ['admin', 'super_admin'] }
 );
+export const POST = withApiAudit('/api/admin/reports/daily', _POST);

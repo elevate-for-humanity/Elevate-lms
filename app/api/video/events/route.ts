@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { getVideoById, VideoPlaybackEvent } from '@/lib/video/registry';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,7 +21,7 @@ export const dynamic = 'force-dynamic';
  * - error: Playback error occurred
  * - progress: Periodic progress update
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -87,3 +88,4 @@ export async function POST(request: NextRequest) {
 function generateSessionId(): string {
   return `vs_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 }
+export const POST = withApiAudit('/api/video/events', _POST);

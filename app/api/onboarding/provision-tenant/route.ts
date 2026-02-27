@@ -10,6 +10,7 @@ import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -24,7 +25,7 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
  * 5. Return access info
  */
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -429,3 +430,4 @@ function generateSetupGuideEmail(data: any): string {
 </html>
   `;
 }
+export const POST = withApiAudit('/api/onboarding/provision-tenant', _POST);

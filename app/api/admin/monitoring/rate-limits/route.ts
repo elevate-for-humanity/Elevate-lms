@@ -4,12 +4,13 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Redis } from '@upstash/redis';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -139,3 +140,4 @@ function analyzeRateLimitHits(hits: any[]) {
     timeline: Object.entries(timeline).map(([time, count]) => ({ time, count })),
   };
 }
+export const GET = withApiAudit('/api/admin/monitoring/rate-limits', _GET);

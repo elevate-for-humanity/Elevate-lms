@@ -7,8 +7,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(
+async function _POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -79,3 +80,4 @@ export async function POST(
 
   return NextResponse.json({ signature });
 }
+export const POST = withApiAudit('/api/signature/documents/[id]/sign', _POST);

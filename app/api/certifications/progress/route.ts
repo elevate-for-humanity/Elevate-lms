@@ -3,10 +3,11 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import programCurriculum from '@/lms-content/curricula/program-curriculum-map.json';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -71,3 +72,4 @@ const { searchParams } = new URL(request.url);
     certifications,
   });
 }
+export const GET = withApiAudit('/api/certifications/progress', _GET);

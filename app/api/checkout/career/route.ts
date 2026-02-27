@@ -7,8 +7,9 @@ import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { toError, toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
 
@@ -58,3 +59,4 @@ export async function POST(request: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/checkout/career', _POST);

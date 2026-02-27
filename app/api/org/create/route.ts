@@ -7,8 +7,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { bindUserToOrg } from '@/lib/org/bindUserToOrg';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -105,3 +106,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/org/create', _POST);

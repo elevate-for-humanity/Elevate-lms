@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const SYSTEM_PROMPTS: Record<string, string> = {
   chat: `You are an AI tutor for Elevate for Humanity, a workforce development platform in Indianapolis, Indiana. You help students studying for career certifications in healthcare, skilled trades, technology, business, and other fields. Provide clear, accurate, educational responses. Reference Indiana-specific licensing requirements, employers, and resources when relevant. Keep responses focused and practical.`,
@@ -79,7 +80,7 @@ async function callGemini(messages: Array<{ role: string; content: string }>, sy
   return null;
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -217,3 +218,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/ai-tutor/chat', _POST);

@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
@@ -48,3 +49,4 @@ const { userId } = await params;
     },
   });
 }
+export const GET = withApiAudit('/api/users/[userId]/progress', _GET);

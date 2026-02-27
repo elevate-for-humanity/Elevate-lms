@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
@@ -14,7 +15,7 @@ const STEP_LABELS: Record<string, string> = {
   documents: 'Documents Uploaded',
 };
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
@@ -97,3 +98,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to send notification' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/onboarding/step-complete', _POST);

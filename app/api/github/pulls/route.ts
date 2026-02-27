@@ -7,9 +7,10 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // List pull requests
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -114,7 +115,7 @@ const userToken = req.headers.get('x-gh-token');
 }
 
 // Create pull request
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
     const auth = await requireAuth(req);
@@ -166,7 +167,7 @@ export async function POST(req: NextRequest) {
 }
 
 // Update pull request (merge, close, update)
-export async function PUT(req: NextRequest) {
+async function _PUT(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -231,3 +232,6 @@ const userToken = req.headers.get('x-gh-token');
     );
   }
 }
+export const GET = withApiAudit('/api/github/pulls', _GET);
+export const POST = withApiAudit('/api/github/pulls', _POST);
+export const PUT = withApiAudit('/api/github/pulls', _PUT);

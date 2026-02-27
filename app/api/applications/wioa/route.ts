@@ -6,8 +6,9 @@ export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -199,3 +200,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/applications/wioa', _POST);

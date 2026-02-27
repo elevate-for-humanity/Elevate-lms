@@ -6,8 +6,9 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createOrUpdateContact, createOpportunity, createOrUpdateAccount, createLead } from '@/lib/integrations/salesforce';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
@@ -71,3 +72,4 @@ const { name, email, phone, company, programInterest } = await request.json();
     opportunityId
   });
 }
+export const POST = withApiAudit('/api/partners/lead', _POST);

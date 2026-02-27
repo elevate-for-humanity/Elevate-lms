@@ -5,8 +5,9 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -80,7 +81,7 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -104,3 +105,5 @@ export async function GET(request: Request) {
     );
   }
 }
+export const GET = withApiAudit('/api/employers/onboard', _GET);
+export const POST = withApiAudit('/api/employers/onboard', _POST);

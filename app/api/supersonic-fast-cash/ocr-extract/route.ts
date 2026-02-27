@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -8,7 +9,7 @@ export const dynamic = 'force-dynamic';
 // OCR extraction moved to Netlify function to reduce bundle size
 // Redirect to /.netlify/functions/ocr-extract
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -71,3 +72,5 @@ return NextResponse.json({
     maxFileSize: '10MB',
   });
 }
+export const GET = withApiAudit('/api/supersonic-fast-cash/ocr-extract', _GET);
+export const POST = withApiAudit('/api/supersonic-fast-cash/ocr-extract', _POST);

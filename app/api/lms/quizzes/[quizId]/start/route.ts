@@ -4,8 +4,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { redirect } from 'next/navigation';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(
+async function _POST(
   request: NextRequest,
   { params }: { params: Promise<{ quizId: string }> }
 ) {
@@ -78,3 +79,4 @@ export async function POST(
   // Redirect to quiz page
   return NextResponse.redirect(new URL(`/lms/quizzes/${quizId}`, request.url));
 }
+export const POST = withApiAudit('/api/lms/quizzes/[quizId]/start', _POST);

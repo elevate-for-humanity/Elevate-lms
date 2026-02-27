@@ -8,8 +8,9 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { withAuth } from '@/lib/with-auth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export const GET = withAuth(
+const _GET = withAuth(
   async (req: NextRequest, user) => {
 
   const supabase = createSupabaseClient();
@@ -65,3 +66,4 @@ export const GET = withAuth(
   },
   { roles: ['admin', 'super_admin'] }
 );
+export const GET = withApiAudit('/api/admin/analytics/overview', _GET);

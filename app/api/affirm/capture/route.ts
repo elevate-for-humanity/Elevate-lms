@@ -16,8 +16,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -197,3 +198,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(errorUrl.toString());
   }
 }
+export const GET = withApiAudit('/api/affirm/capture', _GET);

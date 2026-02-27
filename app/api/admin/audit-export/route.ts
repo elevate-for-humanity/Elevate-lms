@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth/require-admin';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,7 +15,7 @@ export const dynamic = 'force-dynamic';
  *
  * Requires admin/super_admin role.
  */
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   const auth = await requireAdmin();
   if (!auth.authorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
@@ -95,3 +96,4 @@ export async function POST(request: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/admin/audit-export', _POST);

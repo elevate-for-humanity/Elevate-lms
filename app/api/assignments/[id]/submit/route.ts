@@ -8,9 +8,10 @@ import { parseBody } from '@/lib/api-helpers';
 import { createServerSupabaseClient, getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // POST /api/assignments/[id]/submit - Submit assignment
-export async function POST(
+async function _POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -95,3 +96,4 @@ export async function POST(
     );
   }
 }
+export const POST = withApiAudit('/api/assignments/[id]/submit', _POST);

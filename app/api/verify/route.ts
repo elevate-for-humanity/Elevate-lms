@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -43,7 +44,7 @@ async function logAudit(
  * POST /api/verify
  * Rate-limited credential verification with audit logging.
  */
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   const supabase = createAdminClient();
   const ip = getClientIp(req.headers);
   const ipHash = hashIp(ip);
@@ -153,3 +154,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/verify', _POST);

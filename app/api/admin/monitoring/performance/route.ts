@@ -3,12 +3,13 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -142,3 +143,4 @@ function percentile(arr: number[], p: number): number {
   const index = Math.ceil((p / 100) * arr.length) - 1;
   return arr[Math.max(0, Math.min(index, arr.length - 1))];
 }
+export const GET = withApiAudit('/api/admin/monitoring/performance', _GET);

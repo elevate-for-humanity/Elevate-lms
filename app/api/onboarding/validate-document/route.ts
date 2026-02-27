@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 interface ValidationResult {
   valid: boolean;
@@ -18,7 +19,7 @@ interface ValidationResult {
  * Runs basic checks (file exists, readable, minimum size/dimensions for images)
  * and OCR-based field extraction for IDs and SSN cards when Tesseract is available.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     const admin = createAdminClient();
@@ -239,3 +240,4 @@ function parseLooseDate(dateStr: string): Date | null {
     return null;
   }
 }
+export const POST = withApiAudit('/api/onboarding/validate-document', _POST);

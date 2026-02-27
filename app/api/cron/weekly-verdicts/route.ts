@@ -7,10 +7,11 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // This route is called by scheduled cron weekly (Sunday 7:30 PM EST)
 // Generates compliance verdicts for all active enrollments
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     // Verify cron secret
     const authHeader = request.headers.get('authorization');
@@ -174,7 +175,7 @@ async function createAlertsFromVerdicts(
 }
 
 // Allow GET for manual testing (development only)
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json(
       { error: 'Method not allowed in production' },
@@ -184,3 +185,5 @@ export async function GET(request: NextRequest) {
 
   return POST(request);
 }
+export const GET = withApiAudit('/api/cron/weekly-verdicts', _GET);
+export const POST = withApiAudit('/api/cron/weekly-verdicts', _POST);

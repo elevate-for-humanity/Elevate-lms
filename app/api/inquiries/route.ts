@@ -11,9 +11,10 @@ import {
   RATE_LIMITS,
 } from '@/lib/rateLimit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Public endpoint — anonymous inquiry submissions
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
@@ -190,3 +191,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/inquiries', _POST);

@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { searchEntities } from '@/lib/integrations/sam-gov';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +17,7 @@ export const dynamic = 'force-dynamic';
  * Fetches entities from SAM.gov and saves to database
  * Should be called by cron job daily
  */
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -112,9 +113,11 @@ export async function POST(request: Request) {
 }
 
 // Allow GET for manual trigger (admin only)
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 return POST(request);
 }
+export const GET = withApiAudit('/api/sam-gov/sync', _GET);
+export const POST = withApiAudit('/api/sam-gov/sync', _POST);

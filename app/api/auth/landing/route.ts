@@ -9,8 +9,9 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -102,3 +103,4 @@ const cookieStore = await cookies();
     );
   }
 }
+export const GET = withApiAudit('/api/auth/landing', _GET);

@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +21,7 @@ async function guardAdmin() {
 }
 
 // PATCH - Update module (script, video_url, etc.)
-export async function PATCH(
+async function _PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -70,3 +71,4 @@ const denied = await guardAdmin();
     return NextResponse.json({ error: 'Failed to update module' }, { status: 500 });
   }
 }
+export const PATCH = withApiAudit('/api/admin/career-courses/modules/[id]', _PATCH);

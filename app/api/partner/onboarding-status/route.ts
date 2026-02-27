@@ -3,8 +3,9 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -48,3 +49,4 @@ export async function GET(request: Request) {
     return NextResponse.json({ completed: false, error: 'Server error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/partner/onboarding-status', _GET);

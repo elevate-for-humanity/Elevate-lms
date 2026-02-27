@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { v5 as uuidv5 } from 'uuid';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -70,7 +71,7 @@ function buildLessonHtml(
  *
  * Body: { slug?: string } — sync one course by slug, or all if omitted.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -232,7 +233,7 @@ export async function POST(request: NextRequest) {
  * Returns the list of courses available in definitions.ts
  * and their lesson counts.
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -252,3 +253,5 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ courses: summary });
 }
+export const GET = withApiAudit('/api/admin/sync-course-definitions', _GET);
+export const POST = withApiAudit('/api/admin/sync-course-definitions', _POST);

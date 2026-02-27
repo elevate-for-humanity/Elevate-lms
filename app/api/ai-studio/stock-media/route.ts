@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Stock Media Library API
@@ -15,7 +16,7 @@ import { requireAuth } from '@/lib/api/requireAuth';
  * - Pixabay (videos, photos, music)
  */
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -287,3 +288,4 @@ function getPlaceholderMusic(query: string) {
  *    - Sign up at https://pixabay.com/api/docs/
  *    - Add PIXABAY_API_KEY to .env.local
  */
+export const GET = withApiAudit('/api/ai-studio/stock-media', _GET);

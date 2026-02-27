@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { sendApplicationConfirmation, sendAdminApplicationNotification } from '@/lib/notifications/application-emails';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Auto-tag funding eligibility based on intake answers
 function determineFundingTag(body: Record<string, string>): string {
@@ -12,7 +13,7 @@ function determineFundingTag(body: Record<string, string>): string {
   return 'pending-review';
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 
@@ -102,3 +103,4 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ success: true, funding_tag: fundingTag });
 }
+export const POST = withApiAudit('/api/intake', _POST);

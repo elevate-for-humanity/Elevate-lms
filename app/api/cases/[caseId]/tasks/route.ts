@@ -7,8 +7,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getCaseTasks, completeTask, initializeCaseTasks } from '@/lib/workflow/case-management';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(req: Request, { params }: { params: Promise<{ caseId: string }> }) {
+async function _GET(req: Request, { params }: { params: Promise<{ caseId: string }> }) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -31,7 +32,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
   }
 }
 
-export async function POST(req: Request, { params }: { params: Promise<{ caseId: string }> }) {
+async function _POST(req: Request, { params }: { params: Promise<{ caseId: string }> }) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -60,7 +61,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ caseId:
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: Promise<{ caseId: string }> }) {
+async function _PATCH(req: Request, { params }: { params: Promise<{ caseId: string }> }) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -103,3 +104,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/cases/[caseId]/tasks', _GET);
+export const POST = withApiAudit('/api/cases/[caseId]/tasks', _POST);
+export const PATCH = withApiAudit('/api/cases/[caseId]/tasks', _PATCH);

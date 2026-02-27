@@ -20,8 +20,9 @@ import { generateNDAText } from '@/lib/onboarding-nda-template';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
@@ -241,7 +242,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -290,3 +291,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/onboarding/submit', _GET);
+export const POST = withApiAudit('/api/onboarding/submit', _POST);

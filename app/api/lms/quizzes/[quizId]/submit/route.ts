@@ -3,13 +3,14 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 interface SubmitRequest {
   attemptId: string;
   answers: Record<string, string>; // questionId -> answerId
 }
 
-export async function POST(
+async function _POST(
   request: NextRequest,
   { params }: { params: Promise<{ quizId: string }> }
 ) {
@@ -152,3 +153,4 @@ export async function POST(
     totalPoints,
   });
 }
+export const POST = withApiAudit('/api/lms/quizzes/[quizId]/submit', _POST);

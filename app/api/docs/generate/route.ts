@@ -8,8 +8,9 @@ import { LETTER_OF_SUPPORT_TEMPLATE } from "@/lib/docs/templates/letterOfSupport
 import { MOU_TEMPLATE } from "@/lib/docs/templates/mou";
 import { createClient } from "@/lib/supabase/server";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 
@@ -39,3 +40,4 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ document: filled });
 }
+export const POST = withApiAudit('/api/docs/generate', _POST);

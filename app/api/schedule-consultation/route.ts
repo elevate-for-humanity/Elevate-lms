@@ -6,10 +6,11 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { createZoomMeeting } from '@/lib/integrations/zoom';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const body = await request.json();
     const { name, email, phone, notes, appointment_type, appointment_date, appointment_time } = body;
@@ -132,3 +133,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/schedule-consultation', _POST);

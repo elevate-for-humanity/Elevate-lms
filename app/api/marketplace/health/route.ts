@@ -6,8 +6,9 @@ export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -69,3 +70,4 @@ const supabase = createAdminClient();
     );
   }
 }
+export const GET = withApiAudit('/api/marketplace/health', _GET);

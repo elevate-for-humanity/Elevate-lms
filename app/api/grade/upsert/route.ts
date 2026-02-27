@@ -10,8 +10,9 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logStaffRecordAccess } from '@/lib/audit/ferpa';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -92,3 +93,4 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ ok: true });
 }
+export const POST = withApiAudit('/api/grade/upsert', _POST);

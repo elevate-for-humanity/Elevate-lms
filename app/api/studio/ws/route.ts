@@ -4,11 +4,12 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // WebSocket upgrade endpoint info
 // Note: Next.js App Router doesn't support WebSocket upgrades directly
 // This endpoint returns connection info for the WebSocket server
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -21,3 +22,4 @@ return NextResponse.json({
     instructions: 'Connect to wsUrl for PTY terminal access',
   });
 }
+export const GET = withApiAudit('/api/studio/ws', _GET);

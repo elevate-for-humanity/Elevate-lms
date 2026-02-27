@@ -6,8 +6,9 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -84,3 +85,4 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/cron/check-expiring-documents', _GET);

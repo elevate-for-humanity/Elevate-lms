@@ -15,8 +15,9 @@ import {
 import { requireAdmin } from '@/lib/authGuards';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export const POST = withAuth(
+const _POST = withAuth(
   async (request: NextRequest, { user }) => {
 
   try {
@@ -103,3 +104,4 @@ export const POST = withAuth(
   },
   { roles: ['admin', 'super_admin'] }
 );
+export const POST = withApiAudit('/api/admin/bulk', _POST);

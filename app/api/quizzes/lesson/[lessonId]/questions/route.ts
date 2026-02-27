@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   req: Request,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
@@ -31,3 +32,4 @@ export async function GET(
     return NextResponse.json({ questions: [] });
   }
 }
+export const GET = withApiAudit('/api/quizzes/lesson/[lessonId]/questions', _GET);

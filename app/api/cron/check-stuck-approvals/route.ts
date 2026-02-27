@@ -5,6 +5,7 @@ export const maxDuration = 30;
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const STUCK_THRESHOLD_HOURS = 24;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'elevate4humanityedu@gmail.com';
@@ -19,7 +20,7 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'elevate4humanityedu@gmail.com';
  * 
  * Should be called every 6-12 hours by a scheduled function.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   // Verify cron secret
   const cronSecret = process.env.CRON_SECRET;
   const authHeader = request.headers.get('authorization');
@@ -143,7 +144,7 @@ export async function POST(request: NextRequest) {
 /**
  * GET endpoint to check status without triggering alerts
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const supabase = createAdminClient();
   if (!supabase) {
     return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
@@ -159,3 +160,5 @@ export async function GET(request: NextRequest) {
     threshold_hours: STUCK_THRESHOLD_HOURS,
   });
 }
+export const GET = withApiAudit('/api/cron/check-stuck-approvals', _GET);
+export const POST = withApiAudit('/api/cron/check-stuck-approvals', _POST);

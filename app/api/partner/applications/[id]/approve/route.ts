@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Partner Approval - Two-Phase Atomic Flow
@@ -24,7 +25,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  * If Phase 2 fails, partner remains in approved_pending_user state
  * and can be retried without duplicating Phase 1 work.
  */
-export async function POST(
+async function _POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -236,3 +237,4 @@ export async function POST(
     );
   }
 }
+export const POST = withApiAudit('/api/partner/applications/[id]/approve', _POST);

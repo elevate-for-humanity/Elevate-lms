@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,7 @@ async function guardAdmin() {
 }
 
 // GET - Fetch all career courses with modules
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -58,7 +59,7 @@ const denied = await guardAdmin();
 }
 
 // POST - Create Stripe products for career courses
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -151,3 +152,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/admin/career-courses', _GET);
+export const POST = withApiAudit('/api/admin/career-courses', _POST);

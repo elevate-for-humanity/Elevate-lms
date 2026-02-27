@@ -16,6 +16,7 @@ import { randomCredentialCode } from '@/lib/crypto-utils';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const IssueSchema = z.object({
   title: z.string().min(2),
@@ -28,7 +29,7 @@ const IssueSchema = z.object({
   metadata: z.record(z.any()).optional(),
 });
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -123,3 +124,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/credentials/issue', _POST);

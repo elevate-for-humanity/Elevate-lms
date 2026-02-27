@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const sessionId = request.nextUrl.searchParams.get('session_id');
 
   if (!sessionId) {
@@ -33,3 +34,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid session' }, { status: 404 });
   }
 }
+export const GET = withApiAudit('/api/store/checkout/verify', _GET);

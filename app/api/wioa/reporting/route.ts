@@ -7,9 +7,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/wioa/reporting - Generate WIOA reports
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -212,3 +213,4 @@ async function generateServicesReport(
     reportGenerated: new Date().toISOString(),
   };
 }
+export const GET = withApiAudit('/api/wioa/reporting', _GET);

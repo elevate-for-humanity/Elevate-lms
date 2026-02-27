@@ -7,9 +7,10 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/events
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -51,7 +52,7 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/events (admin-only via RBAC/RLS)
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -116,3 +117,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/events', _GET);
+export const POST = withApiAudit('/api/events', _POST);

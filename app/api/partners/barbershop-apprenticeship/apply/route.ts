@@ -9,6 +9,7 @@ import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import crypto from 'crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 interface ApplicationData {
   shopLegalName: string;
@@ -66,7 +67,7 @@ function hashIP(ip: string): string {
   return crypto.createHash('sha256').update(ip + process.env.IP_HASH_SALT || 'efh-salt').digest('hex').slice(0, 16);
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
@@ -262,3 +263,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/partners/barbershop-apprenticeship/apply', _POST);

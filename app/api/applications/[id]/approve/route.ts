@@ -11,8 +11,9 @@ import { sendEmail } from '@/lib/email/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(
+async function _POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -159,3 +160,4 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to approve application' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/applications/[id]/approve', _POST);

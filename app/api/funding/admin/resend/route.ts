@@ -11,12 +11,13 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { sendEmail as realSendEmail } from '@/lib/email';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function sendEmail(to: string, subject: string, text: string) {
   await realSendEmail({ to, subject, html: text.replace(/\n/g, '<br>') });
 }
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -109,3 +110,4 @@ Welcome to Elevate for Humanity!`
     return new Response('Failed to resend email', { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/funding/admin/resend', _POST);

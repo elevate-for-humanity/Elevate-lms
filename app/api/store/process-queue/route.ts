@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { processFulfillmentQueue, getQueueStats } from '@/lib/store/fulfillment-queue';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Process fulfillment queue
@@ -14,7 +15,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  * - Manual trigger from admin
  * - Upstash QStash webhook
  */
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -67,7 +68,7 @@ export async function POST(req: Request) {
 /**
  * Get queue stats
  */
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -78,3 +79,5 @@ export async function GET(request: Request) {
     return Response.json({ error: 'Failed to get stats' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/store/process-queue', _GET);
+export const POST = withApiAudit('/api/store/process-queue', _POST);

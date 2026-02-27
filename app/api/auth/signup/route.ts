@@ -9,8 +9,9 @@ import { createClient } from '@/lib/supabase/server';
 import { APIError } from '@/lib/api/api-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { validatePassword } from '@/lib/auth/password-validation';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export const POST = withErrorHandling(async (request: NextRequest) => {
+const _POST = withErrorHandling(async (request: NextRequest) => {
   // Rate limit signup to prevent account creation abuse
   const rateLimited = await applyRateLimit(request, 'auth');
   if (rateLimited) return rateLimited;
@@ -82,3 +83,4 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
+export const POST = withApiAudit('/api/auth/signup', _POST);

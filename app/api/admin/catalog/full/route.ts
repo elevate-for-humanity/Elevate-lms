@@ -3,6 +3,7 @@ import { programs } from '@/app/data/programs';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function guardAdmin() {
   const supabase = await createClient();
@@ -17,7 +18,7 @@ async function guardAdmin() {
   return null;
 }
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -278,3 +279,4 @@ function generateCatalogHtml(programList: typeof programs) {
 </html>
   `;
 }
+export const GET = withApiAudit('/api/admin/catalog/full', _GET);

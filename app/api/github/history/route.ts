@@ -6,9 +6,10 @@ import { gh, parseRepo, getUserOctokit } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Get commit history
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -77,3 +78,4 @@ const userToken = req.headers.get('x-gh-token');
     );
   }
 }
+export const GET = withApiAudit('/api/github/history', _GET);

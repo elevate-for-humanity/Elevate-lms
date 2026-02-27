@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * CSP violation report endpoint.
  * Receives Content-Security-Policy violation reports from browsers.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const body = await request.json();
     logger.warn('CSP violation report', {
@@ -20,3 +21,4 @@ export async function POST(request: NextRequest) {
 
   return new NextResponse(null, { status: 204 });
 }
+export const POST = withApiAudit('/api/csp-report', _POST);

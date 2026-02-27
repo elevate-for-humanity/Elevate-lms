@@ -7,8 +7,9 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -133,3 +134,4 @@ ${parsed.modules?.map((mod: any, i: number) => `${i + 1}. ${mod.title || mod}`).
     );
   }
 }
+export const POST = withApiAudit('/api/autopilots/build-courses', _POST);

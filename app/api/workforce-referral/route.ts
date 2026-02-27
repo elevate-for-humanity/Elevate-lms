@@ -13,9 +13,10 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { WorkforceAgencyType, WorkforceReferralStatus } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET: List referrals or get specific referral
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -75,7 +76,7 @@ const supabase = await createClient();
 }
 
 // POST: Create new referral
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -153,7 +154,7 @@ export async function POST(request: NextRequest) {
 }
 
 // PATCH: Update referral status
-export async function PATCH(request: NextRequest) {
+async function _PATCH(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -281,7 +282,7 @@ const supabase = await createClient();
 }
 
 // Automated status update endpoint (for cron jobs)
-export async function PUT(request: NextRequest) {
+async function _PUT(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -350,3 +351,7 @@ const supabase = await createClient();
     count: sentCount 
   });
 }
+export const GET = withApiAudit('/api/workforce-referral', _GET);
+export const POST = withApiAudit('/api/workforce-referral', _POST);
+export const PUT = withApiAudit('/api/workforce-referral', _PUT);
+export const PATCH = withApiAudit('/api/workforce-referral', _PATCH);

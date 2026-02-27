@@ -6,6 +6,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const VALID_ROLES = ['student', 'staff', 'instructor', 'admin', 'super_admin'];
 
@@ -16,7 +17,7 @@ const VALID_ROLES = ['student', 'staff', 'instructor', 'admin', 'super_admin'];
  * 
  * Body: { email: string, role: string }
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
  * 
  * List all users with admin/staff roles. Only super_admin can do this.
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -143,3 +144,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/admin/users/role', _GET);
+export const POST = withApiAudit('/api/admin/users/role', _POST);

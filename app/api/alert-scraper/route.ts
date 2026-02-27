@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Scraper Alert Endpoint
@@ -16,7 +17,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  * Logs to database and sends notifications
  */
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -199,7 +200,7 @@ async function sendSlackAlert(data: Record<string, any>) {
 /**
  * GET endpoint to check alert system status
  */
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -217,3 +218,5 @@ return NextResponse.json({
     ],
   });
 }
+export const GET = withApiAudit('/api/alert-scraper', _GET);
+export const POST = withApiAudit('/api/alert-scraper', _POST);

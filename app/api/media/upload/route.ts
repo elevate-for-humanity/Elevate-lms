@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Allowed MIME types for media uploads
 const ALLOWED_TYPES = [
@@ -25,7 +26,7 @@ const ALLOWED_BUCKETS = ['media', 'documents', 'avatars', 'course-content'];
 // Allowed folder patterns
 const ALLOWED_FOLDER_PATTERN = /^[a-zA-Z0-9_-]+$/;
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -139,3 +140,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/media/upload', _POST);

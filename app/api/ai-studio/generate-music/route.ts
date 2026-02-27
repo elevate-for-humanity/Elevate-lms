@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * AI Music Generation API
@@ -16,7 +17,7 @@ import { requireAuth } from '@/lib/api/requireAuth';
  * 2. Generate with AI (future: Suno, MusicGen)
  */
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -132,3 +133,4 @@ async function findMatchingMusic(
 //   const data = await response.json();
 //   return data.audio_url;
 // }
+export const POST = withApiAudit('/api/ai-studio/generate-music', _POST);

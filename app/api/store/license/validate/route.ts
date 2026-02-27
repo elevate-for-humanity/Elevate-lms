@@ -8,8 +8,9 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -141,3 +142,4 @@ export async function POST(req: Request) {
     return Response.json({ error: toErrorMessage(error) }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/store/license/validate', _POST);

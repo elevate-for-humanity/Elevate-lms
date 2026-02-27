@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { generateCertificateNumber } from '@/lib/partner-workflows/certificates';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   const supabase = await createClient();
   const db = createAdminClient() || supabase;
 
@@ -88,3 +89,4 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ issued, failed });
 }
+export const POST = withApiAudit('/api/admin/certificates/bulk', _POST);

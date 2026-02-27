@@ -8,10 +8,11 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 type Params = { params: Promise<{ certificateId: string }> };
 
-export async function GET(_req: NextRequest, { params }: Params) {
+async function _GET(_req: NextRequest, { params }: Params) {
   try {
     const rateLimited = await applyRateLimit(_req, 'api');
     if (rateLimited) return rateLimited;
@@ -88,3 +89,4 @@ export async function GET(_req: NextRequest, { params }: Params) {
     );
   }
 }
+export const GET = withApiAudit('/api/verify/certificate/[certificateId]', _GET);

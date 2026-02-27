@@ -8,9 +8,10 @@ import { parseBody } from '@/lib/api-helpers';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/wioa/employment - Get employment records
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -45,7 +46,7 @@ const supabase = createSupabaseClient();
 }
 
 // POST /api/wioa/employment - Record employment outcome
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -110,3 +111,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/wioa/employment', _GET);
+export const POST = withApiAudit('/api/wioa/employment', _POST);

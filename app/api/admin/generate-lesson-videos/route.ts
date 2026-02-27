@@ -14,6 +14,7 @@ import {
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -191,7 +192,7 @@ async function generateForLesson(
 
 // ── POST /api/admin/generate-lesson-videos ──────────────────────────────
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -273,7 +274,7 @@ export async function POST(request: NextRequest) {
 
 // ── GET /api/admin/generate-lesson-videos (status) ──────────────────────
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -318,3 +319,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to get status' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/admin/generate-lesson-videos', _GET);
+export const POST = withApiAudit('/api/admin/generate-lesson-videos', _POST);

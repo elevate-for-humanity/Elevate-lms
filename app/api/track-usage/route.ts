@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * DMCA Tracking Endpoint
@@ -40,7 +41,7 @@ const getOfficialDomains = () => {
   ];
 };
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -377,7 +378,7 @@ Elevate for Humanity Career & Technical Institute
 /**
  * GET endpoint to check tracking status
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -396,3 +397,5 @@ export async function GET(request: NextRequest) {
     official_domains: officialDomains,
   });
 }
+export const GET = withApiAudit('/api/track-usage', _GET);
+export const POST = withApiAudit('/api/track-usage', _POST);

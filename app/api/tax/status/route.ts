@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { runCertificationTests } from '@/lib/tax-software/testing/irs-certification';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -41,3 +42,4 @@ const searchParams = request.nextUrl.searchParams;
   
   return NextResponse.json(status);
 }
+export const GET = withApiAudit('/api/tax/status', _GET);

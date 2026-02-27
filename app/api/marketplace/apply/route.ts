@@ -13,8 +13,9 @@ import {
   RateLimitPresets,
 } from '@/lib/rateLimit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
 
@@ -103,3 +104,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/marketplace/apply', _POST);

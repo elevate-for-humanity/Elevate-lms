@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/resend';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,7 +13,7 @@ export const dynamic = 'force-dynamic';
  * curl -X POST "https://www.elevateforhumanity.org/api/admin/test-email?token=YOUR_TOKEN" \
  *   -H "content-type: application/json" -d '{"to":"you@gmail.com"}'
  */
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   const token = process.env.ADMIN_TEST_EMAIL_TOKEN;
   if (!token) {
     return NextResponse.json(
@@ -64,3 +65,4 @@ export async function POST(req: NextRequest) {
     { status: 500 }
   );
 }
+export const POST = withApiAudit('/api/admin/test-email', _POST);

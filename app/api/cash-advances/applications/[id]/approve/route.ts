@@ -10,8 +10,9 @@ import { supabaseServer } from '@/lib/supabase-server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(
+async function _POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -75,3 +76,4 @@ export async function POST(
     return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/cash-advances/applications/[id]/approve', _POST);

@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 function csvEscape(data: any) {
   const s = String(v ?? '');
@@ -15,7 +16,7 @@ function csvEscape(data: any) {
   return s;
 }
 
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -131,3 +132,4 @@ const supabase = await createClient();
     },
   });
 }
+export const GET = withApiAudit('/api/time/export', _GET);

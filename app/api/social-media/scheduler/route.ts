@@ -9,12 +9,13 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Social Media Scheduler - Posts to social platforms 3x daily
  * Run via cron at 9 AM, 1 PM, and 5 PM EST
  */
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -309,9 +310,11 @@ async function postToInstagram(
 /**
  * Manual trigger for testing
  */
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
   return GET(req);
 }
+export const GET = withApiAudit('/api/social-media/scheduler', _GET);
+export const POST = withApiAudit('/api/social-media/scheduler', _POST);

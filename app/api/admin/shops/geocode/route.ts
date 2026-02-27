@@ -5,10 +5,11 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { geocodeAddress, buildAddressString, isGeocodingResult } from '@/lib/geo/geocode';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -123,3 +124,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/admin/shops/geocode', _POST);

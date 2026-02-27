@@ -8,8 +8,9 @@ import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -193,3 +194,4 @@ const supabase = await createRouteHandlerClient({ cookies });
 
   return Response.json(rows);
 }
+export const GET = withApiAudit('/api/analytics/reports/caseload', _GET);

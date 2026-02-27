@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const ALLOWED_ROLES = ['admin', 'super_admin', 'staff', 'instructor'];
 
@@ -24,7 +25,7 @@ async function getProctor() {
 }
 
 // GET /api/proctor/sessions/[id]
-export async function GET(
+async function _GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -53,7 +54,7 @@ export async function GET(
 }
 
 // PATCH /api/proctor/sessions/[id] — update status, result, score
-export async function PATCH(
+async function _PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -95,3 +96,5 @@ export async function PATCH(
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/proctor/sessions/[id]', _GET);
+export const PATCH = withApiAudit('/api/proctor/sessions/[id]', _PATCH);

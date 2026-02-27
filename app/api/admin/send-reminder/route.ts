@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireApiAuth } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function sendSMS(phone: string, message: string): Promise<boolean> {
   if (
@@ -45,7 +46,7 @@ async function sendSMS(phone: string, message: string): Promise<boolean> {
   }
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -176,3 +177,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/admin/send-reminder', _POST);

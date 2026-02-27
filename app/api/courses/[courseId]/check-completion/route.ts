@@ -9,10 +9,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabaseServer';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 type Params = { params: Promise<{ courseId: string }> };
 
-export async function POST(req: NextRequest, { params }: Params) {
+async function _POST(req: NextRequest, { params }: Params) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -119,7 +120,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 }
 
 // GET endpoint to check status without updating
-export async function GET(req: NextRequest, { params }: Params) {
+async function _GET(req: NextRequest, { params }: Params) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -162,3 +163,5 @@ const supabase = getSupabaseServerClient();
     external_summary: summary?.[0],
   });
 }
+export const GET = withApiAudit('/api/courses/[courseId]/check-completion', _GET);
+export const POST = withApiAudit('/api/courses/[courseId]/check-completion', _POST);

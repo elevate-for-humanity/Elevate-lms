@@ -3,9 +3,10 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET - Fetch user's messages/conversations
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -94,7 +95,7 @@ const supabase = await createClient();
 }
 
 // POST - Send a new message
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -159,3 +160,5 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ message }, { status: 201 });
 }
+export const GET = withApiAudit('/api/lms/messages', _GET);
+export const POST = withApiAudit('/api/lms/messages', _POST);

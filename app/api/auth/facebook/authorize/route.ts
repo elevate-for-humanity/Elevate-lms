@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -8,7 +9,7 @@ export const maxDuration = 60;
  * Facebook OAuth Authorization
  * Redirects user to Facebook for authorization
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -39,3 +40,4 @@ const clientId = process.env.FACEBOOK_CLIENT_ID;
 
   return NextResponse.redirect(authUrl.toString());
 }
+export const GET = withApiAudit('/api/auth/facebook/authorize', _GET);

@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { aiChat, isAIAvailable } from '@/lib/ai';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const SYSTEM_PROMPT = `You are an AI instructor assistant for Elevate for Humanity, a workforce training institution. Your role is to guide students through their programs and courses with consistent, helpful support.
 
@@ -41,7 +42,7 @@ const SYSTEM_PROMPT = `You are an AI instructor assistant for Elevate for Humani
 - Escalate complex issues to human staff
 - Be concise but thorough`;
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -128,7 +129,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -156,3 +157,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch conversations' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/ai-instructor', _GET);
+export const POST = withApiAudit('/api/ai-instructor', _POST);

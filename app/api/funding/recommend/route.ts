@@ -8,8 +8,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getOpenAIClient, isOpenAIConfigured } from "@/lib/openai-client";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -117,3 +118,4 @@ Be specific and actionable. Focus on practical next steps.
     narrative,
   });
 }
+export const POST = withApiAudit('/api/funding/recommend', _POST);

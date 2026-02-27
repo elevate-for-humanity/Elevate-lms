@@ -3,6 +3,7 @@ import { IntakeCreateSchema } from '@/lib/validators/course';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,7 +12,7 @@ export const dynamic = 'force-dynamic';
  * POST /api/intakes - Public endpoint for lead capture (Get Info forms)
  * AT-02: General Inquiry must create intake record
  */
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
 /**
  * GET /api/intakes - Admin only, list all intakes
  */
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -114,3 +115,5 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/intakes', _GET);
+export const POST = withApiAudit('/api/intakes', _POST);

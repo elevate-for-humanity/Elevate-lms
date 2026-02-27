@@ -8,9 +8,10 @@ import { parseBody } from '@/lib/api-helpers';
 import { createServerSupabaseClient, getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/assignments - Fetch assignments for enrolled courses
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -74,7 +75,7 @@ export async function GET(request: Request) {
 }
 
 // POST /api/assignments - Create new assignment (admin/instructor only)
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -135,3 +136,5 @@ export async function POST(request: Request) {
     );
   }
 }
+export const GET = withApiAudit('/api/assignments', _GET);
+export const POST = withApiAudit('/api/assignments', _POST);

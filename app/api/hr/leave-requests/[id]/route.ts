@@ -9,8 +9,9 @@ import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function PATCH(
+async function _PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -91,3 +92,4 @@ const { id } = await params;
     );
   }
 }
+export const PATCH = withApiAudit('/api/hr/leave-requests/[id]', _PATCH);

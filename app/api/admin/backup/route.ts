@@ -6,8 +6,9 @@ import { createBackup, exportBackupToJSON, listBackups } from '@/lib/backup';
 import { requireAdmin } from '@/lib/authGuards';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export const POST = withAuth(
+const _POST = withAuth(
   async (request: NextRequest, user) => {
 
   try {
@@ -41,7 +42,7 @@ export const POST = withAuth(
   { roles: ['admin', 'super_admin'] }
 );
 
-export const GET = withAuth(
+const _GET = withAuth(
   async (request: NextRequest, user) => {
 
   try {
@@ -61,3 +62,5 @@ export const GET = withAuth(
   },
   { roles: ['admin', 'super_admin'] }
 );
+export const GET = withApiAudit('/api/admin/backup', _GET);
+export const POST = withApiAudit('/api/admin/backup', _POST);

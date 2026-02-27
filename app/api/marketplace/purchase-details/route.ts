@@ -6,8 +6,9 @@ export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -60,3 +61,4 @@ const supabase = createAdminClient();
     return NextResponse.json({ err: toErrorMessage(err) }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/marketplace/purchase-details', _GET);

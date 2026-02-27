@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { firstName, lastName, email, phone, programSlug, cohortId } = body;
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const programSlug = searchParams.get('program');
 
@@ -100,3 +101,5 @@ export async function GET(request: NextRequest) {
     waitlistCount: count || 0,
   });
 }
+export const GET = withApiAudit('/api/waitlist', _GET);
+export const POST = withApiAudit('/api/waitlist', _POST);

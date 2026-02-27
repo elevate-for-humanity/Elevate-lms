@@ -9,8 +9,9 @@ import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   request: Request,
   { params }: { params: Promise<{ attemptId: string }> }
 ) {
@@ -45,7 +46,7 @@ const supabase = createSupabaseClient();
   return NextResponse.json({ data: dataMap });
 }
 
-export async function POST(
+async function _POST(
   request: Request,
   { params }: { params: Promise<{ attemptId: string }> }
 ) {
@@ -100,3 +101,5 @@ export async function POST(
 
   return NextResponse.json({ ok: true });
 }
+export const GET = withApiAudit('/api/scorm/attempts/[attemptId]/data', _GET);
+export const POST = withApiAudit('/api/scorm/attempts/[attemptId]/data', _POST);

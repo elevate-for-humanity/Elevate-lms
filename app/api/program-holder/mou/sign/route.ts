@@ -12,8 +12,9 @@ import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -95,3 +96,4 @@ export async function POST(req: NextRequest) {
 
   return Response.json(updated);
 }
+export const POST = withApiAudit('/api/program-holder/mou/sign', _POST);

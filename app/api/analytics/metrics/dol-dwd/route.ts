@@ -6,8 +6,9 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createServerSupabaseClient } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -38,3 +39,4 @@ const supabase = await createServerSupabaseClient();
     integration_status: 'ready',
   });
 }
+export const GET = withApiAudit('/api/analytics/metrics/dol-dwd', _GET);

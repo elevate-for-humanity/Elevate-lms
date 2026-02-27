@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { checkPartnerApproval, processPartnerDocument } from '@/lib/automation/partner-approval';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +12,7 @@ export const dynamic = 'force-dynamic';
  * POST /api/automation/partner-approval
  * Check partner approval status or process a partner document
  */
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -74,3 +75,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/automation/partner-approval', _POST);

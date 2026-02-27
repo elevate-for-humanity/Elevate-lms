@@ -11,6 +11,7 @@ import { validateApiKey } from '@/lib/licensing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -49,7 +50,7 @@ interface ImportRequest {
   };
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -355,7 +356,7 @@ function generateTempPassword(): string {
 }
 
 // GET endpoint for import status/documentation
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -401,3 +402,5 @@ return NextResponse.json({
     },
   });
 }
+export const GET = withApiAudit('/api/v1/import', _GET);
+export const POST = withApiAudit('/api/v1/import', _POST);

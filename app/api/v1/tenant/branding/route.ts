@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { validateApiKey } from '@/lib/licensing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 
@@ -27,7 +28,7 @@ interface BrandingSettings {
 }
 
 // GET - Retrieve current branding settings
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -74,7 +75,7 @@ const apiKey = request.headers.get('x-api-key');
 }
 
 // PATCH - Update branding settings
-export async function PATCH(request: NextRequest) {
+async function _PATCH(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -168,7 +169,7 @@ const apiKey = request.headers.get('x-api-key');
 }
 
 // POST - Upload logo/favicon (returns upload URL)
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -218,3 +219,6 @@ export async function POST(request: NextRequest) {
     public_url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`,
   });
 }
+export const GET = withApiAudit('/api/v1/tenant/branding', _GET);
+export const POST = withApiAudit('/api/v1/tenant/branding', _POST);
+export const PATCH = withApiAudit('/api/v1/tenant/branding', _PATCH);

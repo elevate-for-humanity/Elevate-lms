@@ -8,6 +8,7 @@ import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { withAuth } from '@/lib/with-auth';
 import { toErrorMessage } from '@/lib/safe';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function getHandler(
   req: NextRequest,
@@ -60,6 +61,7 @@ async function getHandler(
   return Response.json(mapped);
 }
 
-export const GET = withAuth(getHandler, {
+const _GET = withAuth(getHandler, {
   roles: ['admin', 'super_admin'],
 });
+export const GET = withApiAudit('/api/admin/learner/notes', _GET);

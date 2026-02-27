@@ -8,8 +8,9 @@ import { supabaseAdmin } from '@/lib/supabaseClients';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { logBulkExport } from '@/lib/audit/ferpa';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export const GET = withAuth(
+const _GET = withAuth(
   async (req: NextRequest, user) => {
     if (!supabaseAdmin) {
       return NextResponse.json(
@@ -127,3 +128,4 @@ function escapeCsvField(field: any): string {
   }
   return str;
 }
+export const GET = withApiAudit('/api/admin/export/enrollments', _GET);

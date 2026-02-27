@@ -12,8 +12,9 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export const POST = withAuth(
+const _POST = withAuth(
   async (req, context) => {
     const { user } = context;
     const supabase = await createRouteHandlerClient({ cookies });
@@ -117,3 +118,4 @@ export const POST = withAuth(
   },
   { roles: ['admin', 'super_admin'] }
 );
+export const POST = withApiAudit('/api/admin/program-holders/mou/countersign', _POST);

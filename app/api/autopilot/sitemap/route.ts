@@ -3,12 +3,13 @@ import { NextResponse } from 'next/server';
 import { generateSitemap } from '@/lib/autopilot/deploy-prep';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -45,3 +46,5 @@ export async function POST(request: Request) {
     );
   }
 }
+export const GET = withApiAudit('/api/autopilot/sitemap', _GET);
+export const POST = withApiAudit('/api/autopilot/sitemap', _POST);

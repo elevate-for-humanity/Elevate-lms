@@ -5,11 +5,12 @@ import { createRouteHandlerClient } from '@/lib/auth';
 import { getUserById } from '@/lib/supabase-admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Use Node.js runtime
 export const runtime = 'nodejs';
 
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -75,3 +76,4 @@ const supabase = await createRouteHandlerClient({ cookies });
     },
   });
 }
+export const GET = withApiAudit('/api/cert/pdf', _GET);

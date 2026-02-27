@@ -4,9 +4,10 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Server-side progress fetch — bypasses RLS recursion on partner_users
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   const supabase = await createClient();
   if (!supabase) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -52,3 +53,4 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ progress: progress || [] });
 }
+export const GET = withApiAudit('/api/lms/progress', _GET);

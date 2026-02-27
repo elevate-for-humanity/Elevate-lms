@@ -5,12 +5,13 @@ import { toErrorMessage } from '@/lib/safe';
 import { getAppVersion } from '@/lib/version/getAppVersion';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getAuditTelemetry } from '@/lib/audit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -208,3 +209,4 @@ const checks: Record<string, any> = {
     },
   });
 }
+export const GET = withApiAudit('/api/health', _GET);

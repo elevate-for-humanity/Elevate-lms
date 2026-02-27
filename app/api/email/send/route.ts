@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/resend';
 import { logEmailDelivery } from '@/lib/email/monitor';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -12,7 +13,7 @@ export const maxDuration = 60;
  * No auth required — callers are trusted server-side code.
  * Rate-limited to prevent abuse.
  */
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
 
@@ -66,3 +67,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/email/send', _POST);

@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,7 @@ export const dynamic = 'force-dynamic';
  * Public API for credential verification
  * Returns minimal info for public, full info for authenticated partners
  */
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -156,7 +157,7 @@ export async function POST(req: NextRequest) {
  * GET /api/credentials/verify?code=XXX
  * Alternative GET endpoint for simple verification
  */
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -178,3 +179,5 @@ const code = req.nextUrl.searchParams.get('code');
     })
   );
 }
+export const GET = withApiAudit('/api/credentials/verify', _GET);
+export const POST = withApiAudit('/api/credentials/verify', _POST);

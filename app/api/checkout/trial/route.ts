@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Codebase license configurations (one-time purchase, not trial)
 const LICENSES: Record<string, { 
@@ -28,7 +29,7 @@ const LICENSES: Record<string, {
   },
 };
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -89,3 +90,4 @@ const searchParams = request.nextUrl.searchParams;
     return NextResponse.redirect(new URL('/store/licenses?error=checkout_failed', request.url));
   }
 }
+export const GET = withApiAudit('/api/checkout/trial', _GET);

@@ -9,8 +9,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
 import { sendEmail } from '@/lib/email/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(
+async function _POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -96,3 +97,4 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to reject application' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/applications/[id]/reject', _POST);

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,7 +13,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/milady/access
  * Get student's Milady access information
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -116,7 +117,7 @@ export async function GET(request: NextRequest) {
  * POST /api/milady/access
  * Provision Milady access for a student (admin only or self after payment)
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -172,3 +173,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/milady/access', _GET);
+export const POST = withApiAudit('/api/milady/access', _POST);

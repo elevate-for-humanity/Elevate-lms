@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const ALLOWED_ROLES = ['admin', 'super_admin', 'staff', 'instructor'];
 
@@ -24,7 +25,7 @@ async function getProctor() {
 }
 
 // GET /api/proctor/sessions — list sessions
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   try {
     const ctx = await getProctor();
     if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -64,7 +65,7 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/proctor/sessions — create new session
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const ctx = await getProctor();
     if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -123,3 +124,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/proctor/sessions', _GET);
+export const POST = withApiAudit('/api/proctor/sessions', _POST);

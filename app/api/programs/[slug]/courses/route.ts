@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createServerSupabaseClient } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,7 +11,7 @@ export const maxDuration = 60;
 
 type Params = Promise<{ slug: string }>;
 
-export async function GET(
+async function _GET(
   request: Request,
   { params }: { params: Params }
 ) {
@@ -82,3 +83,4 @@ export async function GET(
     }, { status: 200 });
   }
 }
+export const GET = withApiAudit('/api/programs/[slug]/courses', _GET);

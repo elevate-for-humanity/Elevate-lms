@@ -8,8 +8,9 @@ import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -110,3 +111,4 @@ export async function POST(request: Request) {
 
   return NextResponse.redirect(redirectUrl);
 }
+export const POST = withApiAudit('/api/lti/launch', _POST);

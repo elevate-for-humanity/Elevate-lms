@@ -9,6 +9,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { stripe } from '@/lib/stripe/client';
 import { CERTIPORT_EXAMS } from '@/lib/partners/certiport';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Certiport Exam Request
@@ -28,7 +29,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  *
  * Either way, Elevate purchases the voucher from Certiport.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -208,3 +209,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/certiport-exam/request', _POST);

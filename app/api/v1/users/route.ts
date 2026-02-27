@@ -17,9 +17,10 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/v1/users - List users
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -105,7 +106,7 @@ const startTime = Date.now();
 }
 
 // POST /api/v1/users - Create user
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -193,3 +194,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/v1/users', _GET);
+export const POST = withApiAudit('/api/v1/users', _POST);

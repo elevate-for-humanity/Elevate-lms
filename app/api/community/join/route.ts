@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const name = formData.get('name') as string;
@@ -26,3 +27,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.redirect(new URL('/community?error=server-error', request.url));
   }
 }
+export const POST = withApiAudit('/api/community/join', _POST);

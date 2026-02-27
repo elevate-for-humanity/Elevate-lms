@@ -5,10 +5,11 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 type Params = Promise<{ id: string }>;
 
-export async function PATCH(req: Request, { params }: { params: Params }) {
+async function _PATCH(req: Request, { params }: { params: Params }) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -45,3 +46,4 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
     );
   }
 }
+export const PATCH = withApiAudit('/api/employers/onboard/[id]', _PATCH);

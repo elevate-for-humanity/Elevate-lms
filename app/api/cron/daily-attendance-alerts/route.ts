@@ -4,10 +4,11 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@supabase/supabase-js';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // This route is called by scheduled cron daily at 6 AM
 // Cron expression: 0 11 * * * (11:00 UTC = 6:00 AM EST)
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     // Verify cron secret to prevent unauthorized calls
     const authHeader = request.headers.get('authorization');
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Allow GET for manual testing (remove in production)
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   // Only allow in development
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json(
@@ -93,3 +94,5 @@ export async function GET(request: NextRequest) {
   // Manually trigger the cron job for testing
   return POST(request);
 }
+export const GET = withApiAudit('/api/cron/daily-attendance-alerts', _GET);
+export const POST = withApiAudit('/api/cron/daily-attendance-alerts', _POST);

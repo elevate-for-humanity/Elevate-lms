@@ -3,9 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { searchStore } from '@/lib/store/db';
 import { searchItems, getFeaturedForAudience, type Audience } from '@/lib/search/search-index';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 // AUTH: Intentionally public — no authentication required
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -40,3 +41,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ results: [], error: 'Search failed' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/search', _GET);

@@ -9,11 +9,12 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getUserIdFromRequest } from "@/lib/getUserIdFromRequest";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 type Params = { params: Promise<{ forumId: string; threadId: string }> };
 
 // GET: full thread details + posts
-export async function GET(_req: NextRequest, { params }: Params) {
+async function _GET(_req: NextRequest, { params }: Params) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -124,7 +125,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 }
 
 // POST: add a reply to the thread
-export async function POST(req: NextRequest, { params }: Params) {
+async function _POST(req: NextRequest, { params }: Params) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -199,3 +200,5 @@ export async function POST(req: NextRequest, { params }: Params) {
     );
   }
 }
+export const GET = withApiAudit('/api/forums/[forumId]/threads/[threadId]', _GET);
+export const POST = withApiAudit('/api/forums/[forumId]/threads/[threadId]', _POST);

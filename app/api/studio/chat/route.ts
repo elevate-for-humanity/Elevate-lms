@@ -7,13 +7,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import OpenAI from 'openai';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const getOpenAI = () => new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 // Save chat history
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -48,7 +49,7 @@ const userId = req.headers.get('x-user-id');
 }
 
 // Streaming chat
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -193,3 +194,5 @@ Be concise, direct, and provide working code. Focus on the task at hand.`;
     );
   }
 }
+export const GET = withApiAudit('/api/studio/chat', _GET);
+export const POST = withApiAudit('/api/studio/chat', _POST);

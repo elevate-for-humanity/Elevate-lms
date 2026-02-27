@@ -8,9 +8,10 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { requireRole, handleRBACError } from '@/lib/rbac';
 import { withAuth } from '@/lib/with-auth';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/admin/sso - List SSO connections
-export const GET = withAuth(
+const _GET = withAuth(
   async (req, context) => {
     const user = context.user;
     try {
@@ -35,7 +36,7 @@ export const GET = withAuth(
 );
 
 // POST /api/admin/sso - Create SSO connection
-export const POST = withAuth(
+const _POST = withAuth(
   async (req: NextRequest, user) => {
     try {
       await requireRole(['admin']);
@@ -106,3 +107,5 @@ export const POST = withAuth(
   },
   { roles: ['admin', 'super_admin'] }
 );
+export const GET = withApiAudit('/api/admin/sso', _GET);
+export const POST = withApiAudit('/api/admin/sso', _POST);

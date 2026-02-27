@@ -7,8 +7,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export const GET = withErrorHandling(async (request: NextRequest) => {
+const _GET = withErrorHandling(async (request: NextRequest) => {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
 
@@ -36,3 +37,4 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
+export const GET = withApiAudit('/api/programs/list', _GET);

@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -40,7 +41,7 @@ When giving career advice:
 
 Keep responses conversational but informative (3-5 sentences).`;
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -171,7 +172,7 @@ function generateSuggestions(response: string, profile: any): string[] {
   return suggestions.slice(0, 4);
 }
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -181,3 +182,5 @@ return NextResponse.json({
     description: 'Personalized career guidance powered by AI',
   });
 }
+export const GET = withApiAudit('/api/career-counseling/chat', _GET);
+export const POST = withApiAudit('/api/career-counseling/chat', _POST);

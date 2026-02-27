@@ -11,6 +11,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -18,7 +19,7 @@ function getResend() {
   return new Resend(key);
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -102,3 +103,4 @@ export async function POST(req: Request) {
     status: 303,
   });
 }
+export const POST = withApiAudit('/api/license-request', _POST);

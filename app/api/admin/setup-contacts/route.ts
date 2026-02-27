@@ -9,8 +9,9 @@ import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export const POST = withAuth(
+const _POST = withAuth(
   async (req: NextRequest, user) => {
     try {
       const supabase = await createClient();
@@ -275,3 +276,4 @@ export const POST = withAuth(
   },
   { roles: ['admin', 'super_admin'] }
 );
+export const POST = withApiAudit('/api/admin/setup-contacts', _POST);

@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const CONTENT_TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -33,7 +34,7 @@ function contentTypeFor(filePath: string): string {
   return CONTENT_TYPES[ext] || 'application/octet-stream';
 }
 
-export async function GET(
+async function _GET(
   _req: NextRequest,
   ctx: { params: Promise<{ packageId: string; path: string[] }> }
 ) {
@@ -75,3 +76,4 @@ const { packageId, path } = await ctx.params;
     },
   });
 }
+export const GET = withApiAudit('/api/scorm/content/[packageId]/[...path]', _GET);

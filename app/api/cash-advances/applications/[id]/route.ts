@@ -9,8 +9,9 @@ import { parseBody } from '@/lib/api-helpers';
 import { supabaseServer } from '@/lib/supabase-server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -37,7 +38,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
+async function _PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -65,3 +66,5 @@ export async function PATCH(
     return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/cash-advances/applications/[id]', _GET);
+export const PATCH = withApiAudit('/api/cash-advances/applications/[id]', _PATCH);

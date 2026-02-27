@@ -6,9 +6,10 @@ import { gh, parseRepo, getUserOctokit } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Pull latest changes (fetch remote and get diff)
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest) {
 }
 
 // Sync local state with remote (refresh files)
-export async function PUT(req: NextRequest) {
+async function _PUT(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -152,3 +153,5 @@ const userToken = req.headers.get('x-gh-token');
     );
   }
 }
+export const POST = withApiAudit('/api/github/pull', _POST);
+export const PUT = withApiAudit('/api/github/pull', _PUT);

@@ -6,8 +6,9 @@ import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -58,3 +59,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to log resources' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/analytics/slow-resources', _POST);

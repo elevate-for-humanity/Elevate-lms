@@ -8,8 +8,9 @@ import { NextResponse } from 'next/server';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { sanitizeSearchInput } from '@/lib/utils';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -45,3 +46,4 @@ const supabase = createSupabaseClient();
     })),
   });
 }
+export const GET = withApiAudit('/api/help/search', _GET);

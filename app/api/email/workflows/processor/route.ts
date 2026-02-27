@@ -9,6 +9,7 @@ import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -18,7 +19,7 @@ const resend = process.env.RESEND_API_KEY
  * Workflow Processor - Processes triggered workflows and sends drip emails
  * Run via cron every 5 minutes
  */
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -318,9 +319,11 @@ async function processPendingEmails(supabase: any, workflow: any, now: Date) {
 /**
  * Manual trigger for testing
  */
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
 
   return GET(req);
 }
+export const GET = withApiAudit('/api/email/workflows/processor', _GET);
+export const POST = withApiAudit('/api/email/workflows/processor', _POST);

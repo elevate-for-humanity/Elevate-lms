@@ -7,8 +7,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from "@/lib/auth";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(_req: NextRequest) {
+async function _GET(_req: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -56,3 +57,4 @@ const supabase = await createClient();
     longestStreak,
   });
 }
+export const GET = withApiAudit('/api/student/streak', _GET);

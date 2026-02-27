@@ -11,6 +11,7 @@ import { checkRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Verify admin API key for internal/webhook calls
 function verifyAdminApiKey(request: Request): boolean {
@@ -89,7 +90,7 @@ function getProductTier(productSlug: string): {
   return tiers[productSlug as keyof typeof tiers] || tiers['starter-license'];
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
@@ -235,3 +236,4 @@ export async function POST(req: Request) {
     return Response.json({ error: toErrorMessage(error) }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/store/license/generate', _POST);

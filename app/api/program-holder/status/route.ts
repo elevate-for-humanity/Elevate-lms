@@ -6,8 +6,9 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createRouteHandlerClient } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -43,3 +44,4 @@ const supabase = await createRouteHandlerClient({ cookies });
     mou_status: holder?.mou_status || null,
   });
 }
+export const GET = withApiAudit('/api/program-holder/status', _GET);

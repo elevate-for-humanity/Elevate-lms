@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { getRecommendedTemplate } from '@/lib/templates/designs';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Lazy-load OpenAI client to prevent build-time errors
 function getOpenAI() {
@@ -19,7 +20,7 @@ function getOpenAI() {
  * AI generates a complete site configuration based on user input.
  * Returns preview config that can be used to render a preview site.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -234,3 +235,4 @@ function getDefaultConfig(name: string, type: string) {
     },
   };
 }
+export const POST = withApiAudit('/api/ai/generate-site', _POST);

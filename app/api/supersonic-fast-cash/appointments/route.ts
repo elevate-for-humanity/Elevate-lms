@@ -8,10 +8,11 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -153,7 +154,7 @@ export async function POST(request: NextRequest) {
 }
 
 // GET endpoint to fetch appointments
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -189,3 +190,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/supersonic-fast-cash/appointments', _GET);
+export const POST = withApiAudit('/api/supersonic-fast-cash/appointments', _POST);

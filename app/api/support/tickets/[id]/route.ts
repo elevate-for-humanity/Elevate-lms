@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -9,7 +10,7 @@ export const dynamic = 'force-dynamic';
 type Params = Promise<{ id: string }>;
 
 // GET - Fetch single ticket with messages
-export async function GET(request: NextRequest, { params }: { params: Params }) {
+async function _GET(request: NextRequest, { params }: { params: Params }) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -61,7 +62,7 @@ export async function GET(request: NextRequest, { params }: { params: Params }) 
 }
 
 // PATCH - Update ticket status or add message
-export async function PATCH(request: NextRequest, { params }: { params: Params }) {
+async function _PATCH(request: NextRequest, { params }: { params: Params }) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -137,3 +138,5 @@ export async function PATCH(request: NextRequest, { params }: { params: Params }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/support/tickets/[id]', _GET);
+export const PATCH = withApiAudit('/api/support/tickets/[id]', _PATCH);

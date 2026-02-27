@@ -5,12 +5,13 @@ export const runtime = 'edge';
 export const maxDuration = 60;
 import { logSecurityEvent, blacklistIP } from '@/lib/security-monitor';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Honeypot endpoint - should never be accessed by legitimate users
  * Any access to this endpoint indicates a bot or scraper
  */
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -59,9 +60,11 @@ const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
   });
 }
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
   return GET(req);
 }
+export const GET = withApiAudit('/api/trap', _GET);
+export const POST = withApiAudit('/api/trap', _POST);

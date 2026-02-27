@@ -6,6 +6,7 @@ import { processLicenseProvision } from '@/lib/jobs/handlers/license-provision';
 import { processLicenseSuspend } from '@/lib/jobs/handlers/license-suspend';
 import { processEmailSend } from '@/lib/jobs/handlers/email-send';
 import { createClient } from '@supabase/supabase-js';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -97,7 +98,7 @@ export const maxDuration = 60;
  * 
  * Call via cron every minute or on-demand
  */
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   // Verify cron secret
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
@@ -207,3 +208,4 @@ async function processJob(job: ProvisioningJob): Promise<void> {
       throw new Error(`Unknown job type: ${job.job_type}`);
   }
 }
+export const GET = withApiAudit('/api/cron/process-provisioning-jobs', _GET);

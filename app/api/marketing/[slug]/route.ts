@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMarketingPageBySlug } from '@/lib/api/marketing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 // AUTH: Intentionally public — no authentication required
 
 /**
@@ -9,7 +10,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  * Returns marketing page with sections.
  * Strict: 404 if not published or missing required fields.
  */
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
@@ -30,3 +31,4 @@ const { slug } = await params;
 
   return NextResponse.json({ page });
 }
+export const GET = withApiAudit('/api/marketing/[slug]', _GET);

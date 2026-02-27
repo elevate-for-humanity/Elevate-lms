@@ -10,8 +10,9 @@ import { requireApiAuth } from '@/lib/auth';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { sendSlackMessage } from '@/lib/notifications/slack';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -68,3 +69,4 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ tenant });
 }
+export const POST = withApiAudit('/api/tenants/provision', _POST);

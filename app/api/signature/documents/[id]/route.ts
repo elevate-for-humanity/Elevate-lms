@@ -6,8 +6,9 @@ export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -33,3 +34,4 @@ const { id } = await params;
 
   return NextResponse.json({ document: doc });
 }
+export const GET = withApiAudit('/api/signature/documents/[id]', _GET);

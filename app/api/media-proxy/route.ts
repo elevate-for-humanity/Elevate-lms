@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -7,7 +8,7 @@ export const dynamic = 'force-dynamic';
  * Proxies Supabase storage media through the same origin.
  * Supports Range requests for video seeking.
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const url = request.nextUrl.searchParams.get('url');
   if (!url) {
     return NextResponse.json({ error: 'Missing url param' }, { status: 400 });
@@ -52,3 +53,4 @@ export async function GET(request: NextRequest) {
     headers,
   });
 }
+export const GET = withApiAudit('/api/media-proxy', _GET);

@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { useToken } from '@/lib/notifications';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 // AUTH: Intentionally public — no authentication required
 
 export const runtime = 'nodejs';
@@ -11,7 +12,7 @@ export const dynamic = 'force-dynamic';
  * Validate and use a notification token for no-login access.
  * Returns the target URL and metadata if valid.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
 /**
  * GET endpoint for simple token validation (redirect flow)
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -82,3 +83,5 @@ const { searchParams } = new URL(request.url);
 
   return NextResponse.redirect(new URL('/login', request.url));
 }
+export const GET = withApiAudit('/api/token/validate', _GET);
+export const POST = withApiAudit('/api/token/validate', _POST);

@@ -7,11 +7,12 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { recommendationEngine } from '@/lib/recommendations/engine';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * GET /api/lms/recommendations — Get personalized course recommendations
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -75,3 +76,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to generate recommendations' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/lms/recommendations', _GET);

@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Lazy-load OpenAI client to prevent build-time errors
 function getOpenAI() {
@@ -21,7 +22,7 @@ function getOpenAI() {
  * - API integrations
  * - Design recommendations
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -337,3 +338,4 @@ ElevateLMS.render('#dashboard', {
     ],
   };
 }
+export const POST = withApiAudit('/api/ai/build-remote', _POST);

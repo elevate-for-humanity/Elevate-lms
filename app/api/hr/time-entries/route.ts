@@ -9,9 +9,10 @@ import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/hr/time-entries?employee_id=&start=&end=&status=
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/hr/time-entries
 // Body: { employee_id, entry_date, clock_in, clock_out, ... }
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -132,3 +133,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/hr/time-entries', _GET);
+export const POST = withApiAudit('/api/hr/time-entries', _POST);

@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Allowed bucket names (whitelist)
 const ALLOWED_BUCKETS = ['media', 'documents', 'avatars', 'course-content'];
@@ -13,7 +14,7 @@ const ALLOWED_BUCKETS = ['media', 'documents', 'avatars', 'course-content'];
 // Safe folder pattern
 const SAFE_FOLDER_PATTERN = /^[a-zA-Z0-9_-]*$/;
 
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -72,3 +73,4 @@ export async function GET(req: Request) {
     );
   }
 }
+export const GET = withApiAudit('/api/media/list', _GET);

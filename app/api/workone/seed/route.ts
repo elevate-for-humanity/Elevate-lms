@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const STEPS = [
   { key: 'efh_inquiry', label: 'Complete EFH Inquiry Form' },
@@ -34,7 +35,7 @@ const STEPS = [
   { key: 'enrollment_final', label: 'EFH enrollment finalized' },
 ];
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json({ error: 'Not available in production' }, { status: 403 });
   }
@@ -95,3 +96,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/workone/seed', _POST);

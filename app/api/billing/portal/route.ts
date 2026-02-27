@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST() {
+async function _POST() {
   try {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -27,3 +28,4 @@ export async function POST() {
     return NextResponse.json({ error: 'Failed to create billing session' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/billing/portal', _POST);

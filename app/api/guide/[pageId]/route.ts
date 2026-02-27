@@ -3,8 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPageGuide } from '@/lib/store/db';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ pageId: string }> }
 ) {
@@ -29,3 +30,4 @@ const { pageId } = await params;
     return NextResponse.json({ error: 'Failed to fetch guide' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/guide/[pageId]', _GET);

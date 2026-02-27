@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,7 +14,7 @@ export const dynamic = 'force-dynamic';
  * 
  * FOR QA/DEMO PURPOSES ONLY - does not affect production data.
  */
-export async function POST() {
+async function _POST() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
 
@@ -226,3 +227,4 @@ export async function POST() {
     }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/automation/test/document-processing', _POST);

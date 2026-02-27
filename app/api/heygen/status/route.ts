@@ -2,10 +2,11 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -46,3 +47,4 @@ if (!HEYGEN_API_KEY) {
     return NextResponse.json({ error: 'Failed to get video status' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/heygen/status', _GET);

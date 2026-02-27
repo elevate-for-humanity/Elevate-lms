@@ -2,9 +2,10 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getProduct, getRecommendations, getAvatarSalesMessage } from '@/lib/store/db';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 // AUTH: Intentionally public — no authentication required
 
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
@@ -36,3 +37,4 @@ const { slug } = await params;
     return NextResponse.json({ error: 'Failed to fetch product' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/products/[slug]', _GET);

@@ -9,6 +9,7 @@ import { logger } from '@/lib/logger';
 import JSZip from 'jszip';
 import { XMLParser } from 'fast-xml-parser';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Find the launch href from a parsed imsmanifest.xml.
@@ -42,7 +43,7 @@ function findScormVersion(manifestObj: Record<string, any>): string {
   return '1.2'; // default
 }
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -188,3 +189,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/scorm/upload', _POST);

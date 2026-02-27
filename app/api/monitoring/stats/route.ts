@@ -10,12 +10,13 @@ import {
 } from '@/lib/monitoring';
 import { requireOrgAdmin } from '@/lib/auth/require-org-admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * GET /api/monitoring/stats
  * Get monitoring statistics (admin only)
  */
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -86,3 +87,4 @@ export async function GET(req: Request) {
     );
   }
 }
+export const GET = withApiAudit('/api/monitoring/stats', _GET);

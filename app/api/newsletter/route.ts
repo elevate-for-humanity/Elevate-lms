@@ -6,6 +6,7 @@ import { Redis } from "@upstash/redis";
 import { headers } from "next/headers";
 import crypto from "crypto";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // 5 requests per 5 minutes per IP
 const ratelimit =
@@ -24,7 +25,7 @@ function hashIp(ip: string): string {
   return crypto.createHash("sha256").update(ip).digest("hex").slice(0, 16);
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -92,3 +93,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
 }
+export const POST = withApiAudit('/api/newsletter', _POST);

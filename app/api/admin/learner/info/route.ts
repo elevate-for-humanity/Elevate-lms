@@ -6,6 +6,7 @@ import { NextRequest } from 'next/server';
 import { getUserById } from '@/lib/supabase-admin';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function getHandler(
   req: NextRequest,
@@ -39,6 +40,7 @@ async function getHandler(
   }
 }
 
-export const GET = withAuth(getHandler, {
+const _GET = withAuth(getHandler, {
   roles: ['admin', 'super_admin'],
 });
+export const GET = withApiAudit('/api/admin/learner/info', _GET);

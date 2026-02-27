@@ -11,8 +11,9 @@ import {
 } from '@/lib/email/service';
 import { checkRateLimit, verifyTurnstileToken } from '@/lib/turnstile';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
@@ -141,3 +142,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/program-holder/apply', _POST);

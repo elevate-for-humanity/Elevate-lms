@@ -6,6 +6,7 @@ import React from 'react';
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Launch Audit Endpoint
@@ -43,7 +44,7 @@ interface Finding {
   };
 }
 
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -54,7 +55,7 @@ return handleAudit(request, {
   });
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -496,3 +497,5 @@ function generateSummary(checks: any, blockers: Finding[], warnings: Finding[]) 
     topRisks,
   };
 }
+export const GET = withApiAudit('/api/audit/launch', _GET);
+export const POST = withApiAudit('/api/audit/launch', _POST);

@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Simple in-memory rate limiting (per IP)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -31,7 +32,7 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
     
@@ -127,3 +128,4 @@ async function sendSecurityAlert(data: Record<string, any>) {
   }
   */
 }
+export const POST = withApiAudit('/api/security/log', _POST);

@@ -8,12 +8,13 @@ import { createRouteHandlerClient } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/server';
 import { randomBytes } from 'node:crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 function newSerial() {
   return `EFH-${randomBytes(4).toString('hex').toUpperCase()}`;
 }
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -91,3 +92,4 @@ export async function POST(req: NextRequest) {
 
   return Response.json({ ok: true, new_serial: serial });
 }
+export const POST = withApiAudit('/api/cert/replace', _POST);

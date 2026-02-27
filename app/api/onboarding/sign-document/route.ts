@@ -10,8 +10,9 @@ import { createClient } from '@/utils/supabase/server';
 import * as crypto from 'node:crypto';
 import { checkPartnerApproval } from '@/lib/automation/partner-approval';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -165,3 +166,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/onboarding/sign-document', _POST);

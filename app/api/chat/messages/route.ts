@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from "@supabase/supabase-js";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/chat/messages?session_id=xxx — fetch messages for a session
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -34,3 +35,4 @@ const sessionId = req.nextUrl.searchParams.get("session_id");
 
   return NextResponse.json(data || []);
 }
+export const GET = withApiAudit('/api/chat/messages', _GET);

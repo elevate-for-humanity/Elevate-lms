@@ -8,8 +8,9 @@ export const maxDuration = 60;
 import { createServerSupabaseClient } from '@/lib/auth';
 import { withAuth } from '@/lib/with-auth';
 import { toErrorMessage } from '@/lib/safe';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export const POST = withAuth(
+const _POST = withAuth(
   async (request: Request, user) => {
 
   try {
@@ -75,3 +76,4 @@ export const POST = withAuth(
   },
   { roles: ['admin', 'super_admin'] }
 );
+export const POST = withApiAudit('/api/admin/videos/upload', _POST);

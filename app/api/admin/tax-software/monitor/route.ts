@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -29,7 +30,7 @@ async function guardAdmin() {
 /**
  * POST - Run IRS monitor
  */
-export async function POST(req: Request) {
+async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -72,7 +73,7 @@ export async function POST(req: Request) {
 /**
  * GET - Get monitor status
  */
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -95,3 +96,5 @@ const denied = await guardAdmin();
     );
   }
 }
+export const GET = withApiAudit('/api/admin/tax-software/monitor', _GET);
+export const POST = withApiAudit('/api/admin/tax-software/monitor', _POST);

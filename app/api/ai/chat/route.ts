@@ -10,6 +10,7 @@ import OpenAI from 'openai';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 function getOpenAIClient() {
   return new OpenAI({
@@ -17,7 +18,7 @@ function getOpenAIClient() {
   });
 }
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -157,7 +158,7 @@ export async function POST(req: Request) {
 }
 
 // Get chat history
-export async function GET(req: Request) {
+async function _GET(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -199,3 +200,5 @@ export async function GET(req: Request) {
     );
   }
 }
+export const GET = withApiAudit('/api/ai/chat', _GET);
+export const POST = withApiAudit('/api/ai/chat', _POST);

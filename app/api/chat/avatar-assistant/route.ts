@@ -9,6 +9,7 @@ import {
   getStatusScript 
 } from '@/lib/avatar-scripts';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -101,7 +102,7 @@ function getFallbackResponse(message: string): string {
   return FALLBACK_RESPONSES.default;
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -183,7 +184,7 @@ export async function POST(request: NextRequest) {
  * GET endpoint to retrieve opening script for a page
  * Used for initial avatar message on page load
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -209,3 +210,5 @@ const { searchParams } = new URL(request.url);
 
   return NextResponse.json(pageScript);
 }
+export const GET = withApiAudit('/api/chat/avatar-assistant', _GET);
+export const POST = withApiAudit('/api/chat/avatar-assistant', _POST);

@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { strictRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const TRIAL_DURATION_DAYS = 14;
 
@@ -104,7 +105,7 @@ async function sendTrialWelcomeEmail(
  * Body: { orgName, adminName, adminEmail }
  * Returns: { ok, tenantUrl, subdomain, trialEndsAt, correlationId }
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -267,3 +268,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error', correlationId }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/trial/start-managed', _POST);

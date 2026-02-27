@@ -9,6 +9,7 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { randomBytes } from 'node:crypto';
 import { getUserByEmail } from '@/lib/supabase-admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 function parseCSV(raw: string) {
   const lines = raw.trim().split(/\r?\n/);
@@ -25,7 +26,7 @@ function serial() {
   return `EFH-${randomBytes(4).toString('hex').toUpperCase()}`;
 }
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -175,3 +176,4 @@ export async function POST(req: NextRequest) {
 
   return Response.json({ ok: true, issued, errors });
 }
+export const POST = withApiAudit('/api/cert/bulk-issue', _POST);

@@ -8,6 +8,7 @@ import {
   formatFirstBillingDate,
 } from '@/lib/programs/pricing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * POST /api/barber/checkout/public
@@ -23,7 +24,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  * - Automatic weekly invoice emails with payment links
  * - Student can pay via link or auto-charge if card saved
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
@@ -255,7 +256,7 @@ export async function POST(request: NextRequest) {
  * 
  * Calculate payment plan without creating a session (for preview)
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -313,3 +314,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/barber/checkout/public', _GET);
+export const POST = withApiAudit('/api/barber/checkout/public', _POST);

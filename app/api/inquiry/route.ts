@@ -8,11 +8,12 @@ import { sendEmail } from '@/lib/email/resend';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 const ADMIN_SMS = process.env.ADMIN_SMS_GATEWAY || '';
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
@@ -125,3 +126,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/inquiry', _POST);

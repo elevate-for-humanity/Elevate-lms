@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
 
@@ -59,7 +60,7 @@ const fallbackMessages = {
     "Congratulations on completing this module! This is a significant achievement. Take a moment to celebrate your success, then get ready for the next exciting challenge ahead!",
 };
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
@@ -96,3 +97,4 @@ export async function POST(req: NextRequest) {
     });
   }
 }
+export const POST = withApiAudit('/api/ai-instructor/message', _POST);

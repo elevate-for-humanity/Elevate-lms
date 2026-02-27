@@ -7,8 +7,9 @@ import { requireAdmin } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function PATCH(request: NextRequest) {
+async function _PATCH(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -79,3 +80,5 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to update follow-up' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/admin/crm/follow-ups', _POST);
+export const PATCH = withApiAudit('/api/admin/crm/follow-ups', _PATCH);

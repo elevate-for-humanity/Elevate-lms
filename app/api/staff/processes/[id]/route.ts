@@ -7,8 +7,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -71,3 +72,4 @@ const { id } = await params;
     );
   }
 }
+export const GET = withApiAudit('/api/staff/processes/[id]', _GET);

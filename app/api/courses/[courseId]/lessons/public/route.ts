@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,7 +11,7 @@ export const dynamic = 'force-dynamic';
  * Used by the public lesson player page which can't read training_lessons
  * directly due to RLS (authenticated + tenant-scoped).
  */
-export async function GET(
+async function _GET(
   _request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> },
 ) {
@@ -60,3 +61,4 @@ export async function GET(
     modules: modules || [],
   });
 }
+export const GET = withApiAudit('/api/courses/[courseId]/lessons/public', _GET);

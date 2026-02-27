@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { processNotificationQueue, getQueueStats } from '@/lib/notifications/processor';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,7 +13,7 @@ export const maxDuration = 60;
  * 
  * Security: Requires CRON_SECRET header to prevent unauthorized access.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   // Verify cron secret
   const cronSecret = process.env.CRON_SECRET;
   const authHeader = request.headers.get('authorization');
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
 /**
  * GET endpoint to check queue status (admin only)
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   // Verify cron secret or admin auth
   const cronSecret = process.env.CRON_SECRET;
   const authHeader = request.headers.get('authorization');
@@ -71,3 +72,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/cron/process-notifications', _GET);
+export const POST = withApiAudit('/api/cron/process-notifications', _POST);

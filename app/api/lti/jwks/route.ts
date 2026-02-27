@@ -5,8 +5,9 @@ export const maxDuration = 60;
 // app/api/lti/jwks/route.ts
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -26,3 +27,4 @@ export async function GET(request: Request) {
 
   return NextResponse.json(jwks);
 }
+export const GET = withApiAudit('/api/lti/jwks', _GET);

@@ -12,9 +12,10 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { COMPLIANCE_THRESHOLDS } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET: Get audit for specific month/year or list all
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -61,7 +62,7 @@ const supabase = await createClient();
 }
 
 // POST: Generate new audit for month/year
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -218,7 +219,7 @@ export async function POST(request: NextRequest) {
 }
 
 // PATCH: Update audit (manual entries, sign-offs)
-export async function PATCH(request: NextRequest) {
+async function _PATCH(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -323,3 +324,6 @@ const supabase = await createClient();
 
   return NextResponse.json({ success: true, message: `Action '${action}' completed` });
 }
+export const GET = withApiAudit('/api/compliance-audit', _GET);
+export const POST = withApiAudit('/api/compliance-audit', _POST);
+export const PATCH = withApiAudit('/api/compliance-audit', _PATCH);

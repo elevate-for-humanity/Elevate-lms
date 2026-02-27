@@ -10,8 +10,9 @@ import { cookies } from 'next/headers';
 import { sendEmail, emailTemplates } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -88,3 +89,4 @@ export async function POST(request: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/emails/welcome', _POST);

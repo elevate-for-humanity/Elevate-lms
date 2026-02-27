@@ -5,8 +5,9 @@ export const maxDuration = 60;
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -747,3 +748,4 @@ function generateModules(courseType: string, level: string) {
 
   return moduleTemplates[courseType] || moduleTemplates.general;
 }
+export const POST = withApiAudit('/api/ai/generate-course-outline', _POST);

@@ -21,12 +21,13 @@ import {
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * POST /api/grants/sync
  * Sync grants from Grants.gov to local database
  */
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -133,7 +134,7 @@ export async function POST(request: Request) {
  * GET /api/grants/sync
  * Get sync status and recent grants
  */
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -163,3 +164,5 @@ export async function GET(request: Request) {
     );
   }
 }
+export const GET = withApiAudit('/api/grants/sync', _GET);
+export const POST = withApiAudit('/api/grants/sync', _POST);

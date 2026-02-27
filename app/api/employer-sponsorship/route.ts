@@ -16,9 +16,10 @@ import {
 } from '@/lib/enrollment/funding-enforcement';
 import { EMPLOYER_SPONSORSHIP_CONSTRAINTS } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET: List sponsorships (admin) or get specific sponsorship
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -78,7 +79,7 @@ const supabase = await createClient();
 }
 
 // POST: Create new sponsorship
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
@@ -161,7 +162,7 @@ export async function POST(request: NextRequest) {
 }
 
 // PATCH: Update sponsorship (status, hire confirmation, reimbursement, separation)
-export async function PATCH(request: NextRequest) {
+async function _PATCH(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -309,3 +310,6 @@ const supabase = await createClient();
 
   return NextResponse.json({ success: true, message: `Action '${action}' completed` });
 }
+export const GET = withApiAudit('/api/employer-sponsorship', _GET);
+export const POST = withApiAudit('/api/employer-sponsorship', _POST);
+export const PATCH = withApiAudit('/api/employer-sponsorship', _PATCH);

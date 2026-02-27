@@ -8,8 +8,9 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -39,3 +40,4 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ status: 'ok' });
 }
+export const POST = withApiAudit('/api/analytics/events', _POST);

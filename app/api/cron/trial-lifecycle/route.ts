@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -29,7 +30,7 @@ function getSupabaseAdmin() {
  *   3. Log abandoned trials (created > 7 days ago, never engaged)
  *   4. Mark expired trials as 'expired' in licenses table
  */
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
 
@@ -173,3 +174,4 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/cron/trial-lifecycle', _GET);

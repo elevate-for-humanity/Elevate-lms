@@ -7,8 +7,9 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -62,7 +63,7 @@ const repo = req.nextUrl.searchParams.get('repo');
   }
 }
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
     const auth = await requireAuth(req);
@@ -121,3 +122,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/github/branches', _GET);
+export const POST = withApiAudit('/api/github/branches', _POST);

@@ -8,8 +8,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   _req: NextRequest,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
@@ -41,7 +42,7 @@ const supabase = await createClient();
   return NextResponse.json({ bookmarks: data || [] });
 }
 
-export async function POST(
+async function _POST(
   req: NextRequest,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
@@ -81,3 +82,5 @@ export async function POST(
 
   return NextResponse.json({ success: true });
 }
+export const GET = withApiAudit('/api/lessons/[lessonId]/bookmarks', _GET);
+export const POST = withApiAudit('/api/lessons/[lessonId]/bookmarks', _POST);

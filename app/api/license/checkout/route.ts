@@ -5,6 +5,7 @@ import Stripe from 'stripe';
 import { PLANS, PlanId, TRIAL_DAYS } from '@/lib/license/types';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * POST /api/license/checkout
@@ -14,7 +15,7 @@ import { requireAuth } from '@/lib/api/requireAuth';
  * - 14-day trial, no charge until trial ends
  * - Auto-cancels if no payment method at trial end
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
@@ -205,3 +206,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/license/checkout', _POST);

@@ -3,8 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ returnId: string }> }
 ) {
@@ -69,7 +70,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
+async function _PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ returnId: string }> }
 ) {
@@ -188,3 +189,5 @@ export async function PATCH(
     );
   }
 }
+export const GET = withApiAudit('/api/franchise/returns/[returnId]', _GET);
+export const PATCH = withApiAudit('/api/franchise/returns/[returnId]', _PATCH);

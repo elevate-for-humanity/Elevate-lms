@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const MILESTONES = [
   { hours: 500, title: 'Beginner', achieved: false },
@@ -14,7 +15,7 @@ const MILESTONES = [
   { hours: 2000, title: 'Licensure Ready', achieved: false },
 ];
 
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -157,3 +158,4 @@ export async function GET(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/pwa/shop-owner/apprentices/[id]', _GET);

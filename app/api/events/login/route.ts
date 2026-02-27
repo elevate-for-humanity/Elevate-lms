@@ -8,8 +8,9 @@ import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
 
@@ -32,3 +33,4 @@ export async function POST(req: NextRequest) {
 
   return Response.json({ ok: true });
 }
+export const POST = withApiAudit('/api/events/login', _POST);

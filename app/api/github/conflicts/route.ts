@@ -7,9 +7,10 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // Check for merge conflicts between branches
-export async function GET(req: NextRequest) {
+async function _GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -90,7 +91,7 @@ const userToken = req.headers.get('x-gh-token');
 }
 
 // Get file content for conflict resolution
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
     const auth = await requireAuth(req);
@@ -156,3 +157,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const GET = withApiAudit('/api/github/conflicts', _GET);
+export const POST = withApiAudit('/api/github/conflicts', _POST);

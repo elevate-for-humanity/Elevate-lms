@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * EMPLOYER APPLICATION API
@@ -13,7 +14,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  * Handles employer registration submissions.
  * Creates employer record and sets up pending verification.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
@@ -102,3 +103,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/apply/employer', _POST);

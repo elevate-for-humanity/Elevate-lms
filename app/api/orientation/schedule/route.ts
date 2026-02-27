@@ -5,10 +5,11 @@ import { NextResponse } from 'next/server';
 import { createZoomMeeting } from '@/lib/integrations/zoom';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export async function POST(request: Request) {
+async function _POST(request: Request) {
   try {
     const { name, email, date, time } = await request.json();
 
@@ -80,3 +81,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to create meeting. Please call (317) 314-3757.' }, { status: 500 });
   }
 }
+export const POST = withApiAudit('/api/orientation/schedule', _POST);

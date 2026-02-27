@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from "@/lib/auth";
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function awardAchievement(
   supabase: any,
@@ -32,7 +33,7 @@ async function awardAchievement(
   }
 }
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
@@ -233,3 +234,4 @@ export async function POST(req: NextRequest) {
     longestStreak,
   });
 }
+export const POST = withApiAudit('/api/activity/watch-tick', _POST);

@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/with-auth';
 import { createClient } from '@supabase/supabase-js';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -25,7 +26,7 @@ function getSupabaseAdmin() {
  *   ?type=failed   — filter: "all" | "failed" | "started" | "onboarding"
  *   ?limit=50      — max rows (default 50, max 200)
  */
-export const GET = withAuth(
+const _GET = withAuth(
   async (request: NextRequest) => {
     try {
       const { searchParams } = new URL(request.url);
@@ -101,3 +102,4 @@ export const GET = withAuth(
   },
   { roles: ['admin'] }
 );
+export const GET = withApiAudit('/api/admin/trial-events', _GET);

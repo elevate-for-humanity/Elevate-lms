@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,7 +81,7 @@ const TEST_QUESTIONS = [
   },
 ];
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -93,7 +94,7 @@ export async function GET(request: Request) {
   });
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -156,3 +157,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to submit test' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/supersonic-fast-cash/competency-test', _GET);
+export const POST = withApiAudit('/api/supersonic-fast-cash/competency-test', _POST);

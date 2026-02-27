@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,7 +12,7 @@ export const dynamic = 'force-dynamic';
  * Call this endpoint daily via scheduled cron or external scheduler
  * Requires CRON_SECRET header for authentication
  */
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   // Verify cron secret
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
@@ -51,3 +52,4 @@ export async function GET(request: Request) {
     );
   }
 }
+export const GET = withApiAudit('/api/cron/expire-licenses', _GET);

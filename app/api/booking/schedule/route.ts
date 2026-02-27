@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { rateLimitNew as rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rateLimit';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const ScheduleSchema = z.object({
   name: z.string().min(2).max(120),
@@ -18,7 +19,7 @@ const ScheduleSchema = z.object({
   duration: z.number().optional(),
 });
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -150,3 +151,4 @@ export async function POST(req: Request) {
     );
   }
 }
+export const POST = withApiAudit('/api/booking/schedule', _POST);

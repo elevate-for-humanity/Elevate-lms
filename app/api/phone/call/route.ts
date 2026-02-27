@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * Direct Phone Integration API
@@ -22,7 +23,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  * 6. WebRTC (browser-to-phone)
  */
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -139,3 +140,4 @@ async function notifyTeam(callbackData: Record<string, any>) {
   //   })
   // });
 }
+export const POST = withApiAudit('/api/phone/call', _POST);

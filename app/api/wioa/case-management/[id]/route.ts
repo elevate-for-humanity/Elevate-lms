@@ -8,9 +8,10 @@ import { parseBody } from '@/lib/api-helpers';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // GET /api/wioa/case-management/[id] - Get case by ID
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -42,7 +43,7 @@ const supabase = createSupabaseClient();
 }
 
 // PUT /api/wioa/case-management/[id] - Update case
-export async function PUT(
+async function _PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -74,3 +75,5 @@ const supabase = createSupabaseClient();
     );
   }
 }
+export const GET = withApiAudit('/api/wioa/case-management/[id]', _GET);
+export const PUT = withApiAudit('/api/wioa/case-management/[id]', _PUT);

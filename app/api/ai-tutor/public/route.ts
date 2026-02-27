@@ -4,6 +4,7 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { PROGRAMS, buildSystemPrompt } from '@/lib/ai/programRegistry';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -64,7 +65,7 @@ export async function OPTIONS(req: NextRequest) {
   return new NextResponse(null, { status: 204, headers: corsHeaders(origin) });
 }
 
-export async function POST(req: NextRequest) {
+async function _POST(req: NextRequest) {
   const origin = req.headers.get('origin') || '';
   const headers = isAllowedOrigin(origin) ? corsHeaders(origin) : {};
 
@@ -169,3 +170,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+export const POST = withApiAudit('/api/ai-tutor/public', _POST);

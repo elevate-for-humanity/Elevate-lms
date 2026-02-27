@@ -4,10 +4,11 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -49,7 +50,7 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -88,3 +89,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create intake' }, { status: 500 });
   }
 }
+export const GET = withApiAudit('/api/admin/intakes', _GET);
+export const POST = withApiAudit('/api/admin/intakes', _POST);

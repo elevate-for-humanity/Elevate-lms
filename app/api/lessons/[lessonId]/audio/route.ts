@@ -12,6 +12,7 @@ import { COURSE_DEFINITIONS } from '@/lib/courses/definitions';
 import type { CourseLesson, CourseModule } from '@/lib/courses/definitions';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /* ── Paths ──────────────────────────────────────────────────── */
 
@@ -270,7 +271,7 @@ async function convertToAudio(script: string): Promise<Buffer | null> {
 
 type Params = Promise<{ lessonId: string }>;
 
-export async function GET(
+async function _GET(
   request: NextRequest,
   { params }: { params: Params },
 ) {
@@ -375,3 +376,4 @@ export async function GET(
     );
   }
 }
+export const GET = withApiAudit('/api/lessons/[lessonId]/audio', _GET);

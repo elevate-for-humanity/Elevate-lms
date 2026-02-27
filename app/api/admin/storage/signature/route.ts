@@ -6,8 +6,9 @@ export const maxDuration = 60;
 import { createRouteHandlerClient } from '@/lib/auth';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-export const GET = withAuth(
+const _GET = withAuth(
   async (req, context) => {
     const { user } = context;
       const supabase = await createRouteHandlerClient({ cookies });
@@ -39,3 +40,4 @@ export const GET = withAuth(
     },
     { roles: ['admin', 'super_admin'] }
 );
+export const GET = withApiAudit('/api/admin/storage/signature', _GET);

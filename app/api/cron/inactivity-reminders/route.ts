@@ -7,11 +7,12 @@ import { NextResponse } from 'next/server';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { sendEmail, emailTemplates } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 // This endpoint should be called by a cron job (e.g., scheduled cron, GitHub Actions, or external service)
 // Recommended: Run daily at 9 AM
 
-export async function GET(request: Request) {
+async function _GET(request: Request) {
   try {
     // Verify cron secret to prevent unauthorized access
     const authHeader = request.headers.get('authorization');
@@ -131,3 +132,4 @@ export async function GET(request: Request) {
     );
   }
 }
+export const GET = withApiAudit('/api/cron/inactivity-reminders', _GET);

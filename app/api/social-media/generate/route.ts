@@ -8,6 +8,7 @@ import OpenAI from 'openai';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -30,7 +31,7 @@ const PROGRAM_INFO = {
   all: '14+ workforce training programs. Funded (WIOA-funded). Earn while you learn. Job placement assistance.',
 };
 
-export async function POST(req: Request) {
+async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
@@ -158,3 +159,4 @@ Return ONLY a JSON array of ${count} posts, no other text.`;
     );
   }
 }
+export const POST = withApiAudit('/api/social-media/generate', _POST);

@@ -7,6 +7,7 @@ import { getCatalogProduct } from '@/lib/store/db';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 /**
  * POST /api/licenses/checkout
@@ -15,7 +16,7 @@ import { auditMutation } from '@/lib/api/withAudit';
  * After successful payment, the webhook at /api/licenses/webhook
  * will activate the license.
  */
-export async function POST(request: NextRequest) {
+async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
@@ -185,7 +186,7 @@ export async function POST(request: NextRequest) {
  * 
  * Get checkout session status
  */
-export async function GET(request: NextRequest) {
+async function _GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
@@ -213,3 +214,5 @@ const { searchParams } = new URL(request.url);
     );
   }
 }
+export const GET = withApiAudit('/api/licenses/checkout', _GET);
+export const POST = withApiAudit('/api/licenses/checkout', _POST);

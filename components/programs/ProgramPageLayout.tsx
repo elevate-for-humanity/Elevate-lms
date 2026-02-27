@@ -202,7 +202,7 @@ export default function ProgramPageLayout({
                 </ul>
               </div>
               <div className="lg:col-span-2">
-                <div className="relative h-[280px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl">
+                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-xl">
                   <Image
                     src={c.overviewImage}
                     alt={c.overviewImageAlt}

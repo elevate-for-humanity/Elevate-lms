@@ -54,11 +54,10 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
   };
 
   return (
-    <div ref={containerRef} className="relative w-full overflow-hidden bg-black" style={{ maxHeight: '480px' }}>
+    <div ref={containerRef} className="relative w-full h-[50vh] min-h-[320px] max-h-[500px] overflow-hidden bg-black">
       <video
         ref={videoRef}
         className="w-full h-full object-cover"
-        style={{ aspectRatio: '16/9', maxHeight: '480px' }}
         src={videoSrc}
         muted
         playsInline

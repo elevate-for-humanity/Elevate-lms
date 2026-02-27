@@ -44,7 +44,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
         {program.heroVideo ? (
           <ProgramHeroBanner videoSrc={program.heroVideo} />
         ) : (
-          <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <div className="relative w-full h-[50vh] min-h-[320px] max-h-[500px] overflow-hidden">
             <Image src={images.hero} alt={program.name || program.heroTitle || 'Program'} fill className="object-cover" priority sizes="100vw" />
           </div>
         )}
@@ -107,6 +107,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
                     src={images.tiles[index % images.tiles.length]}
                     alt={item}
                     fill
+                    sizes="(max-width: 640px) 50vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
@@ -217,6 +218,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
           src={images.bottomCta}
           alt="Start your career journey"
           fill
+          sizes="100vw"
           className="object-cover"
         />
         <div className="absolute inset-0 bg-black/60" />
@@ -256,6 +258,7 @@ function SnapshotCard({ image, label, description }: { image: string; label: str
           src={image}
           alt={label}
           fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className="object-cover"
         />
       </div>
@@ -276,6 +279,7 @@ function StepCard({ image, step, label, description }: { image: string; step: nu
           src={image}
           alt={label}
           fill
+          sizes="(max-width: 640px) 50vw, 25vw"
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />

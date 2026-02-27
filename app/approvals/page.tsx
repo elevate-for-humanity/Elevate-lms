@@ -177,7 +177,7 @@ export default function ApprovalsPage() {
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <h3 className="text-lg md:text-lg font-bold mb-3">
-                    SAM.gov Active Entity (2Exclusive LLC-S)
+                    SAM.gov Active Entity (Selfish Inc)
                   </h3>
                   <div className="space-y-2 text-lg text-black">
                     <p>
@@ -308,7 +308,7 @@ export default function ApprovalsPage() {
                 <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <h3 className="text-lg md:text-lg font-bold mb-3">
-                    501(c)(3) Nonprofit – 2Exclusive LLC-S
+                    501(c)(3) Nonprofit – Selfish Inc
                   </h3>
                   <p className="text-lg text-black">
                     IRS-recognized tax-exempt charitable organization

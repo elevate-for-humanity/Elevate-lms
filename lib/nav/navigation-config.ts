@@ -103,9 +103,15 @@ export const mainNavigation: NavItem[] = [
     ]
   },
   {
-    label: 'Platform Licensing',
-    href: '/partners/licensing',
-    description: 'B2B SaaS for organizations',
+    label: 'Partner With Us',
+    href: '/partners/barbershop-apprenticeship',
+    description: 'Host apprentices and grow your team',
+    subItems: [
+      { label: 'Barbershop Partner Program', href: '/partners/barbershop-apprenticeship' },
+      { label: 'Apply as Host Shop', href: '/partners/barbershop-apprenticeship/apply' },
+      { label: 'Partner Login', href: '/partner/login' },
+      { label: 'Platform Licensing', href: '/partners/licensing' },
+    ]
   },
 ];
 

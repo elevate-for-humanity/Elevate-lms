@@ -213,41 +213,109 @@ async function _POST(req: Request) {
       html: internalEmailHtml,
     }).catch(err => logger.error('Failed to send internal notification', err));
 
-    // Send confirmation email to applicant
-    const confirmationEmailHtml = `
-      <h2>Application Received</h2>
-      <p>Dear ${body.contactName},</p>
-      <p>Thank you for applying to become a barbershop partner for the Indiana Barber Apprenticeship program. We have received your application for <strong>${body.shopLegalName}</strong>.</p>
-      
-      <h3>What Happens Next</h3>
-      <ol>
-        <li><strong>Verification (1-3 business days):</strong> We'll verify your shop license and supervisor credentials.</li>
-        <li><strong>MOU Review:</strong> We'll send you the official Memorandum of Understanding for signature.</li>
-        <li><strong>Site Approval:</strong> Once verified and MOU signed, your shop becomes an approved worksite.</li>
-        <li><strong>Apprentice Matching:</strong> We'll work with you to match qualified apprentice candidates.</li>
-      </ol>
-      
-      <p>In the meantime, you can review the MOU template here:<br>
-      <a href="https://www.elevateforhumanity.org/docs/Indiana-Barbershop-Apprenticeship-MOU">View MOU Template</a></p>
-      
-      <p>If you have questions, contact us at:</p>
-      <ul>
-        <li>Phone: (317) 314-3757</li>
-        <li>Email: info@elevateforhumanity.org</li>
-      </ul>
-      
-      <p>Thank you for your interest in developing the next generation of licensed barbers!</p>
-      
-      <p>Best regards,<br>
-      Elevate for Humanity<br>
-      Apprenticeship Programs</p>
+    // Send partner welcome email to applicant (+ admin copy)
+    const shopDisplayName = body.shopDbaName || body.shopLegalName;
+    const partnerWelcomeHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="utf-8">
+      <style>
+        body{font-family:Arial,sans-serif;line-height:1.7;color:#333;margin:0;padding:0}
+        .container{max-width:640px;margin:0 auto;padding:0}
+        .header{background:#f97316;color:white;padding:35px 30px;text-align:center}
+        .header h1{margin:0;font-size:24px}
+        .content{padding:30px;background:#f9fafb}
+        .content h2{color:#1e293b;margin-top:0}
+        .section{background:white;border-radius:10px;padding:24px;margin:20px 0;border:1px solid #e2e8f0}
+        .section h3{color:#f97316;margin-top:0;font-size:18px}
+        .cta-btn{display:inline-block;padding:14px 36px;background:#f97316;color:white;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px;margin:10px 0}
+        .footer{padding:24px 30px;text-align:center;color:#64748b;font-size:13px;background:#f1f5f9}
+        ul{padding-left:20px}li{margin-bottom:8px}
+      </style></head>
+      <body><div class="container">
+        <div class="header"><h1>Welcome to the Barbershop Partner Program</h1></div>
+        <div class="content">
+          <h2>Hi ${body.contactName},</h2>
+          <p>Thank you for your interest in becoming a partner shop with <strong>Elevate for Humanity</strong>! We received your application for <strong>${shopDisplayName}</strong> and we are excited to move forward with you.</p>
+
+          <div class="section">
+            <h3>About the Program</h3>
+            <p>The Indiana Barber Apprenticeship is a <strong>USDOL Registered Apprenticeship</strong> program. As a partner shop, you will host apprentices who complete <strong>2,000 hours</strong> of on-the-job training under a licensed supervising barber in your shop. Apprentices also complete theory coursework through Milady RISE.</p>
+            <p>Once an apprentice finishes the program, they are eligible to sit for the <strong>Indiana State Board barber license exam</strong>.</p>
+          </div>
+
+          <div class="section">
+            <h3>What You Need to Know</h3>
+            <ul>
+              <li><strong>Workers&rsquo; Comp:</strong> Partner shops are required to carry workers&rsquo; compensation insurance for apprentices. If you do not currently have it, we can help you understand your options.</li>
+              <li><strong>Pay Structure:</strong> Apprentices must be paid at least <strong>minimum wage ($7.25/hr)</strong> during training. Many shops use an hourly wage, commission, or hybrid model. You choose what works for your business.</li>
+              <li><strong>Supervising Barber:</strong> You must designate a licensed barber in your shop to supervise and verify apprentice hours and competencies.</li>
+              <li><strong>State Board Inspection:</strong> Your shop must hold a valid Indiana shop license and be in good standing with the Indiana Professional Licensing Agency (IPLA).</li>
+              <li><strong>Tools &amp; Kit:</strong> Apprentices are responsible for their own barber kit. Elevate provides a recommended kit list and can help connect apprentices with funding if needed.</li>
+              <li><strong>ITIN Accepted:</strong> Apprentices may use an ITIN (Individual Taxpayer Identification Number) in place of an SSN for enrollment.</li>
+              <li><strong>Video Site Visit:</strong> Before final approval, we conduct a short video site visit (via Zoom) to see your shop and confirm it meets program requirements. This typically takes about 15 minutes.</li>
+              <li><strong>Approval Timeline:</strong> Once your application and site visit are complete, approval typically takes about <strong>1 week</strong>.</li>
+              <li><strong>DOL Listing:</strong> Approved partner shops are listed on the U.S. Department of Labor RAPIDS system as registered apprenticeship worksites.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h3>What We Need From You</h3>
+            <ul>
+              <li>Your <strong>shop logo</strong> (high resolution PNG or JPG)</li>
+              <li><strong>Photos of the inside and outside of your shop</strong> (at least 2-3 of each)</li>
+              <li>These will be used on your partner profile page on our website</li>
+            </ul>
+            <p>You can reply to this email with the images attached, or text them to <strong>(317) 314-3757</strong>.</p>
+          </div>
+
+          <div class="section">
+            <h3>What Happens Next</h3>
+            <ol>
+              <li><strong>Verification (1-3 business days):</strong> We verify your shop license and supervisor credentials.</li>
+              <li><strong>Video Site Visit:</strong> A short Zoom call to see your shop (~15 minutes).</li>
+              <li><strong>MOU Signing:</strong> We send the official Memorandum of Understanding for signature.</li>
+              <li><strong>Approval (~1 week):</strong> Your shop becomes an approved worksite.</li>
+              <li><strong>Apprentice Matching:</strong> We work with you to match qualified apprentice candidates.</li>
+            </ol>
+            <p>In the meantime, you can review the MOU template here:<br>
+            <a href="https://www.elevateforhumanity.org/docs/Indiana-Barbershop-Apprenticeship-MOU" style="color:#f97316">View MOU Template</a></p>
+          </div>
+
+          <div class="section" style="text-align:center;background:#fff7ed">
+            <h3>Schedule Your Site Visit</h3>
+            <p>Ready to move forward? Book your 15-minute Zoom site visit now. We will walk through your shop and answer any questions.</p>
+            <p><a href="https://calendly.com/elevate4humanityedu/30min" class="cta-btn" style="background:#f97316;color:white">Schedule Site Visit</a></p>
+          </div>
+
+          <p>We look forward to having <strong>${shopDisplayName}</strong> as part of the team. If you have any questions, just reply to this email or call us at <strong>(317) 314-3757</strong>.</p>
+
+          <p>Welcome aboard,<br>
+          <strong>Demetrius Ganaway</strong><br>
+          Founder, Elevate for Humanity<br>
+          Career &amp; Technical Institute<br>
+          8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</p>
+        </div>
+        <div class="footer">
+          <p>Elevate for Humanity Career &amp; Technical Institute<br>
+          <a href="https://www.elevateforhumanity.org">www.elevateforhumanity.org</a> | (317) 314-3757</p>
+        </div>
+      </div></body></html>
     `;
 
+    // Send to applicant
     await sendEmail({
       to: body.contactEmail,
-      subject: 'Barbershop Partner Application Received - Elevate for Humanity',
-      html: confirmationEmailHtml,
-    }).catch(err => logger.error('Failed to send confirmation email', err));
+      subject: `Welcome to the Barbershop Partner Program — ${shopDisplayName}`,
+      html: partnerWelcomeHtml,
+    }).catch(err => logger.error('Failed to send partner welcome email', err));
+
+    // Send copy to admin
+    await sendEmail({
+      to: process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com',
+      subject: `[Copy] Welcome to the Barbershop Partner Program — ${shopDisplayName}`,
+      html: partnerWelcomeHtml,
+    }).catch(err => logger.error('Failed to send admin copy of partner welcome email', err));
 
     return NextResponse.json({
       success: true,

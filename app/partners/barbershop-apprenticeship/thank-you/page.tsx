@@ -79,25 +79,41 @@ export default function ThankYouPage() {
             </div>
           </div>
 
+          <div className="bg-orange-50 border border-orange-200 p-8 rounded-xl mb-8 text-center">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Schedule Your Site Visit</h3>
+            <p className="text-gray-600 mb-4">
+              Ready to move forward? Book your 15-minute Zoom site visit now. We&apos;ll walk through
+              your shop and answer any questions.
+            </p>
+            <a
+              href="https://calendly.com/elevate4humanityedu/30min"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 text-white rounded-lg font-bold text-lg hover:bg-orange-600 transition-colors"
+            >
+              Schedule Site Visit <ArrowRight className="w-5 h-5 ml-2" />
+            </a>
+          </div>
+
           <div className="bg-brand-blue-50 p-6 rounded-xl mb-8">
             <div className="flex items-center gap-3 mb-3">
               <Clock className="w-5 h-5 text-brand-blue-600" />
               <span className="font-semibold text-gray-900">Confirmation Email Sent</span>
             </div>
             <p className="text-gray-600 text-sm">
-              Check your inbox for a confirmation email with a copy of your application details and
-              the MOU template.
+              Check your inbox for a confirmation email with your application details, program info,
+              and the MOU template.
             </p>
           </div>
 
           <div className="bg-gray-100 p-6 rounded-xl mb-8">
             <h3 className="font-semibold text-gray-900 mb-3">Questions?</h3>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/support" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-brand-blue-600">
-                <Phone className="w-4 h-4" /> Get Help Online
+              <a href="tel:+13173143757" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-brand-blue-600">
+                <Phone className="w-4 h-4" /> (317) 314-3757
               </a>
               <a href="/contact" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-brand-blue-600">
-                <Mail className="w-4 h-4" /> our contact form
+                <Mail className="w-4 h-4" /> Contact Us
               </a>
             </div>
           </div>

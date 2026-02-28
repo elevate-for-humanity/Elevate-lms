@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/cosmetology-salon.mp4',
+  voiceoverSrc: '/audio/heroes/nail-tech.mp3',
   title: 'Nail Technician Apprenticeship', subtitle: 'Learn manicure, pedicure, gel, acrylic, and nail art. Earn your Indiana Manicurist License through hands-on salon training.',
   badge: 'Earn While You Learn', badgeColor: 'red',
   duration: '6–9 months', cost: '$3,500 (payment plans available)', format: 'In-salon OJT + classroom, Indianapolis', credential: 'Indiana Manicurist License',

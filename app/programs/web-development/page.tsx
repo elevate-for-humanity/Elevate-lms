@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/it-technology.mp4',
+  voiceoverSrc: '/audio/heroes/technology.mp3',
   title: 'Web Development',
   subtitle: 'Build websites and digital experiences. Earn Meta and WordPress certifications in 10 weeks.',
   badge: '4-Star Top Job — DWD',

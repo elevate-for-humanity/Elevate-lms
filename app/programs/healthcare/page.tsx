@@ -105,7 +105,7 @@ const healthcarePrograms = [
     duration: '8–10 weeks',
     desc: 'Venipuncture, specimen handling, and lab safety. CPT certification included.',
     href: '/programs/phlebotomy',
-    image: '/images/programs-fresh/healthcare.jpg',
+    image: '/images/programs-hq/phlebotomy.jpg',
   },
   {
     title: 'CPR & First Aid',

@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/healthcare-cna.mp4',
+  voiceoverSrc: '/audio/heroes/healthcare.mp3',
   title: 'Pharmacy Technician', subtitle: 'Prepare medications, manage inventory, and assist pharmacists. Prepare for PTCB certification in 10 weeks.',
   badge: 'Funding Available', badgeColor: 'green',
   duration: '10 weeks', cost: '$0 with WIOA funding', format: 'In-person, Indianapolis', credential: 'PTCB Exam Prep',

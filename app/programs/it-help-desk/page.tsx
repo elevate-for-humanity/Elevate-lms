@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/it-technology.mp4',
+  voiceoverSrc: '/audio/heroes/technology.mp3',
   title: 'IT Help Desk Technician',
   subtitle: 'Troubleshoot hardware, software, and networks. Earn CompTIA A+ in 8 weeks and start your IT career.',
   badge: '4-Star Top Job — DWD',

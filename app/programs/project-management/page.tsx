@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/it-technology.mp4',
+  voiceoverSrc: '/audio/heroes/business.mp3',
   title: 'Project Management',
   subtitle: 'Plan, execute, and deliver projects on time and on budget. Earn the IT Specialist — Project Management certification in 8 weeks.',
   badge: '4-Star Top Job — DWD',

@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/it-technology.mp4',
+  voiceoverSrc: '/audio/heroes/technology.mp3',
   title: 'Software Development Foundations',
   subtitle: 'Learn Python, JavaScript, and software engineering fundamentals. Earn the IT Specialist certification in 12 weeks.',
   badge: '5-Star Top Job — DWD',

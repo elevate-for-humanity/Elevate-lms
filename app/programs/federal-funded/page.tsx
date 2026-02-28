@@ -14,7 +14,8 @@ export const metadata: Metadata = {
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/program-hero.mp4',
+  videoSrc: '/videos/training-providers-hero.mp4',
+  voiceoverSrc: '/audio/heroes/programs.mp3',
   title: 'Federal-Funded Programs', subtitle: 'Free career training through WIOA, WRG, and JRI. Tuition, books, supplies, and certifications covered.',
   badge: 'Free Training', badgeColor: 'green',
   duration: '3–16 weeks', cost: '$0 for eligible participants', format: 'In-person, Indianapolis', credential: 'Industry Certifications',

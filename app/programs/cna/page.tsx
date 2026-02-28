@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/cna-hero.mp4',
+  voiceoverSrc: '/audio/heroes/cna.mp3',
 
   title: 'CNA Certification',
   subtitle: 'Become a Certified Nursing Assistant in 4–6 weeks. Clinical hours, state exam prep, and job placement included.',

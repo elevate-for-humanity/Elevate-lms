@@ -34,7 +34,7 @@ const config: ProgramPageConfig = {
   duration: '6–12 weeks', cost: 'WorkOne funding available', format: 'In-person, Indianapolis', credential: 'CompTIA + Certiport + Meta',
   overview: 'Our technology programs prepare you for careers in IT support, cybersecurity, web development, software engineering, networking, and design. Every program includes industry-recognized certifications through CompTIA, Certiport, Meta, or Adobe. Training is hands-on in our computer labs with real-world projects.',
   highlights: ['Industry certifications from CompTIA, Certiport, Meta, Adobe', 'Hands-on training in equipped computer labs', 'Real-world projects for your portfolio', 'Job placement with tech employer partners', 'WorkOne funding available for eligible participants', 'DWD 4-Star and 5-Star Top Job programs'],
-  overviewImage: '/images/programs-fresh/cybersecurity.jpg', overviewImageAlt: 'Technology students working in a computer lab',
+  overviewImage: '/images/programs-hq/technology-hero.jpg', overviewImageAlt: 'Technology students working in a computer lab',
   salaryNumber: 78000, salaryLabel: 'Average salary across technology programs', salaryPrefix: '$',
   credentials: ['CompTIA A+', 'CompTIA Security+', 'CompTIA Network+', 'Meta Digital Marketing', 'Adobe Certified Professional', 'Certiport IT Specialist'],
   steps: [

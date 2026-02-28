@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/it-technology.mp4',
+  voiceoverSrc: '/audio/heroes/technology.mp3',
 
   title: 'CAD/Drafting Technician',
   subtitle: 'Design buildings and infrastructure with AutoCAD. Earn the Autodesk Certified User credential in 10 weeks.',

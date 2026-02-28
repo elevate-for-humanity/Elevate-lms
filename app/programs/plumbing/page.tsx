@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/electrician-trades.mp4',
+  voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
   title: 'Plumbing Technician', subtitle: 'Install and repair residential and commercial plumbing systems. Earn OSHA 10 and NCCER credentials in 10 weeks.',
   badge: 'Funding Available', badgeColor: 'orange',
   duration: '10 weeks', cost: '$0 with WIOA funding', format: 'In-person, Indianapolis', credential: 'OSHA 10 + NCCER Core',

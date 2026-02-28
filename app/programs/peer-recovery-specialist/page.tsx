@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/program-hero.mp4',
+  videoSrc: '/videos/career-services-hero.mp4',
+  voiceoverSrc: '/audio/heroes/dsp.mp3',
   title: 'Peer Recovery Specialist', subtitle: 'Use your lived experience to help others overcome addiction and mental health challenges. Earn Indiana certification in 6 weeks.',
   badge: 'Funding Available', badgeColor: 'green',
   duration: '6 weeks', cost: '$0 with WIOA funding', format: 'In-person, Indianapolis', credential: 'Indiana CPRS',

@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/program-hero.mp4',
+  videoSrc: '/videos/electrician-trades.mp4',
+  voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
   title: 'Diesel Mechanic', subtitle: 'Diagnose and repair diesel engines, transmissions, and hydraulic systems. OSHA 10 and ASE prep in 12 weeks.',
   badge: 'Funding Available', badgeColor: 'orange',
   duration: '12 weeks', cost: '$0 with WIOA funding', format: 'In-person, Indianapolis', credential: 'OSHA 10 + ASE Prep',

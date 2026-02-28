@@ -15,7 +15,8 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
   const [isMuted, setIsMuted] = useState(true);
   const hasPlayedVoiceover = useRef(false);
 
-  // Play video + voiceover on scroll into view, pause when scrolled away. No looping.
+  // Play video on scroll into view, pause when scrolled away.
+  // Voiceover starts on first scroll-in and plays until complete (does not pause on scroll-away).
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -34,9 +35,7 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
           }
         } else {
           video.pause();
-          if (vo && !vo.paused) {
-            vo.pause();
-          }
+          // Voiceover keeps playing until complete — do not pause it
         }
       },
       { threshold: 0.3 }

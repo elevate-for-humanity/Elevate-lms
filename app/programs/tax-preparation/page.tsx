@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/program-hero.mp4',
+  videoSrc: '/videos/it-technology.mp4',
+  voiceoverSrc: '/audio/heroes/tax.mp3',
   title: 'Tax Preparation', subtitle: 'Prepare individual and small business tax returns. Earn your IRS PTIN and start earning during tax season.',
   badge: 'Self-Pay', badgeColor: 'orange',
   duration: '6 weeks', cost: '$1,800', format: 'In-person, Indianapolis', credential: 'IRS PTIN + AFSP',

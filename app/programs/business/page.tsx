@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/program-hero.mp4',
+  videoSrc: '/videos/it-technology.mp4',
+  voiceoverSrc: '/audio/heroes/business.mp3',
   title: 'Business Administration', subtitle: 'Build professional business skills. Microsoft Office, communication, and office management in 5 weeks.',
   badge: 'Self-Pay', badgeColor: 'orange',
   duration: '5 weeks', cost: '$4,550', format: 'In-person, Indianapolis', credential: 'IT Specialist — Business Applications',

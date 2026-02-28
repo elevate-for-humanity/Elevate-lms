@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/it-technology.mp4',
+  voiceoverSrc: '/audio/heroes/technology.mp3',
   title: 'Network Administration',
   subtitle: 'Configure, manage, and troubleshoot enterprise networks. Earn CompTIA Network+ in 10 weeks.',
   badge: '4-Star Top Job — DWD',

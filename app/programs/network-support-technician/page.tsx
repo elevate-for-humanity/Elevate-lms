@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/it-technology.mp4',
+  voiceoverSrc: '/audio/heroes/technology.mp3',
   title: 'Network Support Technician',
   subtitle: 'Install, configure, and troubleshoot network infrastructure. Earn the IT Specialist — Networking certification in 8 weeks.',
   badge: 'Funding Available', badgeColor: 'blue',

@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/it-technology.mp4',
+  voiceoverSrc: '/audio/heroes/technology.mp3',
   title: 'Cybersecurity Analyst',
   subtitle: 'Protect networks and data from cyber threats. Earn CompTIA Security+ in 12 weeks.',
   badge: '5-Star Top Job — DWD',

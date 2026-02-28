@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/it-technology.mp4',
+  voiceoverSrc: '/audio/heroes/business.mp3',
   title: 'Office Administration',
   subtitle: 'Master Microsoft Office and business communication. Earn Microsoft Office Specialist certifications in 6 weeks.',
   badge: 'Funding Available',

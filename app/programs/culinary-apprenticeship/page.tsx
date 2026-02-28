@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/program-hero.mp4',
+  videoSrc: '/videos/training-providers-hero.mp4',
+  voiceoverSrc: '/audio/heroes/programs.mp3',
   title: 'Culinary Apprenticeship', subtitle: 'Train in professional kitchens. Earn ServSafe certification and launch your culinary career.',
   badge: 'Earn While You Learn', badgeColor: 'red',
   duration: '12 months', cost: '$0 with WIOA funding', format: 'In-kitchen OJT + classroom, Indianapolis', credential: 'ServSafe Food Handler',

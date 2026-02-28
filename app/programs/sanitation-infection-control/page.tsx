@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/program-hero.mp4',
+  videoSrc: '/videos/healthcare-cna.mp4',
+  voiceoverSrc: '/audio/heroes/healthcare.mp3',
   title: 'Sanitation & Infection Control', subtitle: 'Earn your sanitation and infection control certification. Required for barber, cosmetology, and healthcare programs.',
   badge: 'Required Certification', badgeColor: 'red',
   duration: '1–2 days', cost: 'Included with funded programs', format: 'In-person, Indianapolis', credential: 'Sanitation Certificate',

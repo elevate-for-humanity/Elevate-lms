@@ -12,7 +12,8 @@ export const metadata: Metadata = {
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/program-hero.mp4',
+  videoSrc: '/videos/training-providers-hero.mp4',
+  voiceoverSrc: '/audio/heroes/programs.mp3',
   title: 'Micro Programs', subtitle: 'Short-term certifications you can earn in 1 day to 2 weeks. Stack credentials to boost your resume.',
   badge: 'Quick Certifications', badgeColor: 'red',
   duration: '1 day – 2 weeks', cost: 'Included with funded programs', format: 'In-person, Indianapolis', credential: 'Multiple Certifications',

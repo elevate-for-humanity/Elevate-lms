@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/it-technology.mp4',
+  voiceoverSrc: '/audio/heroes/technology.mp3',
   title: 'Graphic Design',
   subtitle: 'Create visual content for print and digital media. Earn Adobe Certified Professional credentials in 10 weeks.',
   badge: '4-Star Top Job — DWD',

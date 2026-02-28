@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/program-hero.mp4',
+  videoSrc: '/videos/it-technology.mp4',
+  voiceoverSrc: '/audio/heroes/business.mp3',
   title: 'Entrepreneurship & Small Business', subtitle: 'Turn your business idea into reality. Learn planning, marketing, finance, and operations in 5 weeks.',
   badge: 'Self-Pay', badgeColor: 'orange',
   duration: '5 weeks', cost: '$1,500', format: 'In-person, Indianapolis', credential: 'Certificate of Completion',

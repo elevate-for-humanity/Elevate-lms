@@ -25,12 +25,13 @@ const programs = [
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/barber-hero-final.mp4',
+  voiceoverSrc: '/audio/heroes/barber.mp3',
   title: 'Apprenticeship Programs', subtitle: 'Earn while you learn. On-the-job training in licensed shops and professional kitchens.',
   badge: 'Earn While You Learn', badgeColor: 'red',
   duration: '6–18 months', cost: 'Varies by program', format: 'OJT + classroom, Indianapolis', credential: 'State Licensure Pathway',
   overview: 'Our apprenticeship programs combine on-the-job training with structured classroom instruction. You work with real clients and customers from day one under the supervision of licensed professionals. Apprenticeships are the fastest path to licensure in barber, cosmetology, and culinary careers.',
   highlights: ['Paid on-the-job training from day one', 'Work with real clients under supervision', 'DOL-registered apprenticeship structure', 'State licensure exam preparation', 'Payment plans available for self-pay programs', 'JRI funding available for eligible participants'],
-  overviewImage: '/images/programs-fresh/barber.jpg', overviewImageAlt: 'Apprentice working with a client',
+  overviewImage: '/images/heroes-hq/career-services-hero.jpg', overviewImageAlt: 'Career services and apprenticeship training',
   salaryNumber: 40000, salaryLabel: 'Average starting salary across apprenticeship programs', salaryPrefix: '$',
   steps: [
     { title: 'Apply Online', desc: 'Complete our application in about 5 minutes.' },

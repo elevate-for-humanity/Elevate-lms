@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'Medical Assistant Program | CCMA Certified | Indianapolis',
   description: 'Become a Certified Clinical Medical Assistant in 12-16 weeks. Free with WIOA funding. Clinical rotations and job placement included.',
   alternates: { canonical: `${SITE_URL}/programs/medical-assistant` },
+  openGraph: {
+    title: 'Medical Assistant Program | CCMA Certified | Indianapolis',
+    description: 'Become a Certified Clinical Medical Assistant in 12-16 weeks. Free with WIOA funding. Clinical rotations and job placement included.',
+    url: `${SITE_URL}/programs/medical-assistant`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Medical Assistant Program | CCMA Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'Pharmacy Technician | PTCB Certified | Indianapolis',
   description: 'Prepare for the PTCB Certified Pharmacy Technician exam. 10-week program. Pharmacy techs earn $37,790/year in Indiana.',
   alternates: { canonical: `${SITE_URL}/programs/pharmacy-technician` },
+  openGraph: {
+    title: 'Pharmacy Technician | PTCB Certified | Indianapolis',
+    description: 'Prepare for the PTCB Certified Pharmacy Technician exam. 10-week program. Pharmacy techs earn $37,790/year in Indiana.',
+    url: `${SITE_URL}/programs/pharmacy-technician`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Pharmacy Technician | PTCB Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

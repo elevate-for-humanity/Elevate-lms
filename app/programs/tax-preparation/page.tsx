@@ -10,11 +10,18 @@ export const metadata: Metadata = {
   title: 'Tax Preparation | IRS PTIN Certified | Indianapolis',
   description: 'Become a certified tax preparer. 6-week program covering individual and small business tax returns. Earn your IRS PTIN.',
   alternates: { canonical: `${SITE_URL}/programs/tax-preparation` },
+  openGraph: {
+    title: 'Tax Preparation | IRS PTIN Certified | Indianapolis',
+    description: 'Become a certified tax preparer. 6-week program covering individual and small business tax returns. Earn your IRS PTIN.',
+    url: `${SITE_URL}/programs/tax-preparation`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Tax Preparation | IRS PTIN Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/it-technology.mp4',
-  voiceoverSrc: '/audio/heroes/tax.mp3',
+  videoSrc: '/videos/tax-career-paths.mp4',
   title: 'Tax Preparation', subtitle: 'Prepare individual and small business tax returns. Earn your IRS PTIN and start earning during tax season.',
   badge: 'Self-Pay', badgeColor: 'orange',
   duration: '6 weeks', cost: '$1,800', format: 'In-person, Indianapolis', credential: 'IRS PTIN + AFSP',
@@ -29,7 +36,7 @@ const config: ProgramPageConfig = {
     { title: 'Tax Software', topics: ['Professional software navigation', 'E-filing procedures', 'Quality review process', 'Client intake workflow', 'Data security and compliance'] },
     { title: 'Practice & Certification', topics: ['Practice returns with real scenarios', 'IRS PTIN registration', 'AFSP requirements', 'Ethics and due diligence', 'Career placement and tax season hiring'] },
   ],
-  credentials: ['IRS PTIN (Preparer Tax Identification Number)', 'AFSP Eligibility', 'Certificate of Completion'],
+  credentials: ['IRS PTIN (self-registered with IRS)', 'AFSP Eligibility (IRS Annual Filing Season Program)', 'Elevate Certificate of Completion'],
   careers: [
     { title: 'Tax Preparer', salary: '$35,000–$55,000' },
     { title: 'Tax Associate (seasonal)', salary: '$15–$25/hr' },

@@ -36,6 +36,10 @@ export const NAV_ITEMS = [
       { name: 'Peer Recovery Specialist', href: '/programs/peer-recovery-specialist' },
       { name: '— Beauty & Wellness —', href: '/programs', isHeader: true },
       { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
+      { name: 'Apply Now', href: '/programs/barber-apprenticeship/apply', nested: true },
+      { name: 'Host Shops', href: '/programs/barber-apprenticeship/host-shops', nested: true },
+      { name: 'Documents', href: '/programs/barber-apprenticeship/documents', nested: true },
+      { name: 'Orientation', href: '/programs/barber-apprenticeship/orientation', nested: true },
       { name: 'Cosmetology', href: '/programs/cosmetology-apprenticeship' },
       { name: 'Nail Technician', href: '/programs/nail-technician-apprenticeship' },
       { name: '— All Programs —', href: '/programs', isHeader: true },
@@ -65,6 +69,7 @@ export const NAV_ITEMS = [
       { name: 'Indiana Outcomes', href: '/outcomes/indiana' },
       { name: 'Partnerships', href: '/partnerships' },
       { name: 'Barbershop Partners', href: '/partners/barbershop-apprenticeship' },
+      { name: 'Training Sites', href: '/partners/training-sites' },
       { name: 'FAQ', href: '/faq' },
     ]
   },
@@ -98,6 +103,7 @@ export const NAV_ITEMS = [
     subItems: [
       { name: 'Hire Trained Talent', href: '/employers' },
       { name: 'Partner With Us', href: '/partnerships' },
+      { name: 'Training Sites', href: '/partners/training-sites' },
       { name: 'Apprenticeship Sponsors', href: '/funding/dol' },
       { name: 'Employer Portal', href: '/apply/employer' },
       { name: '— Portals —', href: '/partners', isHeader: true },

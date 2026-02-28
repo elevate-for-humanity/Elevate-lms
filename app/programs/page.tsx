@@ -196,20 +196,27 @@ export default async function ProgramsPage() {
       {/* DELIVERY MODEL STATEMENT — Institutional positioning for workforce reviewers */}
       <section className="py-8 bg-slate-50 border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-6 text-center md:text-left">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-center md:text-left">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-1">Delivery Model</p>
-              <p className="text-sm text-slate-600">Related Technical Instruction (RTI) delivered online via LMS. On-the-Job Training (OJT) completed as internship at employer partner sites.</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-1">Classroom / RTI</p>
+              <p className="text-sm text-slate-600">Didactic instruction delivered online via the Elevate LMS. Curriculum, quizzes, and assessments completed digitally.</p>
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-1">Hands-On / OJT</p>
+              <p className="text-sm text-slate-600">Practical training at approved employer partner sites: licensed shops, clinical facilities, employer worksites, and driving schools.</p>
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-1">Credentials</p>
-              <p className="text-sm text-slate-600">Industry credentials issued by certifying bodies (EPA, OSHA, state boards). Completion certificates issued by Elevate for Humanity.</p>
+              <p className="text-sm text-slate-600">Industry credentials issued by certifying bodies (EPA, OSHA, Indiana PLA, state boards) — not by Elevate.</p>
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-1">Progress Tracking</p>
-              <p className="text-sm text-slate-600">LMS-tracked module completion, RTI attendance, OJT hour logs, and competency-based evaluations documented per program.</p>
+              <p className="text-sm text-slate-600">LMS-tracked module completion, OJT hour logs with supervisor approval, and competency-based evaluations.</p>
             </div>
           </div>
+          <p className="text-xs text-slate-500 mt-4 text-center md:text-left">
+            Elevate for Humanity is a hybrid workforce training hub — not a traditional campus. <a href="/disclosures/training-delivery" className="text-brand-red-600 hover:underline">Full training delivery disclosure →</a>
+          </p>
         </div>
       </section>
 
@@ -582,7 +589,7 @@ export default async function ProgramsPage() {
         <div className="flex animate-marquee-reverse whitespace-nowrap">
           {[...Array(2)].map((_, i) => (
             <span key={i} className="text-4xl md:text-5xl font-black text-brand-blue-200 mx-6">
-              Funded Training • Real Careers • No Debt • Job Placement Assistance • 
+              Funded Training for Eligible Participants • Real Careers • Job Placement Assistance • 
             </span>
           ))}
         </div>

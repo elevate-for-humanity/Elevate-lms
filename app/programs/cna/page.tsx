@@ -12,6 +12,14 @@ export const metadata: Metadata = {
   title: 'CNA Certification Program | Free with WIOA | Indianapolis',
   description: 'Become a Certified Nursing Assistant in 4-6 weeks. State exam prep, clinical hours, and job placement included. Free for eligible participants through WIOA.',
   alternates: { canonical: `${SITE_URL}/programs/cna` },
+  openGraph: {
+    title: 'CNA Certification Program | Free with WIOA | Indianapolis',
+    description: 'Become a Certified Nursing Assistant in 4-6 weeks. State exam prep, clinical hours, and job placement included. Free for eligible participants through WIOA.',
+    url: `${SITE_URL}/programs/cna`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'CNA Certification Program | Free with WIOA | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

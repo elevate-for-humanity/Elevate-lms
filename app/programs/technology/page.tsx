@@ -13,6 +13,14 @@ export const metadata: Metadata = {
   title: 'Technology Training Programs | Certified | Indianapolis',
   description: 'IT Help Desk, Cybersecurity, Web Development, Software Development, and more. Industry certifications with job placement.',
   alternates: { canonical: `${SITE_URL}/programs/technology` },
+  openGraph: {
+    title: 'Technology Training Programs | Certified | Indianapolis',
+    description: 'IT Help Desk, Cybersecurity, Web Development, Software Development, and more. Industry certifications with job placement.',
+    url: `${SITE_URL}/programs/technology`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Technology Training Programs | Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const programs = [

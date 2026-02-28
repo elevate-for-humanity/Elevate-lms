@@ -59,7 +59,7 @@ export function ProgramPaymentButton({
             className="w-full py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-brand-green-700 transition flex items-center justify-center gap-2"
           >
             <Award className="w-5 h-5" />
-            Apply for 100% Free Training
+            Apply for Funded Training
           </button>
         )}
 

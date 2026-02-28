@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/funding/wioa',
   },
-  title: 'WIOA Free Training | Elevate For Humanity',
+  title: 'WIOA Funded Training | Elevate For Humanity',
   description:
     'Get Funded career training through WIOA (Workforce Innovation and Opportunity Act). For unemployed, underemployed, and workers facing barriers.',
 };

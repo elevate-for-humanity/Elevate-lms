@@ -35,7 +35,7 @@ export default function ProgramHero({
             <p className="text-lg md:text-xl text-slate-300 mb-6 max-w-3xl mx-auto">{description}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/apply" className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-brand-orange-500 rounded-lg hover:bg-brand-orange-600 transition-colors">
-                Apply Now - Free Training
+                Apply Now
               </Link>
               <Link href="/contact" className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-slate-300 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors border border-slate-500">
                 Learn More

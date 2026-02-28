@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'Cybersecurity Analyst | CompTIA Security+ | Indianapolis',
   description: 'Earn CompTIA Security+ and IT Specialist certifications. 12-week program. Cybersecurity analysts earn $112,000/year.',
   alternates: { canonical: `${SITE_URL}/programs/cybersecurity-analyst` },
+  openGraph: {
+    title: 'Cybersecurity Analyst | CompTIA Security+ | Indianapolis',
+    description: 'Earn CompTIA Security+ and IT Specialist certifications. 12-week program. Cybersecurity analysts earn $112,000/year.',
+    url: `${SITE_URL}/programs/cybersecurity-analyst`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Cybersecurity Analyst | CompTIA Security+ | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

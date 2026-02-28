@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { auditedMutation } from '@/lib/audit/transactional';
 
 async function _POST(req: Request) {
   try {
@@ -35,17 +36,26 @@ async function _POST(req: Request) {
       );
     }
 
-    const { error } = await db.from('apprenticeship_hours').insert({
-      student_id: user.id,
-      program_slug,
-      date_worked,
-      hours: parseFloat(hours),
-      category,
-      notes: notes || null,
+    const { error } = await auditedMutation({
+      table: 'apprenticeship_hours',
+      operation: 'insert',
+      rowData: {
+        student_id: user.id,
+        program_slug,
+        date_worked,
+        hours: parseFloat(hours),
+        category,
+        notes: notes || null,
+      },
+      audit: {
+        action: 'api:post:/api/apprenticeship/hours',
+        actorId: user.id,
+        targetType: 'apprenticeship_hours',
+        metadata: { program_slug, category, hours: parseFloat(hours) },
+      },
     });
 
     if (error) {
-      // Error: $1
       return NextResponse.json(
         { error: 'Failed to log hours' },
         { status: 500 }

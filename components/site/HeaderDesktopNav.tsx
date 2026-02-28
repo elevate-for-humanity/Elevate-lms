@@ -7,6 +7,7 @@ interface SubItem {
   name: string;
   href: string;
   isHeader?: boolean;
+  nested?: boolean;
 }
 
 interface NavItem {
@@ -40,7 +41,7 @@ export default function HeaderDesktopNav({ items }: HeaderDesktopNavProps) {
                   subItem.isHeader ? (
                     <div
                       key={subItem.name}
-                      className="px-4 py-2 text-xs font-bold text-slate-700 uppercase tracking-wide bg-slate-50 mt-1 first:mt-0"
+                      className="px-4 py-2 text-xs font-extrabold text-brand-red-600 uppercase tracking-wide bg-brand-red-50 mt-1 first:mt-0 border-l-3 border-brand-red-500"
                     >
                       {subItem.name.replace(/—/g, '').trim()}
                     </div>
@@ -48,7 +49,11 @@ export default function HeaderDesktopNav({ items }: HeaderDesktopNavProps) {
                     <Link
                       key={subItem.name}
                       href={subItem.href}
-                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-blue-600 focus-visible:bg-slate-50 focus-visible:text-brand-blue-600"
+                      className={`block py-1.5 text-sm hover:bg-slate-50 hover:text-brand-blue-600 focus-visible:bg-slate-50 focus-visible:text-brand-blue-600 ${
+                        subItem.nested
+                          ? 'pl-8 pr-4 text-slate-500 text-xs border-l-2 border-slate-200 ml-4'
+                          : 'px-4 text-slate-700 py-2'
+                      }`}
                     >
                       {subItem.name}
                     </Link>

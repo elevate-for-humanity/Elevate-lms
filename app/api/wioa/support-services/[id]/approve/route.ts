@@ -9,6 +9,7 @@ import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { auditedMutation } from '@/lib/audit/transactional';
 
 // POST /api/wioa/support-services/[id]/approve - Approve/deny support service
 async function _POST(
@@ -34,14 +35,21 @@ async function _POST(
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error }: any = await supabase
-      .from('supportive_services')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await auditedMutation({
+      table: 'supportive_services',
+      operation: 'update',
+      rowData: updateData,
+      filter: { id },
+      audit: {
+        action: 'api:post:/api/wioa/support-services/approve',
+        actorId: approvedBy,
+        targetType: 'supportive_services',
+        targetId: id,
+        metadata: { approved, approved_amount: approvedAmount },
+      },
+    });
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
 
     return NextResponse.json({ success: true, data });
   } catch (error) { 

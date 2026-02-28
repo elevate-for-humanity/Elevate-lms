@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'Software Development Foundations | IT Specialist Certified | Indianapolis',
   description: 'Earn the Certiport IT Specialist — Software Development certification. 12-week program. 5-Star Top Job. Average salary $104,000+.',
   alternates: { canonical: `${SITE_URL}/programs/software-development` },
+  openGraph: {
+    title: 'Software Development Foundations | IT Specialist Certified | Indianapolis',
+    description: 'Earn the Certiport IT Specialist — Software Development certification. 12-week program. 5-Star Top Job. Average salary $104,000+.',
+    url: `${SITE_URL}/programs/software-development`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Software Development Foundations | IT Specialist Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'Network Administration | CompTIA Network+ | Indianapolis',
   description: 'Earn CompTIA Network+ and IT Specialist certifications. 10-week program. Network admins earn $80,600/year in Indiana.',
   alternates: { canonical: `${SITE_URL}/programs/network-administration` },
+  openGraph: {
+    title: 'Network Administration | CompTIA Network+ | Indianapolis',
+    description: 'Earn CompTIA Network+ and IT Specialist certifications. 10-week program. Network admins earn $80,600/year in Indiana.',
+    url: `${SITE_URL}/programs/network-administration`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Network Administration | CompTIA Network+ | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

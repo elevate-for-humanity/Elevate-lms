@@ -99,8 +99,8 @@ export default function MissionPage() {
               <HandHeart className="w-12 h-12 text-brand-orange-600 mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-3">Accessibility</h3>
               <p className="text-gray-600">
-                Funded training through WIOA, WRG, and JRI funding. No tuition, no fees, 
-                no debt. Financial barriers should never prevent career advancement.
+                Training funded through WIOA, WRG, and JRI for eligible participants. 
+                No tuition for those who qualify. Financial barriers should never prevent career advancement.
               </p>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm">
@@ -150,8 +150,8 @@ export default function MissionPage() {
                   <div className="text-sm text-gray-600">Job Placement</div>
                 </div>
                 <div className="bg-brand-orange-50 p-4 rounded-lg">
-                  <div className="text-3xl font-bold text-brand-orange-600">100%</div>
-                  <div className="text-sm text-gray-600">Free Training</div>
+                  <div className="text-3xl font-bold text-brand-orange-600">$0</div>
+                  <div className="text-sm text-gray-600">For Eligible Participants</div>
                 </div>
               </div>
             </div>
@@ -174,7 +174,7 @@ export default function MissionPage() {
               href="/apply"
               className="px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-full hover:bg-brand-orange-50 transition-all"
             >
-              Start Free Training
+              Start Your Training
             </Link>
             <Link
               href="/employers"

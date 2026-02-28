@@ -10,11 +10,18 @@ export const metadata: Metadata = {
   title: 'Entrepreneurship & Small Business | Indianapolis',
   description: 'Learn to start and run a small business. 5-week program covering business planning, marketing, finance, and legal structure.',
   alternates: { canonical: `${SITE_URL}/programs/entrepreneurship` },
+  openGraph: {
+    title: 'Entrepreneurship & Small Business | Indianapolis',
+    description: 'Learn to start and run a small business. 5-week program covering business planning, marketing, finance, and legal structure.',
+    url: `${SITE_URL}/programs/entrepreneurship`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Entrepreneurship & Small Business | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/it-technology.mp4',
-  voiceoverSrc: '/audio/heroes/business.mp3',
+  videoSrc: '/videos/business-finance.mp4',
   title: 'Entrepreneurship & Small Business', subtitle: 'Turn your business idea into reality. Learn planning, marketing, finance, and operations in 5 weeks.',
   badge: 'Self-Pay', badgeColor: 'orange',
   duration: '5 weeks', cost: '$1,500', format: 'In-person, Indianapolis', credential: 'Certificate of Completion',
@@ -29,7 +36,7 @@ const config: ProgramPageConfig = {
     { title: 'Legal & Operations', topics: ['Business entity selection', 'EIN and state registration', 'Licenses and permits', 'Insurance basics', 'Contracts and agreements'] },
     { title: 'Pitch & Launch', topics: ['Elevator pitch development', 'Presentation to business panel', 'Funding sources (SBA, grants)', 'Networking strategies', 'Post-program mentorship'] },
   ],
-  credentials: ['Certificate of Completion', 'Completed Business Plan'],
+  credentials: ['Elevate Certificate of Completion', 'Completed Business Plan'],
   careers: [
     { title: 'Small Business Owner', salary: 'Variable' },
     { title: 'Freelance Consultant', salary: '$40,000–$100,000+' },

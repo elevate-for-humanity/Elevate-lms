@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/funding/wrg',
   },
-  title: 'WRG Free Training | Elevate For Humanity',
+  title: 'WRG Funded Training | Elevate For Humanity',
   description:
     'Get Funded career training through WRG (Workforce Ready Grant). Indiana residents qualify. No income limits. No age limits.',
 };
@@ -97,14 +97,13 @@ export default async function WrgPage() {
 
           <p className="text-lg text-black mb-6">
             WRG stands for <strong>Workforce Ready Grant</strong>. It's
-            Indiana's program to help residents get free short-term career
-            training (4-12 weeks) in high-demand fields.
+            Indiana&apos;s program to help eligible residents access short-term career
+            training (4-12 weeks) in high-demand fields at no cost.
           </p>
 
           <p className="text-lg text-black mb-6">
-            The state pays for your tuition, books, fees, and certifications.
-            You pay nothing. No loans. No debt. Just free training that leads to
-            real jobs.
+            For eligible participants, the state covers tuition, books, fees, and certifications.
+            No loans. No debt. Funded training that leads to real jobs.
           </p>
 
           <div className="bg-brand-green-50 rounded-lg p-6">
@@ -483,7 +482,7 @@ export default async function WrgPage() {
             Ready to Apply for WRG?
           </h2>
           <p className="text-base md:text-lg mb-8">
-            Free training starts here.
+            Your funded training starts here.
           </p>
           <Link
             href="/contact"

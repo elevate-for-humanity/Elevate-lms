@@ -12,6 +12,14 @@ export const metadata: Metadata = {
   title: 'Welding Technician Training | AWS Certified | Indianapolis',
   description: '10-week welding program. MIG, TIG, Stick, and Flux-Core. OSHA 10, AWS certifications. Free for eligible participants through WIOA.',
   alternates: { canonical: `${SITE_URL}/programs/welding` },
+  openGraph: {
+    title: 'Welding Technician Training | AWS Certified | Indianapolis',
+    description: '10-week welding program. MIG, TIG, Stick, and Flux-Core. OSHA 10, AWS certifications. Free for eligible participants through WIOA.',
+    url: `${SITE_URL}/programs/welding`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Welding Technician Training | AWS Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

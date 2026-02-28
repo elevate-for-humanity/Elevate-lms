@@ -137,7 +137,7 @@ export function Hero() {
                 <div className="w-8 h-8 rounded-full bg-brand-orange-600 text-white flex items-center justify-center text-sm font-bold">
                   2
                 </div>
-                <h3 className="font-semibold text-black">Get Approved for Free Training</h3>
+                <h3 className="font-semibold text-black">Get Approved for Funded Training</h3>
               </div>
               <p className="text-sm text-black mb-2">
                 Your WorkOne counselor will:
@@ -170,7 +170,7 @@ export function Hero() {
                 <li>• Get job placement assistance upon completion</li>
               </ul>
               <p className="text-xs text-slate-500 italic">
-                💡 No tuition for eligible students. No debt. Just training and a career!
+                💡 No tuition for eligible participants through WIOA, WRG, or JRI funding. Eligibility determined by your WorkOne counselor.
               </p>
             </div>
           </div>

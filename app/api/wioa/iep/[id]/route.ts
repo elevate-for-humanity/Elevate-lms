@@ -9,6 +9,7 @@ import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { auditedMutation } from '@/lib/audit/transactional';
 
 // GET /api/wioa/iep/[id] - Get IEP by ID
 async function _GET(
@@ -60,14 +61,20 @@ const supabase = createSupabaseClient();
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error }: any = await supabase
-      .from('individual_employment_plans')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await auditedMutation({
+      table: 'individual_employment_plans',
+      operation: 'update',
+      rowData: updateData,
+      filter: { id },
+      audit: {
+        action: 'api:put:/api/wioa/iep',
+        targetType: 'individual_employment_plans',
+        targetId: id,
+        metadata: { fields_updated: Object.keys(body) },
+      },
+    });
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
 
     return NextResponse.json({ success: true, data });
   } catch (error) { 
@@ -89,26 +96,32 @@ async function _POST(
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  const supabase = createSupabaseClient();
   try {
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
     const { approvedBy, approvalNotes } = body;
 
-    const { data, error }: any = await supabase
-      .from('individual_employment_plans')
-      .update({
+    const { data, error } = await auditedMutation({
+      table: 'individual_employment_plans',
+      operation: 'update',
+      rowData: {
         status: 'approved',
         approved_by: approvedBy,
         approved_at: new Date().toISOString(),
         approval_notes: approvalNotes,
         updated_at: new Date().toISOString(),
-      })
-      .eq('id', id)
-      .select()
-      .single();
+      },
+      filter: { id },
+      audit: {
+        action: 'api:post:/api/wioa/iep/approve',
+        actorId: approvedBy,
+        targetType: 'individual_employment_plans',
+        targetId: id,
+        metadata: { approval_notes: approvalNotes },
+      },
+    });
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
 
     return NextResponse.json({ success: true, data });
   } catch (error) { 

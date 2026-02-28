@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'Network Support Technician | IT Specialist Certified | Indianapolis',
   description: 'Earn IT Specialist — Networking certification. 8-week program. Network support technicians earn $55,000/year in Indiana.',
   alternates: { canonical: `${SITE_URL}/programs/network-support-technician` },
+  openGraph: {
+    title: 'Network Support Technician | IT Specialist Certified | Indianapolis',
+    description: 'Earn IT Specialist — Networking certification. 8-week program. Network support technicians earn $55,000/year in Indiana.',
+    url: `${SITE_URL}/programs/network-support-technician`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Network Support Technician | IT Specialist Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

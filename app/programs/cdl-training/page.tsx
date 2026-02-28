@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'CDL Training | Class A License | Indianapolis',
   description: 'Earn your CDL Class A license in 3-6 weeks. Free for eligible participants through WIOA. Truck drivers earn $50,000-$75,000/year.',
   alternates: { canonical: `${SITE_URL}/programs/cdl-training` },
+  openGraph: {
+    title: 'CDL Training | Class A License | Indianapolis',
+    description: 'Earn your CDL Class A license in 3-6 weeks. Free for eligible participants through WIOA. Truck drivers earn $50,000-$75,000/year.',
+    url: `${SITE_URL}/programs/cdl-training`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'CDL Training | Class A License | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

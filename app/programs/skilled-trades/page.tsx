@@ -13,6 +13,14 @@ export const metadata: Metadata = {
   title: 'Skilled Trades Training Programs | Free with WIOA | Indianapolis',
   description: 'HVAC, Electrical, Welding, Plumbing, CDL, and Diesel Mechanic training. Free for eligible participants. Hands-on training with job placement.',
   alternates: { canonical: `${SITE_URL}/programs/skilled-trades` },
+  openGraph: {
+    title: 'Skilled Trades Training Programs | Free with WIOA | Indianapolis',
+    description: 'HVAC, Electrical, Welding, Plumbing, CDL, and Diesel Mechanic training. Free for eligible participants. Hands-on training with job placement.',
+    url: `${SITE_URL}/programs/skilled-trades`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Skilled Trades Training Programs | Free with WIOA | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const programs = [

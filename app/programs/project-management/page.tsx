@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'Project Management | Certiport Certified | Indianapolis',
   description: 'Earn the IT Specialist — Project Management certification. 8-week program. Project managers earn $95,370/year.',
   alternates: { canonical: `${SITE_URL}/programs/project-management` },
+  openGraph: {
+    title: 'Project Management | Certiport Certified | Indianapolis',
+    description: 'Earn the IT Specialist — Project Management certification. 8-week program. Project managers earn $95,370/year.',
+    url: `${SITE_URL}/programs/project-management`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Project Management | Certiport Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

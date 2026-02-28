@@ -9,7 +9,7 @@ import Link from 'next/link';
 interface NavItem {
   name: string;
   href: string;
-  subItems?: { name: string; href: string }[];
+  subItems?: { name: string; href: string; isHeader?: boolean; nested?: boolean }[];
 }
 
 interface HeaderMobileMenuProps {
@@ -103,14 +103,27 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
                   {expandedItem === item.name && (
                     <div className="pb-3 pl-4">
                       {item.subItems.map((subItem) => (
-                        <Link
-                          key={subItem.name}
-                          href={subItem.href}
-                          onClick={() => setIsOpen(false)}
-                          className="block py-3 text-slate-600 hover:text-brand-blue-600"
-                        >
-                          {subItem.name}
-                        </Link>
+                        subItem.isHeader ? (
+                          <div
+                            key={subItem.name}
+                            className="pt-3 pb-1 text-xs font-extrabold text-brand-red-600 uppercase tracking-wide border-l-3 border-brand-red-500 pl-2"
+                          >
+                            {subItem.name.replace(/—/g, '').trim()}
+                          </div>
+                        ) : (
+                          <Link
+                            key={subItem.name}
+                            href={subItem.href}
+                            onClick={() => setIsOpen(false)}
+                            className={`block hover:text-brand-blue-600 ${
+                              subItem.nested
+                                ? 'py-1.5 pl-4 text-xs text-slate-400 border-l border-slate-200'
+                                : 'py-3 text-slate-600'
+                            }`}
+                          >
+                            {subItem.name}
+                          </Link>
+                        )
                       ))}
                     </div>
                   )}

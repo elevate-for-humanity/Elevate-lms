@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { auditedMutation } from '@/lib/audit/transactional';
 
 async function _POST(req: Request) {
   try {
@@ -48,11 +49,18 @@ async function _POST(req: Request) {
       updateData.completion_date = completion_date;
     }
 
-    const { data, error }: any = await supabase
-      .from('rapids_tracking')
-      .upsert(updateData, { onConflict: 'apprentice_id' })
-      .select()
-      .single();
+    const { data, error } = await auditedMutation({
+      table: 'rapids_tracking',
+      operation: 'upsert',
+      rowData: updateData,
+      conflictOn: ['apprentice_id'],
+      audit: {
+        action: 'api:post:/api/rapids/update',
+        targetType: 'rapids_tracking',
+        targetId: apprentice_id,
+        metadata: { status, rapids_id },
+      },
+    });
 
     if (error) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 400 });

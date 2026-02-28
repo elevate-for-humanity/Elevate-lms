@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'Barber Apprenticeship | 2,000-Hour Licensed Training | Indianapolis',
   description: 'Barber apprenticeship in Indianapolis. 2,000 OJT hours in licensed barbershops. Earn while you learn. Licensure pathway included.',
   alternates: { canonical: `${SITE_URL}/programs/barber-apprenticeship` },
+  openGraph: {
+    title: 'Barber Apprenticeship | 2,000-Hour Licensed Training | Indianapolis',
+    description: 'Barber apprenticeship in Indianapolis. 2,000 OJT hours in licensed barbershops. Earn while you learn. Licensure pathway included.',
+    url: `${SITE_URL}/programs/barber-apprenticeship`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Barber Apprenticeship | 2,000-Hour Licensed Training | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

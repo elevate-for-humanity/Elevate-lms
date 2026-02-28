@@ -19,8 +19,8 @@ const fallbackTeam = [
     name: 'Elizabeth Greene',
     title: 'Founder & Chief Executive Officer',
     image_url: '/images/team/elizabeth-greene.jpg',
-    bio: 'Elizabeth founded Elevate for Humanity with a mission to connect everyday people to free workforce training. She also owns Textures Institute of Cosmetology, Greene Staffing Solutions, and Greene Property Management—creating a holistic ecosystem for training, employment, and housing.',
-    email: 'elizabeth@elevateforhumanity.org',
+    bio: 'U.S. military veteran, IRS Enrolled Agent (EA), EFIN and PTIN holder, licensed barber, Indiana substitute teacher, EPA 608 Certified Proctor. Elizabeth founded Elevate for Humanity to connect people to funded workforce training. She also operates SupersonicFastCash, a tax preparation software company.',
+    email: '',
   },
   {
     id: '2',
@@ -67,7 +67,7 @@ const fallbackTeam = [
     name: 'Delores Reynolds',
     title: 'Social Media & Digital Engagement Coordinator',
     image_url: '/images/delores-reynolds.jpg',
-    bio: 'Delores manages digital communications, sharing student success stories and promoting program offerings to reach those who can benefit from free training.',
+    bio: 'Delores manages digital communications, sharing student success stories and promoting program offerings to reach those who can benefit from funded training.',
     email: 'delores@elevateforhumanity.org',
   },
   {
@@ -179,6 +179,35 @@ export default async function TeamPage() {
               <p className="text-slate-500">Contact us to learn more about our team.</p>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Associates & Partners */}
+      <section className="py-14 sm:py-20 bg-white border-t border-slate-100">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Associates & Partners</h2>
+          <p className="text-slate-500 mb-8">Firms and organizations we work with to deliver services.</p>
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div className="border border-slate-200 rounded-xl p-6">
+              <p className="text-xs font-semibold text-brand-red-600 uppercase tracking-wider">Architecture & Design-Build</p>
+              <h3 className="text-lg font-bold text-slate-900 mt-1">Jesse J Wilkerson & Associates</h3>
+              <p className="text-slate-600 text-sm mt-2">
+                Central Indiana architectural firm established in 2008. Services include architectural design, 
+                CAD drafting, REVIT modeling, construction administration, programming, master planning, 
+                construction document production, and technical specifications. Extended to design-build services. 
+                Portfolio includes industrial (Purdue University), multi-family residential, commercial, retail, 
+                health (Jane Pauley), religious, and educational (K-12, Purdue Polytechnic) projects.
+              </p>
+            </div>
+            <div className="border border-slate-200 rounded-xl p-6">
+              <p className="text-xs font-semibold text-brand-red-600 uppercase tracking-wider">CNA Training Partner</p>
+              <h3 className="text-lg font-bold text-slate-900 mt-1">Choice Medical CNA School</h3>
+              <p className="text-slate-600 text-sm mt-2">
+                Certified nursing assistant training partner providing clinical instruction and 
+                hands-on patient care training for Elevate healthcare program participants.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 

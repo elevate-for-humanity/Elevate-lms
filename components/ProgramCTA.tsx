@@ -17,7 +17,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                 Ready to Start Your Career?
               </h2>
               <p className="text-xl mb-8 text-white">
-                Join {programName} and get training at no cost through WIOA funding for eligible participants. No tuition, no debt — just career opportunities.
+                Enroll in {programName} and access training funded through WIOA, WRG, or JRI for eligible participants. No tuition for those who qualify — just training and a career.
               </p>
 
               {/* Highlights with Icons */}
@@ -26,14 +26,14 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
                       src="/images/prog-hero-main.jpg"
-                      alt="Free training"
+                      alt="Funded training"
                       fill
                       className="object-cover"
                     />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg">100% Free Training</h3>
-                    <p className="text-white">Fully funded through WIOA, WRG, and JRI programs</p>
+                    <h3 className="font-bold text-lg">No-Cost Training Available</h3>
+                    <p className="text-white">Funded through WIOA, WRG, and JRI for eligible participants</p>
                   </div>
                 </div>
 
@@ -73,7 +73,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                   href="/apply"
                   className="inline-block px-8 py-4 bg-white text-brand-orange-700 font-bold rounded-full hover:bg-brand-orange-50 transition-all shadow-xl text-center text-lg"
                 >
-                  Apply Now - Free Training
+                  Apply Now
                 </Link>
                 <a
                   href="/support"
@@ -114,7 +114,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                 Start at Indiana Career Connect
               </h2>
               <p className="text-xl mb-6 text-slate-300">
-                All WIOA-funded training starts with Indiana Career Connect. Create your account, schedule an appointment, and get approved for free training.
+                All WIOA-funded training starts with Indiana Career Connect. Create your account, schedule an appointment, and get approved for funded training.
               </p>
 
               <div className="space-y-4 mb-8">

@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'CPR & First Aid Certification | Same-Day | Indianapolis',
   description: 'American Heart Association CPR, First Aid, and AED certification. Same-day certification available. Required for healthcare and trades programs.',
   alternates: { canonical: `${SITE_URL}/programs/cpr-first-aid` },
+  openGraph: {
+    title: 'CPR & First Aid Certification | Same-Day | Indianapolis',
+    description: 'American Heart Association CPR, First Aid, and AED certification. Same-day certification available. Required for healthcare and trades programs.',
+    url: `${SITE_URL}/programs/cpr-first-aid`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'CPR & First Aid Certification | Same-Day | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

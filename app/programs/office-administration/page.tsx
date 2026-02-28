@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'Office Administration | Microsoft Office Specialist | Indianapolis',
   description: 'Earn Microsoft Office Specialist certifications. 6-week program. Office administrators earn $42,000/year in Indiana.',
   alternates: { canonical: `${SITE_URL}/programs/office-administration` },
+  openGraph: {
+    title: 'Office Administration | Microsoft Office Specialist | Indianapolis',
+    description: 'Earn Microsoft Office Specialist certifications. 6-week program. Office administrators earn $42,000/year in Indiana.',
+    url: `${SITE_URL}/programs/office-administration`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Office Administration | Microsoft Office Specialist | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'Graphic Design | Adobe Certified Professional | Indianapolis',
   description: 'Earn Adobe Certified Professional credentials. 10-week program. Graphic designers earn $58,910/year in Indiana.',
   alternates: { canonical: `${SITE_URL}/programs/graphic-design` },
+  openGraph: {
+    title: 'Graphic Design | Adobe Certified Professional | Indianapolis',
+    description: 'Earn Adobe Certified Professional credentials. 10-week program. Graphic designers earn $58,910/year in Indiana.',
+    url: `${SITE_URL}/programs/graphic-design`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Graphic Design | Adobe Certified Professional | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

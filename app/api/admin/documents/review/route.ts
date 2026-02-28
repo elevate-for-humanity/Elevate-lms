@@ -9,6 +9,7 @@ import { sendEmail } from '@/lib/email';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { auditedMutation } from '@/lib/audit/transactional';
 
 async function _POST(request: NextRequest) {
   try {
@@ -51,32 +52,41 @@ async function _POST(request: NextRequest) {
 
     const status = action === 'approve' ? 'approved' : 'rejected';
 
-    const { data: document, error: updateError } = await db
-      .from('documents')
-      .update({
+    const { data: updatedDoc, error: updateError } = await auditedMutation({
+      table: 'documents',
+      operation: 'update',
+      rowData: {
         status,
         reviewed_by: adminId,
         reviewed_at: new Date().toISOString(),
         rejection_reason: action === 'reject' ? rejectionReason : null,
-      })
-      .eq('id', documentId)
-      .select(
-        `
-        *,
-        profiles:user_id (
-          id,
-          full_name,
-          email
-        )
-      `
-      )
-      .single();
+      },
+      filter: { id: documentId },
+      audit: {
+        action: 'api:post:/api/admin/documents/review',
+        actorId: user.id,
+        targetType: 'documents',
+        targetId: documentId,
+        metadata: { decision: action },
+      },
+    });
 
     if (updateError) {
       return NextResponse.json(
         { error: 'Failed to update document' },
         { status: 500 }
       );
+    }
+
+    // Fetch joined profile data for email notifications
+    const { data: document } = await db
+      .from('documents')
+      .select(`*, profiles:user_id (id, full_name, email)`)
+      .eq('id', documentId)
+      .single();
+
+    if (!document) {
+      return NextResponse.json({ success: true, document: updatedDoc });
     }
 
     const userProfile = document.profiles as any;

@@ -10,11 +10,18 @@ export const metadata: Metadata = {
   title: 'Nail Technician Apprenticeship | Licensed Training | Indianapolis',
   description: 'Nail technician apprenticeship in Indianapolis. Hands-on training in licensed salons. Indiana Manicurist License pathway.',
   alternates: { canonical: `${SITE_URL}/programs/nail-technician-apprenticeship` },
+  openGraph: {
+    title: 'Nail Technician Apprenticeship | Licensed Training | Indianapolis',
+    description: 'Nail technician apprenticeship in Indianapolis. Hands-on training in licensed salons. Indiana Manicurist License pathway.',
+    url: `${SITE_URL}/programs/nail-technician-apprenticeship`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Nail Technician Apprenticeship | Licensed Training | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/cosmetology-salon.mp4',
-  voiceoverSrc: '/audio/heroes/nail-tech.mp3',
+  videoSrc: '/videos/nail-tech.mp4',
   title: 'Nail Technician Apprenticeship', subtitle: 'Learn manicure, pedicure, gel, acrylic, and nail art. Earn your Indiana Manicurist License through hands-on salon training.',
   badge: 'Earn While You Learn', badgeColor: 'red',
   duration: '6–9 months', cost: '$3,500 (payment plans available)', format: 'In-salon OJT + classroom, Indianapolis', credential: 'Indiana Manicurist License',

@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { auditedMutation } from '@/lib/audit/transactional';
 
 async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
@@ -76,9 +77,10 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: 'Not a partner' }, { status: 403 });
   }
 
-  const { data, error } = await db
-    .from('training_hours')
-    .insert({
+  const { data, error } = await auditedMutation({
+    table: 'training_hours',
+    operation: 'insert',
+    rowData: {
       organization_id: partnerUser.organization_id,
       apprentice_id: body.apprentice_id,
       date: body.date,
@@ -87,9 +89,18 @@ async function _POST(request: NextRequest) {
       activity_type: body.activity_type || 'training',
       status: 'pending',
       submitted_by: user.id,
-    })
-    .select()
-    .single();
+    },
+    audit: {
+      action: 'api:post:/api/partner/hours',
+      actorId: user.id,
+      targetType: 'training_hours',
+      metadata: {
+        organization_id: partnerUser.organization_id,
+        apprentice_id: body.apprentice_id,
+        hours: body.hours,
+      },
+    },
+  });
 
   if (error) {
     return NextResponse.json({ error: 'Failed to log hours' }, { status: 500 });

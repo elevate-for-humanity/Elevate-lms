@@ -8,15 +8,23 @@ const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
   title: 'Diesel Mechanic Training | ASE Prep | Indianapolis',
-  description: 'Diesel engine repair and maintenance training. 12-week program. OSHA 10 certified. Free for eligible participants.',
+  description: 'Diesel engine repair and maintenance training. 12-week program. OSHA 10 certified. Funding available for eligible participants.',
   alternates: { canonical: `${SITE_URL}/programs/diesel-mechanic` },
+  openGraph: {
+    title: 'Diesel Mechanic Training | ASE Prep | Indianapolis',
+    description: 'Diesel engine repair and maintenance training. 12-week program. OSHA 10 certified. Funding available for eligible participants.',
+    url: `${SITE_URL}/programs/diesel-mechanic`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Diesel Mechanic Training | ASE Prep | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/electrician-trades.mp4',
-  voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
   title: 'Diesel Mechanic', subtitle: 'Diagnose and repair diesel engines, transmissions, and hydraulic systems. OSHA 10 and ASE prep in 12 weeks.',
-  badge: 'Funding Available', badgeColor: 'orange',
+  badge: 'Accepting Interest', badgeColor: 'orange',
+  statusNotice: 'This program requires employer shop partners for hands-on training. We are actively recruiting diesel shops. Submit an interest form to be notified when enrollment opens.',
   duration: '12 weeks', cost: '$0 with WIOA funding', format: 'In-person, Indianapolis', credential: 'OSHA 10 + ASE Prep',
   overview: 'This 12-week program covers diesel engine theory, fuel systems, electrical systems, brakes, transmissions, and hydraulics. You will work on real diesel engines and heavy equipment in a hands-on shop. Graduates earn OSHA 10 certification and are prepared for ASE Medium/Heavy Truck certification exams.',
   highlights: ['Diesel engine theory and operation', 'Fuel system diagnosis and repair', 'Electrical and electronic systems', 'Brake and transmission service', 'Hydraulic system fundamentals', 'OSHA 10-Hour Construction Safety'],
@@ -29,7 +37,7 @@ const config: ProgramPageConfig = {
     { title: 'Drivetrain & Brakes', topics: ['Manual transmissions', 'Automatic transmissions', 'Drive axles and differentials', 'Air brake systems', 'ABS diagnostics'] },
     { title: 'Safety & Certification', topics: ['OSHA 10-Hour certification', 'Shop safety procedures', 'Hazardous materials handling', 'ASE exam preparation', 'Career placement support'] },
   ],
-  credentials: ['OSHA 10-Hour Construction Safety', 'ASE Medium/Heavy Truck Prep', 'CPR/First Aid'],
+  credentials: ['OSHA 10-Hour Construction Safety (DOL card)', 'ASE Medium/Heavy Truck exam preparation', 'CPR/First Aid (AHA/HSI issued)', 'Elevate Certificate of Completion'],
   careers: [
     { title: 'Diesel Mechanic', salary: '$45,000–$65,000' },
     { title: 'Heavy Equipment Mechanic', salary: '$48,000–$68,000' },
@@ -42,7 +50,14 @@ const config: ProgramPageConfig = {
     { title: 'Attend Orientation', desc: 'Tour the diesel shop and meet your instructor.' },
     { title: 'Start Training', desc: 'Begin 12 weeks of hands-on diesel training.' },
   ],
-  applyHref: '/apply?program=diesel-mechanic',
+  faqs: [
+    { question: 'Do I need prior mechanic experience?', answer: 'No. This program starts with engine theory fundamentals and builds to advanced diagnostics. Basic mechanical aptitude is helpful but not required.' },
+    { question: 'What tools do I need?', answer: 'A basic hand tool set is recommended. Specialty tools and diagnostic equipment are provided in the shop. WIOA funding may cover tool costs for eligible participants.' },
+    { question: 'Is this program WIOA-funded?', answer: 'Yes. Eligible participants can receive full funding through WIOA, covering tuition, materials, OSHA certification, and supportive services. Register at Indiana Career Connect to check eligibility.' },
+    { question: 'What is ASE certification?', answer: 'ASE (Automotive Service Excellence) is the industry-standard certification for mechanics. This program prepares you for the ASE Medium/Heavy Truck exams. You can sit for the exams after gaining qualifying work experience.' },
+    { question: 'Where do graduates work?', answer: 'Graduates work at trucking companies, fleet maintenance shops, heavy equipment dealers, construction companies, and independent diesel repair shops. Some start mobile diesel repair businesses.' },
+  ],
+  applyHref: '/inquiry?program=diesel-mechanic',
   breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Skilled Trades', href: '/programs/skilled-trades' }, { label: 'Diesel Mechanic' }],
 };
 

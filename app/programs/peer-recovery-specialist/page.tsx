@@ -10,13 +10,21 @@ export const metadata: Metadata = {
   title: 'Peer Recovery Specialist | Indiana Certified | Indianapolis',
   description: 'Become a Certified Peer Recovery Specialist. 6-week program. Help others overcome addiction and mental health challenges.',
   alternates: { canonical: `${SITE_URL}/programs/peer-recovery-specialist` },
+  openGraph: {
+    title: 'Peer Recovery Specialist | Indiana Certified | Indianapolis',
+    description: 'Become a Certified Peer Recovery Specialist. 6-week program. Help others overcome addiction and mental health challenges.',
+    url: `${SITE_URL}/programs/peer-recovery-specialist`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Peer Recovery Specialist | Indiana Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/career-services-hero.mp4',
-  voiceoverSrc: '/audio/heroes/dsp.mp3',
   title: 'Peer Recovery Specialist', subtitle: 'Use your lived experience to help others overcome addiction and mental health challenges. Earn Indiana certification in 6 weeks.',
-  badge: 'Funding Available', badgeColor: 'green',
+  badge: 'Accepting Interest', badgeColor: 'orange',
+  statusNotice: 'This program requires supervised practicum sites. We are finalizing community partner agreements. Submit an interest form to be notified when enrollment opens.',
   duration: '6 weeks', cost: '$0 with WIOA funding', format: 'In-person, Indianapolis', credential: 'Indiana CPRS',
   overview: 'This 6-week program prepares you for the Indiana Certified Peer Recovery Specialist (CPRS) credential. You will learn recovery coaching, motivational interviewing, crisis intervention, and community resource navigation. This program is designed for individuals with lived experience in recovery from substance use or mental health challenges who want to help others on their journey.',
   highlights: ['Recovery coaching and mentoring techniques', 'Motivational interviewing skills', 'Crisis intervention and de-escalation', 'Community resource navigation', 'Indiana CPRS certification preparation', 'Supervised practicum hours'],
@@ -29,7 +37,7 @@ const config: ProgramPageConfig = {
     { title: 'Community Resources', topics: ['Treatment referral pathways', 'Housing and employment resources', 'Insurance and benefits navigation', 'Support group facilitation', 'Advocacy skills'] },
     { title: 'Certification Prep', topics: ['Indiana CPRS requirements', 'Practicum hours', 'Exam preparation', 'Application process', 'Career placement support'] },
   ],
-  credentials: ['Indiana Certified Peer Recovery Specialist (CPRS)', 'CPR/First Aid', 'Certificate of Completion'],
+  credentials: ['Indiana CPRS exam preparation (state-issued credential)', 'CPR/First Aid (AHA/HSI issued)', 'Elevate Certificate of Completion'],
   careers: [
     { title: 'Peer Recovery Specialist', salary: '$32,000–$42,000' },
     { title: 'Recovery Coach', salary: '$35,000–$45,000' },
@@ -46,7 +54,7 @@ const config: ProgramPageConfig = {
     { question: 'Do I need to be in recovery to enroll?', answer: 'Indiana requires CPRS candidates to have lived experience with recovery from substance use or mental health challenges. You must have at least 2 years of sustained recovery.' },
     { question: 'Is this program free?', answer: 'Yes, for eligible participants. WIOA funding covers tuition and materials. If you do not qualify for WIOA, payment plans are available.' },
   ],
-  applyHref: '/apply?program=peer-recovery-specialist',
+  applyHref: '/inquiry?program=peer-recovery-specialist',
   breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Healthcare', href: '/programs/healthcare' }, { label: 'Peer Recovery Specialist' }],
 };
 

@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'Cosmetology Apprenticeship | Licensed Training | Indianapolis',
   description: 'Cosmetology apprenticeship in Indianapolis. Earn while you learn in licensed salons. Indiana Cosmetology License pathway.',
   alternates: { canonical: `${SITE_URL}/programs/cosmetology-apprenticeship` },
+  openGraph: {
+    title: 'Cosmetology Apprenticeship | Licensed Training | Indianapolis',
+    description: 'Cosmetology apprenticeship in Indianapolis. Earn while you learn in licensed salons. Indiana Cosmetology License pathway.',
+    url: `${SITE_URL}/programs/cosmetology-apprenticeship`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Cosmetology Apprenticeship | Licensed Training | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

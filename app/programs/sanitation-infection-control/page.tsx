@@ -10,11 +10,18 @@ export const metadata: Metadata = {
   title: 'Sanitation & Infection Control | Certified | Indianapolis',
   description: 'Sanitation and infection control certification. Required for barber, cosmetology, and healthcare programs. 1-2 day course.',
   alternates: { canonical: `${SITE_URL}/programs/sanitation-infection-control` },
+  openGraph: {
+    title: 'Sanitation & Infection Control | Certified | Indianapolis',
+    description: 'Sanitation and infection control certification. Required for barber, cosmetology, and healthcare programs. 1-2 day course.',
+    url: `${SITE_URL}/programs/sanitation-infection-control`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Sanitation & Infection Control | Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/healthcare-cna.mp4',
-  voiceoverSrc: '/audio/heroes/healthcare.mp3',
   title: 'Sanitation & Infection Control', subtitle: 'Earn your sanitation and infection control certification. Required for barber, cosmetology, and healthcare programs.',
   badge: 'Required Certification', badgeColor: 'red',
   duration: '1–2 days', cost: 'Included with funded programs', format: 'In-person, Indianapolis', credential: 'Sanitation Certificate',
@@ -27,7 +34,14 @@ const config: ProgramPageConfig = {
     { title: 'Infection Control', topics: ['Bloodborne pathogen standard', 'Universal precautions', 'PPE selection and use', 'Exposure incident procedures', 'Hand hygiene protocols'] },
     { title: 'Regulatory Compliance', topics: ['Indiana Board of Cosmetology rules', 'OSHA BBP standard', 'Inspection readiness', 'Record keeping', 'Certification documentation'] },
   ],
-  credentials: ['Sanitation & Infection Control Certificate', 'OSHA Bloodborne Pathogen Awareness'],
+  careers: [
+    { title: 'Licensed Barber', salary: '$30,000–$60,000+' },
+    { title: 'Cosmetologist', salary: '$28,000–$50,000+' },
+    { title: 'Nail Technician', salary: '$26,000–$42,000' },
+    { title: 'Medical Assistant', salary: '$36,000–$44,000' },
+    { title: 'CNA / Patient Care Aide', salary: '$30,000–$38,000' },
+  ],
+  credentials: ['Elevate Sanitation & Infection Control Certificate', 'OSHA Bloodborne Pathogen Awareness (training completion)'],
   steps: [
     { title: 'Register', desc: 'Sign up for the next available sanitation class.' },
     { title: 'Attend Class', desc: 'Complete 1-2 days of instruction and demonstration.' },

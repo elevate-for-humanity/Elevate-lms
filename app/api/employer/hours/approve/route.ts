@@ -9,6 +9,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { auditedMutation } from '@/lib/audit/transactional';
 
 async function _POST(req: Request) {
   try {
@@ -70,18 +71,26 @@ async function _POST(req: Request) {
       }
     }
 
-    // Approve the hours
-    const { error } = await db
-      .from('apprenticeship_hours')
-      .update({
+    // Approve the hours — transactional with audit
+    const { error } = await auditedMutation({
+      table: 'apprenticeship_hours',
+      operation: 'update',
+      rowData: {
         approved: true,
         approved_by: user.id,
         approved_at: new Date().toISOString(),
-      })
-      .eq('id', hour_id);
+      },
+      filter: { id: hour_id },
+      audit: {
+        action: 'api:post:/api/employer/hours/approve',
+        actorId: user.id,
+        targetType: 'apprenticeship_hours',
+        targetId: hour_id,
+        metadata: { employer_id: profile.employer_id },
+      },
+    });
 
     if (error) {
-      // Error: $1
       return NextResponse.json(
         { error: 'Failed to approve hours' },
         { status: 500 }

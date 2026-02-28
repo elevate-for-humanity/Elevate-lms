@@ -8,12 +8,20 @@ const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
   title: 'HVAC Technician Training | EPA 608 Certified | Indianapolis',
-  description: '15-week HVAC program. EPA 608, OSHA 30, and 6 industry credentials. Free for eligible participants through WIOA.',
+  description: '15-week HVAC program. EPA 608, OSHA 30, and 6 industry credentials. Funding available for eligible participants through WIOA.',
   alternates: { canonical: `${SITE_URL}/programs/hvac-technician` },
+  openGraph: {
+    title: 'HVAC Technician Training | EPA 608 Certified | Indianapolis',
+    description: '15-week HVAC program. EPA 608, OSHA 30, and 6 industry credentials. Funding available for eligible participants through WIOA.',
+    url: `${SITE_URL}/programs/hvac-technician`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'HVAC Technician Training | EPA 608 Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/electrician-trades.mp4', voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
+  videoSrc: '/videos/hvac-technician.mp4', voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
   title: 'HVAC Technician', subtitle: 'Install, maintain, and repair heating and cooling systems. Earn EPA 608 and OSHA 30 in 15 weeks.',
   badge: 'Funding Available', badgeColor: 'orange',
   duration: '15 weeks', cost: '$0 with WIOA funding', format: 'In-person, Indianapolis', credential: 'EPA 608 Universal + OSHA 30',
@@ -29,7 +37,7 @@ const config: ProgramPageConfig = {
     { title: 'Troubleshooting', topics: ['Systematic diagnosis', 'Electrical testing', 'Refrigerant leak detection', 'Airflow measurement', 'Customer communication'] },
     { title: 'Certifications', topics: ['EPA 608 Universal exam', 'OSHA 30-Hour certification', 'CPR/First Aid', 'Rise Up certification', 'Career placement support'] },
   ],
-  credentials: ['EPA 608 Universal Certification', 'OSHA 30-Hour Construction Safety', 'Residential HVAC Certification 1 & 2', 'CPR/First Aid', 'Rise Up'],
+  credentials: ['EPA 608 Universal (Mainstream Engineering, proctored on-site)', 'OSHA 30-Hour Construction Safety (DOL card)', 'Residential HVAC Certification 1 & 2', 'CPR/First Aid (AHA/HSI issued)', 'Rise Up (NRF Foundation)'],
   careers: [
     { title: 'HVAC Technician', salary: '$42,000–$62,000' },
     { title: 'HVAC Installer', salary: '$38,000–$55,000' },
@@ -45,7 +53,7 @@ const config: ProgramPageConfig = {
   faqs: [
     { question: 'Do I need HVAC experience?', answer: 'No. This program starts from the basics. You will learn refrigeration theory, electrical fundamentals, and hands-on skills from scratch.' },
     { question: 'Is this program free?', answer: 'Yes, for eligible participants. WIOA funding covers tuition, tools, and certification fees. If you do not qualify, payment plans are available.' },
-    { question: 'What is EPA 608?', answer: 'EPA 608 is a federal certification required for anyone who handles refrigerants. The Universal level covers all equipment types. It is required by law for HVAC technicians.' },
+    { question: 'What is EPA 608?', answer: 'EPA 608 is a federal certification required for anyone who handles refrigerants. The Universal level covers all equipment types. It is required by law for HVAC technicians. We proctor the exam on-site using the Mainstream Engineering QwikTest system.' },
   ],
   applyHref: '/apply?program=hvac-technician',
   breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Skilled Trades', href: '/programs/skilled-trades' }, { label: 'HVAC Technician' }],

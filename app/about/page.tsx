@@ -127,7 +127,7 @@ export default function AboutPage() {
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Funding Navigation</h3>
                 <p className="text-sm text-gray-700 mb-2">
-                  Most people do not know they qualify for free training. We walk every participant
+                  Most people do not know they may qualify for funded training. We walk every participant
                   through the eligibility process for WIOA (covers tuition, books, supplies, and
                   sometimes transportation and childcare), the Workforce Ready Grant (covers
                   high-demand certifications regardless of income), and JRI (covers training for
@@ -180,25 +180,54 @@ export default function AboutPage() {
       {/* Training Delivery Model */}
       <section className="py-10 bg-slate-50 border-t border-gray-200">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl font-bold text-slate-900 mb-3">How We Deliver Training</h2>
-          <div className="text-sm text-gray-700 space-y-3">
+          <h2 className="text-xl font-bold text-slate-900 mb-3">Training Delivery Model</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Elevate for Humanity is a hybrid workforce training hub and DOL Registered Apprenticeship
+            Sponsor (RAPIDS: 2025-IN-132301). We coordinate employer-based hands-on instruction with
+            online didactic learning — not a traditional campus model.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-4 mb-4">
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <h3 className="font-semibold text-slate-900 text-sm mb-2">Didactic Instruction</h3>
+              <p className="text-xs text-gray-600">Delivered online via the Elevate LMS platform. Curriculum, assessments, and progress tracking are managed digitally.</p>
+            </div>
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <h3 className="font-semibold text-slate-900 text-sm mb-2">Hands-On / OJT Training</h3>
+              <p className="text-xs text-gray-600">Conducted at approved employer partner sites, licensed shops, clinical facilities, and OJT placements. Training sites vary by program.</p>
+            </div>
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <h3 className="font-semibold text-slate-900 text-sm mb-2">Support Services</h3>
+              <p className="text-xs text-gray-600">Career counseling, case management, and advising available virtually and in-person by appointment.</p>
+            </div>
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <h3 className="font-semibold text-slate-900 text-sm mb-2">Administrative Office</h3>
+              <p className="text-xs text-gray-600">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240. Administrative and enrollment support — not an instructional facility.</p>
+            </div>
+          </div>
+          <div className="text-sm text-gray-700 space-y-2">
             <p>
-              Elevate operates as a Hybrid Workforce Training Provider and Registered
-              Apprenticeship Sponsor. Training is delivered through licensed credential partners
-              and approved program holders under centralized institutional oversight, with
-              employer partners providing structured on-the-job training. Elevate manages
-              enrollment, funding navigation, progress tracking, and career services.
+              <strong>Training sites by program:</strong> Barber and cosmetology apprentices train at
+              licensed partner barbershops. Healthcare students complete clinicals at partner medical
+              facilities. CDL students train at partner driving schools. Skilled trades apprentices
+              work at employer worksites. IT and business programs are delivered fully online.
             </p>
             <p>
-              All credentials are issued by recognized third-party authorities (Indiana ISDH,
-              Indiana BMV, EPA, OSHA, Certiport, AWS, NCCER, Indiana PLA) — not by Elevate.
-              Apprenticeship programs are DOL Registered Apprenticeships with Elevate as the
-              registered sponsor.
+              All credentials are issued by recognized third-party authorities (Indiana PLA, ISDH,
+              BMV, EPA, OSHA, Certiport, AWS, NCCER) — not by Elevate. Apprenticeship programs are
+              DOL Registered Apprenticeships with Elevate as the registered sponsor.
             </p>
           </div>
-          <Link href="/accreditation" className="mt-3 text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
-            View approvals and credential details <ArrowRight className="ml-1 w-4 h-4" />
-          </Link>
+          <div className="flex flex-wrap gap-4 mt-4">
+            <Link href="/partners/training-sites" className="text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
+              Employer partners &amp; training sites <ArrowRight className="ml-1 w-4 h-4" />
+            </Link>
+            <Link href="/disclosures/training-delivery" className="text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
+              Full training delivery disclosure <ArrowRight className="ml-1 w-4 h-4" />
+            </Link>
+            <Link href="/accreditation" className="text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
+              Approvals and credentials <ArrowRight className="ml-1 w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -348,11 +377,11 @@ export default function AboutPage() {
                 <p className="text-brand-red-600 font-semibold text-sm mb-4">{founder.title}</p>
                 <p className="text-sm text-gray-700 mb-4">{founder.bio}</p>
                 <p className="text-sm text-gray-700 mb-4">
-                  Elizabeth is also the founder of SupersonicFastCash, a tax preparation software
-                  company. She is an IRS Enrolled Agent with an EFIN and PTIN, authorized to
-                  represent taxpayers before the IRS. This combination of workforce development
-                  and financial services expertise drives the holistic approach at Elevate — helping
-                  participants not just get trained and employed, but build financial stability.
+                  Elizabeth is a U.S. military veteran, IRS Enrolled Agent (EA) with an EFIN 
+                  and PTIN, and EPA 608 Certified Proctor through Mainstream Engineering. She 
+                  is authorized to represent taxpayers before the IRS and to proctor EPA Section 
+                  608 refrigerant handling exams. She also operates SupersonicFastCash, a tax 
+                  preparation software company.
                 </p>
                 <div className="flex flex-wrap gap-3">
                   <Link href="/about/team" className="text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">

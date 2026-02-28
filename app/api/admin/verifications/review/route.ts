@@ -11,6 +11,7 @@ import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { auditedMutation } from '@/lib/audit/transactional';
 
 async function _POST(request: NextRequest) {
   try {
@@ -53,32 +54,41 @@ async function _POST(request: NextRequest) {
 
     const status = action === 'approve' ? 'approved' : 'rejected';
 
-    const { data: verification, error: updateError } = await db
-      .from('id_verifications')
-      .update({
+    const { error: updateError } = await auditedMutation({
+      table: 'id_verifications',
+      operation: 'update',
+      rowData: {
         status,
         verified_by: adminId,
         verified_at: new Date().toISOString(),
         rejection_reason: action === 'reject' ? rejectionReason : null,
-      })
-      .eq('id', verificationId)
-      .select(
-        `
-        *,
-        profiles:user_id (
-          id,
-          full_name,
-          email
-        )
-      `
-      )
-      .single();
+      },
+      filter: { id: verificationId },
+      audit: {
+        action: 'api:post:/api/admin/verifications/review',
+        actorId: user.id,
+        targetType: 'id_verifications',
+        targetId: verificationId,
+        metadata: { decision: action },
+      },
+    });
 
     if (updateError) {
       return NextResponse.json(
         { error: 'Failed to update verification' },
         { status: 500 }
       );
+    }
+
+    // Fetch joined profile data for email notifications
+    const { data: verification } = await db
+      .from('id_verifications')
+      .select(`*, profiles:user_id (id, full_name, email)`)
+      .eq('id', verificationId)
+      .single();
+
+    if (!verification) {
+      return NextResponse.json({ success: true });
     }
 
     await logAdminAudit({

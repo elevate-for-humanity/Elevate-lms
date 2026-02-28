@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'IT Help Desk Technician | CompTIA A+ | Indianapolis',
   description: 'Earn CompTIA A+ and IT Specialist certifications. 8-week program. Help desk technicians earn $55,510/year in Indiana.',
   alternates: { canonical: `${SITE_URL}/programs/it-help-desk` },
+  openGraph: {
+    title: 'IT Help Desk Technician | CompTIA A+ | Indianapolis',
+    description: 'Earn CompTIA A+ and IT Specialist certifications. 8-week program. Help desk technicians earn $55,510/year in Indiana.',
+    url: `${SITE_URL}/programs/it-help-desk`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'IT Help Desk Technician | CompTIA A+ | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

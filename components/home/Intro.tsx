@@ -20,12 +20,12 @@ export default function Intro() {
               />
             </div>
             <div className="p-6">
-              <h3 className="text-xl font-bold text-brand-blue-900 mb-3">Free Workforce Training</h3>
+              <h3 className="text-xl font-bold text-brand-blue-900 mb-3">Funded Workforce Training</h3>
               <p className="text-sm text-black leading-relaxed mb-2">
-                100% funded training through WIOA, WRG, and DOL programs.
+                Training funded through WIOA, WRG, and DOL programs for eligible participants.
               </p>
               <p className="text-xs text-black">
-                <strong>No tuition. No debt. No barriers.</strong>
+                <strong>No tuition for those who qualify. No debt. No barriers.</strong>
               </p>
             </div>
           </div>

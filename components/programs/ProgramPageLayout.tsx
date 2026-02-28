@@ -82,6 +82,9 @@ export interface ProgramPageConfig {
   applyHref?: string;
   inquiryHref?: string;
 
+  // Program status notice — shown as amber banner when program is not yet enrolling
+  statusNotice?: string;
+
   // Breadcrumbs
   breadcrumbs: { label: string; href?: string }[];
 }
@@ -125,6 +128,18 @@ export default function ProgramPageLayout({
           <Breadcrumbs items={c.breadcrumbs} />
         </div>
       </div>
+
+      {/* ===== STATUS NOTICE (e.g. "Accepting interest — not yet enrolling") ===== */}
+      {c.statusNotice && (
+        <div className="bg-amber-50 border-b border-amber-200">
+          <div className="max-w-5xl mx-auto px-6 py-3 flex items-center gap-3">
+            <span className="flex-shrink-0 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-bold">!</span>
+            </span>
+            <p className="text-amber-800 text-sm font-medium">{c.statusNotice}</p>
+          </div>
+        </div>
+      )}
 
       {/* ===== TITLE + QUICK FACTS ===== */}
       <InView animation="fade-up">

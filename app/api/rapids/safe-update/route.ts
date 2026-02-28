@@ -11,6 +11,7 @@ import {
 } from '@/lib/rapids';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { auditedMutation } from '@/lib/audit/transactional';
 
 async function _POST(req: Request) {
   try {
@@ -79,11 +80,18 @@ async function _POST(req: Request) {
       updateData.completion_date = new Date().toISOString().split('T')[0];
     }
 
-    const { data, error }: any = await supabase
-      .from('rapids_tracking')
-      .upsert(updateData, { onConflict: 'apprentice_id' })
-      .select()
-      .single();
+    const { data, error } = await auditedMutation({
+      table: 'rapids_tracking',
+      operation: 'upsert',
+      rowData: updateData,
+      conflictOn: ['apprentice_id'],
+      audit: {
+        action: 'api:post:/api/rapids/safe-update',
+        targetType: 'rapids_tracking',
+        targetId: apprentice_id,
+        metadata: { status: safeStatus, previous_status: current?.status },
+      },
+    });
 
     if (error) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 400 });

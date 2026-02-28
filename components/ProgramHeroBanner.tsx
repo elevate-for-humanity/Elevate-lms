@@ -1,7 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { useRef, useEffect } from 'react';
 
 interface ProgramHeroBannerProps {
   videoSrc: string;
@@ -12,11 +11,9 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
   const videoRef = useRef<HTMLVideoElement>(null);
   const voiceoverRef = useRef<HTMLAudioElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isMuted, setIsMuted] = useState(true);
   const hasPlayedVoiceover = useRef(false);
 
-  // Play video on scroll into view, pause when scrolled away.
-  // Voiceover starts on first scroll-in and plays until complete (does not pause on scroll-away).
+  // Play video + voiceover on scroll into view, pause when scrolled away.
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -35,7 +32,9 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
           }
         } else {
           video.pause();
-          // Voiceover keeps playing until complete — do not pause it
+          if (vo && !vo.paused) {
+            vo.pause();
+          }
         }
       },
       { threshold: 0.3 }
@@ -44,13 +43,6 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
     observer.observe(container);
     return () => observer.disconnect();
   }, []);
-
-  const toggleMute = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = !video.muted;
-    setIsMuted(video.muted);
-  };
 
   return (
     <div ref={containerRef} className="relative w-full h-[50vh] min-h-[320px] max-h-[500px] overflow-hidden bg-black">
@@ -66,25 +58,6 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
       {voiceoverSrc && (
         <audio ref={voiceoverRef} src={voiceoverSrc} preload="none" />
       )}
-
-      {/* Video sound toggle */}
-      <div className="absolute bottom-4 right-4 z-10">
-        <button
-          onClick={toggleMute}
-          aria-label={isMuted ? 'Unmute video' : 'Mute video'}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-full backdrop-blur-sm text-white transition-all ${
-            isMuted
-              ? 'bg-black/50 hover:bg-black/70'
-              : 'bg-brand-blue-600 hover:bg-brand-blue-700'
-          }`}
-        >
-          {isMuted ? (
-            <><VolumeX className="w-5 h-5" /><span className="text-sm font-bold hidden sm:inline">Tap for Sound</span></>
-          ) : (
-            <><Volume2 className="w-5 h-5" /><span className="text-sm font-semibold hidden sm:inline">Sound On</span></>
-          )}
-        </button>
-      </div>
     </div>
   );
 }

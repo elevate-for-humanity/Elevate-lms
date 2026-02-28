@@ -10,11 +10,18 @@ export const metadata: Metadata = {
   title: 'Bookkeeping & QuickBooks | Certified User | Indianapolis',
   description: 'Earn QuickBooks Certified User credential. 5-week program. Bookkeepers earn $45,860/year in Indiana.',
   alternates: { canonical: `${SITE_URL}/programs/bookkeeping` },
+  openGraph: {
+    title: 'Bookkeeping & QuickBooks | Certified User | Indianapolis',
+    description: 'Earn QuickBooks Certified User credential. 5-week program. Bookkeepers earn $45,860/year in Indiana.',
+    url: `${SITE_URL}/programs/bookkeeping`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Bookkeeping & QuickBooks | Certified User | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {
-  videoSrc: '/videos/it-technology.mp4',
-  voiceoverSrc: '/audio/heroes/business.mp3',
+  videoSrc: '/videos/business-finance.mp4',
   title: 'Bookkeeping & QuickBooks', subtitle: 'Master small business accounting and earn the QuickBooks Certified User credential in 5 weeks.',
   badge: 'Self-Pay', badgeColor: 'orange',
   duration: '5 weeks', cost: '$1,500', format: 'In-person, Indianapolis', credential: 'QuickBooks Certified User',
@@ -29,7 +36,7 @@ const config: ProgramPageConfig = {
     { title: 'Financial Statements', topics: ['Income statement (P&L)', 'Balance sheet', 'Cash flow statement', 'Budget vs actual reports', 'Financial analysis basics'] },
     { title: 'Certification Prep', topics: ['QuickBooks Certified User objectives', 'Practice exams', 'On-site Certiport testing', 'Resume and interview prep', 'Career placement support'] },
   ],
-  credentials: ['QuickBooks Certified User', 'Certificate of Completion'],
+  credentials: ['QuickBooks Certified User (Certiport exam)', 'Elevate Certificate of Completion'],
   careers: [
     { title: 'Bookkeeper', salary: '$38,000–$52,000' },
     { title: 'Accounts Payable Clerk', salary: '$36,000–$46,000' },

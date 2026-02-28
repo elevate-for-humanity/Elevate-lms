@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { auditedMutation } from '@/lib/audit/transactional';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -119,10 +120,11 @@ async function _POST(req: Request) {
     );
   }
 
-  // Create transfer request
-  const { data: request, error: insertError } = await db
-    .from('transfer_hour_requests')
-    .insert({
+  // Create transfer request — transactional with audit
+  const { data: request, error: insertError } = await auditedMutation({
+    table: 'transfer_hour_requests',
+    operation: 'insert',
+    rowData: {
       student_id: user.id,
       enrollment_id,
       hours_requested,
@@ -133,9 +135,14 @@ async function _POST(req: Request) {
       documentation_url: documentation_url || null,
       notes: notes || null,
       status: 'pending',
-    })
-    .select()
-    .single();
+    },
+    audit: {
+      action: 'api:post:/api/apprentice/transfer-hours',
+      actorId: user.id,
+      targetType: 'transfer_hour_requests',
+      metadata: { enrollment_id, hours_requested, previous_school_name },
+    },
+  });
 
   if (insertError) {
     logger.error('Error creating transfer request:', insertError);

@@ -16,6 +16,14 @@ export const metadata: Metadata = {
   title: 'Healthcare Training Programs | Free with WIOA | Indianapolis',
   description: 'CNA, Medical Assistant, Phlebotomy, and CPR certification programs. Free for eligible participants. Job placement included.',
   alternates: { canonical: `${SITE_URL}/programs/healthcare` },
+  openGraph: {
+    title: 'Healthcare Training Programs | Free with WIOA | Indianapolis',
+    description: 'CNA, Medical Assistant, Phlebotomy, and CPR certification programs. Free for eligible participants. Job placement included.',
+    url: `${SITE_URL}/programs/healthcare`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Healthcare Training Programs | Free with WIOA | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

@@ -12,8 +12,8 @@ interface ProgramHighlightsProps {
 
 const defaultHighlights: Highlight[] = [
   {
-    title: "100% Free Training",
-    description: "No tuition, no fees, no debt. Fully funded through WIOA, WRG, and JRI programs.",
+    title: "No-Cost Training Available",
+    description: "No tuition for eligible participants. Funded through WIOA, WRG, and JRI programs.",
     image: "/images/trades/program-construction-training.jpg"
   },
   {

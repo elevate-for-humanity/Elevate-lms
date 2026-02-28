@@ -13,6 +13,14 @@ export const metadata: Metadata = {
   description: 'Earn the Autodesk Certified User certification. 10-week program. WorkOne-eligible 4-star Top Job. Drafters earn $63,419/year in Indiana.',
   keywords: 'CAD training, Autodesk certification, AutoCAD training Indianapolis, drafting technician program, architectural drafting, WorkOne funded CAD',
   alternates: { canonical: `${SITE_URL}/programs/cad-drafting` },
+  openGraph: {
+    title: 'CAD/Drafting Technician | Autodesk Certified | Indianapolis',
+    description: 'Earn the Autodesk Certified User certification. 10-week program. WorkOne-eligible 4-star Top Job. Drafters earn $63,419/year in Indiana.',
+    url: `${SITE_URL}/programs/cad-drafting`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'CAD/Drafting Technician | Autodesk Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { auditedMutation } from '@/lib/audit/transactional';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
@@ -103,11 +104,19 @@ async function _POST() {
       ].join(''),
     }).catch((err) => logger.error('Failed to send admin approval email', err as Error));
 
-    // Mark as emailed so we don't send duplicates
-    await db
-      .from('onboarding_progress')
-      .update({ status: 'approval_emailed' })
-      .eq('user_id', user.id);
+    // Mark as emailed so we don't send duplicates — transactional with audit
+    await auditedMutation({
+      table: 'onboarding_progress',
+      operation: 'update',
+      rowData: { status: 'approval_emailed' },
+      filter: { user_id: user.id },
+      audit: {
+        action: 'api:post:/api/enrollment/approve',
+        actorId: user.id,
+        targetType: 'onboarding_progress',
+        metadata: { application_id: application.id, program: application.program_interest },
+      },
+    });
 
     logger.info('Approval emails sent', { userId: user.id, email: application.email });
     return NextResponse.json({ success: true });

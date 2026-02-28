@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { auditedMutation } from '@/lib/audit/transactional';
 
 // POST - Log OJT hours
 async function _POST(request: NextRequest) {
@@ -43,10 +44,11 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Hours must be greater than 0' }, { status: 400 });
     }
 
-    // Insert OJT hours log
-    const { data: log, error } = await db
-      .from('ojt_hours_log')
-      .insert({
+    // Insert OJT hours log — transactional with audit
+    const { data: log, error } = await auditedMutation({
+      table: 'ojt_hours_log',
+      operation: 'insert',
+      rowData: {
         student_id: user.id,
         log_date: date,
         hours: hours || Math.floor(totalMinutes / 60),
@@ -56,11 +58,16 @@ async function _POST(request: NextRequest) {
         supervisor_id: supervisor_id || null,
         enrollment_id: enrollment_id || null,
         activity_type,
-        status: 'pending', // Requires supervisor verification
+        status: 'pending',
         created_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
+      },
+      audit: {
+        action: 'api:post:/api/ojt/hours',
+        actorId: user.id,
+        targetType: 'ojt_hours_log',
+        metadata: { totalMinutes, activity_type, enrollment_id },
+      },
+    });
 
     if (error) {
       logger.error('Error logging OJT hours:', error);

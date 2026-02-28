@@ -12,6 +12,14 @@ export const metadata: Metadata = {
   title: 'Electrical Technician Training | OSHA Certified | Indianapolis',
   description: '12-week electrical training program. OSHA 30, NCCER Core, and residential wiring. Free for eligible participants through WIOA funding.',
   alternates: { canonical: `${SITE_URL}/programs/electrical` },
+  openGraph: {
+    title: 'Electrical Technician Training | OSHA Certified | Indianapolis',
+    description: '12-week electrical training program. OSHA 30, NCCER Core, and residential wiring. Free for eligible participants through WIOA funding.',
+    url: `${SITE_URL}/programs/electrical`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Electrical Technician Training | OSHA Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

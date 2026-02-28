@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'Plumbing Technician Training | OSHA Certified | Indianapolis',
   description: '10-week plumbing program. OSHA 10, NCCER Core, residential and commercial plumbing. Free for eligible participants.',
   alternates: { canonical: `${SITE_URL}/programs/plumbing` },
+  openGraph: {
+    title: 'Plumbing Technician Training | OSHA Certified | Indianapolis',
+    description: '10-week plumbing program. OSHA 10, NCCER Core, residential and commercial plumbing. Free for eligible participants.',
+    url: `${SITE_URL}/programs/plumbing`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Plumbing Technician Training | OSHA Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

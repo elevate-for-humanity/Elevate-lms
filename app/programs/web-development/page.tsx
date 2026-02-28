@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: 'Web Development | Meta & WordPress Certified | Indianapolis',
   description: 'Earn Meta Digital Marketing Associate and WordPress certifications. 10-week program. WorkOne-eligible. Web developers earn $80,267/year.',
   alternates: { canonical: `${SITE_URL}/programs/web-development` },
+  openGraph: {
+    title: 'Web Development | Meta & WordPress Certified | Indianapolis',
+    description: 'Earn Meta Digital Marketing Associate and WordPress certifications. 10-week program. WorkOne-eligible. Web developers earn $80,267/year.',
+    url: `${SITE_URL}/programs/web-development`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Web Development | Meta & WordPress Certified | Indianapolis' }],
+    type: 'website',
+  },
 };
 
 const config: ProgramPageConfig = {

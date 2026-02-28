@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { auditedMutation } from '@/lib/audit/transactional';
 
 async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
@@ -44,23 +45,31 @@ async function _POST(request: NextRequest) {
 
   const newStatus = action === 'approve' ? 'approved' : 'rejected';
 
-  const { data, error } = await db
-    .from('certification_submissions')
-    .update({
+  const { data, error } = await auditedMutation({
+    table: 'certification_submissions',
+    operation: 'update',
+    rowData: {
       status: newStatus,
       reviewed_by: user.id,
       reviewed_at: new Date().toISOString(),
       reviewer_notes: notes || null,
-    })
-    .eq('id', submissionId)
-    .select()
-    .single();
+    },
+    filter: { id: submissionId },
+    audit: {
+      action: 'api:post:/api/admin/certifications/review',
+      actorId: user.id,
+      targetType: 'certification_submissions',
+      targetId: submissionId,
+      metadata: { decision: action, notes: notes || null },
+    },
+  });
 
   if (error) {
     logger.error('Failed to update submission:', error);
     return NextResponse.json({ error: 'Failed to update submission' }, { status: 500 });
   }
 
+  // Secondary audit via admin audit log (non-transactional, supplementary)
   await logAdminAudit({
     action: AdminAction.CERTIFICATION_REVIEWED,
     actorId: user.id,

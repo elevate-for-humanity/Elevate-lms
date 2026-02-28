@@ -170,20 +170,26 @@
 #   schedule = "0 14,18,22 * * *"
 
 # ============================================
-# ADMIN SUBDOMAIN (admin.elevateforhumanity.org)
-# Rewrites admin subdomain root to /admin dashboard
+# ADMIN DOMAIN (www.elevateconnectsdirectory.org)
+# Rewrites admin domain to /admin dashboard
 # ============================================
 
 [[redirects]]
-  from = "https://admin.elevateforhumanity.org"
+  from = "https://www.elevateconnectsdirectory.org"
   to = "https://www.elevateforhumanity.org/admin"
   status = 200
   force = true
 
 [[redirects]]
-  from = "https://admin.elevateforhumanity.org/*"
+  from = "https://www.elevateconnectsdirectory.org/*"
   to = "https://www.elevateforhumanity.org/admin/:splat"
   status = 200
+  force = true
+
+[[redirects]]
+  from = "https://elevateconnectsdirectory.org/*"
+  to = "https://www.elevateconnectsdirectory.org/:splat"
+  status = 301
   force = true
 
 # ============================================

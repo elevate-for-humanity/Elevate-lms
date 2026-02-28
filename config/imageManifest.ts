@@ -80,7 +80,7 @@ export const imageManifest = {
   team: {
     alina: '/images/team/alina-smith/alina-smith-bio-hero-01.jpg',
     founder: {
-      hero: '/images/team/elizabeth-greene.jpg',
+      hero: '/images/team/elizabeth-greene-headshot.jpg',
       portrait: '/images/team/founder/elizabeth-greene-founder-portrait-01.jpg',
       wide: '/images/team/founder/elizabeth-greene-founder-wide-01.jpg',
     },

@@ -18,121 +18,91 @@ export default function FounderPage() {
         <Breadcrumbs items={[{ label: 'Founder' }]} />
       </div>
 
-      {/* Hero — clean image, no overlay */}
-      <section className="relative h-[340px] sm:h-[420px] overflow-hidden">
-        <Image
-          src="/images/heroes-hq/about-hero.jpg"
-          alt="Elevate for Humanity workforce training"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-      </section>
+      {/* Hero — full body photo left, bio right */}
+      <section className="py-10 sm:py-16">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
 
-      {/* Name + Title bar */}
-      <section className="bg-slate-900 py-6">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center gap-6">
-          <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg flex-shrink-0">
-            <Image
-              src="/images/team/elizabeth-greene.jpg"
-              alt="Elizabeth Greene"
-              fill
-              className="object-cover"
-            />
-          </div>
-          <div className="text-center sm:text-left">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Elizabeth Greene</h1>
-            <p className="text-brand-red-400 font-semibold">Founder & Chief Executive Officer</p>
-            <p className="text-slate-400 text-sm">Elevate for Humanity Career & Technical Institute</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Bio + Photo grid */}
-      <section className="py-14 sm:py-20">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="grid lg:grid-cols-5 gap-10 items-start">
-            <div className="lg:col-span-3 text-slate-800 space-y-5 text-[17px] leading-relaxed">
-              <p>
-                Elizabeth Greene is a U.S. military veteran and the founder of Elevate for Humanity
-                Career & Technical Institute. She is an IRS Enrolled Agent (EA) holding both an
-                EFIN and PTIN, authorized to represent taxpayers before the Internal Revenue Service.
-              </p>
-              <p>
-                She is a licensed barber through the Indiana Professional Licensing Agency, holds an
-                Indiana Substitute Teacher License, and is OSHA 10-Hour Safety certified. She is a
-                certified proctor for EPA Section 608 refrigerant handling exams through both the
-                ESCO Group and Mainstream Engineering.
-              </p>
+            {/* Full body photo */}
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl">
+              <Image
+                src="/images/team/elizabeth-greene.jpg"
+                alt="Elizabeth Greene, Founder and CEO of Elevate for Humanity"
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
             </div>
-            <div className="lg:col-span-2">
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-xl">
-                <Image
-                  src="/images/team/elizabeth-greene.jpg"
-                  alt="Elizabeth Greene"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 40vw"
-                />
+
+            {/* Bio */}
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-1">Elizabeth Greene</h1>
+              <p className="text-brand-red-600 font-bold text-lg mb-1">Founder & Chief Executive Officer</p>
+              <p className="text-slate-500 text-sm mb-8">Elevate for Humanity Career & Technical Institute</p>
+
+              <div className="text-slate-800 space-y-4 text-[16px] leading-relaxed">
+                <p>
+                  Elizabeth Greene is a U.S. military veteran and the founder of Elevate for Humanity
+                  Career & Technical Institute, a workforce development organization in Indianapolis
+                  serving justice-involved individuals, low-income families, veterans, and anyone
+                  facing barriers to employment.
+                </p>
+
+                <p>
+                  She is an IRS Enrolled Agent (EA) holding both an EFIN and PTIN, authorized to
+                  represent taxpayers before the Internal Revenue Service. She is also a licensed
+                  barber through the Indiana Professional Licensing Agency, holds an Indiana
+                  Substitute Teacher License, and is OSHA 10-Hour Safety certified.
+                </p>
+
+                <p>
+                  Elizabeth is a certified proctor for EPA Section 608 refrigerant handling exams
+                  through both the ESCO Group and Mainstream Engineering, allowing Elevate to
+                  administer EPA certification exams on-site. She also operates a Certiport
+                  Authorized Testing Center (CATC) for industry certifications.
+                </p>
+
+                <p>
+                  Under her leadership, Elevate for Humanity has secured approvals across federal,
+                  state, and local agencies. The organization is a U.S. Department of Labor Registered
+                  Apprenticeship Sponsor (RAPIDS: 2025-IN-132301), listed on the Eligible Training
+                  Provider List (ETPL), and approved as a Workforce Ready Grant (WRG) provider.
+                  Elevate is WIOA and JRI funding approved, and partners with EmployIndy, Choice
+                  Medical CNA School, Milady, and the National Retail Federation Foundation (NRF Rise Up).
+                </p>
+
+                <p>
+                  Elevate is enrolled in PECOS as a Medicare provider with a National Provider
+                  Identifier (NPI), registered as an Indiana State Bidder with a federal CAGE code,
+                  ITAP/INDOT registered, and ByBlack certified through the NAACP.
+                </p>
+
+                <p>
+                  Elizabeth also founded SupersonicFastCash, a tax preparation software company, and
+                  the RISE Foundation, a 501(c)(3) nonprofit providing philanthropic support for
+                  workforce development initiatives.
+                </p>
+              </div>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link href="/programs" className="inline-flex items-center bg-brand-red-600 text-white px-6 py-3 rounded-full font-bold hover:bg-brand-red-700 transition">
+                  Explore Programs <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+                <Link href="/contact" className="inline-flex items-center border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-full font-bold hover:border-slate-400 transition">
+                  Schedule a Meeting
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Visual break — training image */}
-      <section className="relative h-[250px] sm:h-[300px] overflow-hidden">
-        <Image
-          src="/images/programs-hq/training-classroom.jpg"
-          alt="Students in a training classroom"
-          fill
-          className="object-cover"
-          sizes="100vw"
-        />
-      </section>
-
-      {/* Approvals + Partnerships */}
-      <section className="py-14 sm:py-20 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="grid lg:grid-cols-5 gap-10 items-start">
-            <div className="lg:col-span-2">
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-xl">
-                <Image
-                  src="/images/heroes-hq/career-services-hero.jpg"
-                  alt="Career services and workforce partnerships"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 40vw"
-                />
-              </div>
-            </div>
-            <div className="lg:col-span-3 text-slate-800 space-y-5 text-[17px] leading-relaxed">
-              <p>
-                Under her leadership, Elevate for Humanity has secured approvals across federal,
-                state, and local agencies. The organization is a U.S. Department of Labor Registered
-                Apprenticeship Sponsor (RAPIDS: 2025-IN-132301), listed on the Eligible Training
-                Provider List (ETPL), and approved as a Workforce Ready Grant (WRG) provider.
-              </p>
-              <p>
-                Elevate is WIOA and JRI funding approved, and partners with EmployIndy, Choice
-                Medical CNA School, Milady (cosmetology and barbering curriculum), and the National
-                Retail Federation Foundation (NRF Rise Up retail credentials).
-              </p>
-              <p>
-                She also operates a Certiport Authorized Testing Center for industry certifications
-                and administers EPA 608 exams on-site through ESCO Group and Mainstream Engineering.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Credentials — compact visual grid */}
-      <section className="py-14 sm:py-20 bg-slate-900">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-white mb-8 text-center">Credentials & Approvals</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+      {/* Credentials — compact dark section */}
+      <section className="py-12 bg-slate-900">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-xl font-bold text-white mb-6 text-center">Credentials & Approvals</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
             {[
               'U.S. Military Veteran',
               'IRS Enrolled Agent (EA)',
@@ -158,78 +128,27 @@ export default function FounderPage() {
               'CAGE Code Registered',
               'ByBlack Certified — NAACP',
             ].map((cred) => (
-              <div key={cred} className="bg-slate-800 rounded-lg px-4 py-3">
-                <span className="text-white text-sm font-medium">{cred}</span>
+              <div key={cred} className="bg-slate-800 rounded-lg px-3 py-2.5">
+                <span className="text-white text-xs font-medium">{cred}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Visual break — programs image */}
-      <section className="relative h-[250px] sm:h-[300px] overflow-hidden">
-        <Image
-          src="/images/heroes-hq/programs-hero.jpg"
-          alt="Workforce training programs"
-          fill
-          className="object-cover"
-          sizes="100vw"
-        />
-      </section>
-
-      {/* Organizations + registrations */}
-      <section className="py-14 sm:py-20">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="grid lg:grid-cols-5 gap-10 items-start">
-            <div className="lg:col-span-3 text-slate-800 space-y-5 text-[17px] leading-relaxed">
-              <p>
-                Elevate for Humanity is registered as an Indiana State Bidder, holds a federal CAGE
-                code for government contracting, and is ITAP/INDOT registered. The organization is
-                enrolled in PECOS as a Medicare provider with a National Provider Identifier (NPI)
-                and is ByBlack certified through the NAACP as a Black-owned business.
-              </p>
-              <p>
-                Elizabeth also founded SupersonicFastCash, a tax preparation software company, and
-                the RISE Foundation, a 501(c)(3) nonprofit providing philanthropic support for
-                workforce development initiatives.
-              </p>
-            </div>
-            <div className="lg:col-span-2">
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-xl">
-                <Image
-                  src="/images/heroes-hq/funding-hero.jpg"
-                  alt="Workforce funding and development"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 40vw"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Quote — with background image */}
-      <section className="relative py-20 overflow-hidden">
-        <Image
-          src="/images/heroes-hq/success-hero.jpg"
-          alt="Student success"
-          fill
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="relative max-w-3xl mx-auto px-6 text-center">
-          <blockquote className="text-xl sm:text-2xl text-white italic leading-relaxed">
+      {/* Quote */}
+      <section className="py-14 bg-slate-50 border-y border-slate-100">
+        <div className="max-w-3xl mx-auto px-6 text-center">
+          <blockquote className="text-xl sm:text-2xl text-slate-800 italic leading-relaxed">
             &ldquo;Every person — regardless of their past — deserves access to quality education,
             living-wage employment, and the opportunity to build a better future.&rdquo;
           </blockquote>
-          <p className="mt-4 text-white/70 font-semibold">— Elizabeth Greene</p>
+          <p className="mt-4 text-slate-500 font-semibold">— Elizabeth Greene</p>
         </div>
       </section>
 
       {/* Organizations */}
-      <section className="py-14 sm:py-20 bg-slate-50">
+      <section className="py-14 sm:py-20">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8 text-center">Organizations</h2>
           <div className="grid sm:grid-cols-2 gap-6">
@@ -237,37 +156,28 @@ export default function FounderPage() {
               {
                 name: 'Elevate for Humanity',
                 role: 'Career & Technical Institute',
-                desc: 'Workforce training, apprenticeship sponsorship, funding navigation, and employer partnerships.',
-                image: '/images/heroes-hq/how-it-works-hero.jpg',
+                desc: 'Workforce training, apprenticeship sponsorship, funding navigation, and employer partnerships. DOL Registered Apprenticeship Sponsor, ETPL listed, WRG and WIOA approved.',
               },
               {
                 name: 'SupersonicFastCash',
                 role: 'Tax Preparation Software',
-                desc: 'Tax preparation software. Elizabeth is an IRS Enrolled Agent with EFIN and PTIN.',
-                image: '/images/heroes-hq/tax-refund-hero.jpg',
+                desc: 'Tax preparation software company. Elizabeth is an IRS Enrolled Agent with EFIN and PTIN, authorized to represent taxpayers before the IRS.',
               },
               {
                 name: 'RISE Foundation',
                 role: '501(c)(3) Nonprofit',
-                desc: 'Philanthropic support for workforce development. IRS tax-exempt determination July 2024.',
-                image: '/images/heroes-hq/success-stories-hero.jpg',
+                desc: 'Philanthropic support for workforce development initiatives. IRS tax-exempt determination received July 2024.',
               },
               {
                 name: 'Certiport Testing Center',
                 role: 'Authorized CATC',
-                desc: 'On-site proctoring for Microsoft Office Specialist, IC3, and IT Specialist exams.',
-                image: '/images/programs-hq/business-office.jpg',
+                desc: 'On-site proctoring for industry certification exams including Microsoft Office Specialist, IC3, and IT Specialist credentials.',
               },
             ].map((org) => (
-              <div key={org.name} className="rounded-xl overflow-hidden border border-slate-200 bg-white">
-                <div className="relative h-40">
-                  <Image src={org.image} alt={org.name} fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
-                </div>
-                <div className="p-5">
-                  <p className="text-xs font-semibold text-brand-red-600 uppercase tracking-wider">{org.role}</p>
-                  <h3 className="text-lg font-bold text-slate-900 mt-1">{org.name}</h3>
-                  <p className="text-slate-600 text-sm mt-2">{org.desc}</p>
-                </div>
+              <div key={org.name} className="border border-slate-200 rounded-xl p-6">
+                <p className="text-xs font-semibold text-brand-red-600 uppercase tracking-wider">{org.role}</p>
+                <h3 className="text-lg font-bold text-slate-900 mt-1">{org.name}</h3>
+                <p className="text-slate-600 text-sm mt-2">{org.desc}</p>
               </div>
             ))}
           </div>

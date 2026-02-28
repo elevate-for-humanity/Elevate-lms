@@ -25,7 +25,11 @@ export default function ProgramHeroBanner({ videoSrc, voiceoverSrc }: ProgramHer
         if (!video) return;
 
         if (entry.isIntersecting) {
-          video.play().catch(() => {});
+          video.play().then(() => {
+            // Unmute after muted autoplay succeeds — browser permits this
+            // once the video is already playing from a user-engagement context.
+            video.muted = false;
+          }).catch(() => {});
           if (vo && !hasPlayedVoiceover.current) {
             hasPlayedVoiceover.current = true;
             vo.play().catch(() => {});

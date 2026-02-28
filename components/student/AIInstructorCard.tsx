@@ -50,7 +50,7 @@ export function AIInstructorCard(props: {
       <div className="flex items-start gap-4">
         <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-full border-2 border-zinc-200">
           <Image alt="AI instructor" loading="lazy"
-            src="/images/team/elizabeth-greene.jpg"
+            src="/images/team/elizabeth-greene-headshot.jpg"
             alt="Elizabeth Greene"
             fill
           sizes="100vw"

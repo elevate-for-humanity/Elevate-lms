@@ -5,7 +5,7 @@ const teamMembers = [
   {
     name: "Elizabeth Greene",
     title: "Founder & Chief Executive Officer",
-    image: "/images/team/elizabeth-greene.jpg",
+    image: "/images/team/elizabeth-greene-headshot.jpg",
     bio: "U.S. military veteran, IRS Enrolled Agent (EA), EFIN and PTIN holder, EPA 608 Certified Proctor (ESCO Group & Mainstream Engineering). Elizabeth founded Elevate for Humanity to connect people to funded workforce training. She also operates SupersonicFastCash, a tax preparation software company. Elevate for Humanity is a DOL Registered Apprenticeship Sponsor, ETPL listed, WRG approved, WIOA and JRI approved, EmployIndy partner, Milady curriculum partner, NRF Rise Up provider, Certiport CATC, Choice Medical CNA School partner, PECOS enrolled (Medicare provider), NPI registered, ITAP/INDOT registered, Indiana State Bidder, CAGE code registered, and ByBlack certified (NAACP).",
   },
   {

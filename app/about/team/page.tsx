@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 
 export const metadata: Metadata = {
   alternates: {
@@ -15,15 +16,15 @@ export const metadata: Metadata = {
 // Fallback team data when database is empty
 const fallbackTeam = [
   {
-    id: '1',
+    id: '1', slug: 'elizabeth-greene',
     name: 'Elizabeth Greene',
     title: 'Founder & Chief Executive Officer',
-    image_url: '/images/team/elizabeth-greene.jpg',
+    image_url: '/images/team/elizabeth-greene-headshot.jpg',
     bio: 'U.S. military veteran, IRS Enrolled Agent (EA), EFIN and PTIN holder, licensed barber, Indiana substitute teacher, EPA 608 Certified Proctor. Elizabeth founded Elevate for Humanity to connect people to funded workforce training. She also operates SupersonicFastCash, a tax preparation software company.',
     email: '',
   },
   {
-    id: '2',
+    id: '2', slug: 'jozanna-george',
     name: 'Jozanna George',
     title: 'Director of Enrollment & Beauty Industry Programs',
     image_url: '/images/jozanna-george.jpg',
@@ -31,7 +32,7 @@ const fallbackTeam = [
     email: 'jozanna@elevateforhumanity.org',
   },
   {
-    id: '3',
+    id: '3', slug: 'carlina-wilkes',
     name: 'Dr. Carlina Wilkes',
     title: 'Executive Director of Financial Operations & Organizational Compliance',
     image_url: '/images/carlina-wilkes.jpg',
@@ -39,7 +40,7 @@ const fallbackTeam = [
     email: 'carlina@elevateforhumanity.org',
   },
   {
-    id: '4',
+    id: '4', slug: 'sharon-douglass',
     name: 'Sharon Douglass',
     title: 'Respiratory Therapy & Health Informatics Specialist',
     image_url: '/images/sharon-douglas.jpg',
@@ -47,15 +48,16 @@ const fallbackTeam = [
     email: 'sharon@elevateforhumanity.org',
   },
   {
-    id: '5',
+    id: '5', slug: 'leslie-wafford',
     name: 'Leslie Wafford',
     title: 'Director of Community Services',
     image_url: '/images/leslie-wafford.jpg',
+    photoPosition: 'object-top',
     bio: 'Leslie promotes low-barrier housing access and eviction prevention, helping families navigate housing challenges with her "reach one, teach one" philosophy.',
     email: 'leslie@elevateforhumanity.org',
   },
   {
-    id: '6',
+    id: '6', slug: 'alina-smith',
     name: 'Alina Smith, PMHNP',
     title: 'Psychiatric Mental Health Nurse Practitioner',
     image_url: '/images/alina-smith.jpg',
@@ -63,7 +65,7 @@ const fallbackTeam = [
     email: 'alina@elevateforhumanity.org',
   },
   {
-    id: '7',
+    id: '7', slug: 'delores-reynolds',
     name: 'Delores Reynolds',
     title: 'Social Media & Digital Engagement Coordinator',
     image_url: '/images/delores-reynolds.jpg',
@@ -71,12 +73,36 @@ const fallbackTeam = [
     email: 'delores@elevateforhumanity.org',
   },
   {
-    id: '8',
+    id: '8', slug: 'clystjah-woodley',
     name: 'Clystjah Woodley',
     title: 'Program Coordinator',
     image_url: '/images/clystjah-woodley.jpg',
     bio: 'Clystjah supports program operations and student services, helping participants navigate enrollment and stay on track through their training programs.',
     email: 'clystjah@elevateforhumanity.org',
+  },
+  {
+    id: '9', slug: 'jesse-wilkerson',
+    name: 'Jesse J. Wilkerson',
+    title: 'Principal — Architecture & Design-Build',
+    image_url: '/images/team/jesse-wilkerson.jpg',
+    bio: 'Jesse J. Wilkerson is the Principal of Jesse J. Wilkerson & Associates S-Corp, an architectural and design firm specializing in construction trade integration, architectural planning, and built environment solutions. With a strong focus on architecture aligned with real-world construction and workforce development, Jesse leads projects that bridge architectural design, site operations, and trade execution across commercial, industrial, and institutional environments. His work emphasizes practical design, structural coordination, compliance, and efficient construction workflows, ensuring that architectural planning supports both skilled trades and modern infrastructure needs.',
+    email: '',
+  },
+  {
+    id: '10', slug: 'carl-brown',
+    name: 'Carl Brown',
+    title: 'CDL Instructor & Commercial Truck Driver',
+    image_url: '/images/team/carl-brown.jpg',
+    bio: 'Carl Brown is an experienced Commercial Truck Driver and Trainer with over 15 years in the transportation and logistics industry, specializing in safety-focused operations, driver training, and fleet logistics. Currently serving at Renascent, Inc. in Indianapolis, Carl provides hands-on instruction to new drivers while conducting daily safety inspections and operating a range of commercial equipment including dump trailers, roll-offs, dump trucks, tractor trailers, and flatbeds. Throughout his career, Carl has demonstrated strong leadership, operational planning, and workforce training capabilities across multiple transportation environments, including intermodal, over-the-road (OTR), and delivery logistics. He holds a Class A Commercial Driver\'s License obtained through Chattanooga State Technical Community College and is CPR and First Aid certified.',
+    email: '',
+  },
+  {
+    id: '11', slug: 'amir-naseen',
+    name: 'Amir Naseen',
+    title: 'Credit Repair Specialist',
+    image_url: '/images/team/amir-naseen.jpg',
+    bio: 'Amir Naseen serves as a Credit Repair Specialist supporting financial readiness and workforce advancement initiatives. He specializes in credit education, credit profile analysis, and strategic dispute processes that help individuals improve financial stability and access employment, housing, and training opportunities. Amir works closely with clients to review credit reports, identify inaccuracies, develop corrective action plans, and provide guidance on responsible credit management aligned with long-term financial growth. His approach focuses on compliance, documentation accuracy, and ethical credit restoration practices that support career development, workforce participation, and economic empowerment within structured training and support programs.',
+    email: '',
   },
 ];
 
@@ -98,16 +124,8 @@ export default async function TeamPage() {
         </div>
       </div>
 
-      {/* Hero — image only, no text overlay */}
-      <section className="relative h-[300px] overflow-hidden">
-        <Image
-          src="/images/about-team-new.jpg"
-          alt="Elevate for Humanity Team"
-          fill
-          className="object-cover"
-          priority
-        />
-      </section>
+      {/* Hero — video banner, plays on scroll */}
+      <ProgramHeroBanner videoSrc="/videos/about-mission.mp4" />
 
       <section className="py-10 bg-white">
         <div className="max-w-6xl mx-auto px-4 text-center">
@@ -120,93 +138,69 @@ export default async function TeamPage() {
         </div>
       </section>
 
-      {/* Team Members */}
-      <section className="py-10 sm:py-12 md:py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          {members.length > 0 ? (
-            <div className="space-y-10 sm:space-y-12 md:space-y-16">
-              {members.map((member: any) => (
-                <div key={member.id} id={`member-${member.id}`} className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start scroll-mt-24">
-                  <div className="md:col-span-1">
-                    <div className="relative w-full aspect-[3/4] max-w-[300px] mx-auto rounded-xl overflow-hidden shadow-lg">
-                      <Image
-                        src={member.image_url || '/images/avatar-default.svg'}
-                        alt={member.name}
-                        fill
-                        className="object-cover object-center"
-                      />
-                    </div>
-                  </div>
-                  <div className="md:col-span-2">
-                    <h2 className="text-2xl font-bold text-slate-900 mb-1">
-                      {member.name}
-                    </h2>
-                    <p className="text-lg text-brand-blue-600 font-medium mb-4">
-                      {member.title}
-                    </p>
-                    {member.bio && (
-                      <div className="prose prose-slate max-w-none">
-                        {member.bio.split('\n\n').map((paragraph: string, idx: number) => (
-                          <p key={idx} className="text-slate-600 mb-4">
-                            {paragraph}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                    {member.email && (
-                      <p className="mt-4">
-                        <a href={`mailto:${member.email}`} className="text-brand-blue-600 hover:underline">
-                          {member.email}
-                        </a>
-                      </p>
-                    )}
-                    {member.linkedin_url && (
-                      <a
-                        href={member.linkedin_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 mt-2 text-brand-blue-600 hover:underline"
-                      >
-                        LinkedIn Profile
-                      </a>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-slate-500">Contact us to learn more about our team.</p>
-            </div>
-          )}
-        </div>
-      </section>
+      {/* Team Grid — 3 across, Elizabeth centered top */}
+      <section className="py-10 sm:py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          {/* Elizabeth — centered top */}
+          <div className="flex justify-center mb-8">
+            <Link href={`/about/team/${members[0].slug}`} className="group block w-44">
+              <div className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition">
+                <Image
+                  src={members[0].image_url || '/images/avatar-default.svg'}
+                  alt={members[0].name}
+                  fill
+                  className="object-cover group-hover:scale-105 transition duration-300"
+                  sizes="176px"
+                />
+              </div>
+              <div className="mt-3 text-center">
+                <h3 className="font-bold text-slate-900 text-sm group-hover:text-brand-red-600 transition">{members[0].name}</h3>
+                <p className="text-xs text-slate-500">{members[0].title}</p>
+                <p className="text-xs text-brand-red-600 font-semibold mt-1">View Bio →</p>
+              </div>
+            </Link>
+          </div>
 
-      {/* Associates & Partners */}
-      <section className="py-14 sm:py-20 bg-white border-t border-slate-100">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Associates & Partners</h2>
-          <p className="text-slate-500 mb-8">Firms and organizations we work with to deliver services.</p>
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div className="border border-slate-200 rounded-xl p-6">
-              <p className="text-xs font-semibold text-brand-red-600 uppercase tracking-wider">Architecture & Design-Build</p>
-              <h3 className="text-lg font-bold text-slate-900 mt-1">Jesse J Wilkerson & Associates</h3>
-              <p className="text-slate-600 text-sm mt-2">
-                Central Indiana architectural firm established in 2008. Services include architectural design, 
-                CAD drafting, REVIT modeling, construction administration, programming, master planning, 
-                construction document production, and technical specifications. Extended to design-build services. 
-                Portfolio includes industrial (Purdue University), multi-family residential, commercial, retail, 
-                health (Jane Pauley), religious, and educational (K-12, Purdue Polytechnic) projects.
-              </p>
-            </div>
-            <div className="border border-slate-200 rounded-xl p-6">
-              <p className="text-xs font-semibold text-brand-red-600 uppercase tracking-wider">CNA Training Partner</p>
-              <h3 className="text-lg font-bold text-slate-900 mt-1">Choice Medical CNA School</h3>
-              <p className="text-slate-600 text-sm mt-2">
-                Certified nursing assistant training partner providing clinical instruction and 
-                hands-on patient care training for Elevate healthcare program participants.
-              </p>
-            </div>
+          {/* Middle members — 3 across */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 justify-items-center">
+            {members.slice(1, -1).map((member: any) => (
+              <Link key={member.id} href={`/about/team/${member.slug}`} className="group block w-44">
+                <div className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition">
+                  <Image
+                    src={member.image_url || '/images/avatar-default.svg'}
+                    alt={member.name}
+                    fill
+                    className={`object-cover group-hover:scale-105 transition duration-300 ${member.photoPosition || ''}`}
+                    sizes="176px"
+                  />
+                </div>
+                <div className="mt-3 text-center">
+                  <h3 className="font-bold text-slate-900 text-sm group-hover:text-brand-red-600 transition">{member.name}</h3>
+                  <p className="text-xs text-slate-500">{member.title}</p>
+                  <p className="text-xs text-brand-red-600 font-semibold mt-1">View Bio →</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Last member — centered bottom */}
+          <div className="flex justify-center mt-8">
+            <Link href={`/about/team/${members[members.length - 1].slug}`} className="group block w-44">
+              <div className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition">
+                <Image
+                  src={members[members.length - 1].image_url || '/images/avatar-default.svg'}
+                  alt={members[members.length - 1].name}
+                  fill
+                  className="object-cover group-hover:scale-105 transition duration-300"
+                  sizes="176px"
+                />
+              </div>
+              <div className="mt-3 text-center">
+                <h3 className="font-bold text-slate-900 text-sm group-hover:text-brand-red-600 transition">{members[members.length - 1].name}</h3>
+                <p className="text-xs text-slate-500">{members[members.length - 1].title}</p>
+                <p className="text-xs text-brand-red-600 font-semibold mt-1">View Bio →</p>
+              </div>
+            </Link>
           </div>
         </div>
       </section>

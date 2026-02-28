@@ -105,7 +105,7 @@ export default function SocialMediaHighlight() {
           >
             <div className="relative h-48 overflow-hidden">
               <Image
-                src="/images/team/elizabeth-greene.jpg"
+                src="/images/team/elizabeth-greene-headshot.jpg"
                 alt="Follow us on Instagram"
                 fill
                 className="object-cover group-hover:scale-110 transition-transform duration-300"

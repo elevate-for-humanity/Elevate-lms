@@ -24,7 +24,7 @@ export const TEAM: TeamMember[] = [
     title: 'Founder & Chief Executive Officer',
     orgRole: 'Executive Leadership',
     bio: 'U.S. military veteran, IRS Enrolled Agent (EA), EFIN and PTIN holder, licensed barber, Indiana substitute teacher, EPA 608 Certified Proctor. Elizabeth founded Elevate for Humanity to connect people to funded workforce training. She also operates SupersonicFastCash, a tax preparation software company.',
-    headshotSrc: '/images/team/elizabeth-greene.jpg',
+    headshotSrc: '/images/team/elizabeth-greene-headshot.jpg',
     email: '',
   },
   {

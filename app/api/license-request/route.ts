@@ -13,12 +13,6 @@ import { logger } from '@/lib/logger';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-function getResend() {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) throw new Error('RESEND_API_KEY not configured');
-  return new Resend(key);
-}
-
 async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -62,7 +56,7 @@ async function _POST(req: Request) {
 
   // Send notification email
   try {
-    await getResend().emails.send({
+    await resend.emails.send({
       from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
       to: process.env.NOTIFY_EMAIL_TO || 'elevate4humanityedu@gmail.com',
       subject: `New License Request: ${payload.full_name} (${payload.desired_tier})`,
@@ -78,7 +72,7 @@ async function _POST(req: Request) {
     });
 
     // SMS alert via AT&T gateway
-    await getResend().emails.send({
+    await resend.emails.send({
       from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
       to: process.env.ADMIN_SMS_GATEWAY || '',
       subject: 'License',
@@ -86,7 +80,7 @@ async function _POST(req: Request) {
     });
 
     // Send auto-reply to submitter
-    await getResend().emails.send({
+    await resend.emails.send({
       from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
       to: payload.email,
       subject: 'We received your licensing request | Elevate for Humanity',

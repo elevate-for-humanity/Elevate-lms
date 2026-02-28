@@ -11,12 +11,6 @@ import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
-function getResend() {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) throw new Error('RESEND_API_KEY not configured');
-  return new Resend(key);
-}
-
 export async function POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'strict');
@@ -116,7 +110,7 @@ export async function POST(req: Request) {
 
     // Send welcome email
     try {
-      await getResend().emails.send({
+      await resend.emails.send({
         from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
         to: email,
         subject: 'Shop Partner Application Received - Elevate for Humanity',

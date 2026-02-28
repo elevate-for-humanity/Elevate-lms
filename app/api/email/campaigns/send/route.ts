@@ -12,7 +12,6 @@ import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-
 async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'strict');

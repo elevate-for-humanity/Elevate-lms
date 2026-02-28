@@ -8,6 +8,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// Initialize Resend only if API key is available (prevents build errors)
 
 // Calendly webhook events
 interface CalendlyEvent {

@@ -7,18 +7,6 @@ import { resend } from '@/lib/resend';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-// Lazy-init to avoid build-time crash when env var is missing
-let _resend: Resend | null = null;
-function getResend() {
-  if (!_resend) {
-    if (!process.env.RESEND_API_KEY) {
-      throw new Error('RESEND_API_KEY environment variable is not set');
-    }
-    _resend = new Resend(process.env.RESEND_API_KEY);
-  }
-  return _resend;
-}
-
 // Where to forward inbound emails. Map recipient prefixes to Gmail.
 const FORWARD_MAP: Record<string, string> = {
   'info': 'elevate4humanityedu@gmail.com',
@@ -73,7 +61,8 @@ async function _POST(request: NextRequest) {
     });
 
     // Use Resend SDK forward helper — handles content + attachments automatically
-    const { data, error } = await getResend().emails.receiving.forward({
+    // TODO: receiving.forward is Resend-specific; needs dedicated client if re-enabled
+    const { data, error } = await (resend as any).emails.receiving.forward({
       emailId,
       to: forwardTo,
       from: 'Elevate Forwarding <noreply@elevateforhumanity.org>',

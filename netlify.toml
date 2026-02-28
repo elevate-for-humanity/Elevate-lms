@@ -170,6 +170,23 @@
 #   schedule = "0 14,18,22 * * *"
 
 # ============================================
+# ADMIN SUBDOMAIN (admin.elevateforhumanity.org)
+# Rewrites admin subdomain root to /admin dashboard
+# ============================================
+
+[[redirects]]
+  from = "https://admin.elevateforhumanity.org"
+  to = "https://www.elevateforhumanity.org/admin"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://admin.elevateforhumanity.org/*"
+  to = "https://www.elevateforhumanity.org/admin/:splat"
+  status = 200
+  force = true
+
+# ============================================
 # LMS DOMAIN (elevateforhumanityeducation.com)
 # Do NOT redirect - handled by middleware -> /student-portal
 # ============================================

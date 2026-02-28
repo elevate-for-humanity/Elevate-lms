@@ -12,7 +12,6 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 /**
  * AUTOMATED TENANT PROVISIONING

@@ -12,12 +12,6 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-function getResend() {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) throw new Error('RESEND_API_KEY not configured');
-  return new Resend(key);
-}
-
 async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'strict');
@@ -49,7 +43,7 @@ async function _POST(request: NextRequest) {
 
     // Send notification email
     try {
-      await getResend().emails.send({
+      await resend.emails.send({
         from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
         to: process.env.NOTIFY_EMAIL_TO || 'elevate4humanityedu@gmail.com',
         subject: `New Partner Inquiry: ${data.fullName} (${data.relationshipType})`,
@@ -67,7 +61,7 @@ async function _POST(request: NextRequest) {
       });
 
       // SMS alert via AT&T gateway
-      await getResend().emails.send({
+      await resend.emails.send({
         from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
         to: process.env.ADMIN_SMS_GATEWAY || '',
         subject: 'Partner',
@@ -75,7 +69,7 @@ async function _POST(request: NextRequest) {
       });
 
       // Send auto-reply to submitter
-      await getResend().emails.send({
+      await resend.emails.send({
         from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
         to: data.email,
         subject: 'We received your partner inquiry | Elevate for Humanity',

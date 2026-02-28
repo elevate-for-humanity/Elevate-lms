@@ -9,7 +9,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // Initialize Resend only if API key is available (prevents build errors)
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Calendly webhook events
 interface CalendlyEvent {

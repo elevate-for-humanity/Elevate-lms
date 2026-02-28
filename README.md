@@ -9,7 +9,21 @@
 
 **Production URL:** https://www.elevateforhumanity.org
 **Status:** Live and Operational
-**Last Updated:** February 27, 2026
+**Last Updated:** February 28, 2026
+**Branch:** `main` (single branch — all feature branches merged and pruned)
+
+---
+
+## Recent Changes (v2.1.0)
+
+- **Legal entity normalization** — All references corrected to `2Exclusive LLC-S d/b/a Elevate for Humanity Career & Technical Institute` (training provider) and `Selfish Inc` (501(c)(3) nonprofit). Affects footer, structured data, enrollment agreements, certificates, and disclosures.
+- **36 program pages redesigned** — Config-driven layout with video hero banners, animated counters, scroll-reveal sections, and FAQ structured data.
+- **Routing governance** — Dynamic `[slug]` route no longer shadows dedicated pages. Redirect safety net for 9 legacy slugs. 14 files with broken program links fixed.
+- **CTA compliance** — Removed false "It's Free" claims from 18 files. Programs range $0–$5,400; CTAs now say "Apply Now".
+- **Stock image elimination** — All 34 Pexels/stock image references replaced with local workforce photography.
+- **Brand color tokens** — All `blue-*` Tailwind classes migrated to `brand-blue-*` across 1,469 files.
+- **Template copy cleanup** — "Join thousands" CTAs, "Access your dashboard" placeholders, and generic template text eliminated from 87+ files.
+- **Branch cleanup** — `feat/program-holder-governance` merged and pruned.
 
 ---
 

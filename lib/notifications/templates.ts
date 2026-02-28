@@ -129,7 +129,7 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
           <h2 style="color: #dc2626;">Action needed: document re-upload</h2>
           <p>Hi ${data.name || 'there'},</p>
           <p>We reviewed your document and it needs to be re-uploaded.</p>
-          <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 16px; margin: 16px 0;">
+          <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 16px; margin: 16px 0;">
             <p style="margin: 0;"><strong>Document:</strong> ${data.document_type}</p>
             <p style="margin: 8px 0 0;"><strong>Reason:</strong> ${data.rejection_reason}</p>
           </div>
@@ -227,7 +227,7 @@ If you believe this was in error or have questions, please reply to this email o
             <p>Hi ${data.name || 'there'},</p>
             <p>Your apprenticeship enrollment has been approved. You now have full access to the student portal and can begin your training.</p>
             
-            <div style="background: #f5f3ff; border: 1px solid #c4b5fd; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
               <h3 style="color: ${BRAND_COLOR}; margin-top: 0;">Start Your Theory Training (Milady RISE)</h3>
               <p style="margin-bottom: 16px;">Your theory training through Milady RISE is included in your program. This is required coursework for your apprenticeship.</p>
               <p style="margin-bottom: 8px;"><strong>To access Milady:</strong></p>
@@ -295,7 +295,7 @@ If you believe this was in error or have questions, please reply to this email o
           <h2 style="color: ${BRAND_COLOR};">Transfer hours evaluated</h2>
           <p>Hi ${data.name || 'there'},</p>
           <p>We evaluated your submitted transfer hours.</p>
-          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 16px; margin: 16px 0;">
+          <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 16px; margin: 16px 0;">
             <p style="margin: 0;"><strong>Accepted hours credited:</strong> ${data.accepted_hours}</p>
             <p style="margin: 8px 0 0;"><strong>Hours remaining toward program requirement:</strong> ${data.remaining_hours}</p>
           </div>
@@ -321,7 +321,7 @@ If anything looks incorrect, reply to this email or call ${SUPPORT_PHONE}`,
             <h2 style="color: ${BRAND_COLOR};">You have been matched!</h2>
             <p>Hi ${data.name || 'there'},</p>
             <p>You have been matched with a host shop for your apprenticeship training.</p>
-            <div style="background: #f5f3ff; border: 1px solid #c4b5fd; border-radius: 6px; padding: 16px; margin: 16px 0;">
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 16px; margin: 16px 0;">
               <p style="margin: 0;"><strong>Host Shop:</strong> ${data.shop_name}</p>
               <p style="margin: 8px 0 0;"><strong>Start Date:</strong> ${data.start_date}</p>
             </div>
@@ -345,7 +345,7 @@ Your host shop will contact you with additional details. Questions? Reply to thi
             <h2 style="color: ${BRAND_COLOR};">New apprentice assigned</h2>
             <p>Hi,</p>
             <p>A new apprentice has been assigned to <strong>${data.shop_name}</strong>.</p>
-            <div style="background: #f5f3ff; border: 1px solid #c4b5fd; border-radius: 6px; padding: 16px; margin: 16px 0;">
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 16px; margin: 16px 0;">
               <p style="margin: 0;"><strong>Apprentice:</strong> ${data.apprentice_name}</p>
               <p style="margin: 8px 0 0;"><strong>Start Date:</strong> ${data.start_date}</p>
             </div>

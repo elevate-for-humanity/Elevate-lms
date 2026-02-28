@@ -21,15 +21,14 @@ function onAuditFailure(context: string, error: unknown, event: Record<string, u
   auditFailureCount++;
   const errorMessage = error instanceof Error ? error.message : String(error);
 
-  // Channel 1: Structured stderr — always visible in container logs
-  const failureRecord = {
+  // Channel 1: Structured log — visible in container/edge logs
+  console.error(JSON.stringify({
     level: 'AUDIT_WRITE_FAILURE',
     timestamp: new Date().toISOString(),
     context,
     error: errorMessage,
     event,
-  };
-  process.stderr.write(JSON.stringify(failureRecord) + '\n');
+  }));
 
   // Channel 2: Application logger
   logger.error(context, error as Error, { event });

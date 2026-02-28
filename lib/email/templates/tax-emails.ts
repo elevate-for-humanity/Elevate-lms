@@ -23,7 +23,7 @@ export const riseUpFoundationEmails = {
 
         <p>We've received your request for free tax preparation services through the Rise Up Foundation.</p>
 
-        <div style="background-color: #f0fdf4; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #10b981;">
+        <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
           <p style="margin: 0;"><strong>What happens next:</strong></p>
           <ul style="margin: 10px 0;">
             <li>Eligibility review</li>
@@ -83,7 +83,7 @@ Free Community Tax Services
 
         <p>Your free tax appointment is confirmed.</p>
 
-        <div style="background-color: #eff6ff; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #3b82f6;">
+        <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
           <p style="margin: 0;">📅 <strong>Date:</strong> ${data.date}</p>
           <p style="margin: 10px 0;">⏰ <strong>Time:</strong> ${data.time}</p>
           <p style="margin: 10px 0;">📍 <strong>Location / Virtual:</strong> ${data.location}</p>
@@ -97,7 +97,7 @@ Free Community Tax Services
           <li>Last year's return (if available)</li>
         </ul>
 
-        <p style="background-color: #fef3c7; padding: 10px; border-radius: 4px; font-size: 14px;">
+        <p style="background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 10px; border-radius: 4px; font-size: 14px;">
           <strong>Note:</strong> All services are provided by trained volunteers following IRS VITA/TCE guidelines.
         </p>
 
@@ -190,7 +190,7 @@ export const supersonicFastCashEmails = {
 
         <p>Your tax appointment with SupersonicFastCash is confirmed.</p>
 
-        <div style="background-color: #eff6ff; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #3b82f6;">
+        <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
           <p style="margin: 0;"><strong>Next steps:</strong></p>
           <ul style="margin: 10px 0;">
             <li>Upload your documents securely</li>
@@ -250,10 +250,10 @@ SupersonicFastCash
 
         <p>You can securely complete payment here:</p>
         <p style="text-align: center; margin: 20px 0;">
-          <a href="${data.stripeInvoiceLink}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px;">Pay Invoice</a>
+          <a href="${data.stripeInvoiceLink}" style="display: inline-block; padding: 12px 24px; background-color: #ea580c; color: white; text-decoration: none; border-radius: 6px;">Pay Invoice</a>
         </p>
 
-        <p style="background-color: #fef3c7; padding: 10px; border-radius: 4px; font-size: 14px;">
+        <p style="background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 10px; border-radius: 4px; font-size: 14px;">
           Please review our refund and service policies before submitting payment.
         </p>
 
@@ -302,7 +302,7 @@ Professional Tax Preparation Services
 
         <p>We've received your payment. Thank you.</p>
 
-        <div style="background-color: #f0fdf4; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #10b981;">
+        <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
           <p style="margin: 0;"><strong>Next steps:</strong></p>
           <ul style="margin: 10px 0;">
             <li>Final review</li>

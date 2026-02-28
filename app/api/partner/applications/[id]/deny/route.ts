@@ -68,7 +68,7 @@ async function _POST(
               <p>After reviewing your application for <strong>${application.shop_name}</strong>, we are unable to approve it at this time.</p>
               
               ${reason ? `
-              <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <p style="margin: 0;"><strong>Reason:</strong> ${reason}</p>
               </div>
               ` : ''}

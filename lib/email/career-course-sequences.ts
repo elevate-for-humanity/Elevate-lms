@@ -32,7 +32,7 @@ export function getWelcomeEmail(data: CourseEmailData) {
         
         <p>Thank you for investing in your career! You now have <strong>lifetime access</strong> to ${data.courseName}.</p>
         
-        <div style="background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%); color: white; padding: 30px; border-radius: 12px; margin: 30px 0; text-align: center;">
+        <div style="padding: 30px; border-radius: 12px; margin: 30px 0; text-align: center; border: 2px solid #e5e7eb;">
           <h2 style="margin: 0 0 15px 0; color: white;">Start Learning Now</h2>
           <p style="margin: 0 0 20px 0; opacity: 0.9;">Your course is ready and waiting for you.</p>
           <a href="${SITE_URL}/career-services/courses/${data.courseSlug}/learn" 
@@ -95,7 +95,7 @@ export function getDay3Email(data: CourseEmailData) {
         
         <p>If you haven't started yet, that's okay! Here are some tips to get going:</p>
         
-        <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
+        <div style="background: #f9fafb; border-left: 4px solid #e5e7eb; padding: 15px; margin: 20px 0;">
           <strong>🎯 Start Small:</strong> Just watch the first lesson today. It's only about 10-15 minutes!
         </div>
         
@@ -108,7 +108,7 @@ export function getDay3Email(data: CourseEmailData) {
         
         <div style="text-align: center; margin: 30px 0;">
           <a href="${SITE_URL}/career-services/courses/${data.courseSlug}/learn" 
-             style="display: inline-block; background: #7c3aed; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+             style="display: inline-block; background: #ea580c; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
             Continue Learning →
           </a>
         </div>
@@ -153,7 +153,7 @@ export function getDay7Email(data: CourseEmailData) {
         
         <p>Whether you've completed several lessons or are just getting started, we want to share some bonus resources to help you succeed:</p>
         
-        <div style="background: #f0fdf4; border: 1px solid #86efac; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <h3 style="margin: 0 0 10px 0; color: #166534;">🎁 Bonus Resources</h3>
           <ul style="margin: 0; padding-left: 20px;">
             <li>Download all course worksheets from your dashboard</li>
@@ -171,7 +171,7 @@ export function getDay7Email(data: CourseEmailData) {
         
         <div style="text-align: center; margin: 30px 0;">
           <a href="${SITE_URL}/career-services/courses/${data.courseSlug}/learn" 
-             style="display: inline-block; background: #7c3aed; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+             style="display: inline-block; background: #ea580c; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
             Keep Going →
           </a>
         </div>
@@ -216,7 +216,7 @@ export function getCompletionEmail(data: CourseEmailData & { certificateUrl?: st
         
         <p>This is a huge accomplishment! You've invested in yourself and completed the entire course. That puts you ahead of 90% of people who never finish what they start.</p>
         
-        <div style="background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%); color: white; padding: 30px; border-radius: 12px; margin: 30px 0; text-align: center;">
+        <div style="padding: 30px; border-radius: 12px; margin: 30px 0; text-align: center; border: 2px solid #e5e7eb;">
           <h2 style="margin: 0 0 15px 0; color: white;">Your Certificate is Ready!</h2>
           <p style="margin: 0 0 20px 0; opacity: 0.9;">Download and share your achievement.</p>
           <a href="${SITE_URL}/career-services/courses/${data.courseSlug}/certificate" 
@@ -232,11 +232,11 @@ export function getCompletionEmail(data: CourseEmailData & { certificateUrl?: st
           <li style="margin-bottom: 10px;"><strong>Continue learning:</strong> Check out our other courses</li>
         </ul>
         
-        <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+        <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
           <h4 style="margin: 0 0 10px 0; color: #92400e;">🎁 Graduate Discount</h4>
           <p style="margin: 0 0 15px 0; color: #92400e;">Get 25% off any other course with code: <strong>GRADUATE25</strong></p>
           <a href="${SITE_URL}/career-services/courses" 
-             style="display: inline-block; background: #f59e0b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+             style="display: inline-block; background: #ea580c; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold;">
             Browse Courses
           </a>
         </div>
@@ -281,13 +281,13 @@ export function getReengagementEmail(data: CourseEmailData & { lastLoginDays: nu
         
         <p>But your course is still there, waiting for you. And the skills you'll learn can change your career trajectory.</p>
         
-        <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin: 20px 0;">
+        <div style="background: #f9fafb; border-left: 4px solid #e5e7eb; padding: 15px; margin: 20px 0;">
           <strong>💡 Quick Win:</strong> Just log in and watch ONE lesson today. That's it. Small steps lead to big results.
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
           <a href="${SITE_URL}/career-services/courses/${data.courseSlug}/learn" 
-             style="display: inline-block; background: #7c3aed; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+             style="display: inline-block; background: #ea580c; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
             Jump Back In →
           </a>
         </div>

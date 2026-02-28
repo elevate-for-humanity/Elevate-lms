@@ -9,7 +9,7 @@ const baseStyles = `
 const buttonStyle = `
   display: inline-block;
   padding: 14px 28px;
-  background: #dc2626;
+  background: #ea580c;
   color: white;
   text-decoration: none;
   border-radius: 8px;
@@ -23,7 +23,7 @@ export const emailTemplates = {
     subject: '🎓 Welcome to Elevate for Humanity!',
     html: `
       <div style="${baseStyles} max-width: 600px; margin: 0 auto;">
-        <div style="background: linear-gradient(135deg, #dc2626 0%, #f97316 100%); padding: 40px; text-align: center; border-radius: 12px 12px 0 0;">
+        <div style="padding: 40px; text-align: center; border-bottom: 2px solid #e5e7eb; border-radius: 12px 12px 0 0;">
           <h1 style="color: white; margin: 0; font-size: 32px;">Welcome to Elevate!</h1>
         </div>
         <div style="padding: 40px; background: #ffffff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
@@ -62,14 +62,14 @@ export const emailTemplates = {
     subject: `✅ You're enrolled in ${data.courseName}!`,
     html: `
       <div style="${baseStyles} max-width: 600px; margin: 0 auto;">
-        <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px; text-align: center; border-radius: 12px 12px 0 0;">
+        <div style="padding: 40px; text-align: center; border-bottom: 2px solid #e5e7eb; border-radius: 12px 12px 0 0;">
           <h1 style="color: white; margin: 0; font-size: 32px;">Enrollment Confirmed!</h1>
         </div>
         <div style="padding: 40px; background: #ffffff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
           <h2 style="color: #1f2937; margin-top: 0;">Hi ${data.name},</h2>
           <p style="font-size: 16px; color: #4b5563;">Great news! You're now enrolled in <strong>${data.courseName}</strong>.</p>
 
-          <div style="background: #ecfdf5; padding: 20px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #10b981;">
+          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #e5e7eb;">
             <p style="margin: 0; color: #065f46;"><strong>Start Date:</strong> ${data.startDate}</p>
           </div>
 
@@ -97,14 +97,14 @@ export const emailTemplates = {
     subject: `⏰ Reminder: ${data.assignmentName} due soon`,
     html: `
       <div style="${baseStyles} max-width: 600px; margin: 0 auto;">
-        <div style="background: #f97316; padding: 40px; text-align: center; border-radius: 12px 12px 0 0;">
+        <div style="padding: 40px; text-align: center; border-bottom: 2px solid #e5e7eb; border-radius: 12px 12px 0 0;">
           <h1 style="color: white; margin: 0; font-size: 32px;">Assignment Reminder</h1>
         </div>
         <div style="padding: 40px; background: #ffffff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
           <h2 style="color: #1f2937; margin-top: 0;">Hi ${data.name},</h2>
           <p style="font-size: 16px; color: #4b5563;">This is a friendly reminder about your upcoming assignment.</p>
 
-          <div style="background: #fff7ed; padding: 20px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #f97316;">
+          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #e5e7eb;">
             <p style="margin: 0 0 8px 0; color: #9a3412;"><strong>Assignment:</strong> ${data.assignmentName}</p>
             <p style="margin: 0 0 8px 0; color: #9a3412;"><strong>Course:</strong> ${data.courseName}</p>
             <p style="margin: 0; color: #9a3412;"><strong>Due:</strong> ${data.dueDate}</p>
@@ -133,7 +133,7 @@ export const emailTemplates = {
     subject: `🎉 Your ${data.courseName} Certificate is Ready!`,
     html: `
       <div style="${baseStyles} max-width: 600px; margin: 0 auto;">
-        <div style="background: linear-gradient(135deg, #dc2626 0%, #f97316 100%); padding: 40px; text-align: center; border-radius: 12px 12px 0 0;">
+        <div style="padding: 40px; text-align: center; border-bottom: 2px solid #e5e7eb; border-radius: 12px 12px 0 0;">
           <div style="font-size: 64px; margin-bottom: 16px;">🎉</div>
           <h1 style="color: white; margin: 0; font-size: 32px;">Congratulations!</h1>
         </div>
@@ -141,7 +141,7 @@ export const emailTemplates = {
           <h2 style="color: #1f2937; margin-top: 0;">Hi ${data.name},</h2>
           <p style="font-size: 16px; color: #4b5563;">Congratulations on completing <strong>${data.courseName}</strong>!</p>
 
-          <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 24px 0; text-align: center;">
+          <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin: 24px 0; text-align: center;">
             <p style="margin: 0; color: #92400e; font-size: 18px; font-weight: 600;">Your certificate is now available for download</p>
           </div>
 
@@ -174,7 +174,7 @@ export const emailTemplates = {
     subject: `🏆 Achievement Unlocked: ${data.achievementName}`,
     html: `
       <div style="${baseStyles} max-width: 600px; margin: 0 auto;">
-        <div style="background: linear-gradient(135deg, #f97316 0%, #dc2626 100%); padding: 40px; text-align: center; border-radius: 12px 12px 0 0;">
+        <div style="padding: 40px; text-align: center; border-bottom: 2px solid #e5e7eb; border-radius: 12px 12px 0 0;">
           <div style="font-size: 64px; margin-bottom: 16px;">🏆</div>
           <h1 style="color: white; margin: 0; font-size: 32px;">Achievement Unlocked!</h1>
         </div>
@@ -182,10 +182,10 @@ export const emailTemplates = {
           <h2 style="color: #1f2937; margin-top: 0;">Hi ${data.name},</h2>
           <p style="font-size: 16px; color: #4b5563;">You've unlocked a new achievement!</p>
 
-          <div style="background: #fef3c7; padding: 24px; border-radius: 8px; margin: 24px 0; text-align: center;">
+          <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 24px; border-radius: 8px; margin: 24px 0; text-align: center;">
             <h3 style="margin: 0 0 8px 0; color: #92400e; font-size: 24px;">${data.achievementName}</h3>
             <p style="margin: 0 0 16px 0; color: #78350f;">${data.achievementDescription}</p>
-            <div style="display: inline-block; padding: 8px 16px; background: #fbbf24; color: #78350f; border-radius: 20px; font-weight: 600;">
+            <div style="display: inline-block; padding: 8px 16px; background: #f3f4f6; color: #374151; border-radius: 20px; font-weight: 600;">
               +${data.points} Points
             </div>
           </div>
@@ -208,7 +208,7 @@ export const emailTemplates = {
     subject: `🎊 Congratulations on Your New Job!`,
     html: `
       <div style="${baseStyles} max-width: 600px; margin: 0 auto;">
-        <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px; text-align: center; border-radius: 12px 12px 0 0;">
+        <div style="padding: 40px; text-align: center; border-bottom: 2px solid #e5e7eb; border-radius: 12px 12px 0 0;">
           <div style="font-size: 64px; margin-bottom: 16px;">🎊</div>
           <h1 style="color: white; margin: 0; font-size: 32px;">Congratulations!</h1>
         </div>
@@ -216,7 +216,7 @@ export const emailTemplates = {
           <h2 style="color: #1f2937; margin-top: 0;">Hi ${data.name},</h2>
           <p style="font-size: 16px; color: #4b5563;">We're thrilled to hear about your new job placement!</p>
 
-          <div style="background: #ecfdf5; padding: 24px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #10b981;">
+          <div style="background: #f9fafb; padding: 24px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #e5e7eb;">
             <p style="margin: 0 0 8px 0; color: #065f46;"><strong>Position:</strong> ${data.jobTitle}</p>
             <p style="margin: 0 0 8px 0; color: #065f46;"><strong>Company:</strong> ${data.company}</p>
             <p style="margin: 0 0 8px 0; color: #065f46;"><strong>Salary:</strong> ${data.salary}</p>
@@ -242,7 +242,7 @@ export const emailTemplates = {
     subject: `📊 Your Weekly Progress Report`,
     html: `
       <div style="${baseStyles} max-width: 600px; margin: 0 auto;">
-        <div style="background: #1f2937; padding: 40px; text-align: center; border-radius: 12px 12px 0 0;">
+        <div style="padding: 40px; text-align: center; border-bottom: 2px solid #e5e7eb; border-radius: 12px 12px 0 0;">
           <h1 style="color: white; margin: 0; font-size: 32px;">Weekly Progress Report</h1>
         </div>
         <div style="padding: 40px; background: #ffffff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
@@ -250,19 +250,19 @@ export const emailTemplates = {
           <p style="font-size: 16px; color: #4b5563;">Here's a summary of your learning activity this week:</p>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0;">
-            <div style="background: #fef3c7; padding: 20px; border-radius: 8px; text-align: center;">
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; text-align: center;">
               <div style="font-size: 32px; font-weight: bold; color: #92400e;">${data.coursesInProgress}</div>
               <div style="color: #78350f; font-size: 14px;">Courses in Progress</div>
             </div>
-            <div style="background: #dbeafe; padding: 20px; border-radius: 8px; text-align: center;">
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; text-align: center;">
               <div style="font-size: 32px; font-weight: bold; color: #1e40af;">${data.lessonsCompleted}</div>
               <div style="color: #1e3a8a; font-size: 14px;">Lessons Completed</div>
             </div>
-            <div style="background: #dcfce7; padding: 20px; border-radius: 8px; text-align: center;">
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; text-align: center;">
               <div style="font-size: 32px; font-weight: bold; color: #166534;">${data.quizScore}%</div>
               <div style="color: #14532d; font-size: 14px;">Avg Quiz Score</div>
             </div>
-            <div style="background: #fee2e2; padding: 20px; border-radius: 8px; text-align: center;">
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; text-align: center;">
               <div style="font-size: 32px; font-weight: bold; color: #991b1b;">${data.studyStreak}</div>
               <div style="color: #7f1d1d; font-size: 14px;">Day Streak</div>
             </div>

@@ -128,7 +128,7 @@ async function _POST(req: Request) {
               <p>Hi ${body.firstName},</p>
               <p>We've received your WIOA application for our <strong>${body.program}</strong> program.</p>
 
-              <div style="background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Reference Number:</p>
                 <p style="margin: 0; font-size: 24px; font-weight: bold; font-family: monospace; color: #0f172a;">${referenceNumber}</p>
                 <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b;">Save this number to check your application status</p>
@@ -141,7 +141,7 @@ async function _POST(req: Request) {
                 <li>We'll discuss program details, funding confirmation, and next steps</li>
               </ol>
 
-              <div style="background: #fff7ed; border: 2px solid #fed7aa; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <h3 style="margin-top: 0; color: #ea580c;">Want to Talk Sooner?</h3>
                 <p>Schedule your advisor call now:</p>
                 <a href="https://calendly.com/elevate-for-humanity/advisor-call" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Schedule Call Now</a>

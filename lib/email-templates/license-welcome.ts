@@ -38,18 +38,18 @@ export function generateLicenseWelcomeEmail(data: LicenseWelcomeEmailData): {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${subject}</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f5; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 40px 20px;">
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
           <!-- Header -->
           <tr>
-            <td style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 40px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">
+            <td style="padding: 40px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+              <h1 style="color: #1e293b; margin: 0; font-size: 28px; font-weight: bold;">
                 🎉 License Activated!
               </h1>
-              <p style="color: #d1fae5; margin: 10px 0 0 0; font-size: 16px;">
+              <p style="color: #6b7280; margin: 10px 0 0 0; font-size: 16px;">
                 Welcome to Elevate for Humanity
               </p>
             </td>
@@ -66,7 +66,7 @@ export function generateLicenseWelcomeEmail(data: LicenseWelcomeEmailData): {
               </p>
 
               <!-- License Key Box -->
-              <div style="background-color: #1f2937; border-radius: 8px; padding: 24px; margin: 24px 0;">
+              <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 24px; margin: 24px 0;">
                 <p style="color: #9ca3af; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px 0;">
                   Your License Key
                 </p>
@@ -80,7 +80,7 @@ export function generateLicenseWelcomeEmail(data: LicenseWelcomeEmailData): {
               </p>
 
               <!-- License Details -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border-radius: 8px; margin: 24px 0;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #1e293b; border-radius: 8px; margin: 24px 0;">
                 <tr>
                   <td style="padding: 20px;">
                     <h3 style="color: #111827; font-size: 16px; margin: 0 0 16px 0;">License Details</h3>
@@ -132,7 +132,7 @@ export function generateLicenseWelcomeEmail(data: LicenseWelcomeEmailData): {
               <table width="100%" cellpadding="0" cellspacing="0" style="margin: 32px 0;">
                 <tr>
                   <td align="center">
-                    <a href="${data.repoUrl}" style="display: inline-block; background-color: #059669; color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; margin-right: 12px;">
+                    <a href="${data.repoUrl}" style="display: inline-block; background-color: #ea580c; color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; margin-right: 12px;">
                       Access Repository
                     </a>
                     <a href="https://www.elevateforhumanity.org/store/deployment" style="display: inline-block; background-color: #f3f4f6; color: #374151; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
@@ -156,7 +156,7 @@ export function generateLicenseWelcomeEmail(data: LicenseWelcomeEmailData): {
               </table>
 
               <!-- Support -->
-              <div style="background-color: #eff6ff; border-radius: 8px; padding: 20px; margin: 32px 0;">
+              <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 32px 0;">
                 <h4 style="color: #1e40af; font-size: 16px; margin: 0 0 8px 0;">Need Help?</h4>
                 <p style="color: #3b82f6; font-size: 14px; margin: 0;">
                   Schedule a free onboarding call with our team:<br>
@@ -168,7 +168,7 @@ export function generateLicenseWelcomeEmail(data: LicenseWelcomeEmailData): {
 
           <!-- Footer -->
           <tr>
-            <td style="background-color: #f9fafb; padding: 24px 40px; text-align: center; border-top: 1px solid #e5e7eb;">
+            <td style="background-color: #1e293b; padding: 24px 40px; text-align: center; border-top: 1px solid #e5e7eb;">
               <p style="color: #6b7280; font-size: 14px; margin: 0 0 8px 0;">
                 Elevate for Humanity
               </p>

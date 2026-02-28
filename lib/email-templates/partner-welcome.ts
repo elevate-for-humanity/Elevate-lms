@@ -29,7 +29,7 @@ export function getPartnerWelcomeEmail(data: PartnerWelcomeData): { subject: str
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
 
   <!-- Header -->
-  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center; border-radius: 10px 10px 0 0;">
+  <div style="padding: 40px 20px; text-align: center; border-bottom: 2px solid #e5e7eb; border-radius: 10px 10px 0 0;">
     <h1 style="color: white; margin: 0; font-size: 28px;">🎉 Welcome to ${data.providerName}!</h1>
   </div>
 
@@ -43,16 +43,16 @@ export function getPartnerWelcomeEmail(data: PartnerWelcomeData): { subject: str
     </p>
 
     ${data.enrollmentUrl ? `
-    <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 30px 0;">
+    <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin: 30px 0;">
       <h2 style="margin-top: 0; color: #1f2937; font-size: 20px;">🚀 Get Started</h2>
       <p style="margin-bottom: 15px;">Click the button below to access your courses:</p>
-      <a href="${data.enrollmentUrl}" style="display: inline-block; background: #667eea; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Access ${data.providerName}</a>
+      <a href="${data.enrollmentUrl}" style="display: inline-block; background: #ea580c; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Access ${data.providerName}</a>
     </div>
     ` : ''}
 
     ${data.promoCode ? `
-    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 30px 0; border-radius: 4px;">
-      <h3 style="margin-top: 0; color: #92400e; font-size: 18px;">💰 Your Promo Code</h3>
+    <div style="background: #f9fafb; border-left: 4px solid #e5e7eb; padding: 20px; margin: 30px 0; border-radius: 4px;">
+      <h3 style="margin-top: 0; color: #374151; font-size: 18px;">💰 Your Promo Code</h3>
       <p style="margin-bottom: 10px; color: #78350f;">Use this code during enrollment:</p>
       <div style="background: white; padding: 15px; border-radius: 6px; text-align: center;">
         <code style="font-size: 24px; font-weight: bold; color: #667eea; letter-spacing: 2px;">${data.promoCode}</code>
@@ -61,7 +61,7 @@ export function getPartnerWelcomeEmail(data: PartnerWelcomeData): { subject: str
     ` : ''}
 
     ${data.loginInstructions ? `
-    <div style="background: #e0e7ff; padding: 20px; border-radius: 8px; margin: 30px 0;">
+    <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin: 30px 0;">
       <h3 style="margin-top: 0; color: #3730a3; font-size: 18px;">📝 Login Instructions</h3>
       <p style="color: #4338ca; margin: 0;">${data.loginInstructions}</p>
     </div>
@@ -175,7 +175,7 @@ export function getPartnerCompletionEmail(data: {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
 
   <!-- Header -->
-  <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 20px; text-align: center; border-radius: 10px 10px 0 0;">
+  <div style="padding: 40px 20px; text-align: center; border-bottom: 2px solid #e5e7eb; border-radius: 10px 10px 0 0;">
     <h1 style="color: white; margin: 0; font-size: 32px;">🎓 Congratulations!</h1>
   </div>
 
@@ -188,7 +188,7 @@ export function getPartnerCompletionEmail(data: {
       You did it! You've successfully completed <strong>${data.courseName || data.providerName}</strong>.
     </p>
 
-    <div style="background: #ecfdf5; padding: 30px; border-radius: 8px; margin: 30px 0; text-align: center;">
+    <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 30px; border-radius: 8px; margin: 30px 0; text-align: center;">
       <div style="font-size: 48px; margin-bottom: 10px;">🏆</div>
       <h2 style="margin: 0; color: #065f46; font-size: 24px;">Course Completed!</h2>
       <p style="color: #047857; margin: 10px 0 0 0;">Completed on ${new Date(data.completedAt).toLocaleDateString()}</p>
@@ -196,7 +196,7 @@ export function getPartnerCompletionEmail(data: {
 
     ${data.certificateUrl ? `
     <div style="text-align: center; margin: 30px 0;">
-      <a href="${data.certificateUrl}" style="display: inline-block; background: #10b981; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Download Your Certificate</a>
+      <a href="${data.certificateUrl}" style="display: inline-block; background: #ea580c; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Download Your Certificate</a>
     </div>
     ` : ''}
 
@@ -281,7 +281,7 @@ export function getPartnerMilestoneEmail(data: {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
 
   <!-- Header -->
-  <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 20px; text-align: center; border-radius: 10px 10px 0 0;">
+  <div style="padding: 40px 20px; text-align: center; border-bottom: 2px solid #e5e7eb; border-radius: 10px 10px 0 0;">
     <h1 style="color: white; margin: 0; font-size: 28px;">🎯 Milestone Reached!</h1>
   </div>
 
@@ -294,15 +294,15 @@ export function getPartnerMilestoneEmail(data: {
       You're making great progress in <strong>${data.courseName}</strong>!
     </p>
 
-    <div style="background: #fef3c7; padding: 30px; border-radius: 8px; margin: 30px 0; text-align: center;">
+    <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 30px; border-radius: 8px; margin: 30px 0; text-align: center;">
       <div style="font-size: 48px; margin-bottom: 10px;">⭐</div>
-      <h2 style="margin: 0; color: #92400e; font-size: 24px;">${data.milestone}</h2>
+      <h2 style="margin: 0; color: #374151; font-size: 24px;">${data.milestone}</h2>
       <p style="color: #78350f; margin: 10px 0 0 0;">You're ${data.progress}% complete!</p>
     </div>
 
-    <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 30px 0;">
+    <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin: 30px 0;">
       <div style="background: #e5e7eb; height: 20px; border-radius: 10px; overflow: hidden;">
-        <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; width: ${data.progress}%; transition: width 0.3s ease;"></div>
+        <div style="background: #ea580c; height: 100%; width: ${data.progress}%; transition: width 0.3s ease;"></div>
       </div>
       <p style="text-align: center; margin: 10px 0 0 0; color: #6b7280; font-size: 14px;">${data.progress}% Complete</p>
     </div>
@@ -313,7 +313,7 @@ export function getPartnerMilestoneEmail(data: {
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
-      <a href="https://www.elevateforhumanity.org/lms/courses" style="display: inline-block; background: #667eea; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Continue Learning</a>
+      <a href="https://www.elevateforhumanity.org/lms/courses" style="display: inline-block; background: #ea580c; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Continue Learning</a>
     </div>
 
   </div>

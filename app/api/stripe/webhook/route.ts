@@ -358,19 +358,19 @@ async function _POST(req: Request) {
           // Different email content for new users vs existing users
           const loginSection = isNewUser && tempPassword
             ? `
-              <div style="background: #f0fdf4; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin: 20px 0;">
+              <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
                 <h3 style="margin-top: 0; color: #166534;">🎉 Your Account Has Been Created!</h3>
                 <p><strong>Email:</strong> ${email}</p>
                 <p><strong>Temporary Password:</strong> ${tempPassword}</p>
                 <p style="color: #dc2626; font-weight: bold;">Please change your password after your first login.</p>
               </div>
               <div style="text-align: center; margin: 24px 0;">
-                <a href="${siteUrl}/login" style="display: inline-block; background: #2563eb; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px;">Login to Student Portal →</a>
+                <a href="${siteUrl}/login" style="display: inline-block; background: #ea580c; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px;">Login to Student Portal →</a>
               </div>
             `
             : `
               <div style="text-align: center; margin: 24px 0;">
-                <a href="${siteUrl}/login" style="display: inline-block; background: #2563eb; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px;">Login to Student Portal →</a>
+                <a href="${siteUrl}/login" style="display: inline-block; background: #ea580c; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px;">Login to Student Portal →</a>
               </div>
             `;
 
@@ -398,7 +398,7 @@ async function _POST(req: Request) {
                     <li>✅ Connect with instructors</li>
                   </ol>
                   
-                  <div style="background: #eff6ff; border-radius: 8px; padding: 16px; margin: 20px 0;">
+                  <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                     <p style="margin: 0;"><strong>Need Help?</strong></p>
                     <p style="margin: 8px 0 0 0;">Call us at <a href="tel:3173143757" style="color: #2563eb; font-weight: bold;">(317) 314-3757</a></p>
                   </div>

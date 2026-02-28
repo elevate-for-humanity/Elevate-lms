@@ -253,11 +253,11 @@ async function _POST(req: Request) {
 
       // Build password setup section (only for new users)
       const passwordSection = passwordSetupLink ? `
-            <div style="background: #ecfdf5; border: 2px solid #6ee7b7; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
               <h3 style="margin-top: 0; color: #065f46;">Your Student Account Is Ready</h3>
               <p style="margin-bottom: 16px;">We created your student portal account. Set your password to log in:</p>
               <p style="text-align: center; margin: 16px 0;">
-                <a href="${passwordSetupLink}" style="display: inline-block; background: #059669; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Set Your Password &amp; Log In</a>
+                <a href="${passwordSetupLink}" style="display: inline-block; background: #ea580c; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Set Your Password &amp; Log In</a>
               </p>
               <p style="color: #64748b; font-size: 13px; margin-bottom: 0;">This link expires in 24 hours. After setting your password, you can log in anytime at <a href="${siteUrl}/login" style="color: #059669;">${siteUrl}/login</a></p>
             </div>
@@ -269,7 +269,7 @@ async function _POST(req: Request) {
         subject: `Welcome to Elevate for Humanity — ${body.program} [Ref: ${referenceNumber}]`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background: #f97316; color: white; padding: 24px; text-align: center; border-radius: 8px 8px 0 0;">
+            <div style="padding: 24px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 2px solid #e5e7eb;">
               <h1 style="margin: 0; font-size: 24px;">Welcome to Elevate for Humanity!</h1>
             </div>
 
@@ -283,7 +283,7 @@ async function _POST(req: Request) {
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                   <td style="padding: 10px 12px; vertical-align: top; width: 36px;">
-                    <div style="width: 28px; height: 28px; background: #3b82f6; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">1</div>
+                    <div style="width: 28px; height: 28px; background: #ea580c; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">1</div>
                   </td>
                   <td style="padding: 10px 0;">
                     <strong>Set your password</strong> using the green button above to access your student portal.
@@ -291,7 +291,7 @@ async function _POST(req: Request) {
                 </tr>
                 <tr>
                   <td style="padding: 10px 12px; vertical-align: top;">
-                    <div style="width: 28px; height: 28px; background: #3b82f6; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">2</div>
+                    <div style="width: 28px; height: 28px; background: #ea580c; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">2</div>
                   </td>
                   <td style="padding: 10px 0;">
                     <strong>Complete orientation</strong> — a short online module (about 10 minutes) that unlocks your coursework.
@@ -299,7 +299,7 @@ async function _POST(req: Request) {
                 </tr>
                 <tr>
                   <td style="padding: 10px 12px; vertical-align: top;">
-                    <div style="width: 28px; height: 28px; background: #3b82f6; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">3</div>
+                    <div style="width: 28px; height: 28px; background: #ea580c; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">3</div>
                   </td>
                   <td style="padding: 10px 0;">
                     <strong>Advisor contact</strong> — we'll reach out within 1–2 business days via ${body.preferredContact || 'phone'} to discuss funding options and scheduling.
@@ -307,7 +307,7 @@ async function _POST(req: Request) {
                 </tr>
                 <tr>
                   <td style="padding: 10px 12px; vertical-align: top;">
-                    <div style="width: 28px; height: 28px; background: #3b82f6; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">4</div>
+                    <div style="width: 28px; height: 28px; background: #ea580c; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 14px;">4</div>
                   </td>
                   <td style="padding: 10px 0;">
                     <strong>Start training</strong> — once funding is confirmed, you begin your program.
@@ -315,20 +315,20 @@ async function _POST(req: Request) {
                 </tr>
               </table>
 
-              <div style="background: #fff7ed; border: 2px solid #fed7aa; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <h3 style="margin-top: 0; color: #ea580c;">Want to Talk Sooner?</h3>
                 <p style="margin-bottom: 12px;">Schedule your advisor call now instead of waiting:</p>
                 <a href="https://calendly.com/elevate-for-humanity/advisor-call" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Schedule Call Now</a>
               </div>
 
-              <div style="background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Reference Number:</p>
                 <p style="margin: 0; font-size: 20px; font-weight: bold; font-family: monospace; color: #0f172a;">${referenceNumber}</p>
                 <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b;">Application ID: ${data.id}</p>
               </div>
 
               <div style="text-align: center; margin: 24px 0;">
-                <a href="${siteUrl}/apply/track?id=${data.id}&email=${encodeURIComponent(body.email)}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Track Application Status</a>
+                <a href="${siteUrl}/apply/track?id=${data.id}&email=${encodeURIComponent(body.email)}" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Track Application Status</a>
               </div>
 
               <p>Questions? Call us at <a href="tel:3173143757" style="color: #ea580c; font-weight: bold;">317-314-3757</a> or email <a href="mailto:info@elevateforhumanity.org" style="color: #ea580c;">info@elevateforhumanity.org</a></p>

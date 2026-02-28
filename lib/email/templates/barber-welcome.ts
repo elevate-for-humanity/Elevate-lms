@@ -24,19 +24,19 @@ export function getBarberWelcomeEmail(data: BarberWelcomeEmailData): {
 </head>
 <body style="font-family: 'Times New Roman', Times, serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
 
-  <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
+  <div style="padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px; border: 2px solid #e5e7eb;">
     <h1 style="margin: 0; font-size: 28px;">🎉 Welcome to Barber Apprenticeship!</h1>
     <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">You're officially enrolled, ${studentName}!</p>
   </div>
 
-  <div style="background: #f8fafc; border-left: 4px solid #3b82f6; padding: 20px; margin-bottom: 30px; border-radius: 5px;">
-    <h2 style="margin: 0 0 15px 0; color: #1e40af; font-size: 20px;">📚 Your Student Dashboard</h2>
+  <div style="background: #f9fafb; border-left: 4px solid #e5e7eb; padding: 20px; margin-bottom: 30px; border-radius: 5px;">
+    <h2 style="margin: 0 0 15px 0; color: #1e293b; font-size: 20px;">📚 Your Student Dashboard</h2>
     <p style="margin: 0 0 10px 0;">Access your training portal:</p>
-    <a href="${dashboardUrl}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">Access Dashboard →</a>
+    <a href="${dashboardUrl}" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">Access Dashboard →</a>
     <p style="margin: 15px 0 0 0; font-size: 14px; color: #64748b;">Login with: ${studentEmail}</p>
   </div>
 
-  <div style="background: #fff7ed; border-left: 4px solid #f97316; padding: 20px; margin-bottom: 30px; border-radius: 5px;">
+  <div style="background: #f9fafb; border-left: 4px solid #e5e7eb; padding: 20px; margin-bottom: 30px; border-radius: 5px;">
     <h2 style="margin: 0 0 15px 0; color: #ea580c; font-size: 20px;">🎓 REQUIRED: FREE RISE Certification</h2>
     <p style="margin: 0 0 10px 0;">Complete the Milady RISE Client Well-Being & Safety Certification (normally $29.95, <strong>FREE for you</strong>).</p>
 
@@ -48,7 +48,7 @@ export function getBarberWelcomeEmail(data: BarberWelcomeEmailData): {
       <p style="margin: 0; font-size: 14px;">Create account with your email: ${studentEmail}</p>
 
       <p style="margin: 15px 0 10px 0; font-weight: bold;">Step 3: Enter promo code at checkout</p>
-      <div style="background: #fef3c7; border: 2px dashed #f59e0b; padding: 10px; text-align: center; border-radius: 5px; margin: 10px 0;">
+      <div style="background: #f9fafb; border: 1px dashed #e5e7eb; padding: 10px; text-align: center; border-radius: 5px; margin: 10px 0;">
         <code style="font-size: 18px; font-weight: bold; color: #92400e;">efhcti-rise295</code>
         <p style="margin: 5px 0 0 0; font-size: 12px; color: #92400e;">⚠️ No spaces before or after the code</p>
       </div>
@@ -63,23 +63,23 @@ export function getBarberWelcomeEmail(data: BarberWelcomeEmailData): {
       <p style="margin: 15px 0 10px 0; font-weight: bold;">Step 5: Download your certificate</p>
     </div>
 
-    <div style="background: #dcfce7; border: 1px solid #86efac; padding: 12px; border-radius: 5px; margin-top: 15px;">
-      <p style="margin: 0; font-size: 14px; color: #166534;">
+    <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; border-radius: 5px; margin-top: 15px;">
+      <p style="margin: 0; font-size: 14px; color: #374151;">
         🏆 <strong>BONUS:</strong> You're eligible for the $500 RISE Scholarship!<br>
         <span style="font-size: 13px;">10 students awarded twice per year (Spring & Fall)</span>
       </p>
     </div>
   </div>
 
-  <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 20px; margin-bottom: 30px; border-radius: 5px;">
-    <h2 style="margin: 0 0 15px 0; color: #1e40af; font-size: 20px;">📱 Mobile App (Optional)</h2>
+  <div style="background: #f9fafb; border-left: 4px solid #e5e7eb; padding: 20px; margin-bottom: 30px; border-radius: 5px;">
+    <h2 style="margin: 0 0 15px 0; color: #1e293b; font-size: 20px;">📱 Mobile App (Optional)</h2>
     <p style="margin: 0 0 15px 0;">Access your training on your phone:</p>
 
     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-      <a href="https://apps.apple.com/us/app/thinkific/id1471012001" style="display: inline-block; background: white; color: #1e40af; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; border: 2px solid #3b82f6; flex: 1; min-width: 200px; text-align: center;">
+      <a href="https://apps.apple.com/us/app/thinkific/id1471012001" style="display: inline-block; background: white; color: #374151; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; border: 1px solid #e5e7eb; flex: 1; min-width: 200px; text-align: center;">
         📱 Download for iPhone
       </a>
-      <a href="https://play.google.com/store/apps/details?id=com.thinkific.mobile" style="display: inline-block; background: white; color: #1e40af; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; border: 2px solid #3b82f6; flex: 1; min-width: 200px; text-align: center;">
+      <a href="https://play.google.com/store/apps/details?id=com.thinkific.mobile" style="display: inline-block; background: white; color: #374151; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; border: 1px solid #e5e7eb; flex: 1; min-width: 200px; text-align: center;">
         📱 Download for Android
       </a>
     </div>
@@ -95,7 +95,7 @@ export function getBarberWelcomeEmail(data: BarberWelcomeEmailData): {
     </div>
   </div>
 
-  <div style="background: #f1f5f9; padding: 20px; border-radius: 5px; margin-bottom: 30px;">
+  <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 5px; margin-bottom: 30px;">
     <h2 style="margin: 0 0 15px 0; color: #334155; font-size: 20px;">🚀 Next Steps</h2>
     <ol style="margin: 0; padding-left: 20px;">
       <li style="margin-bottom: 8px;">Login to your student dashboard</li>

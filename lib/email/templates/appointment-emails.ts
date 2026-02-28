@@ -23,7 +23,7 @@ export const appointmentEmailTemplates = {
 
         <p>Your appointment with Elevate for Humanity is confirmed.</p>
 
-        <div style="background-color: #eff6ff; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #3b82f6;">
+        <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
           <p style="margin: 0;">📅 <strong>Date:</strong> ${data.date}</p>
           <p style="margin: 10px 0;">⏰ <strong>Time:</strong> ${data.time}</p>
           <p style="margin: 10px 0;">📞 <strong>Format:</strong> ${data.format === 'phone' ? 'Phone Call' : 'Zoom Video'}</p>
@@ -34,7 +34,7 @@ export const appointmentEmailTemplates = {
         ` : `
           <p><strong>Your secure Zoom meeting link:</strong></p>
           <p style="text-align: center; margin: 20px 0;">
-            <a href="${data.zoomLink}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px;">Join Zoom Meeting</a>
+            <a href="${data.zoomLink}" style="display: inline-block; padding: 12px 24px; background-color: #ea580c; color: white; text-decoration: none; border-radius: 6px;">Join Zoom Meeting</a>
           </p>
           <p style="font-size: 14px; color: #666;">
             Please join from a quiet location with a stable internet connection.
@@ -106,7 +106,7 @@ Phone: (317) 314-3757
 
         <p>This is a reminder about your appointment tomorrow.</p>
 
-        <div style="background-color: #fef3c7; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+        <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
           <p style="margin: 0;">📅 <strong>Date:</strong> ${data.date}</p>
           <p style="margin: 10px 0;">⏰ <strong>Time:</strong> ${data.time}</p>
           <p style="margin: 10px 0;">📞 <strong>Format:</strong> ${data.format === 'phone' ? 'Phone Call' : 'Zoom Video'}</p>
@@ -114,7 +114,7 @@ Phone: (317) 314-3757
 
         ${data.format === 'zoom' && data.zoomLink ? `
           <p style="text-align: center; margin: 20px 0;">
-            <a href="${data.zoomLink}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px;">Join Zoom Meeting</a>
+            <a href="${data.zoomLink}" style="display: inline-block; padding: 12px 24px; background-color: #ea580c; color: white; text-decoration: none; border-radius: 6px;">Join Zoom Meeting</a>
           </p>
         ` : ''}
 
@@ -177,7 +177,7 @@ Phone: (317) 314-3757
           <p>We'll call you at the scheduled time.</p>
         ` : `
           <p style="text-align: center; margin: 20px 0;">
-            <a href="${data.zoomLink}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px;">Join Zoom Meeting</a>
+            <a href="${data.zoomLink}" style="display: inline-block; padding: 12px 24px; background-color: #ea580c; color: white; text-decoration: none; border-radius: 6px;">Join Zoom Meeting</a>
           </p>
         `}
 

@@ -80,7 +80,7 @@ Phone: (317) 314-3757
 
         ${data.calendlyLink ? `
           <p>You can schedule a time that works for you here:<br />
-          <a href="${data.calendlyLink}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0;">Schedule Appointment</a></p>
+          <a href="${data.calendlyLink}" style="display: inline-block; padding: 12px 24px; background-color: #ea580c; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0;">Schedule Appointment</a></p>
         ` : ''}
 
         <p>If you'd rather talk by phone, feel free to reply to this email or call us at <a href="tel:+13173143757">(317) 314-3757</a>.</p>
@@ -180,7 +180,7 @@ Elevate for Humanity
 
         <p>You're officially enrolled in the <strong>${data.programName}</strong> program.</p>
 
-        <div style="background-color: #f0fdf4; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #10b981;">
+        <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
           <p style="margin: 0;"><strong>Program details:</strong></p>
           <ul style="margin: 10px 0;">
             <li>Start date: ${data.startDate}</li>

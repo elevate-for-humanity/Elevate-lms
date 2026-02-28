@@ -96,11 +96,11 @@ async function _POST(request: Request) {
           subject: `Your Milady Login Credentials - ${subject}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <div style="background: #7c3aed; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+              <div style="background: #ea580c; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
                 <h1 style="margin: 0; font-size: 24px;">Your Milady Account is Ready!</h1>
               </div>
               
-              <div style="background: #f8fafc; padding: 20px; border: 1px solid #e2e8f0;">
+              <div style="background: #ffffff; padding: 20px; border: 1px solid #e5e7eb;">
                 <p style="color: #334155; margin-bottom: 16px;">
                   Hi ${student.full_name || 'Student'},
                 </p>
@@ -113,7 +113,7 @@ async function _POST(request: Request) {
                   ${html || `<pre style="white-space: pre-wrap;">${text}</pre>`}
                 </div>
                 
-                <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0;">
+                <div style="background: #f9fafb; border-left: 4px solid #e5e7eb; padding: 16px; margin: 20px 0;">
                   <h4 style="color: #92400e; margin: 0 0 8px 0;">⚠️ Next Step Required</h4>
                   <p style="color: #78350f; margin: 0;">
                     After you log into Milady, return to your Elevate dashboard and mark "Milady Enrollment Complete" to continue your onboarding.
@@ -121,7 +121,7 @@ async function _POST(request: Request) {
                 </div>
                 
                 <div style="text-align: center; margin: 24px 0;">
-                  <a href="${siteUrl}/apprentice" style="display: inline-block; background: #2563eb; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                  <a href="${siteUrl}/apprentice" style="display: inline-block; background: #ea580c; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold;">
                     Go to Dashboard →
                   </a>
                 </div>

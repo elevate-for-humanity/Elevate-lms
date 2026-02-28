@@ -111,10 +111,10 @@ async function sendAlertEmail(data: {
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background: #dc2626; color: white; padding: 20px; text-align: center;">
+      <div style="padding: 20px; text-align: center; border-bottom: 2px solid #e5e7eb;">
         <h1 style="margin: 0;">Unauthorized Site Copy Detected</h1>
       </div>
-      <div style="padding: 24px; background: #fef2f2; border: 1px solid #fecaca;">
+      <div style="padding: 24px; background: #f9fafb; border: 1px solid #e5e7eb;">
         <p style="font-size: 16px; font-weight: bold; color: #991b1b;">Someone has copied your website and is hosting it at:</p>
         <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
           <tr><td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; width: 120px;">Domain</td><td style="padding: 8px; border: 1px solid #ddd;"><a href="http://${data.domain}">${data.domain}</a></td></tr>
@@ -303,7 +303,7 @@ Elevate for Humanity Career & Technical Institute
 
   const dmcaHtml = `
     <div style="font-family: 'Courier New', monospace; max-width: 700px; margin: 0 auto; padding: 24px; border: 2px solid #991b1b; background: #fff;">
-      <div style="text-align: center; padding: 16px; background: #991b1b; color: white; margin: -24px -24px 24px -24px;">
+      <div style="text-align: center; padding: 16px; border-bottom: 2px solid #e5e7eb; color: #1e293b; margin: -24px -24px 24px -24px;">
         <h1 style="margin: 0; font-size: 18px;">DMCA TAKEDOWN NOTICE</h1>
         <p style="margin: 4px 0 0; font-size: 12px;">Pursuant to 17 U.S.C. § 512(c)</p>
       </div>

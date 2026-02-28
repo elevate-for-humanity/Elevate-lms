@@ -32,15 +32,15 @@ export async function sendApplicationConfirmation(application: ApplicationData) 
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Application Received</title>
     </head>
-    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background-color: #f9fafb;">
+    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background-color: #ffffff;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; padding: 40px 20px;">
         <tr>
           <td align="center">
             <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
               <!-- Header -->
               <tr>
-                <td style="background: linear-gradient(135deg, #dc2626 0%, #f97316 50%, #2563eb 100%); padding: 48px 40px; text-align: center;">
-                  <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: bold; letter-spacing: -0.5px;">Application Received!</h1>
+                <td style="padding: 48px 40px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+                  <h1 style="margin: 0; color: #1e293b; font-size: 32px; font-weight: bold; letter-spacing: -0.5px;">Application Received!</h1>
                   <p style="margin: 12px 0 0 0; color: #ffffff; font-size: 18px; opacity: 0.95;">Thank you for taking the first step</p>
                 </td>
               </tr>
@@ -58,8 +58,8 @@ export async function sendApplicationConfirmation(application: ApplicationData) 
                   </p>
 
                   <!-- What's Next Box -->
-                  <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; padding: 24px; margin: 32px 0; border-radius: 8px;">
-                    <h3 style="margin: 0 0 16px 0; color: #92400e; font-size: 20px; font-weight: 600;">What Happens Next?</h3>
+                  <div style="background-color: #f9fafb; border-left: 4px solid #e5e7eb; padding: 24px; margin: 32px 0; border-radius: 8px;">
+                    <h3 style="margin: 0 0 16px 0; color: #374151; font-size: 20px; font-weight: 600;">What Happens Next?</h3>
                     <ol style="margin: 0; padding-left: 20px; color: #78350f; font-size: 15px; line-height: 1.8;">
                       <li style="margin-bottom: 8px;">Our team reviews your application</li>
                       <li style="margin-bottom: 8px;">We'll call you to discuss the program and answer questions</li>
@@ -89,7 +89,7 @@ export async function sendApplicationConfirmation(application: ApplicationData) 
 
                   <!-- CTA Button -->
                   <div style="text-align: center; margin: 32px 0;">
-                    <a href="${SITE_URL}/programs" style="display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #f97316 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 50px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);">
+                    <a href="${SITE_URL}/programs" style="display: inline-block; background-color: #ea580c; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 50px; font-weight: 600; font-size: 16px; ">
                       Explore Our Programs
                     </a>
                   </div>
@@ -109,7 +109,7 @@ export async function sendApplicationConfirmation(application: ApplicationData) 
 
               <!-- Footer -->
               <tr>
-                <td style="background-color: #111827; padding: 32px 40px; text-align: center;">
+                <td style="padding: 32px 40px; text-align: center; border-top: 1px solid #e5e7eb;">
                   <p style="margin: 0 0 8px 0; color: #ffffff; font-size: 16px; font-weight: 600;">
                     Elevate For Humanity
                   </p>
@@ -149,15 +149,15 @@ export async function sendAdminApplicationNotification(application: ApplicationD
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>New Application Received</title>
     </head>
-    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background-color: #f9fafb;">
+    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background-color: #ffffff;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; padding: 40px 20px;">
         <tr>
           <td align="center">
             <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
               <!-- Header -->
               <tr>
-                <td style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); padding: 32px 40px; text-align: center;">
-                  <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">🎓 New Application</h1>
+                <td style="padding: 32px 40px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+                  <h1 style="margin: 0; color: #1e293b; font-size: 28px; font-weight: bold;">🎓 New Application</h1>
                   <p style="margin: 8px 0 0 0; color: #dbeafe; font-size: 16px;">Action Required</p>
                 </td>
               </tr>
@@ -210,16 +210,16 @@ export async function sendAdminApplicationNotification(application: ApplicationD
 
                   <!-- Action Buttons -->
                   <div style="text-align: center; margin: 32px 0;">
-                    <a href="${SITE_URL}/admin/applications/${application.id}" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px; margin: 0 8px; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);">
+                    <a href="${SITE_URL}/admin/applications/${application.id}" style="display: inline-block; background-color: #ea580c; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px; margin: 0 8px; ">
                       Review Application
                     </a>
-                    <a href="${SITE_URL}/admin/applications" style="display: inline-block; background-color: #ffffff; color: #2563eb; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px; margin: 0 8px; border: 2px solid #2563eb;">
+                    <a href="${SITE_URL}/admin/applications" style="display: inline-block; background-color: #ffffff; color: #374151; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px; margin: 0 8px; border: 1px solid #e5e7eb;">
                       View All Applications
                     </a>
                   </div>
 
                   <!-- Next Steps -->
-                  <div style="background-color: #eff6ff; border-left: 4px solid #2563eb; padding: 20px; margin: 32px 0; border-radius: 8px;">
+                  <div style="background-color: #f9fafb; border-left: 4px solid #e5e7eb; padding: 20px; margin: 32px 0; border-radius: 8px;">
                     <h4 style="margin: 0 0 12px 0; color: #1e40af; font-size: 16px; font-weight: 600;">Next Steps:</h4>
                     <ol style="margin: 0; padding-left: 20px; color: #1e3a8a; font-size: 14px; line-height: 1.8;">
                       <li>Review application details in admin dashboard</li>
@@ -269,16 +269,16 @@ export async function sendEnrollmentLink(application: ApplicationData, enrollmen
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Application Approved - Complete Your Enrollment</title>
     </head>
-    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background-color: #f9fafb;">
+    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background-color: #ffffff;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; padding: 40px 20px;">
         <tr>
           <td align="center">
             <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
               <!-- Header -->
               <tr>
-                <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 48px 40px; text-align: center;">
+                <td style="padding: 48px 40px; text-align: center; border-bottom: 2px solid #e5e7eb;">
                   <div style="font-size: 48px; margin-bottom: 16px;">🎉</div>
-                  <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: bold;">Congratulations!</h1>
+                  <h1 style="margin: 0; color: #1e293b; font-size: 32px; font-weight: bold;">Congratulations!</h1>
                   <p style="margin: 12px 0 0 0; color: #d1fae5; font-size: 18px;">Your application has been approved</p>
                 </td>
               </tr>
@@ -296,12 +296,12 @@ export async function sendEnrollmentLink(application: ApplicationData, enrollmen
                   </p>
 
                   <!-- CTA Box -->
-                  <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #10b981; padding: 32px; margin: 32px 0; border-radius: 12px; text-align: center;">
-                    <h3 style="margin: 0 0 16px 0; color: #065f46; font-size: 20px; font-weight: 600;">Complete Your Enrollment Now</h3>
+                  <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 32px; margin: 32px 0; border-radius: 12px; text-align: center;">
+                    <h3 style="margin: 0 0 16px 0; color: #374151; font-size: 20px; font-weight: 600;">Complete Your Enrollment Now</h3>
                     <p style="margin: 0 0 24px 0; color: #047857; font-size: 15px;">
                       Click the button below to finalize your enrollment and get started
                     </p>
-                    <a href="${enrollmentUrl}" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; padding: 18px 48px; border-radius: 50px; font-weight: 700; font-size: 18px; box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4); text-transform: uppercase; letter-spacing: 0.5px;">
+                    <a href="${enrollmentUrl}" style="display: inline-block; background-color: #ea580c; color: #ffffff; text-decoration: none; padding: 18px 48px; border-radius: 50px; font-weight: 700; font-size: 18px;  text-transform: uppercase; letter-spacing: 0.5px;">
                       Complete Enrollment →
                     </a>
                     <p style="margin: 24px 0 0 0; color: #6b7280; font-size: 13px;">
@@ -314,21 +314,21 @@ export async function sendEnrollmentLink(application: ApplicationData, enrollmen
                     <h3 style="margin: 0 0 16px 0; color: #111827; font-size: 20px; font-weight: 600;">What Happens After Enrollment:</h3>
                     <div style="margin: 16px 0;">
                       <div style="display: flex; align-items: start; margin-bottom: 16px;">
-                        <div style="background-color: #10b981; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 16px; flex-shrink: 0;">1</div>
+                        <div style="background-color: #374151; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 16px; flex-shrink: 0;">1</div>
                         <div>
                           <strong style="color: #111827; font-size: 15px;">Instant Access</strong>
                           <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 14px; line-height: 1.6;">Get immediate access to your student dashboard and course materials</p>
                         </div>
                       </div>
                       <div style="display: flex; align-items: start; margin-bottom: 16px;">
-                        <div style="background-color: #10b981; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 16px; flex-shrink: 0;">2</div>
+                        <div style="background-color: #374151; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 16px; flex-shrink: 0;">2</div>
                         <div>
                           <strong style="color: #111827; font-size: 15px;">Orientation</strong>
                           <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 14px; line-height: 1.6;">Complete a brief orientation to learn how to use the platform</p>
                         </div>
                       </div>
                       <div style="display: flex; align-items: start;">
-                        <div style="background-color: #10b981; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 16px; flex-shrink: 0;">3</div>
+                        <div style="background-color: #374151; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 16px; flex-shrink: 0;">3</div>
                         <div>
                           <strong style="color: #111827; font-size: 15px;">Start Learning</strong>
                           <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 14px; line-height: 1.6;">Begin your first module and start building your new career</p>
@@ -352,7 +352,7 @@ export async function sendEnrollmentLink(application: ApplicationData, enrollmen
 
               <!-- Footer -->
               <tr>
-                <td style="background-color: #111827; padding: 32px 40px; text-align: center;">
+                <td style="padding: 32px 40px; text-align: center; border-top: 1px solid #e5e7eb;">
                   <p style="margin: 0 0 8px 0; color: #ffffff; font-size: 16px; font-weight: 600;">
                     Elevate For Humanity
                   </p>

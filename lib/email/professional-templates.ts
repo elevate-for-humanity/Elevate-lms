@@ -20,16 +20,16 @@ function emailLayout(content: string): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #ffffff; }
     .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
-    .header { background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); padding: 40px 20px; text-align: center; }
-    .header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: bold; }
+    .header { padding: 40px 20px; text-align: center; border-bottom: 2px solid #e5e7eb; }
+    .header h1 { color: #1e293b; margin: 0; font-size: 28px; font-weight: bold; }
     .content { padding: 40px 30px; }
-    .content h2 { color: #1e40af; font-size: 24px; margin-top: 0; }
+    .content h2 { color: #1e293b; font-size: 24px; margin-top: 0; }
     .button { display: inline-block; padding: 14px 32px; background-color: #ea580c; color: #ffffff !important; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
-    .info-box { background-color: #f0f9ff; border-left: 4px solid #1e40af; padding: 16px; margin: 20px 0; }
-    .success-box { background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 16px; margin: 20px 0; }
-    .footer { background-color: #f9fafb; padding: 30px; text-align: center; color: #6b7280; font-size: 14px; }
+    .info-box { background-color: #f9fafb; border-left: 4px solid #e5e7eb; padding: 16px; margin: 20px 0; }
+    .success-box { background-color: #f9fafb; border-left: 4px solid #e5e7eb; padding: 16px; margin: 20px 0; }
+    .footer { background-color: #ffffff; padding: 30px; text-align: center; color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb; }
     ul { padding-left: 20px; }
     ul li { margin: 8px 0; }
   </style>

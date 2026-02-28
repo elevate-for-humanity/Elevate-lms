@@ -50,7 +50,7 @@ export async function sendCourseEnrollmentEmail(data: CourseEnrollmentData) {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Course Enrollment Confirmation</title>
     </head>
-    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f9fafb;">
+    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; padding: 40px 20px;">
         <tr>
           <td align="center">
@@ -58,7 +58,7 @@ export async function sendCourseEnrollmentEmail(data: CourseEnrollmentData) {
 
               <!-- Header -->
               <tr>
-                <td style="background: linear-gradient(135deg, #E63946 0%, #F77F00 50%, #06A77D 100%); padding: 40px 30px; text-align: center;">
+                <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
                   <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: bold;">🎉 You're Enrolled!</h1>
                 </td>
               </tr>
@@ -72,7 +72,7 @@ export async function sendCourseEnrollmentEmail(data: CourseEnrollmentData) {
                   </p>
 
                   <!-- Course Details Box -->
-                  <div style="margin: 30px 0; padding: 20px; background-color: #f3f4f6; border-radius: 8px;">
+                  <div style="margin: 30px 0; padding: 20px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;">
                     <h3 style="margin: 0 0 15px 0; color: #111827; font-size: 18px;">📚 Course Details</h3>
                     <table width="100%" cellpadding="8" cellspacing="0">
                       <tr>
@@ -104,8 +104,8 @@ export async function sendCourseEnrollmentEmail(data: CourseEnrollmentData) {
                     liveSessionInfo
                       ? `
                   <!-- Live Instruction Info -->
-                  <div style="margin: 20px 0; padding: 20px; background-color: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 4px;">
-                    <h3 style="margin: 0 0 10px 0; color: #1e40af; font-size: 16px;">📹 Live Instruction Sessions</h3>
+                  <div style="margin: 20px 0; padding: 20px; background-color: #f9fafb; border-left: 4px solid #e5e7eb; border-radius: 4px;">
+                    <h3 style="margin: 0 0 10px 0; color: #1e293b; font-size: 16px;">📹 Live Instruction Sessions</h3>
                     <p style="margin: 0; color: #1e3a8a; font-size: 14px; line-height: 1.6;">${liveSessionInfo}</p>
                   </div>
                   `
@@ -116,8 +116,8 @@ export async function sendCourseEnrollmentEmail(data: CourseEnrollmentData) {
                     handsOnInfo
                       ? `
                   <!-- Hands-On Training Info -->
-                  <div style="margin: 20px 0; padding: 20px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
-                    <h3 style="margin: 0 0 10px 0; color: #92400e; font-size: 16px;">🛠️ Hands-On Training</h3>
+                  <div style="margin: 20px 0; padding: 20px; background-color: #f9fafb; border-left: 4px solid #e5e7eb; border-radius: 4px;">
+                    <h3 style="margin: 0 0 10px 0; color: #374151; font-size: 16px;">🛠️ Hands-On Training</h3>
                     <p style="margin: 0; color: #78350f; font-size: 14px; line-height: 1.6;">${handsOnInfo}</p>
                   </div>
                   `
@@ -125,8 +125,8 @@ export async function sendCourseEnrollmentEmail(data: CourseEnrollmentData) {
                   }
 
                   <!-- Next Steps -->
-                  <div style="margin: 30px 0; padding: 20px; background-color: #f0fdf4; border-left: 4px solid #10b981; border-radius: 4px;">
-                    <h3 style="margin: 0 0 10px 0; color: #065f46; font-size: 18px;">✅ Next Steps</h3>
+                  <div style="margin: 30px 0; padding: 20px; background-color: #f9fafb; border-left: 4px solid #e5e7eb; border-radius: 4px;">
+                    <h3 style="margin: 0 0 10px 0; color: #374151; font-size: 18px;">✅ Next Steps</h3>
                     <ol style="margin: 10px 0 0 0; padding-left: 20px; color: #064e3b;">
                       <li style="margin-bottom: 8px;">Log in to your student dashboard</li>
                       <li style="margin-bottom: 8px;">Complete your student profile</li>
@@ -140,10 +140,10 @@ export async function sendCourseEnrollmentEmail(data: CourseEnrollmentData) {
                   <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
                     <tr>
                       <td align="center">
-                        <a href="${courseUrl}" style="display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #E63946 0%, #F77F00 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 0 10px 10px 0;">
+                        <a href="${courseUrl}" style="display: inline-block; padding: 16px 32px; background-color: #ea580c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 0 10px 10px 0;">
                           Start Course
                         </a>
-                        <a href="${dashboardUrl}" style="display: inline-block; padding: 16px 32px; background-color: #6b7280; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 0 0 10px 0;">
+                        <a href="${dashboardUrl}" style="display: inline-block; padding: 16px 32px; background-color: #ffffff; color: #374151; border: 1px solid #e5e7eb; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin: 0 0 10px 0;">
                           View Dashboard
                         </a>
                       </td>
@@ -207,7 +207,7 @@ export async function sendCourseStartReminderEmail(data: CourseEnrollmentData) {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Course Starting Soon</title>
     </head>
-    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f9fafb;">
+    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; padding: 40px 20px;">
         <tr>
           <td align="center">
@@ -215,7 +215,7 @@ export async function sendCourseStartReminderEmail(data: CourseEnrollmentData) {
 
               <!-- Header -->
               <tr>
-                <td style="background: linear-gradient(135deg, #3b82f6 0%, #7209B7 100%); padding: 40px 30px; text-align: center;">
+                <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
                   <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: bold;">⏰ Your Course Starts Soon!</h1>
                 </td>
               </tr>
@@ -228,8 +228,8 @@ export async function sendCourseStartReminderEmail(data: CourseEnrollmentData) {
                     This is a friendly reminder that <strong>${courseName}</strong> starts on <strong>${startDate}</strong>.
                   </p>
 
-                  <div style="margin: 30px 0; padding: 20px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
-                    <h3 style="margin: 0 0 10px 0; color: #92400e; font-size: 18px;">📅 Get Ready</h3>
+                  <div style="margin: 30px 0; padding: 20px; background-color: #f9fafb; border-left: 4px solid #e5e7eb; border-radius: 4px;">
+                    <h3 style="margin: 0 0 10px 0; color: #374151; font-size: 18px;">📅 Get Ready</h3>
                     <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #78350f;">
                       <li style="margin-bottom: 8px;">Log in to your dashboard and review course materials</li>
                       <li style="margin-bottom: 8px;">Test your internet connection and device</li>
@@ -241,8 +241,8 @@ export async function sendCourseStartReminderEmail(data: CourseEnrollmentData) {
                   ${
                     liveSessionInfo
                       ? `
-                  <div style="margin: 20px 0; padding: 20px; background-color: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 4px;">
-                    <h3 style="margin: 0 0 10px 0; color: #1e40af; font-size: 16px;">📹 Live Sessions</h3>
+                  <div style="margin: 20px 0; padding: 20px; background-color: #f9fafb; border-left: 4px solid #e5e7eb; border-radius: 4px;">
+                    <h3 style="margin: 0 0 10px 0; color: #1e293b; font-size: 16px;">📹 Live Sessions</h3>
                     <p style="margin: 0; color: #1e3a8a; font-size: 14px; line-height: 1.6;">${liveSessionInfo}</p>
                   </div>
                   `
@@ -253,7 +253,7 @@ export async function sendCourseStartReminderEmail(data: CourseEnrollmentData) {
                   <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
                     <tr>
                       <td align="center">
-                        <a href="${courseUrl}" style="display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #3b82f6 0%, #7209B7 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                        <a href="${courseUrl}" style="display: inline-block; padding: 16px 32px; background-color: #ea580c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
                           Access Course
                         </a>
                       </td>
@@ -323,7 +323,7 @@ export async function sendLiveSessionReminderEmail(data: {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Live Session Reminder</title>
     </head>
-    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f9fafb;">
+    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; padding: 40px 20px;">
         <tr>
           <td align="center">
@@ -331,7 +331,7 @@ export async function sendLiveSessionReminderEmail(data: {
 
               <!-- Header -->
               <tr>
-                <td style="background: linear-gradient(135deg, #06A77D 0%, #3b82f6 100%); padding: 40px 30px; text-align: center;">
+                <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
                   <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">📹 Live Session Tomorrow</h1>
                 </td>
               </tr>
@@ -344,8 +344,8 @@ export async function sendLiveSessionReminderEmail(data: {
                     Don't forget! You have a live instruction session tomorrow for <strong>${courseName}</strong>.
                   </p>
 
-                  <div style="margin: 30px 0; padding: 20px; background-color: #f0fdf4; border-left: 4px solid #10b981; border-radius: 4px;">
-                    <h3 style="margin: 0 0 15px 0; color: #065f46; font-size: 18px;">${sessionTitle}</h3>
+                  <div style="margin: 30px 0; padding: 20px; background-color: #f9fafb; border-left: 4px solid #e5e7eb; border-radius: 4px;">
+                    <h3 style="margin: 0 0 15px 0; color: #374151; font-size: 18px;">${sessionTitle}</h3>
                     <table width="100%" cellpadding="8" cellspacing="0">
                       <tr>
                         <td style="color: #6b7280; font-size: 14px; width: 30%;">Date:</td>
@@ -364,7 +364,7 @@ export async function sendLiveSessionReminderEmail(data: {
                   <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
                     <tr>
                       <td align="center">
-                        <a href="${sessionLink}" style="display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #06A77D 0%, #3b82f6 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                        <a href="${sessionLink}" style="display: inline-block; padding: 16px 32px; background-color: #ea580c; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
                           Join Live Session
                         </a>
                       </td>

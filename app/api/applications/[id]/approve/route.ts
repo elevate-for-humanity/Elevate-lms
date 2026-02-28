@@ -139,7 +139,7 @@ async function _POST(
         </ol>
         <p style="margin-top: 20px;">
           <a href="https://www.elevateforhumanity.org/lms/dashboard" 
-             style="background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+             style="background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
             Go to Student Dashboard
           </a>
         </p>

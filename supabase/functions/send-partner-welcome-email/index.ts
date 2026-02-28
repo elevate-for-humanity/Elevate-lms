@@ -39,7 +39,7 @@ function getPartnerWelcomeEmail(data: {
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
 
-  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center; border-radius: 10px 10px 0 0;">
+  <div style="padding: 40px 20px; text-align: center; border-radius: 10px 10px 0 0; border-bottom: 2px solid #e5e7eb;">
     <h1 style="color: white; margin: 0; font-size: 28px;">🎉 Welcome to ${data.providerName}!</h1>
   </div>
 
@@ -52,16 +52,16 @@ function getPartnerWelcomeEmail(data: {
     </p>
 
     ${data.enrollmentUrl ? `
-    <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 30px 0;">
+    <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin: 30px 0;">
       <h2 style="margin-top: 0; color: #1f2937; font-size: 20px;">🚀 Get Started</h2>
       <p style="margin-bottom: 15px;">Click the button below to access your courses:</p>
-      <a href="${data.enrollmentUrl}" style="display: inline-block; background: #667eea; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Access ${data.providerName}</a>
+      <a href="${data.enrollmentUrl}" style="display: inline-block; background: #ea580c; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Access ${data.providerName}</a>
     </div>
     ` : ''}
 
     ${data.promoCode ? `
-    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 30px 0; border-radius: 4px;">
-      <h3 style="margin-top: 0; color: #92400e; font-size: 18px;">💰 Your Promo Code</h3>
+    <div style="background: #f9fafb; border-left: 4px solid #e5e7eb; padding: 20px; margin: 30px 0; border-radius: 4px;">
+      <h3 style="margin-top: 0; color: #374151; font-size: 18px;">💰 Your Promo Code</h3>
       <p style="margin-bottom: 10px; color: #78350f;">Use this code during enrollment:</p>
       <div style="background: white; padding: 15px; border-radius: 6px; text-align: center;">
         <code style="font-size: 24px; font-weight: bold; color: #667eea; letter-spacing: 2px;">${data.promoCode}</code>
@@ -70,7 +70,7 @@ function getPartnerWelcomeEmail(data: {
     ` : ''}
 
     ${data.loginInstructions ? `
-    <div style="background: #e0e7ff; padding: 20px; border-radius: 8px; margin: 30px 0;">
+    <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin: 30px 0;">
       <h3 style="margin-top: 0; color: #3730a3; font-size: 18px;">📝 Login Instructions</h3>
       <p style="color: #4338ca; margin: 0;">${data.loginInstructions}</p>
     </div>

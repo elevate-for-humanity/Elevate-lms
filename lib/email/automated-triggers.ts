@@ -75,13 +75,13 @@ export async function sendRequirementReminderEmail(
 
       <p>This is a friendly reminder that you have an upcoming requirement:</p>
 
-      <div style="background-color: #fef3c7; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+      <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
         <p style="margin: 0;"><strong>${requirementTitle}</strong></p>
         <p style="margin: 10px 0 0 0;">Due: ${dueDate}</p>
       </div>
 
       <p>
-        <a href="${actionLink}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0;">
+        <a href="${actionLink}" style="display: inline-block; padding: 12px 24px; background-color: #ea580c; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0;">
           Complete Requirement
         </a>
       </p>
@@ -144,7 +144,7 @@ export async function sendOverdueRequirementAlert(
 
       <p>We noticed that you have an overdue requirement that needs your attention:</p>
 
-      <div style="background-color: #fee2e2; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #ef4444;">
+      <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
         <p style="margin: 0;"><strong>${requirementTitle}</strong></p>
         <p style="margin: 10px 0 0 0; color: #dc2626;">Overdue by ${daysOverdue} day${daysOverdue !== 1 ? 's' : ''}</p>
       </div>
@@ -152,7 +152,7 @@ export async function sendOverdueRequirementAlert(
       <p>Please complete this requirement as soon as possible to stay on track with your program.</p>
 
       <p>
-        <a href="${actionLink}" style="display: inline-block; padding: 12px 24px; background-color: #dc2626; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0;">
+        <a href="${actionLink}" style="display: inline-block; padding: 12px 24px; background-color: #ea580c; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0;">
           Complete Now
         </a>
       </p>
@@ -296,7 +296,7 @@ export async function sendAtRiskAlertToAdvisor(
 
       <p>The following student has been flagged as at-risk and may need intervention:</p>
 
-      <div style="background-color: #fee2e2; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #dc2626;">
+      <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
         <p style="margin: 0;"><strong>Student:</strong> ${studentName}</p>
         <p style="margin: 10px 0 0 0;"><strong>Program:</strong> ${programName}</p>
       </div>
@@ -307,7 +307,7 @@ export async function sendAtRiskAlertToAdvisor(
       </ul>
 
       <p>
-        <a href="${dashboardLink}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0;">
+        <a href="${dashboardLink}" style="display: inline-block; padding: 12px 24px; background-color: #ea580c; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0;">
           View Student Dashboard
         </a>
       </p>

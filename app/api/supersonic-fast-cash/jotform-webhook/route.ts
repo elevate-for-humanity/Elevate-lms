@@ -14,7 +14,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // JotForm webhook IPs (https://www.jotform.com/developers/webhooks/)
 const JOTFORM_IP_RANGES = [

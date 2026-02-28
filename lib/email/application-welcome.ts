@@ -237,8 +237,8 @@ function buildFundingHtml(p: ProgramInfo): string {
 
   if (hasFunding(p, 'wioa') || hasFunding(p, 'wrg') || hasFunding(p, 'next-level-jobs')) {
     html += `
-<div style="background:#eff6ff;border:1px solid #bfdbfe;padding:16px;border-radius:8px;margin:12px 0">
-<h3 style="margin-top:0;color:#1e40af">WIOA Funding (Workforce Innovation and Opportunity Act)</h3>
+<div style="background:#f9fafb;border:1px solid #e5e7eb;padding:16px;border-radius:8px;margin:12px 0">
+<h3 style="margin-top:0;color:#1e293b">WIOA Funding (Workforce Innovation and Opportunity Act)</h3>
 <p>WIOA is a federal program that pays for job training for people who qualify. It is administered through your local <strong>WorkOne</strong> career center. WIOA can cover:</p>
 <ul>
 <li>100% of your tuition and training costs</li>
@@ -262,8 +262,8 @@ function buildFundingHtml(p: ProgramInfo): string {
 
   if (hasFunding(p, 'jri')) {
     html += `
-<div style="background:#f0fdf4;border:1px solid #bbf7d0;padding:16px;border-radius:8px;margin:12px 0">
-<h3 style="margin-top:0;color:#166534">JRI Funding (Justice Reinvestment Initiative)</h3>
+<div style="background:#f9fafb;border:1px solid #e5e7eb;padding:16px;border-radius:8px;margin:12px 0">
+<h3 style="margin-top:0;color:#374151">JRI Funding (Justice Reinvestment Initiative)</h3>
 <p>JRI is an Indiana state program specifically for people who have been involved in the criminal justice system.</p>
 <p><strong>What JRI covers:</strong> 100% of training costs, tools, transportation, and supportive services.</p>
 <p><strong>Who qualifies:</strong></p>
@@ -279,16 +279,16 @@ function buildFundingHtml(p: ProgramInfo): string {
 
   if (hasFunding(p, 'apprenticeship')) {
     html += `
-<div style="background:#fefce8;border:1px solid #fef08a;padding:16px;border-radius:8px;margin:12px 0">
-<h3 style="margin-top:0;color:#854d0e">Registered Apprenticeship Funding</h3>
+<div style="background:#f9fafb;border:1px solid #e5e7eb;padding:16px;border-radius:8px;margin:12px 0">
+<h3 style="margin-top:0;color:#374151">Registered Apprenticeship Funding</h3>
 <p>As a <strong>USDOL Registered Apprenticeship</strong>, this program qualifies for additional federal and state funding. Apprentices earn wages while training &mdash; you get paid while you learn.</p>
 </div>`;
   }
 
   if (hasFunding(p, 'next-level-jobs')) {
     html += `
-<div style="background:#faf5ff;border:1px solid #e9d5ff;padding:16px;border-radius:8px;margin:12px 0">
-<h3 style="margin-top:0;color:#6b21a8">Next Level Jobs (Indiana)</h3>
+<div style="background:#f9fafb;border:1px solid #e5e7eb;padding:16px;border-radius:8px;margin:12px 0">
+<h3 style="margin-top:0;color:#374151">Next Level Jobs (Indiana)</h3>
 <p>Indiana's Next Level Jobs program provides free training in high-demand fields. This program may qualify &mdash; your WorkOne counselor can confirm eligibility.</p>
 </div>`;
   }
@@ -300,7 +300,7 @@ function buildNextStepsHtml(p: ProgramInfo): string {
   if (isSelfPayOnly(p)) {
     return `
 <h2 style="color:#1e293b;font-size:18px;border-bottom:2px solid #f97316;padding-bottom:6px;margin-top:28px">YOUR NEXT STEPS</h2>
-<div style="background:white;border:1px solid #e2e8f0;border-left:4px solid #f97316;padding:16px;margin:12px 0;border-radius:0 6px 6px 0">
+<div style="background:white;border:1px solid #e2e8f0;border-left:4px solid #e5e7eb;padding:16px;margin:12px 0;border-radius:0 6px 6px 0">
 <h3 style="margin-top:0">Step 1: Call Us to Discuss Enrollment</h3>
 <p>Call <strong>(317) 314-3757</strong> or reply to this email. We will walk you through:</p>
 <ul>
@@ -310,7 +310,7 @@ function buildNextStepsHtml(p: ProgramInfo): string {
 <li>What to bring on your first day</li>
 </ul>
 </div>
-<div style="background:white;border:1px solid #e2e8f0;border-left:4px solid #f97316;padding:16px;margin:12px 0;border-radius:0 6px 6px 0">
+<div style="background:white;border:1px solid #e2e8f0;border-left:4px solid #e5e7eb;padding:16px;margin:12px 0;border-radius:0 6px 6px 0">
 <h3 style="margin-top:0">Step 2: Complete Enrollment</h3>
 <p>Once payment is arranged, we will get you enrolled and send you all the details to get started.</p>
 </div>`;
@@ -319,7 +319,7 @@ function buildNextStepsHtml(p: ProgramInfo): string {
   return `
 <h2 style="color:#1e293b;font-size:18px;border-bottom:2px solid #f97316;padding-bottom:6px;margin-top:28px">YOUR NEXT STEPS &mdash; DO THIS NOW</h2>
 
-<div style="background:white;border:1px solid #e2e8f0;border-left:4px solid #f97316;padding:16px;margin:12px 0;border-radius:0 6px 6px 0">
+<div style="background:white;border:1px solid #e2e8f0;border-left:4px solid #e5e7eb;padding:16px;margin:12px 0;border-radius:0 6px 6px 0">
 <h3 style="margin-top:0">Step 1: Go to Indiana Career Connect and Create an Account</h3>
 <p>Go to: <strong><a href="https://www.indianacareerconnect.com">www.indianacareerconnect.com</a></strong></p>
 <ol>
@@ -331,7 +331,7 @@ function buildNextStepsHtml(p: ProgramInfo): string {
 </ol>
 </div>
 
-<div style="background:white;border:1px solid #e2e8f0;border-left:4px solid #f97316;padding:16px;margin:12px 0;border-radius:0 6px 6px 0">
+<div style="background:white;border:1px solid #e2e8f0;border-left:4px solid #e5e7eb;padding:16px;margin:12px 0;border-radius:0 6px 6px 0">
 <h3 style="margin-top:0">Step 2: Find Your Local WorkOne Office and Make an Appointment</h3>
 <ol>
 <li>Log in to <a href="https://www.indianacareerconnect.com">indianacareerconnect.com</a></li>
@@ -344,7 +344,7 @@ function buildNextStepsHtml(p: ProgramInfo): string {
 <p><strong>Indianapolis WorkOne:</strong> Call <strong>(317) 890-4640</strong> &mdash; they will direct you to the right location.</p>
 </div>
 
-<div style="background:white;border:1px solid #e2e8f0;border-left:4px solid #f97316;padding:16px;margin:12px 0;border-radius:0 6px 6px 0">
+<div style="background:white;border:1px solid #e2e8f0;border-left:4px solid #e5e7eb;padding:16px;margin:12px 0;border-radius:0 6px 6px 0">
 <h3 style="margin-top:0">Step 3: Attend Your WorkOne Appointment</h3>
 <p>Bring:</p>
 <ul>
@@ -356,7 +356,7 @@ ${hasFunding(p, 'jri') ? '<li>If you have a <strong>criminal record</strong>, as
 <p>The counselor will determine your funding eligibility and issue a voucher if approved.</p>
 </div>
 
-<div style="background:white;border:1px solid #e2e8f0;border-left:4px solid #f97316;padding:16px;margin:12px 0;border-radius:0 6px 6px 0">
+<div style="background:white;border:1px solid #e2e8f0;border-left:4px solid #e5e7eb;padding:16px;margin:12px 0;border-radius:0 6px 6px 0">
 <h3 style="margin-top:0">Step 4: Call Us Back and Update Your Progress</h3>
 <p>Once you have met with WorkOne:</p>
 <ol>
@@ -367,7 +367,7 @@ ${hasFunding(p, 'jri') ? '<li>If you have a <strong>criminal record</strong>, as
 </ol>
 </div>
 
-<div style="background:#fef2f2;border:1px solid #fecaca;padding:12px 16px;border-radius:6px;margin:16px 0;font-weight:bold;color:#991b1b">
+<div style="background:#f9fafb;border:1px solid #e5e7eb;padding:12px 16px;border-radius:6px;margin:16px 0;font-weight:bold;color:#374151">
 IMPORTANT: DO NOT WAIT. WorkOne appointments can take 1-2 weeks to schedule. Do Step 1 and Step 2 today.
 </div>`;
 }
@@ -375,11 +375,11 @@ IMPORTANT: DO NOT WAIT. WorkOne appointments can take 1-2 weeks to schedule. Do 
 function buildHtml(firstName: string, p: ProgramInfo): string {
   return `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;line-height:1.8;color:#333;margin:0;padding:0">
 <div style="max-width:680px;margin:0 auto;padding:24px">
-<div style="background:#f97316;color:white;padding:30px;text-align:center;border-radius:8px 8px 0 0">
+<div style="padding:30px;text-align:center;border-radius:8px 8px 0 0;border-bottom:2px solid #e5e7eb">
   <h1 style="margin:0;color:white;font-size:24px">Welcome to Elevate for Humanity!</h1>
   <p style="margin:8px 0 0;color:#fed7aa;font-size:15px">${p.name} Program</p>
 </div>
-<div style="padding:30px;background:#f9fafb;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
+<div style="padding:30px;background:#ffffff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
 
 <p>Hi ${firstName},</p>
 <p>Thank you for applying to the <strong>${p.name}</strong> program at Elevate for Humanity Career &amp; Technical Institute! We received your application and we are excited to help you get started.</p>
@@ -389,7 +389,7 @@ function buildHtml(firstName: string, p: ProgramInfo): string {
 <p><strong>Duration:</strong> ${p.duration}</p>
 <p><strong>Credentials You Earn:</strong> ${p.credentials}</p>
 <p><strong>Career Outlook:</strong> ${p.careerOutlook}</p>
-${p.etplApproved ? '<p style="color:#166534"><strong>✓ ETPL Approved</strong> — This program is on Indiana\'s Eligible Training Provider List.</p>' : ''}
+${p.etplApproved ? '<p style="color:#374151"><strong>✓ ETPL Approved</strong> — This program is on Indiana\'s Eligible Training Provider List.</p>' : ''}
 
 ${buildFundingHtml(p)}
 

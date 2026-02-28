@@ -1456,7 +1456,7 @@ async function _POST(request: NextRequest) {
                     <p><strong>Program:</strong> ${enrollmentConfig.program_slug.replace(/-/g, ' ')}</p>
                     <p><strong>Status:</strong> ${enrollmentConfig.is_deposit ? 'Deposit Paid - Remaining balance due' : 'Fully Paid'}</p>
                     <div style="text-align: center; margin: 24px 0;">
-                      <a href="${siteUrl}/login" style="display: inline-block; background: #2563eb; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold;">Login to Student Portal →</a>
+                      <a href="${siteUrl}/login" style="display: inline-block; background: #ea580c; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold;">Login to Student Portal →</a>
                     </div>
                     <p>Questions? Call us at <a href="tel:3173143757">(317) 314-3757</a></p>
                   </div>

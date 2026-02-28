@@ -96,7 +96,7 @@ export async function sendWelcomeEmail(params: {
   includesMilady?: boolean;
 }) {
   const miladySection = params.includesMilady !== false ? `
-            <div style="background: #7c3aed; color: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; color: #374151; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <h3 style="margin-top: 0; color: white;">Start Your Theory Training (Milady RISE)</h3>
               <p style="margin-bottom: 15px;">Your theory training through Milady RISE is included in your program. This is required coursework.</p>
               <p style="margin-bottom: 10px;"><strong>To get started:</strong></p>

@@ -199,7 +199,7 @@ async function sendPastDueAlert(
       <p>Hi ${student.full_name || 'Student'},</p>
       <p>Your weekly tuition payment of <strong>$${subscription.weekly_amount}</strong> was not successfully processed.</p>
       <p><strong>Please update your payment method immediately to avoid interruption to your course access.</strong></p>
-      <p><a href="https://www.elevateforhumanity.org/account/billing" style="background-color: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Update Payment Method</a></p>
+      <p><a href="https://www.elevateforhumanity.org/account/billing" style="background-color: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Update Payment Method</a></p>
       <p>If you're experiencing financial difficulties, please contact us at support@elevateforhumanity.org to discuss options.</p>
       <p>- Elevate for Humanity Billing Team</p>
     `,

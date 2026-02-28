@@ -132,7 +132,7 @@ export async function sendMOUSignedAdminNotification(
           <p>The signed MOU is available in the admin portal.</p>
 
           <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/program-holders"
-             style="background-color: #2563eb; color: white; padding: 12px 24px;
+             style="background-color: #ea580c; color: white; padding: 12px 24px;
                     text-decoration: none; border-radius: 6px; display: inline-block;">
             View Program Holders
           </a></p>

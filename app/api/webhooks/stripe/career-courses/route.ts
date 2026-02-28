@@ -108,7 +108,7 @@ async function _POST(req: Request) {
                     <h3 style="margin-top: 0;">Start Learning Now</h3>
                     <p>Access your courses and begin your career transformation.</p>
                     <a href="${process.env.NEXT_PUBLIC_SITE_URL}/career-services/courses/my-courses" 
-                       style="display: inline-block; background: #7c3aed; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                       style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
                       Go to My Courses
                     </a>
                   </div>

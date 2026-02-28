@@ -38,8 +38,8 @@ async function _POST(req: NextRequest) {
 
           <!-- Header -->
           <tr>
-            <td style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); padding: 40px 30px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">
+            <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+              <h1 style="color: #1e293b; margin: 0; font-size: 28px; font-weight: bold;">
                 🎓 Congratulations!
               </h1>
               <p style="color: #e0e7ff; margin: 10px 0 0 0; font-size: 16px;">
@@ -59,7 +59,7 @@ async function _POST(req: NextRequest) {
                 We are thrilled to inform you that your certificate for <strong>${programTitle}</strong> has been generated and is now available in our official repository!
               </p>
 
-              <div style="background-color: #eff6ff; border-left: 4px solid #2563eb; padding: 20px; margin: 30px 0; border-radius: 4px;">
+              <div style="background-color: #f9fafb; border-left: 4px solid #e5e7eb; padding: 20px; margin: 30px 0; border-radius: 4px;">
                 <p style="color: #1e40af; font-size: 14px; margin: 0 0 10px 0; font-weight: bold;">
                   Certificate Details:
                 </p>
@@ -96,7 +96,7 @@ async function _POST(req: NextRequest) {
                 </tr>
               </table>
 
-              <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 30px 0; border-radius: 4px;">
+              <div style="background-color: #f9fafb; border-left: 4px solid #e5e7eb; padding: 20px; margin: 30px 0; border-radius: 4px;">
                 <p style="color: #92400e; font-size: 14px; margin: 0 0 10px 0; font-weight: bold;">
                   📋 Important Information:
                 </p>

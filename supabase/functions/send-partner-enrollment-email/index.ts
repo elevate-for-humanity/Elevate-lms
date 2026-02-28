@@ -49,7 +49,7 @@ If you didn't request this enrollment, please reply to this email or contact sup
 function buildHtmlBody(data: RequestBody): string {
   return `
   <html>
-    <body style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #f7f7fb; padding: 24px;">
+    <body style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #ffffff; padding: 24px;">
       <div style="max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 24px 24px 20px; border: 1px solid #e5e7eb;">
         <h1 style="font-size: 20px; margin: 0 0 8px; color: #111827;">
           You're enrolled in ${data.courseName}
@@ -72,7 +72,7 @@ function buildHtmlBody(data: RequestBody): string {
             href="${data.launchUrl}"
             style="
               display: inline-block;
-              background: #0ea5e9;
+              background: #ea580c;
               color: #ffffff;
               padding: 10px 20px;
               border-radius: 999px;

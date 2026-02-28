@@ -97,8 +97,8 @@ async function _POST(req: Request) {
           <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Submitted</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${new Date().toLocaleString()}</td></tr>
         </table>
         <p style="margin-top: 20px;">
-          <a href="mailto:${email}" style="background: #10b981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;">Reply to ${name}</a>
-          <a href="tel:${phone}" style="background: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Call ${phone}</a>
+          <a href="mailto:${email}" style="background: #ea580c; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;">Reply to ${name}</a>
+          <a href="tel:${phone}" style="background: #ea580c; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Call ${phone}</a>
         </p>
       `,
     });

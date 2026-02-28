@@ -13,15 +13,15 @@ export const emailTemplates = {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Welcome to Elevate for Humanity</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 40px 20px;">
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
           <!-- Header -->
           <tr>
-            <td style="background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%); padding: 40px 30px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">Welcome to Elevate for Humanity!</h1>
+            <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+              <h1 style="color: #1e293b; margin: 0; font-size: 28px; font-weight: bold;">Welcome to Elevate for Humanity!</h1>
             </td>
           </tr>
 
@@ -60,7 +60,7 @@ export const emailTemplates = {
 
           <!-- Footer -->
           <tr>
-            <td style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <td style="background-color: #ffffff; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
               <p style="color: #64748b; font-size: 14px; margin: 0 0 10px 0;">
                 Questions? Call us at <a href="tel:317-314-3757" style="color: #ea580c; text-decoration: none;">(317) 314-3757</a>
               </p>
@@ -88,14 +88,14 @@ export const emailTemplates = {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 40px 20px;">
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden;">
           <tr>
-            <td style="background-color: #10b981; padding: 40px 30px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 28px;">🎉 You're Enrolled!</h1>
+            <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+              <h1 style="color: #1e293b; margin: 0; font-size: 28px;">🎉 You're Enrolled!</h1>
             </td>
           </tr>
 
@@ -107,7 +107,7 @@ export const emailTemplates = {
                 Congratulations! You're officially enrolled in <strong>{{programName}}</strong>.
               </p>
 
-              <div style="background-color: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; padding: 20px; margin: 0 0 30px 0;">
+              <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 0 0 30px 0;">
                 <h3 style="color: #065f46; margin: 0 0 15px 0;">Program Details:</h3>
                 <table width="100%" cellpadding="0" cellspacing="0">
                   <tr>
@@ -132,7 +132,7 @@ export const emailTemplates = {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
-                    <a href="{{courseUrl}}" style="display: inline-block; background-color: #10b981; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: bold;">Start Learning</a>
+                    <a href="{{courseUrl}}" style="display: inline-block; background-color: #ea580c; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: bold;">Start Learning</a>
                   </td>
                 </tr>
               </table>
@@ -140,7 +140,7 @@ export const emailTemplates = {
           </tr>
 
           <tr>
-            <td style="background-color: #f8fafc; padding: 30px; text-align: center;">
+            <td style="background-color: #ffffff; padding: 30px; text-align: center;">
               <p style="color: #64748b; font-size: 14px; margin: 0;">
                 Elevate for Humanity | (317) 314-3757 | info@elevateforhumanity.org
               </p>
@@ -161,14 +161,14 @@ export const emailTemplates = {
     html: `
 <!DOCTYPE html>
 <html>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 40px 20px;">
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px;">
           <tr>
-            <td style="background-color: #3b82f6; padding: 40px 30px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 28px;">⏰ Class Reminder</h1>
+            <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+              <h1 style="color: #1e293b; margin: 0; font-size: 28px;">⏰ Class Reminder</h1>
             </td>
           </tr>
 
@@ -180,7 +180,7 @@ export const emailTemplates = {
                 This is a friendly reminder that your class <strong>{{courseName}}</strong> starts soon!
               </p>
 
-              <div style="background-color: #dbeafe; border-radius: 8px; padding: 20px; margin: 0 0 30px 0; text-align: center;">
+              <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 0 0 30px 0; text-align: center;">
                 <p style="color: #1e40af; font-size: 18px; font-weight: bold; margin: 0 0 10px 0;">{{startDate}}</p>
                 <p style="color: #1e40af; font-size: 24px; font-weight: bold; margin: 0;">{{startTime}}</p>
               </div>
@@ -188,7 +188,7 @@ export const emailTemplates = {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
-                    <a href="{{classUrl}}" style="display: inline-block; background-color: #3b82f6; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: bold;">Join Class</a>
+                    <a href="{{classUrl}}" style="display: inline-block; background-color: #ea580c; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: bold;">Join Class</a>
                   </td>
                 </tr>
               </table>
@@ -209,14 +209,14 @@ export const emailTemplates = {
     html: `
 <!DOCTYPE html>
 <html>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 40px 20px;">
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px;">
           <tr>
-            <td style="background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); padding: 40px 30px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 32px;">🎓 Congratulations!</h1>
+            <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+              <h1 style="color: #1e293b; margin: 0; font-size: 32px;">🎓 Congratulations!</h1>
             </td>
           </tr>
 
@@ -228,7 +228,7 @@ export const emailTemplates = {
                 Your Certificate of Completion is ready to download!
               </p>
 
-              <div style="background-color: #f5f3ff; border: 2px solid #8b5cf6; border-radius: 8px; padding: 30px; margin: 0 0 30px 0;">
+              <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 30px; margin: 0 0 30px 0;">
                 <p style="color: #5b21b6; font-size: 20px; font-weight: bold; margin: 0 0 10px 0;">{{programName}}</p>
                 <p style="color: #7c3aed; font-size: 16px; margin: 0;">Completed: {{completionDate}}</p>
               </div>
@@ -261,14 +261,14 @@ export const emailTemplates = {
     html: `
 <!DOCTYPE html>
 <html>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 40px 20px;">
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px;">
           <tr>
-            <td style="background-color: #f59e0b; padding: 40px 30px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 28px;">📅 You're Invited!</h1>
+            <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+              <h1 style="color: #1e293b; margin: 0; font-size: 28px;">📅 You're Invited!</h1>
             </td>
           </tr>
 
@@ -280,7 +280,7 @@ export const emailTemplates = {
                 {{eventDescription}}
               </p>
 
-              <div style="background-color: #fef3c7; border-radius: 8px; padding: 20px; margin: 0 0 30px 0;">
+              <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 0 0 30px 0;">
                 <table width="100%" cellpadding="0" cellspacing="0">
                   <tr>
                     <td style="color: #92400e; padding: 8px 0; font-weight: bold;">📅 Date:</td>
@@ -321,8 +321,8 @@ export const emailTemplates = {
     html: `
 <!DOCTYPE html>
 <html>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 40px 20px;">
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px;">
@@ -336,7 +336,7 @@ export const emailTemplates = {
                 Elevate for Humanity is Indiana's leading workforce training provider, offering 100% funded programs in high-demand careers.
               </p>
 
-              <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px; margin: 0 0 30px 0;">
+              <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 0 0 30px 0;">
                 <h3 style="color: #1e293b; margin: 0 0 15px 0;">Partnership Benefits:</h3>
                 <ul style="color: #475569; margin: 0; padding-left: 20px;">
                   <li style="margin-bottom: 8px;">Access to pre-screened, trained candidates</li>
@@ -349,7 +349,7 @@ export const emailTemplates = {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
-                    <a href="{{meetingUrl}}" style="display: inline-block; background-color: #0ea5e9; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: bold;">Schedule a Meeting</a>
+                    <a href="{{meetingUrl}}" style="display: inline-block; background-color: #ea580c; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: bold;">Schedule a Meeting</a>
                   </td>
                 </tr>
               </table>
@@ -370,14 +370,14 @@ export const emailTemplates = {
     html: `
 <!DOCTYPE html>
 <html>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 40px 20px;">
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px;">
           <tr>
-            <td style="background-color: #1e40af; padding: 40px 30px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 28px;">Build Your Talent Pipeline</h1>
+            <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+              <h1 style="color: #1e293b; margin: 0; font-size: 28px;">Build Your Talent Pipeline</h1>
             </td>
           </tr>
 
@@ -389,7 +389,7 @@ export const emailTemplates = {
                 Finding skilled workers is challenging. Elevate for Humanity provides pre-trained, job-ready candidates in {{industry}} at no cost to you.
               </p>
 
-              <div style="background-color: #dbeafe; border-radius: 8px; padding: 25px; margin: 0 0 30px 0;">
+              <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 25px; margin: 0 0 30px 0;">
                 <h3 style="color: #1e40af; margin: 0 0 15px 0; font-size: 20px;">Why Partner With Us?</h3>
                 <table width="100%" cellpadding="0" cellspacing="0">
                   <tr>
@@ -419,7 +419,7 @@ export const emailTemplates = {
                 </table>
               </div>
 
-              <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 0 0 30px 0;">
+              <div style="background-color: #f9fafb; border-left: 4px solid #e5e7eb; padding: 20px; margin: 0 0 30px 0;">
                 <p style="color: #92400e; font-size: 16px; font-weight: bold; margin: 0 0 10px 0;">Current Available Talent:</p>
                 <p style="color: #78350f; margin: 0; font-size: 14px;">{{availableCandidates}} candidates ready for placement in {{industry}}</p>
               </div>
@@ -427,7 +427,7 @@ export const emailTemplates = {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
-                    <a href="{{hiringUrl}}" style="display: inline-block; background-color: #1e40af; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 6px; font-weight: bold; font-size: 16px;">View Available Candidates</a>
+                    <a href="{{hiringUrl}}" style="display: inline-block; background-color: #ea580c; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 6px; font-weight: bold; font-size: 16px;">View Available Candidates</a>
                   </td>
                 </tr>
               </table>
@@ -439,7 +439,7 @@ export const emailTemplates = {
           </tr>
 
           <tr>
-            <td style="background-color: #f8fafc; padding: 30px; text-align: center;">
+            <td style="background-color: #ffffff; padding: 30px; text-align: center;">
               <p style="color: #64748b; font-size: 14px; margin: 0;">
                 Elevate for Humanity | 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
               </p>
@@ -460,14 +460,14 @@ export const emailTemplates = {
     html: `
 <!DOCTYPE html>
 <html>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 40px 20px;">
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px;">
           <tr>
-            <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 30px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 28px;">You're Making Progress!</h1>
+            <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+              <h1 style="color: #1e293b; margin: 0; font-size: 28px;">You're Making Progress!</h1>
             </td>
           </tr>
 
@@ -479,9 +479,9 @@ export const emailTemplates = {
                 We wanted to check in and celebrate your progress in {{programName}}!
               </p>
 
-              <div style="background-color: #ecfdf5; border-radius: 8px; padding: 25px; margin: 0 0 30px 0; text-align: center;">
+              <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 25px; margin: 0 0 30px 0; text-align: center;">
                 <h3 style="color: #065f46; margin: 0 0 20px 0; font-size: 20px;">Your Progress</h3>
-                <div style="background-color: #d1fae5; border-radius: 50px; height: 30px; position: relative; margin: 0 0 15px 0;">
+                <div style="background-color: #e5e7eb; border-radius: 50px; height: 30px; position: relative; margin: 0 0 15px 0;">
                   <div style="background: linear-gradient(90deg, #10b981 0%, #059669 100%); height: 30px; border-radius: 50px; width: {{progressPercent}}%; display: flex; align-items: center; justify-content: center;">
                     <span style="color: #ffffff; font-weight: bold; font-size: 14px;">{{progressPercent}}%</span>
                   </div>
@@ -491,7 +491,7 @@ export const emailTemplates = {
                 </p>
               </div>
 
-              <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px; margin: 0 0 30px 0;">
+              <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 0 0 30px 0;">
                 <h3 style="color: #1e293b; margin: 0 0 15px 0; font-size: 18px;">Next Steps:</h3>
                 <ul style="color: #475569; margin: 0; padding-left: 20px; line-height: 1.8;">
                   <li>{{nextStep1}}</li>
@@ -500,7 +500,7 @@ export const emailTemplates = {
                 </ul>
               </div>
 
-              <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 0 0 30px 0;">
+              <div style="background-color: #f9fafb; border-left: 4px solid #e5e7eb; padding: 20px; margin: 0 0 30px 0;">
                 <p style="color: #92400e; font-size: 14px; margin: 0;">
                   <strong>Need Help?</strong> Your advisor {{advisorName}} is here to support you. Schedule a meeting anytime!
                 </p>
@@ -509,7 +509,7 @@ export const emailTemplates = {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
-                    <a href="{{portalUrl}}" style="display: inline-block; background-color: #10b981; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: bold; margin-right: 10px;">Continue Learning</a>
+                    <a href="{{portalUrl}}" style="display: inline-block; background-color: #ea580c; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: bold; margin-right: 10px;">Continue Learning</a>
                     <a href="{{advisorUrl}}" style="display: inline-block; background-color: #64748b; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: bold;">Contact Advisor</a>
                   </td>
                 </tr>
@@ -518,7 +518,7 @@ export const emailTemplates = {
           </tr>
 
           <tr>
-            <td style="background-color: #f8fafc; padding: 30px; text-align: center;">
+            <td style="background-color: #ffffff; padding: 30px; text-align: center;">
               <p style="color: #64748b; font-size: 14px; margin: 0;">
                 Elevate for Humanity | (317) 314-3757 | info@elevateforhumanity.org
               </p>
@@ -539,14 +539,14 @@ export const emailTemplates = {
     html: `
 <!DOCTYPE html>
 <html>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 40px 20px;">
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px;">
           <tr>
-            <td style="background-color: #ea580c; padding: 40px 30px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 28px;">Finish Your Application</h1>
+            <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+              <h1 style="color: #1e293b; margin: 0; font-size: 28px;">Finish Your Application</h1>
             </td>
           </tr>
 
@@ -588,7 +588,7 @@ export const emailTemplates = {
                 </table>
               </div>
 
-              <div style="background-color: #fef3c7; border-radius: 8px; padding: 20px; margin: 0 0 30px 0; text-align: center;">
+              <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 0 0 30px 0; text-align: center;">
                 <p style="color: #92400e; font-size: 16px; font-weight: bold; margin: 0 0 10px 0;">⏰ Next Cohort Starts:</p>
                 <p style="color: #78350f; font-size: 24px; font-weight: bold; margin: 0;">{{nextCohortDate}}</p>
               </div>
@@ -608,7 +608,7 @@ export const emailTemplates = {
           </tr>
 
           <tr>
-            <td style="background-color: #f8fafc; padding: 30px; text-align: center;">
+            <td style="background-color: #ffffff; padding: 30px; text-align: center;">
               <p style="color: #64748b; font-size: 14px; margin: 0;">
                 Elevate for Humanity | 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
               </p>
@@ -629,14 +629,14 @@ export const emailTemplates = {
     html: `
 <!DOCTYPE html>
 <html>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 40px 20px;">
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px;">
           <tr>
-            <td style="background-color: #0ea5e9; padding: 40px 30px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 28px;">WorkOne Partnership Update</h1>
+            <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+              <h1 style="color: #1e293b; margin: 0; font-size: 28px;">WorkOne Partnership Update</h1>
               <p style="color: #e0f2fe; margin: 10px 0 0 0; font-size: 16px;">{{month}} Report</p>
             </td>
           </tr>
@@ -651,7 +651,7 @@ export const emailTemplates = {
                 Here's our monthly update on student enrollments, completions, and placements through our WIOA partnership.
               </p>
 
-              <div style="background-color: #f0f9ff; border-radius: 8px; padding: 25px; margin: 0 0 30px 0;">
+              <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 25px; margin: 0 0 30px 0;">
                 <h3 style="color: #075985; margin: 0 0 20px 0; font-size: 20px;">{{month}} Metrics</h3>
                 <table width="100%" cellpadding="0" cellspacing="0">
                   <tr>
@@ -689,7 +689,7 @@ export const emailTemplates = {
                 </table>
               </div>
 
-              <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px; margin: 0 0 30px 0;">
+              <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 0 0 30px 0;">
                 <h3 style="color: #1e293b; margin: 0 0 15px 0; font-size: 18px;">Top Programs This Month:</h3>
                 <ol style="color: #475569; margin: 0; padding-left: 20px; line-height: 1.8;">
                   <li>{{topProgram1}}</li>
@@ -698,7 +698,7 @@ export const emailTemplates = {
                 </ol>
               </div>
 
-              <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 20px; margin: 0 0 30px 0;">
+              <div style="background-color: #f9fafb; border-left: 4px solid #e5e7eb; padding: 20px; margin: 0 0 30px 0;">
                 <p style="color: #065f46; font-size: 14px; margin: 0 0 10px 0;">
                   <strong>Success Story:</strong>
                 </p>
@@ -710,7 +710,7 @@ export const emailTemplates = {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
-                    <a href="{{reportUrl}}" style="display: inline-block; background-color: #0ea5e9; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: bold;">View Full Report</a>
+                    <a href="{{reportUrl}}" style="display: inline-block; background-color: #ea580c; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: bold;">View Full Report</a>
                   </td>
                 </tr>
               </table>
@@ -722,7 +722,7 @@ export const emailTemplates = {
           </tr>
 
           <tr>
-            <td style="background-color: #f8fafc; padding: 30px; text-align: center;">
+            <td style="background-color: #ffffff; padding: 30px; text-align: center;">
               <p style="color: #64748b; font-size: 14px; margin: 0;">
                 Elevate for Humanity | (317) 314-3757 | info@elevateforhumanity.org
               </p>

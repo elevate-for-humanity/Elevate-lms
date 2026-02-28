@@ -125,7 +125,7 @@ async function _POST(request: NextRequest) {
               <p>Hi ${ownerName},</p>
               <p>Thank you for applying to become a Partner Shop with Elevate for Humanity!</p>
               
-              <div style="background: #f8fafc; border-radius: 8px; padding: 20px; margin: 20px 0;">
+              <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
                 <h3 style="margin-top: 0;">Application Details</h3>
                 <p><strong>Shop:</strong> ${shopName}</p>
                 <p><strong>Programs:</strong> ${programsRequested.join(', ')}</p>
@@ -164,7 +164,7 @@ async function _POST(request: NextRequest) {
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #1e3a8a;">New Partner Shop Application</h2>
               
-              <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 20px 0;">
+              <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
                 <p style="margin: 0; font-weight: bold;">Action Required: Review and approve/deny this application</p>
               </div>
               
@@ -180,7 +180,7 @@ async function _POST(request: NextRequest) {
               </table>
               
               <div style="margin-top: 24px; text-align: center;">
-                <a href="${siteUrl}/admin/partners" style="display: inline-block; background: #7c3aed; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Review Application</a>
+                <a href="${siteUrl}/admin/partners" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Review Application</a>
               </div>
             </div>
           `,

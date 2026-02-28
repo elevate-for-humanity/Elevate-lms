@@ -39,9 +39,9 @@ export function generateBuyerDeliveryEmail(data: BuyerDeliveryEmailData): {
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #2563eb 0%, #9333ea 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .header { padding: 30px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 2px solid #e5e7eb; }
             .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; }
-            .button { display: inline-block; background: #2563eb; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+            .button { display: inline-block; background: #ea580c; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
             .info-box { background: #f3f4f6; padding: 15px; border-radius: 6px; margin: 20px 0; }
             .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 14px; }
           </style>
@@ -131,9 +131,9 @@ export function generateCreatorSaleEmail(data: CreatorSaleEmailData): {
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .header { padding: 30px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 2px solid #e5e7eb; }
             .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; }
-            .earnings-box { background: #d1fae5; padding: 20px; border-radius: 6px; margin: 20px 0; text-align: center; }
+            .earnings-box { background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; border-radius: 6px; margin: 20px 0; text-align: center; }
             .earnings-amount { font-size: 36px; font-weight: bold; color: #059669; margin: 10px 0; }
             .info-box { background: #f3f4f6; padding: 15px; border-radius: 6px; margin: 20px 0; }
             .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 14px; }
@@ -169,7 +169,7 @@ export function generateCreatorSaleEmail(data: CreatorSaleEmailData): {
               </ul>
 
               <p style="text-align: center; margin: 30px 0;">
-                <a href="${process.env.NEXT_PUBLIC_SITE_URL}/creator/dashboard" style="display: inline-block; background: #2563eb; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold;">View Dashboard</a>
+                <a href="${process.env.NEXT_PUBLIC_SITE_URL}/creator/dashboard" style="display: inline-block; background: #ea580c; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold;">View Dashboard</a>
               </p>
 
               <p>Keep creating amazing products!</p>
@@ -225,10 +225,10 @@ export function generateCreatorApprovalEmail(data: CreatorApprovalEmailData): {
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #2563eb 0%, #9333ea 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .header { padding: 30px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 2px solid #e5e7eb; }
             .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; }
-            .button { display: inline-block; background: #2563eb; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
-            .info-box { background: #dbeafe; padding: 15px; border-radius: 6px; margin: 20px 0; }
+            .button { display: inline-block; background: #ea580c; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+            .info-box { background: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; border-radius: 6px; margin: 20px 0; }
             .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 14px; }
           </style>
         </head>

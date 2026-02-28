@@ -66,7 +66,7 @@ serve(async (req) => {
           <p>Hi ${enrollment.student_name},</p>
           <p>Great news! Your enrollment for <strong>${courseName}</strong> is complete.</p>
           <h3>Access Your Course</h3>
-          <p><a href="${enrollment.hsi_enrollment_link}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Start Your Training</a></p>
+          <p><a href="${enrollment.hsi_enrollment_link}" style="display: inline-block; padding: 12px 24px; background-color: #ea580c; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Start Your Training</a></p>
           ${enrollment.hsi_student_id ? `<p>Your HSI Student ID: <strong>${enrollment.hsi_student_id}</strong></p>` : ''}
           <h3>Course Details</h3>
           <ul>
@@ -86,7 +86,7 @@ serve(async (req) => {
           <h2>Don't Forget to Complete Your Training!</h2>
           <p>Hi ${enrollment.student_name},</p>
           <p>This is a friendly reminder to complete your <strong>${courseName}</strong> course.</p>
-          <p><a href="${enrollment.hsi_enrollment_link}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Continue Training</a></p>
+          <p><a href="${enrollment.hsi_enrollment_link}" style="display: inline-block; padding: 12px 24px; background-color: #ea580c; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Continue Training</a></p>
           <p>Your certification is waiting! Complete the course to receive your official certificate.</p>
           <p>Questions? We're here to help at support@www.elevateforhumanity.org</p>
           <p>Best regards,<br>Elevate for Humanity Career Training Institute</p>

@@ -1,6 +1,6 @@
 import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { resend } from '@/lib/resend';
 
 async function sendCriticalAlert(data: {
   type: string;
@@ -17,7 +17,6 @@ async function sendCriticalAlert(data: {
     return;
   }
 
-  const resend = new Resend(resendKey);
 
   await resend.emails.send({
     from: 'Elevate LMS Alerts <alerts@elevateforhumanity.org>',

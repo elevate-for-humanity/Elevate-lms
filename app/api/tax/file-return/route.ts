@@ -12,7 +12,7 @@ import { createMeFSubmission } from '@/lib/tax-software/mef/xml-generator';
 import { createTransmitter } from '@/lib/tax-software/mef/transmission';
 import { TaxReturn } from '@/lib/tax-software/types';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
-import { Resend } from 'resend';
+import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
 

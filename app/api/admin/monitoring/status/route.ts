@@ -166,7 +166,7 @@ function checkStripe() {
 
 function checkEmail() {
   const configured = !!(
-    process.env.RESEND_API_KEY &&
+    process.env.SENDGRID_API_KEY &&
     process.env.EMAIL_FROM
   );
 

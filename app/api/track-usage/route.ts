@@ -107,7 +107,7 @@ async function sendAlertEmail(data: {
   userAgent: string;
   timestamp: string;
 }) {
-  const { sendEmail } = await import('@/lib/email/resend');
+  const { sendEmail } = await import('@/lib/email/sendgrid');
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -197,7 +197,7 @@ async function sendDMCATakedown(data: {
   url: string;
   timestamp: string;
 }) {
-  const { sendEmail } = await import('@/lib/email/resend');
+  const { sendEmail } = await import('@/lib/email/sendgrid');
 
   // Check if we already sent a takedown for this domain in the last 24h (avoid spam)
   try {

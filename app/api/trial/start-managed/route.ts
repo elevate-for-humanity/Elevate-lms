@@ -2,7 +2,7 @@ import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
+import { resend } from '@/lib/resend';
 import { strictRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -65,13 +65,12 @@ async function sendTrialWelcomeEmail(
   dashboardUrl: string,
   correlationId: string
 ) {
-  const resendKey = process.env.RESEND_API_KEY;
+  const resendKey = process.env.SENDGRID_API_KEY;
   if (!resendKey) {
-    logger.warn(`[trial] ${correlationId} — RESEND_API_KEY not configured, skipping welcome email`);
+    logger.warn(`[trial] ${correlationId} — SENDGRID_API_KEY not configured, skipping welcome email`);
     return;
   }
 
-  const resend = new Resend(resendKey);
 
   await resend.emails.send({
     from: 'Elevate LMS <noreply@elevateforhumanity.org>',

@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { resend } from '@/lib/resend';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 

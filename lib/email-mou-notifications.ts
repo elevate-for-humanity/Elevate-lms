@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { resend } from '@/lib/resend';
 import { logger } from '@/lib/logger';
 
 function getResendClient() {

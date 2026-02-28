@@ -1,9 +1,9 @@
 /**
  * Email Configuration
- * Supports Resend (recommended) and SendGrid
+ * Primary provider: SendGrid
  */
 
-export type EmailProvider = 'resend' | 'sendgrid' | 'smtp';
+export type EmailProvider = 'sendgrid' | 'smtp';
 
 export interface EmailConfig {
   provider: EmailProvider;
@@ -11,9 +11,8 @@ export interface EmailConfig {
   replyTo?: string;
 }
 
-// Get email configuration from environment
 export function getEmailConfig(): EmailConfig {
-  const provider = (process.env.EMAIL_PROVIDER || 'resend') as EmailProvider;
+  const provider = (process.env.EMAIL_PROVIDER || 'sendgrid') as EmailProvider;
   
   return {
     provider,
@@ -22,15 +21,9 @@ export function getEmailConfig(): EmailConfig {
   };
 }
 
-// Validate email configuration
 export function validateEmailConfig(): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
-  
-  const provider = process.env.EMAIL_PROVIDER;
-  
-  if (provider === 'resend' && !process.env.RESEND_API_KEY) {
-    errors.push('RESEND_API_KEY is required when using Resend provider');
-  }
+  const provider = process.env.EMAIL_PROVIDER || 'sendgrid';
   
   if (provider === 'sendgrid' && !process.env.SENDGRID_API_KEY) {
     errors.push('SENDGRID_API_KEY is required when using SendGrid provider');

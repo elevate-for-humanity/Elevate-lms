@@ -5,8 +5,8 @@
  * Keeps helper functions for specific email scenarios.
  */
 
-import { sendEmail as coreSendEmail } from './resend';
-import type { EmailOptions as CoreEmailOptions } from './resend';
+import { sendEmail as coreSendEmail } from './sendgrid';
+import type { EmailOptions as CoreEmailOptions } from './sendgrid';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 

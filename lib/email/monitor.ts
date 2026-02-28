@@ -11,7 +11,7 @@ export interface EmailLog {
   to: string;
   subject: string;
   status: 'sent' | 'failed' | 'pending';
-  provider: 'resend' | 'sendgrid' | 'fallback';
+  provider: 'sendgrid' | 'smtp' | 'fallback';
   error_message?: string;
   sent_at?: string;
   created_at?: string;
@@ -68,7 +68,7 @@ export async function getEmailStats(timeframe: '24h' | '7d' | '30d' = '24h') {
     successRate: total > 0 ? ((sent / total) * 100).toFixed(2) : '0',
     failureRate: total > 0 ? ((failed / total) * 100).toFixed(2) : '0',
     byProvider: {
-      resend: logs.filter(l => l.provider === 'resend').length,
+      sendgrid: logs.filter(l => l.provider === 'sendgrid').length,
       sendgrid: logs.filter(l => l.provider === 'sendgrid').length,
       fallback: logs.filter(l => l.provider === 'fallback').length,
     },

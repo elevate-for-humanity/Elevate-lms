@@ -12,7 +12,7 @@ import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
+import { resend } from '@/lib/resend';
 import { setAuditContext } from '@/lib/audit-context';
 import { 
   createInstallmentSubscription, 
@@ -57,7 +57,6 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
     return;
   }
 
-  const resend = new Resend(resendKey);
   const programName = program?.title || program?.name || 'your program';
   const studentName = student.full_name || 'Student';
 
@@ -263,7 +262,6 @@ async function sendAdminEnrollmentNotification(
   if (!resendKey) return;
 
   const adminEmail = process.env.ADMIN_EMAIL || 'elevate4humanityedu@gmail.com';
-  const resend = new Resend(resendKey);
 
   try {
     await resend.emails.send({
@@ -391,7 +389,6 @@ async function sendPaymentFailedEmail(studentId: string, programId: string): Pro
 
   if (!student?.email) return;
 
-  const resend = new Resend(resendKey);
 
   await resend.emails.send({
     from: 'Elevate LMS <billing@elevateforhumanity.org>',
@@ -660,7 +657,6 @@ async function sendPaymentConfirmationEmail(
 
   if (!student?.email) return;
 
-  const resend = new Resend(resendKey);
 
   await resend.emails.send({
     from: 'Elevate for Humanity <billing@elevateforhumanity.org>',
@@ -699,7 +695,6 @@ async function sendPaymentCompletionEmail(studentId: string, programId: string):
 
   if (!student?.email) return;
 
-  const resend = new Resend(resendKey);
 
   await resend.emails.send({
     from: 'Elevate for Humanity <billing@elevateforhumanity.org>',

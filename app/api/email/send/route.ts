@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sendEmail } from '@/lib/email/resend';
+import { sendEmail } from '@/lib/email/sendgrid';
 import { logEmailDelivery } from '@/lib/email/monitor';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

@@ -113,7 +113,7 @@ async function _POST(req: Request) {
 
       logger.info('Created new user', { userId, email: emailLower });
 
-      // Step 5: Send password setup email via Resend (Supabase SMTP not configured)
+      // Step 5: Send password setup email via SendGrid (Supabase SMTP not configured)
       try {
         const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
           type: 'recovery',
@@ -123,7 +123,7 @@ async function _POST(req: Request) {
         if (linkError) {
           logger.warn('Recovery link generation failed', linkError);
         } else if (linkData?.properties?.action_link) {
-          const { sendEmail } = await import('@/lib/email/resend');
+          const { sendEmail } = await import('@/lib/email/sendgrid');
           await sendEmail({
             to: emailLower,
             subject: 'Set Your Password — Elevate for Humanity',
@@ -223,7 +223,7 @@ async function _POST(req: Request) {
 
     // Step 10: Send welcome email with Milady link
     try {
-      const { sendWelcomeEmail } = await import('@/lib/email/resend');
+      const { sendWelcomeEmail } = await import('@/lib/email/sendgrid');
       const isBarberProgram = programSlug === 'barber-apprenticeship' || 
         program.name.toLowerCase().includes('barber') ||
         program.name.toLowerCase().includes('apprentice');

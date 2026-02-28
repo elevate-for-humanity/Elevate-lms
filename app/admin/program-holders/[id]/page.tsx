@@ -180,7 +180,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
         .single();
 
       if (holderData?.contact_email) {
-        const { sendProgramHolderApprovalEmail } = await import('@/lib/email/resend');
+        const { sendProgramHolderApprovalEmail } = await import('@/lib/email/sendgrid');
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
         await sendProgramHolderApprovalEmail({
           email: holderData.contact_email,

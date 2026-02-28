@@ -15,7 +15,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
+import { resend } from '@/lib/resend';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
@@ -165,7 +165,6 @@ async function sendUpcomingPaymentReminder(
 ) {
   if (!student?.email || !process.env.RESEND_API_KEY) return;
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
   
   await resend.emails.send({
     from: 'Elevate for Humanity <billing@elevateforhumanity.org>',
@@ -190,7 +189,6 @@ async function sendPastDueAlert(
 ) {
   if (!student?.email || !process.env.RESEND_API_KEY) return;
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
   
   await resend.emails.send({
     from: 'Elevate for Humanity <billing@elevateforhumanity.org>',

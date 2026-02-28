@@ -8,7 +8,8 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { withRateLimit } from '@/lib/api/with-rate-limit';
 import { contactRateLimit } from '@/lib/rate-limit';
 import { applicationSchema } from '@/lib/api/validation-schemas';
-import { sendEmail } from '@/lib/email/resend';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { sendApplicationWelcomeEmail } from '@/lib/email/application-welcome';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { getRoutingRecommendations } from '@/lib/automation/shop-routing';
 
@@ -115,23 +116,13 @@ export const POST = withRateLimit(
         }
       }
 
-      // Send confirmation email to applicant
-      await sendEmail({
+      // Send detailed welcome email with program info, funding (WIOA/JRI), and Indiana Career Connect steps
+      await sendApplicationWelcomeEmail({
         to: email,
-        subject: 'Application Received - Elevate for Humanity',
-        html: `
-          <h2>Thank you for your application, ${firstName}!</h2>
-          <p>We have received your application for <strong>${program}</strong>.</p>
-          <p>Our team will review your application and contact you within 2-3 business days.</p>
-          <p><strong>What's next?</strong></p>
-          <ul>
-            <li>Our admissions team will review your application</li>
-            <li>You'll receive a call or email to discuss next steps</li>
-            <li>If approved, we'll help you get started right away</li>
-          </ul>
-          <p>Questions? Call us at <a href="tel:317-314-3757">317-314-3757</a></p>
-          <p>Best regards,<br>Elevate for Humanity Team</p>
-        `,
+        firstName,
+        programSlug: program,
+      }).catch((err) => {
+        logger.error('[apply] Welcome email failed (non-blocking):', err);
       });
 
       // Send notification email to admin

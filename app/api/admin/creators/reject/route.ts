@@ -6,7 +6,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
-import { sendCreatorRejectionEmail } from '@/lib/email/resend';
+import { sendCreatorRejectionEmail } from '@/lib/email/sendgrid';
 import { z } from 'zod';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

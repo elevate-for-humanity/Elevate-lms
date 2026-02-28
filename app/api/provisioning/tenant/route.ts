@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { Resend } from 'resend';
+import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
@@ -45,7 +45,6 @@ async function sendWelcomeEmail(email: string, orgName: string, subdomain: strin
     return;
   }
   
-  const resend = new Resend(resendKey);
   
   await resend.emails.send({
     from: 'Elevate LMS <noreply@elevateforhumanity.org>',

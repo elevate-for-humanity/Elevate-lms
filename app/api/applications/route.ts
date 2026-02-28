@@ -12,7 +12,7 @@ import {
 } from '@/lib/rateLimit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
-import { sendEmail } from '@/lib/email/resend';
+import { sendEmail } from '@/lib/email/sendgrid';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

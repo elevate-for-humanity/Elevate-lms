@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { sendApplicationWelcomeEmail } from '@/lib/email/application-welcome';
 
 async function _POST(req: Request) {
   try {
@@ -37,6 +38,17 @@ async function _POST(req: Request) {
     });
 
     if (error) throw error;
+
+    // Send detailed welcome email (non-blocking)
+    const applicantName = (data.get("name") as string) || '';
+    const applicantEmail = (data.get("email") as string) || '';
+    if (applicantEmail) {
+      sendApplicationWelcomeEmail({
+        to: applicantEmail,
+        firstName: applicantName.split(' ')[0] || applicantName,
+        programSlug: program,
+      }).catch(() => {});
+    }
 
     return NextResponse.redirect(
       new URL("/apply/success", req.url),

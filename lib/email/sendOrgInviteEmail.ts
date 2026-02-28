@@ -1,9 +1,5 @@
 import { logger } from '@/lib/logger';
-import { Resend } from 'resend';
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+import { sendEmail } from './sendgrid';
 
 interface SendOrgInviteEmailParams {
   to: string;
@@ -18,13 +14,8 @@ export async function sendOrgInviteEmail({
   organizationName,
   inviterName,
 }: SendOrgInviteEmailParams): Promise<{ success: boolean; error?: string }> {
-  if (!resend) {
-    throw new Error('RESEND_API_KEY not configured');
-  }
-
   try {
-    await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'noreply@elevateforhumanity.org',
+    const result = await sendEmail({
       to,
       subject: `Invitation to join ${organizationName}`,
       html: `
@@ -35,21 +26,11 @@ export async function sendOrgInviteEmail({
         <p>This invitation will expire in 7 days.</p>
         <p>If you did not expect this invitation, you can safely ignore this email.</p>
       `,
-      text: `
-You've been invited to join ${organizationName}
-
-${inviterName ? `${inviterName} has invited you to join their organization.\n\n` : ''}
-Click the link below to accept the invitation:
-${inviteUrl}
-
-This invitation will expire in 7 days.
-
-If you did not expect this invitation, you can safely ignore this email.
-      `,
+      text: `You've been invited to join ${organizationName}\n\n${inviterName ? `${inviterName} has invited you to join their organization.\n\n` : ''}Click the link below to accept the invitation:\n${inviteUrl}\n\nThis invitation will expire in 7 days.`,
     });
 
-    return { success: true };
-  } catch (error) { /* Error handled silently */ 
+    return { success: result.success, error: result.error };
+  } catch (error) {
     const message = 'Operation failed';
     logger.error('Failed to send org invite email:', message);
     return { success: false, error: message };

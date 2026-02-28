@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@supabase/supabase-js';
 import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
-import { Resend } from 'resend';
+import { resend } from '@/lib/resend';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';

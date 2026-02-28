@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 
-// Using Node.js runtime for Resend compatibility
+// Using Node.js runtime for SendGrid
 export const maxDuration = 60;
 
 import { z } from 'zod';

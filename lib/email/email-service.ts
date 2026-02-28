@@ -1,9 +1,9 @@
 /**
- * Email Service — delegates to the canonical sendEmail in ./resend.
+ * Email Service — delegates to the canonical sendEmail in ./sendgrid.
  * Kept for its emailTemplates export.
  */
-export { sendEmail } from './resend';
-export type { EmailOptions } from './resend';
+export { sendEmail } from './sendgrid';
+export type { EmailOptions } from './sendgrid';
 // Email templates
 export const emailTemplates = {
   welcome: (name: string) => ({

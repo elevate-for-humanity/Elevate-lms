@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
 import { NextResponse } from 'next/server';
-import { sendEmail } from '@/lib/email/resend';
+import { sendEmail } from '@/lib/email/sendgrid';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

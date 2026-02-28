@@ -106,10 +106,10 @@ const checks: Record<string, any> = {
   }
 
   // Check 5: Resend (optional)
-  if (process.env.RESEND_API_KEY) {
+  if (process.env.SENDGRID_API_KEY) {
     try {
       const response = await fetch('https://api.resend.com/emails', {
-        headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}` },
+        headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY}` },
       });
       checks.checks.resend = {
         ok: response.ok || response.status === 401,

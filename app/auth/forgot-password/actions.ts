@@ -1,7 +1,7 @@
 'use server';
 
 import { createAdminClient } from '@/lib/supabase/admin';
-import { sendEmail } from '@/lib/email/resend';
+import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';

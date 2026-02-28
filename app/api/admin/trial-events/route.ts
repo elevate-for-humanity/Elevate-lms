@@ -83,8 +83,8 @@ const _GET = withAuth(
 
       // Surface setup warnings so operators see what's missing
       const setup_warnings: string[] = [];
-      if (!process.env.RESEND_API_KEY) {
-        setup_warnings.push('RESEND_API_KEY not configured — trial welcome emails are not being sent');
+      if (!process.env.SENDGRID_API_KEY) {
+        setup_warnings.push('SENDGRID_API_KEY not configured — trial welcome emails are not being sent');
       }
       if (!process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID) {
         setup_warnings.push('GA4 measurement ID not configured — client-side funnel analytics are not recording');

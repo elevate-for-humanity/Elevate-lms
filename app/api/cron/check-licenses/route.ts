@@ -155,7 +155,7 @@ async function _GET(request: NextRequest) {
 
 async function sendExpirationEmail(email: string, companyName: string): Promise<void> {
   try {
-    const { sendEmail } = await import('@/lib/email/resend');
+    const { sendEmail } = await import('@/lib/email/sendgrid');
     await sendEmail({
       to: email,
       subject: `Your Elevate LMS License Has Expired - ${companyName}`,
@@ -174,7 +174,7 @@ async function sendExpirationEmail(email: string, companyName: string): Promise<
 
 async function sendExpiryWarningEmail(email: string, companyName: string, expiresAt: string): Promise<void> {
   try {
-    const { sendEmail } = await import('@/lib/email/resend');
+    const { sendEmail } = await import('@/lib/email/sendgrid');
     const expiryDate = new Date(expiresAt).toLocaleDateString();
     await sendEmail({
       to: email,

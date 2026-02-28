@@ -1,8 +1,8 @@
 /**
  * Legacy email templates — full HTML email templates used by cron jobs
- * and the /api/emails/* routes. sendEmail is re-exported from ./resend.
+ * and the /api/emails/* routes. sendEmail is re-exported from ./sendgrid.
  */
-import { sendEmail } from './resend';
+import { sendEmail } from './sendgrid';
 export { sendEmail };
 
 // Email templates

@@ -222,7 +222,7 @@ async function _POST(
     // 7) Send approval notification email
     try {
       if (email) {
-        const { sendWelcomeEmail } = await import('@/lib/email/resend');
+        const { sendWelcomeEmail } = await import('@/lib/email/sendgrid');
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
         let programName = 'Your Program';

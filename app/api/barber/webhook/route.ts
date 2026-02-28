@@ -202,7 +202,7 @@ async function _POST(request: NextRequest) {
 
           // Send welcome email
           try {
-            const { sendEmail } = await import('@/lib/email/resend');
+            const { sendEmail } = await import('@/lib/email/sendgrid');
             
             let paymentSummary = '';
             if (fullyPaid) {
@@ -246,7 +246,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
 
           // Send Milady notification
           try {
-            const { sendEmail } = await import('@/lib/email/resend');
+            const { sendEmail } = await import('@/lib/email/sendgrid');
             await sendEmail({
               to: 'elevate4humanityedu@gmail.com',
               subject: `New Barber Apprentice - ${customerName || customerEmail}`,
@@ -387,7 +387,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
         // Send Welcome Email with Magic Link (if not already sent)
         if (!subRecord?.welcome_email_sent_at && customerEmail) {
           try {
-            const { sendEmail } = await import('@/lib/email/resend');
+            const { sendEmail } = await import('@/lib/email/sendgrid');
             const weeklyPayment = (parseInt(subscription.metadata?.weekly_payment_cents || '0') / 100).toFixed(2);
             const firstBillingDate = subscription.metadata?.first_billing_date || 'the following Friday';
             
@@ -462,7 +462,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
         // Send Milady Email (if not already sent)
         if (!subRecord?.milady_email_sent_at && customerEmail) {
           try {
-            const { sendEmail } = await import('@/lib/email/resend');
+            const { sendEmail } = await import('@/lib/email/sendgrid');
             await sendEmail({
               to: customerEmail,
               subject: 'Your Milady Access - Barber Apprenticeship',
@@ -597,7 +597,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
               // Send completion email
               const customerEmail = subscription.metadata?.customer_email;
               if (customerEmail) {
-                const { sendEmail } = await import('@/lib/email/resend');
+                const { sendEmail } = await import('@/lib/email/sendgrid');
                 await sendEmail({
                   to: customerEmail,
                   subject: 'Congratulations! Your Barber Apprenticeship Tuition is Paid in Full',

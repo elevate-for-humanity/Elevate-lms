@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
-import { sendCreatorApprovalEmail } from '@/lib/email/resend';
+import { sendCreatorApprovalEmail } from '@/lib/email/sendgrid';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';

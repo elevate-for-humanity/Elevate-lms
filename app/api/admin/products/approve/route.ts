@@ -53,7 +53,7 @@ async function _POST(req: Request) {
             .single();
 
           if (profile?.email) {
-            const { sendProductApprovalEmail } = await import('@/lib/email/resend');
+            const { sendProductApprovalEmail } = await import('@/lib/email/sendgrid');
             await sendProductApprovalEmail({
               email: profile.email,
               name: profile.full_name || 'Creator',

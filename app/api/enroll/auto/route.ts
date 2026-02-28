@@ -228,7 +228,7 @@ async function _POST(req: Request) {
       .select('id')
       .single();
 
-    // STEP 7: Send password reset email for new users via Resend
+    // STEP 7: Send password reset email for new users via SendGrid
     if (isNewUser) {
       try {
         const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
@@ -239,7 +239,7 @@ async function _POST(req: Request) {
         if (linkError) {
           logger.warn('Recovery link generation failed', linkError);
         } else if (linkData?.properties?.action_link) {
-          const { sendEmail } = await import('@/lib/email/resend');
+          const { sendEmail } = await import('@/lib/email/sendgrid');
           await sendEmail({
             to: emailLower,
             subject: 'Set Your Password — Elevate for Humanity',

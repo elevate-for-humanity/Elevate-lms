@@ -336,7 +336,7 @@ async function _POST(req: NextRequest) {
         } catch (outboxErr: any) {
           // Outbox failed (missing admin client, RPC, or table) — send directly
           logger.warn('Outbox enqueue failed, sending direct email', outboxErr);
-          const { sendWelcomeEmail } = await import('@/lib/email/resend');
+          const { sendWelcomeEmail } = await import('@/lib/email/sendgrid');
           const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
           // Get program name for the email
@@ -352,7 +352,7 @@ async function _POST(req: NextRequest) {
             programName: program?.name || 'Your Program',
             dashboardUrl: `${siteUrl}/learner/dashboard`,
           });
-          logger.info('Student approval email sent directly via Resend', {
+          logger.info('Student approval email sent directly via SendGrid', {
             userId: enrollment.user_id,
           });
         }
@@ -390,7 +390,7 @@ async function _POST(req: NextRequest) {
             });
 
             if (phProfile.email) {
-              const { sendEmail } = await import('@/lib/email/resend');
+              const { sendEmail } = await import('@/lib/email/sendgrid');
               await sendEmail({
                 to: phProfile.email,
                 subject: 'Student Enrollment Approved',

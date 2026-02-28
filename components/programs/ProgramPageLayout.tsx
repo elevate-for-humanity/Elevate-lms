@@ -85,6 +85,23 @@ export interface ProgramPageConfig {
   // Program status notice — shown as amber banner when program is not yet enrolling
   statusNotice?: string;
 
+  // Program details — for workforce partner RFIs
+  totalHours?: number;
+  schedule?: string;
+  eveningSchedule?: string;
+  cohortSize?: string;
+  admissionRequirements?: string[];
+  modality?: string;
+  facilityInfo?: string;
+  equipmentIncluded?: string;
+  bilingualSupport?: string;
+  nextLevelJobsEligible?: boolean;
+  employerPartners?: string[];
+  selfPayCost?: string;
+  cohortPricing?: string;
+  pricingIncludes?: string[];
+  paymentTerms?: string;
+
   // Breadcrumbs
   breadcrumbs: { label: string; href?: string }[];
 }
@@ -301,6 +318,143 @@ export default function ProgramPageLayout({
 
       {/* ===== EXTRA SECTIONS ===== */}
       {children}
+
+      {/* ===== PROGRAM DETAILS (workforce partner info) ===== */}
+      {(c.totalHours || c.schedule || c.cohortSize || c.modality || c.bilingualSupport || c.employerPartners || c.selfPayCost) && (
+        <InView animation="fade-up">
+          <section className="py-14 lg:py-20 bg-white border-t border-slate-100">
+            <div className="max-w-5xl mx-auto px-6">
+              <div className="text-center mb-10">
+                <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">Program Details</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Structure & Delivery</h2>
+              </div>
+              <div className="grid md:grid-cols-2 gap-8">
+                {/* Left column — Training Structure */}
+                <div className="space-y-4">
+                  <h3 className="font-bold text-slate-900 text-lg border-b border-slate-200 pb-2">Training Structure</h3>
+                  {c.totalHours && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Total Instructional Hours</span>
+                      <span className="font-semibold text-slate-900">{c.totalHours} hours</span>
+                    </div>
+                  )}
+                  {c.schedule && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Standard Schedule</span>
+                      <span className="font-semibold text-slate-900">{c.schedule}</span>
+                    </div>
+                  )}
+                  {c.eveningSchedule && (
+                    <div className="text-sm bg-amber-50 border border-amber-200 rounded-lg p-3">
+                      <span className="font-semibold text-amber-800">Evening/Weekend Option:</span>
+                      <span className="text-amber-700 ml-1">{c.eveningSchedule}</span>
+                    </div>
+                  )}
+                  {c.cohortSize && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Cohort Size</span>
+                      <span className="font-semibold text-slate-900">{c.cohortSize}</span>
+                    </div>
+                  )}
+                  {c.modality && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Modality</span>
+                      <span className="font-semibold text-slate-900">{c.modality}</span>
+                    </div>
+                  )}
+                  {c.facilityInfo && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Training Location</span>
+                      <span className="font-semibold text-slate-900 text-right max-w-[60%]">{c.facilityInfo}</span>
+                    </div>
+                  )}
+                  {c.equipmentIncluded && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Equipment & Materials</span>
+                      <span className="font-semibold text-slate-900 text-right max-w-[60%]">{c.equipmentIncluded}</span>
+                    </div>
+                  )}
+                  {c.bilingualSupport && (
+                    <div className="text-sm bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-3">
+                      <span className="font-semibold text-brand-blue-800">Language Support:</span>
+                      <span className="text-brand-blue-700 ml-1">{c.bilingualSupport}</span>
+                    </div>
+                  )}
+                  {c.nextLevelJobsEligible && (
+                    <div className="flex items-center gap-2 text-sm bg-brand-green-50 border border-brand-green-200 rounded-lg p-3">
+                      <CheckCircle2 className="w-4 h-4 text-brand-green-600 flex-shrink-0" />
+                      <span className="font-semibold text-brand-green-800">Next Level Jobs Eligible</span>
+                    </div>
+                  )}
+                  {c.admissionRequirements && c.admissionRequirements.length > 0 && (
+                    <div className="text-sm">
+                      <span className="text-slate-500 block mb-1">Admission Requirements</span>
+                      <ul className="space-y-1">
+                        {c.admissionRequirements.map((req) => (
+                          <li key={req} className="flex items-start gap-2">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-brand-green-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-slate-700">{req}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right column — Pricing & Partners */}
+                <div className="space-y-4">
+                  {(c.selfPayCost || c.cohortPricing || c.pricingIncludes) && (
+                    <>
+                      <h3 className="font-bold text-slate-900 text-lg border-b border-slate-200 pb-2">Pricing & Funding</h3>
+                      {c.selfPayCost && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-slate-500">Self-Pay Tuition</span>
+                          <span className="font-semibold text-slate-900">{c.selfPayCost}</span>
+                        </div>
+                      )}
+                      {c.cohortPricing && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-slate-500">Cohort/Partner Rate</span>
+                          <span className="font-semibold text-slate-900">{c.cohortPricing}</span>
+                        </div>
+                      )}
+                      {c.pricingIncludes && c.pricingIncludes.length > 0 && (
+                        <div className="text-sm">
+                          <span className="text-slate-500 block mb-1">Tuition Includes</span>
+                          <ul className="space-y-1">
+                            {c.pricingIncludes.map((item) => (
+                              <li key={item} className="flex items-start gap-2">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-brand-green-600 mt-0.5 flex-shrink-0" />
+                                <span className="text-slate-700">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {c.paymentTerms && (
+                        <div className="text-sm text-slate-600 bg-slate-50 rounded-lg p-3">{c.paymentTerms}</div>
+                      )}
+                    </>
+                  )}
+                  {c.employerPartners && c.employerPartners.length > 0 && (
+                    <>
+                      <h3 className="font-bold text-slate-900 text-lg border-b border-slate-200 pb-2 mt-6">Employer Partners</h3>
+                      <ul className="space-y-2">
+                        {c.employerPartners.map((partner) => (
+                          <li key={partner} className="flex items-center gap-2 text-sm">
+                            <Briefcase className="w-4 h-4 text-brand-blue-600 flex-shrink-0" />
+                            <span className="text-slate-700">{partner}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+        </InView>
+      )}
 
       {/* ===== CAREER PATHS ===== */}
       {c.careers && c.careers.length > 0 && (

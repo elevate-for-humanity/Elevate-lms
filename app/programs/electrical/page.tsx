@@ -33,8 +33,25 @@ const config: ProgramPageConfig = {
 
   duration: '12 weeks',
   cost: '$0 with WIOA funding',
-  format: 'In-person, Indianapolis',
+  format: 'Hybrid — In-person + LMS',
   credential: 'OSHA 30 + NCCER Core',
+
+  // Program details
+  totalHours: 240,
+  schedule: 'Mon–Fri, 8:00 AM–12:00 PM (20 hrs/week)',
+  eveningSchedule: 'Evening/weekend cohorts available for working adults. Contact us for schedule options.',
+  cohortSize: '10–15 participants per cohort',
+  admissionRequirements: ['18 years or older', 'High school diploma or GED (or actively pursuing)', 'Able to lift 50 lbs', 'No prior electrical experience required'],
+  modality: 'Hybrid — In-person hands-on labs, LMS-supported theory, live instructor sessions',
+  facilityInfo: 'Elevate training center, Indianapolis',
+  equipmentIncluded: 'All PPE, tools, training materials, and certification exam fees included',
+  bilingualSupport: 'Bilingual (English/Spanish) instruction available. LMS supports Spanish language accessibility.',
+  nextLevelJobsEligible: true,
+  employerPartners: ['Jesse J. Wilkerson & Associates — Architecture & Construction'],
+  selfPayCost: '$5,000',
+  cohortPricing: 'Contact us for organizational/cohort pricing',
+  pricingIncludes: ['240 instructional hours', 'OSHA 30-Hour certification', 'NCCER Core Curriculum certification', 'CPR/First Aid certification', 'All PPE, tools, and materials', 'LMS access', 'Career placement support'],
+  paymentTerms: 'WIOA, Next Level Jobs, and WRG funding accepted. Payment plans available for self-pay students.',
 
   overview: 'This 12-week program covers electrical theory, residential wiring, commercial wiring, NEC code, and safety. You will work with real tools and materials in a hands-on shop environment. Graduates earn OSHA 30 and NCCER Core certifications and are prepared for entry-level electrician helper and apprentice positions.',
   highlights: [

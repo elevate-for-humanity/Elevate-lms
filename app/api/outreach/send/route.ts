@@ -189,7 +189,23 @@ async function sendViaSendGrid(to: string[], subject: string, html: string, text
 }
 
 export async function POST(request: NextRequest) {
-  // Auth temporarily disabled for outreach send
+  // Auth check — only admin can trigger outreach
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+  }
 
   // Parse request
   const body = await request.json();

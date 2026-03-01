@@ -16,7 +16,7 @@ INSERT INTO training_courses (
   'b7e30a11-6c4f-5a9e-8d2b-epa608000001',
   'EPA 608 Certification Prep',
   'EPA Section 608 Universal Certification Prep',
-  'Complete 15-week EPA Section 608 certification preparation. Covers Core, Type I, Type II, and Type III sections with study kits, practice exams, and proctored certification exam access through an approved testing partner. Unlimited online retesting available.',
+  'Complete 15-week EPA Section 608 certification preparation. Covers Core, Type I, Type II, and Type III sections with study kits, practice exams, and proctored certification exam access through EPA-approved certifying organizations (ESCO Institute and Mainstream Engineering). Retest policies vary by certifying organization.',
   true,
   'Certification',
   NOW()

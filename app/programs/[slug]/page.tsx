@@ -170,6 +170,7 @@ export default async function ProgramDetailPage({
     'cdl-training', 'medical-assistant', 'diesel-mechanic',
     'barber-apprenticeship', 'cosmetology-apprenticeship',
     'culinary-apprenticeship', 'sanitation-infection-control',
+    'forklift', 'construction-trades-certification',
     // Category landing pages (not individual programs)
     'healthcare', 'skilled-trades', 'technology',
     'micro-programs', 'federal-funded', 'apprenticeships',

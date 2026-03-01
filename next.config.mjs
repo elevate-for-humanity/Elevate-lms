@@ -283,7 +283,7 @@ const nextConfig = {
       { source: '/programs/drug-collector', destination: '/drug-testing/training', permanent: true },
       { source: '/programs/esthetician-apprenticeship', destination: '/programs/cosmetology-apprenticeship', permanent: true },
       { source: '/programs/professional-esthetician', destination: '/programs/cosmetology-apprenticeship', permanent: true },
-      { source: '/programs/forklift', destination: '/programs/skilled-trades', permanent: true },
+      // forklift now has its own detail page — redirect removed
       { source: '/programs/it-support', destination: '/programs/it-help-desk', permanent: true },
       { source: '/programs/jri', destination: '/programs/peer-recovery-specialist', permanent: true },
       { source: '/programs/phlebotomy', destination: '/programs/healthcare', permanent: true },

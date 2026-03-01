@@ -89,7 +89,7 @@ const config: ProgramPageConfig = {
     'Career readiness — resume building, interview prep, employer introductions',
   ],
 
-  overviewImage: '/images/programs-fresh/construction.jpg',
+  overviewImage: '/images/trades/program-construction-training.jpg',
   overviewImageAlt: 'Construction trades students in hands-on training',
 
   salaryNumber: 48000,
@@ -247,7 +247,7 @@ export default function Page() {
           description: config.subtitle,
           duration_weeks: 11,
           price: 2700,
-          image_url: `${SITE_URL}/images/programs-fresh/construction.jpg`,
+          image_url: `${SITE_URL}/images/trades/program-construction-training.jpg`,
           category: 'Skilled Trades',
           outcomes: config.credentials || [],
         }}

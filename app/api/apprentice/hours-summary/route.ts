@@ -66,42 +66,51 @@ const supabase = await createClient();
       transferHours = enrollment.transfer_hours || 0;
     }
 
-    // Get hour totals from apprentice_hours_log
+    // Get hour totals from consolidated hour_entries
     const { data: hourLogs, error: hoursError } = await db
-      .from('apprentice_hours_log')
-      .select('minutes, hour_type, funding_phase, status')
-      .eq('enrollment_id', enrollment?.id || enrollmentId);
+      .from('hour_entries')
+      .select('hours_claimed, accepted_hours, source_type, status, category')
+      .eq('user_id', user.id);
 
     if (hoursError) {
       logger.error('Error fetching hours:', hoursError);
     }
 
-    // Calculate totals
+    // Calculate totals (hour_entries stores hours directly, not minutes)
     const logs = hourLogs || [];
     
-    const totalRtiMinutes = logs
-      .filter(l => l.hour_type === 'RTI')
-      .reduce((sum, l) => sum + (l.minutes || 0), 0);
+    const totalRtiHours = logs
+      .filter(l => l.source_type === 'rti')
+      .reduce((sum, l) => sum + (Number(l.hours_claimed) || 0), 0);
     
-    const totalOjtMinutes = logs
-      .filter(l => l.hour_type === 'OJT')
-      .reduce((sum, l) => sum + (l.minutes || 0), 0);
+    const totalOjlHours = logs
+      .filter(l => l.source_type === 'ojl' || l.source_type === 'host_shop' || l.source_type === 'timeclock' || l.source_type === 'manual')
+      .reduce((sum, l) => sum + (Number(l.hours_claimed) || 0), 0);
     
-    const approvedMinutes = logs
-      .filter(l => l.status === 'APPROVED')
-      .reduce((sum, l) => sum + (l.minutes || 0), 0);
+    const approvedHoursVal = logs
+      .filter(l => l.status === 'approved')
+      .reduce((sum, l) => sum + (Number(l.accepted_hours) || Number(l.hours_claimed) || 0), 0);
     
-    const pendingMinutes = logs
-      .filter(l => l.status === 'SUBMITTED' || l.status === 'DRAFT')
-      .reduce((sum, l) => sum + (l.minutes || 0), 0);
+    const pendingHoursVal = logs
+      .filter(l => l.status === 'pending')
+      .reduce((sum, l) => sum + (Number(l.hours_claimed) || 0), 0);
 
-    const wioaRtiMinutes = logs
-      .filter(l => l.hour_type === 'RTI' && l.funding_phase === 'WIOA')
-      .reduce((sum, l) => sum + (l.minutes || 0), 0);
+    // WIOA-specific hours (tracked via category)
+    const wioaRtiHours = logs
+      .filter(l => l.source_type === 'rti' && l.category === 'wioa')
+      .reduce((sum, l) => sum + (Number(l.hours_claimed) || 0), 0);
 
-    const wioaOjtMinutes = logs
-      .filter(l => l.hour_type === 'OJT' && l.funding_phase === 'WIOA')
-      .reduce((sum, l) => sum + (l.minutes || 0), 0);
+    const wioaOjlHours = logs
+      .filter(l => (l.source_type === 'ojl' || l.source_type === 'host_shop' || l.source_type === 'timeclock' || l.source_type === 'manual') && l.category === 'wioa')
+      .reduce((sum, l) => sum + (Number(l.hours_claimed) || 0), 0);
+
+    // Alias for backward compat in calculations below
+    const totalRtiMinutes = totalRtiHours * 60;
+    const totalOjlMinutes = totalOjlHours * 60;
+    const approvedMinutes = approvedHoursVal * 60;
+    const pendingMinutes = pendingHoursVal * 60;
+    const wioaRtiMinutes = wioaRtiHours * 60;
+    const wioaOjlMinutes = wioaOjlHours * 60;
 
     // Get RAPIDS status
     const { data: rapidsData } = await db
@@ -118,17 +127,18 @@ const supabase = await createClient();
       .maybeSingle();
 
     // Calculate effective total and progress
-    const totalMinutes = totalRtiMinutes + totalOjtMinutes;
+    const totalMinutes = totalRtiMinutes + totalOjlMinutes;
     const totalHours = totalMinutes / 60;
     const effectiveTotal = totalHours + transferHours;
     const remainingHours = Math.max(requiredHours - effectiveTotal, 0);
     const progressPercentage = Math.min((effectiveTotal / requiredHours) * 100, 100);
     const readyForExam = effectiveTotal >= requiredHours;
 
-    // Convert to hours
+    // Convert to hours — OJL and RTI are separate compliance buckets
     const summary = {
       total_rti_hours: totalRtiMinutes / 60,
-      total_ojt_hours: totalOjtMinutes / 60,
+      total_ojl_hours: totalOjlMinutes / 60,
+      // total_hours kept for dashboard display only — NOT for apprenticeship completion
       total_hours: totalHours,
       approved_hours: approvedMinutes / 60,
       pending_hours: pendingMinutes / 60,
@@ -137,7 +147,7 @@ const supabase = await createClient();
       remaining_hours: remainingHours,
       progress_percentage: progressPercentage,
       wioa_rti_hours: wioaRtiMinutes / 60,
-      wioa_ojt_hours: wioaOjtMinutes / 60,
+      wioa_ojl_hours: wioaOjlMinutes / 60,
       enrollment_id: enrollment?.id || null,
       program_name: (enrollment?.programs as any)?.name || 'Barber Apprenticeship',
       

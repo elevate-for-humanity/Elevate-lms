@@ -154,14 +154,14 @@ export default async function LearnerDashboardPage() {
     .order('date', { ascending: false })
     .limit(30);
 
-  // Fetch training hours (fallback)
+  // Fetch training hours from consolidated hour_entries
   const { data: hoursData } = await db
-    .from('training_hours')
-    .select('hours')
+    .from('hour_entries')
+    .select('hours_claimed')
     .eq('user_id', user.id);
 
   const attendanceHours = attendanceData?.reduce((sum, a) => sum + (a.hours_logged || 0), 0) || 0;
-  const trainingHours = hoursData?.reduce((sum, h) => sum + (h.hours || 0), 0) || 0;
+  const trainingHours = hoursData?.reduce((sum, h) => sum + (Number(h.hours_claimed) || 0), 0) || 0;
   const totalHours = attendanceHours || trainingHours;
 
   // Fetch lesson progress for all enrolled courses

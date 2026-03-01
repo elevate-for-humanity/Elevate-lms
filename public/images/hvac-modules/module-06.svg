@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200">
+  <rect width="400" height="200" fill="#14532d"/>
+  <ellipse cx="280" cy="50" rx="100" ry="60" fill="#4ade80" opacity="0.06"/>
+  <g transform="translate(24, 24)">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
+    </svg>
+  </g>
+  <text x="24" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#4ade80" opacity="0.7" letter-spacing="2">MODULE 06</text>
+  <text x="24" y="130" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="white">EPA 608 Core</text>
+  <rect x="24" y="145" width="40" height="3" rx="1.5" fill="#4ade80" opacity="0.5"/>
+</svg>

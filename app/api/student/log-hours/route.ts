@@ -29,17 +29,17 @@ async function _POST(request: Request) {
     const body = await parseBody<Record<string, any>>(request);
     const { enrollment_id, date, hours, services_performed, notes } = body;
 
-    // Insert into student_hours table
+    // Insert into consolidated hour_entries table
     const { data, error }: any = await db
-      .from('student_hours')
+      .from('hour_entries')
       .insert({
-        student_id: user.id,
-        enrollment_id,
-        date,
-        hours,
-        activity_type: 'practical_work',
-        notes: notes || null,
-        approved: false,
+        user_id: user.id,
+        source_type: 'ojl',
+        work_date: date,
+        hours_claimed: hours,
+        entered_by_email: user.email,
+        notes: [services_performed, notes].filter(Boolean).join(' — ') || null,
+        status: 'pending',
       })
       .select()
       .single();
@@ -50,20 +50,6 @@ async function _POST(request: Request) {
         { error: toErrorMessage(error) },
         { status: 500 }
       );
-    }
-
-    // Also log to apprentice_hours_log if it exists
-    try {
-      await db.from('apprentice_hours_log').insert({
-        apprenticeship_id: enrollment_id,
-        log_date: date,
-        ojl_hours: hours,
-        services_performed,
-        notes,
-      });
-    } catch (e) {
-      // Table might not exist yet, that's okay
-      logger.info('apprentice_hours_log not available:', e);
     }
 
     return NextResponse.json({ success: true, data });

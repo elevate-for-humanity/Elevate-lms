@@ -66,7 +66,7 @@ export default async function PartnerPortalPage() {
         const studentIds = (enrolledStudents || []).map((e: any) => e.student_id);
         if (studentIds.length > 0) {
           const { count: pendingHoursCount } = await db
-            .from('training_hours')
+            .from('hour_entries')
             .select('*', { count: 'exact', head: true })
             .in('user_id', studentIds)
             .eq('status', 'pending');

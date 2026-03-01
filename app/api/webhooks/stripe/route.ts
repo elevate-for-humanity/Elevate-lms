@@ -978,6 +978,39 @@ async function _POST(request: NextRequest) {
                   payment_amount: (session.amount_total || 0) / 100,
                 },
               });
+
+              // Provision Milady access — $295 vendor payment + student credentials
+              try {
+                const { data: profile } = await supabase
+                  .from('profiles')
+                  .select('email, first_name, last_name, full_name, phone')
+                  .eq('id', userId)
+                  .single();
+
+                if (profile) {
+                  const { purchaseMiladyCourse } = await import('@/lib/vendors/milady-purchase');
+                  const miladyResult = await purchaseMiladyCourse(
+                    {
+                      id: userId,
+                      email: profile.email,
+                      firstName: profile.first_name || profile.full_name?.split(' ')[0] || 'Student',
+                      lastName: profile.last_name || profile.full_name?.split(' ').slice(1).join(' ') || '',
+                      phone: profile.phone || undefined,
+                    },
+                    'barber-apprenticeship',
+                    session.payment_intent as string
+                  );
+
+                  if (miladyResult.success) {
+                    logger.info('✅ Milady provisioned for student:', userId);
+                  } else {
+                    logger.warn('[webhook] Milady provisioning queued for manual setup:', userId);
+                  }
+                }
+              } catch (miladyErr) {
+                // Non-fatal: enrollment succeeds even if Milady provisioning fails
+                logger.error('[webhook] Milady provisioning error (non-fatal):', miladyErr instanceof Error ? miladyErr : new Error(String(miladyErr)));
+              }
             }
           }
 

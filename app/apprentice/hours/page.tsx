@@ -20,20 +20,22 @@ export default async function ApprenticeHoursPage() {
   
   if (!user) redirect('/login?next=/apprentice/hours');
 
-  // Fetch hours logs from database
+  // Fetch hours from consolidated hour_entries table
   const { data: hoursData, error } = await db
-    .from('hours_logs')
+    .from('hour_entries')
     .select(`
       id,
-      date,
-      hours,
-      description,
+      work_date,
+      hours_claimed,
+      accepted_hours,
+      notes,
       status,
-      activity_type,
+      source_type,
+      category,
       created_at
     `)
     .eq('user_id', user.id)
-    .order('date', { ascending: false })
+    .order('work_date', { ascending: false })
     .limit(20);
 
   if (error) {
@@ -41,10 +43,10 @@ export default async function ApprenticeHoursPage() {
   }
 
   const logs = hoursData || [];
-  const totalHours = logs.reduce((sum, log: any) => sum + (log.hours || 0), 0);
+  const totalHours = logs.reduce((sum, log: any) => sum + (log.hours_claimed || 0), 0);
   const approvedHours = logs
     .filter((log: any) => log.status === 'approved')
-    .reduce((sum, log: any) => sum + (log.hours || 0), 0);
+    .reduce((sum, log: any) => sum + (log.accepted_hours || log.hours_claimed || 0), 0);
   
   // Apprenticeship typically requires specific hours
   const requiredHours = 2000;
@@ -148,16 +150,16 @@ export default async function ApprenticeHoursPage() {
                 <div key={log.id} className="px-6 py-4 flex items-center justify-between">
                   <div>
                     <p className="font-medium text-gray-900">
-                      {new Date(log.date).toLocaleDateString('en-US', {
+                      {new Date(log.work_date).toLocaleDateString('en-US', {
                         weekday: 'short',
                         month: 'short',
                         day: 'numeric',
                       })}
                     </p>
-                    <p className="text-sm text-gray-500">{log.description || log.activity_type || 'Apprenticeship work'}</p>
+                    <p className="text-sm text-gray-500">{log.notes || log.source_type?.toUpperCase() || 'Apprenticeship work'}</p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="font-semibold text-gray-900">{log.hours} hrs</span>
+                    <span className="font-semibold text-gray-900">{log.hours_claimed} hrs</span>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       log.status === 'approved' 
                         ? 'bg-brand-green-100 text-brand-green-700'

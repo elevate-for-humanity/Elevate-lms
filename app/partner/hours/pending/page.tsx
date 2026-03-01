@@ -5,19 +5,16 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Clock, XCircle, ArrowLeft, User, Calendar, Building, AlertCircle } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface PendingHour {
   id: string;
   user_id: string;
-  date: string;
-  hours: number;
-  hour_type: string;
-  activity_type: string;
-  employer_name: string | null;
-  supervisor_name: string | null;
-  description: string | null;
+  work_date: string;
+  hours_claimed: number;
+  source_type: string;
+  category: string | null;
+  notes: string | null;
   status: string;
   created_at: string;
   student_name?: string;
@@ -26,7 +23,6 @@ interface PendingHour {
 
 export default function PartnerHoursPendingPage() {
   const router = useRouter();
-  const supabase = createClient();
   const [pendingHours, setPendingHours] = useState<PendingHour[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
@@ -40,41 +36,19 @@ export default function PartnerHoursPendingPage() {
   const fetchPendingHours = async () => {
     setLoading(true);
     try {
-      // Fetch pending hours with student info
-      const { data: hours, error: hoursError } = await supabase
-        .from('training_hours')
-        .select(`
-          id,
-          user_id,
-          date,
-          hours,
-          hour_type,
-          activity_type,
-          employer_name,
-          supervisor_name,
-          description,
-          status,
-          created_at
-        `)
-        .eq('status', 'pending')
-        .order('date', { ascending: false });
+      // Use API route (admin client + role checks) instead of direct Supabase query
+      const res = await fetch('/api/partner/hours?status=pending');
+      if (!res.ok) throw new Error('Failed to load pending hours');
+      const data = await res.json();
+      const hours = data.hours || [];
 
-      if (hoursError) throw hoursError;
-
-      // Fetch student names for each hour entry
-      if (hours && hours.length > 0) {
-        const userIds = [...new Set(hours.map(h => h.user_id))];
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('id, full_name, email')
-          .in('id', userIds);
-
-        const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
-        
-        const enrichedHours = hours.map(h => ({
+      if (hours.length > 0) {
+        const enrichedHours = hours.map((h: any) => ({
           ...h,
-          student_name: profileMap.get(h.user_id)?.full_name || 'Unknown',
-          student_email: profileMap.get(h.user_id)?.email || '',
+          student_name: h.user_profiles
+            ? `${h.user_profiles.first_name || ''} ${h.user_profiles.last_name || ''}`.trim() || 'Unknown'
+            : 'Unknown',
+          student_email: h.user_profiles?.email || '',
         }));
 
         setPendingHours(enrichedHours);
@@ -280,7 +254,7 @@ export default function PartnerHoursPendingPage() {
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-gray-400" />
                         <span className="text-sm text-gray-700">
-                          {new Date(hour.date).toLocaleDateString('en-US', {
+                          {new Date(hour.work_date).toLocaleDateString('en-US', {
                             weekday: 'short',
                             month: 'short',
                             day: 'numeric',
@@ -290,35 +264,29 @@ export default function PartnerHoursPendingPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm font-medium text-gray-900">{hour.hours} hours</span>
+                        <span className="text-sm font-medium text-gray-900">{hour.hours_claimed} hours</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          hour.hour_type === 'ojt' 
+                          hour.source_type === 'ojt' 
                             ? 'bg-brand-blue-100 text-brand-blue-700' 
-                            : 'bg-brand-blue-100 text-brand-blue-700'
+                            : 'bg-purple-100 text-purple-700'
                         }`}>
-                          {hour.hour_type === 'ojt' ? 'OJT' : 'RTI'}
+                          {hour.source_type === 'ojt' ? 'OJT' : hour.source_type === 'rti' ? 'RTI' : hour.source_type?.toUpperCase()}
                         </span>
                       </div>
-                      {hour.employer_name && (
+                      {hour.category && (
                         <div className="flex items-center gap-2">
                           <Building className="w-4 h-4 text-gray-400" />
-                          <span className="text-sm text-gray-700">{hour.employer_name}</span>
+                          <span className="text-sm text-gray-700">{hour.category}</span>
                         </div>
                       )}
                     </div>
 
-                    {hour.description && (
+                    {hour.notes && (
                       <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                        <p className="text-sm text-gray-700">{hour.description}</p>
+                        <p className="text-sm text-gray-700">{hour.notes}</p>
                       </div>
-                    )}
-
-                    {hour.supervisor_name && (
-                      <p className="text-sm text-gray-500">
-                        Supervisor: <span className="font-medium">{hour.supervisor_name}</span>
-                      </p>
                     )}
                   </div>
 

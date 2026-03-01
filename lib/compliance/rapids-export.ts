@@ -293,21 +293,22 @@ export async function exportProgressUpdates(
     const firstName = nameParts[0] || '';
     const lastName = nameParts[nameParts.length - 1] || '';
 
-    // Get hours from hours_log table
+    // Get hours from consolidated hour_entries table
     const { data: hoursData } = await supabase
-      .from('hours_log')
-      .select('hours, type')
+      .from('hour_entries')
+      .select('hours_claimed, accepted_hours, source_type')
       .eq('user_id', profile.id)
       .eq('status', 'approved');
 
-    let ojtHours = 0;
+    let ojlHours = 0;
     let rtiHours = 0;
 
     (hoursData || []).forEach((h: any) => {
-      if (h.type === 'ojt' || h.type === 'on_the_job') {
-        ojtHours += h.hours || 0;
-      } else if (h.type === 'rti' || h.type === 'related_instruction' || h.type === 'classroom') {
-        rtiHours += h.hours || 0;
+      const hrs = Number(h.accepted_hours) || Number(h.hours_claimed) || 0;
+      if (h.source_type === 'ojl' || h.source_type === 'host_shop' || h.source_type === 'timeclock' || h.source_type === 'manual') {
+        ojlHours += hrs;
+      } else if (h.source_type === 'rti' || h.source_type === 'in_state_barber_school' || h.source_type === 'continuing_education') {
+        rtiHours += hrs;
       }
     });
 
@@ -317,7 +318,7 @@ export async function exportProgressUpdates(
       lastName,
       firstName,
       reportDate,
-      String(ojtHours),
+      String(ojlHours),
       String(rtiHours),
       String(enrollment.current_wage || 0),
       'Active',

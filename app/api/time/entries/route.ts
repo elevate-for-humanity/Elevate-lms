@@ -168,22 +168,23 @@ async function _POST(req: Request) {
   const week_end_iso = week_end.toISOString().slice(0, 10);
 
   const { data: totals, error: totErr } = await db
-    .from('apprentice_hours_log')
-    .select('minutes, hour_type, funding_phase')
-    .eq('enrollment_id', enrollment_id)
-    .gte('log_date', week_start)
-    .lt('log_date', week_end_iso);
+    .from('hour_entries')
+    .select('hours_claimed, source_type, category')
+    .eq('user_id', user.id)
+    .gte('work_date', week_start)
+    .lt('work_date', week_end_iso);
 
   if (totErr)
     return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
 
+  // Convert hours to minutes for cap checks
   const existingMinutesTotal = (totals ?? []).reduce(
-    (s, r) => s + (r.minutes ?? 0),
+    (s, r) => s + ((Number(r.hours_claimed) || 0) * 60),
     0
   );
   const existingMinutesWioaRTI = (totals ?? [])
-    .filter((r) => r.funding_phase === 'WIOA' && r.hour_type === 'RTI')
-    .reduce((s, r) => s + (r.minutes ?? 0), 0);
+    .filter((r) => r.category === 'wioa' && r.source_type === 'rti')
+    .reduce((s, r) => s + ((Number(r.hours_claimed) || 0) * 60), 0);
 
   const newMinutes = Math.max(
     1,
@@ -208,22 +209,20 @@ async function _POST(req: Request) {
     }
   }
 
+  const newHours = newMinutes / 60;
+
   const { data: created, error: insErr } = await db
-    .from('apprentice_hours_log')
+    .from('hour_entries')
     .insert({
-      enrollment_id,
-      program_holder_id,
-      log_date: entry_date,
-      start_at: start_at.toISOString(),
-      end_at: end_at.toISOString(),
-      hour_type,
-      funding_phase,
-      milady_module_ref,
-      activity_note,
-      location_note,
-      apprentice_attest: true,
-      status: 'SUBMITTED',
-      submitted_at: new Date().toISOString(),
+      user_id: user.id,
+      apprentice_application_id: null,
+      source_type: hour_type === 'RTI' ? 'rti' : 'ojl',
+      category: funding_phase?.toLowerCase() || null,
+      work_date: entry_date,
+      hours_claimed: newHours,
+      entered_by_email: user.email || '',
+      notes: [activity_note, location_note, milady_module_ref ? `Milady: ${milady_module_ref}` : null].filter(Boolean).join(' | ') || null,
+      status: 'pending',
     })
     .select('*')
     .single();
@@ -254,25 +253,16 @@ const supabase = await createClient();
   const funding_phase = searchParams.get('funding_phase');
 
   let query = db
-    .from('apprentice_hours_log')
-    .select(
-      `
-      *,
-      student_enrollments!inner(student_id, program_id),
-      program_holders(business_name, mentor_barber_name)
-    `
-    )
-    .eq('student_enrollments.student_id', user.id)
-    .order('log_date', { ascending: false });
+    .from('hour_entries')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('work_date', { ascending: false });
 
-  if (enrollment_id) {
-    query = query.eq('enrollment_id', enrollment_id);
-  }
   if (status) {
-    query = query.eq('status', status);
+    query = query.eq('status', status.toLowerCase());
   }
   if (funding_phase) {
-    query = query.eq('funding_phase', funding_phase);
+    query = query.eq('category', funding_phase.toLowerCase());
   }
 
   const { data, error } = await query;

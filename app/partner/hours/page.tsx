@@ -35,20 +35,20 @@ export default async function PartnerHoursPage() {
     redirect('/partner');
   }
 
-  // Get hours statistics
+  // Get hours statistics from consolidated hour_entries
   const { data: pendingHours, count: pendingCount } = await db
-    .from('training_hours')
+    .from('hour_entries')
     .select('*', { count: 'exact' })
     .eq('status', 'pending')
     .order('created_at', { ascending: false });
 
   const { count: approvedCount } = await db
-    .from('training_hours')
+    .from('hour_entries')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'approved');
 
   const { count: rejectedCount } = await db
-    .from('training_hours')
+    .from('hour_entries')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'rejected');
 
@@ -58,12 +58,12 @@ export default async function PartnerHoursPage() {
   startOfMonth.setHours(0, 0, 0, 0);
 
   const { data: monthlyHours } = await db
-    .from('training_hours')
-    .select('hours')
+    .from('hour_entries')
+    .select('hours_claimed')
     .eq('status', 'approved')
     .gte('approved_at', startOfMonth.toISOString());
 
-  const totalMonthlyHours = monthlyHours?.reduce((sum, h) => sum + (h.hours || 0), 0) || 0;
+  const totalMonthlyHours = monthlyHours?.reduce((sum, h) => sum + (Number(h.hours_claimed) || 0), 0) || 0;
 
   // OJT placements and unverified hours
   let ojtPlacements: any[] = [];

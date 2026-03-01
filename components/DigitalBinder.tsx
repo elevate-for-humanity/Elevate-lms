@@ -29,9 +29,9 @@ interface DigitalBinderProps {
 }
 
 export default function DigitalBinder({
-  studentId = 'student-123',
-  studentName = 'Student Name',
-  programName = 'Program Name'
+  studentId,
+  studentName,
+  programName,
 }: DigitalBinderProps) {
   const [activeTab, setActiveTab] = useState<'documents' | 'notes' | 'tracking'>('documents');
   const [newNote, setNewNote] = useState('');
@@ -44,7 +44,7 @@ export default function DigitalBinder({
   });
 
   useEffect(() => {
-    if (!studentId || studentId === 'student-123') return;
+    if (!studentId) return;
     const supabase = createClient();
 
     async function loadBinder() {
@@ -99,6 +99,11 @@ export default function DigitalBinder({
     }
   };
 
+  // Only render for authenticated students with a real ID
+  if (!studentId) {
+    return null;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -106,11 +111,11 @@ export default function DigitalBinder({
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold mb-1">Digital Binder</h2>
-            <p className="text-brand-blue-100">{studentName} • {programName}</p>
+            <p className="text-brand-blue-100">{studentName || 'Student'} • {programName || 'Program'}</p>
           </div>
           <div className="text-right">
             <div className="text-sm text-brand-blue-100">Student ID</div>
-            <div className="font-mono font-semibold">{studentId}</div>
+            <div className="font-mono font-semibold">{studentId.substring(0, 8)}…</div>
           </div>
         </div>
       </div>

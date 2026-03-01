@@ -59,25 +59,18 @@ export default function LogApprenticeHoursPage() {
       }
 
       const { error: insertError } = await supabase
-        .from('training_hours')
+        .from('hour_entries')
         .insert({
           user_id: user.id,
-          date: formData.date,
-          hours: hours,
-          activity_type: formData.type === 'ojt' ? 'On-the-Job Training' : 'Related Technical Instruction',
-          hour_type: formData.type,
-          employer_name: formData.employer || null,
-          supervisor_name: formData.supervisor || null,
-          description: formData.notes || null,
+          source_type: formData.type === 'ojt' ? 'ojl' : 'rti',
+          work_date: formData.date,
+          hours_claimed: hours,
+          entered_by_email: user.email,
+          notes: formData.notes || null,
           status: 'pending'
         });
 
       if (insertError) {
-        if (insertError.code === '42P01') {
-          setSuccess(true);
-          setTimeout(() => router.push('/apprentice/hours'), 1500);
-          return;
-        }
         throw insertError;
       }
 

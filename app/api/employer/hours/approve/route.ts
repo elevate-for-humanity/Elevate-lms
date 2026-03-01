@@ -49,21 +49,35 @@ async function _POST(req: Request) {
       );
     }
 
-    // If employer, verify they supervise this student
-    if (profile.role === 'employer' && profile.employer_id) {
-      const { data: hourRecord } = await db
-        .from('apprenticeship_hours')
-        .select(
-          `
-          student_id,
-          user_profiles!apprenticeship_hours_student_id_fkey(employer_id)
-        `
-        )
-        .eq('id', hour_id)
+    // Load the hour entry to validate source_type and ownership
+    const { data: hourRecord } = await db
+      .from('hour_entries')
+      .select('user_id, source_type, status')
+      .eq('id', hour_id)
+      .single();
+
+    if (!hourRecord) {
+      return NextResponse.json({ error: 'Hour entry not found' }, { status: 404 });
+    }
+
+    // Employer cannot approve RTI hours
+    const isRti = ['rti', 'in_state_barber_school', 'continuing_education'].includes(hourRecord.source_type);
+    if (isRti && profile.role === 'employer') {
+      return NextResponse.json(
+        { error: 'Employers cannot approve RTI hours — requires sponsor or admin' },
+        { status: 403 }
+      );
+    }
+
+    // Employer must supervise this student
+    if (profile.role === 'employer' && profile.employer_id && hourRecord.user_id) {
+      const { data: studentProfile } = await db
+        .from('user_profiles')
+        .select('employer_id')
+        .eq('user_id', hourRecord.user_id)
         .single();
 
-      const userProfiles = hourRecord?.user_profiles as any;
-      if (userProfiles?.employer_id !== profile.employer_id) {
+      if (studentProfile?.employer_id !== profile.employer_id) {
         return NextResponse.json(
           { error: "Forbidden - can only approve your own students' hours" },
           { status: 403 }
@@ -71,22 +85,24 @@ async function _POST(req: Request) {
       }
     }
 
-    // Approve the hours — transactional with audit
+    // Approve the hours — trigger enforces attestation fields
     const { error } = await auditedMutation({
-      table: 'apprenticeship_hours',
+      table: 'hour_entries',
       operation: 'update',
       rowData: {
-        approved: true,
-        approved_by: user.id,
+        status: 'approved',
+        approved_by: user.email,
         approved_at: new Date().toISOString(),
+        approved_by_role: profile.role,
+        accepted_hours: null,
       },
-      filter: { id: hour_id },
+      filter: { id: hour_id, status: 'pending' },
       audit: {
         action: 'api:post:/api/employer/hours/approve',
         actorId: user.id,
-        targetType: 'apprenticeship_hours',
+        targetType: 'hour_entries',
         targetId: hour_id,
-        metadata: { employer_id: profile.employer_id },
+        metadata: { employer_id: profile.employer_id, role: profile.role },
       },
     });
 

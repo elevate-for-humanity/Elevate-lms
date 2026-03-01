@@ -9,7 +9,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 export default async function DemoHoursPage() {
   const supabase = await createClient();
   const _admin = createAdminClient(); const db = _admin || supabase;
-  const { data: dbRows } = await db.from('training_hours').select('*').limit(50);
+  const { data: dbRows } = await db.from('hour_entries').select('*').limit(50);
 const hours = (dbRows as any[]) || [];
 
   const totalHours = 680;

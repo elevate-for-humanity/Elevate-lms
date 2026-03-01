@@ -58,11 +58,9 @@ async function _POST(req: Request) {
 
     // Reject the hours
     const { error } = await db
-      .from('training_hours')
+      .from('hour_entries')
       .update({
         status: 'rejected',
-        rejected_by: user.id,
-        rejected_at: new Date().toISOString(),
         rejection_reason: reason || null,
       })
       .eq('id', hour_id);
@@ -78,7 +76,7 @@ async function _POST(req: Request) {
     await db.from('audit_logs').insert({
       actor_id: user.id,
       action: 'hours_rejected',
-      entity_type: 'training_hours',
+      entity_type: 'hour_entries',
       entity_id: hour_id,
       details: { reason },
       created_at: new Date().toISOString(),

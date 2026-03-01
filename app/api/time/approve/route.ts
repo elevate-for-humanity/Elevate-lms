@@ -48,45 +48,36 @@ const supabase = await createClient();
 
   const holderIds = programHolders.map((ph) => ph.id);
 
+  // Query consolidated hour_entries
   let q = db
-    .from('apprentice_hours_log')
+    .from('hour_entries')
     .select(
       `
       id,
-      enrollment_id,
-      log_date,
-      start_at,
-      end_at,
-      minutes,
-      hour_type,
-      funding_phase,
+      apprentice_application_id,
+      work_date,
+      hours_claimed,
+      accepted_hours,
+      source_type,
+      category,
       status,
-      milady_module_ref,
-      activity_note,
-      location_note,
-      submitted_at,
+      notes,
+      entered_by_email,
+      entered_at,
       approved_at,
       approved_by,
-      student_enrollments!inner(
-        student_id,
-        program_id,
-        student_profile:profiles!student_id(
-          id,
-          full_name
-        )
-      ),
-      program_holders(business_name, mentor_barber_name)
+      user_id
     `
     )
-    .in('program_holder_id', holderIds)
-    .eq('status', status)
-    .order('log_date', { ascending: false })
-    .order('start_at', { ascending: false });
+    .eq('status', status.toLowerCase())
+    .order('work_date', { ascending: false });
 
-  if (funding_phase) q = q.eq('funding_phase', funding_phase);
-  if (hour_type) q = q.eq('hour_type', hour_type);
-  if (from) q = q.gte('log_date', from);
-  if (to) q = q.lte('log_date', to);
+  if (hour_type) {
+    const mapped = hour_type === 'RTI' ? 'rti' : hour_type === 'OJT' ? 'ojt' : hour_type.toLowerCase();
+    q = q.eq('source_type', mapped);
+  }
+  if (from) q = q.gte('work_date', from);
+  if (to) q = q.lte('work_date', to);
 
   const { data, error } = await q;
   if (error) return jsonError(toErrorMessage(error), 500);
@@ -118,45 +109,47 @@ export async function POST(req: Request) {
 
   // Fetch entry + status first
   const { data: entry, error: readErr } = await db
-    .from('apprentice_hours_log')
+    .from('hour_entries')
     .select('id,status')
     .eq('id', entry_id)
     .single();
 
   if (readErr) return jsonError('Failed to read time entry', 500);
   if (!entry) return jsonError('Entry not found', 404);
-  if (entry.status === 'LOCKED')
+  if (entry.status === 'locked')
     return jsonError('Entry is locked and cannot be modified', 409);
 
   // Business rules:
-  // - Approve/Reject only when SUBMITTED
-  // - Lock only when APPROVED
+  // - Approve/Reject only when pending
+  // - Lock only when approved
   if (action === 'APPROVE' || action === 'REJECT') {
-    if (entry.status !== 'SUBMITTED')
-      return jsonError('Only SUBMITTED entries can be approved/rejected', 409);
+    if (entry.status !== 'pending')
+      return jsonError('Only pending entries can be approved/rejected', 409);
   }
   if (action === 'LOCK') {
-    if (entry.status !== 'APPROVED')
-      return jsonError('Only APPROVED entries can be locked', 409);
+    if (entry.status !== 'approved')
+      return jsonError('Only approved entries can be locked', 409);
   }
 
   const nextStatus =
     action === 'APPROVE'
-      ? 'APPROVED'
+      ? 'approved'
       : action === 'REJECT'
-        ? 'REJECTED'
-        : 'LOCKED';
+        ? 'rejected'
+        : 'locked';
 
   const patch: Record<string, any> = {
     status: nextStatus,
-    approved_by: user.id,
+    approved_by: user.email,
     approved_at: new Date().toISOString(),
-    verified_by: user.email,
-    verified_at: new Date().toISOString(),
   };
 
+  if (action === 'REJECT' && note) {
+    patch.rejection_reason = note;
+  }
+
   const { data: updated, error: updErr } = await db
-    .from('apprentice_hours_log')
+    .from('hour_entries')
     .update(patch)
     .eq('id', entry_id)
     .select('*')

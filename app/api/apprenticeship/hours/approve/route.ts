@@ -36,7 +36,7 @@ async function _POST(req: Request) {
     // Check if user is admin/sponsor/employer
     const { data: profile } = await db
       .from('user_profiles')
-      .select('role')
+      .select('role, employer_id')
       .eq('user_id', user.id)
       .single();
 
@@ -47,15 +47,57 @@ async function _POST(req: Request) {
       );
     }
 
-    // Approve the hours
+    // Load the hour entry to validate
+    const { data: hourEntry } = await db
+      .from('hour_entries')
+      .select('user_id, source_type, status')
+      .eq('id', hour_id)
+      .single();
+
+    if (!hourEntry) {
+      return NextResponse.json({ error: 'Hour entry not found' }, { status: 404 });
+    }
+
+    if (hourEntry.status !== 'pending') {
+      return NextResponse.json({ error: 'Only pending hours can be approved' }, { status: 400 });
+    }
+
+    // Employer can only approve OJL hours, not RTI
+    const isRti = ['rti', 'in_state_barber_school', 'continuing_education'].includes(hourEntry.source_type);
+    if (isRti && profile.role === 'employer') {
+      return NextResponse.json(
+        { error: 'Employers cannot approve RTI hours — requires sponsor or admin' },
+        { status: 403 }
+      );
+    }
+
+    // OJL hours: employer must supervise this specific student
+    if (profile.role === 'employer' && profile.employer_id) {
+      const { data: studentProfile } = await db
+        .from('user_profiles')
+        .select('employer_id')
+        .eq('user_id', hourEntry.user_id)
+        .single();
+
+      if (studentProfile?.employer_id !== profile.employer_id) {
+        return NextResponse.json(
+          { error: 'Forbidden - can only approve hours for your own apprentices' },
+          { status: 403 }
+        );
+      }
+    }
+
+    // Approve the hours — trigger enforces attestation fields
     const { error } = await db
-      .from('apprenticeship_hours')
+      .from('hour_entries')
       .update({
-        approved: true,
-        approved_by: user.id,
+        status: 'approved',
+        approved_by: user.email,
         approved_at: new Date().toISOString(),
+        approved_by_role: profile.role,
       })
-      .eq('id', hour_id);
+      .eq('id', hour_id)
+      .eq('status', 'pending');
 
     if (error) {
       // Error: $1
@@ -103,7 +145,7 @@ async function _PUT(req: Request) {
     // Check if user is admin/sponsor/employer
     const { data: profile } = await db
       .from('user_profiles')
-      .select('role')
+      .select('role, employer_id')
       .eq('user_id', user.id)
       .single();
 
@@ -114,15 +156,43 @@ async function _PUT(req: Request) {
       );
     }
 
-    // Bulk approve
+    // If employer, verify all hours belong to their apprentices
+    if (profile.role === 'employer' && profile.employer_id) {
+      const { data: entries } = await db
+        .from('hour_entries')
+        .select('user_id')
+        .in('id', hour_ids);
+
+      if (entries) {
+        const studentIds = [...new Set(entries.map(e => e.user_id))];
+        const { data: studentProfiles } = await db
+          .from('user_profiles')
+          .select('user_id, employer_id')
+          .in('user_id', studentIds);
+
+        const unauthorized = studentProfiles?.filter(
+          sp => sp.employer_id !== profile.employer_id
+        );
+        if (unauthorized && unauthorized.length > 0) {
+          return NextResponse.json(
+            { error: 'Forbidden - can only approve hours for your own apprentices' },
+            { status: 403 }
+          );
+        }
+      }
+    }
+
+    // Bulk approve — only pending entries, trigger enforces attestation
     const { error } = await db
-      .from('apprenticeship_hours')
+      .from('hour_entries')
       .update({
-        approved: true,
-        approved_by: user.id,
+        status: 'approved',
+        approved_by: user.email,
         approved_at: new Date().toISOString(),
+        approved_by_role: profile.role,
       })
-      .in('id', hour_ids);
+      .in('id', hour_ids)
+      .eq('status', 'pending');
 
     if (error) {
       // Error: $1

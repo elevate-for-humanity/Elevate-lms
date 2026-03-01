@@ -2,6 +2,15 @@ import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { notFound, redirect } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+
+// Known course UUIDs → program slug for courses with dedicated pages.
+// These redirect immediately without querying Supabase.
+const COURSE_ID_TO_PROGRAM_SLUG: Record<string, string> = {
+  'f0593164-55be-5867-98e7-8a86770a8dd0': 'hvac-technician',
+};
 
 export async function generateMetadata({
   params,
@@ -9,11 +18,20 @@ export async function generateMetadata({
   params: Promise<{ courseId: string }>;
 }): Promise<Metadata> {
   const { courseId } = await params;
+
+  // Known courses redirect — metadata won't be used, but return something sensible
+  if (COURSE_ID_TO_PROGRAM_SLUG[courseId]) {
+    return {
+      title: 'Redirecting... | Elevate for Humanity',
+      description: 'Redirecting to course page.',
+    };
+  }
+
   const supabase = await createClient();
   const _admin = createAdminClient();
   const db = _admin || supabase;
 
-  if (!supabase) {
+  if (!db) {
     return {
       title: 'Course | Elevate for Humanity',
       description: 'Workforce training course at Elevate for Humanity.',
@@ -41,10 +59,6 @@ export async function generateMetadata({
     },
   };
 }
-
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import Image from 'next/image';
 import { Clock, Users, Award, BookOpen, Play, ChevronDown, Shield, Wrench } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -81,9 +95,22 @@ export default async function CourseDetailPage({
   params: Promise<{ courseId: string }>;
 }) {
   const { courseId } = await params;
+
+  // Redirect known courses to their dedicated program pages immediately,
+  // before any DB call. These courses have full local definitions and
+  // don't need Supabase data to render.
+  const knownSlug = COURSE_ID_TO_PROGRAM_SLUG[courseId];
+  if (knownSlug) {
+    redirect(`/programs/${knownSlug}/course`);
+  }
+
   const supabase = await createClient();
   const _admin = createAdminClient();
   const db = _admin || supabase;
+
+  if (!db) {
+    notFound();
+  }
 
   const { data: course, error } = await db
     .from('training_courses')

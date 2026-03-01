@@ -39,43 +39,53 @@ async function _GET(request: Request) {
       );
     }
 
-    // Get unapproved hours
-    // If employer, only show their students
-    // If admin/sponsor, show all
+    // Get pending hours from hour_entries
     const query = db
-      .from('apprenticeship_hours')
+      .from('hour_entries')
       .select(
         `
         id,
-        date_worked,
-        hours,
+        work_date,
+        hours_claimed,
         category,
-        approved,
+        source_type,
+        status,
         notes,
         created_at,
-        user_profiles!apprenticeship_hours_student_id_fkey(
-          first_name,
-          last_name,
-          email,
-          employer_id
-        )
+        user_id
       `
       )
-      .eq('approved', false)
-      .order('date_worked', { ascending: false });
+      .eq('status', 'pending')
+      .order('work_date', { ascending: false });
+
+    const { data: pendingHours } = await query;
+
+    // Enrich with user profile data
+    const userIds = [...new Set((pendingHours || []).map((h: any) => h.user_id).filter(Boolean))];
+    let profileMap: Record<string, any> = {};
+    if (userIds.length > 0) {
+      const { data: profiles } = await db
+        .from('user_profiles')
+        .select('user_id, first_name, last_name, email, employer_id')
+        .in('user_id', userIds);
+      for (const p of profiles || []) {
+        profileMap[p.user_id] = p;
+      }
+    }
+
+    let hours = (pendingHours || []).map((h: any) => ({
+      ...h,
+      user_profiles: profileMap[h.user_id] || null,
+    }));
 
     // Filter by employer if not admin
     if (profile.role === 'employer' && profile.employer_id) {
-      // This requires a join - we'll filter in JS for now
-      const { data: allHours } = await query;
-      const hours = allHours?.filter(
+      hours = hours.filter(
         (item: any) => item.user_profiles?.employer_id === profile.employer_id
       );
-      return NextResponse.json({ hours: hours || [] });
     }
 
-    const { data: hours } = await query;
-    return NextResponse.json({ hours: hours || [] });
+    return NextResponse.json({ hours });
   } catch (err: any) {
     // Error: $1
     return NextResponse.json(

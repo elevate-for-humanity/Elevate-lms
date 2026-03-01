@@ -65,12 +65,12 @@ async function _GET(request: NextRequest) {
         .eq('status', 'active')
         .maybeSingle(),
       
-      // Hours log
+      // Hours log from consolidated hour_entries
       db
-        .from('apprentice_hours_log')
-        .select('id, minutes, hour_type, funding_phase, status, logged_date, description, verified_by')
-        .eq('student_id', user.id)
-        .order('logged_date', { ascending: false })
+        .from('hour_entries')
+        .select('id, hours_claimed, accepted_hours, source_type, category, status, work_date, notes, approved_by')
+        .eq('user_id', user.id)
+        .order('work_date', { ascending: false })
         .limit(10),
       
       // Achievements

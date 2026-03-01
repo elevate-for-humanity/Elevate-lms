@@ -63,20 +63,18 @@ async function _POST(request: NextRequest) {
     }
 
     // Create hour entry from session
-    const hours = Math.floor(durationMinutes / 60);
-    const minutes = durationMinutes % 60;
+    const totalHours = Math.round((durationMinutes / 60) * 100) / 100;
 
     const { error: entryError } = await db
       .from('hour_entries')
       .insert({
-        apprentice_id: apprentice.id,
-        shop_id: session.shop_id,
-        date: checkinTime.toISOString().split('T')[0],
-        hours: hours,
-        minutes: minutes,
-        total_minutes: durationMinutes,
+        user_id: user.id,
+        source_type: 'timeclock',
+        work_date: checkinTime.toISOString().split('T')[0],
+        hours_claimed: totalHours,
         category: 'practical',
-        description: `Auto-logged from check-in session`,
+        notes: `Auto-logged from check-in session`,
+        entered_by_email: user.email || '',
         status: 'pending',
         checkin_session_id: session.id,
         submitted_at: checkoutTime.toISOString(),

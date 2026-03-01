@@ -40,27 +40,46 @@ async function _GET(req: Request) {
       );
     }
 
-    // Get all approved hours with student info
-    const { data: rows, error } = await db
-      .from('apprenticeship_hours')
+    // Get all approved hours from consolidated hour_entries
+    const { data: rawRows, error } = await db
+      .from('hour_entries')
       .select(
         `
-        student_id,
+        user_id,
         program_slug,
-        date_worked,
-        hours,
+        work_date,
+        hours_claimed,
+        accepted_hours,
+        source_type,
         category,
-        approved,
-        approved_at,
-        user_profiles!apprenticeship_hours_student_id_fkey(
-          first_name,
-          last_name,
-          email
-        )
+        status,
+        approved_at
       `
       )
-      .eq('approved', true)
-      .order('date_worked', { ascending: true });
+      .eq('status', 'approved')
+      .order('work_date', { ascending: true });
+
+    // Enrich with user profile data
+    const userIds = [...new Set((rawRows || []).map((h: any) => h.user_id).filter(Boolean))];
+    let profileMap: Record<string, any> = {};
+    if (userIds.length > 0) {
+      const { data: profiles } = await db
+        .from('user_profiles')
+        .select('user_id, first_name, last_name, email')
+        .in('user_id', userIds);
+      for (const p of profiles || []) {
+        profileMap[p.user_id] = p;
+      }
+    }
+
+    const rows = (rawRows || []).map((h: any) => ({
+      ...h,
+      student_id: h.user_id,
+      date_worked: h.work_date,
+      hours: Number(h.accepted_hours) || Number(h.hours_claimed) || 0,
+      approved: true,
+      user_profiles: profileMap[h.user_id] || null,
+    }));
 
     if (error) {
       // Error: $1

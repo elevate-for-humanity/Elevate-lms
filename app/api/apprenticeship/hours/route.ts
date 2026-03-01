@@ -37,20 +37,23 @@ async function _POST(req: Request) {
     }
 
     const { error } = await auditedMutation({
-      table: 'apprenticeship_hours',
+      table: 'hour_entries',
       operation: 'insert',
       rowData: {
-        student_id: user.id,
+        user_id: user.id,
         program_slug,
-        date_worked,
-        hours: parseFloat(hours),
+        work_date: date_worked,
+        hours_claimed: parseFloat(hours),
+        source_type: category === 'on-the-job' ? 'ojl' : 'rti',
         category,
         notes: notes || null,
+        entered_by_email: user.email || '',
+        status: 'pending',
       },
       audit: {
         action: 'api:post:/api/apprenticeship/hours',
         actorId: user.id,
-        targetType: 'apprenticeship_hours',
+        targetType: 'hour_entries',
         metadata: { program_slug, category, hours: parseFloat(hours) },
       },
     });
@@ -89,10 +92,10 @@ async function _GET(req: Request) {
     }
 
     const { data: hours, error } = await db
-      .from('apprenticeship_hours')
+      .from('hour_entries')
       .select('*')
-      .eq('student_id', user.id)
-      .order('date_worked', { ascending: false });
+      .eq('user_id', user.id)
+      .order('work_date', { ascending: false });
 
     if (error) {
       // Error: $1
@@ -104,19 +107,19 @@ async function _GET(req: Request) {
 
     // Calculate totals
     const totalHours =
-      hours?.reduce((sum, h) => sum + parseFloat(h.hours || 0), 0) || 0;
+      hours?.reduce((sum, h) => sum + (Number(h.hours_claimed) || 0), 0) || 0;
     const approvedHours =
       hours
-        ?.filter((h) => h.approved)
-        .reduce((sum, h) => sum + parseFloat(h.hours || 0), 0) || 0;
+        ?.filter((h) => h.status === 'approved')
+        .reduce((sum, h) => sum + (Number(h.accepted_hours) || Number(h.hours_claimed) || 0), 0) || 0;
     const classroomHours =
       hours
-        ?.filter((h) => h.category === 'classroom')
-        .reduce((sum, h) => sum + parseFloat(h.hours || 0), 0) || 0;
+        ?.filter((h) => h.source_type === 'rti')
+        .reduce((sum, h) => sum + (Number(h.hours_claimed) || 0), 0) || 0;
     const onTheJobHours =
       hours
-        ?.filter((h) => h.category === 'on-the-job')
-        .reduce((sum, h) => sum + parseFloat(h.hours || 0), 0) || 0;
+        ?.filter((h) => h.source_type === 'ojl')
+        .reduce((sum, h) => sum + (Number(h.hours_claimed) || 0), 0) || 0;
 
     return NextResponse.json({
       hours: hours || [],

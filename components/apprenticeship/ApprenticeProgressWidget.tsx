@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 interface HourSummary {
   total_rti_hours: number;
-  total_ojt_hours: number;
+  total_ojl_hours: number;
   total_hours: number;
   approved_hours: number;
   pending_hours: number;
@@ -16,7 +16,7 @@ interface HourSummary {
   remaining_hours: number;
   progress_percentage: number;
   wioa_rti_hours: number;
-  wioa_ojt_hours: number;
+  wioa_ojl_hours: number;
   rapids_status: string;
   rapids_id: string | null;
   milady_enrolled: boolean;
@@ -40,16 +40,16 @@ export function ApprenticeProgressWidget({
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<HourSummary>({
     total_rti_hours: 0,
-    total_ojt_hours: 0,
+    total_ojl_hours: 0,
     total_hours: 0,
     approved_hours: 0,
     pending_hours: 0,
     transfer_hours: 0,
-    required_hours: 1500,
-    remaining_hours: 1500,
+    required_hours: 0,
+    remaining_hours: 0,
     progress_percentage: 0,
     wioa_rti_hours: 0,
-    wioa_ojt_hours: 0,
+    wioa_ojl_hours: 0,
     rapids_status: 'pending',
     rapids_id: null,
     milady_enrolled: false,
@@ -150,14 +150,14 @@ export function ApprenticeProgressWidget({
             <div className="text-xs text-brand-blue-600">Milady coursework</div>
           </div>
 
-          {/* OJT Hours (Hands-on) */}
+          {/* OJL Hours (On-the-Job Learning) */}
           <div className="bg-brand-green-50 rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
               <Briefcase className="w-4 h-4 text-brand-green-600" />
-              <span className="text-xs font-semibold text-brand-green-800">OJT (Hands-on)</span>
+              <span className="text-xs font-semibold text-brand-green-800">OJL (Hands-on)</span>
             </div>
             <div className="text-xl font-bold text-brand-green-600">
-              {summary.total_ojt_hours.toFixed(1)}
+              {summary.total_ojl_hours.toFixed(1)}
             </div>
             <div className="text-xs text-brand-green-600">Shop training</div>
           </div>

@@ -46,46 +46,59 @@ export async function GET(req: NextRequest) {
     const weekStart = startDate || getWeekStart(today).toISOString().split('T')[0];
     const weekEnd = endDate || getWeekEnd(today).toISOString().split('T')[0];
 
-    // Build query for apprenticeship hours
+    // Build query for consolidated hour_entries
     let query = db
-      .from('apprenticeship_hours')
+      .from('hour_entries')
       .select(`
         id,
-        student_id,
-        shop_id,
-        date,
-        hours_worked,
-        description,
-        approved,
+        user_id,
+        work_date,
+        hours_claimed,
+        accepted_hours,
+        notes,
+        status,
+        source_type,
         approved_by,
         approved_at,
-        created_at,
-        student:profiles!student_id (
-          full_name,
-          email
-        ),
-        shop:shops (
-          name,
-          license_number
-        ),
-        approver:profiles!approved_by (
-          full_name
-        )
+        created_at
       `)
-      .gte('date', weekStart)
-      .lte('date', weekEnd)
-      .order('date', { ascending: true })
-      .order('student_id', { ascending: true });
+      .gte('work_date', weekStart)
+      .lte('work_date', weekEnd)
+      .order('work_date', { ascending: true })
+      .order('user_id', { ascending: true });
 
     // Apply filters
-    if (shopId) {
-      query = query.eq('shop_id', shopId);
-    }
     if (studentId) {
-      query = query.eq('student_id', studentId);
+      query = query.eq('user_id', studentId);
     }
 
-    const { data: hours, error } = await query;
+    const { data: rawHours, error } = await query;
+
+    // Enrich with profile data
+    const userIds = [...new Set((rawHours || []).map((h: any) => h.user_id).filter(Boolean))];
+    let profileMap: Record<string, any> = {};
+    if (userIds.length > 0) {
+      const { data: profiles } = await db
+        .from('profiles')
+        .select('id, full_name, email')
+        .in('id', userIds);
+      for (const p of profiles || []) {
+        profileMap[p.id] = p;
+      }
+    }
+
+    // Map to expected shape for CSV/JSON generation
+    const hours = (rawHours || []).map((h: any) => ({
+      ...h,
+      // Compat aliases
+      date: h.work_date,
+      hours_worked: Number(h.accepted_hours) || Number(h.hours_claimed) || 0,
+      description: h.notes,
+      approved: h.status === 'approved',
+      student: profileMap[h.user_id] || null,
+      shop: null,
+      approver: h.approved_by ? { full_name: h.approved_by } : null,
+    }));
 
     if (error) {
       // Error: $1

@@ -54,8 +54,9 @@ async function _POST(request: Request) {
         studentEmail = envelopeData.to?.find((e: string) => 
           !e.includes('elevate') && !e.includes('milady')
         );
-      } catch (err) { /* Parse error ignored */ }
-          logger.error("Unhandled error", err instanceof Error ? err : undefined);
+      } catch (err) {
+          logger.error("[milady-email] Envelope parse error", err instanceof Error ? err : undefined);
+        }
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);

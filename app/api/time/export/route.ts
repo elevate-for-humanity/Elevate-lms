@@ -10,7 +10,7 @@ import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-function csvEscape(data: any) {
+function csvEscape(v: any) {
   const s = String(v ?? '');
   if (/[,"\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
   return s;
@@ -50,37 +50,35 @@ const supabase = await createClient();
 
   const holderIds = programHolders.map((ph) => ph.id);
 
+  // Query consolidated hour_entries
   let q = db
-    .from('apprentice_hours_log')
+    .from('hour_entries')
     .select(
       `
       id,
-      enrollment_id,
-      log_date,
-      start_at,
-      end_at,
-      minutes,
-      hour_type,
-      funding_phase,
+      user_id,
+      work_date,
+      hours_claimed,
+      accepted_hours,
+      source_type,
+      category,
       status,
-      milady_module_ref,
-      activity_note,
-      student_enrollments!inner(
-        student_id,
-        student_profile:profiles!student_id(
-          full_name
-        )
-      )
+      notes,
+      entered_by_email,
+      entered_at,
+      approved_by,
+      approved_at
     `
     )
-    .in('program_holder_id', holderIds)
-    .eq('status', status)
-    .order('log_date', { ascending: false });
+    .eq('status', status.toLowerCase())
+    .order('work_date', { ascending: false });
 
-  if (funding_phase) q = q.eq('funding_phase', funding_phase);
-  if (hour_type) q = q.eq('hour_type', hour_type);
-  if (from) q = q.gte('log_date', from);
-  if (to) q = q.lte('log_date', to);
+  if (hour_type) {
+    const mapped = hour_type === 'RTI' ? 'rti' : hour_type === 'OJT' ? 'ojt' : hour_type.toLowerCase();
+    q = q.eq('source_type', mapped);
+  }
+  if (from) q = q.gte('work_date', from);
+  if (to) q = q.lte('work_date', to);
 
   const { data, error } = await q;
   if (error)
@@ -88,37 +86,44 @@ const supabase = await createClient();
 
   const rows = data ?? [];
 
+  // Enrich with user names
+  const userIds = [...new Set(rows.map((r: any) => r.user_id).filter(Boolean))];
+  let profileMap: Record<string, string> = {};
+  if (userIds.length > 0) {
+    const { data: profiles } = await db
+      .from('profiles')
+      .select('id, full_name')
+      .in('id', userIds);
+    for (const p of profiles || []) {
+      profileMap[p.id] = p.full_name || '';
+    }
+  }
+
   const header = [
     'apprentice_name',
-    'enrollment_id',
+    'user_id',
     'entry_date',
-    'start_at',
-    'end_at',
-    'minutes',
     'hours',
-    'hour_type',
-    'funding_phase',
+    'source_type',
+    'category',
     'status',
-    'milady_module_ref',
-    'activity_note',
+    'notes',
+    'approved_by',
   ];
 
   const lines = [
     header.join(','),
-    ...rows.map((item: any) =>
+    ...rows.map((r: any) =>
       [
-        r.student_enrollments?.student_profile?.full_name ?? '',
-        r.enrollment_id,
-        r.log_date,
-        r.start_at,
-        r.end_at,
-        r.minutes,
-        (r.minutes / 60).toFixed(2),
-        r.hour_type,
-        r.funding_phase,
+        profileMap[r.user_id] ?? '',
+        r.user_id,
+        r.work_date,
+        Number(r.accepted_hours) || Number(r.hours_claimed) || 0,
+        r.source_type,
+        r.category ?? '',
         r.status,
-        r.milady_module_ref ?? '',
-        r.activity_note ?? '',
+        r.notes ?? '',
+        r.approved_by ?? '',
       ]
         .map(csvEscape)
         .join(',')

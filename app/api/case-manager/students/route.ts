@@ -77,18 +77,18 @@ async function _GET(request: Request) {
           )
           .eq('student_id', student.user_id);
 
-        // Get hours summary
+        // Get hours summary from consolidated hour_entries
         const { data: hours } = await db
-          .from('apprenticeship_hours')
-          .select('hours, approved')
-          .eq('student_id', student.user_id);
+          .from('hour_entries')
+          .select('hours_claimed, accepted_hours, status')
+          .eq('user_id', student.user_id);
 
         const totalHours =
-          hours?.reduce((sum, h) => sum + parseFloat(h.hours || 0), 0) || 0;
+          hours?.reduce((sum, h) => sum + (Number(h.hours_claimed) || 0), 0) || 0;
         const approvedHours =
           hours
-            ?.filter((h) => h.approved)
-            .reduce((sum, h) => sum + parseFloat(h.hours || 0), 0) || 0;
+            ?.filter((h) => h.status === 'approved')
+            .reduce((sum, h) => sum + (Number(h.accepted_hours) || Number(h.hours_claimed) || 0), 0) || 0;
 
         // Get exam readiness
         const { data: readiness } = await db

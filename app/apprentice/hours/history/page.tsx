@@ -37,18 +37,18 @@ export default async function HoursHistoryPage() {
     .eq('status', 'active')
     .single();
 
-  // Fetch hours log
+  // Fetch hours log from consolidated hour_entries
   const { data: hoursLog } = await db
-    .from('apprenticeship_hours')
+    .from('hour_entries')
     .select('*')
-    .eq('enrollment_id', enrollment?.id)
-    .order('date', { ascending: false })
+    .eq('user_id', user.id)
+    .order('work_date', { ascending: false })
     .limit(50);
 
   // Calculate totals
-  const totalHours = hoursLog?.reduce((sum, h) => sum + (h.hours || 0), 0) || 0;
-  const approvedHours = hoursLog?.filter(h => h.status === 'approved').reduce((sum, h) => sum + (h.hours || 0), 0) || 0;
-  const pendingHours = hoursLog?.filter(h => h.status === 'pending').reduce((sum, h) => sum + (h.hours || 0), 0) || 0;
+  const totalHours = hoursLog?.reduce((sum, h) => sum + (Number(h.hours_claimed) || 0), 0) || 0;
+  const approvedHours = hoursLog?.filter(h => h.status === 'approved').reduce((sum, h) => sum + (Number(h.accepted_hours) || Number(h.hours_claimed) || 0), 0) || 0;
+  const pendingHours = hoursLog?.filter(h => h.status === 'pending').reduce((sum, h) => sum + (Number(h.hours_claimed) || 0), 0) || 0;
   const targetHours = enrollment?.target_hours || 2000;
   const progressPercent = Math.round((approvedHours / targetHours) * 100);
 
@@ -137,11 +137,11 @@ export default async function HoursHistoryPage() {
                 hoursLog.map((entry: any) => (
                   <tr key={entry.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm">
-                      {new Date(entry.date).toLocaleDateString()}
+                      {new Date(entry.work_date).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-3 text-sm font-medium">{entry.hours}h</td>
-                    <td className="px-4 py-3 text-sm">{entry.type || 'On-the-job'}</td>
-                    <td className="px-4 py-3 text-sm">{entry.supervisor_name || 'N/A'}</td>
+                    <td className="px-4 py-3 text-sm font-medium">{entry.hours_claimed}h</td>
+                    <td className="px-4 py-3 text-sm">{entry.source_type?.toUpperCase() || 'OJT'}</td>
+                    <td className="px-4 py-3 text-sm">{entry.approved_by || 'N/A'}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
                         entry.status === 'approved' ? 'bg-brand-green-100 text-brand-green-700' :

@@ -32,17 +32,16 @@ async function _GET(request: NextRequest) {
   }
 
   const query = db
-    .from('training_hours')
-    .select('*, profiles(full_name, email)')
-    .eq('organization_id', partnerUser.organization_id);
+    .from('hour_entries')
+    .select('*')
+    .order('work_date', { ascending: false })
+    .limit(100);
 
   if (status) {
     query.eq('status', status);
   }
 
-  const { data: hours, error } = await query
-    .order('date', { ascending: false })
-    .limit(100);
+  const { data: hours, error } = await query;
 
   if (error) {
     return NextResponse.json({ error: 'Failed to fetch hours' }, { status: 500 });
@@ -78,22 +77,21 @@ async function _POST(request: NextRequest) {
   }
 
   const { data, error } = await auditedMutation({
-    table: 'training_hours',
+    table: 'hour_entries',
     operation: 'insert',
     rowData: {
-      organization_id: partnerUser.organization_id,
-      apprentice_id: body.apprentice_id,
-      date: body.date,
-      hours: body.hours,
-      description: body.description,
-      activity_type: body.activity_type || 'training',
+      user_id: body.apprentice_id,
+      source_type: body.activity_type === 'ojt' ? 'ojl' : 'rti',
+      work_date: body.date,
+      hours_claimed: body.hours,
+      notes: body.description || null,
+      entered_by_email: user.email || '',
       status: 'pending',
-      submitted_by: user.id,
     },
     audit: {
       action: 'api:post:/api/partner/hours',
       actorId: user.id,
-      targetType: 'training_hours',
+      targetType: 'hour_entries',
       metadata: {
         organization_id: partnerUser.organization_id,
         apprentice_id: body.apprentice_id,

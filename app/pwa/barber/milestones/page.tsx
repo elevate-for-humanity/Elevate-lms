@@ -46,10 +46,10 @@ export default function MilestonesPage() {
 
         const [msRes, hoursRes] = await Promise.all([
           supabase.from('apprentice_milestones').select('*').eq('user_id', user.id).order('sort_order', { ascending: true }),
-          supabase.from('hour_entries').select('hours').eq('user_id', user.id).eq('status', 'approved'),
+          supabase.from('hour_entries').select('hours_claimed, accepted_hours').eq('user_id', user.id).eq('status', 'approved'),
         ]);
 
-        const total = (hoursRes.data || []).reduce((sum, h) => sum + (Number(h.hours) || 0), 0);
+        const total = (hoursRes.data || []).reduce((sum, h) => sum + (Number(h.accepted_hours) || Number(h.hours_claimed) || 0), 0);
         setMilestones(msRes.data || []);
         setTotalHours(Math.round(total));
       } catch {

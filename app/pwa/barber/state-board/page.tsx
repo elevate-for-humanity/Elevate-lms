@@ -61,13 +61,13 @@ export default function StateBoardPrepPage() {
           supabase.from('practice_tests').select('*').eq('is_active', true).order('created_at'),
           supabase.from('practice_test_attempts').select('test_id, score, passed, completed_at').eq('user_id', user.id),
           supabase.from('study_topics').select('*').eq('is_active', true).order('sort_order'),
-          supabase.from('hour_entries').select('hours').eq('user_id', user.id).eq('status', 'approved'),
+          supabase.from('hour_entries').select('hours_claimed, accepted_hours').eq('user_id', user.id).eq('status', 'approved'),
         ]);
 
         setTests(testsRes.data || []);
         setAttempts(attemptsRes.data || []);
         setTopics(topicsRes.data || []);
-        setTotalHours((hoursRes.data || []).reduce((sum, h) => sum + (Number(h.hours) || 0), 0));
+        setTotalHours((hoursRes.data || []).reduce((sum, h) => sum + (Number(h.accepted_hours) || Number(h.hours_claimed) || 0), 0));
       } catch {
         // Fail gracefully — show empty state
       } finally {

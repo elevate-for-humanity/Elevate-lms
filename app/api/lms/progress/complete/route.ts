@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { checkCourseCompletion } from '@/lib/course-completion';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -14,7 +15,14 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 /**
  * Mark course as completed
  * POST /api/lms/progress/complete
- * Accepts both JSON and FormData
+ *
+ * Completion requires:
+ * 1. All internal lessons completed
+ * 2. All required external modules completed
+ * 3. All quiz-type lessons passed (score >= 70%)
+ *
+ * Certificate issuance includes quiz scores, exam session linkage,
+ * and seat time in the credential metadata.
  */
 async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'contact');
@@ -54,10 +62,49 @@ async function _POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing courseId' }, { status: 400 });
     }
 
+    // ── COMPLETION GATE ──────────────────────────────────────────────
+    // Verify all course requirements are met before allowing completion.
+    // This prevents certificates from being issued without demonstrated
+    // competency (lessons, quizzes, external modules).
+
+    const completionStatus = await checkCourseCompletion(user.id, courseId);
+
+    if (!completionStatus.isComplete) {
+      return NextResponse.json({
+        error: 'Course requirements not met',
+        missingRequirements: completionStatus.missingRequirements,
+        progress: {
+          internalLessons: `${completionStatus.completedInternalLessons}/${completionStatus.totalInternalLessons}`,
+          externalModules: `${completionStatus.completedExternalModules}/${completionStatus.totalExternalModules}`,
+        },
+      }, { status: 403 });
+    }
+
+    // ── QUIZ PASS VERIFICATION ───────────────────────────────────────
+    // All quiz-type lessons must have a passing attempt (score >= 70%).
+    // This is checked separately from lesson completion because a student
+    // can "complete" a quiz lesson without passing it.
+
+    const quizCheck = await verifyQuizzesPassed(db, user.id, courseId);
+    if (!quizCheck.allPassed) {
+      return NextResponse.json({
+        error: 'Not all required quizzes have been passed',
+        failedQuizzes: quizCheck.failedQuizzes,
+        message: 'A passing score of 70% or higher is required on all quizzes before course completion.',
+      }, { status: 403 });
+    }
+
+    // ── GATHER COMPETENCY EVIDENCE ───────────────────────────────────
+    // Collect quiz scores, seat time, and exam session data for the
+    // certificate metadata. This creates an auditable credential record.
+
+    const seatTime = await getSeatTimeHours(db, user.id, courseId);
+    const examSession = await getLatestExamSession(db, user.id, courseId);
+
     // Get course details
     const { data: course } = await db
       .from('training_courses')
-      .select('slug')
+      .select('slug, title, metadata')
       .eq('id', courseId)
       .single();
 
@@ -89,40 +136,23 @@ async function _POST(req: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    // Get course details
-    const { data: courseDetails } = await db
-      .from('training_courses')
-      .select('title, metadata')
-      .eq('id', courseId)
-      .single();
-
     // Award points for course completion (100 points per course)
     try {
-      const { error: pointsError } = await db
+      const { data: currentProfile } = await db
         .from('profiles')
-        .update({ 
-          points: supabase.rpc('coalesce_add', { current_val: 'points', add_val: 100 })
-        })
+        .select('points')
+        .eq('id', user.id)
+        .single();
+
+      await db
+        .from('profiles')
+        .update({ points: (currentProfile?.points || 0) + 100 })
         .eq('id', user.id);
-      
-      // Fallback: direct increment if RPC doesn't exist
-      if (pointsError) {
-        const { data: currentProfile } = await db
-          .from('profiles')
-          .select('points')
-          .eq('id', user.id)
-          .single();
-        
-        await db
-          .from('profiles')
-          .update({ points: (currentProfile?.points || 0) + 100 })
-          .eq('id', user.id);
-      }
     } catch (pointsErr) {
       logger.error("Points award failed", pointsErr instanceof Error ? pointsErr : undefined);
     }
 
-    // Generate certificate via canonical service
+    // Generate certificate with competency evidence
     try {
       const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
       await issueCertificate({
@@ -131,7 +161,21 @@ async function _POST(req: NextRequest) {
         courseId,
         studentName: profile?.full_name || 'Student',
         studentEmail: profile?.email || user.email || undefined,
-        courseTitle: courseDetails?.title || 'Course Completion',
+        courseTitle: course?.title || 'Course Completion',
+        programHours: seatTime.totalHours || null,
+        competencyEvidence: {
+          quizScores: quizCheck.scores,
+          seatTimeHours: seatTime.totalHours,
+          seatTimeSeconds: seatTime.totalSeconds,
+          examSessionId: examSession?.id || null,
+          examProvider: examSession?.provider || null,
+          examResult: examSession?.result || null,
+          examScore: examSession?.score || null,
+          examProctorId: examSession?.proctor_id || null,
+          examDate: examSession?.completed_at || null,
+          completionVerifiedAt: new Date().toISOString(),
+          completionMethod: 'competency_verified',
+        },
       });
     } catch (certError) {
       logger.error("Certificate generation failed", certError instanceof Error ? certError : undefined);
@@ -150,12 +194,107 @@ async function _POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json(
-      {
-        error:
-          'Internal server error',
-      },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
+
+// ── HELPER: Verify all quiz-type lessons have a passing attempt ────────
+async function verifyQuizzesPassed(
+  db: any,
+  userId: string,
+  courseId: string
+): Promise<{ allPassed: boolean; failedQuizzes: string[]; scores: Record<string, number> }> {
+  // Get all quiz-type lessons for this course
+  const { data: quizLessons } = await db
+    .from('training_lessons')
+    .select('id, title')
+    .eq('course_id', courseId)
+    .eq('type', 'quiz');
+
+  if (!quizLessons || quizLessons.length === 0) {
+    return { allPassed: true, failedQuizzes: [], scores: {} };
+  }
+
+  const failedQuizzes: string[] = [];
+  const scores: Record<string, number> = {};
+
+  for (const quiz of quizLessons) {
+    // Check for a passing attempt (score >= 70)
+    const { data: bestAttempt } = await db
+      .from('quiz_attempts')
+      .select('score, passed')
+      .eq('user_uuid', userId)
+      .eq('quiz_id', quiz.id)
+      .eq('passed', true)
+      .order('score', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (bestAttempt) {
+      scores[quiz.title] = Number(bestAttempt.score);
+    } else {
+      failedQuizzes.push(quiz.title);
+    }
+  }
+
+  return {
+    allPassed: failedQuizzes.length === 0,
+    failedQuizzes,
+    scores,
+  };
+}
+
+// ── HELPER: Get accumulated seat time for the course ──────────────────
+async function getSeatTimeHours(
+  db: any,
+  userId: string,
+  courseId: string
+): Promise<{ totalSeconds: number; totalHours: number }> {
+  const { data } = await db
+    .from('lesson_progress')
+    .select('time_spent_seconds')
+    .eq('user_id', userId)
+    .eq('course_id', courseId);
+
+  const totalSeconds = (data || []).reduce(
+    (sum: number, row: any) => sum + (row.time_spent_seconds || 0),
+    0
+  );
+
+  return {
+    totalSeconds,
+    totalHours: Math.round((totalSeconds / 3600) * 10) / 10,
+  };
+}
+
+// ── HELPER: Get latest exam session for this student + course ─────────
+async function getLatestExamSession(
+  db: any,
+  userId: string,
+  courseId: string
+): Promise<any | null> {
+  // Look up the course slug to match against exam_sessions.program_slug
+  const { data: course } = await db
+    .from('training_courses')
+    .select('slug')
+    .eq('id', courseId)
+    .single();
+
+  if (!course?.slug) return null;
+
+  const { data: session } = await db
+    .from('exam_sessions')
+    .select('id, provider, result, score, proctor_id, proctor_name, completed_at')
+    .eq('student_id', userId)
+    .eq('program_slug', course.slug)
+    .eq('result', 'pass')
+    .order('completed_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  return session;
+}
+
 export const POST = withApiAudit('/api/lms/progress/complete', _POST);

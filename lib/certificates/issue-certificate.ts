@@ -13,6 +13,20 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
+export interface CompetencyEvidence {
+  quizScores?: Record<string, number>;
+  seatTimeHours?: number;
+  seatTimeSeconds?: number;
+  examSessionId?: string | null;
+  examProvider?: string | null;
+  examResult?: string | null;
+  examScore?: number | null;
+  examProctorId?: string | null;
+  examDate?: string | null;
+  completionVerifiedAt?: string;
+  completionMethod?: string;
+}
+
 export interface IssueCertificateParams {
   supabase: SupabaseClient;
   enrollmentId?: string;
@@ -24,6 +38,7 @@ export interface IssueCertificateParams {
   courseTitle?: string;
   programName?: string;
   programHours?: number | null;
+  competencyEvidence?: CompetencyEvidence;
 }
 
 export interface IssueCertificateResult {
@@ -107,7 +122,35 @@ export async function issueCertificate(
     // Table columns: id, user_id, course_id, enrollment_id, certificate_number,
     // issued_at, expires_at, pdf_url, verification_url, metadata, created_at,
     // tenant_id, student_id, verification_code, course_title, program_name,
-    // hours_completed, issued_date
+    // Build metadata with competency evidence when available
+    const certMetadata: Record<string, any> = {
+      issued_via: 'canonical_issue_certificate',
+      student_name: studentName,
+      completion_date: completionDate,
+      completion_method: competencyEvidence?.completionMethod || 'legacy_completion',
+    };
+
+    if (competencyEvidence) {
+      if (competencyEvidence.quizScores && Object.keys(competencyEvidence.quizScores).length > 0) {
+        certMetadata.quiz_scores = competencyEvidence.quizScores;
+      }
+      if (competencyEvidence.seatTimeHours != null) {
+        certMetadata.seat_time_hours = competencyEvidence.seatTimeHours;
+        certMetadata.seat_time_seconds = competencyEvidence.seatTimeSeconds;
+      }
+      if (competencyEvidence.examSessionId) {
+        certMetadata.exam_session_id = competencyEvidence.examSessionId;
+        certMetadata.exam_provider = competencyEvidence.examProvider;
+        certMetadata.exam_result = competencyEvidence.examResult;
+        certMetadata.exam_score = competencyEvidence.examScore;
+        certMetadata.exam_proctor_id = competencyEvidence.examProctorId;
+        certMetadata.exam_date = competencyEvidence.examDate;
+      }
+      if (competencyEvidence.completionVerifiedAt) {
+        certMetadata.completion_verified_at = competencyEvidence.completionVerifiedAt;
+      }
+    }
+
     const { data: certificate, error: certError } = await supabase
       .from('certificates')
       .insert({
@@ -119,15 +162,12 @@ export async function issueCertificate(
         course_title: courseTitle || null,
         program_name: programName || null,
         issued_date: completionDate.split('T')[0],
-        hours_completed: programHours || null,
+        hours_completed: competencyEvidence?.seatTimeHours || programHours || null,
         issued_at: completionDate,
+        exam_session_id: competencyEvidence?.examSessionId || null,
         verification_code: certificateNumber.split('-').pop(),
         verification_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/verify/${certificateNumber.split('-').pop()?.toLowerCase()}`,
-        metadata: {
-          issued_via: 'canonical_issue_certificate',
-          student_name: studentName,
-          completion_date: completionDate,
-        },
+        metadata: certMetadata,
       })
       .select()
       .single();

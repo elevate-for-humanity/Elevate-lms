@@ -17,10 +17,14 @@ export interface CourseCompletionStatus {
   isComplete: boolean;
   internalLessonsComplete: boolean;
   externalModulesComplete: boolean;
+  quizzesPassed: boolean;
   totalInternalLessons: number;
   completedInternalLessons: number;
   totalExternalModules: number;
   completedExternalModules: number;
+  totalQuizzes: number;
+  passedQuizzes: number;
+  failedQuizTitles: string[];
   missingRequirements: string[];
 }
 
@@ -36,10 +40,14 @@ export async function checkCourseCompletion(
     isComplete: false,
     internalLessonsComplete: false,
     externalModulesComplete: false,
+    quizzesPassed: false,
     totalInternalLessons: 0,
     completedInternalLessons: 0,
     totalExternalModules: 0,
     completedExternalModules: 0,
+    totalQuizzes: 0,
+    passedQuizzes: 0,
+    failedQuizTitles: [],
     missingRequirements: [],
   };
 
@@ -67,9 +75,23 @@ export async function checkCourseCompletion(
     );
   }
 
-  // Course is complete if both internal and external are complete
+  // Check quiz pass requirements (score >= 70% on all quiz-type lessons)
+  const quizStatus = await checkQuizzesPassed(userId, courseId);
+  status.quizzesPassed = quizStatus.allPassed;
+  status.totalQuizzes = quizStatus.total;
+  status.passedQuizzes = quizStatus.passed;
+  status.failedQuizTitles = quizStatus.failedTitles;
+  if (!quizStatus.allPassed && quizStatus.total > 0) {
+    status.missingRequirements.push(
+      `${quizStatus.failedTitles.length} quiz(zes) not yet passed: ${quizStatus.failedTitles.join(', ')}`
+    );
+  }
+
+  // Course is complete only if ALL three gates pass
   status.isComplete =
-    status.internalLessonsComplete && status.externalModulesComplete;
+    status.internalLessonsComplete &&
+    status.externalModulesComplete &&
+    status.quizzesPassed;
 
   return status;
 }
@@ -151,6 +173,57 @@ async function checkExternalModules(
     total: requiredModules.length,
     completed: completedModuleIds.size,
     missingModules,
+  };
+}
+
+async function checkQuizzesPassed(
+  userId: string,
+  courseId: string
+): Promise<{
+  allPassed: boolean;
+  total: number;
+  passed: number;
+  failedTitles: string[];
+}> {
+  const supabase = getSupabaseAdmin();
+
+  // Get all quiz-type lessons for this course
+  const { data: quizLessons } = await supabase
+    .from('training_lessons')
+    .select('id, title')
+    .eq('course_id', courseId)
+    .eq('type', 'quiz');
+
+  if (!quizLessons || quizLessons.length === 0) {
+    return { allPassed: true, total: 0, passed: 0, failedTitles: [] };
+  }
+
+  const failedTitles: string[] = [];
+  let passed = 0;
+
+  for (const quiz of quizLessons) {
+    // Check for any passing attempt (score >= 70)
+    const { data: bestAttempt } = await supabase
+      .from('quiz_attempts')
+      .select('score, passed')
+      .eq('user_uuid', userId)
+      .eq('quiz_id', quiz.id)
+      .eq('passed', true)
+      .limit(1)
+      .maybeSingle();
+
+    if (bestAttempt) {
+      passed++;
+    } else {
+      failedTitles.push(quiz.title);
+    }
+  }
+
+  return {
+    allPassed: failedTitles.length === 0,
+    total: quizLessons.length,
+    passed,
+    failedTitles,
   };
 }
 

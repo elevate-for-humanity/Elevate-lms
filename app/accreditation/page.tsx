@@ -54,7 +54,7 @@ export default function AccreditationPage() {
     {
       name: 'EPA Section 608 Approved Testing Site',
       description:
-        'Authorized to administer proctored EPA Section 608 refrigerant handling certification examinations on-site.',
+        'Authorized to administer proctored EPA Section 608 refrigerant handling certification examinations on-site through EPA-approved certifying organizations (ESCO Institute and Mainstream Engineering).',
       icon: Shield,
     },
     {

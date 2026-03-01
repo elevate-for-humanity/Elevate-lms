@@ -31,7 +31,7 @@ const config: ProgramPageConfig = {
 
   title: 'Construction Trades Certification Pathway',
   subtitle:
-    'Earn OSHA 30, EPA 608, Forklift, and CPR/First Aid in 11 weeks. Evening and weekend classes designed for working adults. Bilingual instruction available.',
+    'Prepare for OSHA 30, EPA 608 Universal, Forklift, and CPR/First Aid certification in 11 weeks. Evening and weekend classes designed for working adults. Bilingual instruction available.',
   badge: 'Custom Cohort Available',
   badgeColor: 'orange',
 
@@ -68,7 +68,7 @@ const config: ProgramPageConfig = {
   pricingIncludes: [
     'All instructional hours (130 hours)',
     'OSHA 30-Hour certification exam + DOL card',
-    'EPA 608 Universal exam fee (Mainstream Engineering)',
+    'EPA 608 Universal exam fee (ESCO Institute or Mainstream Engineering)',
     'Forklift operator certification',
     'CPR/First Aid certification (AHA/HSI)',
     'PPE, tools, and training materials',
@@ -82,7 +82,7 @@ const config: ProgramPageConfig = {
 
   highlights: [
     'OSHA 30-Hour Construction Safety — the industry standard, not just OSHA 10',
-    'EPA 608 Universal — federal certification for refrigerant handling, proctored on-site',
+    'EPA 608 Universal exam — federal certification for refrigerant handling, administered on-site through EPA-approved certifying organizations',
     'Forklift Operator Certification — practical evaluation at employer partner site',
     'HVAC fundamentals — refrigeration theory, system components, electrical basics',
     'Building systems — electrical, plumbing, and maintenance theory with blueprint reading',
@@ -163,7 +163,7 @@ const config: ProgramPageConfig = {
 
   credentials: [
     'OSHA 30-Hour Construction Safety (DOL card)',
-    'EPA 608 Universal Certification (Mainstream Engineering, proctored on-site)',
+    'EPA 608 Universal Certification (administered on-site via ESCO Institute or Mainstream Engineering)',
     'Forklift Operator Certification (OSHA-compliant)',
     'CPR/First Aid (AHA/HSI issued)',
     'Elevate Certificate of Completion — Construction Trades & Building Technology',
@@ -194,7 +194,7 @@ const config: ProgramPageConfig = {
     {
       question: 'What credentials will participants earn?',
       answer:
-        'Participants earn 5 credentials: OSHA 30-Hour Construction Safety (DOL card), EPA 608 Universal (federal certification), Forklift Operator Certification, CPR/First Aid, and an Elevate Certificate of Completion in Construction Trades & Building Technology.',
+        'Participants complete training and sit for 5 credential exams: OSHA 30-Hour Construction Safety (DOL card), EPA 608 Universal (administered through EPA-approved certifying organizations), Forklift Operator Certification, CPR/First Aid, and an Elevate Certificate of Completion in Construction Trades & Building Technology. Certifications are issued by the respective certifying bodies, not by Elevate.',
     },
     {
       question: 'Is bilingual instruction available?',

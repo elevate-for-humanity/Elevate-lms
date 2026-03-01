@@ -41,7 +41,7 @@ export default async function OrientationPage() {
       'Your program is 15 weeks (375 hours) combining online coursework and hands-on training.',
       'Related Technical Instruction (RTI) is delivered through the Elevate LMS.',
       'On-the-Job Training (OJT) is completed at employer partner sites.',
-      'You will earn industry-recognized credentials including EPA 608 and OSHA certifications.',
+      'You will prepare for and sit for industry-recognized credential exams including EPA 608 and OSHA certifications, administered through their respective certifying organizations.',
     ]},
     { title: 'Attendance & Expectations', icon: Clock, items: [
       'Attendance is tracked daily. Two consecutive unexcused absences trigger an intervention.',

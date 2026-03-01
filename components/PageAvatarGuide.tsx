@@ -254,7 +254,7 @@ export const AVATAR_CONFIGS: Record<string, {
   courseHVAC: {
     avatarName: 'James',
     avatarRole: 'HVAC Instructor',
-    welcomeMessage: "Welcome to HVAC Training! I'm James. You'll learn heating, cooling, refrigeration, and get EPA 608 certified. Ready to start?",
+    welcomeMessage: "Welcome to HVAC Training! I'm James. You'll learn heating, cooling, refrigeration, and prepare for your EPA 608 certification exam. Ready to start?",
     context: 'trades',
     videoFile: '/videos/avatars/hvac-course.mp4',
   },

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 const config: ProgramPageConfig = {
   videoSrc: '/videos/hvac-technician.mp4', voiceoverSrc: '/audio/heroes/skilled-trades.mp3',
-  title: 'HVAC Technician', subtitle: 'Install, maintain, and repair heating and cooling systems. Earn EPA 608 and OSHA 30 in 15 weeks.',
+  title: 'HVAC Technician', subtitle: 'Install, maintain, and repair heating and cooling systems. Prepare for EPA 608 Universal and OSHA 30 certification in 15 weeks.',
   badge: 'Funding Available', badgeColor: 'orange',
   duration: '15 weeks', cost: '$0 with WIOA funding', format: 'Hybrid — In-person + LMS', credential: 'EPA 608 Universal + OSHA 30',
 
@@ -40,10 +40,10 @@ const config: ProgramPageConfig = {
   employerPartners: ['2 HVAC employer partners (onboarding)', 'Jesse J. Wilkerson & Associates — Construction'],
   selfPayCost: '$5,000',
   cohortPricing: 'Contact us for organizational/cohort pricing',
-  pricingIncludes: ['300 instructional hours', 'EPA 608 Universal exam fee', 'OSHA 30-Hour certification', 'CPR/First Aid certification', 'All PPE, tools, and materials', 'LMS access', 'Career placement support'],
+  pricingIncludes: ['300 instructional hours', 'EPA 608 Universal exam fee (ESCO or Mainstream Engineering)', 'OSHA 30-Hour certification', 'CPR/First Aid certification', 'All PPE, tools, and materials', 'LMS access', 'Career placement support'],
   paymentTerms: 'WIOA, Next Level Jobs, and WRG funding accepted. Payment plans available for self-pay students.',
-  overview: 'This 15-week program covers residential and light commercial HVAC systems. You will learn refrigeration theory, electrical fundamentals, system installation, troubleshooting, and preventive maintenance. Training includes hands-on work with real HVAC equipment. Graduates earn EPA 608 Universal, OSHA 30, and additional industry credentials.',
-  highlights: ['Refrigeration theory and the refrigeration cycle', 'Electrical fundamentals for HVAC', 'System installation and startup', 'Troubleshooting and diagnostics', 'EPA 608 Universal certification', 'OSHA 30-Hour Construction Safety'],
+  overview: 'This 15-week program covers residential and light commercial HVAC systems. You will learn refrigeration theory, electrical fundamentals, system installation, troubleshooting, and preventive maintenance. Training includes hands-on work with real HVAC equipment. The program includes EPA 608 Universal exam preparation and on-site proctored exam administration through EPA-approved certifying organizations (ESCO Institute and Mainstream Engineering). Graduates also complete OSHA 30 and additional industry credentials.',
+  highlights: ['Refrigeration theory and the refrigeration cycle', 'Electrical fundamentals for HVAC', 'System installation and startup', 'Troubleshooting and diagnostics', 'EPA 608 Universal exam prep + on-site proctored exam', 'OSHA 30-Hour Construction Safety'],
   overviewImage: '/images/programs-fresh/hvac.jpg', overviewImageAlt: 'HVAC technician servicing an air conditioning unit',
   salaryNumber: 52000, salaryLabel: 'Average annual salary for HVAC technicians in Indiana (BLS)', salaryPrefix: '$',
   curriculum: [
@@ -54,7 +54,7 @@ const config: ProgramPageConfig = {
     { title: 'Troubleshooting', topics: ['Systematic diagnosis', 'Electrical testing', 'Refrigerant leak detection', 'Airflow measurement', 'Customer communication'] },
     { title: 'Certifications', topics: ['EPA 608 Universal exam', 'OSHA 30-Hour certification', 'CPR/First Aid', 'Rise Up certification', 'Career placement support'] },
   ],
-  credentials: ['EPA 608 Universal (Mainstream Engineering, proctored on-site)', 'OSHA 30-Hour Construction Safety (DOL card)', 'Residential HVAC Certification 1 & 2', 'CPR/First Aid (AHA/HSI issued)', 'Rise Up (NRF Foundation)'],
+  credentials: ['EPA 608 Universal (administered on-site via ESCO Institute or Mainstream Engineering)', 'OSHA 30-Hour Construction Safety (DOL card)', 'Residential HVAC Certification 1 & 2', 'CPR/First Aid (AHA/HSI issued)', 'Rise Up (NRF Foundation)'],
   careers: [
     { title: 'HVAC Technician', salary: '$42,000–$62,000' },
     { title: 'HVAC Installer', salary: '$38,000–$55,000' },
@@ -70,7 +70,7 @@ const config: ProgramPageConfig = {
   faqs: [
     { question: 'Do I need HVAC experience?', answer: 'No. This program starts from the basics. You will learn refrigeration theory, electrical fundamentals, and hands-on skills from scratch.' },
     { question: 'Is this program free?', answer: 'Yes, for eligible participants. WIOA funding covers tuition, tools, and certification fees. If you do not qualify, payment plans are available.' },
-    { question: 'What is EPA 608?', answer: 'EPA 608 is a federal certification required for anyone who handles refrigerants. The Universal level covers all equipment types. It is required by law for HVAC technicians. We proctor the exam on-site using the Mainstream Engineering QwikTest system.' },
+    { question: 'What is EPA 608?', answer: 'EPA Section 608 is a federal certification required by law for anyone who handles refrigerants. The Universal level covers all equipment types. Elevate administers the proctored exam on-site through EPA-approved certifying organizations (ESCO Institute and Mainstream Engineering). Certification is issued by the certifying organization, not by Elevate. Retest policies vary by provider.' },
   ],
   applyHref: '/apply?program=hvac-technician',
   breadcrumbs: [{ label: 'Programs', href: '/programs' }, { label: 'Skilled Trades', href: '/programs/skilled-trades' }, { label: 'HVAC Technician' }],
